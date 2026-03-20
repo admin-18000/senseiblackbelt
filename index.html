@@ -812,19 +812,7 @@ const BELTS = [
 // ═══════════════════════════════════════════════════════
 
 // ── BALL HANDLING ──────────────────────────────────────
-const VIDEOS = [
-  {url:'https://youtu.be/TnuT9lk7Fwk', title:'Ball Handling Drill #1'},
-  {url:'https://youtu.be/gIeDne-5mUE', title:'Ball Handling Drill #2'},
-  {url:'https://youtu.be/6cbf8nMskmE', title:'Ball Handling Drill #3'},
-  {url:'https://youtu.be/7nQoX6DHV5c', title:'Ball Handling Drill #4'},
-  {url:'https://youtu.be/rrfc2hyF-hE', title:'Ball Handling Drill #5'},
-  {url:'https://youtu.be/5WBIegdWthc', title:'Ball Handling Drill #6'},
-  {url:'https://youtu.be/m1gctvzz6nc', title:'Ball Handling Drill #7'},
-  {url:'https://youtu.be/tLthFdKJu9k', title:'Ball Handling Drill #8'},
-  {url:'https://youtu.be/BkMXA0Z8bLc', title:'Ball Handling Drill #9'},
-  {url:'https://youtu.be/ttwQywcjF6s', title:'Ball Handling Drill #10'},
-  // ← AJOUTE TES NOUVELLES VIDÉOS ICI
-];
+
 
 // ── SHOOTING ───────────────────────────────────────────
 // {url:'https://youtu.be/TON_URL', title:'Shooting Drill #1'},
@@ -906,33 +894,11 @@ function buildBelts() {
 }
 
 // ══ BUILD VIDEOS ══════════════════════════════════════
-function getYTId(url) {
-  const m = url.match(/(?:youtu\.be\/|v=)([A-Za-z0-9_-]{11})/);
+)/);
   return m ? m[1] : null;
 }
 
-function buildVideos() {
-  const grid = document.getElementById('vid-grid');
-  if (!grid) return;
-  VIDEOS.forEach((v, i) => {
-    const id = getYTId(v.url);
-    if (!id) return;
-    const card = document.createElement('div');
-    card.className = 'vid-card';
-    card.innerHTML = `
-      <a href="${v.url}" target="_blank" rel="noopener" style="text-decoration:none;display:block">
-        <div class="vid-thumb">
-          <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="${v.title}" loading="lazy">
-          <div class="vid-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-        </div>
-      </a>
-      <div class="vid-info">
-        <div class="vid-title">${v.title}</div>
-        <div class="vid-tag">🏀 Ball Handling · Sensei BlackBelt</div>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
+
 
 // ══ NOTATION DATA SCIENCE ══════════════════════════
 const scores = {maitrise: 0, symetrie: 0, creativite: 0};
@@ -1340,7 +1306,6 @@ if(localStorage.getItem('sensei_unlocked')==='1') document.body.classList.add('u
 
 window.addEventListener('load', () => {
   buildBelts();
-  buildVideos();
   buildBtns('btns-maitrise', 3, 'maitrise');
   buildBtns('btns-symetrie', 3, 'symetrie');
   buildBtns('btns-creativite', 4, 'creativite');
