@@ -11,7 +11,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SENSEI">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <script src="https://www.youtube.com/iframe_api"></script>
 <style>
 :root{
   --black:#080a0f;
@@ -775,81 +774,66 @@ const SECTION_VIDEOS = {
 // ══ DÉTECTION MOBILE ══
 function isMobile() { return window.innerWidth <= 768; }
 
-// ══ API YOUTUBE IFRAME PLAYER ══
-let ytApiReady = false;
-let ytPendingPlay = null;
-let ytActivePlayer = null; // Référence au player actif
+// ══ GESTION VIDÉO ACTIVE ══
+let activeCard = null;
 
-window.onYouTubeIframeAPIReady = function() {
-  ytApiReady = true;
-  if (ytPendingPlay) { ytPendingPlay(); ytPendingPlay = null; }
-};
-
-function stopActivePlayer() {
-  if (ytActivePlayer) {
-    try { 
-      ytActivePlayer.stopVideo();
-      ytActivePlayer.destroy();
-    } catch(e) {}
-    ytActivePlayer = null;
-  }
-  ytPendingPlay = null; // Annuler aussi toute lecture en attente
+function stopActive() {
+  if (!activeCard) return;
+  const v = activeCard._v;
+  activeCard.innerHTML = makeThumb(v, activeCard._ratio);
+  activeCard.onclick = () => playCard(activeCard, v);
+  activeCard = null;
 }
 
-function playYT(containerId, videoId, vertical) {
-  const ratio = vertical ? '177.77%' : '56.25%';
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  // Créer le div cible pour le player
-  container.innerHTML = `<div style="position:relative;padding-bottom:${ratio};height:0;background:#000;overflow:hidden;border-radius:12px"><div id="yt-${containerId}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div></div>`;
-
-  function doPlay() {
-    new YT.Player('yt-' + containerId, {
-      videoId: videoId,
-      playerVars: {
-        autoplay: 1,
-        playsinline: 1,
-        rel: 0,
-        modestbranding: 1,
-      },
-      events: {
-        onReady: e => e.target.playVideo(),
-      }
-    });
-  }
-
-  if (ytApiReady) {
-    doPlay();
-  } else {
-    ytPendingPlay = doPlay;
-  }
+function makeThumb(v, ratio) {
+  return `
+    <div class="card-thumb" style="position:relative;padding-bottom:${ratio};height:0;background:#000;overflow:hidden">
+      <img src="https://img.youtube.com/vi/${v.id}/maxresdefault.jpg"
+           style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none"
+           loading="lazy" alt="${v.title}"
+           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${v.id}/hqdefault.jpg'">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2)">
+        <div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);flex-shrink:0">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px"><polygon points="6,4 20,12 6,20"/></svg>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
 }
 
-// ══ URL EMBED YOUTUBE — desktop uniquement ══
+function playCard(card, v) {
+  stopActive(); // Arrêter la vidéo précédente
+  const ratio = v.vertical ? '177.77%' : '56.25%';
+  const src = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1';
+  card.innerHTML = `
+    <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
+      <iframe src="${src}"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+        allow="autoplay;fullscreen;accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+        allowfullscreen playsinline webkit-playsinline></iframe>
+    </div>
+    <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
+  card._v = v;
+  card._ratio = ratio;
+  activeCard = card;
+  card.onclick = stopActive; // Tap à nouveau = retour thumbnail
+}
+
+// ══ URL EMBED YOUTUBE — desktop ══
 function embedSrc(id) {
-  return 'https://www.youtube.com/embed/' + id
-    + '?autoplay=1'
-    + '&playsinline=1'
-    + '&rel=0'
-    + '&modestbranding=1'
-    + '&enablejsapi=1'
-    + '&origin=' + encodeURIComponent(location.origin || 'file://');
+  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1';
 }
 
-// ══ VIDEO MODAL INTELLIGENTE — desktop uniquement ══
+// ══ VIDEO MODAL — desktop uniquement ══
 function openVideoModal(id, title, vertical) {
   const modal   = document.getElementById('video-modal');
   const wrapper = document.getElementById('video-modal-wrapper');
   const iframe  = document.getElementById('video-modal-iframe');
   const inner   = document.getElementById('video-modal-inner');
-
   document.getElementById('video-modal-title').textContent = title;
-
   if (vertical) {
     const maxH = Math.min(window.innerHeight * 0.85, 720);
-    const w    = Math.round(maxH * 9 / 16);
-    inner.style.maxWidth = w + 'px';
+    inner.style.maxWidth = Math.round(maxH * 9/16) + 'px';
     wrapper.style.height = maxH + 'px';
     wrapper.style.aspectRatio = '';
   } else {
@@ -857,7 +841,6 @@ function openVideoModal(id, title, vertical) {
     wrapper.style.height = '';
     wrapper.style.aspectRatio = '16/9';
   }
-
   iframe.src = embedSrc(id);
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -869,7 +852,6 @@ function closeVideoModal() {
   document.body.style.overflow = '';
 }
 
-// Fermeture aussi avec Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
 
 // ══ BUILDER UNIVERSEL DE GRILLES VIDÉO ══
@@ -914,73 +896,21 @@ function buildVideoSection(sectionKey) {
 }
 
 function makeCard(v) {
-  const ratio         = v.vertical ? '177.77%' : '56.25%';
-  const thumbUrl      = `https://img.youtube.com/vi/${v.id}/maxresdefault.jpg`;
-  const thumbFallback = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
-  const uid           = 'yt-' + v.id + '-' + Math.random().toString(36).slice(2,6);
-
-  const card = document.createElement('div');
+  const ratio = v.vertical ? '177.77%' : '56.25%';
+  const card  = document.createElement('div');
   card.style.cssText = 'background:var(--dark2);border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:all .2s';
   card.onmouseenter = () => { if (!isMobile()) card.style.borderColor = 'rgba(245,197,24,.4)'; };
   card.onmouseleave = () => { if (!isMobile()) card.style.borderColor = 'var(--border)'; };
-
-  const thumbHTML = `
-    <div class="card-thumb" style="position:relative;padding-bottom:${ratio};height:0;background:#000;overflow:hidden">
-      <img src="${thumbUrl}"
-           style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none"
-           loading="lazy" alt="${v.title}"
-           onerror="this.onerror=null;this.src='${thumbFallback}'">
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2)">
-        <div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);flex-shrink:0">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px"><polygon points="6,4 20,12 6,20"/></svg>
-        </div>
-      </div>
-    </div>
-    <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-
-  card.innerHTML = thumbHTML;
-
-  function playInCard() {
-    stopActivePlayer(); // Arrêter toute vidéo en cours avant d'en lancer une nouvelle
-    card.innerHTML = `
-      <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
-        <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
-      </div>
-      <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-
-    function doPlay() {
-      ytActivePlayer = new YT.Player(uid, {
-        videoId: v.id,
-        playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-        events: { onReady: e => e.target.playVideo() }
-      });
-    }
-
-    // Toujours vérifier YT.Player directement — ytApiReady peut être désynchronisé
-    if (typeof YT !== 'undefined' && typeof YT.Player === 'function') {
-      doPlay();
-    } else {
-      ytPendingPlay = doPlay;
-    }
-
-    card.onclick = resetCard;
-  }
-
-  function resetCard() {
-    stopActivePlayer();
-    card.innerHTML = thumbHTML;
-    card.onclick = mainClick;
-  }
-
-  function mainClick() {
+  card._v     = v;
+  card._ratio = ratio;
+  card.innerHTML = makeThumb(v, ratio);
+  card.onclick = () => {
     if (isMobile()) {
-      playInCard();
+      playCard(card, v);
     } else {
       openVideoModal(v.id, v.title, v.vertical);
     }
-  }
-
-  card.onclick = mainClick;
+  };
   return card;
 }
 
@@ -1044,7 +974,7 @@ function showSection(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  stopActivePlayer(); // Arrêter toute vidéo en cours au changement de section
+  stopActive(); // Arrêter toute vidéo en cours au changement de section
   window.scrollTo(0,0);
 }
 
