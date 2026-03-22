@@ -887,25 +887,33 @@ function makeCard(v) {
 
   card.innerHTML = thumbHTML;
 
-  card.onclick = () => {
+  function playInCard() {
+    const ratio2 = v.vertical ? '177.77%' : '56.25%';
+    card.innerHTML = `
+      <div style="position:relative;padding-bottom:${ratio2};height:0;background:#000;overflow:hidden;border-radius:12px">
+        <iframe src="${embedSrc(v.id)}"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+          allow="autoplay;fullscreen;accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+          allowfullscreen playsinline webkit-playsinline></iframe>
+      </div>
+      <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
+    card.onclick = resetCard;
+  }
+
+  function resetCard() {
+    card.innerHTML = thumbHTML;
+    card.onclick = mainClick;
+  }
+
+  function mainClick() {
     if (isMobile()) {
-      // MOBILE : embed directement dans la card, 1 seul clic
-      const ratio2 = v.vertical ? '177.77%' : '56.25%';
-      card.innerHTML = `
-        <div style="position:relative;padding-bottom:${ratio2};height:0;background:#000;overflow:hidden;border-radius:12px">
-          <iframe src="${embedSrc(v.id)}"
-            style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
-            allow="autoplay;fullscreen;accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
-            allowfullscreen playsinline webkit-playsinline></iframe>
-        </div>
-        <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-      // Tap à nouveau pour revenir à la thumbnail
-      card.onclick = () => { card.innerHTML = thumbHTML; card.onclick = arguments.callee; };
+      playInCard();
     } else {
-      // DESKTOP : modale
       openVideoModal(v.id, v.title, v.vertical);
     }
-  };
+  }
+
+  card.onclick = mainClick;
 
   return card;
 }
