@@ -936,14 +936,20 @@ function makeCard(v) {
   function play() {
     if (!isMobile()) { openVideoModal(v.id, v.title, v.vertical); return; }
 
-    stopActive();
+    // 1. D'abord détruire l'ancien player silencieusement
+    if (ytActivePlayer) {
+      try { ytActivePlayer.destroy(); } catch(e) {}
+      ytActivePlayer = null;
+    }
 
+    // 2. Injecter le nouveau DOM immédiatement dans le même tick
     card.innerHTML = `
       <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
         <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
       </div>
       <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
 
+    // 3. Créer le nouveau player immédiatement après
     ytActivePlayer = new YT.Player(uid, {
       videoId: v.id,
       playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
