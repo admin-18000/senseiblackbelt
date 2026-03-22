@@ -787,10 +787,18 @@ window.onYouTubeIframeAPIReady = function() {
 };
 
 function stopActive() {
+  // Stopper la vidéo
   if (ytActivePlayer) {
-    try { ytActivePlayer.destroy(); } catch(e) {}
-    ytActivePlayer = null;
+    try { ytActivePlayer.stopVideo(); } catch(e) {}
   }
+  // Remettre le player dans son conteneur caché
+  const playerEl = document.getElementById('yt-global-player');
+  const container = document.getElementById('yt-global-container');
+  if (playerEl && container) {
+    playerEl.style.cssText = 'width:1px;height:1px';
+    container.appendChild(playerEl);
+  }
+  // Remettre la thumbnail
   if (ytActiveCard && ytActiveV && ytActiveRatio) {
     ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
     ytActiveCard.onclick = (function(card, v) {
@@ -934,9 +942,8 @@ function buildVideoSection(sectionKey) {
 
 function launchPlayer(card, v) {
   const ratio = v.vertical ? '177.77%' : '56.25%';
-  const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
 
-  // Remettre la thumbnail de la card précédente sans toucher au player
+  // Remettre la thumbnail de la card précédente
   if (ytActiveCard && ytActiveCard !== card) {
     ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
     ytActiveCard.onclick = (function(c, vid) {
@@ -947,31 +954,23 @@ function launchPlayer(card, v) {
     })(ytActiveCard, ytActiveV);
   }
 
-  // Injecter le DOM de la nouvelle card
+  // Préparer la card
   card.innerHTML = `
-    <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
-      <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
+    <div id="yt-slot" style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
 
-  if (ytActivePlayer && ytActiveCard === card) {
-    // Même card — juste recharger la vidéo
+  // Déplacer le player global dans la card et le dimensionner
+  const slot = card.querySelector('#yt-slot');
+  const playerEl = document.getElementById('yt-global-player');
+  if (playerEl && slot) {
+    playerEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none';
+    slot.appendChild(playerEl);
+  }
+
+  // Charger et jouer la vidéo sur le player existant — 1 seul tap iOS
+  if (ytActivePlayer && ytActivePlayer.loadVideoById) {
     ytActivePlayer.loadVideoById(v.id);
-  } else if (ytActivePlayer) {
-    // Card différente — réutiliser le player en le déplaçant dans le nouveau div
-    try { ytActivePlayer.destroy(); } catch(e) {}
-    ytActivePlayer = new YT.Player(uid, {
-      videoId: v.id,
-      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-      events: { onReady: e => e.target.playVideo() }
-    });
-  } else {
-    // Aucun player actif — créer
-    ytActivePlayer = new YT.Player(uid, {
-      videoId: v.id,
-      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-      events: { onReady: e => e.target.playVideo() }
-    });
   }
 
   ytActiveCard  = card;
@@ -1517,7 +1516,6 @@ if(localStorage.getItem('sensei_unlocked')==='1') document.body.classList.add('u
 
 window.addEventListener('load', () => {
   buildBelts();
-  // Toutes les sections vidéo via le système unifié
   Object.keys(SECTION_VIDEOS).forEach(key => buildVideoSection(key));
   buildBtns('btns-maitrise', 3, 'maitrise');
   buildBtns('btns-symetrie', 3, 'symetrie');
@@ -1527,6 +1525,34 @@ window.addEventListener('load', () => {
   buildVulga();
   buildIQ();
   buildCalendar();
+
+  // Créer le div conteneur global du player (caché)
+  const playerContainer = document.createElement('div');
+  playerContainer.id = 'yt-global-container';
+  playerContainer.style.cssText = 'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
+  const playerDiv = document.createElement('div');
+  playerDiv.id = 'yt-global-player';
+  playerContainer.appendChild(playerDiv);
+  document.body.appendChild(playerContainer);
+
+  // Initialiser le player global dès que l'API est prête
+  function initGlobalPlayer() {
+    ytActivePlayer = new YT.Player('yt-global-player', {
+      videoId: '',
+      playerVars: { autoplay: 0, playsinline: 1, rel: 0, modestbranding: 1 },
+      events: {}
+    });
+  }
+
+  if (typeof YT !== 'undefined' && YT.Player) {
+    initGlobalPlayer();
+  } else {
+    const orig = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function() {
+      if (orig) orig();
+      initGlobalPlayer();
+    };
+  }
 });
 </script>
 
