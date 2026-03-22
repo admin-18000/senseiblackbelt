@@ -1039,6 +1039,7 @@ function showSection(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  stopActivePlayer(); // Arrêter toute vidéo en cours au changement de section
   window.scrollTo(0,0);
 }
 
