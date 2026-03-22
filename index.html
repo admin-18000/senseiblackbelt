@@ -789,8 +789,17 @@ window.onYouTubeIframeAPIReady = function() {
 function stopActive() {
   if (ytActivePlayer) {
     try { ytActivePlayer.stopVideo(); } catch(e) {}
+    // On garde ytActivePlayer en vie — pas de destroy
   }
   if (ytActiveCard && ytActiveV && ytActiveRatio) {
+    // Récupérer l'iframe et la remettre dans un div caché hors DOM visible
+    try {
+      const iframe = ytActivePlayer.getIframe();
+      if (iframe) {
+        iframe.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+        document.body.appendChild(iframe);
+      }
+    } catch(e) {}
     ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
     ytActiveCard.onclick = (function(card, v) {
       return function() {
@@ -799,62 +808,9 @@ function stopActive() {
       };
     })(ytActiveCard, ytActiveV);
   }
-  ytActiveCard = null;
-  ytActiveV = null;
+  ytActiveCard  = null;
+  ytActiveV     = null;
   ytActiveRatio = null;
-  // NE PAS nullifier ytActivePlayer — on le réutilise au prochain tap
-}
-
-function launchPlayer(card, v) {
-  const ratio = v.vertical ? '177.77%' : '56.25%';
-  const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
-
-  // Remettre la thumbnail de la card précédente
-  if (ytActiveCard && ytActiveCard !== card) {
-    ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
-    ytActiveCard.onclick = (function(c, vid) {
-      return function() {
-        if (!isMobile()) { openVideoModal(vid.id, vid.title, vid.vertical); return; }
-        launchPlayer(c, vid);
-      };
-    })(ytActiveCard, ytActiveV);
-  }
-
-  // Injecter le div cible
-  card.innerHTML = `
-    <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
-      <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
-    </div>
-    <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-
-  if (ytActivePlayer) {
-    // Déplacer l'iframe du player existant dans le nouveau div
-    try {
-      const iframe = ytActivePlayer.getIframe();
-      const slot = document.getElementById(uid);
-      if (iframe && slot) {
-        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none';
-        slot.appendChild(iframe);
-        ytActivePlayer.loadVideoById(v.id);
-      } else {
-        ytActivePlayer.loadVideoById(v.id);
-      }
-    } catch(e) {
-      ytActivePlayer.loadVideoById(v.id);
-    }
-  } else {
-    // Premier tap — créer le player
-    ytActivePlayer = new YT.Player(uid, {
-      videoId: v.id,
-      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-      events: { onReady: e => e.target.playVideo() }
-    });
-  }
-
-  ytActiveCard  = card;
-  ytActiveV     = v;
-  ytActiveRatio = ratio;
-  card.onclick  = () => stopActive();
 }
 
 function makeThumb(v, ratio) {
@@ -984,7 +940,54 @@ function buildVideoSection(sectionKey) {
   items.forEach(v => grid.appendChild(makeCard(v)));
 }
 
+function launchPlayer(card, v) {
+  const ratio = v.vertical ? '177.77%' : '56.25%';
+  const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
 
+  // Remettre la thumbnail de la card précédente
+  if (ytActiveCard && ytActiveCard !== card) {
+    ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
+    ytActiveCard.onclick = (function(c, vid) {
+      return function() {
+        if (!isMobile()) { openVideoModal(vid.id, vid.title, vid.vertical); return; }
+        launchPlayer(c, vid);
+      };
+    })(ytActiveCard, ytActiveV);
+  }
+
+  if (ytActivePlayer) {
+    // Player existant — injecter le slot, déplacer l'iframe dedans, changer la vidéo
+    card.innerHTML = `
+      <div id="${uid}" style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden"></div>
+      <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
+
+    const slot   = document.getElementById(uid);
+    const iframe = ytActivePlayer.getIframe();
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none';
+    slot.appendChild(iframe);
+    ytActivePlayer.cueVideoById(v.id);
+    ytActivePlayer.playVideo();
+
+  } else {
+    // Premier tap — créer le player
+    card.innerHTML = `
+      <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
+        <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
+      </div>
+      <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
+
+    ytActivePlayer = new YT.Player(uid, {
+      videoId: v.id,
+      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
+      events: { onReady: e => e.target.playVideo() }
+    });
+  }
+
+  ytActiveCard  = card;
+  ytActiveV     = v;
+  ytActiveRatio = ratio;
+  card.onclick  = () => stopActive();
+}
 
 function makeCard(v) {
   const ratio = v.vertical ? '177.77%' : '56.25%';
