@@ -775,21 +775,12 @@ const SECTION_VIDEOS = {
 // ══ DÉTECTION MOBILE ══
 function isMobile() { return window.innerWidth <= 768; }
 
-// ══ API YOUTUBE IFRAME PLAYER ══
-let ytApiReady = false;
-let ytActivePlayer = null;
+// ══ MOBILE VIDEO — iframe.src uniquement (pas de YT.Player API) ══
 let ytActiveCard = null;
 let ytActiveV = null;
 let ytActiveRatio = null;
 
-window.onYouTubeIframeAPIReady = function() {
-  ytApiReady = true;
-};
-
 function stopActive() {
-  if (ytActivePlayer) {
-    try { ytActivePlayer.stopVideo(); } catch(e) {}
-  }
   if (ytActiveCard && ytActiveV && ytActiveRatio) {
     ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
     ytActiveCard.onclick = (function(card, v) {
@@ -933,7 +924,6 @@ function buildVideoSection(sectionKey) {
 
 function launchPlayer(card, v) {
   const ratio = v.vertical ? '177.77%' : '56.25%';
-  const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
 
   // Remettre la thumbnail de la card précédente
   if (ytActiveCard && ytActiveCard !== card) {
@@ -946,24 +936,18 @@ function launchPlayer(card, v) {
     })(ytActiveCard, ytActiveV);
   }
 
-  // Injecter le DOM
+  // Injecter l'iframe directement — src synchrone, iOS autorise l'autoplay
   card.innerHTML = `
     <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
-      <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
+      <iframe
+        src="${embedSrc(v.id)}"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+        allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        playsinline
+        webkit-playsinline></iframe>
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-
-  // Créer le player — dans le tap handler synchrone, iOS l'accepte
-  if (ytActivePlayer && ytActiveCard === card) {
-    ytActivePlayer.loadVideoById(v.id);
-  } else {
-    if (ytActivePlayer) { try { ytActivePlayer.stopVideo(); } catch(e) {} }
-    ytActivePlayer = new YT.Player(uid, {
-      videoId: v.id,
-      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-      events: { onReady: e => e.target.playVideo() }
-    });
-  }
 
   ytActiveCard  = card;
   ytActiveV     = v;
