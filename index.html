@@ -733,6 +733,7 @@ const SECTION_VIDEOS = {
   hec: [
     {id:'l5xJnrnOEvk', title:'Hand-Eye Drill #1', vertical:false},
     {id:'Em-ga58-bhY', title:'Hand-Eye Drill #2', vertical:false},
+    {id:'xV0XuRGHsxo', title:'Hand-Eye Drill #3', vertical:true},
     // ← AJOUTE TES NOUVELLES VIDÉOS ICI
   ],
   sc: [
@@ -761,6 +762,7 @@ const SECTION_VIDEOS = {
     // ← AJOUTE TES NOUVELLES VIDÉOS ICI
   ],
   rebounding: [
+    {id:'O2TDPnLiwOM', title:'Rebounding Drill #1', vertical:true},
     // ← AJOUTE TES NOUVELLES VIDÉOS ICI
   ],
   challenges: [
@@ -1711,14 +1713,10 @@ window.addEventListener('load', () => {
   © 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite
 </footer>
 <script>
-// Force hero video autoplay on iOS
 document.addEventListener('DOMContentLoaded', function() {
-  const hv = document.getElementById('hero-video');
-  if (hv) {
-    hv.play().catch(() => {});
-  }
+  var hv = document.getElementById('hero-video');
+  if (hv) { hv.play().catch(function(){}); }
 });
-
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-btn').style.display = 'inline-block'; });
 function installApp() { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(result => { if (result.outcome === 'accepted') document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; }); }
