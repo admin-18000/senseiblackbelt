@@ -1715,12 +1715,11 @@ window.addEventListener('load', () => {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var hv = document.getElementById('hero-video');
-  if (hv) { hv.play().catch(function(){}); }
+  if (hv) {
+    hv.muted = true;
+    hv.play().catch(function(){});
+  }
 });
-document.addEventListener('touchstart', function() {
-  var hv = document.getElementById('hero-video');
-  if (hv) hv.play().catch(function(){});
-}, { once: true });
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-btn').style.display = 'inline-block'; });
 function installApp() { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(result => { if (result.outcome === 'accepted') document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; }); }
