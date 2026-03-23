@@ -882,11 +882,11 @@ function launchPlayer(card, v) {
     })(ytActiveCard, ytActiveV);
   }
 
-  // Injecter iframe directement — src synchrone, iOS autorise l'autoplay au premier tap
+  // Injecter iframe sans src d'abord, puis setter src dans le même tick — iOS reconnaît le geste direct
   card.innerHTML = `
     <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
       <iframe
-        src="${embedSrc(v.id)}"
+        id="yt-iframe-active"
         style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
         allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
@@ -894,6 +894,10 @@ function launchPlayer(card, v) {
         webkit-playsinline></iframe>
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
+
+  // Setter src après injection — dans le même tick du tap
+  const ifi = card.querySelector('#yt-iframe-active');
+  ifi.src = embedSrc(v.id);
 
   ytActiveCard  = card;
   ytActiveV     = v;
