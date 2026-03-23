@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🥋🏀 SENSEI BlackBelt</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#f5c518">
@@ -10,8 +10,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SENSEI">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <script src="https://www.youtube.com/iframe_api"></script>
 <style>
 :root{
   --black:#080a0f;
@@ -48,7 +49,7 @@ body{font-family:var(--font);background:var(--black);color:var(--text);min-heigh
 ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:4px 12px;display:flex;align-items:center;gap:8px;min-height:56px;height:auto;flex-wrap:nowrap}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95);border-bottom:1px solid var(--border);padding:4px 12px;display:flex;align-items:center;gap:8px;min-height:56px;height:auto;flex-wrap:nowrap}
 .nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center;flex-wrap:wrap}
 .nav-admin{display:flex;align-items:center;gap:4px;flex-shrink:0;border-left:1px solid rgba(245,197,24,.3);padding-left:8px}
 .nav-sep{display:none}
@@ -252,9 +253,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .btn-submit:hover{background:var(--gold2)}
 .form-success{display:none;text-align:center;padding:20px;color:var(--green);font-family:var(--font-cond);font-size:14px;font-weight:700;letter-spacing:1px}
 
-@media(max-width:768px){.coach-wrap{grid-template-columns:1fr}.coach-img img{height:280px;object-position:center 20%}.coach-name{font-size:36px}}
-  .coach-name{font-size:36px}
-}
+@media(max-width:768px){.coach-wrap{grid-template-columns:1fr}.coach-img img{height:280px;object-position:center 20%}.coach-name{font-size:36px}}}
 /* ── NEUROSCIENCES ── */
 .neuro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .neuro-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .2s}
@@ -304,28 +303,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
   .g2{grid-template-columns:1fr}
   .section{padding:70px 14px 40px}
 }
-  .hamburger{display:flex}
-  .hero-title{font-size:clamp(52px,15vw,90px)}
-  .belts-grid{grid-template-columns:1fr}
-  .vid-grid{grid-template-columns:1fr}
-  .prog-track{gap:0}
-  .prog-line{width:14px}
-  .coach-wrap{grid-template-columns:1fr}
-  .coach-name{font-size:36px}
-  .time-slots{grid-template-columns:repeat(2,1fr)}
-  .section{padding:70px 14px 40px}
-}
-  .hamburger{display:flex}
-  .hero-title{font-size:clamp(52px,15vw,90px)}
-  .belts-grid{grid-template-columns:1fr}
-  .vid-grid{grid-template-columns:1fr}
-  .prog-track{gap:0}
-  .prog-line{width:14px}
-  .g2{grid-template-columns:1fr}
-  .krow{grid-template-columns:repeat(2,1fr)}
-  .notation-wrap{padding:18px}
-  .section{padding:70px 14px 40px}
-}
+
 
 /* ── COACH ── */
 .coach-wrap{display:grid;grid-template-columns:360px 1fr;gap:40px;align-items:start;max-width:1000px;margin:0 auto}
@@ -777,21 +755,12 @@ const SECTION_VIDEOS = {
 // ══ DÉTECTION MOBILE ══
 function isMobile() { return window.innerWidth <= 768; }
 
-// ══ API YOUTUBE IFRAME PLAYER ══
-let ytApiReady = false;
-let ytActivePlayer = null;
+// ══ MOBILE VIDEO — iframe.src (pas de YT.Player API) ══
 let ytActiveCard = null;
 let ytActiveV = null;
 let ytActiveRatio = null;
 
-window.onYouTubeIframeAPIReady = function() {
-  ytApiReady = true;
-};
-
 function stopActive() {
-  if (ytActivePlayer) {
-    try { ytActivePlayer.stopVideo(); } catch(e) {}
-  }
   if (ytActiveCard && ytActiveV && ytActiveRatio) {
     ytActiveCard.innerHTML = makeThumb(ytActiveV, ytActiveRatio);
     ytActiveCard.onclick = (function(card, v) {
@@ -857,40 +826,6 @@ function closeVideoModal() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
 
-// ══ URL EMBED YOUTUBE — desktop ══
-function embedSrc(id) {
-  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1&origin=https://senseiblackbelt.com';
-}
-
-// ══ VIDEO MODAL — desktop uniquement ══
-function openVideoModal(id, title, vertical) {
-  const modal   = document.getElementById('video-modal');
-  const wrapper = document.getElementById('video-modal-wrapper');
-  const iframe  = document.getElementById('video-modal-iframe');
-  const inner   = document.getElementById('video-modal-inner');
-  document.getElementById('video-modal-title').textContent = title;
-  if (vertical) {
-    const maxH = Math.min(window.innerHeight * 0.85, 720);
-    inner.style.maxWidth = Math.round(maxH * 9/16) + 'px';
-    wrapper.style.height = maxH + 'px';
-    wrapper.style.aspectRatio = '';
-  } else {
-    inner.style.maxWidth = '900px';
-    wrapper.style.height = '';
-    wrapper.style.aspectRatio = '16/9';
-  }
-  iframe.src = embedSrc(id);
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeVideoModal() {
-  document.getElementById('video-modal').style.display = 'none';
-  document.getElementById('video-modal-iframe').src = '';
-  document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
 
 // ══ BUILDER UNIVERSEL DE GRILLES VIDÉO ══
 function buildVideoSection(sectionKey) {
@@ -935,7 +870,6 @@ function buildVideoSection(sectionKey) {
 
 function launchPlayer(card, v) {
   const ratio = v.vertical ? '177.77%' : '56.25%';
-  const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
 
   // Remettre la thumbnail de la card précédente
   if (ytActiveCard && ytActiveCard !== card) {
@@ -948,24 +882,18 @@ function launchPlayer(card, v) {
     })(ytActiveCard, ytActiveV);
   }
 
-  // Injecter le DOM
+  // Injecter iframe directement — src synchrone, iOS autorise l'autoplay au premier tap
   card.innerHTML = `
     <div style="position:relative;padding-bottom:${ratio};height:0;background:#000;border-radius:12px;overflow:hidden">
-      <div id="${uid}" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
+      <iframe
+        src="${embedSrc(v.id)}"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+        allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        playsinline
+        webkit-playsinline></iframe>
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
-
-  // Créer le player — dans le tap handler synchrone, iOS l'accepte
-  if (ytActivePlayer && ytActiveCard === card) {
-    ytActivePlayer.loadVideoById(v.id);
-  } else {
-    if (ytActivePlayer) { try { ytActivePlayer.stopVideo(); } catch(e) {} }
-    ytActivePlayer = new YT.Player(uid, {
-      videoId: v.id,
-      playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
-      events: { onReady: e => e.target.playVideo() }
-    });
-  }
 
   ytActiveCard  = card;
   ytActiveV     = v;
@@ -1515,7 +1443,7 @@ window.addEventListener('load', () => {
     <div class="sec-line"></div>
     <div style="display:grid;grid-template-columns:260px 1fr;gap:36px;align-items:start">
       <div style="border-radius:16px;overflow:hidden;border:2px solid rgba(245,197,24,.3);box-shadow:0 0 40px rgba(245,197,24,.1)">
-        <img src="coach.jpg" alt="Sensei BlackBelt" style="width:100%;height:340px;object-fit:cover;object-position:center 30%;display:block">
+        <img src="coach.jpg" loading="lazy" alt="Sensei BlackBelt" style="width:100%;height:340px;object-fit:cover;object-position:center 30%;display:block">
       </div>
       <div>
         <div class="coach-tag">Coach · Scientifique · Innovateur</div>
@@ -1712,7 +1640,13 @@ window.addEventListener('load', () => {
 <footer style="text-align:center;padding:18px 20px;font-size:11px;color:#7b82a0;border-top:1px solid #1e2235;background:#0d1117;letter-spacing:.3px;font-family:'Barlow Condensed',sans-serif">
   © 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite
 </footer>
+<script src="https://www.youtube.com/iframe_api" defer></script>
 <script>
+// Hero video autoplay iOS
+document.addEventListener("DOMContentLoaded", function() {
+  var hv = document.getElementById("hero-video");
+  if (hv) { hv.muted = true; hv.play().catch(function(){}); }
+});
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-btn').style.display = 'inline-block'; });
 function installApp() { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(result => { if (result.outcome === 'accepted') document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; }); }
