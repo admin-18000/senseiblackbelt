@@ -1715,10 +1715,15 @@ window.addEventListener('load', () => {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var hv = document.getElementById('hero-video');
-  if (hv) {
-    hv.muted = true;
-    hv.play().catch(function(){});
-  }
+  if (!hv) return;
+  hv.muted = true;
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) {
+      hv.play().catch(function(){});
+      obs.disconnect();
+    }
+  }, { threshold: 0.1 });
+  obs.observe(hv);
 });
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-btn').style.display = 'inline-block'; });
