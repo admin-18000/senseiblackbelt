@@ -497,7 +497,7 @@ body.unlocked .sensei-only{display:revert !important}
     <div class="hero-title" style="font-size:clamp(60px,12vw,140px)">SEN<span>SEI</span></div>
     <div class="hero-sub" style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);font-weight:700">BLACK BELT</div>
     <div style="width:100%;max-width:420px;margin:0 auto 36px;border-radius:16px;overflow:hidden;border:2px solid rgba(245,197,24,.3);box-shadow:0 0 40px rgba(245,197,24,.2);animation:fadeUp .8s .35s ease both;position:relative">
-      <video id="hero-video" src="hero.mp4" autoplay muted loop playsinline preload="auto" style="width:100%;display:block;object-fit:cover;max-height:70vh"></video>
+      <video id="hero-video" src="hero.mp4" autoplay muted loop playsinline webkit-playsinline preload="auto" style="width:100%;display:block;object-fit:cover;max-height:70vh"></video>
       <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,.7));text-align:center">
         <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)">SENSEI BLACKBELT · BALL HANDLING</div>
       </div>
@@ -1713,18 +1713,6 @@ window.addEventListener('load', () => {
   © 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite
 </footer>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  var hv = document.getElementById('hero-video');
-  if (!hv) return;
-  hv.muted = true;
-  var obs = new IntersectionObserver(function(entries) {
-    if (entries[0].isIntersecting) {
-      hv.play().catch(function(){});
-      obs.disconnect();
-    }
-  }, { threshold: 0.1 });
-  obs.observe(hv);
-});
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-btn').style.display = 'inline-block'; });
 function installApp() { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(result => { if (result.outcome === 'accepted') document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; }); }
