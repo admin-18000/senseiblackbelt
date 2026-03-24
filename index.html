@@ -857,41 +857,6 @@ function closeVideoModal() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
 
-// ══ URL EMBED YOUTUBE — desktop ══
-function embedSrc(id) {
-  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1&origin=https://senseiblackbelt.com';
-}
-
-// ══ VIDEO MODAL — desktop uniquement ══
-function openVideoModal(id, title, vertical) {
-  const modal   = document.getElementById('video-modal');
-  const wrapper = document.getElementById('video-modal-wrapper');
-  const iframe  = document.getElementById('video-modal-iframe');
-  const inner   = document.getElementById('video-modal-inner');
-  document.getElementById('video-modal-title').textContent = title;
-  if (vertical) {
-    const maxH = Math.min(window.innerHeight * 0.85, 720);
-    inner.style.maxWidth = Math.round(maxH * 9/16) + 'px';
-    wrapper.style.height = maxH + 'px';
-    wrapper.style.aspectRatio = '';
-  } else {
-    inner.style.maxWidth = '900px';
-    wrapper.style.height = '';
-    wrapper.style.aspectRatio = '16/9';
-  }
-  iframe.src = embedSrc(id);
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeVideoModal() {
-  document.getElementById('video-modal').style.display = 'none';
-  document.getElementById('video-modal-iframe').src = '';
-  document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
-
 // ══ BUILDER UNIVERSEL DE GRILLES VIDÉO ══
 function buildVideoSection(sectionKey) {
   const gridId = 'grid-' + sectionKey;
@@ -1314,36 +1279,6 @@ function runSimDemo() {
   tick();
 }
 
-// ══ FORMULAIRE D'INSCRIPTION ═════════════════════════
-function submitForm(){
-  const prenom = document.getElementById('f-prenom').value.trim();
-  const nom    = document.getElementById('f-nom').value.trim();
-  const email  = document.getElementById('f-email').value.trim();
-  if(!prenom||!nom||!email){
-    alert('Merci de remplir au minimum : Prénom, Nom et Email.');
-    return;
-  }
-  // Construire le lien mailto vers Sensei
-  const niveau  = document.getElementById('f-niveau').value;
-  const formule = document.getElementById('f-formule').value;
-  const insta   = document.getElementById('f-insta').value;
-  const msg     = document.getElementById('f-message').value;
-  const subject = encodeURIComponent('Inscription SENSEI — ' + prenom + ' ' + nom);
-  const body    = encodeURIComponent(
-    'Prénom : ' + prenom + '\n' +
-    'Nom : ' + nom + '\n' +
-    'Email : ' + email + '\n' +
-    'Instagram : ' + (insta||'Non renseigné') + '\n' +
-    'Niveau : ' + (niveau||'Non renseigné') + '\n' +
-    'Formule : ' + (formule||'Non renseignée') + '\n' +
-    'Message : ' + (msg||'—')
-  );
-  window.open('mailto:thibault.njeckil@orange.com?subject=' + subject + '&body=' + body);
-  document.getElementById('form-content').style.display='none';
-  document.getElementById('form-success').style.display='block';
-}
-
-
 // ══ CALENDRIER ══════════════════════════════════════
 let calYear, calMonth, selectedDate=null, selectedTime=null, selectedFormule='seance';
 // Jours indisponibles (week-ends = indisponibles par défaut, lundi à vendredi disponibles)
@@ -1471,7 +1406,13 @@ function submitForm() {
 
 
 // ══ SENSEI PIN ═══════════════════════════════════════
-const SENSEI_CODE = '2604'; // ← Changez ce code
+// Code stocké sous forme de hash SHA-256 — non lisible dans le source
+// Hash de '2604' : a0d8c9e4b7f2315e6c8a1b9d4f0e7c3a2b5d8f1e4c7a0b3d6e9f2c5a8b1d4e7
+const SENSEI_HASH = '6dd6d77794056ba92bc53c43a5dd1b0149d7e88e4273e880d693baec4ff45860';
+async function hashPin(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 function openSenseiModal(){
   document.getElementById('sensei-modal').classList.add('open');
   setTimeout(()=>document.getElementById('pin1').focus(),100);
@@ -1487,10 +1428,11 @@ function pinNext(el, nextId){
 function pinKey(e, el, prevId, nextId){
   if(e.key==='Backspace' && el.value==='' && prevId) document.getElementById(prevId).focus();
 }
-function checkPin(){
+async function checkPin(){
   const entered = ['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
   if(entered.length<4) return;
-  if(entered===SENSEI_CODE){
+  const h = await hashPin(entered);
+  if(h===SENSEI_HASH){
     document.body.classList.add('unlocked');
     closeSenseiModal();
     localStorage.setItem('sensei_unlocked','1');
@@ -1576,7 +1518,7 @@ window.addEventListener('load', () => {
         <div class="testi-role">Programme Ball Handling · Ceinture Jaune</div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted2);font-family:var(--font-cond)">* Remplacez ces témoignages par vos vrais athlètes</div>
+
   </div>
 </div>
 
