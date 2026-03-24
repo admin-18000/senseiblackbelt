@@ -99,6 +99,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 @keyframes vidScroll { 0%{transform:translateY(0)} 100%{transform:translateY(-60%)} }
 @keyframes drawLine { from{stroke-dashoffset:2000} to{stroke-dashoffset:0} }
 @keyframes dotPop { 0%{transform:scale(0)} 60%{transform:scale(1.4)} 100%{transform:scale(1)} }
+@keyframes scoreCount { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes elitePop { 0%{opacity:0;transform:scale(0) translateX(8px)} 60%{transform:scale(1.2) translateX(0)} 100%{opacity:1;transform:scale(1) translateX(0)} }
+@keyframes fillBar { from{width:0} to{width:95%} }
+@keyframes rowReveal { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+@keyframes beltGlow { 0%,100%{box-shadow:0 0 0 0 rgba(193,18,31,0)} 50%{box-shadow:0 0 18px 4px rgba(193,18,31,.5)} }
+@keyframes silhouetteIn { from{opacity:0;transform:translateY(10px) scale(.9)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes beltTie { 0%{stroke-dashoffset:120} 100%{stroke-dashoffset:0} }
 
 
 .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .4s ease both}
@@ -560,16 +567,16 @@ body.unlocked .sensei-only{display:revert !important}
                   <path d="M0,118 L8,107 L16,98 L22,92 L30,85 L38,80 L44,76 L52,73 L58,71 L66,68 L72,67 L80,69 L86,70 L92,68 L100,66 L106,67 L112,68 L118,66 L124,64 L130,60 L136,55 L142,49 L148,44 L154,40 L160,37 L166,35 L172,33 L178,31 L182,29"
                     fill="none" stroke="#f5c518" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
                     stroke-dasharray="2000" stroke-dashoffset="2000"
-                    style="animation:drawLine 3s ease forwards .5s"/>
-                  <circle cx="0"   cy="118" r="3.5" fill="#f8f9fa" style="animation:dotPop .3s ease both 1s"/>
-                  <circle cx="30"  cy="85"  r="3.5" fill="#ffd60a" style="animation:dotPop .3s ease both 1.3s"/>
-                  <circle cx="58"  cy="71"  r="3.5" fill="#ff6d00" style="animation:dotPop .3s ease both 1.6s"/>
-                  <circle cx="80"  cy="69"  r="3.5" fill="#2dc653" style="animation:dotPop .3s ease both 1.9s"/>
-                  <circle cx="106" cy="67"  r="3.5" fill="#0077b6" style="animation:dotPop .3s ease both 2.2s"/>
-                  <circle cx="124" cy="64"  r="4.5" fill="#7b2d8b" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .3s ease both 2.5s"/>
-                  <circle cx="142" cy="49"  r="3.5" fill="#8b4513" style="animation:dotPop .3s ease both 2.8s"/>
-                  <circle cx="160" cy="37"  r="3.5" fill="#e0e0e0" style="animation:dotPop .3s ease both 3.1s"/>
-                  <circle cx="182" cy="29"  r="4.5" fill="#c1121f" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .3s ease both 3.4s"/>
+                    style="animation:drawLine 5s ease forwards 0.5s"/>
+                  <circle cx="0"   cy="118" r="3.5" fill="#f8f9fa" style="animation:dotPop .4s ease both 1s"/>
+                  <circle cx="30"  cy="85"  r="3.5" fill="#ffd60a" style="animation:dotPop .4s ease both 1.8s"/>
+                  <circle cx="58"  cy="71"  r="3.5" fill="#ff6d00" style="animation:dotPop .4s ease both 2.5s"/>
+                  <circle cx="80"  cy="69"  r="3.5" fill="#2dc653" style="animation:dotPop .4s ease both 3.1s"/>
+                  <circle cx="106" cy="67"  r="3.5" fill="#0077b6" style="animation:dotPop .4s ease both 3.7s"/>
+                  <circle cx="124" cy="64"  r="4.5" fill="#7b2d8b" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .4s ease both 4.2s"/>
+                  <circle cx="142" cy="49"  r="3.5" fill="#8b4513" style="animation:dotPop .4s ease both 4.6s"/>
+                  <circle cx="160" cy="37"  r="4"   fill="#1a1a1a" stroke="rgba(255,255,255,.6)" stroke-width="1.5" style="animation:dotPop .4s ease both 5s"/>
+                  <circle cx="182" cy="29"  r="4.5" fill="#c1121f" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .4s ease both 5.5s"/>
                   <line x1="106" y1="67" x2="124" y2="64" stroke="rgba(123,45,139,.35)" stroke-width="3.5" stroke-linecap="round"/>
                   <text x="114" y="58" fill="#7b2d8b" font-size="5.5" font-family="sans-serif" font-weight="700" text-anchor="middle">PLATEAU 8 MOIS</text>
                 </svg>
@@ -589,40 +596,47 @@ body.unlocked .sensei-only{display:revert !important}
             <div style="margin:0 10px 10px;padding:7px 9px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.2);border-radius:6px">
               <div style="font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:2px">SCORE DATA SCIENCE</div>
               <div style="display:flex;align-items:baseline;gap:3px">
-                <span style="font-family:var(--font-display);font-size:24px;color:var(--text);letter-spacing:2px">9.2</span>
+                <span id="score-display" style="font-family:var(--font-display);font-size:24px;color:var(--text);letter-spacing:2px;opacity:0">0.0</span>
                 <span style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">/10</span>
-                <span style="margin-left:auto;font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--green-belt);background:rgba(45,198,83,.12);padding:2px 5px;border-radius:3px">ÉLITE</span>
+                <span id="elite-badge" style="margin-left:auto;font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--green-belt);background:rgba(45,198,83,.12);padding:2px 5px;border-radius:3px;opacity:0">ÉLITE</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PHONE DROIT — Ceinture rouge + scores -->
+        <!-- PHONE DROIT — Ceinture noire + scores animés + emoji 🥋 -->
         <div style="width:148px;flex-shrink:0;transform:rotate(5deg) translateY(12px);transform-origin:bottom center">
-          <div style="background:var(--dark2);border-radius:22px;border:2px solid rgba(193,18,31,.35);overflow:hidden">
+          <div style="background:var(--dark2);border-radius:22px;border:2px solid rgba(255,255,255,.2);overflow:hidden">
             <div style="background:var(--dark3);padding:8px 10px 7px;border-bottom:1px solid var(--border)">
-              <div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--red-belt);letter-spacing:1px">CEINTURE ACTUELLE</div>
+              <div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:#e0e0e0;letter-spacing:1px">CEINTURE ACTUELLE</div>
             </div>
-            <div style="padding:12px 10px 8px;text-align:center">
-              <div style="width:46px;height:46px;border-radius:50%;background:rgba(193,18,31,.15);border:2px solid var(--red-belt);display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:20px">🥋</div>
-              <div style="font-family:var(--font-display);font-size:20px;color:var(--red-belt);letter-spacing:2px;line-height:1">ROUGE</div>
-              <div style="font-family:var(--font-cond);font-size:7px;color:var(--muted);margin-bottom:8px">NIVEAU 9 · LÉGENDAIRE</div>
+            <div style="padding:10px 10px 6px;text-align:center">
+
+              <!-- Emoji 🥋 en grand -->
+              <div id="player-silhouette" style="opacity:0;animation:silhouetteIn .6s ease forwards 6s;margin-bottom:4px;font-size:52px;line-height:1">🥋</div>
+
+              <div id="belt-name" style="font-family:var(--font-display);font-size:20px;color:#e0e0e0;letter-spacing:2px;line-height:1;opacity:0;animation:rowReveal .5s ease forwards 6.3s">NOIRE</div>
+              <div id="belt-level" style="font-family:var(--font-cond);font-size:7px;color:var(--muted);margin-bottom:6px;opacity:0;animation:rowReveal .5s ease forwards 6.6s">NIVEAU 8 · ÉLITE</div>
+
+              <!-- Barre de progression animée -->
               <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px;overflow:hidden">
-                <div style="height:100%;width:95%;background:var(--red-belt);border-radius:2px"></div>
+                <div id="prog-bar-red" style="height:100%;width:0;background:#e0e0e0;border-radius:2px;animation:fillBar 1.2s ease forwards 6.2s"></div>
               </div>
             </div>
+
+            <!-- Scores qui apparaissent un par un -->
             <div style="padding:0 10px 10px;display:flex;flex-direction:column;gap:4px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px;opacity:0;animation:rowReveal .4s ease forwards 7s">
                 <span style="font-family:var(--font-cond);font-size:6px;font-weight:700;color:var(--muted)">MAÎTRISE</span>
-                <span style="font-family:var(--font-display);font-size:13px;color:var(--red-belt)">3/3</span>
+                <span style="font-family:var(--font-display);font-size:13px;color:#e0e0e0">3/3</span>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px;opacity:0;animation:rowReveal .4s ease forwards 7.5s">
                 <span style="font-family:var(--font-cond);font-size:6px;font-weight:700;color:var(--muted)">SYMÉTRIE</span>
-                <span style="font-family:var(--font-display);font-size:13px;color:var(--red-belt)">3/3</span>
+                <span style="font-family:var(--font-display);font-size:13px;color:#e0e0e0">3/3</span>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:4px;opacity:0;animation:rowReveal .4s ease forwards 8s">
                 <span style="font-family:var(--font-cond);font-size:6px;font-weight:700;color:var(--muted)">CRÉATIVITÉ</span>
-                <span style="font-family:var(--font-display);font-size:13px;color:var(--red-belt)">4/4</span>
+                <span style="font-family:var(--font-display);font-size:13px;color:#e0e0e0">4/4</span>
               </div>
             </div>
           </div>
@@ -1578,6 +1592,33 @@ window.addEventListener('load', () => {
       }
     });
   }
+
+  // ══ MOCKUPS : compteur score 0 → 9.2 à partir de 8.8s ══
+  setTimeout(() => {
+    const el = document.getElementById('score-display');
+    const badge = document.getElementById('elite-badge');
+    if (!el) return;
+    el.style.opacity = '1';
+    el.style.animation = 'scoreCount .4s ease both';
+    let current = 0;
+    const target = 9.2;
+    const duration = 1400;
+    const steps = 60;
+    const increment = target / steps;
+    const interval = duration / steps;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        current = target;
+        clearInterval(timer);
+        if (badge) {
+          badge.style.opacity = '1';
+          badge.style.animation = 'elitePop .5s ease both';
+        }
+      }
+      el.textContent = current.toFixed(1);
+    }, interval);
+  }, 5500);
 });
 </script>
 
