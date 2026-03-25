@@ -660,6 +660,17 @@ body.unlocked .sensei-only{display:revert !important}
             <button class="btn-primary" onclick="showSection('belts',document.querySelector('.nav-btn:nth-child(2)'))">Voir les ceintures</button>
             <a href="https://www.instagram.com/sensei_blackbelt/" target="_blank" class="btn-secondary">Rejoindre le programme</a>
           </div>
+
+          <!-- Einstein E=mc² — animation desktop -->
+          <div style="width:100%;max-width:280px;margin-top:20px;border-radius:10px;overflow:hidden;border:1px solid rgba(245,197,24,.15);position:relative;background:#080a0f">
+            <div style="padding:8px 12px;border-bottom:1px solid rgba(245,197,24,.1);display:flex;align-items:center;gap:8px">
+              <div style="font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--gold);letter-spacing:1px">E = mc²</div>
+              <div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Énergie · Basket · Einstein</div>
+            </div>
+            <div style="position:relative;height:140px">
+              <canvas id="einstein-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -997,7 +1008,7 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Chaque tir suit une trajectoire parabolique dictée par la physique. L'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.</div>
       <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-a" style="width:100%;height:100%"></canvas>
+        <canvas id="visu-a" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
       </div>
     </div>
 
@@ -1013,7 +1024,7 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C'est la base neurologique de la ceinture noire.</div>
       <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-b" style="width:100%;height:100%"></canvas>
+        <canvas id="visu-b" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
       </div>
     </div>
 
@@ -1029,7 +1040,7 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Chaque rebond du ballon illustre la conservation de l'énergie et la 3ème loi de Newton. L'énergie cinétique se transforme en potentielle puis revient — avec des pertes dues au sol.</div>
       <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-c" style="width:100%;height:100%"></canvas>
+        <canvas id="visu-c" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
       </div>
     </div>
 
@@ -1914,12 +1925,136 @@ window.addEventListener('load', () => {
 
 // ══ VISUALISATION SCIENTIFIQUE ══════════════════════════
 function initVisuSci() {
+  function resizeCanvas(canvas) {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width || canvas.offsetWidth;
+    canvas.height = rect.height || canvas.offsetHeight;
+  }
+
+  // ── Einstein E=mc² appliqué au basket ──
+  (function() {
+    const canvas = document.getElementById('einstein-canvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    resizeCanvas(canvas);
+    const w = canvas.width, h = canvas.height;
+
+    // Particules d'énergie
+    const particles = [];
+    for(let i=0; i<40; i++) {
+      particles.push({
+        x: w/2 + (Math.random()-.5)*20,
+        y: h/2 + (Math.random()-.5)*20,
+        vx: (Math.random()-.5)*3,
+        vy: (Math.random()-.5)*3,
+        r: Math.random()*2+1,
+        life: Math.random(),
+        speed: Math.random()*2+1,
+        hue: Math.random() > 0.5 ? 45 : 200
+      });
+    }
+
+    // Ballon central
+    let ballPulse = 0;
+    let equationAlpha = 0;
+    let equationPhase = 0;
+
+    const subTexts = [
+      'Énergie cinétique du ballon',
+      'Masse × vitesse² × constante',
+      'Chaque tir = énergie libérée',
+      'La science derrière le geste'
+    ];
+    let subIdx = 0;
+    setInterval(() => { subIdx = (subIdx+1) % subTexts.length; }, 2000);
+
+    function draw() {
+      ctx.clearRect(0,0,w,h);
+
+      // Fond radial subtil
+      const bg = ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,h*.8);
+      bg.addColorStop(0,'rgba(245,197,24,.04)');
+      bg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+
+      ballPulse += 0.04;
+      equationPhase += 0.02;
+
+      // Particules
+      for(let p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        p.life -= 0.008;
+        if(p.life <= 0 || p.x<0 || p.x>w || p.y<0 || p.y>h) {
+          p.x = w/2+(Math.random()-.5)*30;
+          p.y = h/2+(Math.random()-.5)*30;
+          p.vx = (Math.random()-.5)*p.speed*2;
+          p.vy = (Math.random()-.5)*p.speed*2;
+          p.life = 1;
+        }
+        const alpha = p.life * 0.7;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.hue === 45 ? `rgba(245,197,24,${alpha})` : `rgba(100,180,255,${alpha*0.6})`;
+        ctx.fill();
+      }
+
+      // Ballon central pulsant
+      const br = 18 + Math.sin(ballPulse)*2;
+      const grd = ctx.createRadialGradient(w/2-3,h/2-3,0,w/2,h/2,br);
+      grd.addColorStop(0,'#f5a623'); grd.addColorStop(1,'#c1510a');
+      ctx.beginPath(); ctx.arc(w/2,h/2,br,0,Math.PI*2);
+      ctx.fillStyle = grd; ctx.fill();
+      ctx.strokeStyle = `rgba(245,197,24,${0.4+Math.sin(ballPulse)*.3})`;
+      ctx.lineWidth = 2; ctx.stroke();
+      // Lignes ballon
+      ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.arc(w/2,h/2,br,0.2,Math.PI-0.2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(w/2-br,h/2); ctx.lineTo(w/2+br,h/2); ctx.stroke();
+
+      // Glow pulsant autour du ballon
+      const glow = ctx.createRadialGradient(w/2,h/2,br,w/2,h/2,br*3);
+      glow.addColorStop(0,`rgba(245,197,24,${0.15+Math.sin(ballPulse)*.1})`);
+      glow.addColorStop(1,'rgba(245,197,24,0)');
+      ctx.beginPath(); ctx.arc(w/2,h/2,br*3,0,Math.PI*2);
+      ctx.fillStyle = glow; ctx.fill();
+
+      // E=mc² animée
+      const eq_alpha = 0.5 + Math.sin(equationPhase)*0.3;
+      ctx.fillStyle = `rgba(245,197,24,${eq_alpha})`;
+      ctx.font = '900 22px Bebas Neue';
+      ctx.textAlign = 'center';
+      ctx.fillText('E = mc²', w/2, h*0.2);
+
+      // Flèches énergie
+      const arrows = [[1,0],[0,1],[-1,0],[0,-1],[0.7,0.7],[-0.7,0.7],[0.7,-0.7],[-0.7,-0.7]];
+      arrows.forEach((a,i) => {
+        const dist = 38 + Math.sin(ballPulse + i*0.8)*4;
+        const ax = w/2 + a[0]*dist, ay = h/2 + a[1]*dist;
+        const alpha2 = 0.2 + Math.sin(ballPulse + i*0.5)*0.15;
+        ctx.strokeStyle = `rgba(245,197,24,${alpha2})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(w/2 + a[0]*(br+4), h/2 + a[1]*(br+4));
+        ctx.lineTo(ax, ay);
+        ctx.stroke();
+      });
+
+      // Sous-texte rotatif
+      ctx.fillStyle = 'rgba(245,197,24,.35)';
+      ctx.font = '700 8px Barlow Condensed';
+      ctx.fillText(subTexts[subIdx], w/2, h*0.88);
+      ctx.textAlign = 'left';
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
   // ── A : Parabole du tir ──
   (function() {
     const canvas = document.getElementById('visu-a');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    function resize() { resizeCanvas(canvas); }
     resize();
     const g = 9.81;
     let angle = 45, v0 = 12, trail = [], phase = 0, drawT = 0, ballT = 0;
@@ -1982,7 +2117,7 @@ function initVisuSci() {
     const canvas = document.getElementById('visu-b');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    function resize() { resizeCanvas(canvas); }
     resize();
     const nodes=[];
     for(let i=0;i<28;i++) nodes.push({x:Math.random()*canvas.width*0.9+canvas.width*0.05,y:Math.random()*canvas.height*0.85+canvas.height*0.08,r:Math.random()*4+3,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,pulse:Math.random()*Math.PI*2,active:false,activeCooldown:0});
@@ -2011,7 +2146,7 @@ function initVisuSci() {
     const canvas = document.getElementById('visu-c');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    function resize() { resizeCanvas(canvas); }
     resize();
     const equations=[{text:'F = ma',vx:.5,vy:.3,size:18},{text:'v² = u² + 2as',vx:-.4,vy:.25,size:14},{text:'p = mv',vx:.3,vy:-.3,size:16},{text:'E = ½mv²',vx:-.3,vy:.4,size:15},{text:'θ = 45°',vx:.4,vy:-.2,size:16},{text:'Δx = v₀t + ½at²',vx:-.25,vy:.3,size:13},{text:'g = 9.81 m/s²',vx:.35,vy:-.35,size:14}];
     equations.forEach(eq=>{eq.x=Math.random()*canvas.width*.8+canvas.width*.1;eq.y=Math.random()*canvas.height*.7+canvas.height*.15;eq.opacity=Math.random()*.35+.1;eq.phase=Math.random()*Math.PI*2;});
