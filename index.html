@@ -1369,6 +1369,11 @@ function showSection(id, btn) {
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   window.scrollTo(0,0);
+  // Initialiser les animations canvas au premier affichage
+  if (id === 'visusci' && !window._visuSciInited) {
+    window._visuSciInited = true;
+    setTimeout(initVisuSci, 50);
+  }
 }
 
 // ══ BUILD BELTS ══════════════════════════════════════
@@ -1801,7 +1806,8 @@ window.addEventListener('load', () => {
   buildVulga();
   buildIQ();
   buildCalendar();
-  initVisuSci();
+  initEinstein();
+  // initVisuSci est appelé à la première ouverture de la section, pas au load
 
   // ══ MOCKUPS : charger les vraies thumbnails YouTube ══
   const ids = SECTION_VIDEOS.ballhandling;
@@ -1923,15 +1929,13 @@ window.addEventListener('load', () => {
   }
 });
 
-// ══ VISUALISATION SCIENTIFIQUE ══════════════════════════
-function initVisuSci() {
+// ══ EINSTEIN E=mc² — lancé au load (dans s-home) ══
+function initEinstein() {
   function resizeCanvas(canvas) {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width || canvas.offsetWidth;
     canvas.height = rect.height || canvas.offsetHeight;
   }
-
-  // ── Einstein E=mc² appliqué au basket ──
   (function() {
     const canvas = document.getElementById('einstein-canvas');
     if(!canvas) return;
@@ -2049,6 +2053,10 @@ function initVisuSci() {
     }
     draw();
   })();
+}
+
+// ══ VISUALISATION SCIENTIFIQUE — lancé à la 1ère ouverture de la rubrique ══
+function initVisuSci() {
   // ── A : Parabole du tir ──
   (function() {
     const canvas = document.getElementById('visu-a');
@@ -2168,61 +2176,8 @@ function initVisuSci() {
     }
     draw();
   })();
-    const g = 9.81;
-    let angle = 45, v0 = 12, trail = [], phase = 0, drawT = 0, ballT = 0;
-    function getTotalTime(a,v){ return (2*v*Math.sin(a*Math.PI/180))/g; }
-    let totalT = getTotalTime(angle,v0);
-    function getPos(t,a,v){
-      const rad=a*Math.PI/180, w=canvas.width, h=canvas.height;
-      const sx=w*0.1, sy=h*0.8, scale=w/14;
-      return {x: sx+v*Math.cos(rad)*t*scale*0.3, y: sy-(v*Math.sin(rad)*t-0.5*g*t*t)*scale*0.3};
-    }
-    function draw(){
-      const w=canvas.width, h=canvas.height;
-      ctx.clearRect(0,0,w,h);
-      ctx.strokeStyle='rgba(245,197,24,.04)'; ctx.lineWidth=1;
-      for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
-      for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
-      ctx.strokeStyle='rgba(245,197,24,.2)'; ctx.lineWidth=1; ctx.setLineDash([4,8]);
-      ctx.beginPath();ctx.moveTo(w*0.05,h*0.8);ctx.lineTo(w*0.95,h*0.8);ctx.stroke();
-      ctx.setLineDash([]);
-      if(trail.length>1){
-        const grad=ctx.createLinearGradient(trail[0].x,0,trail[trail.length-1].x,0);
-        grad.addColorStop(0,'rgba(245,197,24,0)');grad.addColorStop(0.5,'rgba(245,197,24,.08)');grad.addColorStop(1,'rgba(245,197,24,0)');
-        ctx.beginPath();ctx.moveTo(trail[0].x,h*0.8);
-        for(let p of trail) ctx.lineTo(p.x,p.y);
-        ctx.lineTo(trail[trail.length-1].x,h*0.8);ctx.fillStyle=grad;ctx.fill();
-        ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);
-        for(let p of trail) ctx.lineTo(p.x,p.y);
-        ctx.strokeStyle='#f5c518';ctx.lineWidth=2;ctx.stroke();
-        const mid=trail[Math.floor(trail.length/2)];
-        if(mid){ctx.fillStyle='rgba(245,197,24,.8)';ctx.font='700 10px Barlow Condensed';ctx.fillText('H max',mid.x-16,mid.y-10);ctx.beginPath();ctx.arc(mid.x,mid.y,3,0,Math.PI*2);ctx.fillStyle='#f5c518';ctx.fill();}
-      }
-      if(phase===0){
-        drawT+=totalT/120; if(drawT>=totalT){drawT=totalT;phase=1;ballT=0;trail=[];}
-        else{trail=[];for(let tt=0;tt<=drawT;tt+=totalT/80){const p=getPos(tt,angle,v0);if(p.y<=h*0.81)trail.push(p);}}
-      }
-      if(phase===1){
-        trail=[];for(let tt=0;tt<=totalT;tt+=totalT/80){const p=getPos(tt,angle,v0);if(p.y<=h*0.81)trail.push(p);}
-        ballT+=totalT/100; if(ballT>=totalT){phase=2;}
-        else{
-          const bp=getPos(ballT,angle,v0);
-          const grd=ctx.createRadialGradient(bp.x,bp.y,0,bp.x,bp.y,20);
-          grd.addColorStop(0,'rgba(245,197,24,.3)');grd.addColorStop(1,'rgba(245,197,24,0)');
-          ctx.beginPath();ctx.arc(bp.x,bp.y,20,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
-          ctx.beginPath();ctx.arc(bp.x,bp.y,10,0,Math.PI*2);ctx.fillStyle='#e8850a';ctx.fill();
-          ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5;ctx.stroke();
-        }
-      }
-      if(phase===2){setTimeout(()=>{trail=[];drawT=0;angle=[30,45,60][Math.floor(Math.random()*3)];totalT=getTotalTime(angle,v0);phase=0;},800);phase=-1;}
-      ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 12px Barlow Condensed';
-      ctx.fillText('y = x·tan(θ) − gx²/2v₀²cos²(θ)',w*0.5,h*0.15);
-      ctx.fillStyle='rgba(245,197,24,.3)';ctx.font='10px Barlow Condensed';
-      ctx.fillText('θ = '+angle+'°  |  v₀ = '+v0+' m/s  |  g = 9.81 m/s²',w*0.5,h*0.22);
-      requestAnimationFrame(draw);
-    }
-    draw();
-  })();
+}
+</script>
 
 <!-- ══ LE COACH ══ -->
 <div id="s-coach" class="section">
