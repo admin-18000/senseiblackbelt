@@ -689,6 +689,11 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
 
     <!-- ══ MOBILE : carousel ══ -->
+    <!-- ══ BANDEAU EINSTEIN — mobile uniquement ══ -->
+    <div class="mockup-mobile" style="position:relative;height:90px;overflow:hidden;background:#080a0f">
+      <canvas id="einstein-band" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+    </div>
+
     <div class="mockup-mobile" style="padding:28px 12px 24px;background:linear-gradient(rgba(0,0,0,0),var(--black) 60px)">
       <div style="text-align:center;margin-bottom:20px">
         <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;color:var(--gold);border:1px solid rgba(245,197,24,.3);padding:4px 16px;border-radius:20px;display:inline-block;margin-bottom:10px">L'APP EN ACTION</div>
@@ -1948,6 +1953,88 @@ function initEinstein() {
     canvas.width = rect.width || canvas.offsetWidth;
     canvas.height = rect.height || canvas.offsetHeight;
   }
+
+  // ── Bandeau Einstein mobile ──
+  (function() {
+    const canvas = document.getElementById('einstein-band');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    resizeCanvas(canvas);
+    const w = canvas.width, h = canvas.height;
+
+    const particles = [];
+    for(let i=0;i<60;i++) particles.push({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-.5)*1.2, vy: (Math.random()-.5)*.6,
+      r: Math.random()*1.5+.5, life: Math.random(),
+      hue: Math.random()>.5?45:200
+    });
+
+    const phrases = ['Énergie cinétique du ballon','Chaque tir = physique appliquée','La science derrière le geste','E = mc² · Le basket autrement'];
+    let pi=0, t=0;
+    setInterval(()=>pi=(pi+1)%phrases.length, 2000);
+
+    function draw() {
+      ctx.clearRect(0,0,w,h);
+      t+=.03;
+
+      // Fond dégradé
+      const bg=ctx.createLinearGradient(0,0,w,0);
+      bg.addColorStop(0,'rgba(0,0,0,0)');
+      bg.addColorStop(.5,'rgba(245,197,24,.04)');
+      bg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+      // Particules
+      for(let p of particles){
+        p.x+=p.vx; p.y+=p.vy; p.life-=.005;
+        if(p.life<=0||p.x<0||p.x>w||p.y<0||p.y>h){
+          p.x=Math.random()*w; p.y=Math.random()*h;
+          p.vx=(Math.random()-.5)*1.2; p.vy=(Math.random()-.5)*.6; p.life=1;
+        }
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.hue===45?`rgba(245,197,24,${p.life*.4})`:`rgba(100,180,255,${p.life*.2})`;
+        ctx.fill();
+      }
+
+      // Ballon centré
+      const bx=w/2, by=h/2, br=14+Math.sin(t)*2;
+      const glow=ctx.createRadialGradient(bx,by,br,bx,by,br*3);
+      glow.addColorStop(0,`rgba(245,197,24,${.15+Math.sin(t)*.08})`);
+      glow.addColorStop(1,'rgba(245,197,24,0)');
+      ctx.beginPath(); ctx.arc(bx,by,br*3,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+      const grd=ctx.createRadialGradient(bx-2,by-2,0,bx,by,br);
+      grd.addColorStop(0,'#f5a623'); grd.addColorStop(1,'#c1510a');
+      ctx.beginPath(); ctx.arc(bx,by,br,0,Math.PI*2); ctx.fillStyle=grd; ctx.fill();
+      ctx.strokeStyle=`rgba(245,197,24,${.4+Math.sin(t)*.2})`; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.strokeStyle='rgba(0,0,0,.4)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(bx,by,br,.2,Math.PI-.2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx-br,by); ctx.lineTo(bx+br,by); ctx.stroke();
+
+      // E=mc² à gauche
+      ctx.fillStyle=`rgba(245,197,24,${.7+Math.sin(t)*.2})`;
+      ctx.font='900 20px Bebas Neue'; ctx.textAlign='left';
+      ctx.fillText('E = mc²', 16, h/2+7);
+
+      // Phrase à droite
+      ctx.fillStyle=`rgba(245,197,24,${.55+Math.sin(t+1)*.15})`;
+      ctx.font='700 10px Barlow Condensed'; ctx.textAlign='right';
+      ctx.fillText(phrases[pi], w-16, h/2+7);
+      ctx.textAlign='left';
+
+      // Lignes bord haut/bas
+      const lx=ctx.createLinearGradient(0,0,w,0);
+      lx.addColorStop(0,'rgba(245,197,24,0)');
+      lx.addColorStop(.5,`rgba(245,197,24,${.2+Math.sin(t)*.08})`);
+      lx.addColorStop(1,'rgba(245,197,24,0)');
+      ctx.strokeStyle=lx; ctx.lineWidth=.5;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,h); ctx.lineTo(w,h); ctx.stroke();
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
   (function() {
     const canvas = document.getElementById('einstein-canvas');
     if(!canvas) return;
@@ -2056,9 +2143,9 @@ function initEinstein() {
       });
 
       // Sous-texte rotatif
-      ctx.fillStyle = 'rgba(245,197,24,.35)';
-      ctx.font = '700 8px Barlow Condensed';
-      ctx.fillText(subTexts[subIdx], w/2, h*0.88);
+      ctx.fillStyle = 'rgba(245,197,24,.75)';
+      ctx.font = '700 ' + Math.max(10, Math.round(w * 0.07)) + 'px Barlow Condensed';
+      ctx.fillText(subTexts[subIdx], w/2, h*0.9);
       ctx.textAlign = 'left';
 
       requestAnimationFrame(draw);
