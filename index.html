@@ -419,6 +419,7 @@ body.unlocked .sensei-only{display:revert !important}
     <button class="nav-btn" onclick="showSection('battle',this)">Battle Royal</button>
     <button class="nav-btn" onclick="showSection('vulga',this)">Science</button>
     <button class="nav-btn" onclick="showSection('neuro',this)">Neurosciences</button>
+    <button class="nav-btn" onclick="showSection('visusci',this)">Visualisation</button>
     <button class="nav-btn" onclick="showSection('coach',this)">Le Coach</button>
   </div>
   <div class="nav-admin">
@@ -451,6 +452,7 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('battle',null);closeMenu()">⚔️ Battle Royal</button>
   <button class="mm-btn" onclick="showSection('vulga',null);closeMenu()">📐 Vulgarisation Scientifique</button>
   <button class="mm-btn" onclick="showSection('neuro',null);closeMenu()">🧬 Neurosciences</button>
+  <button class="mm-btn" onclick="showSection('visusci',null);closeMenu()">🔬 Visualisation Scientifique</button>
 
   <button class="mm-btn" onclick="showSection('reserver',null);closeMenu()" style="color:var(--gold)">💳 Réserver une séance</button>
   <button class="mm-btn" onclick="showSection('coach',null);closeMenu()">🏆 Le Coach</button>
@@ -973,6 +975,64 @@ body.unlocked .sensei-only{display:revert !important}
     <div class="sec-sub">Intelligence du jeu · Lecture de terrain · Décision</div>
     <div class="sec-line"></div>
     <div class="iq-grid" id="iq-grid"></div>
+  </div>
+</div>
+
+<!-- ══ VISUALISATION SCIENTIFIQUE ══ -->
+<div id="s-visusci" class="section">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-title">VISUALISATION <span>SCIENTIFIQUE</span></div>
+    <div class="sec-sub">Physique · Neurosciences · Lois de Newton · Le basket autrement</div>
+    <div class="sec-line"></div>
+
+    <!-- Concept A -->
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:24px">🏀</div>
+        <div>
+          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)">LA PARABOLE DU TIR</div>
+          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div>
+        </div>
+        <div style="margin-left:auto;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--gold);padding:4px 10px;border-radius:12px;letter-spacing:1px">⚡ PHYSIQUE BALISTIQUE</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Chaque tir suit une trajectoire parabolique dictée par la physique. L'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.</div>
+      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
+        <canvas id="visu-a" style="width:100%;height:100%"></canvas>
+      </div>
+    </div>
+
+    <!-- Concept B -->
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:24px">🧠</div>
+        <div>
+          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)">PLASTICITÉ NEURONALE</div>
+          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">ΔW = η · δ · x &nbsp;(règle de Hebb)</div>
+        </div>
+        <div style="margin-left:auto;background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--purple-belt);padding:4px 10px;border-radius:12px;letter-spacing:1px">🧬 NEUROSCIENCES</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C'est la base neurologique de la ceinture noire.</div>
+      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
+        <canvas id="visu-b" style="width:100%;height:100%"></canvas>
+      </div>
+    </div>
+
+    <!-- Concept C -->
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:24px">⚡</div>
+        <div>
+          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)">LOIS DE NEWTON</div>
+          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">F = ma &nbsp;·&nbsp; v² = u² + 2as &nbsp;·&nbsp; p = mv</div>
+        </div>
+        <div style="margin-left:auto;background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--green-belt);padding:4px 10px;border-radius:12px;letter-spacing:1px">📐 MÉCANIQUE</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">Chaque rebond du ballon illustre la conservation de l'énergie et la 3ème loi de Newton. L'énergie cinétique se transforme en potentielle puis revient — avec des pertes dues au sol.</div>
+      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
+        <canvas id="visu-c" style="width:100%;height:100%"></canvas>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1730,6 +1790,7 @@ window.addEventListener('load', () => {
   buildVulga();
   buildIQ();
   buildCalendar();
+  initVisuSci();
 
   // ══ MOCKUPS : charger les vraies thumbnails YouTube ══
   const ids = SECTION_VIDEOS.ballhandling;
@@ -1850,6 +1911,138 @@ window.addEventListener('load', () => {
     }, {passive:true});
   }
 });
+
+// ══ VISUALISATION SCIENTIFIQUE ══════════════════════════
+function initVisuSci() {
+  // ── A : Parabole du tir ──
+  (function() {
+    const canvas = document.getElementById('visu-a');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    resize();
+    const g = 9.81;
+    let angle = 45, v0 = 12, trail = [], phase = 0, drawT = 0, ballT = 0;
+    function getTotalTime(a,v){ return (2*v*Math.sin(a*Math.PI/180))/g; }
+    let totalT = getTotalTime(angle,v0);
+    function getPos(t,a,v){
+      const rad=a*Math.PI/180, w=canvas.width, h=canvas.height;
+      const sx=w*0.1, sy=h*0.8, scale=w/14;
+      return {x: sx+v*Math.cos(rad)*t*scale*0.3, y: sy-(v*Math.sin(rad)*t-0.5*g*t*t)*scale*0.3};
+    }
+    function draw(){
+      const w=canvas.width, h=canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle='rgba(245,197,24,.04)'; ctx.lineWidth=1;
+      for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+      ctx.strokeStyle='rgba(245,197,24,.2)'; ctx.lineWidth=1; ctx.setLineDash([4,8]);
+      ctx.beginPath();ctx.moveTo(w*0.05,h*0.8);ctx.lineTo(w*0.95,h*0.8);ctx.stroke();
+      ctx.setLineDash([]);
+      if(trail.length>1){
+        const grad=ctx.createLinearGradient(trail[0].x,0,trail[trail.length-1].x,0);
+        grad.addColorStop(0,'rgba(245,197,24,0)');grad.addColorStop(0.5,'rgba(245,197,24,.08)');grad.addColorStop(1,'rgba(245,197,24,0)');
+        ctx.beginPath();ctx.moveTo(trail[0].x,h*0.8);
+        for(let p of trail) ctx.lineTo(p.x,p.y);
+        ctx.lineTo(trail[trail.length-1].x,h*0.8);ctx.fillStyle=grad;ctx.fill();
+        ctx.beginPath();ctx.moveTo(trail[0].x,trail[0].y);
+        for(let p of trail) ctx.lineTo(p.x,p.y);
+        ctx.strokeStyle='#f5c518';ctx.lineWidth=2;ctx.stroke();
+        const mid=trail[Math.floor(trail.length/2)];
+        if(mid){ctx.fillStyle='rgba(245,197,24,.8)';ctx.font='700 10px Barlow Condensed';ctx.fillText('H max',mid.x-16,mid.y-10);ctx.beginPath();ctx.arc(mid.x,mid.y,3,0,Math.PI*2);ctx.fillStyle='#f5c518';ctx.fill();}
+      }
+      if(phase===0){
+        drawT+=totalT/120; if(drawT>=totalT){drawT=totalT;phase=1;ballT=0;trail=[];}
+        else{trail=[];for(let tt=0;tt<=drawT;tt+=totalT/80){const p=getPos(tt,angle,v0);if(p.y<=h*0.81)trail.push(p);}}
+      }
+      if(phase===1){
+        trail=[];for(let tt=0;tt<=totalT;tt+=totalT/80){const p=getPos(tt,angle,v0);if(p.y<=h*0.81)trail.push(p);}
+        ballT+=totalT/100; if(ballT>=totalT){phase=2;}
+        else{
+          const bp=getPos(ballT,angle,v0);
+          const grd=ctx.createRadialGradient(bp.x,bp.y,0,bp.x,bp.y,20);
+          grd.addColorStop(0,'rgba(245,197,24,.3)');grd.addColorStop(1,'rgba(245,197,24,0)');
+          ctx.beginPath();ctx.arc(bp.x,bp.y,20,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+          ctx.beginPath();ctx.arc(bp.x,bp.y,10,0,Math.PI*2);ctx.fillStyle='#e8850a';ctx.fill();
+          ctx.strokeStyle='#f5c518';ctx.lineWidth=1.5;ctx.stroke();
+        }
+      }
+      if(phase===2){setTimeout(()=>{trail=[];drawT=0;angle=[30,45,60][Math.floor(Math.random()*3)];totalT=getTotalTime(angle,v0);phase=0;},800);phase=-1;}
+      ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 12px Barlow Condensed';
+      ctx.fillText('y = x·tan(θ) − gx²/2v₀²cos²(θ)',w*0.5,h*0.15);
+      ctx.fillStyle='rgba(245,197,24,.3)';ctx.font='10px Barlow Condensed';
+      ctx.fillText('θ = '+angle+'°  |  v₀ = '+v0+' m/s  |  g = 9.81 m/s²',w*0.5,h*0.22);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── B : Réseau neuronal ──
+  (function() {
+    const canvas = document.getElementById('visu-b');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    resize();
+    const nodes=[];
+    for(let i=0;i<28;i++) nodes.push({x:Math.random()*canvas.width*0.9+canvas.width*0.05,y:Math.random()*canvas.height*0.85+canvas.height*0.08,r:Math.random()*4+3,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,pulse:Math.random()*Math.PI*2,active:false,activeCooldown:0});
+    const labels=['RÉPÉTITION','SYNAPSE','MYÉLINE','PLASTICITÉ','MÉMOIRE','AUTOMATISME','RÉFLEXE','DOPAMINE'];
+    let labelIdx=0;
+    function triggerChain(){labelIdx=(labelIdx+1)%labels.length;const s=Math.floor(Math.random()*nodes.length);nodes[s].active=true;nodes[s].activeCooldown=60;}
+    triggerChain();setInterval(triggerChain,2200);
+    function draw(){
+      const w=canvas.width,h=canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle='rgba(245,197,24,.03)';ctx.lineWidth=1;
+      for(let x=0;x<w;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+      for(let n of nodes){n.x+=n.vx;n.y+=n.vy;if(n.x<20||n.x>w-20)n.vx*=-1;if(n.y<20||n.y>h-20)n.vy*=-1;n.pulse+=.05;if(n.activeCooldown>0)n.activeCooldown--;else n.active=false;}
+      for(let i=0;i<nodes.length;i++){for(let j=i+1;j<nodes.length;j++){const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<120){const alpha=(1-dist/120)*.15,isActive=nodes[i].active||nodes[j].active;ctx.strokeStyle=isActive?`rgba(245,197,24,${alpha*4})`:`rgba(245,197,24,${alpha})`;ctx.lineWidth=isActive?1.5:.5;ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();if(nodes[i].active&&!nodes[j].active&&dist<80&&Math.random()<.02){nodes[j].active=true;nodes[j].activeCooldown=45;}}}}
+      for(let n of nodes){const pulse=Math.sin(n.pulse)*.3+.7,r=n.r*(n.active?1.8:1)*pulse;if(n.active){const grd=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*4);grd.addColorStop(0,'rgba(245,197,24,.4)');grd.addColorStop(1,'rgba(245,197,24,0)');ctx.beginPath();ctx.arc(n.x,n.y,r*4,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();}ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);ctx.fillStyle=n.active?'#f5c518':'rgba(245,197,24,.4)';ctx.fill();}
+      ctx.fillStyle='rgba(245,197,24,.06)';ctx.font='900 40px Bebas Neue';ctx.textAlign='center';ctx.fillText(labels[labelIdx],w/2,h/2+14);ctx.textAlign='left';
+      ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 11px Barlow Condensed';ctx.fillText('ΔW = η · δ · x    (règle de Hebb)',w*.05,h*.92);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── C : Newton + ballon ──
+  (function() {
+    const canvas = document.getElementById('visu-c');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+    resize();
+    const equations=[{text:'F = ma',vx:.5,vy:.3,size:18},{text:'v² = u² + 2as',vx:-.4,vy:.25,size:14},{text:'p = mv',vx:.3,vy:-.3,size:16},{text:'E = ½mv²',vx:-.3,vy:.4,size:15},{text:'θ = 45°',vx:.4,vy:-.2,size:16},{text:'Δx = v₀t + ½at²',vx:-.25,vy:.3,size:13},{text:'g = 9.81 m/s²',vx:.35,vy:-.35,size:14}];
+    equations.forEach(eq=>{eq.x=Math.random()*canvas.width*.8+canvas.width*.1;eq.y=Math.random()*canvas.height*.7+canvas.height*.15;eq.opacity=Math.random()*.35+.1;eq.phase=Math.random()*Math.PI*2;});
+    let bx=canvas.width*.5,by=canvas.height*.3,bvx=2.2,bvy=0;
+    const bg=0.18; let trail=[];
+    function draw(){
+      const w=canvas.width,h=canvas.height,floor=h*.82;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle='rgba(245,197,24,.03)';ctx.lineWidth=1;
+      for(let x=0;x<w;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+      ctx.strokeStyle='rgba(245,197,24,.15)';ctx.setLineDash([4,8]);
+      ctx.beginPath();ctx.moveTo(w*.05,floor);ctx.lineTo(w*.95,floor);ctx.stroke();ctx.setLineDash([]);
+      bvy+=bg;bx+=bvx;by+=bvy;
+      if(by>=floor){by=floor;bvy*=-.72;bvx*=.98;ctx.strokeStyle='rgba(245,197,24,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,by-40);ctx.stroke();ctx.strokeStyle='#f5c518';ctx.beginPath();ctx.moveTo(bx-5,by-30);ctx.lineTo(bx,by-42);ctx.lineTo(bx+5,by-30);ctx.stroke();}
+      if(bx>w*.9){bvx*=-1;bx=w*.9;}if(bx<w*.1){bvx*=-1;bx=w*.1;}
+      if(Math.abs(bvy)<.5&&by>=floor-1){bvy=-8;bvx=(Math.random()-.5)*4+2;trail=[];}
+      trail.push({x:bx,y:by});if(trail.length>30)trail.shift();
+      for(let i=1;i<trail.length;i++){const alpha=i/trail.length*.4;ctx.strokeStyle=`rgba(245,197,24,${alpha})`;ctx.lineWidth=i/trail.length*3;ctx.beginPath();ctx.moveTo(trail[i-1].x,trail[i-1].y);ctx.lineTo(trail[i].x,trail[i].y);ctx.stroke();}
+      const grd=ctx.createRadialGradient(bx-2,by-2,0,bx,by,14);grd.addColorStop(0,'#f5a623');grd.addColorStop(1,'#c1510a');
+      ctx.beginPath();ctx.arc(bx,by,14,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();ctx.strokeStyle='rgba(245,197,24,.4)';ctx.lineWidth=1.5;ctx.stroke();
+      const speed=Math.sqrt(bvx*bvx+bvy*bvy);
+      if(speed>1){ctx.strokeStyle='rgba(45,198,83,.7)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bvx*8,by+bvy*8);ctx.stroke();ctx.fillStyle='rgba(45,198,83,.8)';ctx.font='700 9px Barlow Condensed';ctx.fillText('v='+speed.toFixed(1),bx+bvx*8+4,by+bvy*8);}
+      equations.forEach(eq=>{eq.x+=eq.vx;eq.y+=eq.vy;eq.phase+=.02;if(eq.x<0||eq.x>w)eq.vx*=-1;if(eq.y<h*.05||eq.y>h*.88)eq.vy*=-1;const pulse=Math.sin(eq.phase)*.15+eq.opacity;ctx.fillStyle=`rgba(245,197,24,${pulse})`;ctx.font=`700 ${eq.size}px Barlow Condensed`;ctx.fillText(eq.text,eq.x,eq.y);});
+      ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 11px Barlow Condensed';ctx.fillText('3ème loi de Newton — Action = Réaction',w*.05,h*.92);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+}
+
 </script>
 
 <!-- ══ LE COACH ══ -->
