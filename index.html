@@ -392,6 +392,9 @@ body.unlocked .sensei-only{display:revert !important}
 .sensei-pin-err{font-size:11px;color:var(--red);font-family:var(--font-cond);height:16px;margin-bottom:8px}
 .sensei-close{font-size:11px;color:var(--muted);font-family:var(--font-cond);cursor:pointer;text-decoration:underline}
 
+<style>
+.combo-layout { grid-template-columns: 1fr 1fr; }
+@media(max-width:768px){ .combo-layout{ grid-template-columns:1fr !important } }
 </style>
 </head>
 <body>
@@ -423,6 +426,9 @@ body.unlocked .sensei-only{display:revert !important}
     <button class="nav-btn" onclick="showSection('profil',this)">🏅 Mon Profil</button>
     <button class="nav-btn" onclick="showSection('minijeux',this)">🎮 Mini-Jeux</button>
     <button class="nav-btn" onclick="showSection('stats',this)">📈 Mes Stats</button>
+    <button class="nav-btn" onclick="showSection('piliers',this)">🏆 7 Piliers</button>
+    <button class="nav-btn" onclick="showSection('eco',this)">🌿 Eco Dynamics</button>
+    <button class="nav-btn" onclick="showSection('network',this)">🌍 Network</button>
     <button class="nav-btn" onclick="showSection('coach',this)">Le Coach</button>
   </div>
   <div class="nav-admin">
@@ -461,6 +467,9 @@ body.unlocked .sensei-only{display:revert !important}
 
   <button class="mm-btn" onclick="showSection('reserver',null);closeMenu()" style="color:var(--gold)">💳 Réserver une séance</button>
   <button class="mm-btn" onclick="showSection('stats',null);closeMenu()">📈 Mes Stats</button>
+  <button class="mm-btn" onclick="showSection('piliers',null);closeMenu()">🏆 7 Piliers</button>
+  <button class="mm-btn" onclick="showSection('eco',null);closeMenu()">🌿 Eco Dynamics</button>
+  <button class="mm-btn" onclick="showSection('network',null);closeMenu()">🌍 Network</button>
   <button class="mm-btn" onclick="showSection('coach',null);closeMenu()">🏆 Le Coach</button>
   <button class="mm-btn" onclick="showSection('testi',null);closeMenu()">⭐ Avis</button>
   <button class="mm-btn sensei-only" onclick="showSection('masters',null);closeMenu()" style="color:var(--gold)">🔒 Masters Only</button>
@@ -1087,6 +1096,7 @@ body.unlocked .sensei-only{display:revert !important}
     <button onclick="openProgTab('bh',this)" class="prog-tab active-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 18px;border-radius:6px;border:1px solid rgba(123,45,139,.5);background:rgba(123,45,139,.15);color:var(--purple-belt);cursor:pointer">🥋 Black Belt Ball-Handling</button>
     <button onclick="openProgTab('bp',this)" class="prog-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">💪 Bench Press Program (PDF)</button>
     <button onclick="openProgTab('xl',this)" class="prog-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📊 Bench Press Calculator (Excel)</button>
+    <button onclick="openProgTab('load',this)" class="prog-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">⚡ Simulateur de charge</button>
   </div>
 
   <!-- ══ TAB 1 : Black Belt Ball-Handling PDF ══ -->
@@ -1300,6 +1310,41 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
   </div>
 
+
+  <!-- ══ TAB SIMULATEUR CHARGE (#21) ══ -->
+  <div id="prog-load" class="prog-panel" style="display:none">
+    <div style="max-width:700px;margin:0 auto">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">⚡ Simulateur de charge neuromotrice</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:24px">Basé sur Schöllhorn et al. (2025) : un excès de charge neuromotrice peut interférer avec les patterns moteurs automatisés. Zone optimale : <strong style="color:var(--text)">6–12 unités / semaine.</strong></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;margin-bottom:24px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">🏀 Séances Basket / sem.</label>
+            <input id="load-basket" type="number" min="0" max="14" step="0.5" value="3" oninput="computeLoad()"
+              style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:var(--font-cond);font-size:20px;font-weight:700;outline:none;text-align:center">
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted);text-align:center;margin-top:3px">coefficient ×1.0</div>
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">🏋️ Séances Muscu / sem.</label>
+            <input id="load-muscu" type="number" min="0" max="14" step="0.5" value="2" oninput="computeLoad()"
+              style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:var(--font-cond);font-size:20px;font-weight:700;outline:none;text-align:center">
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted);text-align:center;margin-top:3px">coefficient ×0.5</div>
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">🥋 Sessions Drills / sem.</label>
+            <input id="load-drills" type="number" min="0" max="14" step="0.5" value="3" oninput="computeLoad()"
+              style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:var(--font-cond);font-size:20px;font-weight:700;outline:none;text-align:center">
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted);text-align:center;margin-top:3px">coefficient ×0.8</div>
+          </div>
+        </div>
+        <div id="load-result" style="display:none"></div>
+      </div>
+      <div style="padding:14px 18px;background:rgba(245,197,24,.05);border:1px solid rgba(245,197,24,.15);border-radius:8px;font-size:11px;color:var(--muted);font-family:var(--font-cond);line-height:1.6">
+        📚 Source : Schöllhorn W.I. et al. (2025). Differential basic resistive skills training in basketball players. J. Funct. Morphol. Kinesiol. · Basil P. (2025) SimpliFaster.
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -1316,6 +1361,7 @@ function openProgTab(id, btn) {
   btn.style.background = 'rgba(245,197,24,.1)';
   btn.style.color = 'var(--gold)';
   btn.style.borderColor = 'rgba(245,197,24,.4)';
+  if (id === 'load') { requestAnimationFrame(computeLoad); }
 }
 
 // ══ CALCULATEUR BENCH PRESS ══
@@ -2198,6 +2244,7 @@ function shuffleArray(arr) {
     <button onclick="openProfilTab('journal',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📓 Journal</button>
     <button onclick="openProfilTab('certif',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🎖️ Certificat</button>
     <button onclick="openProfilTab('export',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📤 Export</button>
+    <button onclick="openProfilTab('combo',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🏋️ Ma Séance</button>
   </div>
 
   <!-- ══ TAB 1 : MA CEINTURE ══ -->
@@ -2403,6 +2450,40 @@ function shuffleArray(arr) {
   </div>
 
 </div><!-- /max-width -->
+
+  <!-- ══ TAB COMBO (#18) ══ -->
+  <div id="pr-combo" class="pr-panel" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start" class="combo-layout">
+      <!-- Bibliothèque -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Bibliothèque de drills</div>
+        <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-bottom:14px">Clique pour ajouter à ta séance</div>
+        <div id="combo-bank" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <!-- Séance construite -->
+      <div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Ma séance</div>
+          <div id="combo-sequence"></div>
+        </div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:18px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="combo-total" style="font-family:var(--font-display);font-size:24px;color:var(--gold)">0s</div>
+              <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">DURÉE TOTALE</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="combo-cog" style="font-family:var(--font-display);font-size:24px;color:var(--purple-belt)">0 / 5</div>
+              <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">CHARGE COG. MOY.</div>
+            </div>
+          </div>
+          <div id="combo-advice" style="font-family:var(--font-cond);font-size:12px;color:var(--muted);padding:10px 14px;background:var(--dark3);border-radius:8px">Sélectionne des drills pour composer ta séance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /max-width -->
 </div><!-- /s-profil -->
 
 <style>
@@ -2438,6 +2519,7 @@ function openProfilTab(id, btn) {
     if (id==='tracker') trackerInit();
     if (id==='journal')  journalRender();
     if (id==='certif')   certPreview();
+    if (id==='combo')    buildCombo();
   });
 }
 
@@ -2797,6 +2879,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <button onclick="openStatsTab('chart',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📉 Control Chart</button>
     <button onclick="openStatsTab('dmaic',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">⚙️ DMAIC</button>
     <button onclick="openStatsTab('cpk',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📊 Indice Cpk</button>
+    <button onclick="openStatsTab('percentile',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🏅 Percentile</button>
   </div>
 
   <!-- ══ TAB 1 : RADAR CHART ══ -->
@@ -2952,6 +3035,20 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
 </div><!-- /max-width -->
+
+  <!-- ══ TAB PERCENTILE ══ -->
+  <div id="st-percentile" class="st-panel" style="display:none">
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Comparaison · Distribution Sensei</div>
+        <div style="font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--text)">MON <span style="color:var(--gold)">PERCENTILE</span></div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--font-cond);margin-top:4px">Basé sur tes sessions radar vs la distribution des élèves Sensei</div>
+      </div>
+      <div id="st-percentile-content"></div>
+    </div>
+  </div>
+
+</div><!-- /max-width -->
 </div><!-- /s-stats -->
 
 <style>
@@ -2972,6 +3069,7 @@ function openStatsTab(id, btn) {
   btn.style.background = 'rgba(245,197,24,.1)'; btn.style.color = 'var(--gold)'; btn.style.borderColor = 'rgba(245,197,24,.4)';
   if (id === 'chart') { setTimeout(chartDraw, 50); }
   if (id === 'cpk')   { cpkCompute(); }
+  if (id === 'percentile') { buildPercentile(); }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -3351,6 +3449,129 @@ document.addEventListener('DOMContentLoaded', () => {
   buildDMAIC();
 });
 </script>
+
+<!-- ══════════════════════════════════════════════════
+     🏆 7 PILIERS DU TRANSFERT EN MATCH
+     ══════════════════════════════════════════════════ -->
+<div id="s-piliers" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">7 PILIERS DU <span>TRANSFERT</span></div>
+  <div class="sec-sub">De l'entraînement à la performance en match · Sensei BlackBelt</div>
+  <div class="sec-line"></div>
+
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:28px">
+    <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.7">
+      Le Dribble à 2 Ballons ne sert à rien si les compétences acquises ne se transfèrent pas en match. Ces <strong style="color:var(--text)">7 piliers</strong> sont les mécanismes neuromoteurs et cognitifs qui assurent le transfert de l'entraînement à la compétition.
+    </div>
+  </div>
+
+  <div id="piliers-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:32px"></div>
+
+  <!-- Progression visuelle -->
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px">
+    <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Mon niveau sur chaque pilier</div>
+    <div id="piliers-sliders"></div>
+    <div style="margin-top:16px;padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);margin-bottom:2px">SCORE DE TRANSFERT GLOBAL</div>
+        <div id="piliers-score" style="font-family:var(--font-display);font-size:42px;color:var(--gold)">—</div>
+      </div>
+      <button onclick="piliersSave()" style="font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     🌿 ECOLOGICAL DYNAMICS
+     ══════════════════════════════════════════════════ -->
+<div id="s-eco" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">ECOLOGICAL <span>DYNAMICS</span></div>
+  <div class="sec-sub">Constraints-Led Approach · Pédagogie non-linéaire · Sensei BlackBelt</div>
+  <div class="sec-line"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px" class="eco-intro-grid">
+    <div style="background:var(--dark2);border:1px solid rgba(245,197,24,.3);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🎯</div>
+      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px">TÂCHE</div>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);line-height:1.5">Modifier la complexité, le nombre de ballons, le rythme, la combinaison</div>
+    </div>
+    <div style="background:var(--dark2);border:1px solid rgba(45,198,83,.3);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🌍</div>
+      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--green-belt);margin-bottom:6px">ENVIRONNEMENT</div>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);line-height:1.5">Cones, reaction sticks, bruit, fatigue, espace réduit, signal externe</div>
+    </div>
+    <div style="background:var(--dark2);border:1px solid rgba(0,119,182,.3);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🧠</div>
+      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--blue-belt);margin-bottom:6px">INDIVIDU</div>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);line-height:1.5">Niveau de ceinture, main dominante, fatigue, profil VAK</div>
+    </div>
+  </div>
+
+  <!-- Drills avec variantes -->
+  <div id="eco-drills-list"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     🌍 SENSEI NETWORK
+     ══════════════════════════════════════════════════ -->
+<div id="s-network" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">SENSEI <span>NETWORK</span></div>
+  <div class="sec-sub">La communauté mondiale Sensei BlackBelt</div>
+  <div class="sec-line"></div>
+
+  <!-- Carte monde SVG -->
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+    <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">📍 Élèves dans le monde</div>
+    <div style="position:relative;background:var(--dark3);border-radius:10px;overflow:hidden;border:1px solid var(--border);height:320px;display:flex;align-items:center;justify-content:center">
+      <canvas id="network-map" style="width:100%;height:100%;display:block"></canvas>
+    </div>
+    <div id="network-pins" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px"></div>
+  </div>
+
+  <!-- Rejoindre le network -->
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+    <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">➕ Ajouter ma position</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px" class="network-form-grid">
+      <div>
+        <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Prénom / Pseudo</label>
+        <input id="net-name" type="text" placeholder="Ex: Thibault" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+      </div>
+      <div>
+        <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Ville / Pays</label>
+        <input id="net-city" type="text" placeholder="Ex: Paris, France" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+      </div>
+    </div>
+    <button onclick="networkAdd()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 24px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">📍 Me mettre sur la carte</button>
+  </div>
+
+  <!-- Stats réseau -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center">
+      <div id="net-count" style="font-family:var(--font-display);font-size:44px;color:var(--gold)">0</div>
+      <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">MEMBRES</div>
+    </div>
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center">
+      <div id="net-countries" style="font-family:var(--font-display);font-size:44px;color:var(--blue-belt)">0</div>
+      <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">PAYS</div>
+    </div>
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center">
+      <div id="net-belts-count" style="font-family:var(--font-display);font-size:44px;color:var(--green-belt)">0</div>
+      <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">CEINTURES</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<style>
+@media(max-width:768px){
+  .eco-intro-grid { grid-template-columns:1fr !important; }
+  .network-form-grid { grid-template-columns:1fr !important; }
+}
+</style>
 
 <div id="s-challenges" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title">CHAL<span>LENGES</span></div><div class="sec-sub">Défis · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-challenges"></div></div></div>
 <div id="s-battle" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title">BATTLE <span>ROYAL</span></div><div class="sec-sub">Confrontations · 1v1 · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-battle"></div></div></div>
@@ -4625,7 +4846,8 @@ function initVisuSci() {
     <div class="sec-title">ILS EN <span>PARLENT</span></div>
     <div class="sec-sub">Ce que disent les athlètes et les experts</div>
     <div class="sec-line"></div>
-    <div class="testi-grid">
+    <!-- Témoignages fixes -->
+    <div class="testi-grid" id="testi-static">
       <div class="testi-card">
         <div class="testi-quote">"</div>
         <div class="testi-text">Tu es le seul être humain au monde à vulgariser les sciences exactes par le basketball. C'est un concept éducatif totalement révolutionnaire. Première mondiale.</div>
@@ -4645,25 +4867,184 @@ function initVisuSci() {
         <div class="testi-role">Programme Ball Handling · Ceinture Jaune</div>
       </div>
     </div>
+    <!-- Témoignages dynamiques ajoutés via Masters -->
+    <div class="testi-grid" id="testi-dynamic" style="margin-top:16px"></div>
 
   </div>
 </div>
 
 <!-- ══ MASTERS ONLY ══ -->
 <div id="s-masters" class="section">
-  <div style="max-width:860px;margin:0 auto">
-    <div class="masters-hero">
-      <div style="font-size:56px;margin-bottom:12px">🔒</div>
-      <div class="masters-title">MASTERS ONLY</div>
-      <div style="font-family:var(--font-cond);font-size:13px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:20px">Accès exclusif · Sur invitation du Sensei uniquement</div>
-      <div class="masters-perks">
-        <div class="masters-perk"><div class="masters-perk-icon">🥷</div><div><strong>Contenu Ceinture Noire & Rouge</strong><p>Drills avancés réservés aux niveaux élite</p></div></div>
-        <div class="masters-perk"><div class="masters-perk-icon">📊</div><div><strong>Analyse Vidéo Personnalisée</strong><p>Feedback direct du Sensei sous 48h</p></div></div>
-        <div class="masters-perk"><div class="masters-perk-icon">📐</div><div><strong>Modélisation Mathématique</strong><p>Rapport complet de votre progression</p></div></div>
-        <div class="masters-perk"><div class="masters-perk-icon">🎯</div><div><strong>Programme Sur Mesure</strong><p>Plan d'entraînement calibré sur vos données</p></div></div>
-      </div>
-      <a href="https://www.instagram.com/sensei_blackbelt/" target="_blank" class="btn-pay" style="display:inline-block;width:auto;padding:14px 36px">Demander l'accès au Sensei →</a>
+  <div style="max-width:1000px;margin:0 auto">
+    <div class="sec-title">MAS<span>TERS</span></div>
+    <div class="sec-sub">Espace Sensei · Accès PIN · Outils coach exclusifs</div>
+    <div class="sec-line"></div>
+
+    <!-- Onglets Masters -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px">
+      <button onclick="openMastersTab('eleves',this)" class="ms-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer">👥 Mes Élèves</button>
+      <button onclick="openMastersTab('certifcoach',this)" class="ms-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🎖️ Certificats</button>
+      <button onclick="openMastersTab('demo',this)" class="ms-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🎬 Mode Démo</button>
+      <button onclick="openMastersTab('pins',this)" class="ms-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🔐 Codes Ceintures</button>
+      <button onclick="openMastersTab('accueil',this)" class="ms-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📣 Témoignages</button>
     </div>
+
+    <!-- TAB : MES ÉLÈVES (#24) -->
+    <div id="ms-eleves" class="ms-panel">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">➕ Ajouter un élève</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Prénom Nom</label>
+            <input id="el-name" type="text" placeholder="Ex: Jean Dupont" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Ceinture</label>
+            <select id="el-belt" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+              <option value="0">⚪ Blanche</option><option value="1">🟡 Jaune</option><option value="2">🟠 Orange</option>
+              <option value="3">🟢 Verte</option><option value="4">🔵 Bleue</option><option value="5">🟣 Violette</option>
+              <option value="6">🟤 Marron</option><option value="7">⚫ Noire</option><option value="8">🔴 Rouge</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Score (/10)</label>
+            <input id="el-score" type="number" min="0" max="10" step="0.1" placeholder="7.5" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Dernière séance</label>
+            <input id="el-date" type="date" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Notes</label>
+          <input id="el-notes" type="text" placeholder="Observations, axes de travail..." style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+        </div>
+        <button onclick="eleveAdd()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 24px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">✅ Ajouter l'élève</button>
+      </div>
+      <!-- Tableau élèves -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)">Tableau de bord</div>
+          <div id="eleves-count" style="font-family:var(--font-cond);font-size:11px;color:var(--muted)">0 élève(s)</div>
+        </div>
+        <div id="eleves-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB : CERTIFICATS COACH (#23) -->
+    <div id="ms-certifcoach" class="ms-panel" style="display:none">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Générer un certificat officiel</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Élève (ou saisie libre)</label>
+            <select id="cc-eleve-select" onchange="ccFillFromEleve()" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none;margin-bottom:6px">
+              <option value="">— Sélectionner un élève —</option>
+            </select>
+            <input id="cc-name" type="text" placeholder="Ou saisir un nom" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="ccPreview()">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Ceinture</label>
+            <select id="cc-belt" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" onchange="ccPreview()">
+              <option value="0">⚪ Blanche</option><option value="1">🟡 Jaune</option><option value="2">🟠 Orange</option>
+              <option value="3">🟢 Verte</option><option value="4">🔵 Bleue</option><option value="5">🟣 Violette</option>
+              <option value="6">🟤 Marron</option><option value="7">⚫ Noire</option><option value="8">🔴 Rouge</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Score (/10)</label>
+            <input id="cc-score" type="number" min="0" max="10" step="0.1" placeholder="9.2" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="ccPreview()">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Date</label>
+            <input id="cc-date" type="date" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="ccPreview()">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="ccPreview()" style="font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer">👁️ Aperçu</button>
+          <button onclick="ccDownload()" style="font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">⬇️ Télécharger PNG</button>
+          <button onclick="ccPrint()" style="font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;border:none;background:var(--dark3);color:var(--text);border:1px solid var(--border);cursor:pointer">🖨️ Imprimer</button>
+        </div>
+      </div>
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-bottom:12px">Prévisualisation</div>
+        <canvas id="cc-canvas" width="800" height="500" style="width:100%;height:auto;border-radius:8px;display:block"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB : MODE DÉMO (#30) -->
+    <div id="ms-demo" class="ms-panel" style="display:none">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">🎬 Mode Démo Sensei</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:20px">
+          Charge un profil fictif complet pour présenter l'app à de nouveaux élèves ou lors d'événements. Toutes les sections (Profil, Stats, Journal) seront pré-remplies avec des données réalistes.
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px">
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);text-align:center">
+            <div style="font-size:28px;margin-bottom:6px">🥋🟣</div>
+            <div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--purple-belt)">Ceinture Violette</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">Niveau 6 — Maître</div>
+          </div>
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);text-align:center">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--gold)">8.4</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">Score Radar Moyen</div>
+          </div>
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);text-align:center">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">24</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">Séances dans le journal</div>
+          </div>
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);text-align:center">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--green-belt)">1.24</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">Indice Cpk</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button onclick="demoLoad()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">🎬 Charger le profil démo</button>
+          <button onclick="demoReset()" style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:12px 20px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">🗑️ Effacer toutes les données</button>
+        </div>
+        <div id="demo-msg" style="display:none;margin-top:12px;font-family:var(--font-cond);font-size:12px;color:var(--green-belt)"></div>
+      </div>
+    </div>
+
+    <!-- TAB : CODES CEINTURES (#6) -->
+    <div id="ms-pins" class="ms-panel" style="display:none">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">🔐 Codes d'accès par ceinture</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px">Chaque ceinture peut avoir un code personnel que tu donnes à tes élèves. L'app demandera ce code avant de valider le passage de ceinture.</div>
+        <div id="pins-list"></div>
+        <div style="margin-top:16px;display:flex;gap:10px">
+          <button onclick="pinsSave()" style="font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">💾 Sauvegarder les codes</button>
+          <button onclick="pinsReset()" style="font-family:var(--font-cond);font-size:12px;font-weight:700;padding:10px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">↺ Désactiver tous</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB : TÉMOIGNAGES (#28) -->
+    <div id="ms-accueil" class="ms-panel" style="display:none">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">➕ Ajouter un témoignage</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Auteur</label>
+            <input id="testi-author" type="text" placeholder="Prénom / Pseudo" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Rôle / Ceinture</label>
+            <input id="testi-role" type="text" placeholder="Ex: Ceinture Verte · Paris" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Témoignage</label>
+          <textarea id="testi-text" rows="3" placeholder="Ce que dit l'élève..." style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:10px;color:var(--text);font-family:var(--font-cond);font-size:13px;resize:vertical;outline:none"></textarea>
+        </div>
+        <button onclick="testiAdd()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px 24px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">✅ Publier le témoignage</button>
+      </div>
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Témoignages publiés</div>
+        <div id="testi-admin-list"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -5386,6 +5767,787 @@ localStorage.setItem('sensei_last_seen', Date.now().toString());
 // Vérifier le rappel au chargement
 setTimeout(schedulePWAReminder, 2000);
 
+</script>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// 🏆 7 PILIERS DU TRANSFERT
+// ═══════════════════════════════════════════════════════════════
+const PILIERS_DATA = [
+  { id:'attention',  icon:'👁\uFE0F',  color:'#f5c518', label:'Lib\u00e9ration de l\u2019Attention',   desc:'Dribbler sans regarder le ballon lib\u00e8re les ressources cognitives pour lire le jeu. Base de tous les transferts.',       key:'p_attention' },
+  { id:'pression',   icon:'🛡️',  color:'#0077b6', label:'Stabilité sous Pression',       desc:'Maintenir son niveau technique sous contrainte défensive. Testé via Pin & Peel et situations de fatigue.',              key:'p_pression' },
+  { id:'symetrie',   icon:'↔️',  color:'#2dc653', label:'Sym\u00e9trie Droite/Gauche',         desc:'Attaquer des deux c\u00f4t\u00e9s avec la m\u00eame efficacit\u00e9. Le corps calleux s\u2019\u00e9paissit avec la pratique bilat\u00e9rale.',            key:'p_symetrie' },
+  { id:'imprevu',    icon:'⚡',   color:'#ff6d00', label:'Robustesse \u00e0 l\u2019Impr\u00e9vu',        desc:'Adapter son dribble en temps réel face à des stimuli inattendus. Développé par les Cone Variant et Reaction Stick.',   key:'p_imprevu' },
+  { id:'decision',   icon:'🧠',  color:'#7b2d8b', label:'Vitesse Décisionnelle',           desc:'Choisir la bonne action en moins de 0.5 seconde. Entraîné par les drills à dissociation cognitive élevée.',           key:'p_decision' },
+  { id:'fatigue',    icon:'💪',  color:'#e63946', label:'Résilience à la Fatigue',         desc:'Conserver la qualité technique en fin de match. Phase 4 du programme Bench Press + drills post-sprint.',              key:'p_fatigue' },
+  { id:'vision',     icon:'🏀',  color:'#c1121f', label:'Intégration Dribble & Vision',    desc:'Le pilier final : dribbler en sentant le ballon tout en lisant le jeu. "Le ballon, tu le sens. Le jeu, tu le regardes."', key:'p_vision' },
+];
+
+const pilierScores = {};
+PILIERS_DATA.forEach(p => pilierScores[p.key] = parseInt(localStorage.getItem(p.key)||'5'));
+
+function buildPiliers() {
+  const grid = document.getElementById('piliers-grid');
+  const sliders = document.getElementById('piliers-sliders');
+  if (!grid || grid.children.length > 0) return;
+
+  PILIERS_DATA.forEach((p, idx) => {
+    // Carte
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;border-left:4px solid ${p.color};transition:all .2s`;
+    card.onmouseenter = () => card.style.borderColor = p.color;
+    card.onmouseleave = () => card.style.borderColor = 'var(--border)';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:40px;height:40px;border-radius:50%;background:${p.color}20;border:2px solid ${p.color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${p.icon}</div>
+        <div>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p.color}">Pilier ${idx+1}</div>
+          <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:var(--text)">${p.label}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">${p.desc}</div>`;
+    grid.appendChild(card);
+
+    // Slider
+    const row = document.createElement('div');
+    row.style.cssText = 'margin-bottom:14px';
+    row.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:${p.color}">${p.icon} ${p.label}</span>
+        <span id="pilier-val-${p.key}" style="font-family:var(--font-display);font-size:20px;color:${p.color}">${pilierScores[p.key]}</span>
+      </div>
+      <input type="range" min="0" max="10" step="1" value="${pilierScores[p.key]}"
+        style="width:100%;accent-color:${p.color};cursor:pointer"
+        oninput="pilierUpdate('${p.key}',this.value,'${p.color}')">`;
+    sliders.appendChild(row);
+  });
+  pilierUpdateScore();
+}
+
+function pilierUpdate(key, val, color) {
+  pilierScores[key] = parseInt(val);
+  const el = document.getElementById('pilier-val-' + key);
+  if (el) el.textContent = val;
+  pilierUpdateScore();
+}
+
+function pilierUpdateScore() {
+  const vals = Object.values(pilierScores);
+  const avg = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+  const el = document.getElementById('piliers-score');
+  if (el) el.textContent = avg + ' / 10';
+}
+
+function piliersSave() {
+  PILIERS_DATA.forEach(p => localStorage.setItem(p.key, pilierScores[p.key]));
+  showNotif('✅ Scores des 7 piliers enregistrés !');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🌿 ECOLOGICAL DYNAMICS
+// ═══════════════════════════════════════════════════════════════
+const ECO_DRILLS = [
+  {
+    name: 'Tornado – TAP² – Cross',
+    belt: '⚪ Blanche',
+    variants: [
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Ajouter un 4ème dribble après le Cross (ex : entre-jambes)' },
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Alterner rythme lent/rapide toutes les 5 reps' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Cone Variant : toucher un cône désigné entre chaque cycle' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Reaction Stick : réagir à la couleur entre chaque série' },
+      { type:'Individu',     color:'var(--blue-belt)',  icon:'🧠', text:'Main non-dominante uniquement (asymétrie forcée)' },
+    ]
+  },
+  {
+    name: 'Windshield Wipers (6 variantes)',
+    belt: '⚪ Blanche',
+    variants: [
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Passer de convergent à simultané sans pause' },
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Ajouter une balle lestée sur un côté (contraste de charge)' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Exécuter en fin de séance (fatigue = contrainte individu)' },
+      { type:'Individu',     color:'var(--blue-belt)',  icon:'🧠', text:'Fermer les yeux 5 secondes pendant l\u2019ex\u00e9cution (proprioception)' },
+    ]
+  },
+  {
+    name: 'Three-Ball TAP³ : Tap × Tap × Tap',
+    belt: '🔵 Bleue',
+    variants: [
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Variante 4 ballons : TAP⁴ si niveau suffisant' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Signal auditif (clap) pour changer de rythme mid-drill' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Bruit ambiant / musique : tester la dissociation auditive' },
+      { type:'Individu',     color:'var(--blue-belt)',  icon:'🧠', text:'Post-sprint 30m : tester la résilience à la fatigue' },
+    ]
+  },
+  {
+    name: 'Pin & Peel Reaction Drill',
+    belt: '🔵 Bleue',
+    variants: [
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Niveau 2 : inversion des codes (Rouge = ne pas taper)' },
+      { type:'Tâche',        color:'var(--gold)',       icon:'🎯', text:'Niveau 3 : 3 signaux — ROUGE / JAUNE / GRIS avec règles différentes' },
+      { type:'Environnement',color:'var(--green-belt)', icon:'🌍', text:'Utiliser le vrai Reaction Stick physique (outil Sensei)' },
+      { type:'Individu',     color:'var(--blue-belt)',  icon:'🧠', text:'En dribblant 2 ballons simultanément (dissociation motrice totale)' },
+    ]
+  },
+];
+
+function buildEcoDrills() {
+  const list = document.getElementById('eco-drills-list');
+  if (!list || list.children.length > 0) return;
+  ECO_DRILLS.forEach(drill => {
+    const block = document.createElement('div');
+    block.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px';
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px';
+    header.innerHTML = `
+      <div style="font-family:var(--font-cond);font-size:15px;font-weight:700;color:var(--text)">${drill.name}</div>
+      <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;background:rgba(245,197,24,.1);color:var(--gold);border-radius:12px;padding:2px 10px;border:1px solid rgba(245,197,24,.3)">${drill.belt}</div>`;
+    block.appendChild(header);
+    const variants = document.createElement('div');
+    variants.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+    drill.variants.forEach(v => {
+      const row = document.createElement('div');
+      row.style.cssText = `display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;background:var(--dark3);border-left:3px solid ${v.color}`;
+      row.innerHTML = `<span style="font-size:16px;flex-shrink:0">${v.icon}</span><div><div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${v.color};margin-bottom:2px">${v.type}</div><div style="font-family:var(--font-cond);font-size:12px;color:var(--text)">${v.text}</div></div>`;
+      variants.appendChild(row);
+    });
+    block.appendChild(variants);
+    list.appendChild(block);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🌍 NETWORK
+// ═══════════════════════════════════════════════════════════════
+const BELT_COLORS_NET = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+
+function networkLoad() {
+  const members = JSON.parse(localStorage.getItem('sensei_network')||'[]');
+  const pins = document.getElementById('network-pins');
+  const countEl = document.getElementById('net-count');
+  const countriesEl = document.getElementById('net-countries');
+  const beltsEl = document.getElementById('net-belts-count');
+  if (!pins) return;
+  pins.innerHTML = '';
+  if (members.length === 0) {
+    pins.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted)">Sois le premier à rejoindre le réseau !</div>';
+  } else {
+    members.forEach((m, i) => {
+      const tag = document.createElement('div');
+      tag.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--dark3);border-radius:20px;border:1px solid var(--border);font-family:var(--font-cond);font-size:11px;color:var(--text)';
+      tag.innerHTML = `<span style="color:var(--gold)">📍</span><strong>${m.name}</strong><span style="color:var(--muted)">— ${m.city}</span>
+        <button onclick="networkRemove(${i})" style="margin-left:4px;background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:10px">✕</button>`;
+      pins.appendChild(tag);
+    });
+  }
+  if (countEl) countEl.textContent = members.length;
+  const countries = new Set(members.map(m => m.city.split(',').pop().trim())).size;
+  if (countriesEl) countriesEl.textContent = countries;
+  if (beltsEl) beltsEl.textContent = members.reduce((a,m)=>a+(m.belt||0),0);
+  networkDrawMap(members);
+}
+
+function networkAdd() {
+  const name = document.getElementById('net-name').value.trim();
+  const city = document.getElementById('net-city').value.trim();
+  if (!name || !city) { showNotif('❌ Remplis ton prénom et ta ville.'); return; }
+  const members = JSON.parse(localStorage.getItem('sensei_network')||'[]');
+  const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  members.push({ name, city, belt: beltIdx, date: new Date().toLocaleDateString('fr-FR') });
+  localStorage.setItem('sensei_network', JSON.stringify(members));
+  document.getElementById('net-name').value = '';
+  document.getElementById('net-city').value = '';
+  showNotif('📍 Tu rejoins le Sensei Network !');
+  networkLoad();
+}
+
+function networkRemove(idx) {
+  const members = JSON.parse(localStorage.getItem('sensei_network')||'[]');
+  members.splice(idx, 1);
+  localStorage.setItem('sensei_network', JSON.stringify(members));
+  networkLoad();
+}
+
+function networkDrawMap(members) {
+  const canvas = document.getElementById('network-map');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth || 800;
+  canvas.height = canvas.offsetHeight || 320;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  // Fond grille
+  ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=40){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=0;y<H;y+=40){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+  // Points membres (positionnement aléatoire déterministe basé sur le nom)
+  members.forEach((m, i) => {
+    const hash = m.name.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const x = 40 + ((hash * 137 + i * 89) % (W - 80));
+    const y = 30 + ((hash * 53 + i * 67) % (H - 60));
+    const beltIdx = m.belt || 0;
+    const color = BELT_COLORS_NET[beltIdx] || '#f5c518';
+    ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI*2);
+    ctx.fillStyle = color + '40'; ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+    ctx.font = 'bold 10px Barlow Condensed, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(m.name, x, y - 11);
+  });
+  if (members.length === 0) {
+    ctx.font = 'bold 13px Barlow Condensed, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.2)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Le réseau Sensei se construit ici — rejoins-le !', W/2, H/2);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📊 PERCENTILE (#12) — Onglet dans Mes Stats
+// ═══════════════════════════════════════════════════════════════
+function buildPercentile() {
+  const el = document.getElementById('st-percentile-content');
+  if (!el || el.dataset.built) return;
+  el.dataset.built = '1';
+  const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions')||'[]');
+  if (sessions.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;font-family:var(--font-cond);font-size:13px;color:var(--muted)">Enregistre des sessions dans l\u2019onglet <strong style="color:var(--gold)">Radar</strong> pour voir ton percentile.</div>';
+    return;
+  }
+  const myAvg = sessions.reduce((a,s)=>a+s.global,0)/sessions.length;
+  // Distribution synthétique basée sur la science (courbe normale centrée sur 5.5)
+  const synthetic = [3.2,3.8,4.1,4.3,4.5,4.6,4.8,4.9,5.0,5.1,5.2,5.3,5.4,5.5,5.5,5.6,5.7,5.8,5.9,6.0,6.1,6.2,6.4,6.6,6.9,7.2,7.5,7.8,8.1,8.6];
+  const below = synthetic.filter(v => v <= myAvg).length;
+  const pct = Math.round((below / synthetic.length) * 100);
+  const color = pct >= 80 ? 'var(--red)' : pct >= 60 ? 'var(--gold)' : pct >= 40 ? 'var(--green-belt)' : 'var(--blue-belt)';
+  el.innerHTML = `
+    <div style="text-align:center;padding:32px 24px">
+      <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">TON PERCENTILE SENSEI</div>
+      <div style="font-family:var(--font-display);font-size:80px;color:${color};line-height:1">Top ${100-pct}%</div>
+      <div style="font-family:var(--font-cond);font-size:14px;color:var(--muted);margin-top:8px">Ton score moyen <strong style="color:${color}">${myAvg.toFixed(2)}</strong> te place dans le top <strong style="color:${color}">${100-pct}%</strong> des élèves Sensei.</div>
+      <div style="margin-top:24px;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;max-width:400px;margin-left:auto;margin-right:auto">
+        <div style="height:100%;background:${color};border-radius:5px;width:${pct}%;transition:width .8s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;max-width:400px;margin:6px auto 0;font-family:var(--font-cond);font-size:10px;color:var(--muted2)">
+        <span>0%</span><span>50%</span><span>100%</span>
+      </div>
+      <div style="margin-top:20px;padding:14px 20px;background:var(--dark3);border-radius:10px;font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;display:inline-block;text-align:left">
+        ${pct>=80?'🏆 Niveau élite — tu fais partie des meilleurs élèves Sensei.':pct>=60?'📈 Très bon niveau — continue sur cette lancée.':pct>=40?'✅ Bon niveau — tu progresses dans la bonne direction.':'🔰 Niveau en développement — chaque session compte.'}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔢 COMBINAISONS (#18) — Onglet dans Mon Profil
+// ═══════════════════════════════════════════════════════════════
+const COMBO_DRILLS_LIST = [
+  { id:'d1', name:'Tornado – TAP²', duration:60, belt:0, cog:2 },
+  { id:'d2', name:'Windshield Wipers', duration:60, belt:0, cog:3 },
+  { id:'d3', name:'Small-Ball Drill', duration:60, belt:0, cog:2 },
+  { id:'d4', name:'Weighted-Ball Drill', duration:60, belt:1, cog:2 },
+  { id:'d5', name:'Juggling 3 Tennis Balls', duration:90, belt:1, cog:3 },
+  { id:'d6', name:'Juggling-Dribbling Combo', duration:90, belt:1, cog:4 },
+  { id:'d7', name:'Three-Ball One-Hand Tap', duration:60, belt:2, cog:4 },
+  { id:'d8', name:'Three-Ball TAP³', duration:60, belt:4, cog:5 },
+  { id:'d9', name:'Pin & Peel Reaction Drill', duration:60, belt:4, cog:5 },
+  { id:'d10',name:'Cone Variant', duration:90, belt:5, cog:4 },
+  { id:'d11',name:'Reaction Stick Variant', duration:90, belt:5, cog:5 },
+];
+let comboSelected = [];
+
+function buildCombo() {
+  const el = document.getElementById('pr-combo');
+  if (!el || el.dataset.built) return;
+  el.dataset.built = '1';
+  const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const available = COMBO_DRILLS_LIST.filter(d => d.belt <= beltIdx);
+  const bankEl = document.getElementById('combo-bank');
+  if (!bankEl) return;
+  bankEl.innerHTML = '';
+  available.forEach(d => {
+    const card = document.createElement('div');
+    card.id = 'combo-card-' + d.id;
+    card.style.cssText = 'padding:10px 14px;background:var(--dark3);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none';
+    card.innerHTML = `<div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--text)">${d.name}</div>
+      <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);margin-top:2px">⏱ ${d.duration}s · 🧠 Cognitif ${d.cog}/5</div>`;
+    card.onclick = () => comboToggle(d);
+    bankEl.appendChild(card);
+  });
+  comboRender();
+}
+
+function comboToggle(d) {
+  const idx = comboSelected.findIndex(s => s.id === d.id);
+  if (idx >= 0) comboSelected.splice(idx, 1);
+  else comboSelected.push(d);
+  const card = document.getElementById('combo-card-' + d.id);
+  if (card) {
+    const sel = comboSelected.find(s => s.id === d.id);
+    card.style.borderColor = sel ? 'var(--gold)' : 'var(--border)';
+    card.style.background = sel ? 'rgba(245,197,24,.08)' : 'var(--dark3)';
+  }
+  comboRender();
+}
+
+function comboRender() {
+  const seq = document.getElementById('combo-sequence');
+  const totalEl = document.getElementById('combo-total');
+  const cogEl = document.getElementById('combo-cog');
+  const adviceEl = document.getElementById('combo-advice');
+  if (!seq) return;
+  seq.innerHTML = '';
+  if (comboSelected.length === 0) {
+    seq.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:20px">Sélectionne des drills dans la bibliothèque →</div>';
+  } else {
+    comboSelected.forEach((d, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--dark3);border-radius:7px;border:1px solid rgba(245,197,24,.2);margin-bottom:6px';
+      row.innerHTML = `<span style="font-family:var(--font-display);font-size:18px;color:var(--gold);flex-shrink:0">${i+1}</span>
+        <div style="flex:1"><div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--text)">${d.name}</div>
+        <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">${d.duration}s · Cognitif ${d.cog}/5</div></div>
+        <button onclick="comboRemove('${d.id}')" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px">✕</button>`;
+      seq.appendChild(row);
+    });
+  }
+  const total = comboSelected.reduce((a,d)=>a+d.duration,0);
+  const avgCog = comboSelected.length ? (comboSelected.reduce((a,d)=>a+d.cog,0)/comboSelected.length).toFixed(1) : 0;
+  if (totalEl) totalEl.textContent = total >= 60 ? Math.floor(total/60)+'min '+(total%60?total%60+'s':'') : total+'s';
+  if (cogEl) cogEl.textContent = avgCog + ' / 5';
+  const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  let advice = '';
+  if (comboSelected.length === 0) advice = 'Commence par sélectionner 2 à 4 drills.';
+  else if (total > 1200) advice = '⚠️ Séance très longue (>20 min). Divise en 2 sessions.';
+  else if (parseFloat(avgCog) > 4 && beltIdx < 4) advice = '⚠️ Charge cognitive élevée pour ton niveau. Réduis la complexité.';
+  else if (comboSelected.length >= 2 && total <= 900) advice = '✅ Séance équilibrée — bonne progression.';
+  else advice = '📋 Séance correcte.';
+  if (adviceEl) adviceEl.textContent = advice;
+}
+
+function comboRemove(id) {
+  comboSelected = comboSelected.filter(d => d.id !== id);
+  const card = document.getElementById('combo-card-' + id);
+  if (card) { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--dark3)'; }
+  comboRender();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ⚡ SIMULATEUR CHARGE NEUROMOTRICE (#21)
+// ═══════════════════════════════════════════════════════════════
+function computeLoad() {
+  const basket = parseInt(document.getElementById('load-basket').value)||0;
+  const muscu  = parseInt(document.getElementById('load-muscu').value)||0;
+  const drills = parseInt(document.getElementById('load-drills').value)||0;
+  const result = document.getElementById('load-result');
+  if (!result) return;
+
+  // Coefficients issus de Schöllhorn et al. (2025) & basil (2025)
+  // Charge neuromotrice = basket×1.0 + drills×0.8 + muscu×0.5
+  const charge = basket * 1.0 + drills * 0.8 + muscu * 0.5;
+  // Zone optimale : 6–12 unités / semaine
+  const optimal = charge >= 6 && charge <= 12;
+  const over = charge > 12;
+  const under = charge < 4;
+  const color = optimal ? 'var(--green-belt)' : over ? 'var(--red)' : 'var(--muted)';
+  const pct = Math.min(100, (charge/16)*100);
+
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+      <span style="font-family:var(--font-display);font-size:52px;color:${color}">${charge.toFixed(1)}</span>
+      <span style="font-family:var(--font-cond);font-size:14px;color:var(--muted)">unités / semaine</span>
+    </div>
+    <div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;background:${color};border-radius:5px;width:${pct}%;transition:width .5s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:var(--font-cond);font-size:9px;color:var(--muted2);margin-bottom:12px">
+      <span>0</span><span style="color:var(--green-belt)">6–12 (optimal)</span><span>16+</span>
+    </div>
+    <div style="padding:12px 16px;border-radius:8px;background:${over?'rgba(230,57,70,.08)':optimal?'rgba(45,198,83,.08)':'rgba(122,130,153,.08)'};border:1px solid ${over?'rgba(230,57,70,.3)':optimal?'rgba(45,198,83,.3)':'var(--border)'};font-family:var(--font-cond);font-size:12px;color:${color};line-height:1.6">
+      ${over ? '🔴 Surcharge neuromotrice — risque d\u2019interf\u00e9rence avec les patterns moteurs automatis\u00e9s (Sch\u00f6llhorn, 2025). R\u00e9duis les séances de drills ou la musculation.' :
+        optimal ? '✅ Zone optimale basket — charge suffisante pour progresser sans surcharger la motricité fine.' :
+        under ? '📈 Charge insuffisante — augmente la fréquence des drills ou des séances basket pour stimuler l\u2019adaptation neurologique.' :
+        '⚠️ Zone limite — surveille les signes de fatigue technique.'}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 👥 MES ÉLÈVES — Masters
+// ═══════════════════════════════════════════════════════════════
+const BELT_NAMES_M = ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
+const BELT_EMOJIS_M = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+const BELT_COLS_M = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+
+function eleveAdd() {
+  const name  = document.getElementById('el-name').value.trim();
+  const belt  = parseInt(document.getElementById('el-belt').value)||0;
+  const score = parseFloat(document.getElementById('el-score').value)||0;
+  const date  = document.getElementById('el-date').value;
+  const notes = document.getElementById('el-notes').value.trim();
+  if (!name) { showNotif('\u274C Saisis le nom de l\u2019\u00e9l\u00e8ve.'); return; }
+  const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]');
+  eleves.push({ id: Date.now(), name, belt, score, date, notes });
+  localStorage.setItem('sensei_eleves', JSON.stringify(eleves));
+  ['el-name','el-score','el-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('el-belt').value = '0';
+  eleveRender();
+  ccRefreshSelect();
+  showNotif('✅ Élève ajouté !');
+}
+
+function eleveRender() {
+  const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]');
+  const list = document.getElementById('eleves-list');
+  const count = document.getElementById('eleves-count');
+  if (!list) return;
+  if (count) count.textContent = eleves.length + ' élève(s)';
+  list.innerHTML = '';
+  if (eleves.length === 0) {
+    list.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:24px">Aucun élève enregistré</div>';
+    return;
+  }
+  // Tableau
+  const table = document.createElement('div');
+  table.style.cssText = 'overflow-x:auto';
+  const headers = ['Nom','Ceinture','Score','Dernière séance','Notes',''];
+  const thead = document.createElement('div');
+  thead.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1fr 1.5fr 2fr 40px;gap:8px;padding:8px 12px;background:rgba(245,197,24,.06);border-radius:6px;margin-bottom:6px';
+  headers.forEach(h => {
+    const th = document.createElement('div');
+    th.style.cssText = 'font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold)';
+    th.textContent = h;
+    thead.appendChild(th);
+  });
+  table.appendChild(thead);
+  eleves.forEach(e => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1fr 1.5fr 2fr 40px;gap:8px;padding:10px 12px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);margin-bottom:6px;align-items:center';
+    row.innerHTML = `
+      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--text)">${e.name}</div>
+      <div style="font-family:var(--font-cond);font-size:12px;color:${BELT_COLS_M[e.belt]}">${BELT_EMOJIS_M[e.belt]} ${BELT_NAMES_M[e.belt]}</div>
+      <div style="font-family:var(--font-display);font-size:18px;color:${e.score>=7.5?'var(--green-belt)':e.score>=5?'var(--gold)':'var(--red)'}">${e.score||'—'}</div>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted)">${e.date||'—'}</div>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.notes||'—'}</div>
+      <button onclick="eleveDelete(${e.id})" style="background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:14px">🗑️</button>`;
+    table.appendChild(row);
+  });
+  list.appendChild(table);
+}
+
+function eleveDelete(id) {
+  if (!confirm('Supprimer cet élève ?')) return;
+  const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]').filter(e=>e.id!==id);
+  localStorage.setItem('sensei_eleves', JSON.stringify(eleves));
+  eleveRender();
+  ccRefreshSelect();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🎖️ CERTIFICAT COACH — Masters
+// ═══════════════════════════════════════════════════════════════
+function ccRefreshSelect() {
+  const sel = document.getElementById('cc-eleve-select');
+  if (!sel) return;
+  const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]');
+  sel.innerHTML = '<option value="">— Sélectionner un élève —</option>';
+  eleves.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = e.name + ' — ' + BELT_EMOJIS_M[e.belt] + ' ' + BELT_NAMES_M[e.belt];
+    sel.appendChild(opt);
+  });
+}
+
+function ccFillFromEleve() {
+  const id = parseInt(document.getElementById('cc-eleve-select').value);
+  if (!id) return;
+  const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]');
+  const e = eleves.find(el=>el.id===id);
+  if (!e) return;
+  document.getElementById('cc-name').value = e.name;
+  document.getElementById('cc-belt').value = e.belt;
+  document.getElementById('cc-score').value = e.score||'';
+  document.getElementById('cc-date').value = e.date||new Date().toISOString().slice(0,10);
+  ccPreview();
+}
+
+function ccPreview() {
+  const canvas = document.getElementById('cc-canvas');
+  if (!canvas) return;
+  // Réutilise la logique de certPreview avec les champs cc-*
+  const ctx = canvas.getContext('2d');
+  const W=800, H=500;
+  const BELT_CERT = [
+    {name:'BLANCHE',color:'#f8f9fa',emoji:'⚪',lvl:'Niveau 1'},
+    {name:'JAUNE',color:'#ffd60a',emoji:'🟡',lvl:'Niveau 2'},
+    {name:'ORANGE',color:'#ff6d00',emoji:'🟠',lvl:'Niveau 3'},
+    {name:'VERTE',color:'#2dc653',emoji:'🟢',lvl:'Niveau 4'},
+    {name:'BLEUE',color:'#0077b6',emoji:'🔵',lvl:'Niveau 5'},
+    {name:'VIOLETTE',color:'#7b2d8b',emoji:'🟣',lvl:'Niveau 6'},
+    {name:'MARRON',color:'#8b4513',emoji:'🟤',lvl:'Niveau 7'},
+    {name:'NOIRE',color:'#e0e0e0',emoji:'⚫',lvl:'Niveau 8'},
+    {name:'ROUGE',color:'#c1121f',emoji:'🔴',lvl:'Niveau 9 — Légendaire'},
+  ];
+  const beltIdx = parseInt(document.getElementById('cc-belt').value)||0;
+  const bd = BELT_CERT[beltIdx];
+  const name  = document.getElementById('cc-name').value  || 'Nom Prénom';
+  const score = document.getElementById('cc-score').value || '—';
+  const dateVal = document.getElementById('cc-date').value;
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#f5c518'; ctx.lineWidth=4; ctx.strokeRect(12,12,W-24,H-24);
+  ctx.strokeStyle=bd.color; ctx.lineWidth=1.5; ctx.strokeRect(20,20,W-40,H-40);
+  const grd=ctx.createRadialGradient(W/2,H/2,50,W/2,H/2,350);
+  grd.addColorStop(0,bd.color+'18'); grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+  ctx.font='bold 13px Arial Narrow,sans-serif'; ctx.fillStyle='#f5c518'; ctx.textAlign='center';
+  ctx.fillText('SENSEI BLACKBELT · MÉTHODE BASKET SCIENTIFIQUE · THIBAULT NJECKIL',W/2,52);
+  ctx.strokeStyle='#f5c518'; ctx.lineWidth=1; ctx.globalAlpha=.4;
+  ctx.beginPath(); ctx.moveTo(60,62); ctx.lineTo(W-60,62); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.font='800 18px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.5)';
+  ctx.fillText('CERTIFICAT OFFICIEL DE PASSAGE DE CEINTURE',W/2,96);
+  ctx.font='64px serif'; ctx.fillText(bd.emoji,W/2,182);
+  ctx.font='bold 40px Arial Narrow,sans-serif'; ctx.fillStyle='#f0f2f8'; ctx.fillText(name.toUpperCase(),W/2,242);
+  ctx.font='bold 52px Arial Narrow,sans-serif'; ctx.fillStyle=bd.color; ctx.fillText('CEINTURE '+bd.name,W/2,306);
+  ctx.font='16px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.5)'; ctx.fillText(bd.lvl,W/2,334);
+  ctx.font='bold 18px Arial Narrow,sans-serif'; ctx.fillStyle='#f5c518'; ctx.fillText('SCORE DATA SCIENCE : '+score+' / 10',W/2,374);
+  ctx.font='13px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.4)';
+  ctx.fillText('Certifié le '+dateStr+' par Thibault NJECKIL · senseiblackbelt.com',W/2,420);
+  ctx.strokeStyle='#f5c518'; ctx.lineWidth=1; ctx.globalAlpha=.4;
+  ctx.beginPath(); ctx.moveTo(60,438); ctx.lineTo(W-60,438); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.font='11px Arial,sans-serif'; ctx.fillStyle='rgba(255,255,255,.2)';
+  ctx.fillText('Lean Six Sigma 6σ · Propriété intellectuelle protégée · Dépôt INPI',W/2,460);
+}
+
+function ccDownload() {
+  ccPreview();
+  const canvas = document.getElementById('cc-canvas');
+  const name = document.getElementById('cc-name').value||'eleve';
+  const link = document.createElement('a');
+  link.download = 'certificat-sensei-'+name.toLowerCase().replace(/\s+/g,'-')+'-coach.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function ccPrint() {
+  ccPreview();
+  const canvas = document.getElementById('cc-canvas');
+  const img = canvas.toDataURL('image/png');
+  const win = window.open('');
+  win.document.write('<html><body style="margin:0;background:#000"><img src="'+img+'" style="width:100%;max-width:800px;display:block;margin:0 auto"><script>window.onload=function(){window.print();window.close()}<\/script></body></html>');
+  win.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🎬 MODE DÉMO (#30)
+// ═══════════════════════════════════════════════════════════════
+function demoLoad() {
+  if (!confirm('Charger le profil démo ? Tes données actuelles seront remplacées.')) return;
+  // Ceinture violette (idx 5)
+  localStorage.setItem('sensei_belt_idx','5');
+  localStorage.setItem('sensei_profil_meta', JSON.stringify({name:'Alex Demo', start: new Date(Date.now()-120*86400000).toISOString().slice(0,10)}));
+  // Drills cochés
+  const drills = {};
+  for(let i=0;i<6;i++) drills['belt_'+i] = [0,1,2];
+  localStorage.setItem('sensei_drills_checked', JSON.stringify(drills));
+  // Sessions radar
+  const sessions = [
+    {date:'01/01/2026', scores:{maitrise:6,symetrie:5,creativite:7,vitesse:6,vision:6,robustesse:5}, global:5.83},
+    {date:'08/01/2026', scores:{maitrise:7,symetrie:6,creativite:7,vitesse:7,vision:7,robustesse:6}, global:6.67},
+    {date:'15/01/2026', scores:{maitrise:7,symetrie:7,creativite:8,vitesse:7,vision:8,robustesse:7}, global:7.33},
+    {date:'22/01/2026', scores:{maitrise:8,symetrie:8,creativite:8,vitesse:8,vision:8,robustesse:7}, global:7.83},
+    {date:'29/01/2026', scores:{maitrise:8,symetrie:8,creativite:9,vitesse:8,vision:9,robustesse:8}, global:8.33},
+    {date:'05/02/2026', scores:{maitrise:9,symetrie:8,creativite:9,vitesse:9,vision:9,robustesse:8}, global:8.67},
+  ];
+  localStorage.setItem('sensei_radar_sessions', JSON.stringify(sessions));
+  // Journal
+  const journal = [];
+  const drillNames = ['Tornado TAP²','Windshield Wipers','Three-Ball TAP³','Pin & Peel','Cone Variant'];
+  for(let i=0;i<24;i++) {
+    journal.push({
+      id: Date.now()-i*86400000*3,
+      date: new Date(Date.now()-i*86400000*3).toISOString().slice(0,10),
+      dur: 45+Math.floor(Math.random()*30),
+      drills: drillNames[i%drillNames.length],
+      bench: 70+Math.floor(Math.random()*15),
+      feeling: 3+Math.floor(Math.random()*3),
+      notes: ''
+    });
+  }
+  localStorage.setItem('sensei_journal', JSON.stringify(journal));
+  const msg = document.getElementById('demo-msg');
+  if (msg) { msg.style.display='block'; msg.textContent='✅ Profil démo chargé ! Va dans "Mon Profil" et "Mes Stats" pour voir le résultat.'; }
+  showNotif('🎬 Profil démo chargé !');
+}
+
+function demoReset() {
+  if (!confirm('Effacer TOUTES les donn\u00e9es de l\u2019app ?')) return;
+  const keys = ['sensei_belt_idx','sensei_profil_meta','sensei_drills_checked','sensei_radar_sessions','sensei_journal','sensei_dmaic','sensei_eleves','sensei_testi','sensei_belt_pins','sensei_network'];
+  keys.forEach(k => localStorage.removeItem(k));
+  const msg = document.getElementById('demo-msg');
+  if (msg) { msg.style.display='block'; msg.style.color='var(--orange-belt)'; msg.textContent='🗑️ Toutes les données ont été effacées.'; }
+  showNotif('🗑️ Données effacées.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔐 CODES CEINTURES (#6)
+// ═══════════════════════════════════════════════════════════════
+function buildPinsList() {
+  const list = document.getElementById('pins-list');
+  if (!list || list.children.length > 0) return;
+  const saved = JSON.parse(localStorage.getItem('sensei_belt_pins')||'{}');
+  BELT_NAMES_M.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--dark3);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)';
+    row.innerHTML = `
+      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:${BELT_COLS_M[i]};width:100px;flex-shrink:0">${BELT_EMOJIS_M[i]} ${name}</div>
+      <input id="pin-belt-${i}" type="text" maxlength="8" placeholder="Laisser vide = sans code"
+        value="${saved[i]||''}"
+        style="flex:1;background:var(--dark2);border:1px solid var(--border);border-radius:5px;padding:7px 12px;color:var(--text);font-family:var(--font-cond);font-size:13px;letter-spacing:2px;outline:none">
+      <div style="font-family:var(--font-cond);font-size:10px;color:${saved[i]?'var(--green-belt)':'var(--muted2)'};flex-shrink:0">${saved[i]?'🔒 Actif':'—'}</div>`;
+    list.appendChild(row);
+  });
+}
+
+function pinsSave() {
+  const pins = {};
+  BELT_NAMES_M.forEach((_, i) => {
+    const val = document.getElementById('pin-belt-'+i);
+    if (val && val.value.trim()) pins[i] = val.value.trim();
+  });
+  localStorage.setItem('sensei_belt_pins', JSON.stringify(pins));
+  // Rebuild pour actualiser les indicateurs
+  document.getElementById('pins-list').innerHTML = '';
+  buildPinsList();
+  showNotif('🔐 Codes ceintures sauvegardés !');
+}
+
+function pinsReset() {
+  if (!confirm('Désactiver tous les codes ceintures ?')) return;
+  localStorage.removeItem('sensei_belt_pins');
+  document.getElementById('pins-list').innerHTML = '';
+  buildPinsList();
+  showNotif('Codes désactivés.');
+}
+
+// Vérification du code avant passage de ceinture
+const _origTrackerPassBelt = trackerPassBelt;
+window.trackerPassBelt = function() {
+  const cur = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const pins = JSON.parse(localStorage.getItem('sensei_belt_pins')||'{}');
+  const nextPin = pins[cur+1];
+  if (nextPin) {
+    const entered = prompt('🔐 Code requis pour la ceinture ' + BELT_EMOJIS_M[cur+1] + ' ' + BELT_NAMES_M[cur+1] + ' :');
+    if (entered !== nextPin) { showNotif('❌ Code incorrect — demande le code à Sensei.'); return; }
+  }
+  _origTrackerPassBelt();
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 📣 TÉMOIGNAGES DYNAMIQUES (#28)
+// ═══════════════════════════════════════════════════════════════
+function testiAdd() {
+  const author = document.getElementById('testi-author').value.trim();
+  const role   = document.getElementById('testi-role').value.trim();
+  const text   = document.getElementById('testi-text').value.trim();
+  if (!author || !text) { showNotif('❌ Remplis auteur et témoignage.'); return; }
+  const testis = JSON.parse(localStorage.getItem('sensei_testi')||'[]');
+  testis.push({ id:Date.now(), author, role, text });
+  localStorage.setItem('sensei_testi', JSON.stringify(testis));
+  ['testi-author','testi-role','testi-text'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  testiAdminRender();
+  testiPublicRender();
+  showNotif('✅ Témoignage publié !');
+}
+
+function testiAdminRender() {
+  const list = document.getElementById('testi-admin-list');
+  if (!list) return;
+  const testis = JSON.parse(localStorage.getItem('sensei_testi')||'[]');
+  list.innerHTML = '';
+  if (testis.length === 0) {
+    list.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:20px">Aucun témoignage ajouté</div>';
+    return;
+  }
+  testis.forEach(t => {
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:14px;background:var(--dark3);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)';
+    card.innerHTML = `<div style="font-family:var(--font-cond);font-size:13px;color:var(--text);margin-bottom:6px;font-style:italic">"${t.text}"</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><span style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:var(--gold)">${t.author}</span>
+        ${t.role?`<span style="font-family:var(--font-cond);font-size:10px;color:var(--muted)"> · ${t.role}</span>`:''}
+        </div>
+        <button onclick="testiDelete(${t.id})" style="background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:12px">🗑️</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function testiDelete(id) {
+  const testis = JSON.parse(localStorage.getItem('sensei_testi')||'[]').filter(t=>t.id!==id);
+  localStorage.setItem('sensei_testi', JSON.stringify(testis));
+  testiAdminRender();
+  testiPublicRender();
+}
+
+function testiPublicRender() {
+  const dyn = document.getElementById('testi-dynamic');
+  if (!dyn) return;
+  const testis = JSON.parse(localStorage.getItem('sensei_testi')||'[]');
+  dyn.innerHTML = '';
+  testis.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'testi-card';
+    card.innerHTML = `<div class="testi-quote">"</div>
+      <div class="testi-text">${t.text}</div>
+      <div class="testi-author">${t.author}</div>
+      ${t.role?`<div class="testi-role">${t.role}</div>`:''}`;
+    dyn.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ⚙️ MASTERS — Navigation onglets
+// ═══════════════════════════════════════════════════════════════
+function openMastersTab(id, btn) {
+  document.querySelectorAll('.ms-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('ms-' + id).style.display = 'block';
+  document.querySelectorAll('.ms-tab').forEach(b => {
+    b.style.background='var(--dark3)'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)';
+  });
+  btn.style.background='rgba(245,197,24,.1)'; btn.style.color='var(--gold)'; btn.style.borderColor='rgba(245,197,24,.4)';
+  if (id==='eleves')     { eleveRender(); }
+  if (id==='certifcoach'){ ccRefreshSelect(); requestAnimationFrame(ccPreview); }
+  if (id==='pins')       { buildPinsList(); }
+  if (id==='accueil')    { testiAdminRender(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔁 HOOKS showSection pour les nouvelles sections
+// ═══════════════════════════════════════════════════════════════
+const _showSectionBase = showSection;
+showSection = function(id, btn) {
+  _showSectionBase(id, btn);
+  if (id==='piliers')  { requestAnimationFrame(function(){ buildPiliers(); }); }
+  if (id==='eco')      { requestAnimationFrame(function(){ buildEcoDrills(); }); }
+  if (id==='network')  { requestAnimationFrame(function(){ networkLoad(); }); }
+  if (id==='testi')    { testiPublicRender(); }
+  if (id==='masters')  { requestAnimationFrame(function(){
+    eleveRender(); ccRefreshSelect(); buildPinsList(); testiAdminRender();
+    const elDate = document.getElementById('el-date');
+    if (elDate && !elDate.value) elDate.value = new Date().toISOString().slice(0,10);
+    const ccDate = document.getElementById('cc-date');
+    if (ccDate && !ccDate.value) ccDate.value = new Date().toISOString().slice(0,10);
+    requestAnimationFrame(ccPreview);
+  }); }
+};
+
+// Init DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  testiPublicRender();
+});
 </script>
 
 </body>
