@@ -420,6 +420,9 @@ body.unlocked .sensei-only{display:revert !important}
     <button class="nav-btn" onclick="showSection('vulga',this)">Science</button>
     <button class="nav-btn" onclick="showSection('neuro',this)">Neurosciences</button>
     <button class="nav-btn" onclick="showSection('visusci',this)">Visualisation</button>
+    <button class="nav-btn" onclick="showSection('profil',this)">🏅 Mon Profil</button>
+    <button class="nav-btn" onclick="showSection('minijeux',this)">🎮 Mini-Jeux</button>
+    <button class="nav-btn" onclick="showSection('stats',this)">📈 Mes Stats</button>
     <button class="nav-btn" onclick="showSection('coach',this)">Le Coach</button>
   </div>
   <div class="nav-admin">
@@ -448,6 +451,8 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('tutorials',null);closeMenu()">🎓 Tutorials</button>
   <button class="mm-btn sensei-only" onclick="showSection('programs',null);closeMenu()">📋 Training Programs</button>
   <button class="mm-btn sensei-only" onclick="showSection('data',null);closeMenu()">📊 Data Science</button>
+  <button class="mm-btn" onclick="showSection('profil',null);closeMenu()">🏅 Mon Profil</button>
+  <button class="mm-btn" onclick="showSection('minijeux',null);closeMenu()">🎮 Mini-Jeux</button>
   <button class="mm-btn" onclick="showSection('challenges',null);closeMenu()">🔥 Challenges</button>
   <button class="mm-btn" onclick="showSection('battle',null);closeMenu()">⚔️ Battle Royal</button>
   <button class="mm-btn" onclick="showSection('vulga',null);closeMenu()">📐 Vulgarisation Scientifique</button>
@@ -455,6 +460,7 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('visusci',null);closeMenu()">🔬 Visualisation Scientifique</button>
 
   <button class="mm-btn" onclick="showSection('reserver',null);closeMenu()" style="color:var(--gold)">💳 Réserver une séance</button>
+  <button class="mm-btn" onclick="showSection('stats',null);closeMenu()">📈 Mes Stats</button>
   <button class="mm-btn" onclick="showSection('coach',null);closeMenu()">🏆 Le Coach</button>
   <button class="mm-btn" onclick="showSection('testi',null);closeMenu()">⭐ Avis</button>
   <button class="mm-btn sensei-only" onclick="showSection('masters',null);closeMenu()" style="color:var(--gold)">🔒 Masters Only</button>
@@ -1408,6 +1414,1956 @@ function syncSlider(val) {
 // Init au chargement
 document.addEventListener('DOMContentLoaded', () => { calcBench(); });
 </script>
+<!-- ══════════════════════════════════════════════════════
+     🎮 MINI-JEUX — Pin & Peel · Quiz IQ Sensei · Profil VAK
+     ══════════════════════════════════════════════════════ -->
+<div id="s-minijeux" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">MINI-<span>JEUX</span></div>
+  <div class="sec-sub">Entraîne ton cerveau · Temps de réaction · IQ Sensei · Profil VAK</div>
+  <div class="sec-line"></div>
+
+  <!-- ══ ONGLETS MINI-JEUX ══ -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px">
+    <button onclick="openMiniJeu('pinpeel',this)" class="mj-tab" style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:8px;border:1px solid rgba(230,57,70,.5);background:rgba(230,57,70,.15);color:var(--red);cursor:pointer">⚡ Pin &amp; Peel</button>
+    <button onclick="openMiniJeu('quiziq',this)" class="mj-tab" style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🧠 Quiz IQ Sensei</button>
+    <button onclick="openMiniJeu('vak',this)" class="mj-tab" style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">👁️ Profil VAK</button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       JEU 1 : PIN & PEEL — Réaction visuelle
+       ══════════════════════════════════════ -->
+  <div id="mj-pinpeel" class="mj-panel">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start" class="pp-layout">
+
+      <!-- Zone de jeu -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border)">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:4px">RÉACTION VISUELLE · NIVEAU 2</div>
+          <div style="font-family:var(--font-display);font-size:26px;letter-spacing:2px;color:var(--text)">PIN &amp; PEEL <span style="color:var(--gold)">REACTION DRILL</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;font-family:var(--font-cond)">Issu du programme Sensei BlackBelt · Constraints-Led Approach</div>
+        </div>
+
+        <!-- Affichage couleur -->
+        <div style="padding:32px 24px;text-align:center">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px" id="pp-instruction">Appuie sur START pour commencer</div>
+
+          <!-- Signal couleur -->
+          <div id="pp-signal" onclick="ppTap()" style="width:200px;height:200px;border-radius:50%;margin:0 auto 28px;background:var(--dark3);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none;-webkit-user-select:none">
+            <span id="pp-signal-txt" style="font-family:var(--font-display);font-size:28px;letter-spacing:2px;color:var(--muted)">?</span>
+          </div>
+
+          <!-- Temps de réaction -->
+          <div id="pp-reaction" style="font-family:var(--font-display);font-size:64px;color:var(--gold);line-height:1;margin-bottom:8px">—</div>
+          <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);margin-bottom:28px" id="pp-reaction-label">millisecondes</div>
+
+          <!-- Règle : signal inversé ou non -->
+          <div id="pp-rule-display" style="display:none;margin-bottom:20px;padding:10px 16px;border-radius:8px;background:var(--dark3);font-family:var(--font-cond);font-size:12px;color:var(--muted);border:1px solid var(--border)"></div>
+
+          <!-- Boutons -->
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button id="pp-start-btn" onclick="ppStart()" style="font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:none;background:var(--red);color:#fff;cursor:pointer;transition:all .2s">▶ START</button>
+            <button onclick="ppReset()" style="font-family:var(--font-cond);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:12px 20px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">↺ Reset</button>
+          </div>
+
+          <!-- Niveau -->
+          <div style="margin-top:24px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button onclick="ppSetLevel(1,this)" class="pp-lvl active-lvl" style="font-family:var(--font-cond);font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:1px solid rgba(45,198,83,.5);background:rgba(45,198,83,.15);color:var(--green-belt);cursor:pointer">Niveau 1 — Basique</button>
+            <button onclick="ppSetLevel(2,this)" class="pp-lvl" style="font-family:var(--font-cond);font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">Niveau 2 — Inversé</button>
+            <button onclick="ppSetLevel(3,this)" class="pp-lvl" style="font-family:var(--font-cond);font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">Niveau 3 — 3 signaux</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historique & stats -->
+      <div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">📊 Mes stats</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="pp-stat-best" style="font-family:var(--font-display);font-size:28px;color:var(--green-belt)">—</div>
+              <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">MEILLEUR (ms)</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="pp-stat-avg" style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">—</div>
+              <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">MOYENNE (ms)</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="pp-stat-trials" style="font-family:var(--font-display);font-size:28px;color:var(--text)">0</div>
+              <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">ESSAIS</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+              <div id="pp-stat-errors" style="font-family:var(--font-display);font-size:28px;color:var(--red)">0</div>
+              <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">ERREURS</div>
+            </div>
+          </div>
+          <!-- Jauge niveau -->
+          <div style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;font-family:var(--font-cond);font-size:10px;color:var(--muted);margin-bottom:4px">
+              <span>Niveau réflexe</span><span id="pp-level-label">—</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+              <div id="pp-level-bar" style="height:100%;border-radius:3px;background:var(--gold);width:0%;transition:width .5s"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;max-height:280px;overflow-y:auto">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Historique</div>
+          <div id="pp-history" style="font-family:var(--font-cond);font-size:12px;color:var(--muted)">Aucun essai encore</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       JEU 2 : QUIZ IQ SENSEI
+       ══════════════════════════════════════ -->
+  <div id="mj-quiziq" class="mj-panel" style="display:none">
+    <div style="max-width:720px;margin:0 auto">
+      <!-- Écran intro -->
+      <div id="quiz-intro" style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center">
+        <div style="font-size:64px;margin-bottom:16px">🧠</div>
+        <div style="font-family:var(--font-display);font-size:32px;letter-spacing:3px;color:var(--text);margin-bottom:8px">QUIZ IQ <span style="color:var(--gold)">SENSEI</span></div>
+        <div style="font-family:var(--font-cond);font-size:13px;color:var(--muted);margin-bottom:8px">15 questions · Neurosciences · Physique · Méthode Sensei</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted2);margin-bottom:32px">Teste tes connaissances sur la science du basketball</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px">
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--gold)">15</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">QUESTIONS</div>
+          </div>
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">3</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">THÈMES</div>
+          </div>
+          <div style="padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div style="font-family:var(--font-display);font-size:28px;color:var(--green-belt)">∞</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">REJOUABLE</div>
+          </div>
+        </div>
+        <button onclick="quizStart()" style="font-family:var(--font-cond);font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:14px 40px;border-radius:8px;border:none;background:var(--gold);color:var(--black);cursor:pointer">Commencer le Quiz →</button>
+      </div>
+
+      <!-- Écran question -->
+      <div id="quiz-game" style="display:none">
+        <!-- Progress bar -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px">
+          <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);flex-shrink:0">Q <span id="quiz-q-num">1</span>/15</div>
+          <div style="flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+            <div id="quiz-progress" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:0%"></div>
+          </div>
+          <div id="quiz-score-live" style="font-family:var(--font-cond);font-size:12px;color:var(--gold);flex-shrink:0">0 pts</div>
+        </div>
+
+        <!-- Carte question -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:32px">
+          <div id="quiz-category" style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple-belt);margin-bottom:12px"></div>
+          <div id="quiz-question" style="font-family:var(--font-cond);font-size:18px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:28px"></div>
+          <div id="quiz-choices" style="display:flex;flex-direction:column;gap:10px"></div>
+          <div id="quiz-explanation" style="display:none;margin-top:20px;padding:14px 18px;border-radius:8px;font-family:var(--font-cond);font-size:12px;line-height:1.6;color:var(--text)"></div>
+          <button id="quiz-next-btn" onclick="quizNext()" style="display:none;margin-top:20px;font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">Question suivante →</button>
+        </div>
+      </div>
+
+      <!-- Écran résultat -->
+      <div id="quiz-result" style="display:none;background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center">
+        <div id="quiz-result-emoji" style="font-size:64px;margin-bottom:16px"></div>
+        <div style="font-family:var(--font-display);font-size:28px;letter-spacing:3px;color:var(--text);margin-bottom:8px">RÉSULTAT</div>
+        <div id="quiz-final-score" style="font-family:var(--font-display);font-size:72px;color:var(--gold);line-height:1;margin:16px 0"></div>
+        <div id="quiz-verdict" style="font-family:var(--font-cond);font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 24px;border-radius:20px;display:inline-block;margin-bottom:16px"></div>
+        <div id="quiz-result-msg" style="font-family:var(--font-cond);font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.6"></div>
+        <div id="quiz-breakdown" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px"></div>
+        <button onclick="quizStart()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">↺ Rejouer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       JEU 3 : PROFIL VAK
+       ══════════════════════════════════════ -->
+  <div id="mj-vak" class="mj-panel" style="display:none">
+    <div style="max-width:680px;margin:0 auto">
+      <!-- Intro -->
+      <div id="vak-intro" style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center">
+        <div style="font-size:56px;margin-bottom:16px">👁️👂🏀</div>
+        <div style="font-family:var(--font-display);font-size:30px;letter-spacing:3px;color:var(--text);margin-bottom:8px">MON PROFIL <span style="color:var(--gold)">VAK</span></div>
+        <div style="font-family:var(--font-cond);font-size:13px;color:var(--muted);margin-bottom:24px">Visuel · Auditif · Kinesthésique — Comment ton cerveau apprend le mieux</div>
+        <div style="background:var(--dark3);border-radius:12px;padding:20px;text-align:left;margin-bottom:28px">
+          <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.7">
+            Le modèle VAK (issu de la méthode Sensei BlackBelt) identifie ton canal d'apprentissage dominant.<br>
+            <strong style="color:var(--text)">👁️ Visuel</strong> — tu apprends par l'observation et les démonstrations<br>
+            <strong style="color:var(--text)">👂 Auditif</strong> — tu retiens par les instructions verbales et le rythme<br>
+            <strong style="color:var(--text)">🤲 Kinesthésique</strong> — tu intègres par la pratique et le ressenti du ballon
+          </div>
+        </div>
+        <button onclick="vakStart()" style="font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:13px 36px;border-radius:8px;border:none;background:var(--gold);color:var(--black);cursor:pointer">Découvrir mon profil →</button>
+      </div>
+
+      <!-- Questions VAK -->
+      <div id="vak-game" style="display:none">
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px">
+          <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);flex-shrink:0">Question <span id="vak-q-num">1</span>/9</div>
+          <div style="flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+            <div id="vak-progress" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:0%"></div>
+          </div>
+        </div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:32px">
+          <div id="vak-scenario" style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px"></div>
+          <div id="vak-question" style="font-family:var(--font-cond);font-size:17px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:24px"></div>
+          <div id="vak-choices" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+
+      <!-- Résultat VAK -->
+      <div id="vak-result" style="display:none">
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:36px;text-align:center;margin-bottom:20px">
+          <div id="vak-result-emoji" style="font-size:64px;margin-bottom:12px"></div>
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">TON PROFIL DOMINANT</div>
+          <div id="vak-result-name" style="font-family:var(--font-display);font-size:44px;letter-spacing:4px;margin-bottom:8px"></div>
+          <div id="vak-result-desc" style="font-family:var(--font-cond);font-size:13px;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto 24px"></div>
+          <!-- Barres VAK -->
+          <div style="max-width:400px;margin:0 auto 28px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+              <div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--blue-belt);width:100px;text-align:left">👁️ Visuel</div>
+              <div style="flex:1;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden"><div id="vak-bar-v" style="height:100%;background:var(--blue-belt);border-radius:5px;width:0%;transition:width .8s ease"></div></div>
+              <div id="vak-pct-v" style="font-family:var(--font-cond);font-size:12px;color:var(--blue-belt);width:36px;text-align:right"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+              <div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--orange-belt);width:100px;text-align:left">👂 Auditif</div>
+              <div style="flex:1;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden"><div id="vak-bar-a" style="height:100%;background:var(--orange-belt);border-radius:5px;width:0%;transition:width .8s ease .1s"></div></div>
+              <div id="vak-pct-a" style="font-family:var(--font-cond);font-size:12px;color:var(--orange-belt);width:36px;text-align:right"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:var(--green-belt);width:100px;text-align:left">🤲 Kinesth.</div>
+              <div style="flex:1;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden"><div id="vak-bar-k" style="height:100%;background:var(--green-belt);border-radius:5px;width:0%;transition:width .8s ease .2s"></div></div>
+              <div id="vak-pct-k" style="font-family:var(--font-cond);font-size:12px;color:var(--green-belt);width:36px;text-align:right"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommandations drills -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">🏀 Drills recommandés pour ton profil</div>
+          <div id="vak-drills" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+
+        <div style="text-align:center">
+          <button onclick="vakStart()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">↺ Refaire le test</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /max-width -->
+</div><!-- /s-minijeux -->
+
+<style>
+.pp-layout { grid-template-columns: 1fr 320px; }
+@media(max-width:768px){ .pp-layout{ grid-template-columns:1fr !important } }
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// 🎮 MINI-JEUX — Navigation onglets
+// ══════════════════════════════════════════════════════════
+function openMiniJeu(id, btn) {
+  document.querySelectorAll('.mj-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('mj-' + id).style.display = 'block';
+  document.querySelectorAll('.mj-tab').forEach(b => {
+    b.style.background = 'var(--dark3)';
+    b.style.color = 'var(--muted)';
+    b.style.borderColor = 'var(--border)';
+  });
+  btn.style.background = 'rgba(245,197,24,.1)';
+  btn.style.color = 'var(--gold)';
+  btn.style.borderColor = 'rgba(245,197,24,.4)';
+}
+
+// ══════════════════════════════════════════════════════════
+// ⚡ JEU 1 : PIN & PEEL
+// ══════════════════════════════════════════════════════════
+const PP = {
+  level: 1,
+  state: 'idle',   // idle | waiting | active | error
+  signalTime: null,
+  results: [],
+  errors: 0,
+  waitTimer: null,
+  expectedAction: null,  // 'tap' | 'notap'
+  COLORS: {
+    ROUGE: { bg:'#c1121f', label:'ROUGE', action:'tap' },
+    JAUNE:  { bg:'#ffd60a', label:'JAUNE',  action:'tap' },
+    GRIS:   { bg:'#6b7280', label:'GRIS',   action:'notap' },
+  },
+};
+
+function ppSetLevel(n, btn) {
+  PP.level = n;
+  ppReset();
+  document.querySelectorAll('.pp-lvl').forEach(b => {
+    b.style.background = 'var(--dark3)'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--border)';
+  });
+  btn.style.background = 'rgba(245,197,24,.1)'; btn.style.color = 'var(--gold)'; btn.style.borderColor = 'rgba(245,197,24,.4)';
+  const rule = document.getElementById('pp-rule-display');
+  if (n === 1) { rule.style.display='none'; }
+  else if (n === 2) {
+    rule.style.display='block';
+    rule.textContent = '⚡ Règle inversée : ROUGE = Ne pas taper · GRIS = Taper';
+  } else {
+    rule.style.display='block';
+    rule.textContent = '⚡ Niveau 3 : 3 signaux possibles — ROUGE → taper · JAUNE → ne pas taper · GRIS → taper';
+  }
+}
+
+function ppStart() {
+  if (PP.state === 'waiting' || PP.state === 'active') return;
+  PP.state = 'waiting';
+  const sig = document.getElementById('pp-signal');
+  const txt = document.getElementById('pp-signal-txt');
+  const inst = document.getElementById('pp-instruction');
+  sig.style.background = 'var(--dark3)';
+  sig.style.borderColor = 'var(--border)';
+  txt.textContent = '...';
+  inst.textContent = 'Prépare-toi...';
+  document.getElementById('pp-start-btn').textContent = '⏳ En cours...';
+  const delay = 800 + Math.random() * 2200;
+  PP.waitTimer = setTimeout(() => ppShowSignal(), delay);
+}
+
+function ppShowSignal() {
+  PP.state = 'active';
+  PP.signalTime = performance.now();
+  const sig = document.getElementById('pp-signal');
+  const txt = document.getElementById('pp-signal-txt');
+  const inst = document.getElementById('pp-instruction');
+
+  let colorKey, color, expectedAction;
+  if (PP.level === 1) {
+    const keys = ['ROUGE','JAUNE'];
+    colorKey = keys[Math.floor(Math.random()*2)];
+    color = PP.COLORS[colorKey];
+    expectedAction = 'tap';
+    inst.textContent = 'TAPE ! → ' + color.label;
+  } else if (PP.level === 2) {
+    const keys = Object.keys(PP.COLORS);
+    colorKey = keys[Math.floor(Math.random()*3)];
+    color = PP.COLORS[colorKey];
+    // Inversé
+    expectedAction = color.action === 'tap' ? 'notap' : 'tap';
+    const shouldTap = expectedAction === 'tap';
+    inst.textContent = shouldTap ? '✅ TAPE ! → ' + color.label : '🚫 NE PAS TAPER → ' + color.label;
+  } else {
+    const keys = Object.keys(PP.COLORS);
+    colorKey = keys[Math.floor(Math.random()*3)];
+    color = PP.COLORS[colorKey];
+    expectedAction = color.action;
+    const shouldTap = expectedAction === 'tap';
+    inst.textContent = shouldTap ? '✅ TAPE ! → ' + color.label : '🚫 NE PAS TAPER → ' + color.label;
+  }
+
+  PP.expectedAction = expectedAction;
+  sig.style.background = color.bg;
+  sig.style.borderColor = color.bg;
+  txt.textContent = color.label;
+  txt.style.color = colorKey === 'JAUNE' ? '#000' : '#fff';
+
+  // Timeout si pas de réaction (2s)
+  PP.waitTimer = setTimeout(() => {
+    if (PP.state === 'active') {
+      if (PP.expectedAction === 'tap') {
+        // Trop lent = erreur
+        ppRegisterError('Trop lent !');
+      } else {
+        // Ne pas taper = correct
+        ppRegisterResult(null, true);
+      }
+    }
+  }, 2000);
+}
+
+function ppTap() {
+  if (PP.state === 'idle') { ppStart(); return; }
+  if (PP.state === 'waiting') {
+    clearTimeout(PP.waitTimer);
+    ppRegisterError('Trop tôt !');
+    return;
+  }
+  if (PP.state !== 'active') return;
+  clearTimeout(PP.waitTimer);
+  const rt = Math.round(performance.now() - PP.signalTime);
+  if (PP.expectedAction === 'tap') {
+    ppRegisterResult(rt, false);
+  } else {
+    ppRegisterError('Mauvaise réaction !');
+  }
+}
+
+function ppRegisterResult(rt, noTap) {
+  PP.state = 'idle';
+  const sig = document.getElementById('pp-signal');
+  const txt = document.getElementById('pp-signal-txt');
+  const inst = document.getElementById('pp-instruction');
+  const reac = document.getElementById('pp-reaction');
+  sig.style.background = 'rgba(45,198,83,.3)';
+  sig.style.borderColor = 'var(--green-belt)';
+  if (noTap) {
+    txt.textContent = '✓';
+    txt.style.color = 'var(--green-belt)';
+    reac.textContent = '✓';
+    inst.textContent = 'Bonne retenue ! ';
+    document.getElementById('pp-reaction-label').textContent = 'Correct — pas de frappe';
+  } else {
+    txt.textContent = rt + 'ms';
+    txt.style.color = '#fff';
+    reac.textContent = rt;
+    inst.textContent = rt < 200 ? '⚡ Réflexe élite !' : rt < 300 ? '✅ Excellent !' : rt < 450 ? '👍 Bon réflexe' : '📈 Continue à t\'entraîner';
+    document.getElementById('pp-reaction-label').textContent = 'millisecondes';
+    PP.results.push(rt);
+  }
+  ppUpdateStats();
+  ppAddHistory(rt, noTap, false);
+  document.getElementById('pp-start-btn').textContent = '▶ START';
+}
+
+function ppRegisterError(msg) {
+  PP.state = 'idle';
+  PP.errors++;
+  const sig = document.getElementById('pp-signal');
+  sig.style.background = 'rgba(230,57,70,.3)';
+  sig.style.borderColor = 'var(--red)';
+  document.getElementById('pp-signal-txt').textContent = '✗';
+  document.getElementById('pp-signal-txt').style.color = 'var(--red)';
+  document.getElementById('pp-instruction').textContent = '❌ ' + msg;
+  document.getElementById('pp-reaction').textContent = '✗';
+  document.getElementById('pp-reaction-label').textContent = 'Erreur';
+  ppUpdateStats();
+  ppAddHistory(null, false, true);
+  document.getElementById('pp-start-btn').textContent = '▶ START';
+}
+
+function ppUpdateStats() {
+  const r = PP.results;
+  if (r.length > 0) {
+    const best = Math.min(...r);
+    const avg = Math.round(r.reduce((a,b)=>a+b,0)/r.length);
+    document.getElementById('pp-stat-best').textContent = best;
+    document.getElementById('pp-stat-avg').textContent = avg;
+    // Niveau réflexe
+    const lbl = document.getElementById('pp-level-label');
+    const bar = document.getElementById('pp-level-bar');
+    let lvlTxt, pct, col;
+    if (avg < 180)      { lvlTxt='⚡ Élite NBA';       pct=100; col='var(--red)'; }
+    else if (avg < 220) { lvlTxt='🏆 Expert';           pct=80;  col='var(--orange-belt)'; }
+    else if (avg < 300) { lvlTxt='✅ Avancé';           pct=60;  col='var(--green-belt)'; }
+    else if (avg < 400) { lvlTxt='📈 Intermédiaire';    pct=40;  col='var(--blue-belt)'; }
+    else                { lvlTxt='🔰 Débutant';         pct=20;  col='var(--muted)'; }
+    lbl.textContent = lvlTxt;
+    bar.style.width = pct + '%';
+    bar.style.background = col;
+  }
+  document.getElementById('pp-stat-trials').textContent = PP.results.length;
+  document.getElementById('pp-stat-errors').textContent = PP.errors;
+}
+
+function ppAddHistory(rt, noTap, error) {
+  const hist = document.getElementById('pp-history');
+  if (hist.textContent === 'Aucun essai encore') hist.innerHTML = '';
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--font-cond);font-size:11px';
+  const total = PP.results.length + PP.errors;
+  if (error) {
+    row.innerHTML = `<span style="color:var(--muted)">#${total}</span><span style="color:var(--red)">✗ Erreur</span>`;
+  } else if (noTap) {
+    row.innerHTML = `<span style="color:var(--muted)">#${total}</span><span style="color:var(--green-belt)">✓ Bonne retenue</span>`;
+  } else {
+    const c = rt < 250 ? 'var(--green-belt)' : rt < 400 ? 'var(--gold)' : 'var(--red)';
+    row.innerHTML = `<span style="color:var(--muted)">#${PP.results.length}</span><span style="color:${c}">${rt} ms</span>`;
+  }
+  hist.prepend(row);
+}
+
+function ppReset() {
+  clearTimeout(PP.waitTimer);
+  PP.state = 'idle'; PP.results = []; PP.errors = 0; PP.signalTime = null;
+  const sig = document.getElementById('pp-signal');
+  sig.style.background = 'var(--dark3)'; sig.style.borderColor = 'var(--border)';
+  document.getElementById('pp-signal-txt').textContent = '?';
+  document.getElementById('pp-signal-txt').style.color = 'var(--muted)';
+  document.getElementById('pp-reaction').textContent = '—';
+  document.getElementById('pp-reaction-label').textContent = 'millisecondes';
+  document.getElementById('pp-instruction').textContent = 'Appuie sur START pour commencer';
+  document.getElementById('pp-start-btn').textContent = '▶ START';
+  document.getElementById('pp-stat-best').textContent = '—';
+  document.getElementById('pp-stat-avg').textContent = '—';
+  document.getElementById('pp-stat-trials').textContent = '0';
+  document.getElementById('pp-stat-errors').textContent = '0';
+  document.getElementById('pp-level-label').textContent = '—';
+  document.getElementById('pp-level-bar').style.width = '0%';
+  document.getElementById('pp-history').textContent = 'Aucun essai encore';
+}
+
+// ══════════════════════════════════════════════════════════
+// 🧠 JEU 2 : QUIZ IQ SENSEI
+// ══════════════════════════════════════════════════════════
+const QUIZ_DATA = [
+  // NEUROSCIENCES
+  { cat:'🧬 Neurosciences', q:'Quelle structure cérébrale est le "chef d\'orchestre" de l\'automatisation du dribble selon la méthode Sensei ?', choices:['Le cortex préfrontal','Le cervelet','L\'amygdale','L\'hippocampe'], correct:1, exp:'Le cervelet gère les boucles cérébelleuses responsables de l\'automatisation motrice. Après 10 000 répétitions, le geste devient instinctif.' },
+  { cat:'🧬 Neurosciences', q:'Qu\'est-ce que la neuroplasticité structurelle induite par l\'entraînement intensif du dribble ?', choices:['Une fatigue musculaire chronique','Une augmentation de la densité synaptique dans le cortex moteur','Une diminution de la fréquence cardiaque','Un gain de taille osseuse'], correct:1, exp:'Draganski et al. (2004) ont démontré que l\'entraînement induit des changements dans la matière grise, notamment dans les zones de motricité fine des mains.' },
+  { cat:'🧬 Neurosciences', q:'Pourquoi un basketteur expert "pense" moins à son dribble qu\'un débutant ?', choices:['Il est moins concentré','Son cervelet a automatisé le geste, libérant le cortex préfrontal','Il a moins de neurones actifs','Son cerveau est plus petit'], correct:1, exp:'C\'est l\'état de flow (Csikszentmihalyi) : désactivation partielle du cortex préfrontal. La ceinture noire, c\'est la maîtrise inconsciente.' },
+  { cat:'🧬 Neurosciences', q:'Quelle structure cérébrale s\'épaissit chez les athlètes ambidextres selon la méthode Sensei ?', choices:['Le tronc cérébral','Le corps calleux','Le bulbe rachidien','La moelle épinière'], correct:1, exp:'Le corps calleux — faisceau de fibres reliant les deux hémisphères — s\'épaissit chez les athlètes ambidextres (Schlaug et al., 1995).' },
+  { cat:'🧬 Neurosciences', q:'L\'entraînement rythmique (dribble sur tempo musical) accélère l\'acquisition des automatismes de combien selon Thaut et al. (2015) ?', choices:['10 à 15%','30 à 40%','5 à 10%','50 à 60%'], correct:1, exp:'La synchronisation des ganglions de la base avec le cortex moteur supplémentaire accélère l\'acquisition des automatismes de 30 à 40%.' },
+  // PHYSIQUE & MATHS
+  { cat:'📐 Physique & Maths', q:'Quel est l\'angle optimal pour maximiser la fenêtre d\'entrée dans le panier selon la méthode Sensei ?', choices:['38°','45°','51°','60°'], correct:2, exp:'Un angle de 51° optimise la fenêtre d\'entrée dans le panier. 45° maximise la portée mais 51° est plus efficace pour marquer.' },
+  { cat:'📐 Physique & Maths', q:'Quel phénomène physique explique que les meilleurs tireurs mettent du backspin sur le ballon ?', choices:['L\'effet Doppler','L\'effet Magnus','La loi de Hooke','L\'effet Venturi'], correct:1, exp:'L\'effet Magnus : la rotation crée une différence de pression qui courbe la trajectoire vers le bas au contact du panneau — le "lucky bounce".' },
+  { cat:'📐 Physique & Maths', q:'Un crossover à quel angle conserve 70% de la vitesse initiale selon la physique du dribble ?', choices:['30°','45°','60°','90°'], correct:1, exp:'v₂ = v₁·cos(2θ). À 45°, cos(90°) = 0,7 soit 70% de la vitesse conservée. Les meilleurs meneurs changent à 35-40° pour équilibrer vitesse et déséquilibre.' },
+  { cat:'📐 Physique & Maths', q:'Quelle loi de Newton illustre parfaitement le rebond du ballon sur le sol ?', choices:['1ère loi (inertie)','2ème loi (F=ma)','3ème loi (action-réaction)','Aucune'], correct:2, exp:'3ème loi : le sol renvoie exactement la force appliquée. Maîtriser le dribble, c\'est appliquer Newton inconsciemment.' },
+  { cat:'📐 Physique & Maths', q:'Selon Einstein et la relativité appliquée au dribble, un dribble à 5 km/h vers un défenseur qui recule à 3 km/h est perçu à quelle vitesse ?', choices:['2 km/h','5 km/h','8 km/h','15 km/h'], correct:2, exp:'Tout est relatif au référentiel. La vitesse perçue = 5 + 3 = 8 km/h. Le changement de rythme exploite cette relativité cognitive.' },
+  // MÉTHODE SENSEI
+  { cat:'🥋 Méthode Sensei', q:'Dans la méthode Sensei, que signifie l\'acronyme VAK ?', choices:['Vitesse · Agilité · Kinesthésique','Visuel · Auditif · Kinesthésique','Vertical · Axial · Kinétique','Vif · Agile · Koordiné'], correct:1, exp:'VAK = Visuel (ce qu\'on voit) · Auditif (ce qu\'on entend, le rythme du dribble) · Kinesthésique (le toucher de balle, le contrôle de la gravité).' },
+  { cat:'🥋 Méthode Sensei', q:'Quel est le ratio de force relative optimal pour un basketteur au développé couché selon la science du sport ?', choices:['0.75× le poids de corps','1.0× le poids de corps','1.5× le poids de corps','2.5× le poids de corps'], correct:2, exp:'1.5× = zone optimale basket : force suffisante pour les duels physiques, protection articulaire accrue, sans surcharge neuromusculaire nuisant à la motricité fine.' },
+  { cat:'🥋 Méthode Sensei', q:'Qu\'est-ce que la "Constraints-Led Approach" utilisée dans le bonus de l\'eBook Sensei ?', choices:['Une méthode d\'étirement','Une pédagogie non-linéaire utilisant des contraintes environnementales','Un programme de musculation','Un système de notation'], correct:1, exp:'La Constraints-Led Approach (Ecological Dynamics) manipule les contraintes tâche / environnement / individu pour créer des comportements moteurs adaptatifs — Cone Variant, Reaction Stick Variant.' },
+  { cat:'🥋 Méthode Sensei', q:'Combien de drills contient le "Stationary Ball-Handling Progression Package" de l\'eBook Black Belt ?', choices:['10 drills','12 drills','15 drills','20 drills'], correct:2, exp:'15 drills numérotés, du Tornado–TAP²–Cross au Three-Ball TAP³, plus le bonus Science-Based Teaching avec la Constraints-Led Approach.' },
+  { cat:'🥋 Méthode Sensei', q:'Selon les 7 piliers du transfert Sensei, quel est le dernier pilier qui conclut la progression de l\'entraînement à la performance en match ?', choices:['Vitesse Décisionnelle','Résilience à la Fatigue','Intégration Dribble & Vision','Robustesse à l\'Imprévu'], correct:2, exp:'Le 7ème pilier — Intégration Dribble & Vision — représente la synthèse finale : dribbler sans regarder le ballon (le ballon, tu le sens · le jeu, tu le regardes).' },
+];
+
+let quizState = { idx:0, score:0, answers:[], shuffled:[] };
+
+function quizStart() {
+  quizState = { idx:0, score:0, answers:[], shuffled: shuffleArray([...QUIZ_DATA]) };
+  document.getElementById('quiz-intro').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-game').style.display = 'block';
+  quizShowQuestion();
+}
+
+function quizShowQuestion() {
+  const q = quizState.shuffled[quizState.idx];
+  const total = quizState.shuffled.length;
+  document.getElementById('quiz-q-num').textContent = quizState.idx + 1;
+  document.getElementById('quiz-progress').style.width = ((quizState.idx / total) * 100) + '%';
+  document.getElementById('quiz-score-live').textContent = quizState.score + ' pts';
+  document.getElementById('quiz-category').textContent = q.cat;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-explanation').style.display = 'none';
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  const choicesEl = document.getElementById('quiz-choices');
+  choicesEl.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'text-align:left;padding:14px 18px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);color:var(--text);font-family:var(--font-cond);font-size:13px;cursor:pointer;transition:all .2s;width:100%';
+    btn.textContent = ['A','B','C','D'][i] + '. ' + c;
+    btn.onmouseenter = () => { btn.style.borderColor = 'rgba(245,197,24,.4)'; btn.style.background = 'rgba(245,197,24,.05)'; };
+    btn.onmouseleave = () => { if (!btn.dataset.answered) { btn.style.borderColor = 'var(--border)'; btn.style.background = 'var(--dark3)'; } };
+    btn.onclick = () => quizAnswer(i, btn);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function quizAnswer(idx, btn) {
+  const q = quizState.shuffled[quizState.idx];
+  const choices = document.getElementById('quiz-choices').querySelectorAll('button');
+  choices.forEach(b => { b.dataset.answered = '1'; b.style.cursor = 'default'; b.onmouseenter = null; b.onmouseleave = null; });
+  const correct = idx === q.correct;
+  if (correct) {
+    quizState.score++;
+    btn.style.background = 'rgba(45,198,83,.2)';
+    btn.style.borderColor = 'var(--green-belt)';
+    btn.style.color = 'var(--green-belt)';
+  } else {
+    btn.style.background = 'rgba(230,57,70,.15)';
+    btn.style.borderColor = 'var(--red)';
+    btn.style.color = 'var(--red)';
+    choices[q.correct].style.background = 'rgba(45,198,83,.2)';
+    choices[q.correct].style.borderColor = 'var(--green-belt)';
+    choices[q.correct].style.color = 'var(--green-belt)';
+  }
+  quizState.answers.push({ correct });
+  const exp = document.getElementById('quiz-explanation');
+  exp.style.display = 'block';
+  exp.style.background = correct ? 'rgba(45,198,83,.08)' : 'rgba(230,57,70,.08)';
+  exp.style.borderLeft = '3px solid ' + (correct ? 'var(--green-belt)' : 'var(--red)');
+  exp.textContent = (correct ? '✅ ' : '❌ ') + q.exp;
+  document.getElementById('quiz-score-live').textContent = quizState.score + ' pts';
+  const nextBtn = document.getElementById('quiz-next-btn');
+  nextBtn.style.display = 'inline-block';
+  nextBtn.textContent = quizState.idx < quizState.shuffled.length - 1 ? 'Question suivante →' : 'Voir mes résultats →';
+}
+
+function quizNext() {
+  quizState.idx++;
+  if (quizState.idx >= quizState.shuffled.length) { quizShowResult(); return; }
+  quizShowQuestion();
+}
+
+function quizShowResult() {
+  document.getElementById('quiz-game').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.style.display = 'block';
+  const total = quizState.shuffled.length;
+  const score = quizState.score;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('quiz-final-score').textContent = score + '/' + total;
+  const emojis = ['😅','🤔','📈','👍','🏆','🧠'];
+  const ei = Math.min(Math.floor(pct/20), 5);
+  document.getElementById('quiz-result-emoji').textContent = emojis[ei];
+  const verdict = document.getElementById('quiz-verdict');
+  let vt, vbg, vc;
+  if (pct >= 90)      { vt='IQ SENSEI ÉLITE'; vbg='rgba(245,197,24,.15)'; vc='var(--gold)'; }
+  else if (pct >= 70) { vt='EXPERT SENSEI';    vbg='rgba(45,198,83,.12)';  vc='var(--green-belt)'; }
+  else if (pct >= 50) { vt='EN PROGRESSION';   vbg='rgba(0,119,182,.12)';  vc='var(--blue-belt)'; }
+  else                { vt='CONTINUE À APPRENDRE'; vbg='rgba(122,130,153,.1)'; vc='var(--muted)'; }
+  verdict.textContent = vt; verdict.style.background = vbg; verdict.style.color = vc; verdict.style.border = '1px solid ' + vc;
+  const msgs = ['La méthode Sensei n\'a plus de secrets pour toi !','Excellent niveau scientifique. Quelques révisions et tu touches le sommet.','Bonne base. Relis les sections Neurosciences et Physique de l\'app.','Explore les sections Science et Neurosciences de l\'app pour progresser.'];
+  document.getElementById('quiz-result-msg').textContent = pct>=90?msgs[0]:pct>=70?msgs[1]:pct>=50?msgs[2]:msgs[3];
+  // Breakdown par catégorie
+  const cats = ['🧬 Neurosciences', '📐 Physique & Maths', '🥋 Méthode Sensei'];
+  const breakdown = document.getElementById('quiz-breakdown');
+  breakdown.innerHTML = '';
+  cats.forEach(cat => {
+    const qs = quizState.shuffled.filter((q,i) => q.cat===cat);
+    const correct = qs.filter((q,i) => {
+      const globalIdx = quizState.shuffled.indexOf(q);
+      return globalIdx < quizState.answers.length && quizState.answers[globalIdx]?.correct;
+    }).length;
+    const div = document.createElement('div');
+    div.style.cssText = 'padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)';
+    div.innerHTML = `<div style="font-size:20px;margin-bottom:4px">${cat.split(' ')[0]}</div><div style="font-family:var(--font-display);font-size:24px;color:var(--gold)">${correct}/${qs.length}</div><div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">${cat.slice(3)}</div>`;
+    breakdown.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// 👁️ JEU 3 : PROFIL VAK
+// ══════════════════════════════════════════════════════════
+const VAK_DATA = [
+  { scenario:'APPRENTISSAGE D\'UN DRILL', q:'Quand Sensei t\'explique un nouveau drill, comment tu intègres le mieux ?', choices:[
+    { txt:'Je regarde la vidéo / la démo plusieurs fois', type:'V' },
+    { txt:'J\'écoute les instructions et je répète à voix haute le rythme', type:'A' },
+    { txt:'Je l\'essaie tout de suite, même sans bien comprendre', type:'K' },
+  ]},
+  { scenario:'MÉMORISATION DU MOUVEMENT', q:'Pour te souvenir d\'un enchaînement de dribbles, tu...', choices:[
+    { txt:'Visualises mentalement la séquence comme un film', type:'V' },
+    { txt:'Comptes le rythme : "1-et-2-et" ou récite les étapes', type:'A' },
+    { txt:'Rejoues le mouvement dans ta tête avec les sensations', type:'K' },
+  ]},
+  { scenario:'ERREUR TECHNIQUE', q:'Sensei te dit que ton crossover n\'est pas correct. Comment tu comprends le mieux la correction ?', choices:[
+    { txt:'Il me montre en slow-motion sur vidéo', type:'V' },
+    { txt:'Il me l\'explique verbalement étape par étape', type:'A' },
+    { txt:'Il guide ma main physiquement pour sentir le bon geste', type:'K' },
+  ]},
+  { scenario:'CONCENTRATION EN SÉANCE', q:'Pendant 1 minute de drill, qu\'est-ce qui t\'aide le plus à rester focus ?', choices:[
+    { txt:'Regarder un point fixe devant moi (repère visuel)', type:'V' },
+    { txt:'Me donner un rythme ou compter les rebonds à voix basse', type:'A' },
+    { txt:'Sentir mes doigts contrôler le ballon, me concentrer sur le toucher', type:'K' },
+  ]},
+  { scenario:'PROGRESSION & FEEDBACK', q:'Pour savoir si tu progresses, tu te fies surtout à...', choices:[
+    { txt:'La vidéo de toi en train de dribbler (comparaison visuelle)', type:'V' },
+    { txt:'Ce que Sensei ou quelqu\'un te dit oralement', type:'A' },
+    { txt:'Tes sensations : le mouvement devient plus fluide, plus naturel', type:'K' },
+  ]},
+  { scenario:'PHASE DE REPOS', q:'Entre deux séries, pour récupérer mentalement, tu...', choices:[
+    { txt:'Regardes la vidéo de référence pour te remettre le drill en tête', type:'V' },
+    { txt:'Répètes les consignes à voix basse : "dos droit, regard levé..."', type:'A' },
+    { txt:'Fermes les yeux et ressens encore le mouvement dans tes mains', type:'K' },
+  ]},
+  { scenario:'MOTIVATION', q:'Qu\'est-ce qui te motive le plus à progresser ?', choices:[
+    { txt:'Voir des vidéos de joueurs pro qui exécutent le même drill', type:'V' },
+    { txt:'Entendre Sensei te dire que tu t\'améliores', type:'A' },
+    { txt:'Sentir physiquement que le geste devient automatique', type:'K' },
+  ]},
+  { scenario:'ENVIRONNEMENT D\'ENTRAÎNEMENT', q:'Dans quelle condition tu apprends le mieux un nouveau mouvement ?', choices:[
+    { txt:'Avec un miroir ou une caméra pour me voir', type:'V' },
+    { txt:'Dans le silence pour entendre le rythme du ballon', type:'A' },
+    { txt:'En musique, avec une énergie physique dans la salle', type:'K' },
+  ]},
+  { scenario:'TRANSFERT EN MATCH', q:'Quand tu appliques un drill en situation de match, tu...', choices:[
+    { txt:'Visualises mentalement le geste avant de l\'exécuter', type:'V' },
+    { txt:'T\'entends répéter mentalement la consigne de Sensei', type:'A' },
+    { txt:'Laisses ton corps agir instinctivement sans réfléchir', type:'K' },
+  ]},
+];
+
+let vakState = { idx:0, scores:{ V:0, A:0, K:0 } };
+
+function vakStart() {
+  vakState = { idx:0, scores:{ V:0, A:0, K:0 } };
+  document.getElementById('vak-intro').style.display = 'none';
+  document.getElementById('vak-result').style.display = 'none';
+  document.getElementById('vak-game').style.display = 'block';
+  vakShowQuestion();
+}
+
+function vakShowQuestion() {
+  const q = VAK_DATA[vakState.idx];
+  document.getElementById('vak-q-num').textContent = vakState.idx + 1;
+  document.getElementById('vak-progress').style.width = ((vakState.idx / VAK_DATA.length) * 100) + '%';
+  document.getElementById('vak-scenario').textContent = q.scenario;
+  document.getElementById('vak-question').textContent = q.q;
+  const choicesEl = document.getElementById('vak-choices');
+  choicesEl.innerHTML = '';
+  const shuffled = shuffleArray([...q.choices]);
+  shuffled.forEach(c => {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'text-align:left;padding:14px 18px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);color:var(--text);font-family:var(--font-cond);font-size:13px;cursor:pointer;transition:all .2s;width:100%';
+    btn.textContent = c.txt;
+    btn.onmouseenter = () => { btn.style.borderColor = 'rgba(245,197,24,.4)'; btn.style.background = 'rgba(245,197,24,.05)'; };
+    btn.onmouseleave = () => { btn.style.borderColor = 'var(--border)'; btn.style.background = 'var(--dark3)'; };
+    btn.onclick = () => {
+      vakState.scores[c.type]++;
+      vakState.idx++;
+      if (vakState.idx >= VAK_DATA.length) { vakShowResult(); } else { vakShowQuestion(); }
+    };
+    choicesEl.appendChild(btn);
+  });
+}
+
+function vakShowResult() {
+  document.getElementById('vak-game').style.display = 'none';
+  document.getElementById('vak-result').style.display = 'block';
+  const s = vakState.scores;
+  const total = VAK_DATA.length;
+  const pV = Math.round((s.V/total)*100);
+  const pA = Math.round((s.A/total)*100);
+  const pK = Math.round((s.K/total)*100);
+  // Dominant
+  const dom = s.V>=s.A && s.V>=s.K ? 'V' : s.A>=s.V && s.A>=s.K ? 'A' : 'K';
+  const profiles = {
+    V: { name:'VISUEL', emoji:'👁️', color:'var(--blue-belt)', desc:'Tu apprends en regardant. Les démonstrations vidéo, les repères visuels et les slow-motions sont tes meilleurs alliés. Tu mémorises les patterns et les trajectoires comme un film mental.', drills:[
+      { icon:'🎥', title:'Regarde d\'abord les vidéos Sensei avant de pratiquer', sub:'Ball Handling, Hand-Eye Coordination — observe 2-3 fois avant de reproduire' },
+      { icon:'📍', title:'Utilise un repère visuel fixe pendant le drill', sub:'"Regarde un repère devant toi" — technique de la section Annexes' },
+      { icon:'🪞', title:'Entraîne-toi face à un miroir ou avec une caméra', sub:'La rétroaction visuelle accélère ta correction technique' },
+    ]},
+    A: { name:'AUDITIF', emoji:'👂', color:'var(--orange-belt)', desc:'Tu apprends en entendant et en verbalisant. Le rythme du ballon, les instructions orales de Sensei et les comptages à voix haute ancrent les patterns moteurs dans ta mémoire.', drills:[
+      { icon:'🥁', title:'Utilise le métronome pour tes drills', sub:'Le rythme synchronise les ganglions de la base et le cortex moteur (Thaut, 2015)' },
+      { icon:'🗣️', title:'Répète les consignes à voix haute pendant le drill', sub:'"Dos droit · Regard levé · Doigts" — la verbalisation renforce l\'automatisation' },
+      { icon:'🔢', title:'Compte les rebonds du ballon à voix basse', sub:'Aide mnémotechnique auditif — issu du Drill #1 Tornado TAP²' },
+    ]},
+    K: { name:'KINESTHÉSIQUE', emoji:'🤲', color:'var(--green-belt)', desc:'Tu apprends par le corps et les sensations. Toucher le ballon, sentir la gravité, ressentir la fluidité du geste — c\'est ton canal d\'apprentissage dominant. La pratique immédiate est ta force.', drills:[
+      { icon:'🏀', title:'Lance-toi dans le drill immédiatement, ajuste en cours de route', sub:'Ton cerveau kinesthésique intègre mieux en faisant qu\'en observant' },
+      { icon:'👐', title:'Ferme les yeux pendant 10 secondes entre les séries', sub:'Ressens encore le mouvement dans tes mains — mémorisation kinesthésique' },
+      { icon:'⚖️', title:'Utilise des ballons de poids différents (Drills #4 & #5)', sub:'Le contraste de charge (Weighted Ball) maximise ton ressenti proprioceptif' },
+    ]},
+  };
+  const p = profiles[dom];
+  document.getElementById('vak-result-emoji').textContent = p.emoji;
+  document.getElementById('vak-result-name').textContent = p.name;
+  document.getElementById('vak-result-name').style.color = p.color;
+  document.getElementById('vak-result-desc').textContent = p.desc;
+  // Barres
+  setTimeout(() => {
+    document.getElementById('vak-bar-v').style.width = pV + '%';
+    document.getElementById('vak-bar-a').style.width = pA + '%';
+    document.getElementById('vak-bar-k').style.width = pK + '%';
+  }, 100);
+  document.getElementById('vak-pct-v').textContent = pV + '%';
+  document.getElementById('vak-pct-a').textContent = pA + '%';
+  document.getElementById('vak-pct-k').textContent = pK + '%';
+  // Drills recommandés
+  const drillsEl = document.getElementById('vak-drills');
+  drillsEl.innerHTML = '';
+  p.drills.forEach(d => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:14px;align-items:flex-start;padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)';
+    div.innerHTML = `<div style="font-size:24px;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--dark2);border-radius:8px">${d.icon}</div><div><div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${d.title}</div><div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);line-height:1.5">${d.sub}</div></div>`;
+    drillsEl.appendChild(div);
+  });
+}
+
+// ══ UTILS ══
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     📈 MES STATS — Radar · Control Chart · DMAIC
+     ══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════
+     🏅 MON PROFIL — Tracker ceinture · Journal · Certificat
+     ══════════════════════════════════════════════════════ -->
+<div id="s-profil" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">MON <span>PROFIL</span></div>
+  <div class="sec-sub">Tracker de ceinture · Journal de séance · Certificat · Export</div>
+  <div class="sec-line"></div>
+
+  <!-- ONGLETS -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px">
+    <button onclick="openProfilTab('tracker',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer">🥋 Ma Ceinture</button>
+    <button onclick="openProfilTab('journal',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📓 Journal</button>
+    <button onclick="openProfilTab('certif',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">🎖️ Certificat</button>
+    <button onclick="openProfilTab('export',this)" class="pr-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📤 Export</button>
+  </div>
+
+  <!-- ══ TAB 1 : MA CEINTURE ══ -->
+  <div id="pr-tracker" class="pr-panel">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start" class="profil-layout">
+
+      <!-- Carte ceinture actuelle -->
+      <div>
+        <div id="tracker-belt-card" style="border-radius:16px;padding:28px;margin-bottom:20px;border:2px solid var(--border);background:var(--dark2);position:relative;overflow:hidden">
+          <div id="tracker-belt-glow" style="position:absolute;inset:0;pointer-events:none;opacity:.15"></div>
+          <div style="position:relative;z-index:1">
+            <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">MA CEINTURE ACTUELLE</div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+              <div id="tracker-emoji" style="font-size:52px">🥋⚪</div>
+              <div>
+                <div id="tracker-belt-name" style="font-family:var(--font-display);font-size:36px;letter-spacing:3px;color:var(--white-belt)">BLANCHE</div>
+                <div id="tracker-belt-level" style="font-family:var(--font-cond);font-size:13px;color:var(--muted)">Niveau 1 — Débutant</div>
+              </div>
+            </div>
+            <!-- Barre progression drills -->
+            <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-bottom:6px">Drills validés pour cette ceinture</div>
+            <div style="height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:6px">
+              <div id="tracker-drill-bar" style="height:100%;border-radius:4px;background:var(--gold);width:0%;transition:width .5s"></div>
+            </div>
+            <div id="tracker-drill-count" style="font-family:var(--font-cond);font-size:11px;color:var(--muted)">0 / 0 drills validés</div>
+          </div>
+        </div>
+
+        <!-- Drills à valider -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">✅ Drills à valider pour passer</div>
+          <div id="tracker-drills-list"></div>
+        </div>
+
+        <!-- Bouton passage de ceinture -->
+        <div id="tracker-pass-wrap" style="display:none;background:rgba(45,198,83,.08);border:1px solid rgba(45,198,83,.3);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:40px;margin-bottom:8px">🎉</div>
+          <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:var(--green-belt);margin-bottom:12px">Tous les drills validés ! Tu peux passer à la ceinture suivante.</div>
+          <button onclick="trackerPassBelt()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">🥋 Passer à la ceinture suivante →</button>
+        </div>
+      </div>
+
+      <!-- Panneau progression globale -->
+      <div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Ma progression</div>
+          <div id="tracker-belt-timeline"></div>
+        </div>
+
+        <!-- Infos joueur -->
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Mon profil</div>
+          <div style="margin-bottom:12px">
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Prénom</label>
+            <input id="profil-name" type="text" placeholder="Ton prénom" oninput="profilSaveMeta()"
+              style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Date de début</label>
+            <input id="profil-start" type="date" oninput="profilSaveMeta()"
+              style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div id="profil-days" style="margin-top:12px;font-family:var(--font-cond);font-size:12px;color:var(--muted)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2 : JOURNAL ══ -->
+  <div id="pr-journal" class="pr-panel" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start" class="profil-layout">
+
+      <!-- Formulaire nouvelle entrée -->
+      <div>
+        <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">➕ Nouvelle séance</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Date</label>
+              <input id="j-date" type="date" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+            </div>
+            <div>
+              <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Durée (min)</label>
+              <input id="j-duration" type="number" min="5" max="180" placeholder="45" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Drills travaillés</label>
+            <input id="j-drills" type="text" placeholder="Ex : Tornado TAP², Windshield Wipers, 3-Ball Dissociation" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Charge bench (kg)</label>
+              <input id="j-bench" type="number" placeholder="Ex : 80" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+            </div>
+            <div>
+              <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Ressenti (1–5 ⭐)</label>
+              <select id="j-feeling" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+                <option value="">—</option>
+                <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                <option value="4">⭐⭐⭐⭐ Bon</option>
+                <option value="3">⭐⭐⭐ Correct</option>
+                <option value="2">⭐⭐ Difficile</option>
+                <option value="1">⭐ Mauvaise séance</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:16px">
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Notes libres</label>
+            <textarea id="j-notes" rows="3" placeholder="Observations, points à travailler, sensations..." style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:12px;resize:vertical;outline:none"></textarea>
+          </div>
+          <button onclick="journalAdd()" style="width:100%;font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:11px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">💾 Enregistrer la séance</button>
+        </div>
+
+        <!-- Liste des entrées -->
+        <div id="journal-list"></div>
+      </div>
+
+      <!-- Stats journal -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;position:sticky;top:80px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">📊 Stats globales</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+            <div id="j-stat-total" style="font-family:var(--font-display);font-size:28px;color:var(--gold)">0</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">SÉANCES</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+            <div id="j-stat-time" style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">0h</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">TEMPS TOTAL</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+            <div id="j-stat-streak" style="font-family:var(--font-display);font-size:28px;color:var(--orange-belt)">0</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">SEMAINE STREAK</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
+            <div id="j-stat-feeling" style="font-family:var(--font-display);font-size:28px;color:var(--green-belt)">—</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">RESSENTI MOY.</div>
+          </div>
+        </div>
+        <button onclick="journalClear()" style="margin-top:14px;width:100%;font-family:var(--font-cond);font-size:11px;font-weight:700;padding:7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">🗑️ Effacer le journal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3 : CERTIFICAT ══ -->
+  <div id="pr-certif" class="pr-panel" style="display:none">
+    <div style="max-width:680px;margin:0 auto">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Personnalise ton certificat</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Nom complet</label>
+            <input id="cert-name" type="text" placeholder="Prénom Nom" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="certPreview()">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Ceinture obtenue</label>
+            <select id="cert-belt" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" onchange="certPreview()">
+              <option value="0">⚪ Blanche</option><option value="1">🟡 Jaune</option><option value="2">🟠 Orange</option>
+              <option value="3">🟢 Verte</option><option value="4">🔵 Bleue</option><option value="5">🟣 Violette</option>
+              <option value="6">🟤 Marron</option><option value="7">⚫ Noire</option><option value="8">🔴 Rouge</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Score Data Science (/10)</label>
+            <input id="cert-score" type="number" min="0" max="10" step="0.1" placeholder="9.2" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="certPreview()">
+          </div>
+          <div>
+            <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Date</label>
+            <input id="cert-date" type="date" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none" oninput="certPreview()">
+          </div>
+        </div>
+        <button onclick="certDownload()" style="width:100%;font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:11px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">⬇️ Télécharger le certificat (PNG)</button>
+      </div>
+
+      <!-- Prévisualisation canvas -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Prévisualisation</div>
+        <canvas id="cert-canvas" width="800" height="500" style="width:100%;height:auto;border-radius:8px;display:block"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4 : EXPORT ══ -->
+  <div id="pr-export" class="pr-panel" style="display:none">
+    <div style="max-width:600px;margin:0 auto">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📤 Exporter mon profil</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px">Génère un code texte contenant toutes tes données (ceinture, journal, stats radar). Tu peux l'envoyer à Sensei ou le sauvegarder en dehors de l'app.</div>
+        <button onclick="exportGenerate()" style="width:100%;font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:11px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer;margin-bottom:12px">Générer mon code d'export</button>
+        <textarea id="export-code" rows="5" readonly placeholder="Ton code apparaîtra ici..." style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:10px;color:var(--muted);font-family:monospace;font-size:11px;resize:none;outline:none"></textarea>
+        <button onclick="exportCopy()" style="margin-top:8px;width:100%;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px;border-radius:5px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer">📋 Copier le code</button>
+      </div>
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:28px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📥 Importer un profil</div>
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px">Colle ici un code exporté pour restaurer un profil sur un autre appareil.</div>
+        <textarea id="import-code" rows="4" placeholder="Colle ton code ici..." style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:10px;color:var(--text);font-family:monospace;font-size:11px;resize:none;outline:none;margin-bottom:10px"></textarea>
+        <button onclick="importProfile()" style="width:100%;font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:11px;border-radius:6px;border:none;background:var(--dark3);color:var(--text);border:1px solid var(--border);cursor:pointer">Importer ce profil</button>
+        <div id="import-msg" style="display:none;font-family:var(--font-cond);font-size:11px;text-align:center;margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /max-width -->
+</div><!-- /s-profil -->
+
+<style>
+.profil-layout { grid-template-columns: 1fr 280px; }
+@media(max-width:768px){ .profil-layout{ grid-template-columns:1fr !important } }
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// 🏅 MON PROFIL
+// ══════════════════════════════════════════════════════════
+const BELTS_PROFIL = [
+  { id:'white',  name:'Blanche', emoji:'🥋⚪', color:'#f8f9fa', drills:['Tornado – TAP² – Cross','Windshield Wipers (6 variantes)','Small-Ball Drill : TAP²'] },
+  { id:'yellow', name:'Jaune',   emoji:'🥋🟡', color:'#ffd60a', drills:['Weighted-Ball Drill : TAP²','Juggling : 3 Tennis Balls','Juggling-Dribbling Combo'] },
+  { id:'orange', name:'Orange',  emoji:'🥋🟠', color:'#ff6d00', drills:['Three-Ball : One-Hand Tap','Three-Ball Dissociation : 3 Tennis Balls','Three-Ball Dissociation : 1 Tennis + 2 Standard'] },
+  { id:'green',  name:'Verte',   emoji:'🥋🟢', color:'#2dc653', drills:['Three-Ball Dissociation : 2 Tennis + 1 Standard','Three-Ball Dissociation : 3 Standard','Multiprehension : Standard + Tennis + Weighted'] },
+  { id:'blue',   name:'Bleue',   emoji:'🥋🔵', color:'#0077b6', drills:['Multiprehension : Standard + Small + Weighted','Three-Ball TAP³ : Tap × Tap × Tap','Pin & Peel Reaction Drill'] },
+  { id:'purple', name:'Violette',emoji:'🥋🟣', color:'#7b2d8b', drills:['Cone Variant (Constraints-Led)','Reaction Stick Variant','Drill 2 Ballons + Plot Incertain'] },
+  { id:'brown',  name:'Marron',  emoji:'🥋🟤', color:'#8b4513', drills:['Programme Bench Press Phase 1–2','Simulateur charge neuromotrice','Quiz IQ Sensei ≥ 12/15'] },
+  { id:'black',  name:'Noire',   emoji:'🥋⚫', color:'#e0e0e0', drills:['Programme Bench Press Phase 3','Ratio force relative ≥ 1.5×','Score Radar global ≥ 8.0'] },
+  { id:'red',    name:'Rouge',   emoji:'🥋🔴', color:'#c1121f', drills:['Cpk ≥ 1.33 (3 sessions)','DMAIC complet','Score Radar global ≥ 9.5'] },
+];
+
+function openProfilTab(id, btn) {
+  document.querySelectorAll('.pr-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('pr-' + id).style.display = 'block';
+  document.querySelectorAll('.pr-tab').forEach(b => {
+    b.style.background='var(--dark3)'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)';
+  });
+  btn.style.background='rgba(245,197,24,.1)'; btn.style.color='var(--gold)'; btn.style.borderColor='rgba(245,197,24,.4)';
+  // requestAnimationFrame garantit que le panel est rendu avant l'init
+  requestAnimationFrame(function() {
+    if (id==='tracker') trackerInit();
+    if (id==='journal')  journalRender();
+    if (id==='certif')   certPreview();
+  });
+}
+
+// ── TRACKER ──
+function trackerInit() {
+  const drillsList = document.getElementById('tracker-drills-list');
+  if (!drillsList) { setTimeout(trackerInit, 50); return; }
+
+  const meta = JSON.parse(localStorage.getItem('sensei_profil_meta')||'{}');
+  const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const checkedDrills = JSON.parse(localStorage.getItem('sensei_drills_checked')||'{}');
+
+  const nameEl = document.getElementById('profil-name');
+  const startEl = document.getElementById('profil-start');
+  if (meta.name && nameEl) nameEl.value = meta.name;
+  if (meta.start && startEl) startEl.value = meta.start;
+  profilUpdateDays(meta.start);
+
+  const belt = BELTS_PROFIL[beltIdx];
+  const card = document.getElementById('tracker-belt-card');
+  if (!card) return;
+  card.style.borderColor = belt.color;
+  document.getElementById('tracker-belt-glow').style.background = 'radial-gradient(ellipse at 30% 30%, ' + belt.color + ', transparent 70%)';
+  document.getElementById('tracker-emoji').textContent = belt.emoji;
+  document.getElementById('tracker-belt-name').textContent = belt.name.toUpperCase();
+  document.getElementById('tracker-belt-name').style.color = belt.color;
+  document.getElementById('tracker-belt-level').textContent = 'Niveau ' + (beltIdx+1);
+
+  // Drills list
+  drillsList.innerHTML = '';
+  const drillKey = 'belt_' + beltIdx;
+  const checked = checkedDrills[drillKey] || [];
+  belt.drills.forEach(function(d, i) {
+    const row = document.createElement('div');
+    const isDone = checked.includes(i);
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);margin-bottom:8px;cursor:pointer;transition:all .2s';
+    const checkBox = document.createElement('div');
+    checkBox.style.cssText = 'width:22px;height:22px;border-radius:5px;border:2px solid ' + (isDone?belt.color:'var(--border)') + ';background:' + (isDone?belt.color+'30':'transparent') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px';
+    checkBox.textContent = isDone ? '✓' : '';
+    const label = document.createElement('div');
+    label.style.cssText = 'font-family:var(--font-cond);font-size:13px;color:' + (isDone?belt.color:'var(--text)') + ';' + (isDone?'text-decoration:line-through;opacity:.7':'');
+    label.textContent = d;
+    row.appendChild(checkBox);
+    row.appendChild(label);
+    row.onclick = function() { trackerToggleDrill(beltIdx, i); };
+    drillsList.appendChild(row);
+  });
+
+  const total = belt.drills.length;
+  const pct = total > 0 ? Math.round((checked.length / total) * 100) : 0;
+  document.getElementById('tracker-drill-bar').style.width = pct + '%';
+  document.getElementById('tracker-drill-bar').style.background = belt.color;
+  document.getElementById('tracker-drill-count').textContent = checked.length + ' / ' + total + ' drills validés';
+
+  const passWrap = document.getElementById('tracker-pass-wrap');
+  if (passWrap) passWrap.style.display = (total > 0 && checked.length >= total && beltIdx < 8) ? 'block' : 'none';
+
+  // Timeline
+  const timeline = document.getElementById('tracker-belt-timeline');
+  if (timeline) {
+    timeline.innerHTML = '';
+    BELTS_PROFIL.forEach(function(b, i) {
+      const done = i < beltIdx, current = i === beltIdx;
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:6px 0;opacity:' + (done||current?'1':'0.3');
+      const dot = document.createElement('div');
+      dot.style.cssText = 'width:28px;height:28px;border-radius:50%;background:' + (done?b.color+'30':current?b.color+'20':'var(--dark3)') + ';border:2px solid ' + (done||current?b.color:'var(--border)') + ';display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0';
+      dot.textContent = done ? '✓' : (current ? '●' : '');
+      const nameDiv = document.createElement('div');
+      nameDiv.style.cssText = 'font-family:var(--font-cond);font-size:12px;font-weight:700;color:' + (current?b.color:done?'var(--text)':'var(--muted)');
+      nameDiv.textContent = b.name;
+      row.appendChild(dot);
+      row.appendChild(nameDiv);
+      if (current) {
+        const badge = document.createElement('div');
+        badge.style.cssText = 'margin-left:auto;font-family:var(--font-cond);font-size:9px;font-weight:700;background:'+b.color+'20;color:'+b.color+';border-radius:10px;padding:2px 8px;border:1px solid '+b.color;
+        badge.textContent = 'ACTUELLE';
+        row.appendChild(badge);
+      }
+      timeline.appendChild(row);
+    });
+  }
+}
+
+
+function trackerToggleDrill(beltIdx, drillIdx) {
+  const all = JSON.parse(localStorage.getItem('sensei_drills_checked')||'{}');
+  const key = 'belt_' + beltIdx;
+  if (!all[key]) all[key] = [];
+  const pos = all[key].indexOf(drillIdx);
+  if (pos >= 0) all[key].splice(pos,1); else all[key].push(drillIdx);
+  localStorage.setItem('sensei_drills_checked', JSON.stringify(all));
+  trackerInit();
+}
+
+function trackerPassBelt() {
+  const cur = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  if (cur >= 8) return;
+  localStorage.setItem('sensei_belt_idx', cur + 1);
+  // Animation
+  document.getElementById('tracker-pass-wrap').style.display = 'none';
+  trackerInit();
+  // Confettis
+  spawnConfetti(BELTS_PROFIL[cur+1].color);
+}
+
+function profilSaveMeta() {
+  const meta = { name: document.getElementById('profil-name').value, start: document.getElementById('profil-start').value };
+  localStorage.setItem('sensei_profil_meta', JSON.stringify(meta));
+  profilUpdateDays(meta.start);
+}
+
+function profilUpdateDays(start) {
+  const el = document.getElementById('profil-days');
+  if (!start || !el) return;
+  // Parse la date locale sans décalage de fuseau horaire
+  const parts = start.split('-');
+  const startDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.max(0, Math.floor((today - startDate) / 86400000));
+  if (diff === 0) {
+    el.textContent = '🏀 Jour 1 — Bienvenue dans le programme Sensei !';
+  } else {
+    el.textContent = '🏀 ' + diff + ' jour' + (diff>1?'s':'') + ' dans le programme Sensei';
+  }
+}
+
+// ── CONFETTIS ──
+function spawnConfetti(color) {
+  for (let i=0; i<60; i++) {
+    const el = document.createElement('div');
+    el.style.cssText = `position:fixed;top:-10px;left:${Math.random()*100}vw;width:8px;height:8px;background:${color};border-radius:50%;z-index:9999;pointer-events:none;animation:confettiFall ${1+Math.random()*2}s linear forwards`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 3000);
+  }
+}
+
+// ── JOURNAL ──
+function journalAdd() {
+  const date = document.getElementById('j-date').value || new Date().toISOString().slice(0,10);
+  const dur  = document.getElementById('j-duration').value;
+  const drills = document.getElementById('j-drills').value;
+  const bench  = document.getElementById('j-bench').value;
+  const feeling = document.getElementById('j-feeling').value;
+  const notes  = document.getElementById('j-notes').value;
+  if (!drills && !notes) { alert('Indique au moins les drills travaillés.'); return; }
+  const entries = JSON.parse(localStorage.getItem('sensei_journal')||'[]');
+  entries.unshift({ date, dur:parseInt(dur)||0, drills, bench:parseFloat(bench)||0, feeling:parseInt(feeling)||0, notes, id: Date.now() });
+  localStorage.setItem('sensei_journal', JSON.stringify(entries));
+  ['j-date','j-duration','j-drills','j-bench','j-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('j-feeling').value = '';
+  journalRender();
+}
+
+function journalRender() {
+  const entries = JSON.parse(localStorage.getItem('sensei_journal')||'[]');
+  const list = document.getElementById('journal-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (entries.length === 0) {
+    list.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:24px">Aucune séance enregistrée</div>';
+  } else {
+    entries.forEach(e => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px';
+      const stars = '⭐'.repeat(e.feeling||0);
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold)">${e.date}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${e.dur?`<span style="font-family:var(--font-cond);font-size:10px;background:rgba(0,119,182,.15);color:var(--blue-belt);border-radius:10px;padding:2px 8px">⏱ ${e.dur} min</span>`:''}
+            ${e.bench?`<span style="font-family:var(--font-cond);font-size:10px;background:rgba(230,57,70,.12);color:var(--red);border-radius:10px;padding:2px 8px">🏋️ ${e.bench}kg</span>`:''}
+            ${stars?`<span style="font-size:10px">${stars}</span>`:''}
+          </div>
+        </div>
+        ${e.drills?`<div style="font-family:var(--font-cond);font-size:11px;color:var(--text);margin-bottom:4px">🏀 ${e.drills}</div>`:''}
+        ${e.notes?`<div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);font-style:italic">${e.notes}</div>`:''}
+        <div style="text-align:right;margin-top:8px"><button onclick="journalDelete(${e.id})" style="font-family:var(--font-cond);font-size:10px;background:transparent;border:none;color:var(--muted2);cursor:pointer">🗑️ Supprimer</button></div>`;
+      list.appendChild(card);
+    });
+  }
+  // Stats
+  const total = entries.length;
+  const totalMin = entries.reduce((a,e)=>a+(e.dur||0),0);
+  const feelings = entries.filter(e=>e.feeling>0).map(e=>e.feeling);
+  const avgFeel = feelings.length ? (feelings.reduce((a,b)=>a+b,0)/feelings.length).toFixed(1) : '—';
+  document.getElementById('j-stat-total').textContent = total;
+  document.getElementById('j-stat-time').textContent = totalMin >= 60 ? (totalMin/60).toFixed(1)+'h' : totalMin+'m';
+  document.getElementById('j-stat-feeling').textContent = avgFeel;
+  // Streak simplifié (semaines avec ≥1 séance)
+  const weeks = new Set(entries.map(e => { const d=new Date(e.date); return d.getFullYear()+'W'+Math.ceil((d.getDate())/7); }));
+  document.getElementById('j-stat-streak').textContent = weeks.size;
+  // Init date today
+  const jDate = document.getElementById('j-date');
+  if (jDate && !jDate.value) jDate.value = new Date().toISOString().slice(0,10);
+}
+
+function journalDelete(id) {
+  const entries = JSON.parse(localStorage.getItem('sensei_journal')||'[]').filter(e=>e.id!==id);
+  localStorage.setItem('sensei_journal', JSON.stringify(entries));
+  journalRender();
+}
+
+function journalClear() {
+  if (!confirm('Effacer tout le journal ?')) return;
+  localStorage.removeItem('sensei_journal');
+  journalRender();
+}
+
+// ── CERTIFICAT ──
+const BELT_CERT_DATA = [
+  { name:'BLANCHE',  color:'#f8f9fa', emoji:'⚪', lvl:'Niveau 1' },
+  { name:'JAUNE',    color:'#ffd60a', emoji:'🟡', lvl:'Niveau 2' },
+  { name:'ORANGE',   color:'#ff6d00', emoji:'🟠', lvl:'Niveau 3' },
+  { name:'VERTE',    color:'#2dc653', emoji:'🟢', lvl:'Niveau 4' },
+  { name:'BLEUE',    color:'#0077b6', emoji:'🔵', lvl:'Niveau 5' },
+  { name:'VIOLETTE', color:'#7b2d8b', emoji:'🟣', lvl:'Niveau 6' },
+  { name:'MARRON',   color:'#8b4513', emoji:'🟤', lvl:'Niveau 7' },
+  { name:'NOIRE',    color:'#e0e0e0', emoji:'⚫', lvl:'Niveau 8' },
+  { name:'ROUGE',    color:'#c1121f', emoji:'🔴', lvl:'Niveau 9 — Légendaire' },
+];
+
+function certPreview() {
+  const canvas = document.getElementById('cert-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=800, H=500;
+  const beltIdx = parseInt(document.getElementById('cert-belt').value)||0;
+  const bd = BELT_CERT_DATA[beltIdx];
+  const name  = document.getElementById('cert-name').value  || 'Prénom Nom';
+  const score = document.getElementById('cert-score').value || '—';
+  const dateVal = document.getElementById('cert-date').value;
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+
+  ctx.clearRect(0,0,W,H);
+  // Fond
+  ctx.fillStyle = '#080a0f'; ctx.fillRect(0,0,W,H);
+  // Bordure dorée
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 4;
+  ctx.strokeRect(12, 12, W-24, H-24);
+  ctx.strokeStyle = bd.color; ctx.lineWidth = 1.5;
+  ctx.strokeRect(20, 20, W-40, H-40);
+  // Fond dégradé subtil ceinture
+  const grd = ctx.createRadialGradient(W/2,H/2,50,W/2,H/2,350);
+  grd.addColorStop(0, bd.color + '18'); grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+  // Header SENSEI
+  ctx.font = 'bold 16px "Arial Narrow", sans-serif';
+  ctx.fillStyle = '#f5c518'; ctx.textAlign = 'center';
+  ctx.fillText('SENSEI BLACKBELT · MÉTHODE BASKET SCIENTIFIQUE · THIBAULT NJECKIL', W/2, 52);
+  // Ligne
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 1; ctx.globalAlpha = .4;
+  ctx.beginPath(); ctx.moveTo(60,62); ctx.lineTo(W-60,62); ctx.stroke(); ctx.globalAlpha=1;
+  // Titre
+  ctx.font = '800 20px "Arial", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillText('CERTIFICAT DE PASSAGE DE CEINTURE', W/2, 100);
+  // Emoji ceinture
+  ctx.font = '72px serif'; ctx.fillText(bd.emoji, W/2, 185);
+  // Nom
+  ctx.font = 'bold 42px "Arial Narrow", sans-serif';
+  ctx.fillStyle = '#f0f2f8'; ctx.fillText(name.toUpperCase(), W/2, 245);
+  // Ceinture
+  ctx.font = 'bold 56px "Arial Narrow", sans-serif';
+  ctx.fillStyle = bd.color; ctx.fillText('CEINTURE ' + bd.name, W/2, 310);
+  ctx.font = '18px "Arial", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillText(bd.lvl, W/2, 340);
+  // Score
+  ctx.font = 'bold 20px "Arial Narrow", sans-serif';
+  ctx.fillStyle = '#f5c518'; ctx.fillText('SCORE DATA SCIENCE : ' + score + ' / 10', W/2, 385);
+  // Date + signature
+  ctx.font = '15px "Arial", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.4)';
+  ctx.fillText('Certifié le ' + dateStr + ' · senseiblackbelt.com', W/2, 430);
+  // Ligne basse
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth=1; ctx.globalAlpha=.4;
+  ctx.beginPath(); ctx.moveTo(60,445); ctx.lineTo(W-60,445); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.font = '12px "Arial", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.25)';
+  ctx.fillText('Lean Six Sigma 6σ · Propriété intellectuelle protégée · Dépôt INPI', W/2, 465);
+}
+
+function certDownload() {
+  certPreview();
+  const canvas = document.getElementById('cert-canvas');
+  const name = document.getElementById('cert-name').value || 'eleve';
+  const link = document.createElement('a');
+  link.download = 'certificat-sensei-' + name.toLowerCase().replace(/\s+/g,'-') + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ── EXPORT / IMPORT ──
+function exportGenerate() {
+  const data = {
+    v: 1,
+    belt: localStorage.getItem('sensei_belt_idx'),
+    meta: localStorage.getItem('sensei_profil_meta'),
+    drills: localStorage.getItem('sensei_drills_checked'),
+    journal: localStorage.getItem('sensei_journal'),
+    radar: localStorage.getItem('sensei_radar_sessions'),
+    dmaic: localStorage.getItem('sensei_dmaic'),
+    exported: new Date().toISOString(),
+  };
+  document.getElementById('export-code').value = btoa(JSON.stringify(data));
+}
+
+function exportCopy() {
+  const ta = document.getElementById('export-code');
+  if (!ta.value) { exportGenerate(); }
+  navigator.clipboard.writeText(ta.value).then(() => alert('✅ Code copié dans le presse-papiers !'));
+}
+
+function importProfile() {
+  const code = document.getElementById('import-code').value.trim();
+  const msg = document.getElementById('import-msg');
+  try {
+    const data = JSON.parse(atob(code));
+    if (data.v !== 1) throw new Error('Version incompatible');
+    if (data.belt)   localStorage.setItem('sensei_belt_idx', data.belt);
+    if (data.meta)   localStorage.setItem('sensei_profil_meta', data.meta);
+    if (data.drills) localStorage.setItem('sensei_drills_checked', data.drills);
+    if (data.journal)localStorage.setItem('sensei_journal', data.journal);
+    if (data.radar)  localStorage.setItem('sensei_radar_sessions', data.radar);
+    if (data.dmaic)  localStorage.setItem('sensei_dmaic', data.dmaic);
+    msg.style.color = 'var(--green-belt)'; msg.textContent = '✅ Profil importé avec succès !'; msg.style.display='block';
+    trackerInit(); journalRender();
+  } catch(e) {
+    msg.style.color = 'var(--red)'; msg.textContent = '❌ Code invalide ou corrompu.'; msg.style.display='block';
+  }
+}
+
+// ── CSS confettis ──
+if (!document.getElementById('confetti-style')) {
+  const s = document.createElement('style');
+  s.id = 'confetti-style';
+  s.textContent = '@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity:0; } }';
+  document.head.appendChild(s);
+}
+
+// Init au chargement & à l'ouverture
+const _showSectionOrig2 = window.showSection;
+window.showSection = function(id, btn) {
+  _showSectionOrig2(id, btn);
+  if (id==='profil') { requestAnimationFrame(()=>requestAnimationFrame(()=>{ trackerInit(); journalRender(); certPreview(); })); }
+};
+document.addEventListener('DOMContentLoaded', () => {
+  const jDate = document.getElementById('j-date');
+  if (jDate) jDate.value = new Date().toISOString().slice(0,10);
+  const certDate = document.getElementById('cert-date');
+  if (certDate) certDate.value = new Date().toISOString().slice(0,10);
+});
+</script>
+
+<div id="s-stats" class="section">
+<div style="max-width:1100px;margin:0 auto">
+  <div class="sec-title">MES <span>STATS</span></div>
+  <div class="sec-sub">Radar · Progression · DMAIC · Lean Six Sigma appliqué au basket</div>
+  <div class="sec-line"></div>
+
+  <!-- ONGLETS -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px">
+    <button onclick="openStatsTab('radar',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer">🕸️ Radar</button>
+    <button onclick="openStatsTab('chart',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📉 Control Chart</button>
+    <button onclick="openStatsTab('dmaic',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">⚙️ DMAIC</button>
+    <button onclick="openStatsTab('cpk',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">📊 Indice Cpk</button>
+  </div>
+
+  <!-- ══ TAB 1 : RADAR CHART ══ -->
+  <div id="st-radar" class="st-panel">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start" class="stats-layout">
+
+      <!-- Radar SVG -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:28px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Profil technique · 6 axes Sensei</div>
+        <div style="font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:20px">MON RADAR <span style="color:var(--gold)">SENSEI</span></div>
+        <div style="position:relative;width:100%;max-width:420px;margin:0 auto">
+          <canvas id="radar-canvas" width="420" height="420" style="width:100%;height:auto;display:block"></canvas>
+        </div>
+        <div style="margin-top:16px;font-family:var(--font-cond);font-size:11px;color:var(--muted);text-align:center">
+          Ajuste tes scores à droite → le radar se met à jour en temps réel
+        </div>
+      </div>
+
+      <!-- Sliders -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:24px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Évalue chaque axe (0–10)</div>
+        <div id="radar-sliders"></div>
+        <div style="margin-top:20px;padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);text-align:center">
+          <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);margin-bottom:4px">SCORE GLOBAL</div>
+          <div id="radar-global" style="font-family:var(--font-display);font-size:48px;color:var(--gold)">—</div>
+          <div id="radar-verdict" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px"></div>
+        </div>
+        <button onclick="radarSave()" style="margin-top:14px;width:100%;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">💾 Enregistrer cette session</button>
+        <div id="radar-saved-msg" style="display:none;font-family:var(--font-cond);font-size:11px;color:var(--green-belt);text-align:center;margin-top:8px">✅ Session enregistrée !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2 : CONTROL CHART ══ -->
+  <div id="st-chart" class="st-panel" style="display:none">
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:28px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+        <div>
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Lean Six Sigma · Control Chart</div>
+          <div style="font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--text)">PROGRESSION <span style="color:var(--gold)">DANS LE TEMPS</span></div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--font-cond);margin-top:4px">Chaque point = une session enregistrée depuis l'onglet Radar</div>
+        </div>
+        <button onclick="chartClear()" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:7px 14px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">🗑️ Effacer</button>
+      </div>
+      <div style="position:relative;width:100%;height:320px;background:var(--dark3);border-radius:12px;overflow:hidden;border:1px solid var(--border)">
+        <canvas id="chart-canvas" style="width:100%;height:100%;display:block"></canvas>
+        <div id="chart-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:40px;margin-bottom:12px">📉</div>
+          <div style="font-family:var(--font-cond);font-size:13px;color:var(--muted)">Enregistre des sessions dans l'onglet Radar</div>
+          <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted2);margin-top:4px">Les données apparaîtront ici automatiquement</div>
+        </div>
+      </div>
+      <!-- Légende -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-family:var(--font-cond);font-size:11px;color:var(--muted)">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:2px;background:var(--gold)"></div>Score global</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:1px;background:var(--green-belt);border-top:1px dashed var(--green-belt)"></div>UCL (seuil haut)</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:1px;background:var(--red);border-top:1px dashed var(--red)"></div>LCL (seuil bas)</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:1px;background:var(--blue-belt);border-top:1px dashed var(--blue-belt)"></div>Moyenne</div>
+      </div>
+      <!-- Analyse automatique -->
+      <div id="chart-analysis" style="display:none;margin-top:16px;padding:14px 18px;border-radius:8px;background:var(--dark3);border:1px solid var(--border);font-family:var(--font-cond);font-size:12px;color:var(--text);line-height:1.7"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3 : DMAIC ══ -->
+  <div id="st-dmaic" class="st-panel" style="display:none">
+    <div style="max-width:800px;margin:0 auto">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Lean Six Sigma 6σ · Thibault NJECKIL</div>
+        <div style="font-family:var(--font-display);font-size:24px;letter-spacing:3px;color:var(--text);margin-bottom:12px">DMAIC <span style="color:var(--gold)">BASKET</span></div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-cond);line-height:1.6">La méthode DMAIC (Define · Measure · Analyze · Improve · Control) de la certification Lean Six Sigma appliquée à ta progression basketball. C'est ta signature scientifique.</div>
+      </div>
+
+      <!-- Étapes DMAIC -->
+      <div id="dmaic-steps"></div>
+
+      <!-- Bouton reset -->
+      <div style="text-align:center;margin-top:20px">
+        <button onclick="dmaicReset()" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:8px 20px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">↺ Réinitialiser le DMAIC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4 : Cpk ══ -->
+  <div id="st-cpk" class="st-panel" style="display:none">
+    <div style="max-width:720px;margin:0 auto">
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Six Sigma · Indice de capabilité</div>
+        <div style="font-family:var(--font-display);font-size:24px;letter-spacing:3px;color:var(--text);margin-bottom:12px">INDICE <span style="color:var(--gold)">Cpk</span></div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-cond);line-height:1.6;margin-bottom:0">En Six Sigma, le Cpk mesure la capacité d'un processus à rester dans les limites de contrôle de façon <strong style="color:var(--text)">régulière et constante</strong>. Appliqué au basket : à quel point reproduis-tu ton niveau de performance sous pression, session après session ?</div>
+      </div>
+
+      <!-- Cpk calculé depuis les sessions -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px">Calculé depuis tes sessions enregistrées</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px">
+          <div style="text-align:center;padding:16px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div id="cpk-val" style="font-family:var(--font-display);font-size:44px;color:var(--gold)">—</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">INDICE Cpk</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div id="cpk-mean" style="font-family:var(--font-display);font-size:44px;color:var(--blue-belt)">—</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">MOYENNE</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div id="cpk-sigma" style="font-family:var(--font-display);font-size:44px;color:var(--purple-belt)">—</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">ÉCART-TYPE (σ)</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)">
+            <div id="cpk-n" style="font-family:var(--font-display);font-size:44px;color:var(--text)">—</div>
+            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted);letter-spacing:.5px">SESSIONS</div>
+          </div>
+        </div>
+
+        <!-- Barre Cpk -->
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-cond);font-size:10px;color:var(--muted);margin-bottom:6px">
+            <span>Instable</span><span>Acceptable</span><span>Maîtrisé</span><span>Excellent</span>
+          </div>
+          <div style="height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;position:relative">
+            <div id="cpk-bar" style="height:100%;border-radius:5px;background:var(--gold);width:0%;transition:width .8s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-cond);font-size:9px;color:var(--muted2);margin-top:3px">
+            <span>0</span><span>0.67</span><span>1.0</span><span>1.33</span><span>2.0</span>
+          </div>
+        </div>
+
+        <div id="cpk-interpretation" style="padding:14px 18px;border-radius:8px;background:var(--dark3);border:1px solid var(--border);font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6">
+          Enregistre au moins 3 sessions dans l'onglet <strong style="color:var(--gold)">Radar</strong> pour calculer ton indice Cpk.
+        </div>
+      </div>
+
+      <!-- Table Six Sigma basket -->
+      <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px">
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Grille d'interprétation basket</div>
+        <table style="width:100%;border-collapse:collapse;font-family:var(--font-cond);font-size:12px">
+          <thead><tr style="background:rgba(245,197,24,.08);border-bottom:2px solid rgba(245,197,24,.3)">
+            <th style="padding:10px 12px;text-align:left;color:var(--gold)">Cpk</th>
+            <th style="padding:10px 12px;text-align:left;color:var(--gold)">Niveau Six Sigma</th>
+            <th style="padding:10px 12px;text-align:left;color:var(--gold)">Traduction basket</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;color:var(--red);font-weight:700">&lt; 0.67</td><td style="padding:10px 12px;color:var(--muted)">Instable</td><td style="padding:10px 12px;color:var(--muted)">Performances très irrégulières — l'entraînement ne se transfère pas</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;color:var(--orange-belt);font-weight:700">0.67–1.0</td><td style="padding:10px 12px;color:var(--muted)">Acceptable</td><td style="padding:10px 12px;color:var(--muted)">Progression visible mais inconsistante selon les séances</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;color:var(--gold);font-weight:700">1.0–1.33</td><td style="padding:10px 12px;color:var(--muted)">Maîtrisé</td><td style="padding:10px 12px;color:var(--muted)">Niveau reproduit régulièrement — geste en cours d'automatisation</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;color:var(--green-belt);font-weight:700">1.33–2.0</td><td style="padding:10px 12px;color:var(--muted)">Excellent</td><td style="padding:10px 12px;color:var(--muted)">Geste automatisé, stable sous pression — proche ceinture noire</td></tr>
+            <tr><td style="padding:10px 12px;color:var(--red-belt);font-weight:700">&gt; 2.0</td><td style="padding:10px 12px;color:var(--muted)">Six Sigma</td><td style="padding:10px 12px;color:var(--muted)">Excellence absolue — niveau Sensei Rouge 🏆</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /max-width -->
+</div><!-- /s-stats -->
+
+<style>
+.stats-layout { grid-template-columns: 1fr 300px; }
+@media(max-width:768px){ .stats-layout{ grid-template-columns:1fr !important } }
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// 📈 MES STATS — Navigation onglets
+// ══════════════════════════════════════════════════════════
+function openStatsTab(id, btn) {
+  document.querySelectorAll('.st-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('st-' + id).style.display = 'block';
+  document.querySelectorAll('.st-tab').forEach(b => {
+    b.style.background = 'var(--dark3)'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--border)';
+  });
+  btn.style.background = 'rgba(245,197,24,.1)'; btn.style.color = 'var(--gold)'; btn.style.borderColor = 'rgba(245,197,24,.4)';
+  if (id === 'chart') { setTimeout(chartDraw, 50); }
+  if (id === 'cpk')   { cpkCompute(); }
+}
+
+// ══════════════════════════════════════════════════════════
+// 🕸️ RADAR CHART
+// ══════════════════════════════════════════════════════════
+const RADAR_AXES = [
+  { key:'maitrise',   label:'Maîtrise',    color:'#f5c518' },
+  { key:'symetrie',   label:'Symétrie D/G', color:'#0077b6' },
+  { key:'creativite', label:'Créativité',  color:'#7b2d8b' },
+  { key:'vitesse',    label:'Vitesse',     color:'#ff6d00' },
+  { key:'vision',     label:'Vision',      color:'#2dc653' },
+  { key:'robustesse', label:'Robustesse',  color:'#e63946' },
+];
+
+let radarScores = { maitrise:5, symetrie:5, creativite:5, vitesse:5, vision:5, robustesse:5 };
+
+function buildRadarSliders() {
+  const wrap = document.getElementById('radar-sliders');
+  if (!wrap || wrap.children.length > 0) return;
+  RADAR_AXES.forEach(ax => {
+    const row = document.createElement('div');
+    row.style.cssText = 'margin-bottom:16px';
+    row.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-family:var(--font-cond);font-size:12px;font-weight:700;color:${ax.color}">${ax.label}</span>
+        <span id="radar-val-${ax.key}" style="font-family:var(--font-display);font-size:20px;color:${ax.color}">5</span>
+      </div>
+      <input type="range" min="0" max="10" step="1" value="5"
+        style="width:100%;accent-color:${ax.color};cursor:pointer"
+        oninput="radarUpdate('${ax.key}',this.value)">`;
+    wrap.appendChild(row);
+  });
+  radarDrawCanvas();
+  radarUpdateGlobal();
+}
+
+function radarUpdate(key, val) {
+  radarScores[key] = parseInt(val);
+  document.getElementById('radar-val-' + key).textContent = val;
+  radarDrawCanvas();
+  radarUpdateGlobal();
+  document.getElementById('radar-saved-msg').style.display = 'none';
+}
+
+function radarUpdateGlobal() {
+  const vals = Object.values(radarScores);
+  const avg = (vals.reduce((a,b)=>a+b,0) / vals.length).toFixed(1);
+  document.getElementById('radar-global').textContent = avg;
+  const v = document.getElementById('radar-verdict');
+  if      (avg >= 9)  { v.textContent = '🏆 Niveau Élite';       v.style.color = 'var(--gold)'; }
+  else if (avg >= 7)  { v.textContent = '🥋 Ceinture Noire';      v.style.color = '#e0e0e0'; }
+  else if (avg >= 5.5){ v.textContent = '🟣 Expert — Maître';     v.style.color = 'var(--purple-belt)'; }
+  else if (avg >= 4)  { v.textContent = '🟢 Avancé — Vert';       v.style.color = 'var(--green-belt)'; }
+  else if (avg >= 2.5){ v.textContent = '🟡 Intermédiaire';       v.style.color = 'var(--yellow-belt)'; }
+  else                { v.textContent = '⚪ Débutant';             v.style.color = 'var(--white-belt)'; }
+}
+
+function radarDrawCanvas() {
+  const canvas = document.getElementById('radar-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  // Canvas plus grand pour que les labels aient de la place
+  canvas.width = 500; canvas.height = 500;
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  // R réduit pour laisser de la marge aux labels
+  const R = Math.min(W,H) * 0.28;
+  const LABEL_OFFSET = 46; // distance label depuis le bord du radar
+  const N = RADAR_AXES.length;
+  ctx.clearRect(0, 0, W, H);
+
+  // Toiles de fond (5 niveaux)
+  for (let level = 1; level <= 5; level++) {
+    const r = R * (level/5);
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const angle = (Math.PI*2*i/N) - Math.PI/2;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = level === 5 ? 'rgba(245,197,24,.2)' : 'rgba(255,255,255,.06)';
+    ctx.lineWidth = level === 5 ? 1.5 : 1;
+    ctx.stroke();
+  }
+
+  // Axes
+  for (let i = 0; i < N; i++) {
+    const angle = (Math.PI*2*i/N) - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+    ctx.strokeStyle = 'rgba(255,255,255,.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Polygone des scores
+  const pts = RADAR_AXES.map((ax, i) => {
+    const angle = (Math.PI*2*i/N) - Math.PI/2;
+    const r = R * (radarScores[ax.key] / 10);
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  });
+  ctx.beginPath();
+  pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(245,197,24,.15)';
+  ctx.fill();
+  ctx.strokeStyle = '#f5c518';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Points + labels
+  RADAR_AXES.forEach((ax, i) => {
+    const angle = (Math.PI*2*i/N) - Math.PI/2;
+    const p = pts[i];
+    // Point coloré
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+    ctx.fillStyle = ax.color;
+    ctx.fill();
+
+    // Label — positionné avec plus d'offset
+    const lx = cx + (R + LABEL_OFFSET) * Math.cos(angle);
+    const ly = cy + (R + LABEL_OFFSET) * Math.sin(angle);
+    ctx.font = 'bold 12px "Barlow Condensed", Arial Narrow, sans-serif';
+    ctx.fillStyle = ax.color;
+    // Alignement selon la position angulaire
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    ctx.textAlign = Math.abs(cosA) < 0.15 ? 'center' : cosA > 0 ? 'left' : 'right';
+    ctx.textBaseline = Math.abs(sinA) < 0.15 ? 'middle' : sinA < 0 ? 'bottom' : 'top';
+    ctx.fillText(ax.label, lx, ly);
+
+    // Score sur le point
+    ctx.font = '11px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.6)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // Décaler le score vers l'intérieur pour éviter chevauchement
+    const scoreOffset = 14;
+    const sx = p.x - scoreOffset * Math.cos(angle);
+    const sy = p.y - scoreOffset * Math.sin(angle);
+    ctx.fillText(radarScores[ax.key], sx, sy);
+  });
+}
+
+function radarSave() {
+  const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions') || '[]');
+  const entry = {
+    date: new Date().toLocaleDateString('fr-FR'),
+    scores: { ...radarScores },
+    global: parseFloat((Object.values(radarScores).reduce((a,b)=>a+b,0)/6).toFixed(2))
+  };
+  sessions.push(entry);
+  localStorage.setItem('sensei_radar_sessions', JSON.stringify(sessions));
+  document.getElementById('radar-saved-msg').style.display = 'block';
+  setTimeout(() => { document.getElementById('radar-saved-msg').style.display='none'; }, 2500);
+  chartDraw();
+  cpkCompute();
+}
+
+// ══════════════════════════════════════════════════════════
+// 📉 CONTROL CHART (Six Sigma)
+// ══════════════════════════════════════════════════════════
+function chartDraw() {
+  const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions') || '[]');
+  const empty = document.getElementById('chart-empty');
+  const analysis = document.getElementById('chart-analysis');
+  if (sessions.length < 2) {
+    empty.style.display = 'flex';
+    analysis.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const canvas = document.getElementById('chart-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio || 800;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio || 320;
+  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  ctx.clearRect(0,0,W,H);
+
+  const vals = sessions.map(s => s.global);
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const sigma = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/vals.length);
+  const UCL = Math.min(10, mean + 3*sigma);
+  const LCL = Math.max(0,  mean - 3*sigma);
+
+  const pad = { l:40, r:20, t:20, b:40 };
+  const gW = W - pad.l - pad.r;
+  const gH = H - pad.t - pad.b;
+  const minY = Math.max(0, LCL - 1);
+  const maxY = Math.min(10, UCL + 1);
+  const scX = i => pad.l + (i/(vals.length-1)) * gW;
+  const scY = v => pad.t + (1 - (v-minY)/(maxY-minY)) * gH;
+
+  // Grille
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+  for (let i=0; i<=4; i++) {
+    const y = pad.t + i/4*gH;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // UCL / LCL / Mean
+  const drawHLine = (y, color, dash) => {
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=1;
+    ctx.setLineDash(dash||[]); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); ctx.setLineDash([]);
+  };
+  drawHLine(scY(UCL),  '#2dc653', [6,4]);
+  drawHLine(scY(LCL),  '#e63946', [6,4]);
+  drawHLine(scY(mean), '#0077b6', [4,4]);
+
+  // Labels
+  ctx.font = '10px Barlow Condensed, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.textAlign='left';
+  ctx.fillText('UCL ' + UCL.toFixed(1), pad.l+4, scY(UCL)-4);
+  ctx.fillText('LCL '  + LCL.toFixed(1), pad.l+4, scY(LCL)-4);
+  ctx.fillText('μ ' + mean.toFixed(1), pad.l+4, scY(mean)-4);
+
+  // Courbe
+  ctx.beginPath(); ctx.strokeStyle='#f5c518'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  vals.forEach((v,i) => i===0 ? ctx.moveTo(scX(i),scY(v)) : ctx.lineTo(scX(i),scY(v)));
+  ctx.stroke();
+
+  // Points
+  vals.forEach((v,i) => {
+    const x=scX(i), y=scY(v);
+    const out = v > UCL || v < LCL;
+    ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fillStyle = out ? '#e63946' : '#f5c518'; ctx.fill();
+    ctx.strokeStyle = '#080a0f'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // Date label
+    ctx.font='9px Barlow Condensed, sans-serif'; ctx.fillStyle='rgba(255,255,255,.35)'; ctx.textAlign='center';
+    ctx.fillText(sessions[i].date, x, H-pad.b+14);
+  });
+
+  // Axe Y
+  ctx.font='10px Barlow Condensed, sans-serif'; ctx.fillStyle='rgba(255,255,255,.3)'; ctx.textAlign='right';
+  for (let v=0; v<=10; v+=2) {
+    if(v>=minY && v<=maxY) ctx.fillText(v, pad.l-5, scY(v)+4);
+  }
+
+  // Analyse automatique
+  analysis.style.display = 'block';
+  const outPts = vals.filter(v=>v>UCL||v<LCL).length;
+  const trend = vals.length>=3 && vals[vals.length-1] > vals[vals.length-2] && vals[vals.length-2] > vals[vals.length-3];
+  const regress = vals.length>=3 && vals[vals.length-1] < vals[vals.length-2] && vals[vals.length-2] < vals[vals.length-3];
+  let msg = `📊 <strong style="color:var(--gold)">${vals.length} sessions</strong> enregistrées · Moyenne : <strong style="color:var(--blue-belt)">${mean.toFixed(2)}</strong> · Écart-type : <strong style="color:var(--purple-belt)">σ=${sigma.toFixed(2)}</strong><br>`;
+  if (outPts > 0) msg += `⚠️ <strong style="color:var(--red)">${outPts} session(s)</strong> hors limites de contrôle — variation anormale détectée.<br>`;
+  if (trend)      msg += `📈 <strong style="color:var(--green-belt)">Tendance haussière</strong> sur les 3 dernières sessions — progression confirmée !`;
+  if (regress)    msg += `📉 <strong style="color:var(--orange-belt)">Tendance baissière</strong> sur les 3 dernières sessions — analyse conseillée dans DMAIC.`;
+  if (!trend && !regress && outPts===0) msg += `✅ <strong style="color:var(--green-belt)">Processus stable</strong> — ton niveau est sous contrôle statistique.`;
+  analysis.innerHTML = msg;
+}
+
+function chartClear() {
+  if (!confirm('Effacer toutes les sessions ?')) return;
+  localStorage.removeItem('sensei_radar_sessions');
+  document.getElementById('chart-empty').style.display = 'flex';
+  document.getElementById('chart-analysis').style.display = 'none';
+  cpkCompute();
+}
+
+// ══════════════════════════════════════════════════════════
+// ⚙️ DMAIC
+// ══════════════════════════════════════════════════════════
+const DMAIC_CONFIG = [
+  { key:'D', label:'DEFINE',   color:'#f5c518',  icon:'🎯', title:'Définir l\'objectif',
+    desc:'Quelle compétence veux-tu améliorer ? Définis un objectif SMART (Spécifique, Mesurable, Atteignable, Réaliste, Temporel).',
+    placeholder:'Ex : Atteindre 8/10 en Symétrie D/G dans les 4 prochaines semaines en travaillant le Drill #3 Windshield Wipers 3×/semaine.' },
+  { key:'M', label:'MEASURE',  color:'#0077b6',  icon:'📏', title:'Mesurer la situation actuelle',
+    desc:'Quel est ton score actuel sur l\'axe ciblé ? Note ta baseline ici (utilise l\'onglet Radar pour mesurer objectivement).',
+    placeholder:'Ex : Score Symétrie actuel : 4/10. Main gauche très en retrait. 3 sessions radar enregistrées : 4.2 · 3.8 · 4.5 de moyenne.' },
+  { key:'A', label:'ANALYZE',  color:'#7b2d8b',  icon:'🔍', title:'Analyser les causes racines',
+    desc:'Pourquoi ce score est-il bas ? Identifie les causes racines (5 Pourquoi ? / Diagramme d\'Ishikawa simplifié).',
+    placeholder:'Ex : Main gauche peu utilisée en match → manque de confiance → drill non pratiqué en isolation → pas de routine dédiée à la main gauche.' },
+  { key:'I', label:'IMPROVE',  color:'#ff6d00',  icon:'⬆️', title:'Plan d\'amélioration',
+    desc:'Quelles actions concrètes vas-tu mettre en place ? Utilise les drills Sensei pour construire ton plan d\'action.',
+    placeholder:'Ex : Semaine 1-2 : Drill #1 Tornado main gauche uniquement (5 min/jour). Semaine 3-4 : Drill #3 Windshield Wipers. Semaine 5 : mesure de contrôle.' },
+  { key:'C', label:'CONTROL',  color:'#2dc653',  icon:'✅', title:'Contrôler & maintenir',
+    desc:'Comment vas-tu maintenir les gains ? Définis ta routine de maintenance (Phase 4 du programme Bench Press comme modèle).',
+    placeholder:'Ex : 2 drills main gauche intégrés dans chaque échauffement. Mesure Radar toutes les 2 semaines. Seuil d\'alerte : score < 6/10.' },
+];
+
+function buildDMAIC() {
+  const wrap = document.getElementById('dmaic-steps');
+  if (!wrap || wrap.children.length > 0) return;
+  const saved = JSON.parse(localStorage.getItem('sensei_dmaic') || '{}');
+  DMAIC_CONFIG.forEach((step, idx) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:14px;border-left:4px solid ' + step.color;
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+        <div style="width:44px;height:44px;border-radius:50%;background:${step.color}20;border:2px solid ${step.color};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${step.icon}</div>
+        <div>
+          <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${step.color}">${step.key} — ${step.label}</div>
+          <div style="font-family:var(--font-cond);font-size:15px;font-weight:700;color:var(--text)">${step.title}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-family:var(--font-cond);line-height:1.6;margin-bottom:12px">${step.desc}</div>
+      <textarea id="dmaic-${step.key}" rows="4" placeholder="${step.placeholder}"
+        style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:12px;color:var(--text);font-family:var(--font-cond);font-size:12px;line-height:1.6;resize:vertical;outline:none;transition:border-color .2s"
+        onfocus="this.style.borderColor='rgba(245,197,24,.4)'" onblur="this.style.borderColor='var(--border)';dmaicSave()"
+      >${saved[step.key]||''}</textarea>`;
+    wrap.appendChild(div);
+  });
+}
+
+function dmaicSave() {
+  const data = {};
+  DMAIC_CONFIG.forEach(s => {
+    const el = document.getElementById('dmaic-' + s.key);
+    if (el) data[s.key] = el.value;
+  });
+  localStorage.setItem('sensei_dmaic', JSON.stringify(data));
+}
+
+function dmaicReset() {
+  if (!confirm('Réinitialiser tout le DMAIC ?')) return;
+  localStorage.removeItem('sensei_dmaic');
+  DMAIC_CONFIG.forEach(s => {
+    const el = document.getElementById('dmaic-' + s.key);
+    if (el) el.value = '';
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// 📊 CPK
+// ══════════════════════════════════════════════════════════
+function cpkCompute() {
+  const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions') || '[]');
+  const n = sessions.length;
+  document.getElementById('cpk-n').textContent = n;
+  if (n < 3) {
+    document.getElementById('cpk-val').textContent   = '—';
+    document.getElementById('cpk-mean').textContent  = '—';
+    document.getElementById('cpk-sigma').textContent = '—';
+    document.getElementById('cpk-bar').style.width   = '0%';
+    document.getElementById('cpk-interpretation').textContent = 'Enregistre au moins 3 sessions dans l\'onglet Radar pour calculer ton indice Cpk.';
+    return;
+  }
+  const vals  = sessions.map(s => s.global);
+  const mean  = vals.reduce((a,b)=>a+b,0)/n;
+  const sigma = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/n) || 0.001;
+  const USL = 10, LSL = 0;
+  const cpu = (USL - mean) / (3*sigma);
+  const cpl = (mean - LSL)  / (3*sigma);
+  const cpk = Math.min(cpu, cpl);
+
+  document.getElementById('cpk-val').textContent   = cpk.toFixed(2);
+  document.getElementById('cpk-mean').textContent  = mean.toFixed(2);
+  document.getElementById('cpk-sigma').textContent = sigma.toFixed(2);
+
+  const pct = Math.min(100, (cpk/2)*100);
+  const bar = document.getElementById('cpk-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = cpk>=1.33 ? 'var(--green-belt)' : cpk>=1.0 ? 'var(--gold)' : cpk>=0.67 ? 'var(--orange-belt)' : 'var(--red)';
+
+  const interp = document.getElementById('cpk-interpretation');
+  let msg, col;
+  if (cpk >= 2.0)      { msg='🏆 Excellence Six Sigma — tu reproduis ton niveau comme un Sensei Rouge. Geste totalement automatisé.'; col='var(--red-belt)'; }
+  else if (cpk >= 1.33){ msg='✅ Processus excellent — geste stable sous pression, proche de la ceinture noire.'; col='var(--green-belt)'; }
+  else if (cpk >= 1.0) { msg='📈 Processus maîtrisé — ton niveau est reproductible mais encore perfectible. Continue les phases 3 & 4.'; col='var(--gold)'; }
+  else if (cpk >= 0.67){ msg='⚠️ Processus acceptable mais instable — identifie les séances basses dans le Control Chart et analyse avec DMAIC.'; col='var(--orange-belt)'; }
+  else                 { msg='🔴 Processus instable — variation élevée entre les sessions. Réduis la complexité des drills et travaille la régularité.'; col='var(--red)'; }
+  interp.style.color = col;
+  interp.textContent = msg;
+}
+
+// ══ Init au chargement ══
+document.addEventListener('DOMContentLoaded', () => {
+  buildRadarSliders();
+  buildDMAIC();
+});
+// Init aussi à l'ouverture de la section (la section peut être affichée après DOMContentLoaded)
+const _origShowSection = window.showSection;
+window.showSection = function(id, btn) {
+  _origShowSection(id, btn);
+  if (id === 'stats') { buildRadarSliders(); buildDMAIC(); setTimeout(()=>chartDraw(),100); setTimeout(()=>cpkCompute(),100); }
+};
+</script>
+
 <div id="s-challenges" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title">CHAL<span>LENGES</span></div><div class="sec-sub">Défis · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-challenges"></div></div></div>
 <div id="s-battle" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title">BATTLE <span>ROYAL</span></div><div class="sec-sub">Confrontations · 1v1 · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-battle"></div></div></div>
 
@@ -2829,5 +4785,598 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferr
 function installApp() { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(result => { if (result.outcome === 'accepted') document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; }); }
 window.addEventListener('appinstalled', () => { document.getElementById('install-btn').style.display = 'none'; deferredPrompt = null; });
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     🌟 FEATURES GLOBALES — Onboarding · Dojo · Timer · Métronome
+                           Swipe · Notifs · Partage Instagram
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- ── ONBOARDING (première visite) ── -->
+<div id="onboarding-overlay" onclick="obFinishIfOutside(event)" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center">
+  <div style="background:var(--dark2);border:1px solid rgba(245,197,24,.3);border-radius:20px;padding:36px 32px;max-width:440px;width:90%;text-align:center;position:relative">
+    <!-- Étapes -->
+    <div id="ob-steps">
+      <!-- Étape 1 -->
+      <div id="ob-step-1">
+        <div style="font-size:64px;margin-bottom:16px">🥋🏀</div>
+        <div style="font-family:var(--font-display);font-size:32px;letter-spacing:3px;color:var(--gold);margin-bottom:8px">SENSEI</div>
+        <div style="font-family:var(--font-display);font-size:20px;letter-spacing:2px;color:var(--text);margin-bottom:16px">BLACK BELT</div>
+        <div style="font-family:var(--font-cond);font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:24px">
+          La méthode basketball scientifique en 9 ceintures.<br>
+          <strong style="color:var(--text)">Neurosciences · Lean Six Sigma · Physique appliquée.</strong>
+        </div>
+        <button onclick="obNext(2)" style="width:100%;font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:13px;border-radius:8px;border:none;background:var(--gold);color:var(--black);cursor:pointer;margin-bottom:10px">Commencer →</button>
+        <button onclick="obFinish()" style="width:100%;font-family:var(--font-cond);font-size:11px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline;padding:4px">Passer l'introduction</button>
+      </div>
+      <!-- Étape 2 -->
+      <div id="ob-step-2" style="display:none">
+        <div style="font-size:52px;margin-bottom:16px">🎯</div>
+        <div style="font-family:var(--font-display);font-size:24px;letter-spacing:2px;color:var(--text);margin-bottom:16px">Quel est ton <span style="color:var(--gold)">niveau ?</span></div>
+        <div id="ob-belt-choices" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;max-height:320px;overflow-y:auto"></div>
+        <button onclick="obSkip()" style="font-family:var(--font-cond);font-size:11px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline">Passer cette étape</button>
+      </div>
+      <!-- Étape 3 -->
+      <div id="ob-step-3" style="display:none">
+        <div style="font-size:52px;margin-bottom:16px">📱</div>
+        <div style="font-family:var(--font-display);font-size:24px;letter-spacing:2px;color:var(--text);margin-bottom:12px">3 rubriques <span style="color:var(--gold)">clés</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:left">
+          <div style="padding:12px 16px;background:var(--dark3);border-radius:10px;border-left:3px solid var(--gold)">
+            <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold)">🏅 Mon Profil</div>
+            <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-top:3px">Tracker de ceinture · Journal · Certificat</div>
+          </div>
+          <div style="padding:12px 16px;background:var(--dark3);border-radius:10px;border-left:3px solid var(--blue-belt)">
+            <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--blue-belt)">📈 Mes Stats</div>
+            <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-top:3px">Radar · Control Chart · DMAIC · Cpk</div>
+          </div>
+          <div style="padding:12px 16px;background:var(--dark3);border-radius:10px;border-left:3px solid var(--red)">
+            <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--red)">🎮 Mini-Jeux</div>
+            <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-top:3px">Pin & Peel · Quiz IQ · Profil VAK</div>
+          </div>
+        </div>
+        <button onclick="obFinish()" style="width:100%;font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:13px;border-radius:8px;border:none;background:var(--gold);color:var(--black);cursor:pointer">C'est parti ! 🏀</button>
+      </div>
+    </div>
+    <!-- Dots -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:20px" id="ob-dots">
+      <div id="ob-dot-1" style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></div>
+      <div id="ob-dot-2" style="width:8px;height:8px;border-radius:50%;background:var(--muted2)"></div>
+      <div id="ob-dot-3" style="width:8px;height:8px;border-radius:50%;background:var(--muted2)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODE DOJO — Bouton flottant ── -->
+<div id="dojo-btn" onclick="toggleDojo()" title="Mode Dojo" style="position:fixed;bottom:70px;right:20px;z-index:998;width:40px;height:40px;border-radius:50%;background:rgba(123,45,139,.2);border:1px solid rgba(123,45,139,.4);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .3s;backdrop-filter:blur(8px)" title="Mode Dojo">🧘</div>
+
+<!-- Canvas particules Dojo -->
+<canvas id="dojo-canvas" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:1"></canvas>
+
+<!-- ── TIMER DRILL — Overlay flottant ── -->
+<div id="timer-widget" style="display:none;position:fixed;bottom:20px;left:20px;z-index:997;background:var(--dark2);border:1px solid rgba(245,197,24,.4);border-radius:14px;padding:14px 18px;backdrop-filter:blur(12px);min-width:180px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+    <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)">⏱ TIMER DRILL</div>
+    <button onclick="timerClose()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1">✕</button>
+  </div>
+  <div id="timer-display" style="font-family:var(--font-display);font-size:48px;color:var(--text);text-align:center;line-height:1;margin-bottom:10px">1:00</div>
+  <div style="display:flex;gap:6px;margin-bottom:8px">
+    <button onclick="timerStartStop()" id="timer-ss-btn" style="flex:1;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:8px;border-radius:5px;border:none;background:var(--gold);color:var(--black);cursor:pointer">▶ START</button>
+    <button onclick="timerReset()" style="font-family:var(--font-cond);font-size:12px;font-weight:700;padding:8px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer">↺</button>
+  </div>
+  <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">
+    <button onclick="timerSet(60)"  style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">1 min</button>
+    <button onclick="timerSet(90)"  style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">1:30</button>
+    <button onclick="timerSet(120)" style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">2 min</button>
+    <button onclick="timerSet(180)" style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">3 min</button>
+  </div>
+</div>
+
+<!-- ── MÉTRONOME — Widget flottant ── -->
+<div id="metro-widget" style="display:none;position:fixed;bottom:20px;left:220px;z-index:997;background:var(--dark2);border:1px solid rgba(0,119,182,.4);border-radius:14px;padding:14px 18px;backdrop-filter:blur(12px);min-width:160px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+    <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue-belt)">🥁 MÉTRONOME</div>
+    <button onclick="metroClose()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1">✕</button>
+  </div>
+  <div style="text-align:center;margin-bottom:10px">
+    <div id="metro-bpm-display" style="font-family:var(--font-display);font-size:40px;color:var(--blue-belt);line-height:1">80</div>
+    <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)">BPM</div>
+  </div>
+  <input type="range" min="40" max="200" step="2" value="80" id="metro-slider"
+    oninput="metroBpmChange(this.value)"
+    style="width:100%;accent-color:var(--blue-belt);margin-bottom:10px;cursor:pointer">
+  <div style="display:flex;gap:6px;margin-bottom:8px">
+    <button onclick="metroStartStop()" id="metro-ss-btn" style="flex:1;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:8px;border-radius:5px;border:none;background:var(--blue-belt);color:#fff;cursor:pointer">▶ START</button>
+  </div>
+  <div id="metro-beat" style="width:20px;height:20px;border-radius:50%;background:var(--blue-belt);margin:0 auto;opacity:0;transition:opacity .05s"></div>
+  <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+    <button onclick="metroBpmSet(60)"  style="font-family:var(--font-cond);font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">60</button>
+    <button onclick="metroBpmSet(80)"  style="font-family:var(--font-cond);font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">80</button>
+    <button onclick="metroBpmSet(100)" style="font-family:var(--font-cond);font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">100</button>
+    <button onclick="metroBpmSet(120)" style="font-family:var(--font-cond);font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer">120</button>
+  </div>
+</div>
+
+<!-- ── BARRE OUTILS SÉANCE (Timer + Métronome) ── -->
+<div id="session-toolbar" style="position:fixed;bottom:120px;left:20px;z-index:996;display:flex;flex-direction:column;gap:6px">
+  <button onclick="timerToggle()" title="Timer Drill" style="width:40px;height:40px;border-radius:50%;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(245,197,24,.3)'" onmouseleave="this.style.background='rgba(245,197,24,.15)'">⏱️</button>
+  <button onclick="metroToggle()" title="Métronome" style="width:40px;height:40px;border-radius:50%;background:rgba(0,119,182,.15);border:1px solid rgba(0,119,182,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(0,119,182,.3)'" onmouseleave="this.style.background='rgba(0,119,182,.15)'">🥁</button>
+  <button onclick="shareInsta()" title="Partager sur Instagram" style="width:40px;height:40px;border-radius:50%;background:rgba(193,18,31,.15);border:1px solid rgba(193,18,31,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(193,18,31,.3)'" onmouseleave="this.style.background='rgba(193,18,31,.15)'">📸</button>
+</div>
+
+<!-- ── MODAL PARTAGE INSTAGRAM ── -->
+<div id="insta-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center">
+  <div style="background:var(--dark2);border:1px solid rgba(245,197,24,.3);border-radius:18px;padding:28px;max-width:400px;width:90%;text-align:center">
+    <div style="font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--gold);margin-bottom:4px">PARTAGE INSTAGRAM</div>
+    <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-bottom:20px">Génère une Story prête à publier</div>
+    <canvas id="insta-canvas" width="540" height="960" style="width:100%;max-width:200px;height:auto;border-radius:12px;display:block;margin:0 auto 16px;border:2px solid rgba(245,197,24,.3)"></canvas>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button onclick="instaGenerate()" style="flex:1;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px;border-radius:6px;border:none;background:var(--dark3);color:var(--text);cursor:pointer;border:1px solid var(--border)">🔄 Actualiser</button>
+      <button onclick="instaDownload()" style="flex:1;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:10px;border-radius:6px;border:none;background:var(--gold);color:var(--black);cursor:pointer">⬇️ Télécharger</button>
+    </div>
+    <button onclick="closeInsta()" style="font-family:var(--font-cond);font-size:11px;color:var(--muted);background:transparent;border:none;cursor:pointer;text-decoration:underline">Fermer</button>
+  </div>
+</div>
+
+<!-- ── NOTIFICATION BANNER ── -->
+<div id="notif-banner" style="display:none;position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9998;background:var(--dark2);border:1px solid rgba(245,197,24,.3);border-radius:10px;padding:12px 20px;font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold);backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:380px;width:90%;text-align:center;letter-spacing:.5px"></div>
+
+<style>
+#dojo-canvas { opacity: 0; transition: opacity .5s; }
+#dojo-canvas.active { opacity: 1; display: block !important; }
+body.dojo-mode { background: #050709 !important; }
+body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 🌟 ONBOARDING
+// ═══════════════════════════════════════════════════════════
+(function initOnboarding() {
+  if (localStorage.getItem('sensei_onboarded')) return;
+  const ov = document.getElementById('onboarding-overlay');
+  ov.style.display = 'flex';
+  // Marquer immédiatement pour éviter la réapparition en cas de fermeture brutale
+  localStorage.setItem('sensei_onboarded', '1');
+  // Remplir choix de ceintures
+  const BELT_NAMES = ['⚪ Blanche — Débutant','🟡 Jaune — Initié','🟠 Orange — Confirmé','🟢 Verte — Avancé','🔵 Bleue — Expert','🟣 Violette — Maître','🟤 Marron — Grand Maître','⚫ Noire — Élite','🔴 Rouge — Légendaire'];
+  const BELT_COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const wrap = document.getElementById('ob-belt-choices');
+  BELT_NAMES.forEach((n,i) => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `text-align:left;padding:11px 16px;border-radius:8px;border:1px solid var(--border);background:var(--dark3);color:${BELT_COLORS[i]};font-family:var(--font-cond);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;width:100%`;
+    btn.textContent = n;
+    btn.onmouseenter = () => { btn.style.borderColor=BELT_COLORS[i]; btn.style.background=BELT_COLORS[i]+'20'; };
+    btn.onmouseleave = () => { btn.style.borderColor='var(--border)'; btn.style.background='var(--dark3)'; };
+    btn.onclick = () => { localStorage.setItem('sensei_belt_idx', i); obNext(3); };
+    wrap.appendChild(btn);
+  });
+})();
+
+function obNext(step) {
+  [1,2,3].forEach(s => {
+    document.getElementById('ob-step-'+s).style.display = s===step?'block':'none';
+    const dot = document.getElementById('ob-dot-'+s);
+    if (dot) dot.style.background = s===step?'var(--gold)':'var(--muted2)';
+  });
+}
+
+function obSkip() { obNext(3); }
+
+function obFinish() {
+  localStorage.setItem('sensei_onboarded','1');
+  document.getElementById('onboarding-overlay').style.display='none';
+  showNotif('🥋 Bienvenue dans le programme SENSEI !');
+}
+
+function obFinishIfOutside(e) {
+  // Ferme si clic sur le fond noir (pas sur la carte)
+  if (e.target === document.getElementById('onboarding-overlay')) {
+    obFinish();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🧘 MODE DOJO
+// ═══════════════════════════════════════════════════════════
+let dojoActive = false;
+let dojoAnim = null;
+const dojoParticles = [];
+
+function toggleDojo() {
+  dojoActive = !dojoActive;
+  const btn = document.getElementById('dojo-btn');
+  const canvas = document.getElementById('dojo-canvas');
+  document.body.classList.toggle('dojo-mode', dojoActive);
+  canvas.classList.toggle('active', dojoActive);
+  btn.style.background = dojoActive ? 'rgba(123,45,139,.5)' : 'rgba(123,45,139,.2)';
+  btn.style.borderColor = dojoActive ? 'var(--purple-belt)' : 'rgba(123,45,139,.4)';
+  btn.textContent = dojoActive ? '✨' : '🧘';
+  if (dojoActive) { dojoInitParticles(); dojoLoop(); showNotif('🧘 Mode Dojo activé — Focus maximum'); }
+  else { cancelAnimationFrame(dojoAnim); showNotif('Mode Dojo désactivé'); }
+}
+
+function dojoInitParticles() {
+  dojoParticles.length = 0;
+  for (let i=0; i<55; i++) dojoParticles.push({
+    x: Math.random()*window.innerWidth,
+    y: Math.random()*window.innerHeight,
+    r: 0.5+Math.random()*2.5,
+    vx: (Math.random()-.5)*0.4,
+    vy: -0.2-Math.random()*0.5,
+    o: Math.random(),
+    color: ['#f5c518','#7b2d8b','#c1121f','#0077b6'][Math.floor(Math.random()*4)]
+  });
+}
+
+function dojoLoop() {
+  const canvas = document.getElementById('dojo-canvas');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  dojoParticles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.o += (Math.random()-.5)*.03;
+    if (p.y < -10) { p.y = canvas.height+10; p.x = Math.random()*canvas.width; }
+    if (p.x < -10) p.x = canvas.width+10;
+    if (p.x > canvas.width+10) p.x = -10;
+    p.o = Math.max(0.05, Math.min(0.7, p.o));
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.color; ctx.globalAlpha = p.o; ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  if (dojoActive) dojoAnim = requestAnimationFrame(dojoLoop);
+}
+
+window.addEventListener('resize', () => { if(dojoActive) dojoInitParticles(); });
+
+// ═══════════════════════════════════════════════════════════
+// ⏱️ TIMER DRILL
+// ═══════════════════════════════════════════════════════════
+const TIMER = { total:60, remaining:60, running:false, interval:null };
+
+function timerToggle() {
+  const w = document.getElementById('timer-widget');
+  w.style.display = w.style.display==='none' ? 'block' : 'none';
+}
+function timerClose() { document.getElementById('timer-widget').style.display='none'; timerStop(); }
+
+function timerSet(s) {
+  timerStop();
+  TIMER.total=s; TIMER.remaining=s;
+  timerRender();
+}
+
+function timerStartStop() {
+  if (TIMER.running) timerStop(); else timerStart();
+}
+
+function timerStart() {
+  if (TIMER.remaining <= 0) TIMER.remaining = TIMER.total;
+  TIMER.running = true;
+  document.getElementById('timer-ss-btn').textContent = '⏸ PAUSE';
+  document.getElementById('timer-ss-btn').style.background = 'var(--red)';
+  TIMER.interval = setInterval(() => {
+    TIMER.remaining--;
+    timerRender();
+    if (TIMER.remaining <= 0) { timerFinish(); }
+  }, 1000);
+}
+
+function timerStop() {
+  TIMER.running = false;
+  clearInterval(TIMER.interval);
+  document.getElementById('timer-ss-btn').textContent = '▶ START';
+  document.getElementById('timer-ss-btn').style.background = 'var(--gold)';
+}
+
+function timerReset() {
+  timerStop();
+  TIMER.remaining = TIMER.total;
+  timerRender();
+}
+
+function timerFinish() {
+  timerStop();
+  TIMER.remaining = 0;
+  timerRender();
+  // Son de fin via Web Audio API
+  timerBeep();
+  showNotif('⏱️ Drill terminé ! 🏀');
+}
+
+function timerRender() {
+  const m = Math.floor(TIMER.remaining/60);
+  const s = TIMER.remaining%60;
+  const disp = document.getElementById('timer-display');
+  if (!disp) return;
+  disp.textContent = m+':'+(s<10?'0':'')+s;
+  const pct = TIMER.remaining/TIMER.total;
+  disp.style.color = pct > .5 ? 'var(--text)' : pct > .2 ? 'var(--gold)' : 'var(--red)';
+}
+
+function timerBeep() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0, 0.15, 0.3].forEach(t => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.12);
+      osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+0.12);
+    });
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🥁 MÉTRONOME
+// ═══════════════════════════════════════════════════════════
+const METRO = { bpm:80, running:false, interval:null, audioCtx:null };
+
+function metroToggle() {
+  const w = document.getElementById('metro-widget');
+  w.style.display = w.style.display==='none' ? 'block' : 'none';
+}
+function metroClose() { document.getElementById('metro-widget').style.display='none'; metroStop(); }
+
+function metroBpmChange(v) {
+  METRO.bpm = parseInt(v);
+  document.getElementById('metro-bpm-display').textContent = v;
+  if (METRO.running) { metroStop(); metroStart(); }
+}
+function metroBpmSet(v) {
+  METRO.bpm=v;
+  document.getElementById('metro-bpm-display').textContent=v;
+  document.getElementById('metro-slider').value=v;
+  if (METRO.running) { metroStop(); metroStart(); }
+}
+
+function metroStartStop() {
+  if (METRO.running) metroStop(); else metroStart();
+}
+
+function metroStart() {
+  METRO.running = true;
+  document.getElementById('metro-ss-btn').textContent = '⏹ STOP';
+  document.getElementById('metro-ss-btn').style.background = 'var(--red)';
+  const ms = Math.round(60000/METRO.bpm);
+  METRO.interval = setInterval(() => {
+    metroBeat();
+  }, ms);
+  metroBeat();
+}
+
+function metroStop() {
+  METRO.running = false;
+  clearInterval(METRO.interval);
+  document.getElementById('metro-ss-btn').textContent = '▶ START';
+  document.getElementById('metro-ss-btn').style.background = 'var(--blue-belt)';
+  const beat = document.getElementById('metro-beat');
+  if (beat) beat.style.opacity = '0';
+}
+
+function metroBeat() {
+  // Flash visuel
+  const beat = document.getElementById('metro-beat');
+  if (beat) { beat.style.opacity='1'; setTimeout(()=>beat.style.opacity='0',80); }
+  // Click audio
+  try {
+    if (!METRO.audioCtx) METRO.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = METRO.audioCtx.createOscillator();
+    const gain = METRO.audioCtx.createGain();
+    osc.connect(gain); gain.connect(METRO.audioCtx.destination);
+    osc.frequency.value = 1000;
+    gain.gain.setValueAtTime(0.25, METRO.audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, METRO.audioCtx.currentTime+0.04);
+    osc.start(METRO.audioCtx.currentTime);
+    osc.stop(METRO.audioCtx.currentTime+0.04);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 📸 PARTAGE INSTAGRAM
+// ═══════════════════════════════════════════════════════════
+function shareInsta() {
+  document.getElementById('insta-modal').style.display='flex';
+  instaGenerate();
+}
+function closeInsta() { document.getElementById('insta-modal').style.display='none'; }
+
+function instaGenerate() {
+  const canvas = document.getElementById('insta-canvas');
+  const ctx = canvas.getContext('2d');
+  const W=540, H=960;
+  ctx.clearRect(0,0,W,H);
+
+  // Fond noir
+  ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
+
+  // Dégradé fond
+  const grd = ctx.createRadialGradient(W/2,H*.35,40,W/2,H*.35,300);
+  grd.addColorStop(0,'rgba(245,197,24,.18)'); grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+
+  // Grille subtile
+  ctx.strokeStyle='rgba(255,255,255,.03)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=0;y<H;y+=40){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+
+  // Ceinture actuelle
+  const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const BELT_STORY = [
+    {name:'BLANCHE',color:'#f8f9fa',emoji:'⚪'},{name:'JAUNE',color:'#ffd60a',emoji:'🟡'},
+    {name:'ORANGE',color:'#ff6d00',emoji:'🟠'},{name:'VERTE',color:'#2dc653',emoji:'🟢'},
+    {name:'BLEUE',color:'#0077b6',emoji:'🔵'},{name:'VIOLETTE',color:'#7b2d8b',emoji:'🟣'},
+    {name:'MARRON',color:'#8b4513',emoji:'🟤'},{name:'NOIRE',color:'#e0e0e0',emoji:'⚫'},
+    {name:'ROUGE',color:'#c1121f',emoji:'🔴'}
+  ];
+  const b = BELT_STORY[beltIdx];
+  const meta = JSON.parse(localStorage.getItem('sensei_profil_meta')||'{}');
+  const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions')||'[]');
+  const avgScore = sessions.length ? (sessions.reduce((a,s)=>a+s.global,0)/sessions.length).toFixed(1) : '—';
+
+  // Bande couleur ceinture en haut
+  ctx.fillStyle=b.color; ctx.globalAlpha=.25; ctx.fillRect(0,0,W,6); ctx.globalAlpha=1;
+  ctx.fillStyle=b.color; ctx.fillRect(0,0,W,6);
+
+  // Logo SENSEI
+  ctx.font='bold 14px Arial Narrow,sans-serif';
+  ctx.fillStyle='rgba(245,197,24,.6)'; ctx.textAlign='center';
+  ctx.fillText('SENSEI BLACKBELT · senseiblackbelt.com', W/2, 44);
+
+  // Emoji + ceinture
+  ctx.font='80px serif'; ctx.fillText(b.emoji, W/2, 220);
+
+  ctx.font='bold 22px Arial,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.45)'; ctx.fillText('CEINTURE', W/2, 270);
+
+  ctx.font='bold 72px Arial Narrow,sans-serif';
+  ctx.fillStyle=b.color; ctx.fillText(b.name, W/2, 350);
+
+  // Nom si renseigné
+  if (meta.name) {
+    ctx.font='bold 28px Arial,sans-serif';
+    ctx.fillStyle='#f0f2f8'; ctx.fillText(meta.name.toUpperCase(), W/2, 400);
+  }
+
+  // Ligne
+  ctx.strokeStyle='rgba(245,197,24,.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(80,430); ctx.lineTo(W-80,430); ctx.stroke();
+
+  // Stats
+  if (sessions.length > 0) {
+    ctx.font='bold 14px Arial,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.4)'; ctx.fillText('SCORE RADAR MOYEN', W/2, 470);
+    ctx.font='bold 56px Arial Narrow,sans-serif';
+    ctx.fillStyle='#f5c518'; ctx.fillText(avgScore + ' / 10', W/2, 530);
+  }
+
+  // Barres ceintures
+  const bw=40, gap=8, totalW = 9*(bw+gap)-gap;
+  const startX = (W-totalW)/2;
+  BELT_STORY.forEach((belt,i) => {
+    const x = startX + i*(bw+gap);
+    ctx.fillStyle = i<=beltIdx ? belt.color : 'rgba(255,255,255,.08)';
+    ctx.globalAlpha = i<=beltIdx ? 1 : .5;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x,600,bw,12,3) : ctx.rect(x,600,bw,12);
+    ctx.fill();
+    ctx.globalAlpha=1;
+  });
+
+  ctx.font='bold 13px Arial,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.3)';
+  ctx.fillText('Niveau ' + (beltIdx+1) + ' / 9', W/2, 640);
+
+  // Date
+  ctx.font='13px Arial,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.3)';
+  ctx.fillText(new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}), W/2, 680);
+
+  // Bande bas
+  ctx.fillStyle=b.color; ctx.globalAlpha=.15; ctx.fillRect(0,H-8,W,8); ctx.globalAlpha=1;
+  ctx.fillStyle=b.color; ctx.fillRect(0,H-4,W,4);
+
+  // Watermark
+  ctx.font='11px Arial,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.2)'; ctx.textAlign='center';
+  ctx.fillText('@sensei_blackbelt · #SenseiBlackBelt #Basketball #BallHandling', W/2, H-20);
+}
+
+function instaDownload() {
+  const canvas = document.getElementById('insta-canvas');
+  const link = document.createElement('a');
+  link.download = 'sensei-story-' + new Date().toISOString().slice(0,10) + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🔔 NOTIFICATION BANNER
+// ═══════════════════════════════════════════════════════════
+function showNotif(msg, duration=3000) {
+  const banner = document.getElementById('notif-banner');
+  banner.textContent = msg;
+  banner.style.display = 'block';
+  banner.style.opacity = '1';
+  banner.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(banner._t);
+  banner._t = setTimeout(() => {
+    banner.style.opacity = '0';
+    setTimeout(()=>banner.style.display='none', 400);
+  }, duration);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 👆 SWIPE MOBILE — navigation entre sections
+// ═══════════════════════════════════════════════════════════
+(function initSwipe() {
+  let tx=0, ty=0;
+  const SECTIONS_ORDER = ['home','belts','ballhandling','hec','sc','tutorials','programs','challenges','battle','profil','stats','minijeux','vulga','neuro','visusci','iq','shooting','defense','rebounding','coach','testi','reserver','inscription'];
+  document.addEventListener('touchstart', e => {
+    tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+  }, { passive:true });
+  document.addEventListener('touchend', e => {
+    const dx=e.changedTouches[0].clientX-tx;
+    const dy=e.changedTouches[0].clientY-ty;
+    if (Math.abs(dx)<60 || Math.abs(dy)>Math.abs(dx)*1.2) return; // pas assez horizontal
+    // Ne swipe pas si l'utilisateur interagit avec un élément scrollable ou un slider
+    if (e.target.closest('input[type=range],textarea,select,.vid-grid,.vid-section-grid,canvas')) return;
+    const cur = document.querySelector('.section.active');
+    if (!cur) return;
+    const curId = cur.id.replace('s-','');
+    const idx = SECTIONS_ORDER.indexOf(curId);
+    if (idx < 0) return;
+    if (dx < -60 && idx < SECTIONS_ORDER.length-1) {
+      showSection(SECTIONS_ORDER[idx+1], null);
+    } else if (dx > 60 && idx > 0) {
+      showSection(SECTIONS_ORDER[idx-1], null);
+    }
+  }, { passive:true });
+})();
+
+// ═══════════════════════════════════════════════════════════
+// 🔔 NOTIFICATIONS PWA LOCALES
+// ═══════════════════════════════════════════════════════════
+(function initPWANotif() {
+  if (!('Notification' in window)) return;
+  // Demander la permission au premier passage dans Mon Profil
+  const _orig = window.showSection;
+  window.showSection = function(id,btn) {
+    _orig(id,btn);
+    if (id==='profil' && Notification.permission==='default' && !localStorage.getItem('sensei_notif_asked')) {
+      localStorage.setItem('sensei_notif_asked','1');
+      setTimeout(()=>{
+        if (confirm('Activer les rappels d\'entraînement ? (Notifications push locales)')) {
+          Notification.requestPermission().then(p => {
+            if (p==='granted') {
+              showNotif('🔔 Rappels activés ! On te rappellera si tu n\'as pas dribblé depuis 3 jours.');
+              schedulePWAReminder();
+            }
+          });
+        }
+      }, 1500);
+    }
+  };
+})();
+
+function schedulePWAReminder() {
+  const lastSeen = localStorage.getItem('sensei_last_seen');
+  if (!lastSeen) return;
+  const diff = (Date.now()-parseInt(lastSeen))/(1000*60*60*24);
+  if (diff >= 3 && Notification.permission==='granted') {
+    new Notification('SENSEI BlackBelt 🥋🏀', {
+      body: 'Tu n\'as pas dribblé depuis ' + Math.floor(diff) + ' jours. C\'est le moment !',
+      icon: 'logo.png'
+    });
+  }
+}
+
+// Enregistrer la dernière visite
+localStorage.setItem('sensei_last_seen', Date.now().toString());
+// Vérifier le rappel au chargement
+setTimeout(schedulePWAReminder, 2000);
+
+</script>
+
 </body>
 </html>
