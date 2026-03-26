@@ -64,6 +64,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .nav-admin{display:flex;align-items:center;gap:4px;flex-shrink:0;border-left:1px solid rgba(245,197,24,.3);padding-left:8px}
 .nav-sep{display:none}
 .nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s}
+@media(min-width:1100px){.nav-btn{font-size:11px;padding:5px 9px}}
+@media(min-width:1400px){.nav-btn{font-size:12px;padding:5px 10px;letter-spacing:.5px}}
 .nav-btn:hover,.nav-btn.active{background:rgba(245,197,24,.1);color:var(--gold)}
 .nav-join{background:var(--gold);color:var(--black);padding:6px 12px;border-radius:4px;font-family:var(--font-cond);font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .nav-join:hover{background:var(--gold2);transform:scale(1.03)}
@@ -198,7 +200,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .prog-line.done{background:rgba(45,198,83,.5) !important;transition:background .5s}
 .prog-line.active{background:var(--gold) !important}
 .prog-dot.locked{background:var(--dark3) !important;border-color:var(--border);color:var(--muted2)}
-.prog-label{font-size:9px;font-family:var(--font-cond);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:6px;text-align:center;white-space:nowrap}
+.prog-label{font-size:11px;font-family:var(--font-cond);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:6px;text-align:center;white-space:nowrap}
 .prog-line{height:2px;width:24px;flex-shrink:0;margin-top:-16px;align-self:flex-start;margin-left:-2px;margin-right:-2px;position:relative;top:16px}
 @keyframes glowPulse{0%,100%{box-shadow:0 0 8px rgba(245,197,24,.3)}50%{box-shadow:0 0 20px rgba(245,197,24,.6)}}
 
@@ -348,7 +350,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .cal-nav{background:var(--dark3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:var(--font-cond);font-size:14px;font-weight:700;transition:all .2s}
 .cal-nav:hover{border-color:var(--gold);color:var(--gold)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
-.cal-day-label{font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);text-align:center;padding:4px 0}
+.cal-day-label{font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);text-align:center;padding:4px 0}
 .cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-cond);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid transparent}
 .cal-day:empty{cursor:default}
 .cal-day.past{color:var(--muted2);cursor:not-allowed}
@@ -2074,7 +2076,7 @@ function quizShowResult() {
     }).length;
     const div = document.createElement('div');
     div.style.cssText = 'padding:14px;background:var(--dark3);border-radius:10px;border:1px solid var(--border)';
-    div.innerHTML = `<div style="font-size:20px;margin-bottom:4px">${cat.split(' ')[0]}</div><div style="font-family:var(--font-display);font-size:24px;color:var(--gold)">${correct}/${qs.length}</div><div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">${cat.slice(3)}</div>`;
+    div.innerHTML = `<div style="font-size:20px;margin-bottom:4px">${cat.split(' ')[0]}</div><div style="font-family:var(--font-display);font-size:24px;color:var(--gold)">${correct}/${qs.length}</div><div style="font-family:var(--font-cond);font-size:11px;color:var(--muted)">${cat.slice(3)}</div>`;
     breakdown.appendChild(div);
   });
 }
@@ -2595,7 +2597,7 @@ function trackerInit() {
       row.appendChild(nameDiv);
       if (current) {
         const badge = document.createElement('div');
-        badge.style.cssText = 'margin-left:auto;font-family:var(--font-cond);font-size:9px;font-weight:700;background:'+b.color+'20;color:'+b.color+';border-radius:10px;padding:2px 8px;border:1px solid '+b.color;
+        badge.style.cssText = 'margin-left:auto;font-family:var(--font-cond);font-size:10px;font-weight:700;background:'+b.color+'20;color:'+b.color+';border-radius:10px;padding:2px 8px;border:1px solid '+b.color;
         badge.textContent = 'ACTUELLE';
         row.appendChild(badge);
       }
@@ -2665,7 +2667,7 @@ function journalAdd() {
   const bench  = document.getElementById('j-bench').value;
   const feeling = document.getElementById('j-feeling').value;
   const notes  = document.getElementById('j-notes').value;
-  if (!drills && !notes) { alert('Indique au moins les drills travaillés.'); return; }
+  if (!drills && !notes) { senseiAlert('Indique au moins les drills travaillés.', '📓'); return; return; }
   const entries = JSON.parse(localStorage.getItem('sensei_journal')||'[]');
   entries.unshift({ date, dur:parseInt(dur)||0, drills, bench:parseFloat(bench)||0, feeling:parseInt(feeling)||0, notes, id: Date.now() });
   localStorage.setItem('sensei_journal', JSON.stringify(entries));
@@ -2724,9 +2726,10 @@ function journalDelete(id) {
 }
 
 function journalClear() {
-  if (!confirm('Effacer tout le journal ?')) return;
+  senseiConfirm('Effacer tout le journal de séance ? Cette action est irréversible.', '🗑️', true).then(ok => { if (!ok) return;
   localStorage.removeItem('sensei_journal');
   journalRender();
+  });
 }
 
 // ── CERTIFICAT ──
@@ -2829,7 +2832,7 @@ function exportGenerate() {
 function exportCopy() {
   const ta = document.getElementById('export-code');
   if (!ta.value) { exportGenerate(); }
-  navigator.clipboard.writeText(ta.value).then(() => alert('✅ Code copié dans le presse-papiers !'));
+  navigator.clipboard.writeText(ta.value).then(() => showNotif('📋 Code copié dans le presse-papiers !'));
 }
 
 function importProfile() {
@@ -3076,12 +3079,12 @@ function openStatsTab(id, btn) {
 // 🕸️ RADAR CHART
 // ══════════════════════════════════════════════════════════
 const RADAR_AXES = [
-  { key:'maitrise',   label:'Maîtrise',    color:'#f5c518' },
-  { key:'symetrie',   label:'Symétrie D/G', color:'#0077b6' },
-  { key:'creativite', label:'Créativité',  color:'#7b2d8b' },
-  { key:'vitesse',    label:'Vitesse',     color:'#ff6d00' },
-  { key:'vision',     label:'Vision',      color:'#2dc653' },
-  { key:'robustesse', label:'Robustesse',  color:'#e63946' },
+  { key:'maitrise',   label:'Maîtrise',   labelFull:'Maîtrise',    color:'#f5c518' },
+  { key:'symetrie',   label:'Symétrie',   labelFull:'Symétrie D/G', color:'#0077b6' },
+  { key:'creativite', label:'Créativité', labelFull:'Créativité',  color:'#7b2d8b' },
+  { key:'vitesse',    label:'Vitesse',    labelFull:'Vitesse',     color:'#ff6d00' },
+  { key:'vision',     label:'Vision',     labelFull:'Vision',      color:'#2dc653' },
+  { key:'robustesse', label:'Robustesse', labelFull:'Robustesse',  color:'#e63946' },
 ];
 
 let radarScores = { maitrise:5, symetrie:5, creativite:5, vitesse:5, vision:5, robustesse:5 };
@@ -3131,13 +3134,17 @@ function radarDrawCanvas() {
   const canvas = document.getElementById('radar-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  // Canvas plus grand pour que les labels aient de la place
-  canvas.width = 500; canvas.height = 500;
+  // Canvas responsive : adapté à la largeur réelle du conteneur
+  const containerW = canvas.parentElement ? canvas.parentElement.offsetWidth : 500;
+  const size = Math.max(300, Math.min(500, containerW));
+  canvas.width = size; canvas.height = size;
   const W = canvas.width, H = canvas.height;
   const cx = W/2, cy = H/2;
   // R réduit pour laisser de la marge aux labels
-  const R = Math.min(W,H) * 0.28;
-  const LABEL_OFFSET = 46; // distance label depuis le bord du radar
+  const R = Math.min(W,H) * 0.26;
+  const LABEL_OFFSET = size < 380 ? 38 : 50; // offset réduit sur petits écrans
+  // Taille police adaptée
+  const fontSize = size < 380 ? 11 : 13;
   const N = RADAR_AXES.length;
   ctx.clearRect(0, 0, W, H);
 
@@ -3196,7 +3203,7 @@ function radarDrawCanvas() {
     // Label — positionné avec plus d'offset
     const lx = cx + (R + LABEL_OFFSET) * Math.cos(angle);
     const ly = cy + (R + LABEL_OFFSET) * Math.sin(angle);
-    ctx.font = 'bold 12px "Barlow Condensed", Arial Narrow, sans-serif';
+    ctx.font = 'bold ' + fontSize + 'px "Barlow Condensed", Arial Narrow, sans-serif';
     ctx.fillStyle = ax.color;
     // Alignement selon la position angulaire
     const cosA = Math.cos(angle);
@@ -3330,11 +3337,11 @@ function chartDraw() {
 }
 
 function chartClear() {
-  if (!confirm('Effacer toutes les sessions ?')) return;
+  senseiConfirm('Effacer toutes les sessions radar ? Cette action est irréversible.', '📉', true).then(ok => { if (!ok) return;
   localStorage.removeItem('sensei_radar_sessions');
   document.getElementById('chart-empty').style.display = 'flex';
   document.getElementById('chart-analysis').style.display = 'none';
-  cpkCompute();
+  cpkCompute(); });
 }
 
 // ══════════════════════════════════════════════════════════
@@ -3392,11 +3399,12 @@ function dmaicSave() {
 }
 
 function dmaicReset() {
-  if (!confirm('Réinitialiser tout le DMAIC ?')) return;
+  senseiConfirm('Réinitialiser tout le DMAIC ? Tes notes seront perdues.', '⚙️', true).then(ok => { if (!ok) return;
   localStorage.removeItem('sensei_dmaic');
   DMAIC_CONFIG.forEach(s => {
     const el = document.getElementById('dmaic-' + s.key);
     if (el) el.value = '';
+  });
   });
 }
 
@@ -4289,7 +4297,7 @@ function submitForm() {
   const prenom = document.getElementById('f-prenom').value.trim();
   const nom    = document.getElementById('f-nom').value.trim();
   const email  = document.getElementById('f-email').value.trim();
-  if (!prenom||!nom||!email) { alert('Merci de remplir : Prénom, Nom et Email.'); return; }
+  if (!prenom||!nom||!email) { senseiAlert('Merci de remplir : Prénom, Nom et Email.', '✍️'); return; }
   const niveau  = document.getElementById('f-niveau').value;
   const formule = document.getElementById('f-formule').value;
   const insta   = document.getElementById('f-insta').value;
@@ -5738,14 +5746,14 @@ function showNotif(msg, duration=3000) {
   if (!localStorage.getItem('sensei_notif_asked')) {
     setTimeout(function() {
       localStorage.setItem('sensei_notif_asked','1');
-      if (confirm('Activer les rappels d\'entr\u00e9nement Sensei ?')) {
+      senseiConfirm('Activer les rappels d\'entraînement Sensei ? L\'app te rappellera si tu n\'as pas dribblé depuis 3 jours.', '🔔', false).then(ok => { if (!ok) return;
         Notification.requestPermission().then(function(p) {
           if (p==='granted') {
             showNotif('\ud83d\udd14 Rappels activ\u00e9s !');
             schedulePWAReminder();
           }
         });
-      }
+      });
     }, 8000);
   }
 })();
@@ -6235,11 +6243,12 @@ function eleveRender() {
 }
 
 function eleveDelete(id) {
-  if (!confirm('Supprimer cet élève ?')) return;
+  senseiConfirm('Supprimer cet élève définitivement ?', '👤', true).then(ok => { if (!ok) return;
   const eleves = JSON.parse(localStorage.getItem('sensei_eleves')||'[]').filter(e=>e.id!==id);
   localStorage.setItem('sensei_eleves', JSON.stringify(eleves));
   eleveRender();
   ccRefreshSelect();
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6344,7 +6353,7 @@ function ccPrint() {
 // 🎬 MODE DÉMO (#30)
 // ═══════════════════════════════════════════════════════════════
 function demoLoad() {
-  if (!confirm('Charger le profil démo ? Tes données actuelles seront remplacées.')) return;
+  senseiConfirm('Charger le profil démo ? Tes données actuelles seront remplacées.', '🎬', false).then(ok => { if (!ok) return;
   // Ceinture violette (idx 5)
   localStorage.setItem('sensei_belt_idx','5');
   localStorage.setItem('sensei_profil_meta', JSON.stringify({name:'Alex Demo', start: new Date(Date.now()-120*86400000).toISOString().slice(0,10)}));
@@ -6380,15 +6389,17 @@ function demoLoad() {
   const msg = document.getElementById('demo-msg');
   if (msg) { msg.style.display='block'; msg.textContent='✅ Profil démo chargé ! Va dans "Mon Profil" et "Mes Stats" pour voir le résultat.'; }
   showNotif('🎬 Profil démo chargé !');
+  });
 }
 
 function demoReset() {
-  if (!confirm('Effacer TOUTES les donn\u00e9es de l\u2019app ?')) return;
+  senseiConfirm('Effacer TOUTES les données de l\'app ? Cette action est irréversible.', '🗑️', true).then(ok => { if (!ok) return;
   const keys = ['sensei_belt_idx','sensei_profil_meta','sensei_drills_checked','sensei_radar_sessions','sensei_journal','sensei_dmaic','sensei_eleves','sensei_testi','sensei_belt_pins','sensei_network'];
   keys.forEach(k => localStorage.removeItem(k));
   const msg = document.getElementById('demo-msg');
   if (msg) { msg.style.display='block'; msg.style.color='var(--orange-belt)'; msg.textContent='🗑️ Toutes les données ont été effacées.'; }
   showNotif('🗑️ Données effacées.');
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6425,11 +6436,12 @@ function pinsSave() {
 }
 
 function pinsReset() {
-  if (!confirm('Désactiver tous les codes ceintures ?')) return;
+  senseiConfirm('Désactiver tous les codes ceintures ?', '🔐', false).then(ok => { if (!ok) return;
   localStorage.removeItem('sensei_belt_pins');
   document.getElementById('pins-list').innerHTML = '';
   buildPinsList();
   showNotif('Codes désactivés.');
+  });
 }
 
 // Vérification du code avant passage de ceinture
@@ -6439,10 +6451,18 @@ window.trackerPassBelt = function() {
   const pins = JSON.parse(localStorage.getItem('sensei_belt_pins')||'{}');
   const nextPin = pins[cur+1];
   if (nextPin) {
-    const entered = prompt('🔐 Code requis pour la ceinture ' + BELT_EMOJIS_M[cur+1] + ' ' + BELT_NAMES_M[cur+1] + ' :');
-    if (entered !== nextPin) { showNotif('❌ Code incorrect — demande le code à Sensei.'); return; }
+    senseiPrompt(
+      'Code requis pour passer en ceinture ' + BELT_EMOJIS_M[cur+1] + ' ' + BELT_NAMES_M[cur+1],
+      '🔐',
+      'Entrer le code Sensei...'
+    ).then(entered => {
+      if (!entered) return;
+      if (entered !== nextPin) { showNotif('❌ Code incorrect — demande le code à Sensei.'); return; }
+      _origTrackerPassBelt();
+    });
+  } else {
+    _origTrackerPassBelt();
   }
-  _origTrackerPassBelt();
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -6547,6 +6567,86 @@ showSection = function(id, btn) {
 // Init DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
   testiPublicRender();
+});
+</script>
+
+
+<!-- ══ MODALS CUSTOM SENSEI (remplace confirm/alert/prompt natifs) ══ -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div id="modal-box" style="background:var(--dark2);border:1px solid rgba(245,197,24,.3);border-radius:16px;padding:28px 28px 24px;max-width:420px;width:90%;text-align:center">
+    <div id="modal-icon" style="font-size:36px;margin-bottom:12px"></div>
+    <div id="modal-title" style="font-family:var(--font-display);font-size:20px;letter-spacing:2px;color:var(--text);margin-bottom:8px"></div>
+    <div id="modal-msg" style="font-family:var(--font-cond);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px"></div>
+    <!-- Input pour prompt() -->
+    <input id="modal-input" type="text" style="display:none;width:100%;background:var(--dark3);border:1px solid rgba(245,197,24,.3);border-radius:6px;padding:10px 14px;color:var(--text);font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:2px;outline:none;text-align:center;margin-bottom:16px">
+    <div id="modal-btns" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<script>
+// ══ SYSTÈME MODAL SENSEI ══
+let _modalResolve = null;
+
+function _showModal(icon, title, msg, buttons, withInput, inputPlaceholder) {
+  return new Promise(resolve => {
+    _modalResolve = resolve;
+    const overlay = document.getElementById('modal-overlay');
+    document.getElementById('modal-icon').textContent = icon;
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-msg').textContent = msg;
+    const inp = document.getElementById('modal-input');
+    if (withInput) {
+      inp.style.display = 'block';
+      inp.value = '';
+      inp.placeholder = inputPlaceholder || '';
+      setTimeout(() => inp.focus(), 100);
+    } else {
+      inp.style.display = 'none';
+    }
+    const btnsEl = document.getElementById('modal-btns');
+    btnsEl.innerHTML = '';
+    buttons.forEach(btn => {
+      const b = document.createElement('button');
+      b.style.cssText = `font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:11px 24px;border-radius:6px;border:${btn.primary ? 'none' : '1px solid var(--border)'};background:${btn.primary ? 'var(--gold)' : 'transparent'};color:${btn.primary ? 'var(--black)' : 'var(--muted)'};cursor:pointer;min-width:100px`;
+      b.textContent = btn.label;
+      b.onclick = () => {
+        overlay.style.display = 'none';
+        if (withInput) resolve(btn.value === true ? inp.value : btn.value);
+        else resolve(btn.value);
+      };
+      btnsEl.appendChild(b);
+    });
+    overlay.style.display = 'flex';
+  });
+}
+
+// API publique
+function senseiAlert(msg, icon) {
+  return _showModal(icon||'ℹ️', '', msg, [{label:'OK', value:true, primary:true}], false);
+}
+function senseiConfirm(msg, icon, danger) {
+  const title = danger ? 'Confirmer' : '';
+  return _showModal(icon||(danger?'⚠️':'❓'), title, msg, [
+    {label:'Annuler',  value:false, primary:false},
+    {label:'Confirmer', value:true,  primary:true}
+  ], false);
+}
+function senseiPrompt(msg, icon, placeholder) {
+  return _showModal(icon||'🔐', '', msg, [
+    {label:'Annuler',  value:null,  primary:false},
+    {label:'Valider',  value:true,  primary:true}
+  ], true, placeholder);
+}
+
+// Fermer avec Echap
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+      overlay.style.display = 'none';
+      if (_modalResolve) { _modalResolve(false); _modalResolve = null; }
+    }
+  }
 });
 </script>
 
