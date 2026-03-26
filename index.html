@@ -2777,12 +2777,6 @@ if (!document.getElementById('confetti-style')) {
   document.head.appendChild(s);
 }
 
-// Init au chargement & à l'ouverture
-const _showSectionOrig2 = window.showSection;
-window.showSection = function(id, btn) {
-  _showSectionOrig2(id, btn);
-  if (id==='profil') { requestAnimationFrame(()=>requestAnimationFrame(()=>{ trackerInit(); journalRender(); certPreview(); })); }
-};
 document.addEventListener('DOMContentLoaded', () => {
   const jDate = document.getElementById('j-date');
   if (jDate) jDate.value = new Date().toISOString().slice(0,10);
@@ -3356,12 +3350,6 @@ document.addEventListener('DOMContentLoaded', () => {
   buildRadarSliders();
   buildDMAIC();
 });
-// Init aussi à l'ouverture de la section (la section peut être affichée après DOMContentLoaded)
-const _origShowSection = window.showSection;
-window.showSection = function(id, btn) {
-  _origShowSection(id, btn);
-  if (id === 'stats') { buildRadarSliders(); buildDMAIC(); setTimeout(()=>chartDraw(),100); setTimeout(()=>cpkCompute(),100); }
-};
 </script>
 
 <div id="s-challenges" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title">CHAL<span>LENGES</span></div><div class="sec-sub">Défis · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-challenges"></div></div></div>
@@ -3686,6 +3674,33 @@ function showSection(id, btn) {
   if (id === 'visusci' && !window._visuSciInited) {
     window._visuSciInited = true;
     setTimeout(initVisuSci, 50);
+  }
+  // Hooks sections spéciales — UN SEUL ENDROIT, propre
+  if (id === 'profil') {
+    requestAnimationFrame(function() {
+      // S'assurer que le 1er onglet (tracker) est visible par défaut
+      var trackerPanel = document.getElementById('pr-tracker');
+      var trackerPanels = document.querySelectorAll('.pr-panel');
+      trackerPanels.forEach(function(p) { p.style.display = 'none'; });
+      if (trackerPanel) trackerPanel.style.display = 'block';
+      // Activer le bon onglet visuellement
+      document.querySelectorAll('.pr-tab').forEach(function(b, i) {
+        if (i === 0) { b.style.background='rgba(245,197,24,.1)'; b.style.color='var(--gold)'; b.style.borderColor='rgba(245,197,24,.4)'; }
+        else { b.style.background='var(--dark3)'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)'; }
+      });
+      requestAnimationFrame(function() {
+        trackerInit();
+        journalRender();
+        certPreview();
+      });
+    });
+  }
+  if (id === 'stats') {
+    requestAnimationFrame(function() {
+      buildRadarSliders();
+      buildDMAIC();
+      setTimeout(function() { chartDraw(); cpkCompute(); }, 80);
+    });
   }
 }
 
@@ -5339,24 +5354,19 @@ function showNotif(msg, duration=3000) {
 // ═══════════════════════════════════════════════════════════
 (function initPWANotif() {
   if (!('Notification' in window)) return;
-  // Demander la permission au premier passage dans Mon Profil
-  const _orig = window.showSection;
-  window.showSection = function(id,btn) {
-    _orig(id,btn);
-    if (id==='profil' && Notification.permission==='default' && !localStorage.getItem('sensei_notif_asked')) {
+  if (!localStorage.getItem('sensei_notif_asked')) {
+    setTimeout(function() {
       localStorage.setItem('sensei_notif_asked','1');
-      setTimeout(()=>{
-        if (confirm('Activer les rappels d\'entraînement ? (Notifications push locales)')) {
-          Notification.requestPermission().then(p => {
-            if (p==='granted') {
-              showNotif('🔔 Rappels activés ! On te rappellera si tu n\'as pas dribblé depuis 3 jours.');
-              schedulePWAReminder();
-            }
-          });
-        }
-      }, 1500);
-    }
-  };
+      if (confirm('Activer les rappels d\'entr\u00e9nement Sensei ?')) {
+        Notification.requestPermission().then(function(p) {
+          if (p==='granted') {
+            showNotif('\ud83d\udd14 Rappels activ\u00e9s !');
+            schedulePWAReminder();
+          }
+        });
+      }
+    }, 8000);
+  }
 })();
 
 function schedulePWAReminder() {
