@@ -2329,7 +2329,16 @@ function shuffleArray(arr) {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
             <div>
               <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Date</label>
-              <input id="j-date" type="date" style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none">
+              <div style="display:flex;gap:0;position:relative">
+              <input id="j-date-display" type="text" readonly
+                style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:5px 0 0 5px;padding:8px 10px;color:var(--text);font-family:var(--font-cond);font-size:13px;outline:none;cursor:pointer"
+                onclick="document.getElementById('j-date-picker').showPicker ? document.getElementById('j-date-picker').showPicker() : document.getElementById('j-date-picker').click()">
+              <input id="j-date" type="date"
+                style="opacity:0;position:absolute;right:0;top:0;width:36px;height:100%;border:none;background:transparent;cursor:pointer"
+                oninput="var v=this.value; document.getElementById('j-date-display').value=v?formatDateDisplay(v):''; ">
+              <button type="button" onclick="document.getElementById('j-date').showPicker ? document.getElementById('j-date').showPicker() : document.getElementById('j-date').click()"
+                style="padding:0 10px;background:var(--dark3);border:1px solid var(--border);border-left:none;border-radius:0 5px 5px 0;color:var(--muted);cursor:pointer;font-size:14px">📅</button>
+            </div>
             </div>
             <div>
               <label style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px" data-i18n="pr_lbl_duration">Durée (min)</label>
@@ -2370,14 +2379,14 @@ function shuffleArray(arr) {
 
       <!-- Stats journal -->
       <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;position:sticky;top:80px">
-        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">📊 Stats globales</div>
+        <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px" data-i18n="pr_stats_globales">📊 Stats globales</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
             <div id="j-stat-total" style="font-family:var(--font-display);font-size:28px;color:var(--gold)">0</div>
             <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)" data-i18n="pr_stat_sessions">SÉANCES</div>
           </div>
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
-            <div id="j-stat-time" style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">0h</div>
+            <div id="j-stat-time" style="font-family:var(--font-display);font-size:22px;color:var(--blue-belt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">0h</div>
             <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)" data-i18n="pr_stat_total">TEMPS TOTAL</div>
           </div>
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
@@ -2719,7 +2728,13 @@ function journalRender() {
   document.getElementById('j-stat-streak').textContent = weeks.size;
   // Init date today
   const jDate = document.getElementById('j-date');
-  if (jDate && !jDate.value) jDate.value = new Date().toISOString().slice(0,10);
+  if (jDate && !jDate.value) {
+    jDate.value = new Date().toISOString().slice(0,10);
+  }
+  if (jDate) {
+    var jDisplay = document.getElementById('j-date-display');
+    if (jDisplay) jDisplay.value = formatDateDisplay(jDate.value);
+  }
 }
 
 function journalDelete(id) {
@@ -2867,7 +2882,11 @@ if (!document.getElementById('confetti-style')) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const jDate = document.getElementById('j-date');
-  if (jDate) jDate.value = new Date().toISOString().slice(0,10);
+  if (jDate) {
+    jDate.value = new Date().toISOString().slice(0,10);
+    var jDisp2 = document.getElementById('j-date-display');
+    if (jDisp2) jDisp2.value = formatDateDisplay(jDate.value);
+  }
   const certDate = document.getElementById('cert-date');
   if (certDate) certDate.value = new Date().toISOString().slice(0,10);
 });
@@ -6935,6 +6954,32 @@ function applyLang(lang) {
   var pilGrid = document.getElementById('piliers-grid');
   var pilSlid = document.getElementById('piliers-sliders');
   if (pilGrid) { pilGrid.innerHTML=''; if(pilSlid) pilSlid.innerHTML=''; buildPiliers(); }
+  // Update date displays when language changes
+  if (typeof updateDateDisplays === 'function') updateDateDisplays(lang);
+}
+
+// ── Format date display selon la langue ──
+function formatDateDisplay(iso) {
+  if (!iso) return '';
+  var parts = iso.split('-'); // [yyyy, mm, dd]
+  if (parts.length !== 3) return iso;
+  if (window._lang === 'en') {
+    return parts[1] + '/' + parts[2] + '/' + parts[0]; // MM/DD/YYYY
+  } else {
+    return parts[2] + '/' + parts[1] + '/' + parts[0]; // DD/MM/YYYY
+  }
+}
+function updateDateDisplays(lang) {
+  var pickers = [
+    {picker:'j-date', display:'j-date-display'},
+  ];
+  pickers.forEach(function(p) {
+    var picker = document.getElementById(p.picker);
+    var display = document.getElementById(p.display);
+    if (picker && display && picker.value) {
+      display.value = formatDateDisplay(picker.value);
+    }
+  });
 }
 
 function toggleLang() {
@@ -8483,6 +8528,20 @@ function applyLangTracker(lang) {
   var T = window.LANG_DATA; if (!T) return;
   Object.assign(T.fr, { pr_stat_cogload: 'CHARGE COG. MOY.' });
   Object.assign(T.en, { pr_stat_cogload: 'AVG. COG. LOAD' });
+})();
+</script>
+<script>
+(function(){
+  var T = window.LANG_DATA; if (!T) return;
+  Object.assign(T.fr, {
+    pr_stats_globales: '📊 Stats globales',
+    pr_stat_cogload: 'CHARGE COG. MOY.',
+    pr_stat_total: 'TEMPS TOTAL',
+  });
+  Object.assign(T.en, {
+    pr_stats_globales: '📊 Global Stats',
+    pr_stat_cogload: 'AVG. COG. LOAD',
+  });
 })();
 </script>
 <script>
