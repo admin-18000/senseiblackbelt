@@ -680,7 +680,7 @@ body.unlocked .sensei-only{display:revert !important}
             <!-- Einstein -->
             <div style="display:flex;flex-direction:column;gap:8px">
               <div style="text-align:center">
-                <div style="font-family:var(--font-cond);font-size:7px;font-weight:700;letter-spacing:2px;color:rgba(245,197,24,.45);margin-bottom:3px">PHYSIQUE DU BASKET</div>
+                <div style="font-family:var(--font-cond);font-size:7px;font-weight:700;letter-spacing:2px;color:rgba(245,197,24,.45);margin-bottom:3px" data-i18n="home_physique_basket">PHYSIQUE DU BASKET</div>
                 <div style="font-family:var(--font-display);font-size:clamp(22px,2.5vw,32px);color:var(--gold);letter-spacing:3px;line-height:1">E = mc²</div>
               </div>
               <div style="position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(245,197,24,.15);background:#080a0f;flex:1;min-height:0">
@@ -867,12 +867,12 @@ body.unlocked .sensei-only{display:revert !important}
         </div>
         <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center">
           <div style="font-size:36px;margin-bottom:12px">📐</div>
-          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:8px">PHYSIQUE & MATHS</div>
+          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:8px" data-i18n="home_physique_maths">PHYSIQUE & MATHS</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.6" data-i18n="home_feat4">Parabole du tir, lois de Newton, équations du mouvement — le basket autrement</div>
         </div>
         <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center">
           <div style="font-size:36px;margin-bottom:12px">♿</div>
-          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:8px">POUR TOUS</div>
+          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:8px" data-i18n="home_pour_tous">POUR TOUS</div>
           <div style="font-size:12px;color:var(--muted);line-height:1.6" data-i18n="home_feat2">Femmes, hommes, personnes handicapées — la maîtrise n'a pas de frontières</div>
         </div>
       </div>
@@ -5833,7 +5833,7 @@ function buildPiliers() {
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
         <div style="width:40px;height:40px;border-radius:50%;background:${p.color}20;border:2px solid ${p.color};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${p.icon}</div>
         <div>
-          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p.color}">Pilier ${idx+1}</div>
+          <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p.color}">${window._lang==='en'?'Pillar':'Pilier'} ${idx+1}</div>
           <div style="font-family:var(--font-cond);font-size:14px;font-weight:700;color:var(--text)">${p.label}</div>
         </div>
       </div>
@@ -6058,7 +6058,7 @@ function buildPercentile() {
     <div style="text-align:center;padding:32px 24px">
       <div style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px" data-i18n="st_your_percentile">TON PERCENTILE SENSEI</div>
       <div style="font-family:var(--font-display);font-size:80px;color:${color};line-height:1">Top ${100-pct}%</div>
-      <div style="font-family:var(--font-cond);font-size:14px;color:var(--muted);margin-top:8px">Ton score moyen <strong style="color:${color}">${myAvg.toFixed(2)}</strong> te place dans le top <strong style="color:${color}">${100-pct}%</strong> des élèves Sensei.</div>
+      <div style="font-family:var(--font-cond);font-size:14px;color:var(--muted);margin-top:8px">${window._lang==='en'?'Your average score <strong style="color:'+color+'">'+myAvg.toFixed(2)+'</strong> places you in the top <strong style="color:'+color+'">'+( 100-pct)+'%</strong> of Sensei students.':'Ton score moyen <strong style="color:'+color+'">'+myAvg.toFixed(2)+'</strong> te place dans le top <strong style="color:'+color+'">'+( 100-pct)+'%</strong> des élèves Sensei.'}</div>
       <div style="margin-top:24px;height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;max-width:400px;margin-left:auto;margin-right:auto">
         <div style="height:100%;background:${color};border-radius:5px;width:${pct}%;transition:width .8s ease"></div>
       </div>
@@ -8373,6 +8373,45 @@ function applyLangTracker(lang) {
 })();
 </script>
 <script>
+// ── Clés i18n consolidées ──
+(function(){
+  var T = window.LANG_DATA; if (!T) return;
+  Object.assign(T.fr, {
+    data_crit_mastery: 'Maîtrise <span class="crit-max">/ 3 pts</span>',
+    data_crit_symmetry: 'Symétrie <span class="crit-max">/ 3 pts</span>',
+    data_crit_creativity: 'Créativité <span class="crit-max">/ 4 pts</span>',
+    st_cpk_description: 'En Six Sigma\u00a0\u03c3, le Cpk mesure la capacité d\'un processus à rester dans les limites de contrôle de façon <strong style="color:var(--text)" data-i18n="st_regular">régulière et constante</strong>. Appliqué au basket\u00a0: à quel point reproduis-tu ton niveau de performance sous pression, session après session\u00a0?',
+    mj_vak_description: 'Le test VAK identifie ta <em>préférence</em> d\'apprentissage déclarée — non un talent inné fixe. Selon les neurosciences (Rogowsky et al., 2015), tout être humain mobilise simultanément les canaux Visuel, Auditif et Kinesthésique. Ce profil est un outil de conscience, pas une catégorie définitive.<br><br><strong style="color:var(--text)">\ud83d\udc41\ufe0f Visuel</strong> — tu as tendance à apprendre par l\'observation et les démonstrations<br><strong style="color:var(--text)">\ud83d\udc42 Auditif</strong> — tu retiens facilement par les instructions verbales et le rythme<br><strong style="color:var(--text)">\ud83e\udd32 Kinesthésique</strong> — tu intègres surtout par la pratique et le ressenti du ballon',
+    home_ma_progression: 'MA PROGRESSION',
+    home_physique_basket: 'PHYSIQUE DU BASKET',
+    home_physique_maths: 'PHYSIQUE & MATHS',
+    home_pour_tous: 'POUR TOUS',
+    home_app_action: "L'APP EN ACTION",
+    home_join_btn: 'Rejoindre le programme',
+    mj_pp_best: 'MEILLEUR (ms)', mj_pp_trials: 'ESSAIS', mj_pp_errors: 'ERREURS',
+    mj_cla_tag: 'Issu du programme Sensei BlackBelt · Constraints-Led Approach',
+    pr_belt_white_name: 'BLANCHE', testi_author1: 'Athlète SENSEI', res_select_label: 'Sélectionner',
+  });
+  Object.assign(T.en, {
+    data_crit_mastery: 'Mastery <span class="crit-max">/ 3 pts</span>',
+    data_crit_symmetry: 'Symmetry <span class="crit-max">/ 3 pts</span>',
+    data_crit_creativity: 'Creativity <span class="crit-max">/ 4 pts</span>',
+    st_cpk_description: 'In Six Sigma\u00a0\u03c3, Cpk measures a process\'s ability to stay within control limits in a <strong style="color:var(--text)">regular and consistent</strong> manner. Applied to basketball: how reliably do you reproduce your performance level under pressure, session after session?',
+    mj_vak_description: 'This VAK test identifies your <em>declared learning preference</em> — not a fixed innate trait. Neuroscience research (Rogowsky et al., 2015) shows that all humans simultaneously engage Visual, Auditory, and Kinesthetic channels. This profile is a self-awareness tool, not a definitive category.<br><br><strong style="color:var(--text)">\ud83d\udc41\ufe0f Visual</strong> — you tend to learn through observation and demonstrations<br><strong style="color:var(--text)">\ud83d\udc42 Auditory</strong> — you retain information easily through verbal instructions and rhythm<br><strong style="color:var(--text)">\ud83e\udd32 Kinesthetic</strong> — you integrate skills primarily through practice and ball feel',
+    home_ma_progression: 'MY PROGRESS',
+    home_physique_basket: 'BASKETBALL PHYSICS',
+    home_physique_maths: 'PHYSICS & MATH',
+    home_pour_tous: 'FOR EVERYONE',
+    home_app_action: 'THE APP IN ACTION',
+    home_join_btn: 'Join the program',
+    mj_pp_best: 'BEST (ms)', mj_pp_trials: 'TRIALS', mj_pp_errors: 'ERRORS',
+    mj_cla_tag: 'From the Sensei BlackBelt program · Constraints-Led Approach',
+    pr_belt_white_name: 'WHITE', testi_author1: 'SENSEI Athlete', res_select_label: 'Select',
+  });
+})();
+</script>
+
+<script>
 // ── Init langue — APRÈS tous les scripts d'extension ──
 (function() {
   var saved = localStorage.getItem('sensei_lang') || 'fr';
@@ -8383,50 +8422,6 @@ function applyLangTracker(lang) {
   }
 })();
 </script>
+
 </body>
 </html>
-<!-- injected before </body> -->
-<script>
-(function(){
-  var T = window.LANG_DATA; if (!T) return;
-
-  Object.assign(T.fr, {
-    // Data Science crit-labels
-    data_crit_mastery:  'Maîtrise <span class="crit-max">/ 3 pts</span>',
-    data_crit_symmetry: 'Symétrie <span class="crit-max">/ 3 pts</span>',
-    data_crit_creativity: 'Créativité <span class="crit-max">/ 4 pts</span>',
-    // CPK description complète
-    st_cpk_description: 'En Six Sigma\u00a0σ, le Cpk mesure la capacité d\'un processus à rester dans les limites de contrôle de façon <strong style="color:var(--text)" data-i18n="st_regular">régulière et constante</strong>. Appliqué au basket\u00a0: à quel point reproduis-tu ton niveau de performance sous pression, session après session\u00a0?',
-    // VAK description avec nuance scientifique
-    mj_vak_description: 'Le test VAK identifie ta <em>préférence</em> d\'apprentissage déclarée — non un talent inné fixe. Selon les neurosciences (Rogowsky et al., 2015), tout être humain mobilise simultanément les canaux Visuel, Auditif et Kinesthésique. Ce profil est un outil de conscience, pas une catégorie définitive.<br><br><strong style="color:var(--text)">👁️ Visuel</strong> — tu as tendance à apprendre par l\'observation et les démonstrations<br><strong style="color:var(--text)">👂 Auditif</strong> — tu retiens facilement par les instructions verbales et le rythme<br><strong style="color:var(--text)">🤲 Kinesthésique</strong> — tu intègres surtout par la pratique et le ressenti du ballon',
-  });
-
-  Object.assign(T.en, {
-    // Data Science crit-labels
-    data_crit_mastery:  'Mastery <span class="crit-max">/ 3 pts</span>',
-    data_crit_symmetry: 'Symmetry <span class="crit-max">/ 3 pts</span>',
-    data_crit_creativity: 'Creativity <span class="crit-max">/ 4 pts</span>',
-    // CPK description complète EN
-    st_cpk_description: 'In Six Sigma\u00a0σ, Cpk measures a process\'s ability to stay within control limits in a <strong style="color:var(--text)">regular and consistent</strong> manner. Applied to basketball: how reliably do you reproduce your performance level under pressure, session after session?',
-    // VAK description EN with scientific nuance
-    mj_vak_description: 'This VAK test identifies your <em>declared learning preference</em> — not a fixed innate trait. Neuroscience research (Rogowsky et al., 2015) shows that all humans simultaneously engage Visual, Auditory, and Kinesthetic channels. This profile is a self-awareness tool, not a definitive category.<br><br><strong style="color:var(--text)">👁️ Visual</strong> — you tend to learn through observation and demonstrations<br><strong style="color:var(--text)">👂 Auditory</strong> — you retain information easily through verbal instructions and rhythm<br><strong style="color:var(--text)">🤲 Kinesthetic</strong> — you integrate skills primarily through practice and ball feel',
-  });
-})();
-</script>
-<script>
-(function(){
-  var T = window.LANG_DATA; if (!T) return;
-  Object.assign(T.fr, {
-    home_ma_progression: 'MA PROGRESSION',
-    mj_pp_best: 'MEILLEUR (ms)',
-    mj_pp_trials: 'ESSAIS',
-    mj_pp_errors: 'ERREURS',
-  });
-  Object.assign(T.en, {
-    home_ma_progression: 'MY PROGRESS',
-    mj_pp_best: 'BEST (ms)',
-    mj_pp_trials: 'TRIALS',
-    mj_pp_errors: 'ERRORS',
-  });
-})();
-</script>
