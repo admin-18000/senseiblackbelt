@@ -460,8 +460,8 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('tutorials',null);closeMenu()" data-i18n="mob_tutorials">🎓 Tutorials</button>
   <button class="mm-btn sensei-only" onclick="showSection('programs',null);closeMenu()" data-i18n="mob_programs">📋 Training Programs</button>
   <button class="mm-btn sensei-only" onclick="showSection('data',null);closeMenu()" data-i18n="mob_data">📊 Data Science</button>
-  <button class="mm-btn" onclick="showSection('profil',null);closeMenu()">🏅 Mon Profil</button>
-  <button class="mm-btn" onclick="showSection('minijeux',null);closeMenu()">🎮 Mini-Jeux</button>
+  <button class="mm-btn" onclick="showSection('profil',null);closeMenu()" data-i18n="mob_profil">🏅 Mon Profil</button>
+  <button class="mm-btn" onclick="showSection('minijeux',null);closeMenu()" data-i18n="mob_minijeux">🎮 Mini-Jeux</button>
   <button class="mm-btn" onclick="showSection('challenges',null);closeMenu()" data-i18n="mob_challenges">🔥 Challenges</button>
   <button class="mm-btn" onclick="showSection('battle',null);closeMenu()" data-i18n="mob_battle">⚔️ Battle Royal</button>
   <button class="mm-btn" onclick="showSection('vulga',null);closeMenu()" data-i18n="mob_vulga">📐 Vulgarisation Scientifique</button>
@@ -469,10 +469,10 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('visusci',null);closeMenu()" data-i18n="mob_visusci">🔬 Visualisation Scientifique</button>
 
   <button class="mm-btn" onclick="showSection('reserver',null);closeMenu()" style="color:var(--gold)" data-i18n="mob_reserver">💳 Réserver une séance</button>
-  <button class="mm-btn" onclick="showSection('stats',null);closeMenu()">📈 Mes Stats</button>
-  <button class="mm-btn" onclick="showSection('piliers',null);closeMenu()">🏆 7 Piliers</button>
-  <button class="mm-btn" onclick="showSection('eco',null);closeMenu()">🌿 Eco Dynamics</button>
-  <button class="mm-btn" onclick="showSection('network',null);closeMenu()">🌍 Network</button>
+  <button class="mm-btn" onclick="showSection('stats',null);closeMenu()" data-i18n="mob_stats">📈 Mes Stats</button>
+  <button class="mm-btn" onclick="showSection('piliers',null);closeMenu()" data-i18n="mob_piliers">🏆 7 Piliers</button>
+  <button class="mm-btn" onclick="showSection('eco',null);closeMenu()" data-i18n="mob_eco">🌿 Eco Dynamics</button>
+  <button class="mm-btn" onclick="showSection('network',null);closeMenu()" data-i18n="mob_network">🌍 Network</button>
   <button class="mm-btn" onclick="showSection('coach',null);closeMenu()" data-i18n="mob_coach">🏆 Le Coach</button>
   <button class="mm-btn" onclick="showSection('testi',null);closeMenu()" data-i18n="mob_testi">⭐ Avis</button>
   <button class="mm-btn sensei-only" onclick="showSection('masters',null);closeMenu()" style="color:var(--gold)" data-i18n="mob_masters">🔒 Masters Only</button>
@@ -2378,7 +2378,7 @@ function shuffleArray(arr) {
           </div>
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
             <div id="j-stat-time" style="font-family:var(--font-display);font-size:28px;color:var(--blue-belt)">0h</div>
-            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">TEMPS TOTAL</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)" data-i18n="pr_stat_total">TEMPS TOTAL</div>
           </div>
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
             <div id="j-stat-streak" style="font-family:var(--font-display);font-size:28px;color:var(--orange-belt)">0</div>
@@ -2386,7 +2386,7 @@ function shuffleArray(arr) {
           </div>
           <div style="text-align:center;padding:12px;background:var(--dark3);border-radius:8px">
             <div id="j-stat-feeling" style="font-family:var(--font-display);font-size:28px;color:var(--green-belt)">—</div>
-            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)">RESSENTI MOY.</div>
+            <div style="font-family:var(--font-cond);font-size:9px;color:var(--muted)" data-i18n="pr_stat_feeling">RESSENTI MOY.</div>
           </div>
         </div>
         <button onclick="journalClear()" style="margin-top:14px;width:100%;font-family:var(--font-cond);font-size:11px;font-weight:700;padding:7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer" data-i18n="pr_clear_journal">🗑️ Effacer le journal</button>
@@ -3231,7 +3231,7 @@ function radarDrawCanvas() {
 function radarSave() {
   const sessions = JSON.parse(localStorage.getItem('sensei_radar_sessions') || '[]');
   const entry = {
-    date: new Date().toLocaleDateString('fr-FR'),
+    date: new Date().toLocaleDateString(window._lang==='en'?'en-GB':'fr-FR'),
     scores: { ...radarScores },
     global: parseFloat((Object.values(radarScores).reduce((a,b)=>a+b,0)/6).toFixed(2))
   };
@@ -3241,6 +3241,9 @@ function radarSave() {
   setTimeout(() => { document.getElementById('radar-saved-msg').style.display='none'; }, 2500);
   chartDraw();
   cpkCompute();
+  // Reset percentile so it recalculates with new data
+  var pctEl = document.getElementById('st-percentile-content');
+  if (pctEl) { delete pctEl.dataset.built; pctEl.innerHTML = ''; }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -6066,7 +6069,7 @@ function buildPercentile() {
         <span>0%</span><span>50%</span><span>100%</span>
       </div>
       <div style="margin-top:20px;padding:14px 20px;background:var(--dark3);border-radius:10px;font-family:var(--font-cond);font-size:12px;color:var(--muted);line-height:1.6;display:inline-block;text-align:left">
-        ${pct>=80?'🏆 Niveau élite — tu fais partie des meilleurs élèves Sensei.':pct>=60?'📈 Très bon niveau — continue sur cette lancée.':pct>=40?'✅ Bon niveau — tu progresses dans la bonne direction.':'🔰 Niveau en développement — chaque session compte.'}
+        ${pct>=80?(window._lang==='en'?'🏆 Elite level — you are among the best Sensei athletes.':'🏆 Niveau élite — tu fais partie des meilleurs élèves Sensei.'):pct>=60?(window._lang==='en'?'📈 Very good level — keep it up.':'📈 Très bon niveau — continue sur cette lancée.'):pct>=40?(window._lang==='en'?'✅ Good level — you are progressing in the right direction.':'✅ Bon niveau — tu progresses dans la bonne direction.'):(window._lang==='en'?'🔰 Developing level — every session counts.':'🔰 Niveau en développement — chaque session compte.')}
       </div>
     </div>`;
 }
@@ -6131,7 +6134,7 @@ function comboRender() {
   if (!seq) return;
   seq.innerHTML = '';
   if (comboSelected.length === 0) {
-    seq.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:20px" data-i18n="pr_combo_empty">Sélectionne des drills dans la bibliothèque →</div>';
+    seq.innerHTML = '<div style="font-family:var(--font-cond);font-size:12px;color:var(--muted);text-align:center;padding:20px" data-i18n="pr_combo_empty">'+(window._lang==='en'?'Select drills from the library →':'Sélectionne des drills dans la bibliothèque →')+'</div>';
   } else {
     comboSelected.forEach((d, i) => {
       const row = document.createElement('div');
@@ -6149,11 +6152,11 @@ function comboRender() {
   if (cogEl) cogEl.textContent = avgCog + ' / 5';
   const beltIdx = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
   let advice = '';
-  if (comboSelected.length === 0) advice = 'Commence par sélectionner 2 à 4 drills.';
-  else if (total > 1200) advice = '⚠️ Séance très longue (>20 min). Divise en 2 sessions.';
-  else if (parseFloat(avgCog) > 4 && beltIdx < 4) advice = '⚠️ Charge cognitive élevée pour ton niveau. Réduis la complexité.';
-  else if (comboSelected.length >= 2 && total <= 900) advice = '✅ Séance équilibrée — bonne progression.';
-  else advice = '📋 Séance correcte.';
+  if (comboSelected.length === 0) advice = window._lang==='en'?'Start by selecting 2 to 4 drills.':'Commence par sélectionner 2 à 4 drills.';
+  else if (total > 1200) advice = window._lang==='en'?'⚠️ Very long session (>20 min). Split into 2 sessions.':'⚠️ Séance très longue (>20 min). Divise en 2 sessions.';
+  else if (parseFloat(avgCog) > 4 && beltIdx < 4) advice = window._lang==='en'?'⚠️ High cognitive load for your level. Reduce complexity.':'⚠️ Charge cognitive élevée pour ton niveau. Réduis la complexité.';
+  else if (comboSelected.length >= 2 && total <= 900) advice = window._lang==='en'?'✅ Balanced session — good progression.':'✅ Séance équilibrée — bonne progression.';
+  else advice = window._lang==='en'?'📋 Good session.':'📋 Séance correcte.';
   if (adviceEl) adviceEl.textContent = advice;
 }
 
@@ -8463,6 +8466,18 @@ function applyLangTracker(lang) {
 })();
 </script>
 
+<script>
+(function(){
+  var T = window.LANG_DATA; if (!T) return;
+  Object.assign(T.fr, {
+    pr_stat_feeling: 'RESSENTI MOY.',
+    pr_stat_total: 'TEMPS TOTAL',
+  });
+  Object.assign(T.en, {
+    pr_stat_feeling: 'AVG. FEELING',
+  });
+})();
+</script>
 <script>
 // ── Init langue — APRÈS tous les scripts d'extension ──
 (function() {
