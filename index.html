@@ -8946,7 +8946,10 @@ function playerLinkGenerate() {
   };
 
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const url = window.location.href.split('?')[0] + '?p=' + encoded;
+  const base = window.location.hostname === 'localhost' || window.location.protocol !== 'https:'
+    ? 'https://senseiblackbelt.com/index.html'
+    : window.location.href.split('?')[0];
+  const url = base + '?p=' + encoded;
 
   // Recommandations dans le modal
   document.getElementById('player-link-reco').innerHTML =
