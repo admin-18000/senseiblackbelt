@@ -5507,6 +5507,7 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   <button onclick="timerToggle()" title="Timer Drill" style="width:40px;height:40px;border-radius:50%;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(245,197,24,.3)'" onmouseleave="this.style.background='rgba(245,197,24,.15)'">⏱️</button>
   <button onclick="metroToggle()" title="Metronome" style="width:40px;height:40px;border-radius:50%;background:rgba(0,119,182,.15);border:1px solid rgba(0,119,182,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(0,119,182,.3)'" onmouseleave="this.style.background='rgba(0,119,182,.15)'">🥁</button>
   <button onclick="shareInsta()" title="Share on Instagram" style="width:40px;height:40px;border-radius:50%;background:rgba(193,18,31,.15);border:1px solid rgba(193,18,31,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(193,18,31,.3)'" onmouseleave="this.style.background='rgba(193,18,31,.15)'">📸</button>
+  <button onclick="openPuzzleModal()" title="Instagram Puzzle Grid" style="width:40px;height:40px;border-radius:50%;background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(123,45,139,.3)'" onmouseleave="this.style.background='rgba(123,45,139,.15)'" id="puzzle-toolbar-btn">🔲</button>
 </div>
 
 <!-- ── MODAL PARTAGE INSTAGRAM ── -->
@@ -7163,6 +7164,8 @@ function applyLang(lang) {
   if (ppLbl && (ppLbl.textContent === 'millisecondes' || ppLbl.textContent === 'milliseconds')) {
     ppLbl.textContent = lang === 'en' ? 'milliseconds' : 'millisecondes';
   }
+  var puzzleBtn = document.getElementById('puzzle-toolbar-btn');
+  if (puzzleBtn) puzzleBtn.title = lang === 'en' ? 'Instagram Puzzle Grid' : 'Puzzle Instagram';
 }
 
 // ── Format date display selon la langue ──
@@ -8817,6 +8820,16 @@ function applyLangTracker(lang) {
     pr_qr_scan: 'Scanner avec le téléphone du joueur',
     pr_link_or_send: 'Ou envoyer le lien',
     pr_copy_link: '📋 Copier',
+    puzzle_subtitle: '9 cases 1080×1080px · Carré Instagram · Poster de 9→1',
+    puzzle_tpl_0: '🥋 Coach + App',
+    puzzle_tpl_1: '🏠 HOME Sensei',
+    puzzle_tpl_2: '📊 Data Science',
+    puzzle_tpl_3: '⚡ Minimal',
+    puzzle_preview_hint: 'Aperçu — cliquer sur une case pour télécharger',
+    puzzle_dl_all: '⬇️ Télécharger les 9 cases',
+    puzzle_post_order: 'Poster sur Instagram de la case 9 → 1',
+    puzzle_tpl_4: '🔄 Before / After',
+    puzzle_tpl_5: '🎯 Drill of the Week',
   });
   Object.assign(T.en, {
     pr_stats_globales: '📊 Global Stats',
@@ -8830,6 +8843,16 @@ function applyLangTracker(lang) {
     pr_qr_scan: 'Scan with the player\'s phone',
     pr_link_or_send: 'Or send the link',
     pr_copy_link: '📋 Copy',
+    puzzle_subtitle: '9 tiles 1080×1080px · Square Instagram · Post from 9→1',
+    puzzle_tpl_0: '🥋 Coach + App',
+    puzzle_tpl_1: '🏠 HOME Sensei',
+    puzzle_tpl_2: '📊 Data Science',
+    puzzle_tpl_3: '⚡ Minimal',
+    puzzle_preview_hint: 'Preview — click a tile to download',
+    puzzle_dl_all: '⬇️ Download all 9 tiles',
+    puzzle_post_order: 'Post on Instagram from tile 9 → 1',
+    puzzle_tpl_4: '🔄 Before / After',
+    puzzle_tpl_5: '🎯 Drill of the Week',
   });
 })();
 </script>
@@ -8845,6 +8868,767 @@ function applyLangTracker(lang) {
 })();
 </script>
 
+<!-- ── MODAL PUZZLE INSTAGRAM ── -->
+<div id="puzzle-modal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);overflow-y:auto;padding:20px">
+  <div style="max-width:960px;margin:0 auto">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div>
+        <div style="font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--gold)">🔲 INSTAGRAM PUZZLE GRID</div>
+        <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);margin-top:4px" data-i18n="puzzle_subtitle">9 cases 1080×1080px · Carré Instagram · Poster de 9→1</div>
+      </div>
+      <button onclick="closePuzzleModal()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:20px">✕</button>
+    </div>
+
+    <!-- Sélecteur de template -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px" id="puzzle-template-btns">
+      <button onclick="puzzleSelectTemplate(0,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer" data-i18n="puzzle_tpl_0">🥋 Coach + App</button>
+      <button onclick="puzzleSelectTemplate(1,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_1">🏠 HOME Sensei</button>
+      <button onclick="puzzleSelectTemplate(2,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_2">📊 Data Science</button>
+      <button onclick="puzzleSelectTemplate(3,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_3">⚡ Minimal</button>
+      <button onclick="puzzleSelectTemplate(4,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_4">🔄 Before / After</button>
+      <button onclick="puzzleSelectTemplate(5,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_5">🎯 Drill of the Week</button>
+    </div>
+
+    <!-- Aperçu 3×3 + téléchargement -->
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+      <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:16px" data-i18n="puzzle_preview_hint">Aperçu — cliquer sur une case pour télécharger</div>
+      <div id="puzzle-grid-preview" style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:600px;margin:0 auto"></div>
+    </div>
+
+    <!-- Bouton tout télécharger -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="puzzleDownloadAll()" style="font-family:var(--font-cond);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:12px 24px;border-radius:7px;border:none;background:var(--gold);color:var(--black);cursor:pointer" data-i18n="puzzle_dl_all">⬇️ Télécharger les 9 cases</button>
+      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);align-self:center" data-i18n="puzzle_post_order">Poster sur Instagram de la case 9 → 1</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 🔲 PUZZLE INSTAGRAM — 4 templates · 1080×1080px par case
+// Normes Instagram : carré 1:1, 1080×1080, sRGB, < 8MB
+// ═══════════════════════════════════════════════════════════
+
+const PUZZLE_SIZE = 1080;
+const PUZZLE_GAP  = 6; // gap blanc entre cases (filet Instagram)
+
+let _puzzleTemplate = 0;
+let _puzzleCanvases = [];
+let _puzzleCoachImg = null;
+let _puzzleThumbImgs = {};
+
+// Données app
+function puzzleGetData() {
+  const beltIdx   = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const meta      = JSON.parse(localStorage.getItem('sensei_profil_meta')||'{}');
+  const sessions  = JSON.parse(localStorage.getItem('sensei_radar_sessions')||'[]');
+  const journal   = JSON.parse(localStorage.getItem('sensei_journal')||'[]');
+  const drills    = JSON.parse(localStorage.getItem('sensei_drills_checked')||'{}');
+  const avg       = sessions.length ? (sessions.reduce((a,s)=>a+(s.global||0),0)/sessions.length).toFixed(1) : '—';
+  const beltNames = ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
+  const beltNamesEN = ['White','Yellow','Orange','Green','Blue','Purple','Brown','Black','Red'];
+  const beltColors  = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const beltEmojis  = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+  const en = window._lang === 'en';
+  return { beltIdx, meta, sessions, journal, drills, avg, beltNames, beltNamesEN, beltColors, beltEmojis, en,
+    beltName: en ? beltNamesEN[beltIdx] : beltNames[beltIdx],
+    beltColor: beltColors[beltIdx],
+    beltEmoji: beltEmojis[beltIdx],
+    name: meta.name || (en?'Athlete':'Athlète') };
+}
+
+// Helpers canvas
+function pF(ctx, text, x, y, size, color, align, weight, family) {
+  ctx.font = (weight||'700') + ' ' + size + 'px ' + (family||'"Barlow Condensed",Arial Narrow,sans-serif');
+  ctx.fillStyle = color || '#ffffff';
+  ctx.textAlign = align || 'center';
+  ctx.fillText(text, x, y);
+}
+function pLine(ctx, x1,y1,x2,y2,color,w) {
+  ctx.strokeStyle = color||'rgba(245,197,24,.25)'; ctx.lineWidth=w||1;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function pRect(ctx,x,y,w,h,r,fill,stroke,sw) {
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(x,y,w,h,r||0);
+  else { ctx.moveTo(x+(r||0),y); ctx.arcTo(x+w,y,x+w,y+h,r||0); ctx.arcTo(x+w,y+h,x,y+h,r||0); ctx.arcTo(x,y+h,x,y,r||0); ctx.arcTo(x,y,x+w,y,r||0); ctx.closePath(); }
+  if(fill) { ctx.fillStyle=fill; ctx.fill(); }
+  if(stroke) { ctx.strokeStyle=stroke; ctx.lineWidth=sw||1; ctx.stroke(); }
+}
+function pHex(ctx, cx, cy, r, scores) {
+  // scores = [mastery,symmetry,creativity,speed,vision,resilience] 0-10
+  const angles = [-Math.PI/2, -Math.PI/6, Math.PI/6, Math.PI/2, 5*Math.PI/6, -5*Math.PI/6];
+  // grille
+  [.33,.66,1].forEach(f => {
+    ctx.beginPath();
+    angles.forEach((a,i) => { const x=cx+Math.cos(a)*r*f, y=cy+Math.sin(a)*r*f; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.closePath(); ctx.strokeStyle='rgba(245,197,24,0.12)'; ctx.lineWidth=1; ctx.stroke();
+  });
+  angles.forEach(a => pLine(ctx, cx, cy, cx+Math.cos(a)*r, cy+Math.sin(a)*r, 'rgba(245,197,24,0.1)', 1));
+  // shape
+  const pts = scores.map((s,i) => { const f=(s/10)*r, a=angles[i]; return [cx+Math.cos(a)*f, cy+Math.sin(a)*f]; });
+  ctx.beginPath(); pts.forEach(([x,y],i) => i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));
+  ctx.closePath(); ctx.fillStyle='rgba(245,197,24,0.2)'; ctx.fill();
+  ctx.strokeStyle='#f5c518'; ctx.lineWidth=3; ctx.stroke();
+  // points
+  const dotColors = ['#f5c518','#2dc653','#7b2d8b','#ff6d00','#0077b6','#c1121f'];
+  pts.forEach(([x,y],i) => { ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2); ctx.fillStyle=dotColors[i]; ctx.fill(); });
+}
+function pBeltBars(ctx, x, y, w, beltIdx, beltColors) {
+  const bw = Math.floor((w-8*4)/9);
+  beltColors.forEach((c,i) => {
+    ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+i*(bw+4),y,bw,20,4); else ctx.rect(x+i*(bw+4),y,bw,20);
+    ctx.fillStyle = i<=beltIdx ? c : 'rgba(255,255,255,0.06)'; ctx.fill();
+  });
+}
+
+// ── Fond commun ──
+function pBg(ctx, accent) {
+  ctx.fillStyle = '#080a0f'; ctx.fillRect(0,0,PUZZLE_SIZE,PUZZLE_SIZE);
+  const grd = ctx.createRadialGradient(PUZZLE_SIZE/2,PUZZLE_SIZE/2,0,PUZZLE_SIZE/2,PUZZLE_SIZE/2,PUZZLE_SIZE*.7);
+  grd.addColorStop(0, (accent||'rgba(245,197,24,')+'0.04)');
+  grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,PUZZLE_SIZE,PUZZLE_SIZE);
+  ctx.strokeStyle='rgba(255,255,255,0.025)'; ctx.lineWidth=1;
+  for(let x=0;x<PUZZLE_SIZE;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,PUZZLE_SIZE);ctx.stroke();}
+  for(let y=0;y<PUZZLE_SIZE;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(PUZZLE_SIZE,y);ctx.stroke();}
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 0 — COACH + APP
+// ══════════════════════════════════════════
+function puzzleDrawTemplate0(canvases, d) {
+  const S=PUZZLE_SIZE;
+
+  // Case 1 : photo coach
+  const c1=canvases[0].getContext('2d'); pBg(c1);
+  if(_puzzleCoachImg) {
+    const ir=_puzzleCoachImg.naturalWidth/_puzzleCoachImg.naturalHeight;
+    let dw=S, dh=S/ir; if(dh<S){dh=S;dw=S*ir;}
+    c1.drawImage(_puzzleCoachImg,(S-dw)/2,(S-dh)/2,dw,dh);
+    const grad=c1.createLinearGradient(0,S*.5,0,S); grad.addColorStop(0,'transparent'); grad.addColorStop(1,'rgba(8,10,15,.85)');
+    c1.fillStyle=grad; c1.fillRect(0,0,S,S);
+  }
+  pRect(c1,60,S-220,S-120,50,8,'rgba(245,197,24,0.15)','rgba(245,197,24,0.4)',1);
+  pF(c1,'COACH · SCIENTIST · INNOVATOR',S/2,S-185,28,'#f5c518');
+  pF(c1,'THIBAULT NJECKIL',S/2,S-120,48,'#ffffff','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1,'@sensei_blackbelt',S/2,S-60,26,'rgba(245,197,24,0.6)');
+
+  // Case 2 : SEN géant
+  const c2=canvases[1].getContext('2d'); pBg(c2,'rgba(245,197,24,');
+  c2.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; c2.fillStyle='#f5c518'; c2.textAlign='left';
+  c2.fillText('SEN',-40,900);
+
+  // Case 3 : SEI blanc
+  const c3=canvases[2].getContext('2d'); pBg(c3,'rgba(255,255,255,');
+  c3.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; c3.fillStyle='#ffffff'; c3.textAlign='left';
+  c3.fillText('SEI',-40,900);
+
+  // Case 4 : thumbnail BH Drill #1
+  const c4=canvases[3].getContext('2d'); pBg(c4);
+  const vid = (typeof SECTION_VIDEOS !== 'undefined' && SECTION_VIDEOS.ballhandling) ? SECTION_VIDEOS.ballhandling[0] : null;
+  if(vid && _puzzleThumbImgs[vid.id]) {
+    const ti=_puzzleThumbImgs[vid.id];
+    const ir=ti.naturalWidth/ti.naturalHeight; let dw=S,dh=S/ir; if(dh<S){dh=S;dw=S*ir;}
+    c4.drawImage(ti,(S-dw)/2,(S-dh)/2,dw,dh);
+    const g4=c4.createLinearGradient(0,S*.4,0,S); g4.addColorStop(0,'transparent'); g4.addColorStop(1,'rgba(8,10,15,.9)');
+    c4.fillStyle=g4; c4.fillRect(0,0,S,S);
+  }
+  c4.beginPath(); c4.arc(S/2,S/2,100,0,Math.PI*2); c4.fillStyle='rgba(245,197,24,0.9)'; c4.fill();
+  c4.beginPath(); c4.moveTo(S/2-35,S/2-55); c4.lineTo(S/2-35,S/2+55); c4.lineTo(S/2+65,S/2); c4.closePath(); c4.fillStyle='#080a0f'; c4.fill();
+  pF(c4,'BALL HANDLING DRILL #1',S/2,S-160,32,'rgba(255,255,255,0.9)');
+  pF(c4,'Tornado — TAP² — Cross',S/2,S-105,28,'rgba(245,197,24,0.8)');
+  pRect(c4,S/2-130,S-80,260,44,22,'rgba(248,249,250,0.1)','rgba(248,249,250,0.3)',1);
+  pF(c4,'⚪ WHITE BELT',S/2,S-50,26,'#f8f9fa');
+
+  // Case 5 : progression
+  const c5=canvases[4].getContext('2d'); pBg(c5);
+  pF(c5,'PROGRESSION SYSTEM',S/2,90,30,'rgba(245,197,24,0.6)');
+  pLine(c5,100,110,S-100,110,'rgba(245,197,24,0.2)',1);
+  const belt = typeof BELTS_PROFIL !== 'undefined' ? BELTS_PROFIL[d.beltIdx] : null;
+  const drillsDone = belt ? belt.drills.filter(dr => (d.drills[d.beltIdx]||[]).includes(dr)).length : 0;
+  const drillsTotal = belt ? belt.drills.length : 3;
+  // flèche ceintures
+  const bw2=90, gap2=14, startX=(S-(9*bw2+8*gap2))/2;
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+  bColors.forEach((c,i) => {
+    const x=startX+i*(bw2+gap2), y=200;
+    pRect(c5,x,y,bw2,bw2,10, i===d.beltIdx?c:'rgba(255,255,255,0.04)', i===d.beltIdx?c:'rgba(255,255,255,0.1)', i===d.beltIdx?3:1);
+    c5.font='52px serif'; c5.textAlign='center'; c5.fillText(bEmojis[i],x+bw2/2,y+bw2/2+18);
+    if(i<8){pF(c5,'→',x+bw2+gap2/2,y+bw2/2+10,28,'rgba(245,197,24,0.3)');}
+  });
+  pF(c5, d.en?'CURRENT BELT':'CEINTURE ACTUELLE', S/2, 360, 26, 'rgba(245,197,24,0.5)');
+  pF(c5, (d.en?d.beltNamesEN[d.beltIdx]:d.beltNames[d.beltIdx]).toUpperCase()+' BELT', S/2, 420, 52, d.beltColor, 'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c5,100,460,S-100,460,'rgba(245,197,24,0.15)',1);
+  if(belt) {
+    pF(c5, d.en?'DRILLS TO COMPLETE':'DRILLS À VALIDER', S/2, 510, 26, 'rgba(245,197,24,0.5)');
+    belt.drills.forEach((dr,i) => {
+      const done=(d.drills[d.beltIdx]||[]).includes(dr);
+      pF(c5,(done?'✓ ':'○ ')+dr, S/2, 570+i*68, 24, done?'rgba(45,198,83,0.9)':'rgba(255,255,255,0.45)');
+    });
+  }
+  pLine(c5,100,S-200,S-100,S-200,'rgba(245,197,24,0.15)',1);
+  pRect(c5,100,S-180,S-200,16,4,'rgba(255,255,255,0.06)');
+  pRect(c5,100,S-180,Math.round((S-200)*(drillsDone/Math.max(drillsTotal,1))),16,4,'#f5c518');
+  pF(c5,drillsDone+' / '+drillsTotal+(d.en?' drills completed':' drills validés'),S/2,S-128,26,'rgba(255,255,255,0.4)');
+
+  // Case 6 : radar
+  const c6=canvases[5].getContext('2d'); pBg(c6);
+  pF(c6,'MY SENSEI RADAR',S/2,80,30,'rgba(245,197,24,0.6)');
+  const lastSess = d.sessions.length ? d.sessions[d.sessions.length-1] : null;
+  const sc = lastSess ? [lastSess.scores.maitrise||5,lastSess.scores.symetrie||5,lastSess.scores.creativite||5,lastSess.scores.vitesse||5,lastSess.scores.vision||5,lastSess.scores.robustesse||5] : [5,5,5,5,5,5];
+  pHex(c6,S/2,S/2,360,sc);
+  const lbls=d.en?['MASTERY','SYMMETRY','CREATIVITY','SPEED','VISION','RESILIENCE']:['MAÎTRISE','SYMÉTRIE','CRÉATIVITÉ','VITESSE','VISION','RÉSILIENCE'];
+  const lclr=['#f5c518','#2dc653','#7b2d8b','#ff6d00','#0077b6','#c1121f'];
+  const lPos=[[S/2,-20],[S-80,S/2-240],[S-60,S/2+280],[S/2,S-40],[80,S/2+280],[90,S/2-240]];
+  lbls.forEach((l,i)=>pF(c6,l,lPos[i][0],lPos[i][1],24,lclr[i],'center'));
+  pF(c6,d.avg+' / 10',S/2,S-100,72,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c6,d.en?'GLOBAL SCORE':'SCORE GLOBAL',S/2,S-40,26,'rgba(255,255,255,0.35)');
+
+  // Case 7 : citation + badges
+  const c7=canvases[6].getContext('2d'); pBg(c7);
+  c7.font='900 300px "Bebas Neue",Arial Narrow,sans-serif'; c7.fillStyle='rgba(245,197,24,0.04)'; c7.textAlign='left'; c7.fillText('"',30,320);
+  pF(c7,d.en?'"The black belt is not a':'"La ceinture noire n\'est',S/2,380,38,'rgba(255,255,255,0.65)');
+  pF(c7,d.en?'a destination. It is':'pas une destination. C\'est',S/2,440,38,'rgba(255,255,255,0.65)');
+  pF(c7,d.en?'a way of learning."':'une façon d\'apprendre."',S/2,500,38,'rgba(255,255,255,0.65)');
+  pLine(c7,200,540,S-200,540,'rgba(245,197,24,0.2)',1);
+  pF(c7,'— Thibault NJECKIL',S/2,600,30,'rgba(245,197,24,0.6)');
+  const badges=d.en?['🔬 Visuomotor','📐 Lean 6σ','🧬 Neuroscience','🏀 Basketball Coach']:['🔬 Visuomoteur','📐 Lean 6σ','🧬 Neurosciences','🏀 Entraîneur'];
+  const bclr=['rgba(245,197,24,','rgba(45,198,83,','rgba(0,119,182,','rgba(193,18,31,'];
+  [[S/2-240,680],[S/2+80,680],[S/2-240,760],[S/2+80,760]].forEach(([x,y],i)=>{
+    pRect(c7,x-160,y-38,320,52,26,bclr[i]+'0.08)',bclr[i]+'0.3)',1);
+    pF(c7,badges[i],x,y,26,bclr[i]+'0.9)');
+  });
+  pF(c7,'senseiblackbelt.com',S/2,S-60,28,'rgba(245,197,24,0.3)');
+
+  // Case 8 : score DATA SCIENCE
+  const c8=canvases[7].getContext('2d'); pBg(c8,'rgba(245,197,24,');
+  pF(c8,d.en?'DATA SCIENCE SCORE':'SCORE DATA SCIENCE',S/2,140,36,'rgba(245,197,24,0.6)');
+  pF(c8,d.avg,S/2,580,380,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c8,200,640,S-200,640,'rgba(245,197,24,0.2)',1);
+  pF(c8,'/ 10',S/2,700,60,'rgba(255,255,255,0.3)');
+  pRect(c8,S/2-300,760,600,16,8,'rgba(255,255,255,0.06)');
+  const score_pct=d.avg!=='—'?parseFloat(d.avg)/10:0.5;
+  pRect(c8,S/2-300,760,Math.round(600*score_pct),16,8,'#f5c518');
+  pF(c8,'ELITE',S/2,840,60,'rgba(245,197,24,0.8)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c8,'LEAN SIX SIGMA · DMAIC · CPK',S/2,S-80,28,'rgba(255,255,255,0.2)');
+  pF(c8,'Méthode Basketball Scientifique',S/2,S-40,24,'rgba(255,255,255,0.15)');
+
+  // Case 9 : 9 ceintures + CTA
+  const c9=canvases[8].getContext('2d'); pBg(c9);
+  pF(c9,'9',S/2,420,420,'rgba(245,197,24,0.06)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,d.en?'9 MASTERY LEVELS':'9 NIVEAUX DE MAÎTRISE',S/2,140,40,'rgba(245,197,24,0.7)');
+  pBeltBars(c9,80,200,S-160,d.beltIdx,bColors);
+  pF(c9,d.en?'From beginner to legendary':'Du débutant au légendaire',S/2,290,30,'rgba(255,255,255,0.35)');
+  pF(c9,d.en?'Measurable · Progressive · Scientific':'Mesurable · Progressif · Scientifique',S/2,340,26,'rgba(255,255,255,0.25)');
+  pLine(c9,100,S-280,S-100,S-280,'rgba(245,197,24,0.15)',1);
+  pRect(c9,S/2-260,S-240,520,100,50,'#f5c518');
+  pF(c9,d.en?'JOIN THE PROGRAM →':'REJOINDRE LE PROGRAMME →',S/2,S-182,38,'#080a0f','center','900');
+  pF(c9,'senseiblackbelt.com',S/2,S-80,28,'rgba(245,197,24,0.35)');
+  pF(c9,'#SenseiBlackBelt #Basketball #BallHandling',S/2,S-36,22,'rgba(255,255,255,0.2)');
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 1 — HOME SENSEI
+// ══════════════════════════════════════════
+function puzzleDrawTemplate1(canvases, d) {
+  const S=PUZZLE_SIZE;
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bNames=d.en?d.beltNamesEN:d.beltNames;
+  const bDescs=d.en?['Beginner','Initiated','Confirmed','Advanced','Expert','Master','Grand Master','Elite','Legendary']:['Débutant','Initié','Confirmé','Avancé','Expert','Maître','Grand Maître','Élite','Légendaire'];
+  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+
+  function drawBeltCell(ctx, idx) {
+    pBg(ctx);
+    const accent=bColors[idx];
+    pRect(ctx,0,0,S,S,0,null,accent,8);
+    ctx.font='200px serif'; ctx.textAlign='center'; ctx.fillText(bEmojis[idx],S/2,440);
+    pF(ctx,'LEVEL '+(idx+1),S/2,520,40,'rgba(255,255,255,0.3)');
+    pF(ctx,bNames[idx].toUpperCase(),S/2,640,120,accent,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+    pF(ctx,bDescs[idx],S/2,720,36,'rgba(255,255,255,0.4)');
+    pLine(ctx,200,760,S-200,760,accent+'88',2);
+    pF(ctx,'SENSEI BLACKBELT',S/2,840,30,'rgba(245,197,24,0.3)');
+  }
+
+  // Cases 1,4,7 : intro + ceintures impaires
+  const c1=canvases[0].getContext('2d'); pBg(c1);
+  pF(c1,'BASKETBALL',S/2,300,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1,'MASTERY',S/2,400,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1,'BELTS',S/2,500,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c1,200,540,S-200,540,'rgba(245,197,24,0.2)',1);
+  pF(c1,'9 niveaux de maîtrise',S/2,620,36,'rgba(255,255,255,0.3)');
+  pF(c1,'senseiblackbelt.com',S/2,S-80,30,'rgba(245,197,24,0.3)');
+
+  // SEN / SEI
+  const c2=canvases[1].getContext('2d'); pBg(c2,'rgba(245,197,24,');
+  c2.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; c2.fillStyle='#f5c518'; c2.textAlign='left'; c2.fillText('SEN',-40,900);
+  const c3=canvases[2].getContext('2d'); pBg(c3,'rgba(255,255,255,');
+  c3.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; c3.fillStyle='#ffffff'; c3.textAlign='left'; c3.fillText('SEI',-40,900);
+
+  // Ceintures
+  const c4=canvases[3].getContext('2d'); drawBeltCell(c4,0);
+  const c5=canvases[4].getContext('2d');
+  pBg(c5); pF(c5,'BLACK',S/2,400,220,'#e0e0e0','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c5,'BELT',S/2,600,220,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pBeltBars(c5,80,700,S-160,d.beltIdx,bColors);
+  pF(c5,'senseiblackbelt.com',S/2,S-60,28,'rgba(245,197,24,0.3)');
+
+  const c6=canvases[5].getContext('2d'); drawBeltCell(c6,3);
+  const c7=canvases[6].getContext('2d'); drawBeltCell(c7,6);
+  const c8=canvases[7].getContext('2d'); drawBeltCell(c8,7);
+  const c9=canvases[8].getContext('2d');
+  pBg(c9,`rgba(193,18,31,`);
+  pRect(c9,0,0,S,S,0,null,'#c1121f',8);
+  c9.font='200px serif'; c9.textAlign='center'; c9.fillText('🔴',S/2,400);
+  pF(c9,'LEGENDARY',S/2,560,80,'#c1121f','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,d.en?'LEVEL 9':'NIVEAU 9',S/2,660,50,'rgba(255,255,255,0.4)');
+  pF(c9,d.en?'The Sensei. Creator. Ultimate.':'Le Sensei. Créateur. Référence.',S/2,730,30,'rgba(255,255,255,0.35)');
+  pRect(c9,S/2-240,S-200,480,90,45,'#c1121f');
+  pF(c9,d.en?'JOIN →':'REJOINDRE →',S/2,S-146,40,'#ffffff','center','900');
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 2 — DATA SCIENCE
+// ══════════════════════════════════════════
+function puzzleDrawTemplate2(canvases, d) {
+  const S=PUZZLE_SIZE;
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+
+  // 1: Radar
+  const c1=canvases[0].getContext('2d'); pBg(c1);
+  pF(c1,'MY SENSEI RADAR',S/2,100,40,'rgba(245,197,24,0.6)');
+  const lastSess=d.sessions.length?d.sessions[d.sessions.length-1]:null;
+  const sc=lastSess?[lastSess.scores.maitrise||5,lastSess.scores.symetrie||5,lastSess.scores.creativite||5,lastSess.scores.vitesse||5,lastSess.scores.vision||5,lastSess.scores.robustesse||5]:[5,5,5,5,5,5];
+  pHex(c1,S/2,S/2,360,sc);
+  const lbls=d.en?['MASTERY','SYMMETRY','CREATIVITY','SPEED','VISION','RESILIENCE']:['MAÎTRISE','SYMÉTRIE','CRÉATIVITÉ','VITESSE','VISION','RÉSILIENCE'];
+  const lclr=['#f5c518','#2dc653','#7b2d8b','#ff6d00','#0077b6','#c1121f'];
+  const lPos=[[S/2,-20],[S-80,S/2-240],[S-60,S/2+280],[S/2,S-40],[80,S/2+280],[90,S/2-240]];
+  lbls.forEach((l,i)=>pF(c1,l,lPos[i][0],lPos[i][1],28,lclr[i],'center'));
+
+  // 2: Score global
+  const c2=canvases[1].getContext('2d'); pBg(c2,'rgba(245,197,24,');
+  pF(c2,'GLOBAL SCORE',S/2,140,40,'rgba(245,197,24,0.6)');
+  pF(c2,d.avg,S/2,620,420,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c2,'/ 10',S/2,700,60,'rgba(255,255,255,0.3)');
+  pRect(c2,S/2-300,760,600,20,10,'rgba(255,255,255,0.06)');
+  pRect(c2,S/2-300,760,Math.round(600*(d.avg!=='—'?parseFloat(d.avg)/10:0.5)),20,10,'#f5c518');
+
+  // 3: Belt actuelle
+  const c3=canvases[2].getContext('2d'); pBg(c3);
+  c3.font='280px serif'; c3.textAlign='center'; c3.fillText(d.beltEmoji,S/2,560);
+  pF(c3,d.beltName.toUpperCase()+' BELT',S/2,700,80,d.beltColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pBeltBars(c3,80,820,S-160,d.beltIdx,bColors);
+
+  // 4: Sessions count
+  const c4=canvases[3].getContext('2d'); pBg(c4,'rgba(0,119,182,');
+  pF(c4,d.en?'TRAINING LOG':'JOURNAL',S/2,140,40,'rgba(245,197,24,0.6)');
+  pF(c4,String(d.sessions.length),S/2,580,360,'#0077b6','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c4,d.en?'SESSIONS':'SÉANCES',S/2,680,60,'rgba(255,255,255,0.5)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  if(d.journal.length>0){
+    pLine(c4,100,740,S-100,740,'rgba(245,197,24,0.1)',1);
+    d.journal.slice(0,3).forEach((e,i)=>{
+      pF(c4,(e.date||'')+ ' · '+(e.drill||'—'),S/2,810+i*72,26,'rgba(255,255,255,0.35)');
+    });
+  }
+
+  // 5: SENSEI logo central
+  const c5=canvases[4].getContext('2d'); pBg(c5);
+  c5.font='900 480px "Bebas Neue",Arial Narrow,sans-serif'; c5.fillStyle='rgba(245,197,24,0.06)'; c5.textAlign='center'; c5.fillText('SEN',S/2,560);
+  c5.fillStyle='rgba(255,255,255,0.04)'; c5.fillText('SEI',S/2,980);
+  pF(c5,'DATA',S/2,300,120,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c5,'SCIENCE',S/2,440,80,'rgba(255,255,255,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c5,'LEAN SIX SIGMA σ',S/2,560,36,'rgba(245,197,24,0.4)');
+  pF(c5,'DMAIC · CPK · RADAR',S/2,620,30,'rgba(255,255,255,0.25)');
+
+  // 6: Progression courbe
+  const c6=canvases[5].getContext('2d'); pBg(c6);
+  pF(c6,d.en?'MY PROGRESSION':'MA PROGRESSION',S/2,100,40,'rgba(245,197,24,0.6)');
+  if(d.sessions.length>1){
+    const maxS=Math.max(...d.sessions.map(s=>s.global||0))||10;
+    const pts=d.sessions.slice(-8).map((s,i,arr)=>[160+i*(S-320)/(arr.length-1||1),S-180-((s.global||0)/maxS)*(S-400)]);
+    c6.beginPath(); c6.moveTo(pts[0][0],pts[0][1]);
+    pts.forEach(([x,y])=>c6.lineTo(x,y));
+    c6.strokeStyle='#f5c518'; c6.lineWidth=6; c6.lineJoin='round'; c6.stroke();
+    pts.forEach(([x,y])=>{c6.beginPath();c6.arc(x,y,14,0,Math.PI*2);c6.fillStyle='#f5c518';c6.fill();});
+    pLine(c6,140,S-160,S-140,S-160,'rgba(245,197,24,0.15)',1);
+    const last=d.sessions[d.sessions.length-1];
+    pF(c6,String(last.global||'—'),pts[pts.length-1][0],pts[pts.length-1][1]-30,36,'#f5c518');
+  } else {
+    pF(c6,d.en?'Add sessions in My Stats':'Ajoutez des séances dans My Stats',S/2,S/2,32,'rgba(255,255,255,0.2)');
+  }
+
+  // 7: Percentile
+  const c7=canvases[6].getContext('2d'); pBg(c7,'rgba(123,45,139,');
+  pF(c7,d.en?'YOUR PERCENTILE':'TON PERCENTILE',S/2,140,40,'rgba(245,197,24,0.6)');
+  const pct = d.sessions.length && d.avg!=='—' ? Math.round(parseFloat(d.avg)*10) : 50;
+  pF(c7,'P'+pct,S/2,580,300,'#7b2d8b','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7,d.en?'Top '+Math.max(1,100-pct)+'%':'Top '+Math.max(1,100-pct)+'%',S/2,680,60,'rgba(255,255,255,0.5)');
+
+  // 8: E=MC²
+  const c8=canvases[7].getContext('2d'); pBg(c8);
+  pF(c8,'E = MC²',S/2,480,200,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c8,d.en?'BASKETBALL PHYSICS':'PHYSIQUE DU BASKET',S/2,600,40,'rgba(245,197,24,0.5)');
+  pLine(c8,200,650,S-200,650,'rgba(245,197,24,0.15)',1);
+  pF(c8,d.en?'Physique · Maths · Neuroscience':'Physique · Maths · Neurosciences',S/2,720,32,'rgba(255,255,255,0.3)');
+  pF(c8,'Lean Six Sigma 6σ',S/2,780,32,'rgba(255,255,255,0.25)');
+
+  // 9: CTA
+  const c9=canvases[8].getContext('2d'); pBg(c9);
+  pBeltBars(c9,80,260,S-160,d.beltIdx,bColors);
+  pF(c9,d.en?'BECOME THE ATHLETE':'DEVIENS L\'ATHLÈTE',S/2,420,56,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,d.en?'YOU WERE MEANT TO BE':'QUE TU ES CENSÉ ÊTRE',S/2,500,56,'rgba(255,255,255,0.6)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pRect(c9,S/2-280,S-220,560,110,55,'#f5c518');
+  pF(c9,d.en?'JOIN THE PROGRAM →':'REJOINDRE →',S/2,S-156,44,'#080a0f','center','900');
+  pF(c9,'senseiblackbelt.com',S/2,S-72,28,'rgba(245,197,24,0.35)');
+  pF(c9,'#SenseiBlackBelt',S/2,S-28,24,'rgba(255,255,255,0.2)');
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 3 — MINIMAL
+// ══════════════════════════════════════════
+function puzzleDrawTemplate3(canvases, d) {
+  const S=PUZZLE_SIZE;
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+
+  const cells = [
+    (ctx)=>{ pBg(ctx); pF(ctx,'🥋',S/2,S/2+80,'center','',400,'serif'); c1font(ctx,300); pF(ctx,'SENSEI',S/2,200,120,'rgba(245,197,24,0.08)','center','900','"Bebas Neue",Arial Narrow,sans-serif'); pF(ctx,'#SenseiBlackBelt',S/2,S-80,32,'rgba(245,197,24,0.4)'); },
+    (ctx)=>{ pBg(ctx,'rgba(245,197,24,'); c1font(ctx,900); ctx.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; ctx.fillStyle='#f5c518'; ctx.textAlign='left'; ctx.fillText('SEN',-40,900); },
+    (ctx)=>{ pBg(ctx,'rgba(255,255,255,'); ctx.font='900 860px "Bebas Neue",Arial Narrow,sans-serif'; ctx.fillStyle='#ffffff'; ctx.textAlign='left'; ctx.fillText('SEI',-40,900); },
+    (ctx)=>{ pBg(ctx); pF(ctx,'BLACK BELT',S/2,S/2,140,d.beltColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif'); pLine(ctx,100,S/2+60,S-100,S/2+60,'rgba(255,255,255,0.1)',1); pF(ctx,'Level 8 · Elite',S/2,S/2+130,36,'rgba(255,255,255,0.3)'); },
+    (ctx)=>{ pBg(ctx); pBeltBars(ctx,80,S/2-20,S-160,d.beltIdx,bColors); pF(ctx,'9 BELTS',S/2,S/2-80,80,'rgba(245,197,24,0.15)','center','900','"Bebas Neue",Arial Narrow,sans-serif'); },
+    (ctx)=>{ pBg(ctx); pF(ctx,d.avg,S/2,S/2+60,280,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif'); pF(ctx,d.en?'SCORE':'SCORE',S/2,S/2+160,50,'rgba(255,255,255,0.3)'); },
+    (ctx)=>{ pBg(ctx); pF(ctx,'E = MC²',S/2,S/2+40,160,'rgba(245,197,24,0.6)','center','900','"Bebas Neue",Arial Narrow,sans-serif'); pF(ctx,d.en?'Basketball Physics':'Physique du Basket',S/2,S/2+160,34,'rgba(255,255,255,0.25)'); },
+    (ctx)=>{ pBg(ctx); pF(ctx,'"',S/2,400,300,'rgba(245,197,24,0.06)'); pF(ctx,d.en?'"A way of':'\"Une façon',S/2,520,52,'rgba(255,255,255,0.55)'); pF(ctx,d.en?'learning."':'d\'apprendre."',S/2,600,52,'rgba(255,255,255,0.55)'); pF(ctx,'— T. NJECKIL',S/2,700,32,'rgba(245,197,24,0.4)'); },
+    (ctx)=>{ pBg(ctx); pRect(ctx,S/2-280,S/2-60,560,120,60,'#f5c518'); pF(ctx,d.en?'JOIN →':'REJOINDRE →',S/2,S/2+10,52,'#080a0f','center','900'); pF(ctx,'senseiblackbelt.com',S/2,S/2+100,30,'rgba(245,197,24,0.35)'); },
+  ];
+  function c1font(ctx,w){ ctx.font=w+'px serif'; }
+  cells.forEach((fn,i)=>{
+    const ctx=canvases[i].getContext('2d');
+    // fix : case 0 needs its own draw
+    if(i===0){ pBg(ctx); ctx.font='280px serif'; ctx.textAlign='center'; ctx.fillText('🥋',S/2,560); pF(ctx,'#SenseiBlackBelt',S/2,S-80,32,'rgba(245,197,24,0.4)'); }
+    else fn(ctx);
+  });
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 4 — BEFORE / AFTER
+// ══════════════════════════════════════════
+function puzzleDrawTemplate4(canvases, d) {
+  const S=PUZZLE_SIZE;
+  const en=d.en;
+
+  // LIGNE 1 — "AVANT" : le joueur sans méthode
+  // Case 1 : fond rouge sombre, chaos
+  const c1=canvases[0].getContext('2d');
+  c1.fillStyle='#0d0507'; c1.fillRect(0,0,S,S);
+  c1.strokeStyle='rgba(193,18,31,0.04)'; c1.lineWidth=1;
+  for(let x=0;x<S;x+=60){c1.beginPath();c1.moveTo(x,0);c1.lineTo(x,S);c1.stroke();}
+  for(let y=0;y<S;y+=60){c1.beginPath();c1.moveTo(0,y);c1.lineTo(S,y);c1.stroke();}
+  pF(c1,en?'BEFORE':'AVANT',S/2,200,160,'rgba(193,18,31,0.12)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1,en?'❌':' ❌',S/2,420,200,'center');
+  pF(c1,en?'No method':'Sans méthode',S/2,580,52,'rgba(193,18,31,0.8)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1,en?'Repetition without direction':'Répétition sans direction',S/2,650,30,'rgba(255,255,255,0.35)');
+  pF(c1,en?'No measurable progress':'Aucune progression mesurable',S/2,700,30,'rgba(255,255,255,0.25)');
+  pF(c1,en?'Frustration & stagnation':'Frustration & stagnation',S/2,750,30,'rgba(255,255,255,0.2)');
+
+  // Case 2 : texte AVANT descriptif
+  const c2=canvases[1].getContext('2d');
+  c2.fillStyle='#0d0507'; c2.fillRect(0,0,S,S);
+  pRect(c2,80,160,S-160,600,16,'rgba(193,18,31,0.06)','rgba(193,18,31,0.25)',2);
+  pF(c2,en?'The player trains...':'Le joueur s\'entraîne...',S/2,280,38,'rgba(255,255,255,0.6)');
+  const befores=en
+    ?['Drills without structure','No performance tracking','No feedback loop','Same routine every session','No goal, no belt, no vision']
+    :['Drills sans structure','Aucun suivi de performance','Pas de boucle de feedback','Même routine chaque séance','Pas d\'objectif ni de vision'];
+  befores.forEach((t,i)=>pF(c2,'✗ '+t,S/2,380+i*82,28,'rgba(193,18,31,0.75)'));
+  pF(c2,en?'Years of stagnation':'Des années de stagnation',S/2,S-120,40,'rgba(255,255,255,0.2)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+
+  // Case 3 : score avant (bas)
+  const c3=canvases[2].getContext('2d');
+  c3.fillStyle='#0d0507'; c3.fillRect(0,0,S,S);
+  pF(c3,en?'TYPICAL SCORE':'SCORE TYPIQUE',S/2,220,42,'rgba(193,18,31,0.5)');
+  pF(c3,'3.2',S/2,560,320,'rgba(193,18,31,0.4)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c3,'/ 10',S/2,650,60,'rgba(255,255,255,0.2)');
+  pRect(c3,S/2-300,720,600,20,10,'rgba(255,255,255,0.04)');
+  pRect(c3,S/2-300,720,Math.round(600*0.32),20,10,'rgba(193,18,31,0.4)');
+  pF(c3,en?'No system = no progress':'Sans système = pas de progrès',S/2,S-100,28,'rgba(255,255,255,0.2)');
+
+  // LIGNE 2 — TRANSFORMATION
+  // Case 4 : flèche de transformation
+  const c4=canvases[3].getContext('2d'); pBg(c4);
+  pF(c4,en?'THE TURNING POINT':'LE TOURNANT',S/2,160,44,'rgba(245,197,24,0.6)');
+  pLine(c4,S/2,260,S/2,S-260,'rgba(245,197,24,0.15)',2);
+  c4.beginPath(); c4.moveTo(S/2-60,S-300); c4.lineTo(S/2,S-220); c4.lineTo(S/2+60,S-300);
+  c4.strokeStyle='#f5c518'; c4.lineWidth=4; c4.lineJoin='round'; c4.stroke();
+  pF(c4,'↓',S/2,S/2+40,200,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c4,en?'SENSEI METHOD':'MÉTHODE SENSEI',S/2,S-140,44,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+
+  // Case 5 : les 7 pilliers (centre)
+  const c5=canvases[4].getContext('2d'); pBg(c5);
+  pF(c5,en?'7 PILLARS OF TRANSFER':'7 PILIERS DU TRANSFERT',S/2,100,38,'rgba(245,197,24,0.6)');
+  pLine(c5,100,130,S-100,130,'rgba(245,197,24,0.15)',1);
+  const pilColors=['#f5c518','#0077b6','#2dc653','#ff6d00','#7b2d8b','#e63946','#c1121f'];
+  const pilLabelsEn=['Attention Release','Stability Under Pressure','Left/Right Symmetry','Adaptability','Decision Speed','Fatigue Resilience','Dribble & Vision'];
+  const pilLabelsFr=['Libération Attention','Stabilité Pression','Symétrie D/G','Robustesse Imprévu','Vitesse Décisionnelle','Résilience Fatigue','Dribble & Vision'];
+  const pilLabels=en?pilLabelsEn:pilLabelsFr;
+  pilLabels.forEach((l,i)=>{
+    const y=180+i*122;
+    pRect(c5,80,y-52,S-160,88,10,'rgba(255,255,255,0.03)',pilColors[i]+'44',1);
+    pF(c5,(i+1)+'. '+l,S/2,y,32,pilColors[i]);
+  });
+
+  // Case 6 : E=MC² + neurosciences
+  const c6=canvases[5].getContext('2d'); pBg(c6);
+  pF(c6,'E = MC²',S/2,380,180,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c6,en?'BASKETBALL PHYSICS':'PHYSIQUE DU BASKET',S/2,500,40,'rgba(245,197,24,0.5)');
+  pLine(c6,200,550,S-200,550,'rgba(245,197,24,0.15)',1);
+  pF(c6,en?'Every session = applied science':'Chaque séance = science appliquée',S/2,640,32,'rgba(255,255,255,0.35)');
+  pF(c6,en?'Physics · Maths · Neuroscience':'Physique · Maths · Neurosciences',S/2,700,30,'rgba(255,255,255,0.25)');
+  pF(c6,'Lean Six Sigma 6σ',S/2,760,30,'rgba(255,255,255,0.2)');
+
+  // LIGNE 3 — "APRÈS" : le joueur avec la méthode
+  // Case 7 : score après
+  const c7=canvases[6].getContext('2d'); pBg(c7,'rgba(45,198,83,');
+  pF(c7,en?'AFTER':'APRÈS',S/2,200,160,'rgba(45,198,83,0.1)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7,en?'WITH THE METHOD':'AVEC LA MÉTHODE',S/2,280,38,'rgba(245,197,24,0.6)');
+  pF(c7,d.avg,S/2,580,320,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7,'/ 10',S/2,660,60,'rgba(255,255,255,0.3)');
+  pRect(c7,S/2-300,720,600,20,10,'rgba(255,255,255,0.06)');
+  pRect(c7,S/2-300,720,Math.round(600*(d.avg!=='—'?parseFloat(d.avg)/10:0.87)),20,10,'#f5c518');
+  pF(c7,d.en?'DATA SCIENCE SCORE':'SCORE DATA SCIENCE',S/2,S-80,28,'rgba(255,255,255,0.25)');
+
+  // Case 8 : résultats concrets
+  const c8=canvases[7].getContext('2d'); pBg(c8);
+  pRect(c8,80,120,S-160,700,16,'rgba(45,198,83,0.06)','rgba(45,198,83,0.25)',2);
+  pF(c8,en?'The player now...':'Le joueur maintenant...',S/2,240,38,'rgba(255,255,255,0.6)');
+  const afters=en
+    ?['Structured 9-belt progression','Data Science score tracked','Real-time radar feedback','Scientific drills per belt','Measurable, visible progress']
+    :['Progression 9 ceintures structurée','Score Data Science suivi','Feedback radar en temps réel','Drills scientifiques par ceinture','Progrès mesurable et visible'];
+  afters.forEach((t,i)=>pF(c8,'✓ '+t,S/2,360+i*82,28,'rgba(45,198,83,0.85)'));
+  pF(c8,d.en?'ELITE LEVEL':'NIVEAU ÉLITE',S/2,S-100,44,'rgba(245,197,24,0.6)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+
+  // Case 9 : CTA émotionnel
+  const c9=canvases[8].getContext('2d'); pBg(c9,'rgba(245,197,24,');
+  c9.font='280px serif'; c9.textAlign='center'; c9.fillText(d.beltEmoji,S/2,460);
+  pF(c9,d.en?'YOUR TURN':'À TON TOUR',S/2,600,100,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,d.en?'Which belt will you reach?':'Quelle ceinture vas-tu atteindre ?',S/2,700,32,'rgba(255,255,255,0.45)');
+  pRect(c9,S/2-280,S-200,560,110,55,'#f5c518');
+  pF(c9,d.en?'START NOW →':'COMMENCER →',S/2,S-136,44,'#080a0f','center','900');
+  pF(c9,'senseiblackbelt.com',S/2,S-60,28,'rgba(245,197,24,0.4)');
+}
+
+// ══════════════════════════════════════════
+// TEMPLATE 5 — DRILL OF THE WEEK
+// ══════════════════════════════════════════
+function puzzleDrawTemplate5(canvases, d) {
+  const S=PUZZLE_SIZE;
+  const en=d.en;
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+
+  // Données du drill actuel (ceinture du joueur)
+  const belt = typeof BELTS_PROFIL !== 'undefined' ? BELTS_PROFIL[d.beltIdx] : null;
+  const drill = belt ? belt.drills[0] : (en?'Tornado – TAP² – Cross':'Tornado – TAP² – Cross');
+  const vidId = (typeof SECTION_VIDEOS !== 'undefined' && SECTION_VIDEOS.ballhandling) ? SECTION_VIDEOS.ballhandling[Math.min(d.beltIdx*2,14)].id : 'ttwQywcjF6s';
+  const bColor = d.beltColor;
+  const bName = en ? d.beltNamesEN[d.beltIdx] : d.beltNames[d.beltIdx];
+
+  // ECO DYNAMICS
+  const ecoTask = en?'Modify complexity, number of balls, rhythm, combination':'Modifier complexité, nb de ballons, rythme, combinaison';
+  const ecoEnv  = en?'Cones, reaction sticks, noise, fatigue, reduced space':'Cônes, sticks réaction, bruit, fatigue, espace réduit';
+  const ecoInd  = en?'Belt level, dominant hand, fatigue, VAK profile':'Niveau ceinture, main dominante, fatigue, profil VAK';
+
+  // Pilier associé
+  const pilier = typeof PILIERS_DATA!=='undefined' ? PILIERS_DATA[Math.min(d.beltIdx,6)] : null;
+  const pilLabel = pilier ? (en ? ['Attention Release','Stability Under Pressure','Left/Right Symmetry','Adaptability','Decision Speed','Fatigue Resilience','Dribble & Vision'][Math.min(d.beltIdx,6)] : pilier.label) : '';
+  const pilColor = pilier ? pilier.color : '#f5c518';
+
+  // LIGNE 1 — Le drill
+  // Case 1 : thumbnail vidéo
+  const c1=canvases[0].getContext('2d'); pBg(c1);
+  if(_puzzleThumbImgs[vidId]) {
+    const ti=_puzzleThumbImgs[vidId];
+    const ir=ti.naturalWidth/ti.naturalHeight; let dw=S,dh=S/ir; if(dh<S){dh=S;dw=S*ir;}
+    c1.drawImage(ti,(S-dw)/2,(S-dh)/2,dw,dh);
+    const g=c1.createLinearGradient(0,0,0,S); g.addColorStop(0,'rgba(8,10,15,0.4)'); g.addColorStop(.6,'transparent'); g.addColorStop(1,'rgba(8,10,15,0.95)');
+    c1.fillStyle=g; c1.fillRect(0,0,S,S);
+  }
+  c1.beginPath(); c1.arc(S/2,S/2,90,0,Math.PI*2); c1.fillStyle='rgba(245,197,24,0.88)'; c1.fill();
+  c1.beginPath(); c1.moveTo(S/2-30,S/2-50); c1.lineTo(S/2-30,S/2+50); c1.lineTo(S/2+60,S/2); c1.closePath(); c1.fillStyle='#080a0f'; c1.fill();
+  pF(c1,en?'DRILL OF THE WEEK':'DRILL DE LA SEMAINE',S/2,120,36,'#f5c518');
+  pF(c1,drill,S/2,S-160,34,'rgba(255,255,255,0.9)');
+  pRect(c1,S/2-200,S-110,400,60,30,bColor+'22',bColor,2);
+  pF(c1,bName.toUpperCase()+' BELT',S/2,S-72,28,bColor,'center','900');
+
+  // Case 2 : titre drill + description
+  const c2=canvases[1].getContext('2d'); pBg(c2);
+  pF(c2,en?'DRILL':'DRILL',S/2,120,40,'rgba(245,197,24,0.5)');
+  pF(c2,drill,S/2,260,46,'#ffffff','center','700');
+  pLine(c2,100,300,S-100,300,'rgba(245,197,24,0.15)',1);
+  pF(c2,en?'NEUROMOTOR OBJECTIVE:':'OBJECTIF NEUROMOTEUR :',S/2,380,28,'rgba(245,197,24,0.5)');
+  pF(c2,en?'Dual-task cognitive dissociation':'Dissociation cognitive double tâche',S/2,440,30,'rgba(255,255,255,0.5)');
+  pF(c2,en?'Ball automatism + attention released':'Automatisme ballon + attention libérée',S/2,500,28,'rgba(255,255,255,0.4)');
+  pLine(c2,100,560,S-100,560,'rgba(245,197,24,0.1)',1);
+  pF(c2,en?'SETS · REPS':'SÉRIES · REPS',S/2,640,32,'rgba(245,197,24,0.5)');
+  pF(c2,'3 × 45s',S/2,740,80,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c2,en?'Rest 30s between sets':'Récup 30s entre les séries',S/2,820,28,'rgba(255,255,255,0.3)');
+
+  // Case 3 : tag ceinture + pilier
+  const c3=canvases[2].getContext('2d'); pBg(c3);
+  c3.font='200px serif'; c3.textAlign='center'; c3.fillText(d.beltEmoji,S/2,420);
+  pF(c3,bName.toUpperCase()+' BELT',S/2,520,72,bColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c3,200,580,S-200,580,'rgba(245,197,24,0.15)',1);
+  pRect(c3,S/2-240,620,480,80,40,'rgba(0,0,0,0)',pilColor+'44',1);
+  pF(c3,en?'PILLAR:':'PILIER :',S/2,655,26,'rgba(255,255,255,0.3)');
+  pF(c3,pilLabel,S/2,710,30,pilColor,'center','700');
+  pBeltBars(c3,80,S-120,S-160,d.beltIdx,bColors);
+
+  // LIGNE 2 — ECO DYNAMICS
+  // Case 4 : TASK
+  const c4=canvases[3].getContext('2d'); pBg(c4,'rgba(245,197,24,');
+  pRect(c4,60,60,S-120,S-120,20,'rgba(245,197,24,0.04)','rgba(245,197,24,0.2)',2);
+  c4.font='160px serif'; c4.textAlign='center'; c4.fillText('🎯',S/2,360);
+  pF(c4,'TASK',S/2,460,100,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c4,200,510,S-200,510,'rgba(245,197,24,0.2)',1);
+  pF(c4,ecoTask,S/2,580,28,'rgba(255,255,255,0.45)',null,null,null,null,'center',S-160,true);
+  // word wrap manual
+  const taskWords=ecoTask.split(',');
+  taskWords.forEach((w,i)=>pF(c4,w.trim()+(i<taskWords.length-1?',':''),S/2,590+i*68,28,'rgba(255,255,255,0.45)'));
+
+  // Case 5 : ENVIRONMENT
+  const c5=canvases[4].getContext('2d'); pBg(c5,'rgba(0,119,182,');
+  pRect(c5,60,60,S-120,S-120,20,'rgba(0,119,182,0.04)','rgba(0,119,182,0.2)',2);
+  c5.font='160px serif'; c5.textAlign='center'; c5.fillText('🌍',S/2,360);
+  pF(c5,'ENVIRONMENT',S/2,460,80,'#0077b6','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c5,200,510,S-200,510,'rgba(0,119,182,0.2)',1);
+  const envWords=ecoEnv.split(',');
+  envWords.forEach((w,i)=>pF(c5,w.trim()+(i<envWords.length-1?',':''),S/2,590+i*68,28,'rgba(255,255,255,0.45)'));
+
+  // Case 6 : INDIVIDUAL
+  const c6=canvases[5].getContext('2d'); pBg(c6,'rgba(193,18,31,');
+  pRect(c6,60,60,S-120,S-120,20,'rgba(193,18,31,0.04)','rgba(193,18,31,0.2)',2);
+  c6.font='160px serif'; c6.textAlign='center'; c6.fillText('🧠',S/2,360);
+  pF(c6,'INDIVIDUAL',S/2,460,80,'#c1121f','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c6,200,510,S-200,510,'rgba(193,18,31,0.2)',1);
+  const indWords=ecoInd.split(',');
+  indWords.forEach((w,i)=>pF(c6,w.trim()+(i<indWords.length-1?',':''),S/2,590+i*68,28,'rgba(255,255,255,0.45)'));
+
+  // LIGNE 3 — Science + CTA
+  // Case 7 : principe neuro
+  const c7=canvases[6].getContext('2d'); pBg(c7,'rgba(123,45,139,');
+  pF(c7,en?'NEUROSCIENCE':'NEUROSCIENCE',S/2,120,40,'rgba(245,197,24,0.5)');
+  c7.font='140px serif'; c7.textAlign='center'; c7.fillText('🧬',S/2,380);
+  pF(c7,en?'Hebb\'s rule':'Règle de Hebb',S/2,500,52,'#7b2d8b','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pLine(c7,200,560,S-200,560,'rgba(123,45,139,0.3)',1);
+  pF(c7,'ΔW = η · δ · x',S/2,650,48,'rgba(245,197,24,0.7)','center','700','"Barlow Condensed",Arial Narrow,sans-serif');
+  pF(c7,en?'Repetition → Synaptic strengthening':'Répétition → Renforcement synaptique',S/2,730,26,'rgba(255,255,255,0.35)');
+  pF(c7,en?'→ Motor automatism':'→ Automatisme moteur',S/2,790,26,'rgba(255,255,255,0.3)');
+
+  // Case 8 : progression attendue
+  const c8=canvases[7].getContext('2d'); pBg(c8);
+  pF(c8,en?'EXPECTED PROGRESS':'PROGRESSION ATTENDUE',S/2,120,34,'rgba(245,197,24,0.5)');
+  pLine(c8,100,160,S-100,160,'rgba(245,197,24,0.1)',1);
+  const metrics=en
+    ?[['SESSIONS','3-5'],['IMPROVEMENT','+0.8pt'],['SYMMETRY','+12%'],['AUTOMATISM','↑ HIGH']]
+    :[['SÉANCES','3-5'],['AMÉLIORATION','+0.8pt'],['SYMÉTRIE','+12%'],['AUTOMATISME','↑ ÉLEVÉ']];
+  metrics.forEach(([label,val],i)=>{
+    const y=260+i*170; const col=i%2===0?'#f5c518':'#2dc653';
+    pRect(c8,S/2-240,y-60,480,110,12,'rgba(255,255,255,0.02)',col+'33',1);
+    pF(c8,label,S/2,y-10,26,'rgba(255,255,255,0.35)');
+    pF(c8,val,S/2,y+50,60,col,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  });
+
+  // Case 9 : CTA + hashtags
+  const c9=canvases[8].getContext('2d'); pBg(c9);
+  pF(c9,en?'TRY THIS DRILL':'ESSAIE CE DRILL',S/2,200,64,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,en?'Today. 3 sets. 45 seconds.':'Aujourd\'hui. 3 séries. 45 secondes.',S/2,300,34,'rgba(255,255,255,0.4)');
+  pLine(c9,100,360,S-100,360,'rgba(245,197,24,0.1)',1);
+  pF(c9,'#SenseiBlackBelt',S/2,460,40,'rgba(245,197,24,0.5)');
+  pF(c9,'#BallHandling #Basketball',S/2,520,32,'rgba(255,255,255,0.25)');
+  pF(c9,'#Neuroscience #DataScience',S/2,574,32,'rgba(255,255,255,0.2)');
+  pF(c9,'#DrillOfTheWeek',S/2,628,32,'rgba(255,255,255,0.2)');
+  pRect(c9,S/2-260,S-200,520,110,55,'#f5c518');
+  pF(c9,en?'JOIN THE PROGRAM →':'REJOINDRE →',S/2,S-136,44,'#080a0f','center','900');
+  pF(c9,'senseiblackbelt.com',S/2,S-60,28,'rgba(245,197,24,0.35)');
+}
+function puzzleRender() {
+  const d = puzzleGetData();
+  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5];
+  fns[_puzzleTemplate](_puzzleCanvases, d);
+  // mise à jour aperçu
+  const grid = document.getElementById('puzzle-grid-preview');
+  grid.innerHTML='';
+  _puzzleCanvases.forEach((canvas,i)=>{
+    const wrapper=document.createElement('div');
+    wrapper.style.cssText='position:relative;cursor:pointer;border-radius:4px;overflow:hidden';
+    const img=document.createElement('img');
+    img.src=canvas.toDataURL('image/jpeg',0.92);
+    img.style.cssText='width:100%;display:block;border-radius:4px';
+    const badge=document.createElement('div');
+    badge.style.cssText='position:absolute;top:6px;left:6px;background:rgba(8,10,15,.8);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:1px';
+    badge.textContent=(i+1)+'/9';
+    const dlbtn=document.createElement('div');
+    dlbtn.style.cssText='position:absolute;bottom:6px;right:6px;background:rgba(245,197,24,.9);color:#080a0f;font-family:var(--font-cond);font-size:9px;font-weight:900;padding:4px 8px;border-radius:8px;cursor:pointer;letter-spacing:1px';
+    dlbtn.textContent='⬇️';
+    dlbtn.onclick=(function(c,n){return function(e){e.stopPropagation();puzzleDownloadOne(c,n);};})(canvas,i+1);
+    wrapper.appendChild(img); wrapper.appendChild(badge); wrapper.appendChild(dlbtn);
+    wrapper.onclick=(function(c,n){return function(){puzzleDownloadOne(c,n);};})(canvas,i+1);
+    grid.appendChild(wrapper);
+  });
+}
+
+function puzzleDownloadOne(canvas, n) {
+  const link=document.createElement('a');
+  link.download='sensei-puzzle-'+n+'-of-9.jpg';
+  link.href=canvas.toDataURL('image/jpeg',0.92);
+  link.click();
+}
+
+function puzzleDownloadAll() {
+  _puzzleCanvases.forEach((c,i)=>{ setTimeout(()=>puzzleDownloadOne(c,i+1), i*200); });
+}
+
+function puzzleSelectTemplate(idx, btn) {
+  _puzzleTemplate=idx;
+  document.querySelectorAll('#puzzle-template-btns button').forEach(b=>{
+    b.style.background='var(--dark3)'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)';
+  });
+  btn.style.background='rgba(245,197,24,.1)'; btn.style.color='var(--gold)'; btn.style.borderColor='rgba(245,197,24,.5)';
+  puzzleRender();
+}
+
+function openPuzzleModal() {
+  // Créer les 9 canvases offscreen 1080×1080
+  _puzzleCanvases = Array.from({length:9},()=>{ const c=document.createElement('canvas'); c.width=PUZZLE_SIZE; c.height=PUZZLE_SIZE; return c; });
+  // Charger coach.jpg
+  if(!_puzzleCoachImg) {
+    const img=new Image(); img.crossOrigin='anonymous';
+    img.onload=()=>{ _puzzleCoachImg=img; puzzleRender(); };
+    img.onerror=()=>{ _puzzleCoachImg=null; puzzleRender(); };
+    img.src='coach.jpg';
+  }
+  // Charger thumbnail BH selon ceinture actuelle
+  const beltIdx2 = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
+  const vidId = (typeof SECTION_VIDEOS!=='undefined'&&SECTION_VIDEOS.ballhandling) ? SECTION_VIDEOS.ballhandling[Math.min(beltIdx2*2,14)].id : 'ttwQywcjF6s';
+  const vidId0 = (typeof SECTION_VIDEOS!=='undefined'&&SECTION_VIDEOS.ballhandling) ? SECTION_VIDEOS.ballhandling[0].id : 'ttwQywcjF6s';
+  [vidId, vidId0].forEach(id => {
+    if(id && !_puzzleThumbImgs[id]) {
+      const ti=new Image(); ti.crossOrigin='anonymous';
+      ti.onload=()=>{ _puzzleThumbImgs[id]=ti; puzzleRender(); };
+      ti.onerror=()=>{};
+      ti.src='https://img.youtube.com/vi/'+id+'/maxresdefault.jpg';
+    }
+  });
+  document.getElementById('puzzle-modal').style.display='block';
+  puzzleRender();
+}
+
+function closePuzzleModal() {
+  document.getElementById('puzzle-modal').style.display='none';
+}
+</script>
 <!-- ── QRCode.js CDN ── -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
