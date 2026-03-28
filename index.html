@@ -8980,14 +8980,13 @@ function pHex(ctx, cx, cy, r, scores) {
 function pBeltBars(ctx, x, y, w, beltIdx, beltColors) {
   const bw = Math.floor((w - 8*8) / 9);
   const H = 60;
-  const R = 8;
-  const COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#e07b39','#aaaaaa','#ff2d2d'];
+  const COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#3a3a3a','#c1121f'];
   for(let i=0;i<9;i++){
     const bx = x + i*(bw+8);
     ctx.beginPath();
-    if(ctx.roundRect) ctx.roundRect(bx,y,bw,H,R); else ctx.rect(bx,y,bw,H);
+    if(ctx.roundRect) ctx.roundRect(bx,y,bw,H,6); else ctx.rect(bx,y,bw,H);
     ctx.fillStyle = COLORS[i];
-    ctx.globalAlpha = i <= beltIdx ? 1 : 0.35;
+    ctx.globalAlpha = 1;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
