@@ -5546,7 +5546,7 @@ body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
   localStorage.setItem('sensei_onboarded', '1');
   // Remplir choix de ceintures
   const BELT_NAMES = ['⚪ Blanche — Débutant','🟡 Jaune — Initié','🟠 Orange — Confirmé','🟢 Verte — Avancé','🔵 Bleue — Expert','🟣 Violette — Maître','🟤 Marron — Grand Maître','⚫ Noire — Élite','🔴 Rouge — Légendaire'];
-  const BELT_COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const BELT_COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
   const wrap = document.getElementById('ob-belt-choices');
   BELT_NAMES.forEach((n,i) => {
     const btn = document.createElement('button');
@@ -6139,7 +6139,7 @@ function buildEcoDrills() {
 // ═══════════════════════════════════════════════════════════════
 // 🌍 NETWORK
 // ═══════════════════════════════════════════════════════════════
-const BELT_COLORS_NET = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+const BELT_COLORS_NET = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
 
 function networkLoad() {
   const members = JSON.parse(localStorage.getItem('sensei_network')||'[]');
@@ -6406,8 +6406,8 @@ function computeLoad() {
 // 👥 MES ÉLÈVES — Masters
 // ═══════════════════════════════════════════════════════════════
 const BELT_NAMES_M = ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
-const BELT_EMOJIS_M = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
-const BELT_COLS_M = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+const BELT_EMOJIS_M = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','🏅','🔴'];
+const BELT_COLS_M = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
 
 function eleveAdd() {
   const name  = document.getElementById('el-name').value.trim();
@@ -8930,8 +8930,8 @@ function puzzleGetData() {
   const avg       = sessions.length ? (sessions.reduce((a,s)=>a+(s.global||0),0)/sessions.length).toFixed(1) : '—';
   const beltNames = ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
   const beltNamesEN = ['White','Yellow','Orange','Green','Blue','Purple','Brown','Black','Red'];
-  const beltColors  = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
-  const beltEmojis  = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+  const beltColors  = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
+  const beltEmojis  = ['⚪','🟡','🟠','🟢','🔵','🟣','🟤','🏅','🔴'];
   const en = window._lang === 'en';
   return { beltIdx, meta, sessions, journal, drills, avg, beltNames, beltNamesEN, beltColors, beltEmojis, en,
     beltName: en ? beltNamesEN[beltIdx] : beltNames[beltIdx],
@@ -8978,11 +8978,19 @@ function pHex(ctx, cx, cy, r, scores) {
   pts.forEach(([x,y],i) => { ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2); ctx.fillStyle=dotColors[i]; ctx.fill(); });
 }
 function pBeltBars(ctx, x, y, w, beltIdx, beltColors) {
-  const bw = Math.floor((w-8*4)/9);
-  beltColors.forEach((c,i) => {
-    ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+i*(bw+4),y,bw,20,4); else ctx.rect(x+i*(bw+4),y,bw,20);
-    ctx.fillStyle = i<=beltIdx ? c : 'rgba(255,255,255,0.06)'; ctx.fill();
-  });
+  const bw = Math.floor((w - 8*8) / 9);
+  const H = 60;
+  const R = 8;
+  const COLORS = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#e07b39','#aaaaaa','#ff2d2d'];
+  for(let i=0;i<9;i++){
+    const bx = x + i*(bw+8);
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(bx,y,bw,H,R); else ctx.rect(bx,y,bw,H);
+    ctx.fillStyle = COLORS[i];
+    ctx.globalAlpha = i <= beltIdx ? 1 : 0.35;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
 }
 
 // ── Fond commun ──
@@ -9053,8 +9061,8 @@ function puzzleDrawTemplate0(canvases, d) {
   const drillsTotal = belt ? belt.drills.length : 3;
   // flèche ceintures
   const bw2=90, gap2=14, startX=(S-(9*bw2+8*gap2))/2;
-  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
-  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
+  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','🏅','🔴'];
   bColors.forEach((c,i) => {
     const x=startX+i*(bw2+gap2), y=200;
     pRect(c5,x,y,bw2,bw2,10, i===d.beltIdx?c:'rgba(255,255,255,0.04)', i===d.beltIdx?c:'rgba(255,255,255,0.1)', i===d.beltIdx?3:1);
@@ -9137,20 +9145,26 @@ function puzzleDrawTemplate0(canvases, d) {
 // ══════════════════════════════════════════
 function puzzleDrawTemplate1(canvases, d) {
   const S=PUZZLE_SIZE;
-  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
   const bNames=d.en?d.beltNamesEN:d.beltNames;
   const bDescs=d.en?['Beginner','Initiated','Confirmed','Advanced','Expert','Master','Grand Master','Elite','Legendary']:['Débutant','Initié','Confirmé','Avancé','Expert','Maître','Grand Maître','Élite','Légendaire'];
-  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','⚫','🔴'];
+  const bEmojis=['⚪','🟡','🟠','🟢','🔵','🟣','🟤','🏅','🔴'];
 
   function drawBeltCell(ctx, idx) {
     pBg(ctx);
-    const accent=bColors[idx];
-    pRect(ctx,0,0,S,S,0,null,accent,8);
+    const accent = bColors[idx];
+    // Ceinture noire : fond très légèrement gris + bordure blanche pour distinguer
+    if(idx===7) {
+      ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,S,S);
+    }
+    pRect(ctx,0,0,S,S,0,null,idx===7?'#ffffff':accent,idx===7?6:8);
     ctx.font='200px serif'; ctx.textAlign='center'; ctx.fillText(bEmojis[idx],S/2,440);
     pF(ctx,'LEVEL '+(idx+1),S/2,520,40,'rgba(255,255,255,0.3)');
-    pF(ctx,bNames[idx].toUpperCase(),S/2,640,120,accent,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
+    // Texte ceinture noire en blanc pour visibilité
+    const textColor = idx===7 ? '#ffffff' : accent;
+    pF(ctx,bNames[idx].toUpperCase(),S/2,640,120,textColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
     pF(ctx,bDescs[idx],S/2,720,36,'rgba(255,255,255,0.4)');
-    pLine(ctx,200,760,S-200,760,accent+'88',2);
+    pLine(ctx,200,760,S-200,760,(idx===7?'#ffffff':accent)+'88',2);
     pF(ctx,'SENSEI BLACKBELT',S/2,840,30,'rgba(245,197,24,0.3)');
   }
 
@@ -9196,7 +9210,7 @@ function puzzleDrawTemplate1(canvases, d) {
 // ══════════════════════════════════════════
 function puzzleDrawTemplate2(canvases, d) {
   const S=PUZZLE_SIZE;
-  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
 
   // 1: Radar
   const c1=canvases[0].getContext('2d'); pBg(c1);
@@ -9292,7 +9306,7 @@ function puzzleDrawTemplate2(canvases, d) {
 // ══════════════════════════════════════════
 function puzzleDrawTemplate3(canvases, d) {
   const S=PUZZLE_SIZE;
-  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
 
   const cells = [
     (ctx)=>{ pBg(ctx); pF(ctx,'🥋',S/2,S/2+80,'center','',400,'serif'); c1font(ctx,300); pF(ctx,'SENSEI',S/2,200,120,'rgba(245,197,24,0.08)','center','900','"Bebas Neue",Arial Narrow,sans-serif'); pF(ctx,'#SenseiBlackBelt',S/2,S-80,32,'rgba(245,197,24,0.4)'); },
@@ -9426,7 +9440,7 @@ function puzzleDrawTemplate4(canvases, d) {
 function puzzleDrawTemplate5(canvases, d) {
   const S=PUZZLE_SIZE;
   const en=d.en;
-  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#8b4513','#e0e0e0','#c1121f'];
+  const bColors=['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#1a1a1a','#ff3347'];
 
   // Données du drill actuel (ceinture du joueur)
   const belt = typeof BELTS_PROFIL !== 'undefined' ? BELTS_PROFIL[d.beltIdx] : null;
