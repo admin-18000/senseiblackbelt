@@ -9152,28 +9152,27 @@ function puzzleDrawTemplate1(canvases, d) {
   function drawBeltCell(ctx, idx) {
     pBg(ctx);
     const accent = bColors[idx];
-    // Ceinture noire : fond très légèrement gris + bordure blanche pour distinguer
     if(idx===7) {
-      ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,S,S);
+      // Ceinture noire : fond gris foncé visible
+      ctx.fillStyle='#1c1c1c'; ctx.fillRect(0,0,S,S);
     }
     pRect(ctx,0,0,S,S,0,null,idx===7?'#ffffff':accent,idx===7?6:8);
     ctx.font='200px serif'; ctx.textAlign='center'; ctx.fillText(bEmojis[idx],S/2,440);
-    pF(ctx,'LEVEL '+(idx+1),S/2,520,40,'rgba(255,255,255,0.3)');
-    // Texte ceinture noire en blanc pour visibilité
+    pF(ctx,'LEVEL '+(idx+1),S/2,520,40,'rgba(255,255,255,0.4)');
     const textColor = idx===7 ? '#ffffff' : accent;
     pF(ctx,bNames[idx].toUpperCase(),S/2,640,120,textColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
-    pF(ctx,bDescs[idx],S/2,720,36,'rgba(255,255,255,0.4)');
-    pLine(ctx,200,760,S-200,760,(idx===7?'#ffffff':accent)+'88',2);
+    pF(ctx,bDescs[idx],S/2,720,36,'rgba(255,255,255,0.45)');
+    pLine(ctx,200,760,S-200,760,(idx===7?'rgba(255,255,255,0.4)':accent+'88'),2);
     pF(ctx,'SENSEI BLACKBELT',S/2,840,30,'rgba(245,197,24,0.3)');
   }
 
-  // Cases 1,4,7 : intro + ceintures impaires
+  // Cases 1 : intro
   const c1=canvases[0].getContext('2d'); pBg(c1);
   pF(c1,'BASKETBALL',S/2,300,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c1,'MASTERY',S/2,400,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c1,'BELTS',S/2,500,72,'rgba(245,197,24,0.7)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pLine(c1,200,540,S-200,540,'rgba(245,197,24,0.2)',1);
-  pF(c1,'9 niveaux de maîtrise',S/2,620,36,'rgba(255,255,255,0.3)');
+  pF(c1,d.en?'9 mastery levels':'9 niveaux de maîtrise',S/2,620,36,'rgba(255,255,255,0.3)');
   pF(c1,'senseiblackbelt.com',S/2,S-80,30,'rgba(245,197,24,0.3)');
 
   // SEN / SEI
@@ -9185,7 +9184,8 @@ function puzzleDrawTemplate1(canvases, d) {
   // Ceintures
   const c4=canvases[3].getContext('2d'); drawBeltCell(c4,0);
   const c5=canvases[4].getContext('2d');
-  pBg(c5); pF(c5,'BLACK',S/2,400,220,'#e0e0e0','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pBg(c5);
+  pF(c5,'BLACK',S/2,400,220,'#ffffff','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c5,'BELT',S/2,600,220,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pBeltBars(c5,80,700,S-160,d.beltIdx,bColors);
   pF(c5,'senseiblackbelt.com',S/2,S-60,28,'rgba(245,197,24,0.3)');
@@ -9194,10 +9194,10 @@ function puzzleDrawTemplate1(canvases, d) {
   const c7=canvases[6].getContext('2d'); drawBeltCell(c7,6);
   const c8=canvases[7].getContext('2d'); drawBeltCell(c8,7);
   const c9=canvases[8].getContext('2d');
-  pBg(c9,`rgba(193,18,31,`);
+  pBg(c9,'rgba(193,18,31,');
   pRect(c9,0,0,S,S,0,null,'#c1121f',8);
   c9.font='200px serif'; c9.textAlign='center'; c9.fillText('🔴',S/2,400);
-  pF(c9,'LEGENDARY',S/2,560,80,'#c1121f','center','900','"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c9,'LEGENDARY',S/2,560,80,'#ffffff','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c9,d.en?'LEVEL 9':'NIVEAU 9',S/2,660,50,'rgba(255,255,255,0.4)');
   pF(c9,d.en?'The Sensei. Creator. Ultimate.':'Le Sensei. Créateur. Référence.',S/2,730,30,'rgba(255,255,255,0.35)');
   pRect(c9,S/2-240,S-200,480,90,45,'#c1121f');
