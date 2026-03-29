@@ -1086,61 +1086,185 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ VISUALISATION SCIENTIFIQUE ══ -->
 <div id="s-visusci" class="section">
   <div style="max-width:1100px;margin:0 auto">
+
     <div class="sec-title" data-i18n="sec_vis_title">VISUALISATION <span>SCIENTIFIQUE</span></div>
-    <div class="sec-sub" data-i18n="sec_vis_sub">Physique · Neurosciences · Lois de Newton · Le basket autrement</div>
+    <div class="sec-sub" data-i18n="sec_vis_sub">Physique · Neurosciences · Maths · Le basket autrement</div>
     <div class="sec-line"></div>
 
-    <!-- Concept A -->
-    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div style="font-size:24px">🏀</div>
-        <div>
-          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)" data-i18n="vis_card1_title">LA PARABOLE DU TIR</div>
-          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div>
-        </div>
-        <div style="margin-left:auto;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--gold);padding:4px 10px;border-radius:12px;letter-spacing:1px" data-i18n="vis_tag1">⚡ PHYSIQUE BALISTIQUE</div>
+    <!-- ── SH1 : PHYSIQUE & BALISTIQUE ── -->
+    <div class="vis-sh" data-i18n="vis_sh1">⚡ PHYSIQUE &amp; BALISTIQUE</div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🏀</span>
+        <div><div class="vis-card-title" data-i18n="vis_card1_title">LA PARABOLE DU TIR</div><div class="vis-formula">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div></div>
+        <span class="vis-tag vis-tag-gold" data-i18n="vis_tag1">⚡ PHYSIQUE BALISTIQUE</span>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" data-i18n="vis_card1_desc">Chaque tir suit une trajectoire parabolique dictée par la physique. L'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.</div>
-      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-a" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
-      </div>
+      <div class="vis-desc" data-i18n="vis_card1_desc">Chaque tir suit une trajectoire parabolique dictée par la physique. L'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.</div>
+      <div class="vis-wrap"><canvas id="visu-a"></canvas></div>
     </div>
 
-    <!-- Concept B -->
-    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div style="font-size:24px">🧠</div>
-        <div>
-          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)" data-i18n="vis_neuro_title" >PLASTICITÉ NEURONALE</div>
-          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">ΔW = η · δ · x &nbsp;(règle de Hebb)</div>
-        </div>
-        <div style="margin-left:auto;background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--purple-belt);padding:4px 10px;border-radius:12px;letter-spacing:1px" data-i18n="vis_tag2">🧬 NEUROSCIENCES</div>
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🎯</span>
+        <div><div class="vis-card-title" data-i18n="vis_card4_title">ANGLE OPTIMAL DU TIR</div><div class="vis-formula">θ_opt ≈ 52° (avec amorti panier)</div></div>
+        <span class="vis-tag vis-tag-gold" data-i18n="vis_tag4">⚡ BIOMÉCANIQUE</span>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" data-i18n="vis_card2_desc">La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C'est la base neurologique de la ceinture noire.</div>
-      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-b" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
-      </div>
+      <div class="vis-desc" data-i18n="vis_card4_desc">45° est l'angle minimal — mais les études biomécaniques montrent qu'un angle légèrement supérieur (~52°) maximise la fenêtre d'entrée. La simulation compare les deux trajectoires.</div>
+      <div class="vis-wrap"><canvas id="visu-angle"></canvas></div>
     </div>
 
-    <!-- Concept C -->
-    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div style="font-size:24px">⚡</div>
-        <div>
-          <div style="font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--text)" data-i18n="vis_card3_title">LOIS DE NEWTON</div>
-          <div style="font-family:var(--font-cond);font-size:11px;color:var(--gold);letter-spacing:1px">F = ma &nbsp;·&nbsp; v² = u² + 2as &nbsp;·&nbsp; p = mv</div>
-        </div>
-        <div style="margin-left:auto;background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--green-belt);padding:4px 10px;border-radius:12px;letter-spacing:1px" data-i18n="vis_meca_title" >📐 MÉCANIQUE</div>
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🌀</span>
+        <div><div class="vis-card-title" data-i18n="vis_card5_title">EFFET MAGNUS — BACKSPIN</div><div class="vis-formula">F = 4πr³ρ(ω × v)</div></div>
+        <span class="vis-tag vis-tag-gold" data-i18n="vis_tag5">⚡ AÉRODYNAMIQUE</span>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" data-i18n="vis_card3_desc">Chaque rebond du ballon illustre la conservation de l'énergie et la 3ème loi de Newton. L'énergie cinétique se transforme en potentielle puis revient — avec des pertes dues au sol.</div>
-      <div style="position:relative;width:100%;height:280px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)">
-        <canvas id="visu-c" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+      <div class="vis-desc" data-i18n="vis_card5_desc">Le backspin crée une force de Magnus qui ralentit le ballon avant impact et augmente la probabilité d'entrée douce dans le panier. Un ballon sans spin rebondit plus durement — avec spin, il cherche le filet.</div>
+      <div class="vis-wrap"><canvas id="visu-magnus"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">⚡</span>
+        <div><div class="vis-card-title" data-i18n="vis_card3_title">LOIS DE NEWTON</div><div class="vis-formula">F = ma · v² = u² + 2as · p = mv</div></div>
+        <span class="vis-tag vis-tag-green" data-i18n="vis_meca_title">📐 MÉCANIQUE</span>
       </div>
+      <div class="vis-desc" data-i18n="vis_card3_desc">Chaque rebond du ballon illustre la conservation de l'énergie et la 3ème loi de Newton. L'énergie cinétique se transforme en déformation élastique puis revient — avec des pertes.</div>
+      <div class="vis-wrap"><canvas id="visu-c"></canvas></div>
+    </div>
+
+    <!-- ── SH2 : ARBITRAGE & GÉOMÉTRIE ── -->
+    <div class="vis-sh" data-i18n="vis_sh2">📐 ARBITRAGE &amp; GÉOMÉTRIE</div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">⏱️</span>
+        <div><div class="vis-card-title" data-i18n="vis_card6_title">LE TIR AU BUZZER</div><div class="vis-formula">t ∈ [tₙ, tₙ₊₁[ — discrétisation du temps</div></div>
+        <span class="vis-tag vis-tag-red" data-i18n="vis_tag6">📐 ANALYSE NUMÉRIQUE</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card6_desc">Le temps continu est découpé en intervalles mesurables. L'arbitre cherche dans quel intervalle discret le ballon a quitté la main. Si la main s'ouvre avant t₀ — le tir est valide.</div>
+      <div class="vis-wrap"><canvas id="visu-buzzer"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">👟</span>
+        <div><div class="vis-card-title" data-i18n="vis_card7_title">PIED SUR LA LIGNE</div><div class="vis-formula">A ∩ B = ∅ ?</div></div>
+        <span class="vis-tag vis-tag-red" data-i18n="vis_tag7">📐 TOPOLOGIE</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card7_desc">La chaussure et la ligne sont deux ensembles de points du plan. Si leur intersection est non vide (A ∩ B ≠ ∅), le joueur est sorti. Question purement ensembliste — la géométrie comme règle d'arbitrage.</div>
+      <div class="vis-wrap"><canvas id="visu-ligne"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">✋</span>
+        <div><div class="vis-card-title" data-i18n="vis_card8_title">LE CONTRE LÉGAL</div><div class="vis-formula">sign(h′(t)) : le ballon descend-il déjà ?</div></div>
+        <span class="vis-tag vis-tag-red" data-i18n="vis_tag8">📐 ANALYSE RÉELLE</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card8_desc">Le contre est légal si le ballon a déjà dépassé son sommet — h′(t) &lt; 0 au moment du contact. Si h′(t) &gt; 0, le ballon monte encore : contre illégal. L'arbitre lit le signe de la dérivée.</div>
+      <div class="vis-wrap"><canvas id="visu-contre"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🏋️</span>
+        <div><div class="vis-card-title" data-i18n="vis_card9_title">FAUTE AU REBOND</div><div class="vis-formula">Cyl_A ∩ Cyl_B ≠ ∅ → faute</div></div>
+        <span class="vis-tag vis-tag-red" data-i18n="vis_tag9">📐 GÉOMÉTRIE 3D</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card9_desc">Chaque joueur occupe un cylindre de révolution. Si deux cylindres se chevauchent, l'un envahit le volume de l'autre — faute. La règle NBA/FIBA est littéralement une intersection de solides de révolution.</div>
+      <div class="vis-wrap"><canvas id="visu-cylindre"></canvas></div>
+    </div>
+
+    <!-- ── SH3 : NEUROSCIENCES ── -->
+    <div class="vis-sh" data-i18n="vis_sh3">🧠 NEUROSCIENCES &amp; APPRENTISSAGE</div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🧠</span>
+        <div><div class="vis-card-title" data-i18n="vis_neuro_title">PLASTICITÉ NEURONALE</div><div class="vis-formula">ΔW = η · δ · x (règle de Hebb)</div></div>
+        <span class="vis-tag vis-tag-purple" data-i18n="vis_tag2">🧬 NEUROSCIENCES</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card2_desc">La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C'est la base neurologique de la ceinture noire.</div>
+      <div class="vis-wrap"><canvas id="visu-b"></canvas></div>
+    </div>
+
+    <!-- ── SH4 : MATHÉMATIQUES APPLIQUÉES ── -->
+    <div class="vis-sh" data-i18n="vis_sh4">📊 MATHÉMATIQUES APPLIQUÉES</div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">📷</span>
+        <div><div class="vis-card-title" data-i18n="vis_card10_title">TRANSFORMÉE DE HOUGH</div><div class="vis-formula">ρ = x·cosθ + y·sinθ</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag10">🤖 VISION PAR ORDINATEUR</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card10_desc">Chaque point d'une image vote pour toutes les lignes qui peuvent le contenir. Les lignes réelles (3-points, raquette, fond) émergent par accumulation de votes dans l'espace (ρ, θ) — c'est ainsi que la vidéo arbitre les lignes.</div>
+      <div class="vis-wrap"><canvas id="visu-hough"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🥁</span>
+        <div><div class="vis-card-title" data-i18n="vis_card11_title">FOURIER &amp; RYTHME DE DRIBBLE</div><div class="vis-formula">X(f) = ∫ x(t)·e⁻²πft dt</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag11">📡 TRAITEMENT DU SIGNAL</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card11_desc">Le dribble est un signal périodique. La transformée de Fourier décompose ce signal en fréquences — révélant la régularité du rythme et les harmoniques. Un dribble parfait a un spectre fréquentiel étroit et propre.</div>
+      <div class="vis-wrap"><canvas id="visu-fourier"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🎲</span>
+        <div><div class="vis-card-title" data-i18n="vis_card12_title">ESPÉRANCE — 2 PTS VS 3 PTS</div><div class="vis-formula">E = p × valeur</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag12">📊 PROBABILITÉS</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card12_desc">Si tu marques 40% à 2pts et 33% à 3pts : E₂ = 0.80 pts/tir, E₃ = 0.99 pts/tir. Le tir à 3pts est statistiquement supérieur même avec un pourcentage plus faible — la NBA l'a compris dès les années 2010.</div>
+      <div class="vis-wrap"><canvas id="visu-esperance"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🧮</span>
+        <div><div class="vis-card-title" data-i18n="vis_card13_title">BAYES &amp; DÉCISION DU MENEUR</div><div class="vis-formula">P(A|B) = P(B|A)·P(A) / P(B)</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag13">📊 PROBABILITÉS BAYÉSIENNES</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card13_desc">Le meneur met à jour sa probabilité de succès à chaque nouvelle information visuelle : défenseur avancé, aide qui couvre, coéquipier ouvert. Chaque indice est une nouvelle preuve — exactement Bayes en action.</div>
+      <div class="vis-wrap"><canvas id="visu-bayes"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🌐</span>
+        <div><div class="vis-card-title" data-i18n="vis_card14_title">GRAPHE DE PASSES</div><div class="vis-formula">G = (V, E) — centralité de betweenness</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag14">🔗 THÉORIE DES GRAPHES</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card14_desc">Chaque joueur est un nœud, chaque passe une arête pondérée. Le joueur à forte centralité est le hub du jeu — le neutraliser effondre la circulation du ballon. Les meilleures défenses ciblent ces nœuds critiques.</div>
+      <div class="vis-wrap"><canvas id="visu-graphe"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">⚖️</span>
+        <div><div class="vis-card-title" data-i18n="vis_card15_title">CENTRE DE GRAVITÉ DÉFENSIF</div><div class="vis-formula">G = Σmᵢrᵢ / Σmᵢ</div></div>
+        <span class="vis-tag vis-tag-green" data-i18n="vis_tag15">📐 MÉCANIQUE</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card15_desc">La position défensive optimale maintient le centre de gravité bas et centré. Abaisser les hanches de 20 cm réduit le temps de réaction latérale — la physique justifie la stance basse enseignée dès la ceinture blanche.</div>
+      <div class="vis-wrap"><canvas id="visu-cog"></canvas></div>
+    </div>
+
+    <div class="vis-card">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">📉</span>
+        <div><div class="vis-card-title" data-i18n="vis_card16_title">RÉGRESSION &amp; FATIGUE</div><div class="vis-formula">ŷ = ax + b · R² = corrélation²</div></div>
+        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag16">📊 STATISTIQUES</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card16_desc">En traçant le % de réussite au tir en fonction des minutes jouées, on observe une régression linéaire négative — l'efficacité baisse avec la fatigue. Le coefficient directeur quantifie le coût énergétique du jeu.</div>
+      <div class="vis-wrap"><canvas id="visu-regression"></canvas></div>
     </div>
 
   </div>
 </div>
-
 <div id="s-shooting" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_shoot_title">SHOOTING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_shoot_sub">Tirs · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-shooting"><div class="coming-soon"><div class="cs-icon">🏀</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_shoot">Les vidéos de shoot arrivent bientôt — Coach Sensei BlackBelt</div></div></div></div></div>
 <div id="s-defense" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_def_title">DEFENSE <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_def_sub">Défense · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-defense"><div class="coming-soon"><div class="cs-icon">🛡️</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_defense">Les vidéos de défense arrivent bientôt</div></div></div></div></div>
 <div id="s-rebounding" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_reb_title">REBOUNDING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_reb_sub">Rebond · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-rebounding"><div class="coming-soon"><div class="cs-icon">💪</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_rebound">Les vidéos de rebond arrivent bientôt</div></div></div></div></div>
@@ -7861,7 +7985,6 @@ function applyLangTracker(lang) {
     sec_vis_sub: 'Physique · Neurosciences · Lois de Newton · Le basket autrement',
     // Visusci cards FR
     vis_card1_title: 'LA PARABOLE DU TIR',
-    vis_card2_title: 'PLASTICITÉ NEURONALE',
     vis_card3_title: 'LOIS DE NEWTON',
     vis_card1_desc: "Chaque tir suit une trajectoire parabolique dictée par la physique. L'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.",
     vis_card2_desc: "La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C'est la base neurologique de la ceinture noire.",
@@ -7878,7 +8001,6 @@ function applyLangTracker(lang) {
     sec_vis_sub: 'Physics · Neuroscience · Newton\'s laws · Basketball differently',
     // Visusci cards EN
     vis_card1_title: 'THE SHOT PARABOLA',
-    vis_card2_title: 'NEURAL PLASTICITY',
     vis_card3_title: "NEWTON'S LAWS",
     vis_card1_desc: "Every shot follows a parabolic trajectory dictated by physics. The optimal angle is 45° — not too flat, not too steep. The simulation recalculates the trajectory in real time.",
     vis_card2_desc: "Repetition strengthens synaptic connections. Every drill practiced myelinates nerve fibers — the movement becomes automatic. This is the neurological foundation of the black belt.",
@@ -8531,6 +8653,10 @@ function applyLangTracker(lang) {
     st_cpk_radar_hint_end: ' to calculate your Cpk index.',
     st_dmaic_desc2: 'Lean Six Sigma\u00a0\u03c3 certification applied to your basketball progress. This is your scientific signature.',
   });
+
+  Object.assign(T.fr, {
+    st_dmaic_desc2: 'Certification Lean Six Sigma σ appliquée à ta progression basket. C’est ta signature scientifique.',
+  });
 })();
 </script>
 
@@ -8703,6 +8829,49 @@ function applyLangTracker(lang) {
     ins_access_code: 'Code d\'accès Sensei',
     st_process_stable: 'Processus stable',
     vis_card1_desc: 'Chaque tir suit une trajectoire parabolique dictée par la physique. L\'angle optimal est 45° — ni trop plat, ni trop vertical. La simulation recalcule la trajectoire en temps réel.',
+    vis_sh1: '⚡ PHYSIQUE &amp; BALISTIQUE',
+    vis_sh2: '📐 ARBITRAGE &amp; GÉOMÉTRIE',
+    vis_sh3: '🧠 NEUROSCIENCES &amp; APPRENTISSAGE',
+    vis_sh4: '📊 MATHÉMATIQUES APPLIQUÉES',
+    vis_card4_title: 'ANGLE OPTIMAL DU TIR',
+    vis_card4_desc: "45° est l'angle minimal — mais les études biomécaniques montrent qu'un angle légèrement supérieur (~52°) maximise la fenêtre d'entrée dans le panier. La simulation compare les deux trajectoires.",
+    vis_tag4: '⚡ BIOMÉCANIQUE',
+    vis_card5_title: 'EFFET MAGNUS — BACKSPIN',
+    vis_card5_desc: "Le backspin crée une force de Magnus qui ralentit le ballon avant impact et augmente la probabilité d'entrée douce dans le panier. Avec spin, le ballon cherche le filet.",
+    vis_tag5: '⚡ AÉRODYNAMIQUE',
+    vis_card6_title: 'LE TIR AU BUZZER',
+    vis_card6_desc: "Le temps continu est découpé en intervalles mesurables. L'arbitre cherche dans quel intervalle discret le ballon a quitté la main. Si la main s'ouvre avant t₀ — le tir est valide.",
+    vis_tag6: '📐 ANALYSE NUMÉRIQUE',
+    vis_card7_title: 'PIED SUR LA LIGNE',
+    vis_card7_desc: "La chaussure et la ligne sont deux ensembles de points du plan. Si leur intersection est non vide (A ∩ B ≠ ∅), le joueur est sorti. Question purement ensembliste.",
+    vis_tag7: '📐 TOPOLOGIE',
+    vis_card8_title: 'LE CONTRE LÉGAL',
+    vis_card8_desc: "Le contre est légal si h′(t) < 0 au moment du contact — le ballon descend déjà. Si h′(t) > 0, il monte encore : contre illégal. L'arbitre lit le signe de la dérivée.",
+    vis_tag8: '📐 ANALYSE RÉELLE',
+    vis_card9_title: 'FAUTE AU REBOND',
+    vis_card9_desc: "Chaque joueur occupe un cylindre de révolution. Si deux cylindres se chevauchent, l'un envahit le volume de l'autre — faute. La règle NBA/FIBA est une intersection de solides de révolution.",
+    vis_tag9: '📐 GÉOMÉTRIE 3D',
+    vis_card10_title: 'TRANSFORMÉE DE HOUGH',
+    vis_card10_desc: "Chaque point d'une image vote pour toutes les lignes qui peuvent le contenir. Les lignes réelles émergent par accumulation de votes dans l'espace (ρ, θ) — c'est ainsi que la vidéo arbitre les lignes.",
+    vis_tag10: '🤖 VISION PAR ORDINATEUR',
+    vis_card11_title: 'FOURIER &amp; RYTHME DE DRIBBLE',
+    vis_card11_desc: "Le dribble est un signal périodique. La transformée de Fourier révèle la régularité du rythme et les harmoniques. Un dribble parfait a un spectre fréquentiel étroit et propre.",
+    vis_tag11: '📡 TRAITEMENT DU SIGNAL',
+    vis_card12_title: 'ESPÉRANCE — 2 PTS VS 3 PTS',
+    vis_card12_desc: "Si tu marques 40% à 2pts et 33% à 3pts : E₂ = 0.80 pts/tir, E₃ = 0.99 pts/tir. Le 3pts est statistiquement supérieur même avec un % plus faible — la NBA l'a compris dès les années 2010.",
+    vis_tag12: '📊 PROBABILITÉS',
+    vis_card13_title: 'BAYES &amp; DÉCISION DU MENEUR',
+    vis_card13_desc: "Le meneur met à jour sa probabilité de succès à chaque nouvelle information visuelle. Chaque indice est une preuve qui révise le calcul — exactement Bayes en action.",
+    vis_tag13: '📊 PROBABILITÉS BAYÉSIENNES',
+    vis_card14_title: 'GRAPHE DE PASSES',
+    vis_card14_desc: "Chaque joueur est un nœud, chaque passe une arête pondérée. Le joueur à forte centralité est le hub du jeu. Les meilleures défenses ciblent ces nœuds critiques.",
+    vis_tag14: '🔗 THÉORIE DES GRAPHES',
+    vis_card15_title: 'CENTRE DE GRAVITÉ DÉFENSIF',
+    vis_card15_desc: "La position défensive optimale maintient le centre de gravité bas. Abaisser les hanches de 20 cm réduit le temps de réaction latérale — la physique justifie la stance basse.",
+    vis_tag15: '📐 MÉCANIQUE',
+    vis_card16_title: 'RÉGRESSION &amp; FATIGUE',
+    vis_card16_desc: "En traçant le % de réussite en fonction des minutes jouées, on observe une régression linéaire négative — l'efficacité baisse avec la fatigue. Le coefficient directeur quantifie le coût énergétique.",
+    vis_tag16: '📊 STATISTIQUES',
     vis_card2_desc: 'La répétition renforce les connexions synaptiques. Chaque drill pratiqué myélinise les fibres nerveuses — le geste devient automatique. C\'est la base neurologique de la ceinture noire.',
     st_record_hint: 'Enregistre des sessions dans l\'onglet Radar',
     cpk_row1: 'Performances très irrégulières — l\'entraînement ne se transfère pas',
@@ -8716,6 +8885,49 @@ function applyLangTracker(lang) {
     vis_card3_title: 'NEWTON\'S LAWS',
     data_belt_label: 'Athlete\'s current belt',
     vis_card3_desc: 'Every ball bounce illustrates conservation of energy and Newton\'s 3rd law. Kinetic energy transforms into elastic deformation then returns — with losses.',
+    vis_sh1: '⚡ PHYSICS &amp; BALLISTICS',
+    vis_sh2: '📐 OFFICIATING &amp; GEOMETRY',
+    vis_sh3: '🧠 NEUROSCIENCE &amp; LEARNING',
+    vis_sh4: '📊 APPLIED MATHEMATICS',
+    vis_card4_title: 'OPTIMAL SHOT ANGLE',
+    vis_card4_desc: "45° is the minimum angle — but biomechanical studies show that a slightly higher angle (~52°) maximizes the entry window into the basket. The simulation compares both trajectories.",
+    vis_tag4: '⚡ BIOMECHANICS',
+    vis_card5_title: 'MAGNUS EFFECT — BACKSPIN',
+    vis_card5_desc: "Backspin creates a Magnus force that slows the ball before impact and increases the chance of a soft entry. A ball without spin bounces harder — with spin, it finds the net.",
+    vis_tag5: '⚡ AERODYNAMICS',
+    vis_card6_title: 'THE BUZZER SHOT',
+    vis_card6_desc: "Continuous time is divided into measurable intervals. The referee identifies in which discrete interval the ball left the hand. If the hand opens before t₀ — the shot counts.",
+    vis_tag6: '📐 NUMERICAL ANALYSIS',
+    vis_card7_title: 'FOOT ON THE LINE',
+    vis_card7_desc: "The shoe and the line are two sets of points on a plane. If their intersection is non-empty (A ∩ B ≠ ∅), the player is out of bounds. A purely set-theoretic question.",
+    vis_tag7: '📐 TOPOLOGY',
+    vis_card8_title: 'THE LEGAL BLOCK',
+    vis_card8_desc: "A block is legal if h′(t) < 0 at the moment of contact — the ball is already descending. If h′(t) > 0, the ball is still rising: illegal block. The referee reads the sign of the derivative.",
+    vis_tag8: '📐 REAL ANALYSIS',
+    vis_card9_title: 'REBOUNDING FOUL',
+    vis_card9_desc: "Each player occupies a cylinder of revolution. If two cylinders overlap, one has invaded the other's volume — foul. The NBA/FIBA rule is literally an intersection of solids of revolution.",
+    vis_tag9: '📐 3D GEOMETRY',
+    vis_card10_title: 'HOUGH TRANSFORM',
+    vis_card10_desc: "Each image point votes for all lines that could contain it. Real lines emerge through accumulated votes in (ρ, θ) space — this is how video technology referees lines on the court.",
+    vis_tag10: '🤖 COMPUTER VISION',
+    vis_card11_title: 'FOURIER &amp; DRIBBLE RHYTHM',
+    vis_card11_desc: "The dribble is a periodic signal. The Fourier transform reveals rhythm regularity and harmonics. A perfect dribble has a narrow, clean frequency spectrum.",
+    vis_tag11: '📡 SIGNAL PROCESSING',
+    vis_card12_title: 'EXPECTED VALUE — 2 VS 3 PTS',
+    vis_card12_desc: "If you shoot 40% from 2 and 33% from 3: E₂ = 0.80 pts/shot, E₃ = 0.99 pts/shot. The 3-pointer is statistically superior even with a lower percentage — the NBA figured this out in the 2010s.",
+    vis_tag12: '📊 PROBABILITY',
+    vis_card13_title: 'BAYES &amp; POINT GUARD DECISION',
+    vis_card13_desc: "The point guard updates their success probability with each new visual cue: defender close, help covering, teammate open. Each cue is new evidence revising the calculation — exactly Bayes.",
+    vis_tag13: '📊 BAYESIAN PROBABILITY',
+    vis_card14_title: 'PASSING NETWORK GRAPH',
+    vis_card14_desc: "Each player is a node, each pass a weighted edge. The high-centrality player is the game's hub — neutralize them and ball circulation collapses. The best defenses target these critical nodes.",
+    vis_tag14: '🔗 GRAPH THEORY',
+    vis_card15_title: 'DEFENSIVE CENTER OF GRAVITY',
+    vis_card15_desc: "The optimal defensive stance keeps the center of gravity low. Lowering the hips by 20 cm reduces lateral reaction time — physics justifies the low stance taught from white belt onward.",
+    vis_tag15: '📐 MECHANICS',
+    vis_card16_title: 'REGRESSION &amp; FATIGUE',
+    vis_card16_desc: "Plotting shot percentage against minutes played reveals a negative linear regression — efficiency drops with fatigue. The slope quantifies the energetic cost of play.",
+    vis_tag16: '📊 STATISTICS',
     pil_mecha_text: 'neuromotor and cognitive mechanisms that ensure the transfer from training to competition.',
     st_trend_down: 'Downward trend',
     home_feat4: 'Parabolic shot trajectory, Newton\'s laws, motion equations — the exact sciences of basketball.',
@@ -9816,6 +10028,170 @@ function closePlayerLinkModal() {
     banner.style.display = 'block';
     setTimeout(()=>{ banner.style.transition='opacity 1s'; banner.style.opacity='0'; setTimeout(()=>banner.style.display='none',1000); }, 7000);
   } catch(e) {}
+})();
+</script>
+
+
+<script>
+// Clés i18n FR manquantes — ajout pour symétrie complète FR/EN
+(function(){
+  var T = window.LANG_DATA; if (!T) return;
+  Object.assign(T.fr, {
+    mj_tab_pp: '⚡ Pin & Peel',
+    mj_tab_quiz: '🧠 Sensei IQ Quiz',
+    mj_tab_vak: '👁️ Profil VAK',
+    pr_tab_certif: '🎖️ Certificat',
+    pr_tab_combo: '🏋️ Ma Séance',
+    pr_tab_export: '📤 Export',
+    pr_tab_journal: '📓 Journal d\'entraînement',
+    pr_tab_tracker: '🥋 Ma Ceinture',
+    sec_battle_sub: 'Confrontations · 1v1 · Coach Sensei BlackBelt',
+    sec_battle_title: 'BATTLE <span style="color:var(--gold)">ROYAL</span>',
+    sec_chal_title: 'CHAL<span style="color:var(--gold)">LENGES</span>',
+    sec_coach_sub: 'Thibault NJECKIL · Certification Lean Six Sigma 6\u03c3',
+    sec_coach_title: 'LE <span style="color:var(--gold)">COACH</span>',
+    sec_ins_sub: 'Rejoindre le programme SENSEI · Tous niveaux · Toutes pratiques',
+    sec_ins_title: 'S\u2019IN<span style="color:var(--gold)">CRIRE</span>',
+    sec_mas_sub: 'Espace Sensei · Acc\u00e8s PIN · Outils coach exclusifs',
+    sec_mas_title: 'MAS<span style="color:var(--gold)">TERS</span>',
+    sec_res_sub: 'Choisissez votre formule · S\u00e9lectionnez votre cr\u00e9neau · Payez en s\u00e9curit\u00e9',
+    sec_res_title: 'R\u00c9<span style="color:var(--gold)">SERVER</span>',
+    sec_testi_sub: 'Ce que disent les athl\u00e8tes et les experts',
+    sec_testi_title: 'ILS EN <span style="color:var(--gold)">PARLENT</span>',
+    st_tab_chart: '📉 Control Chart',
+    st_tab_cpk: '📊 Indice Cpk',
+    st_tab_dmaic: '⚙️ DMAIC',
+    st_tab_pct: '🏅 Percentile',
+    st_tab_radar: '🕸️ Radar',
+  });
+})();
+</script>
+<style>
+/* ── VISUSCI ── */
+.vis-sh{font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:10px;margin:40px 0 18px}
+.vis-card{background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;overflow:hidden;transition:border-color .25s}
+.vis-card:hover{border-color:rgba(245,197,24,.25)}
+.vis-card-hd{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.vis-card-title{font-family:var(--font-cond);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--text)}
+.vis-formula{font-family:monospace;font-size:11px;color:var(--gold);margin-top:2px}
+.vis-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.vis-wrap{position:relative;width:100%;height:260px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)}
+.vis-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+.vis-tag{margin-left:auto;font-family:var(--font-cond);font-size:9px;font-weight:700;padding:4px 10px;border-radius:12px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
+.vis-tag-gold{background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);color:var(--gold)}
+.vis-tag-purple{background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);color:var(--purple-belt)}
+.vis-tag-green{background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);color:var(--green-belt)}
+.vis-tag-blue{background:rgba(0,119,182,.15);border:1px solid rgba(0,119,182,.3);color:var(--blue-belt)}
+.vis-tag-red{background:rgba(193,18,31,.15);border:1px solid rgba(193,18,31,.3);color:var(--red-belt)}
+</style>
+<script>
+(function(){
+var GOLD='#f5c518',MUTED='#7a8299',TEXT='#f0f2f8',RED='#e63946',GREEN='#2dc653',BLUE='#0077b6',PURPLE='#7b2d8b';
+function t(fr,en){return window._lang==='en'?en:fr;}
+function initC(id){var el=document.getElementById(id);if(!el)return null;var w=el.parentElement.clientWidth||600;el.width=w;el.height=260;return el.getContext('2d');}
+
+/* ── Parabole (visu-a) ── */
+function drawA(){var c=initC('visu-a');if(!c)return;var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.beginPath();c.moveTo(0,H-28);c.lineTo(W,H-28);c.stroke();var bx=W-60,by=H-115;c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.moveTo(bx-18,by);c.lineTo(bx+18,by);c.stroke();c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=1;c.beginPath();c.moveTo(bx+18,by);c.lineTo(bx+18,by+58);c.stroke();[{a:35,col:'rgba(230,57,70,.55)',lbl:t('35° — trop plat','35° — too flat')},{a:45,col:GOLD,lbl:t('45° — optimal','45° — optimal')},{a:60,col:'rgba(0,119,182,.55)',lbl:t('60° — trop vertical','60° — too steep')}].forEach(function(ag){var v0=18,g=0.5,th=ag.a*Math.PI/180,vx=v0*Math.cos(th),vy=v0*Math.sin(th),sx=80,sy=H-28;c.strokeStyle=ag.col;c.lineWidth=ag.a===45?2.5:1.5;c.setLineDash(ag.a===45?[]:[4,4]);c.beginPath();c.moveTo(sx,sy);for(var tt=0;tt<120;tt++){var x=sx+vx*tt,y=sy-vy*tt+0.5*g*tt*tt;if(y>sy)break;c.lineTo(x,y);}c.stroke();c.setLineDash([]);c.fillStyle=ag.col;c.font='10px monospace';c.fillText(ag.lbl,sx+vx*16,sy-vy*16+0.5*g*256-8);});if(!drawA._t)drawA._t=0;drawA._t=(drawA._t+0.6)%120;var T=drawA._t,v0=18,g=0.5,th=45*Math.PI/180,vx=v0*Math.cos(th),vy=v0*Math.sin(th),bx2=80+vx*T,by2=(H-28)-vy*T+0.5*g*T*T;c.fillStyle=GOLD;c.beginPath();c.arc(bx2,by2,8,0,Math.PI*2);c.fill();c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText(t('Panier','Basket'),bx-14,by-8);}
+
+/* ── Angle 52° (visu-angle) ── */
+function drawAngle(){var c=initC('visu-angle');if(!c)return;var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.beginPath();c.moveTo(0,H-28);c.lineTo(W,H-28);c.stroke();var bx=W-70,by=H-118,rim=20;c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.moveTo(bx-rim,by);c.lineTo(bx+rim,by);c.stroke();[{a:45,col:'rgba(245,197,24,.45)',lbl:'45°',dash:[5,4]},{a:52,col:GREEN,lbl:t('52° — max fenêtre','52° — max window'),dash:[]}].forEach(function(ag){var v0=17,g=0.5,th=ag.a*Math.PI/180,vx=v0*Math.cos(th),vy=v0*Math.sin(th),sx=80,sy=H-28;c.strokeStyle=ag.col;c.lineWidth=ag.dash.length?1.5:2.5;c.setLineDash(ag.dash);c.beginPath();c.moveTo(sx,sy);for(var tt=0;tt<120;tt++){var x=sx+vx*tt,y=sy-vy*tt+0.5*g*tt*tt;if(y>sy)break;c.lineTo(x,y);}c.stroke();c.setLineDash([]);c.fillStyle=ag.col;c.font='10px monospace';c.fillText(ag.lbl,sx+vx*14,sy-vy*14+0.5*g*196-8);});c.fillStyle='rgba(45,198,83,.15)';c.fillRect(bx-rim,by-4,rim*2,8);c.fillStyle=GREEN;c.font='10px sans-serif';c.textAlign='center';c.fillText(t('fenêtre','window'),bx,by-10);c.textAlign='left';}
+
+/* ── Magnus (visu-magnus) ── */
+function drawMagnus(){var c=initC('visu-magnus');if(!c)return;var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);if(!drawMagnus._t)drawMagnus._t=0;drawMagnus._t+=0.5;var T=drawMagnus._t;[{lbl:t('Sans spin','No spin'),col:'rgba(230,57,70,.7)',ky:0,sx:60,spin:false},{lbl:t('Backspin','Backspin'),col:GREEN,ky:0.014,sx:90,spin:true}].forEach(function(tr){var sy=H-38,v0=16,g=0.55,th=50*Math.PI/180,vx=v0*Math.cos(th),vy=v0*Math.sin(th);c.strokeStyle=tr.col;c.lineWidth=tr.spin?2.5:1.5;c.setLineDash(tr.spin?[]:[5,4]);c.beginPath();c.moveTo(tr.sx,sy);for(var tt=0;tt<110;tt++){var x=tr.sx+vx*tt,y=sy-vy*tt+0.5*g*tt*tt+tr.ky*tt*tt;if(y>sy)break;c.lineTo(x,y);}c.stroke();c.setLineDash([]);c.fillStyle=tr.col;c.font='10px sans-serif';c.fillText(tr.lbl,tr.sx+4,H-56);var pt=Math.min(T%90,90),bx2=tr.sx+vx*pt,by2=sy-vy*pt+0.5*g*pt*pt+tr.ky*pt*pt;if(by2<=sy){c.fillStyle=tr.col;c.beginPath();c.arc(bx2,by2,8,0,Math.PI*2);c.fill();if(tr.spin){c.strokeStyle=GOLD;c.lineWidth=1.5;c.beginPath();c.arc(bx2,by2,11,-Math.PI/2,Math.PI/4);c.stroke();c.fillStyle=GOLD;c.font='9px sans-serif';c.fillText('↺',bx2-4,by2+4);}}});var bkx=W-60,bky=H-108;c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.moveTo(bkx-18,bky);c.lineTo(bkx+18,bky);c.stroke();}
+
+/* ── Newton (visu-c) ── */
+function drawNewton(){var c=initC('visu-c');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawNewton._t)drawNewton._t=0;drawNewton._t+=0.04;c.clearRect(0,0,W,H);var ground=H-28,cx=W/2,T=drawNewton._t,bounces=0,tt=T%6;while(tt>0){var dur=1.8*Math.pow(0.87,bounces);if(tt<dur)break;tt-=dur;bounces++;}var h0=120*Math.pow(0.75,bounces*2),frac=tt/(1.8*Math.pow(0.87,bounces)),by=ground-h0*(1-Math.pow(2*frac-1,2));c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.beginPath();c.moveTo(0,ground);c.lineTo(W,ground);c.stroke();c.fillStyle=GOLD;c.beginPath();c.arc(cx,by,16,0,Math.PI*2);c.fill();var vy2=h0*(4*frac-2)*0.5;if(Math.abs(vy2)>2){c.strokeStyle=GOLD+'88';c.lineWidth=2;c.beginPath();c.moveTo(cx,by+16);c.lineTo(cx,by+16+vy2*0.5);c.stroke();}c.fillStyle=MUTED;c.font='11px sans-serif';c.fillText('F = ma',18,28);c.fillText('p = mv',18,44);c.fillText('e ≈ 0.87',18,60);var ep=h0/120,ek=1-ep;c.fillStyle='rgba(45,198,83,.7)';c.fillRect(W-80,ground-100*ep,20,100*ep);c.fillStyle='rgba(245,197,24,.7)';c.fillRect(W-54,ground-100*ek,20,100*ek);c.fillStyle=MUTED;c.font='9px sans-serif';c.fillText(t('Ep','PE'),W-76,ground+12);c.fillText(t('Ec','KE'),W-50,ground+12);}
+
+/* ── Buzzer (visu-buzzer) ── */
+function drawBuzzer(){var c=initC('visu-buzzer');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawBuzzer._t)drawBuzzer._t=0;drawBuzzer._t=(drawBuzzer._t+0.3)%100;c.clearRect(0,0,W,H);var ticks=[80,180,280,380,480],y=H/2,T=drawBuzzer._t,buzzerX=280;c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1.5;c.beginPath();c.moveTo(40,y);c.lineTo(W-40,y);c.stroke();ticks.forEach(function(x,i){c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=1;c.beginPath();c.moveTo(x,y-12);c.lineTo(x,y+12);c.stroke();var lbl=['t₋₂','t₋₁','t₀','t₊₁','t₊₂'][i];c.fillStyle=x===buzzerX?RED:MUTED;c.font=x===buzzerX?'bold 12px monospace':'11px monospace';c.textAlign='center';c.fillText(lbl,x,y+26);});c.textAlign='left';c.fillStyle='rgba(45,198,83,.12)';c.fillRect(180,y-38,100,76);var bx=40+(W-80)*(T/100),ballY=y-48+Math.sin(T*0.15)*10;c.fillStyle=GOLD;c.beginPath();c.arc(bx,ballY,10,0,Math.PI*2);c.fill();c.strokeStyle=RED;c.lineWidth=1.5;c.setLineDash([4,3]);c.beginPath();c.moveTo(buzzerX,y-58);c.lineTo(buzzerX,y+38);c.stroke();c.setLineDash([]);c.fillStyle=RED;c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('⏱ BUZZER',buzzerX,y-64);c.fillStyle=GREEN;c.font='10px sans-serif';c.fillText(t('✓ lâché avant t₀','✓ released before t₀'),285,y-48);c.fillStyle=MUTED;c.font='10px sans-serif';c.textAlign='left';c.fillText(t('discrétisation → t ∈ [tₙ, tₙ₊₁[','discretization → t ∈ [tₙ, tₙ₊₁['),18,H-12);}
+
+/* ── Ligne / intersection (visu-ligne) ── */
+function drawLigne(){var c=initC('visu-ligne');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawLigne._t)drawLigne._t=0;drawLigne._t=(drawLigne._t+0.5)%200;c.clearRect(0,0,W,H);var T=drawLigne._t,phase=Math.floor(T/100);c.strokeStyle=BLUE;c.lineWidth=4;c.beginPath();c.moveTo(0,H/2+30);c.lineTo(W,H/2+30);c.stroke();c.fillStyle=BLUE+'88';c.font='10px sans-serif';c.fillText(t('ligne de fond','baseline'),10,H/2+48);var shoe1y=phase===0?H/2+10:H/2+22;c.fillStyle=phase===0?'rgba(230,57,70,.2)':'rgba(45,198,83,.15)';c.strokeStyle=phase===0?RED:GREEN;c.lineWidth=2;c.beginPath();c.ellipse(W*0.3,shoe1y,50,18,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle=phase===0?RED:GREEN;c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(phase===0?t('A ∩ B ≠ ∅ — FAUTE','A ∩ B ≠ ∅ — FOUL'):t('A ∩ B = ∅ — IN','A ∩ B = ∅ — IN'),W*0.3,H/2-18);if(phase===0){c.fillStyle='rgba(230,57,70,.4)';c.beginPath();c.ellipse(W*0.3,H/2+28,28,6,0,0,Math.PI*2);c.fill();}c.fillStyle='rgba(45,198,83,.15)';c.strokeStyle=GREEN;c.lineWidth=2;c.beginPath();c.ellipse(W*0.72,H/2-10,50,18,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle=GREEN;c.fillText(t('A ∩ B = ∅ — OK','A ∩ B = ∅ — IN'),W*0.72,H/2-36);c.textAlign='left';c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText('A = {pts chaussure}  B = {pts ligne}',16,H-12);}
+
+/* ── Contre légal (visu-contre) ── */
+function drawContre(){var c=initC('visu-contre');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawContre._t)drawContre._t=0;drawContre._t=(drawContre._t+0.4)%140;c.clearRect(0,0,W,H);var T=drawContre._t,sx=60,sy=H-38,vx=3,vy=4.5,g=0.08;c.strokeStyle='rgba(255,255,255,.15)';c.lineWidth=1.5;c.beginPath();c.moveTo(sx,sy);for(var tt=0;tt<140;tt++){var y=sy-vy*tt+0.5*g*tt*tt;if(y>sy)break;c.lineTo(sx+vx*tt,y);}c.stroke();var tPeak=vy/g,xPeak=sx+vx*tPeak,yPeak=sy-vy*tPeak+0.5*g*tPeak*tPeak;c.strokeStyle='rgba(245,197,24,.35)';c.lineWidth=1;c.setLineDash([3,3]);c.beginPath();c.moveTo(xPeak,yPeak);c.lineTo(xPeak,sy);c.stroke();c.setLineDash([]);c.fillStyle=GOLD;c.font='10px sans-serif';c.textAlign='center';c.fillText(t("sommet h'(t)=0","apex h'(t)=0"),xPeak,yPeak-10);c.fillStyle='rgba(230,57,70,.07)';c.fillRect(sx,0,xPeak-sx,H);c.fillStyle='rgba(45,198,83,.07)';c.fillRect(xPeak,0,W-xPeak,H);c.fillStyle=RED;c.font='bold 10px sans-serif';c.fillText(t("h'(t)>0 illégal","h'(t)>0 illegal"),sx+(xPeak-sx)/2,22);c.fillStyle=GREEN;c.fillText(t("h'(t)<0 légal","h'(t)<0 legal"),xPeak+(W-xPeak)/2,22);c.textAlign='left';var bx=sx+vx*T,by=sy-vy*T+0.5*g*T*T;if(by>sy)by=sy;c.fillStyle=GOLD;c.beginPath();c.arc(bx,by,12,0,Math.PI*2);c.fill();}
+
+/* ── Cylindre (visu-cylindre) ── */
+function drawCylindre(){var c=initC('visu-cylindre');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawCylindre._t)drawCylindre._t=0;drawCylindre._t=(drawCylindre._t+0.3)%120;c.clearRect(0,0,W,H);var ground=H-28,T=drawCylindre._t,overlap=Math.sin(T*Math.PI/120)*32;c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.beginPath();c.moveTo(0,ground);c.lineTo(W,ground);c.stroke();var ax=W*0.3,r=52,top=75;c.fillStyle='rgba(0,119,182,.13)';c.strokeStyle=BLUE;c.lineWidth=1.5;c.fillRect(ax-r,top,r*2,ground-top);c.strokeRect(ax-r,top,r*2,ground-top);c.beginPath();c.ellipse(ax,top,r,11,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle=BLUE;c.font='bold 14px sans-serif';c.textAlign='center';c.fillText('A',ax,48);var bx=W*0.7-overlap;c.fillStyle='rgba(230,57,70,.13)';c.strokeStyle=RED;c.lineWidth=1.5;c.fillRect(bx-r,top,r*2,ground-top);c.strokeRect(bx-r,top,r*2,ground-top);c.beginPath();c.ellipse(bx,top,r,11,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle=RED;c.fillText('B',bx,48);var ox=Math.max(ax-r,bx-r),ox2=Math.min(ax+r,bx+r);if(ox2>ox){c.fillStyle='rgba(230,57,70,.32)';c.fillRect(ox,top,ox2-ox,ground-top);c.fillStyle=RED;c.font='bold 10px sans-serif';c.fillText(t('⚠ INVASION','⚠ FOUL'),(ox+ox2)/2,top+28);}c.textAlign='left';c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText(T<60?'Cyl_A ∩ Cyl_B = ∅':t('Cyl_A ∩ Cyl_B ≠ ∅ → FAUTE','Cyl_A ∩ Cyl_B ≠ ∅ → FOUL'),38,H-10);}
+
+/* ── Neurones (visu-b) ── */
+function drawNeuro(){var c=initC('visu-b');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawNeuro._t)drawNeuro._t=0;drawNeuro._t+=0.4;c.clearRect(0,0,W,H);var T=drawNeuro._t;var nodes=[{x:W*.14,y:H*.35},{x:W*.14,y:H*.65},{x:W*.37,y:H*.22},{x:W*.37,y:H*.5},{x:W*.37,y:H*.78},{x:W*.63,y:H*.35},{x:W*.63,y:H*.65},{x:W*.86,y:H*.5}];var syn=[[0,2],[0,3],[1,3],[1,4],[2,5],[3,5],[3,6],[4,6],[5,7],[6,7]];syn.forEach(function(s,i){var a=nodes[s[0]],b=nodes[s[1]],w=.3+.7*((Math.sin(T*.05+i*.6)+1)/2);c.strokeStyle='rgba(245,197,24,'+w+')';c.lineWidth=w*3;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();});nodes.forEach(function(n,i){var p=(Math.sin(T*.08+i*.8)+1)/2;c.fillStyle='rgba(123,45,139,'+(.4+.6*p)+')';c.strokeStyle=PURPLE;c.lineWidth=1.5;c.beginPath();c.arc(n.x,n.y,10+p*4,0,Math.PI*2);c.fill();c.stroke();});c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText(t('Répétition → myélinisation → automatisme','Repetition → myelination → automatism'),18,H-12);}
+
+/* ── Hough (visu-hough) ── */
+function drawHough(){var c=initC('visu-hough');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawHough._t)drawHough._t=0;drawHough._t+=0.5;c.clearRect(0,0,W,H);var half=W/2;c.fillStyle='rgba(255,255,255,.02)';c.fillRect(0,0,half,H);c.fillRect(half,0,half,H);c.strokeStyle='rgba(255,255,255,.08)';c.strokeRect(0,0,half,H);c.strokeRect(half,0,half,H);c.fillStyle=MUTED;c.font='10px sans-serif';c.textAlign='center';c.fillText(t('Image terrain','Court image'),half/2,16);c.fillText(t('Espace (ρ,θ)','(ρ,θ) space'),half+half/2,16);c.strokeStyle=BLUE;c.lineWidth=2.5;c.beginPath();c.arc(half/2,H+18,H*.72,Math.PI+.32,Math.PI*2-.32);c.stroke();var pts=[[half*.2,H*.7],[half*.4,H*.45],[half*.6,H*.38],[half*.8,H*.62]];pts.forEach(function(p,i){c.fillStyle=GOLD;c.beginPath();c.arc(p[0],p[1],5,0,Math.PI*2);c.fill();c.strokeStyle='rgba(245,197,24,.07)';c.lineWidth=.8;for(var th2=0;th2<=180;th2+=18){var r2=th2/180;c.beginPath();c.moveTo(half+r2*(half-18),H*.12);c.lineTo(half+r2*(half-18),H*.88);c.stroke();}pts.forEach(function(p2,j){c.strokeStyle='rgba(245,197,24,'+(.12+j*.04)+')';c.lineWidth=1;c.beginPath();for(var th3=0;th3<=180;th3+=3){var rad=th3*Math.PI/180,rho=p2[0]*Math.cos(rad)+p2[1]*Math.sin(rad),px=half+th3/180*half*.9,py=H/2-rho*.28;th3===0?c.moveTo(px,py):c.lineTo(px,py);}c.stroke();});});c.fillStyle=RED;c.beginPath();c.arc(half+half*.58,H*.33,8,0,Math.PI*2);c.fill();c.fillStyle=RED;c.font='bold 10px sans-serif';c.fillText(t('pic = ligne','peak = line'),half+half*.58,H*.22);c.textAlign='left';}
+
+/* ── Fourier (visu-fourier) ── */
+function drawFourier(){var c=initC('visu-fourier');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawFourier._t)drawFourier._t=0;drawFourier._t+=.05;c.clearRect(0,0,W,H);var T=drawFourier._t,half=W/2;c.fillStyle=MUTED;c.font='10px sans-serif';c.textAlign='center';c.fillText(t('Signal dribble x(t)','Dribble signal x(t)'),half/2,16);c.fillText(t('Spectre |X(f)|','Spectrum |X(f)|'),half+half/2,16);c.strokeStyle=GOLD;c.lineWidth=2;c.beginPath();for(var i=0;i<half-18;i++){var tt2=i/50,v=Math.sin(Math.PI*2*2*tt2+T)+.3*Math.sin(Math.PI*2*5*tt2+T*1.3)+.1*Math.sin(Math.PI*2*9*tt2),y=H/2-v*40;i===0?c.moveTo(10+i,y):c.lineTo(10+i,y);}c.stroke();var freqs=[{f:2,amp:1,col:GREEN},{f:5,amp:.3,col:GOLD},{f:9,amp:.1,col:BLUE}];freqs.forEach(function(fr){var x=half+fr.f*(half-18)/12,h=(H-58)*fr.amp;c.fillStyle=fr.col+'99';c.fillRect(x-6,H-30-h,12,h);c.strokeStyle=fr.col;c.lineWidth=1.5;c.strokeRect(x-6,H-30-h,12,h);c.fillStyle=fr.col;c.font='9px monospace';c.fillText(fr.f+'Hz',x,H-14);});c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;c.beginPath();c.moveTo(half+4,H-30);c.lineTo(W-10,H-30);c.stroke();c.textAlign='left';}
+
+/* ── Espérance (visu-esperance) ── */
+function drawEsp(){var c=initC('visu-esperance');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawEsp._t)drawEsp._t=0;drawEsp._t=(drawEsp._t+.3)%100;c.clearRect(0,0,W,H);var ground=H-48,T=drawEsp._t;var p2=.25+.15*Math.sin(T*.063),p3=.25+.1*Math.sin(T*.063+1),e2=p2*2,e3=p3*3,maxH=H-76;[{lbl:t('% 2pts','% 2pts'),val:p2,max:.6,col:'rgba(0,119,182,.7)',x:W*.12},{lbl:t('% 3pts','% 3pts'),val:p3,max:.6,col:'rgba(123,45,139,.7)',x:W*.32},{lbl:t('E[2pts]','E[2pts]'),val:e2,max:1.5,col:e2>e3?GREEN:'rgba(45,198,83,.4)',x:W*.57},{lbl:t('E[3pts]','E[3pts]'),val:e3,max:1.5,col:e3>e2?GOLD:'rgba(245,197,24,.4)',x:W*.77}].forEach(function(b){var bh=(b.val/b.max)*maxH;c.fillStyle=b.col;c.fillRect(b.x-24,ground-bh,48,bh);c.strokeStyle='rgba(255,255,255,.15)';c.lineWidth=1;c.strokeRect(b.x-24,ground-bh,48,bh);c.fillStyle=TEXT;c.font='bold 11px monospace';c.textAlign='center';c.fillText((b.val*100).toFixed(0)+(b.val<1?'%':''),b.x,ground-bh-6);c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText(b.lbl,b.x,ground+16);});c.strokeStyle='rgba(255,255,255,.1)';c.lineWidth=1;c.beginPath();c.moveTo(28,ground);c.lineTo(W-18,ground);c.stroke();c.fillStyle=GOLD;c.font='bold 11px sans-serif';c.fillText(e3>e2?t('🏆 3pts plus rentable!','🏆 3-pointer more efficient!'):t('🏆 2pts plus rentable!','🏆 2-pointer more efficient!'),W*.38,H-12);c.textAlign='left';}
+
+/* ── Bayes (visu-bayes) ── */
+function drawBayes(){var c=initC('visu-bayes');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawBayes._t)drawBayes._t=0;drawBayes._t=(drawBayes._t+.3)%240;c.clearRect(0,0,W,H);var T=drawBayes._t,steps=[{lbl:t('Prob. initiale','Prior'),p:.5,col:MUTED},{lbl:t('Défenseur avancé','Defender close'),p:.35,col:RED},{lbl:t('Aide couvre','Help covers'),p:.25,col:'#ff8800'},{lbl:t('Coéquipier ouvert','Teammate open'),p:.72,col:GREEN}],step=Math.min(Math.floor(T/60),3),p=steps[step].p,cx=W/2,cy=H*.44,r=Math.min(cx,cy)-28;c.strokeStyle='rgba(255,255,255,.1)';c.lineWidth=18;c.beginPath();c.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);c.stroke();c.strokeStyle=steps[step].col;c.lineWidth=18;c.beginPath();c.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+p*Math.PI*2);c.stroke();c.fillStyle=TEXT;c.font='bold 28px monospace';c.textAlign='center';c.fillText(Math.round(p*100)+'%',cx,cy+10);c.fillStyle=MUTED;c.font='11px sans-serif';c.fillText(t('P(succès|contexte)','P(success|context)'),cx,cy+28);c.fillStyle=steps[step].col;c.font='bold 12px sans-serif';c.fillText('+ '+steps[step].lbl,cx,H-22);steps.forEach(function(s,i){c.fillStyle=i===step?s.col:'rgba(255,255,255,.2)';c.beginPath();c.arc(W*.15+i*(W*.7/3),H-44,i===step?6:4,0,Math.PI*2);c.fill();});c.textAlign='left';}
+
+/* ── Graphe (visu-graphe) ── */
+function drawGraphe(){var c=initC('visu-graphe');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawGraphe._t)drawGraphe._t=0;drawGraphe._t+=.5;c.clearRect(0,0,W,H);var T=drawGraphe._t,nodes=[{x:W*.5,y:H*.22,r:20,col:GOLD,lbl:'PG'},{x:W*.18,y:H*.48,r:13,col:BLUE,lbl:'SG'},{x:W*.82,y:H*.48,r:13,col:BLUE,lbl:'SF'},{x:W*.3,y:H*.8,r:12,col:PURPLE,lbl:'PF'},{x:W*.7,y:H*.8,r:12,col:PURPLE,lbl:'C'}],edges=[{a:0,b:1,w:12},{a:0,b:2,w:10},{a:0,b:3,w:8},{a:0,b:4,w:7},{a:1,b:3,w:4},{a:2,b:4,w:5},{a:1,b:2,w:3}];edges.forEach(function(e){var a=nodes[e.a],b=nodes[e.b];c.strokeStyle='rgba(245,197,24,'+(e.w/14)+')';c.lineWidth=e.w/4;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();});var ei=Math.floor(T/60)%edges.length,ea=nodes[edges[ei].a],eb=nodes[edges[ei].b],frac=(T%60)/60,bx=ea.x+(eb.x-ea.x)*frac,by=ea.y+(eb.y-ea.y)*frac;c.fillStyle=GOLD+'bb';c.beginPath();c.arc(bx,by,6,0,Math.PI*2);c.fill();nodes.forEach(function(n){c.fillStyle=n.col==='#f5c518'?'rgba(245,197,24,.2)':'rgba(0,0,0,.25)';c.strokeStyle=n.col;c.lineWidth=n.col===GOLD?2.5:1.5;c.beginPath();c.arc(n.x,n.y,n.r,0,Math.PI*2);c.fill();c.stroke();c.fillStyle=TEXT;c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(n.lbl,n.x,n.y+4);});c.fillStyle=GOLD;c.font='10px sans-serif';c.fillText(t('PG = hub — betweenness max','PG = hub — max betweenness'),W/2,H-12);c.textAlign='left';}
+
+/* ── Centre gravité (visu-cog) ── */
+function drawCOG(){var c=initC('visu-cog');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawCOG._t)drawCOG._t=0;drawCOG._t=(drawCOG._t+.5)%120;c.clearRect(0,0,W,H);var ground=H-28,T=drawCOG._t;c.strokeStyle='rgba(255,255,255,.08)';c.lineWidth=1;c.beginPath();c.moveTo(0,ground);c.lineTo(W,ground);c.stroke();[{cx:W*.28,hipFrac:.42,col:MUTED,lbl:t('Position haute','High stance')},{cx:W*.72,hipFrac:.62+.04*Math.sin(T*.1),col:GOLD,lbl:t('Position basse','Low stance')}].forEach(function(p){var totalH=ground-58,hipY=ground-totalH*p.hipFrac,headY=ground-totalH*.93;c.strokeStyle=p.col;c.lineWidth=2;c.beginPath();c.moveTo(p.cx,hipY);c.lineTo(p.cx,headY);c.stroke();c.fillStyle=p.col+'55';c.strokeStyle=p.col;c.lineWidth=1.5;c.beginPath();c.arc(p.cx,headY-8,10,0,Math.PI*2);c.fill();c.stroke();c.strokeStyle=p.col;c.lineWidth=2;c.beginPath();c.moveTo(p.cx,hipY);c.lineTo(p.cx-22,ground);c.stroke();c.beginPath();c.moveTo(p.cx,hipY);c.lineTo(p.cx+22,ground);c.stroke();var cogY=hipY+10;c.fillStyle=RED;c.strokeStyle='white';c.lineWidth=1;c.beginPath();c.arc(p.cx,cogY,7,0,Math.PI*2);c.fill();c.stroke();c.fillStyle='white';c.font='bold 9px sans-serif';c.textAlign='center';c.fillText('G',p.cx,cogY+3);c.fillStyle=p.col;c.font='10px sans-serif';c.fillText(p.lbl,p.cx,ground+18);c.strokeStyle=p.col+'55';c.lineWidth=1;c.setLineDash([3,3]);c.beginPath();c.moveTo(p.cx-40,cogY);c.lineTo(p.cx+40,cogY);c.stroke();c.setLineDash([]);});c.textAlign='left';c.fillStyle=MUTED;c.font='10px sans-serif';c.fillText(t('G bas → réaction latérale ↓','Low G → lateral reaction ↓'),16,H-10);}
+
+/* ── Régression (visu-regression) ── */
+function drawReg(){var c=initC('visu-regression');if(!c)return;var W=c.canvas.width,H=c.canvas.height;if(!drawReg._t)drawReg._t=0;drawReg._t=(drawReg._t+.3)%100;c.clearRect(0,0,W,H);var pad=48,pw=W-pad*2,ph=H-pad*2;c.strokeStyle='rgba(255,255,255,.15)';c.lineWidth=1;c.beginPath();c.moveTo(pad,pad);c.lineTo(pad,H-pad);c.lineTo(W-pad,H-pad);c.stroke();c.fillStyle=MUTED;c.font='10px sans-serif';c.textAlign='center';c.fillText(t('Minutes jouées','Minutes played'),W/2,H-8);c.save();c.translate(13,H/2);c.rotate(-Math.PI/2);c.fillText(t('% réussite','% shooting'),0,0);c.restore();var data=[];for(var i=0;i<20;i++){var x=5+i*1.9,y=52-x*.6+((i*7%13)-6)*3;data.push({x:x,y:Math.max(22,Math.min(64,y))});}data.forEach(function(d,i){var px=pad+(d.x/42)*pw,py=H-pad-(d.y-15)/(64-15)*ph;c.fillStyle=i<10?GOLD:RED+'bb';c.beginPath();c.arc(px,py,4,0,Math.PI*2);c.fill();});c.strokeStyle=GREEN;c.lineWidth=2;c.beginPath();c.moveTo(pad,H-pad-(52-15)/(64-15)*ph);c.lineTo(W-pad,H-pad-(52-42*.6-15)/(64-15)*ph);c.stroke();c.fillStyle=GREEN;c.font='bold 10px sans-serif';c.textAlign='right';c.fillText('ŷ = 52 − 0.6·x  R²≈0.74',W-pad-4,pad+14);c.fillStyle=RED;c.font='10px sans-serif';c.textAlign='center';c.fillText(t('Fatigue → efficacité ↓','Fatigue → efficiency ↓'),W*.72,H-pad-28);c.textAlign='left';}
+
+/* ── Boucle principale + IntersectionObserver ── */
+var _active=false,_raf=null,_visible={};
+var _fns=[
+  {id:'visu-a',fn:drawA},{id:'visu-angle',fn:drawAngle},{id:'visu-magnus',fn:drawMagnus},
+  {id:'visu-c',fn:drawNewton},{id:'visu-buzzer',fn:drawBuzzer},{id:'visu-ligne',fn:drawLigne},
+  {id:'visu-contre',fn:drawContre},{id:'visu-cylindre',fn:drawCylindre},{id:'visu-b',fn:drawNeuro},
+  {id:'visu-hough',fn:drawHough},{id:'visu-fourier',fn:drawFourier},{id:'visu-esperance',fn:drawEsp},
+  {id:'visu-bayes',fn:drawBayes},{id:'visu-graphe',fn:drawGraphe},{id:'visu-cog',fn:drawCOG},
+  {id:'visu-regression',fn:drawReg}
+];
+/* IntersectionObserver — ne dessine que les canvas dans le viewport */
+var _io = null;
+function _initIO(){
+  if(_io || typeof IntersectionObserver==='undefined') return;
+  _io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var canvas=e.target.querySelector('canvas');
+      if(canvas) _visible[canvas.id]=e.isIntersecting;
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('.vis-wrap').forEach(function(wrap){
+    var canvas=wrap.querySelector('canvas');
+    if(canvas){ _visible[canvas.id]=false; _io.observe(wrap); }
+  });
+}
+function loop(){
+  _fns.forEach(function(d){
+    if(_visible[d.id]!==false && document.getElementById(d.id)) d.fn();
+  });
+  _raf=requestAnimationFrame(loop);
+}
+function startVS(){
+  if(!_active){_active=true; _initIO(); loop();}
+}
+function stopVS(){
+  _active=false;
+  if(_raf){cancelAnimationFrame(_raf);_raf=null;}
+  if(_io){_io.disconnect();_io=null;}
+  Object.keys(_visible).forEach(function(k){_visible[k]=false;});
+}
+
+/* Hook showSection */
+var _origSS=window.showSection;
+if(typeof _origSS==='function'){
+  window.showSection=function(id,btn){_origSS(id,btn);if(id==='visusci')startVS();else stopVS();};
+}
+
+/* Resize */
+window.addEventListener('resize',function(){_fns.forEach(function(d){var el=document.getElementById(d.id);if(!el)return;el.width=el.parentElement.clientWidth||600;el.height=260;});});
+
+/* Hook applyLang */
+window.applyLangVisuSci=function(){_fns.forEach(function(d){if(d.fn._t!==undefined)d.fn._t=0;});};
+var _prevAL=window.applyLang;
+if(typeof _prevAL==='function'){window.applyLang=function(lang){_prevAL(lang);window.applyLangVisuSci();};}
 })();
 </script>
 </body>
