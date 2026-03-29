@@ -10194,5 +10194,19 @@ var _prevAL=window.applyLang;
 if(typeof _prevAL==='function'){window.applyLang=function(lang){_prevAL(lang);window.applyLangVisuSci();};}
 })();
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) {
+        console.log('[SENSEI SW] Enregistre :', reg.scope);
+      })
+      .catch(function(err) {
+        console.warn('[SENSEI SW] Echec :', err);
+      });
+  });
+}
+</script>
 </body>
 </html>
