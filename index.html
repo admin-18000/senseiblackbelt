@@ -10465,7 +10465,10 @@ function drawHough(){
   // Arc ligne 3pts — clippé dans la moitié gauche
   c.save();c.beginPath();c.rect(0,0,half,H);c.clip();
   c.strokeStyle=BLUE;c.lineWidth=2.5;
-  c.beginPath();c.arc(half/2,H*1.05,H*0.82,Math.PI+0.38,Math.PI*2-0.38);c.stroke();
+  // Rayon adaptatif pour que l'arc reste dans la moitie gauche
+  var arcCx=half*0.5,arcCy=H*1.1;
+  var arcR=half*0.52;
+  c.beginPath();c.arc(arcCx,arcCy,arcR,Math.PI+0.30,Math.PI*2-0.30);c.stroke();
   c.restore();
   // 4 points — apparaissent un par un (T 0->40 = 1 point tous les 10 frames)
   var pts=[
@@ -10821,17 +10824,17 @@ function drawReg(){
     c.fillText('y=52-0.6x  R2~0.74',W-padR-4,padT+14);
     c.fillStyle=RED;
     c.font=Math.min(11,Math.max(9,W*0.018))+'px sans-serif';
-    c.textAlign='left';
-    c.fillText(t('Fatigue -> efficacite baisse','Fatigue -> efficiency drops'),padL+pw*0.52,padT+14);
+    c.textAlign='right';
+    c.fillText(t('Fatigue -> eff. baisse','Fatigue -> eff. drops'),W-padR-4,padT+28);
   }
   c.textAlign='left';
 }
 
 var _active=false,_raf=null,_visible={};
 var _fns=[
-  {id:'visu-a',fn:drawA},{id:'visu-angle',fn:drawAngle},{id:'visu-magnus',fn:drawMagnus},
-  {id:'visu-c',fn:drawNewton},{id:'visu-buzzer',fn:drawBuzzer},{id:'visu-ligne',fn:drawLigne},
-  {id:'visu-contre',fn:drawContre},{id:'visu-cylindre',fn:drawCylindre},{id:'visu-b',fn:drawNeuro},
+  {id:'visu-angle',fn:drawAngle},{id:'visu-magnus',fn:drawMagnus},
+  {id:'visu-buzzer',fn:drawBuzzer},{id:'visu-ligne',fn:drawLigne},
+  {id:'visu-contre',fn:drawContre},{id:'visu-cylindre',fn:drawCylindre},
   {id:'visu-hough',fn:drawHough},{id:'visu-fourier',fn:drawFourier},{id:'visu-esperance',fn:drawEsp},
   {id:'visu-bayes',fn:drawBayes},{id:'visu-graphe',fn:drawGraphe},{id:'visu-cog',fn:drawCOG},
   {id:'visu-regression',fn:drawReg}
