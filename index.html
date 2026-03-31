@@ -1288,6 +1288,129 @@ body.unlocked .sensei-only{display:revert !important}
       <div id="td_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0;letter-spacing:1px"></div>
     </div>
   </div>
+
+  <!-- DRIBBLE RÉACTION + RHYTHM CHALLENGE -->
+  <div class="tr-card" id="tdr_card">
+    <div class="tr-card-title" id="tdr_cardTitle">🎯 DRIBBLE RÉACTION</div>
+
+    <!-- Sélection mode -->
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="tdr-mode-btn" data-mode="reaction" onclick="_tdr_setMode('reaction')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+               background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🎯</div>
+        <div id="tdr_lblReaction">RÉACTION</div>
+      </button>
+      <button class="tdr-mode-btn" data-mode="rhythm" onclick="_tdr_setMode('rhythm')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🎵</div>
+        <div id="tdr_lblRhythm">RYTHME</div>
+      </button>
+    </div>
+
+    <!-- Panel Réaction : niveaux -->
+    <div id="tdr_panelReaction">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+        <button class="tdr-lvl-btn" data-level="simple" onclick="_tdr_setLevel('simple')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+                 background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🟢</div>
+          <div id="tdr_lblSimple">SIMPLE</div>
+          <div style="font-size:8px;color:#7a8299;margin-top:2px">30s</div>
+        </button>
+        <button class="tdr-lvl-btn" data-level="double" onclick="_tdr_setLevel('double')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🟡</div>
+          <div id="tdr_lblDouble">DOUBLE</div>
+          <div style="font-size:8px;color:#7a8299;margin-top:2px">30s</div>
+        </button>
+        <button class="tdr-lvl-btn" data-level="random" onclick="_tdr_setLevel('random')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🔴</div>
+          <div id="tdr_lblRandom">RANDOM</div>
+          <div style="font-size:8px;color:#7a8299;margin-top:2px">45s</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel Rhythm : modes -->
+    <div id="tdr_panelRhythm" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+        <button class="tdr-rmode-btn" data-rmode="sync" onclick="_tdr_setRMode('sync')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+                 background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🎵</div>
+          <div id="tdr_lblSync">SYNC</div>
+        </button>
+        <button class="tdr-rmode-btn" data-rmode="offbeat" onclick="_tdr_setRMode('offbeat')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🎶</div>
+          <div id="tdr_lblOffbeat">OFF-BEAT</div>
+        </button>
+        <button class="tdr-rmode-btn" data-rmode="chaos" onclick="_tdr_setRMode('chaos')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;letter-spacing:.5px;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🔥</div>
+          <div id="tdr_lblChaos">CHAOS</div>
+        </button>
+      </div>
+      <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:10px" id="tdr_rhythmDesc">
+        Cibles sur chaque beat — reste en rythme !
+      </div>
+    </div>
+
+    <!-- Guide placement -->
+    <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;margin-bottom:10px;font-size:9px;color:#7a8299;line-height:1.6">
+      📱 <span id="tdr_guide1">Pose le téléphone à 2-3m face à toi</span><br>
+      👤 <span id="tdr_guide2">Corps entier visible dans le cadre</span><br>
+      💡 <span id="tdr_guide3">Bonne luminosité requise</span>
+    </div>
+
+    <!-- Canvas caméra -->
+    <div id="tdr_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
+      <video id="tdr_video" width="640" height="480" playsinline muted
+        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+      <canvas id="tdr_canvas" width="640" height="480"
+        style="width:100%;height:100%;display:block;background:#0d1117"></canvas>
+    </div>
+
+    <!-- Status + score live -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div id="tdr_status" style="font-size:11px;color:#7a8299;letter-spacing:.5px">
+        Appuie sur DÉMARRER
+      </div>
+      <div style="font-size:11px;color:#f5c518;font-family:var(--font-cond);font-weight:700">
+        <span id="tdr_scoreLive">0</span> pts &nbsp;
+        <span id="tdr_timeLive" style="color:#7a8299"></span>
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start" id="tdr_btnStart" onclick="_tdr_start()" ontouchstart="" style="flex:1">▶ <span id="tdr_lblStart">DÉMARRER</span></button>
+      <button class="tr-btn tr-btn-stop"  id="tdr_btnStop"  onclick="_tdr_stop()"  ontouchstart="" style="display:none;flex:1">⏹ STOP</button>
+      <button class="tr-btn tr-btn-save"  id="tdr_btnSave"  onclick="_tdr_saveSession()" ontouchstart="" style="display:none;flex:1">💾 <span id="tdr_lblSave">SAUVEGARDER</span></button>
+    </div>
+
+    <!-- Résultats -->
+    <div id="tdr_results" style="display:none;margin-bottom:10px"></div>
+
+    <!-- Historique -->
+    <div id="tdr_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+
   <div class="tr-card">
     <div class="tr-card-title">⏱ SESSION</div>
     <div style="text-align:center;padding:8px 0 14px">
@@ -11563,7 +11686,7 @@ function openTrainingTab(id, btn) {
   // Scroller vers le panel actif
   var onglets = document.querySelector('[onclick^="openTrainingTab"]');
   if(onglets) onglets.scrollIntoView({behavior:'smooth',block:'start'});
-  if(id==='dribble')  initTraining_d();
+  if(id==='dribble')  { initTraining_d(); initTraining_dr(); }
   if(id==='shot')     initTraining_sc2();
   if(id==='agility')  initTraining_ag2();
   if(id==='sc')       initTraining_sc();
@@ -13171,6 +13294,39 @@ function _trApplyLang() {
     }
     if(typeof _tsym_setMode==='function')_tsym_setMode(_tsym_mode||'dribble');
   });
+  // DRIBBLE RÉACTION
+  var tdrCard = document.getElementById('tdr_cardTitle');
+  if(tdrCard) tdrCard.textContent = '🎯 ' + (en?'DRIBBLE REACTION':'DRIBBLE RÉACTION');
+  var tdrLbls = {
+    'tdr_lblReaction': en?'REACTION':'RÉACTION',
+    'tdr_lblRhythm':   en?'RHYTHM':'RYTHME',
+    'tdr_lblSimple':   'SIMPLE',
+    'tdr_lblDouble':   'DOUBLE',
+    'tdr_lblRandom':   'RANDOM',
+    'tdr_lblSync':     'SYNC',
+    'tdr_lblOffbeat':  'OFF-BEAT',
+    'tdr_lblChaos':    'CHAOS',
+    'tdr_lblStart':    en?'START':'DÉMARRER',
+    'tdr_lblSave':     en?'SAVE':'SAUVEGARDER',
+  };
+  Object.keys(tdrLbls).forEach(function(id){
+    var el=document.getElementById(id); if(el) el.textContent=tdrLbls[id];
+  });
+  var tdrG1=document.getElementById('tdr_guide1');
+  if(tdrG1) tdrG1.textContent=en?'Place phone 2-3m facing you':'Pose le téléphone à 2-3m face à toi';
+  var tdrG2=document.getElementById('tdr_guide2');
+  if(tdrG2) tdrG2.textContent=en?'Full body visible in frame':'Corps entier visible dans le cadre';
+  var tdrG3=document.getElementById('tdr_guide3');
+  if(tdrG3) tdrG3.textContent=en?'Good lighting required':'Bonne luminosité requise';
+  var tdrRD=document.getElementById('tdr_rhythmDesc');
+  if(tdrRD) tdrRD.textContent=en?'Targets on each beat — stay in rhythm!':'Cibles sur chaque beat — reste en rythme !';
+  var tdrSt=document.getElementById('tdr_status');
+  if(tdrSt&&(tdrSt.textContent.indexOf('Appuie')>-1||tdrSt.textContent.indexOf('Press')>-1))
+    tdrSt.textContent=en?'Press START':'Appuie sur DÉMARRER';
+  var tdrHL=document.getElementById('tdr_histList');
+  if(tdrHL&&tdrHL.querySelector('.tr-empty'))
+    tdrHL.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+  else if(typeof _tdr_renderHistory==='function') _tdr_renderHistory();
 }
 
 
@@ -13890,7 +14046,459 @@ function _tsym_onError(msg) {
 function _tsym_expandCanvas() {
   var cnt = document.getElementById('tsym_camContainer');
   if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
-}</script>
+}
+
+/* DRIBBLE RÉACTION */
+/* ═══════════════════════════════════════════════════════════════
+   DRIBBLE RÉACTION + RHYTHM CHALLENGE
+   Réutilise : _tsym_detector, _tsym_kp, _tsym_loadModel,
+               _td_beep, _td_metroBPM, _td_detectDribble,
+               _tr_saveProgress, _TSYM_KP
+═══════════════════════════════════════════════════════════════ */
+
+/* ── État ─────────────────────────────────────────────────────── */
+var _tdr_mode       = 'reaction'; // 'reaction' | 'rhythm'
+var _tdr_level      = 'simple';   // 'simple' | 'double' | 'random'
+var _tdr_rMode      = 'sync';     // 'sync' | 'offbeat' | 'chaos'
+var _tdr_running    = false;
+var _tdr_rafId      = null;
+var _tdr_stream     = null;
+var _tdr_video      = null;
+var _tdr_canvas     = null;
+var _tdr_ctx        = null;
+var _tdr_scale      = 1;          // pixels par cm approximatif
+var _tdr_centerX    = 0.5;        // centre joueur en fraction de W
+var _tdr_calibrated = false;
+var _tdr_targets    = [];         // [{x,y,r,color,born,hit}]
+var _tdr_score      = 0;
+var _tdr_hits       = 0;
+var _tdr_total      = 0;
+var _tdr_reactionTimes = [];
+var _tdr_lastSpawn  = 0;
+var _tdr_sec        = 0;
+var _tdr_duration   = 30;
+var _tdr_timer      = null;
+var _tdr_metroSync  = null;
+var _tdr_bpm        = 80;
+var _tdr_sessions   = [];
+var _tdr_poses      = [];         // dernières poses lissées
+var _tdr_smoothBuf  = [];         // buffer lissage 5 frames
+var _tdr_calTimer   = null;
+
+/* ── Init ─────────────────────────────────────────────────────── */
+function initTraining_dr() {
+  _tdr_canvas = document.getElementById('tdr_canvas');
+  _tdr_ctx    = _tdr_canvas ? _tdr_canvas.getContext('2d') : null;
+  _tdr_renderHistory();
+  _tdr_setMode('reaction');
+  _tdr_setLevel('simple');
+}
+
+/* ── Sélection mode / niveau ──────────────────────────────────── */
+function _tdr_setMode(m) {
+  _tdr_mode = m;
+  var r = document.getElementById('tdr_panelReaction');
+  var rh = document.getElementById('tdr_panelRhythm');
+  if (r)  r.style.display  = m === 'reaction' ? 'block' : 'none';
+  if (rh) rh.style.display = m === 'rhythm'   ? 'block' : 'none';
+  document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
+    b.style.background = b.dataset.mode === m ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
+    b.style.color      = b.dataset.mode === m ? '#f5c518' : '#7a8299';
+    b.style.border     = b.dataset.mode === m ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+function _tdr_setLevel(lvl) {
+  _tdr_level = lvl;
+  _tdr_duration = lvl === 'random' ? 45 : 30;
+  document.querySelectorAll('.tdr-lvl-btn').forEach(function(b) {
+    var active = b.dataset.level === lvl;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+function _tdr_setRMode(rm) {
+  _tdr_rMode = rm;
+  document.querySelectorAll('.tdr-rmode-btn').forEach(function(b) {
+    var active = b.dataset.rmode === rm;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+/* ── Caméra ───────────────────────────────────────────────────── */
+function _tdr_start() {
+  if (!navigator.mediaDevices) {
+    _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
+  }
+  _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
+  var constraints = [{video:{facingMode:'user',width:640,height:480}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i) {
+    if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
+      _tdr_stream = stream;
+      _tdr_video  = document.getElementById('tdr_video');
+      if (!_tdr_video) return;
+      _tdr_video.srcObject = stream;
+      _tdr_video.onloadedmetadata = function() {
+        _tdr_video.play();
+        _tdr_status(_t('Chargement IA...','Loading AI...'), '#f5c518');
+        _tsym_loadModel(function() { _tdr_calibrate(); });
+      };
+    }).catch(function() { tryC(i+1); });
+  }
+  tryC(0);
+  var container = document.getElementById('tdr_camContainer');
+  if (container) container.style.display = 'block';
+  var btnStart = document.getElementById('tdr_btnStart');
+  var btnStop  = document.getElementById('tdr_btnStop');
+  if (btnStart) btnStart.style.display = 'none';
+  if (btnStop)  btnStop.style.display  = 'flex';
+}
+
+function _tdr_stop() {
+  _tdr_running = false;
+  clearInterval(_tdr_timer);
+  clearInterval(_tdr_metroSync);
+  clearTimeout(_tdr_calTimer);
+  if (_tdr_rafId) { cancelAnimationFrame(_tdr_rafId); _tdr_rafId = null; }
+  if (_tdr_stream) { _tdr_stream.getTracks().forEach(function(t){t.stop();}); _tdr_stream = null; }
+  if (_tdr_video) _tdr_video.srcObject = null;
+  var container = document.getElementById('tdr_camContainer');
+  if (container) container.style.display = 'none';
+  var btnStart = document.getElementById('tdr_btnStart');
+  var btnStop  = document.getElementById('tdr_btnStop');
+  if (btnStart) btnStart.style.display = 'flex';
+  if (btnStop)  btnStop.style.display  = 'none';
+  _tdr_status(_t('Appuie sur DÉMARRER','Press START'), '#7a8299');
+  _tdr_calibrated = false;
+  _tdr_smoothBuf = [];
+}
+
+/* ── Calibration 3s ───────────────────────────────────────────── */
+function _tdr_calibrate() {
+  _tdr_calibrated = false;
+  _tdr_smoothBuf  = [];
+  var remaining   = 3;
+  _tdr_status(_t('Calibration 3...','Calibrating 3...'), '#f5c518');
+  _tdr_detect(); // Démarrer la détection pour collecter les poses
+
+  _tdr_calTimer = setInterval(function() {
+    remaining--;
+    if (remaining > 0) {
+      _tdr_status(_t('Calibration '+remaining+'...','Calibrating '+remaining+'...'), '#f5c518');
+    } else {
+      clearInterval(_tdr_calTimer);
+      // Calculer l'échelle depuis le buffer de poses
+      if (_tdr_smoothBuf.length > 0) {
+        var lastPoses = _tdr_smoothBuf[_tdr_smoothBuf.length-1];
+        var ls = _tsym_kp(lastPoses, 'leftShoulder');
+        var rs = _tsym_kp(lastPoses, 'rightShoulder');
+        var lh = _tsym_kp(lastPoses, 'leftHip');
+        if (ls && rs && lh && _tdr_canvas) {
+          var W = _tdr_canvas.width;
+          _tdr_centerX = ((ls.x + rs.x) / 2) / W;
+          var shoulderW = Math.abs(ls.x - rs.x);
+          _tdr_scale   = shoulderW / 0.4; // épaules ≈ 40% de la largeur
+          _tdr_calibrated = true;
+        }
+      }
+      if (!_tdr_calibrated) {
+        // Fallback : valeurs par défaut
+        _tdr_centerX = 0.5; _tdr_scale = 200; _tdr_calibrated = true;
+      }
+      _tdr_status(_t('Prêt ! GO !','Ready! GO!'), '#2dc653');
+      setTimeout(function() { _tdr_startDrill(); }, 500);
+    }
+  }, 1000);
+}
+
+/* ── Boucle détection ─────────────────────────────────────────── */
+function _tdr_detect() {
+  if (!_tsym_detector || !_tdr_video) {
+    _tdr_rafId = requestAnimationFrame(_tdr_detect); return;
+  }
+  _tsym_detector.estimatePoses(_tdr_video).then(function(poses) {
+    // Lissage sur 5 frames
+    _tdr_smoothBuf.push(poses);
+    if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
+    _tdr_poses = poses;
+    _tdr_drawFrame(poses);
+    if (_tdr_running) _tdr_checkHits(poses);
+    _tdr_rafId = requestAnimationFrame(_tdr_detect);
+  }).catch(function() {
+    _tdr_rafId = requestAnimationFrame(_tdr_detect);
+  });
+}
+
+/* ── Dessin ───────────────────────────────────────────────────── */
+function _tdr_drawFrame(poses) {
+  var cv = _tdr_canvas, ctx = _tdr_ctx;
+  if (!cv || !ctx || !_tdr_video) return;
+  var W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  // Miroir vidéo
+  ctx.save(); ctx.scale(-1,1); ctx.drawImage(_tdr_video,-W,0,W,H); ctx.restore();
+  // Squelette léger
+  if (poses && poses[0]) _tsym_drawSkeleton(poses[0].keypoints, W/_tdr_video.videoWidth, H/_tdr_video.videoHeight, W);
+  // Cibles
+  _tdr_drawTargets(ctx, W, H);
+  // Score overlay
+  if (_tdr_running) {
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold 18px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(_tdr_score + ' pts', 10, 28);
+    ctx.textAlign = 'right';
+    ctx.fillText(_tdr_sec + 's', W-10, 28);
+  }
+}
+
+function _tdr_drawTargets(ctx, W, H) {
+  var now = Date.now();
+  _tdr_targets.forEach(function(t) {
+    if (t.hit) return;
+    var age   = (now - t.born) / t.ttl;
+    var alpha = Math.max(0, 1 - age);
+    var pulse = 1 + 0.1 * Math.sin(now / 120);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    // Cercle extérieur pulsant
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Cercle intérieur plein
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r, 0, Math.PI*2);
+    ctx.fillStyle = t.color;
+    ctx.fill();
+    // Croix centrale
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(t.x-8, t.y); ctx.lineTo(t.x+8, t.y);
+    ctx.moveTo(t.x, t.y-8); ctx.lineTo(t.x, t.y+8);
+    ctx.stroke();
+    ctx.restore();
+  });
+  // Flash hit
+  _tdr_targets = _tdr_targets.filter(function(t) {
+    return !t.hit || (Date.now() - t.hitTime < 300);
+  });
+}
+
+/* ── Spawn cibles ─────────────────────────────────────────────── */
+function _tdr_spawnTarget() {
+  if (!_tdr_canvas) return;
+  var W = _tdr_canvas.width, H = _tdr_canvas.height;
+  var cx = W * (1 - _tdr_centerX); // miroir
+  var positions = [
+    {x: cx - _tdr_scale*0.5, y: H*0.45, color:'#2dc653'},  // gauche
+    {x: cx + _tdr_scale*0.5, y: H*0.45, color:'#e63946'},  // droite
+    {x: cx,                  y: H*0.25, color:'#f5c518'},  // haut
+    {x: cx - _tdr_scale*0.3, y: H*0.65, color:'#4ecdc4'},  // bas-gauche
+    {x: cx + _tdr_scale*0.3, y: H*0.65, color:'#7b2d8b'},  // bas-droite
+  ];
+  var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
+  var shuffled = positions.sort(function(){return Math.random()-0.5;});
+  for (var i=0; i<count && i<shuffled.length; i++) {
+    var p = shuffled[i];
+    _tdr_targets.push({
+      x: p.x + (Math.random()-0.5)*20,
+      y: p.y + (Math.random()-0.5)*20,
+      r: 32, color: p.color,
+      born: Date.now(), ttl: 2000,
+      hit: false, hitTime: 0
+    });
+    _tdr_total++;
+  }
+  // Cibles expirées
+  _tdr_targets = _tdr_targets.filter(function(t){
+    if (!t.hit && Date.now()-t.born > t.ttl) { return false; }
+    return true;
+  });
+}
+
+/* ── Détection collision ──────────────────────────────────────── */
+function _tdr_checkHits(poses) {
+  if (!poses || !poses[0] || !_tdr_canvas) return;
+  var W = _tdr_canvas.width, H = _tdr_canvas.height;
+  var sx = W / (_tdr_video ? _tdr_video.videoWidth : W);
+  var sy = H / (_tdr_video ? _tdr_video.videoHeight : H);
+  // Les deux poignets
+  var wrists = ['leftWrist','rightWrist'];
+  wrists.forEach(function(name) {
+    var kp = _tsym_kp(poses, name);
+    if (!kp) return;
+    var wx = W - kp.x * sx; // miroir
+    var wy = kp.y * sy;
+    _tdr_targets.forEach(function(t) {
+      if (t.hit) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      if (Math.sqrt(dx*dx+dy*dy) < t.r + 20) {
+        t.hit = true;
+        t.hitTime = Date.now();
+        var rt = Date.now() - t.born;
+        _tdr_reactionTimes.push(rt);
+        _tdr_hits++;
+        // Score : plus vite = plus de points
+        var bonus = Math.max(0, Math.round((2000-rt)/200));
+        _tdr_score += 10 + bonus;
+        _tdr_flashHit(t);
+        _td_beep(660, 0.1, 0.1); // son court
+        if (navigator.vibrate) navigator.vibrate(30);
+        _tdr_updateScoreDisplay();
+      }
+    });
+  });
+}
+
+function _tdr_flashHit(t) {
+  if (!_tdr_ctx || !_tdr_canvas) return;
+  var ctx = _tdr_ctx;
+  ctx.save();
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = t.color;
+  ctx.beginPath();
+  ctx.arc(t.x, t.y, t.r*2, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+/* ── Drill ────────────────────────────────────────────────────── */
+function _tdr_startDrill() {
+  _tdr_running = true;
+  _tdr_score   = 0;
+  _tdr_hits    = 0;
+  _tdr_total   = 0;
+  _tdr_sec     = _tdr_duration;
+  _tdr_targets = [];
+  _tdr_reactionTimes = [];
+  _tdr_bpm = _td_metroBPM || 80;
+
+  if (_tdr_mode === 'reaction') {
+    // Spawn toutes les 1.5s
+    _tdr_spawnTarget();
+    _tdr_lastSpawn = Date.now();
+    _tdr_timer = setInterval(function() {
+      _tdr_sec--;
+      _tdr_updateScoreDisplay();
+      if (_tdr_sec <= 0) { clearInterval(_tdr_timer); _tdr_endDrill(); return; }
+      var elapsed = Date.now() - _tdr_lastSpawn;
+      var interval = _tdr_level === 'random' ? 800 + Math.random()*1200 : 1500;
+      if (elapsed >= interval) { _tdr_spawnTarget(); _tdr_lastSpawn = Date.now(); }
+    }, 1000);
+  } else {
+    // Rhythm Challenge — sync avec BPM
+    var beatMs = 60000 / _tdr_bpm;
+    if (_tdr_rMode === 'offbeat') beatMs = beatMs * 1.5;
+    var chaosBeat = 0;
+    _tdr_metroSync = setInterval(function() {
+      if (_tdr_rMode === 'chaos') {
+        chaosBeat++;
+        if (chaosBeat % 8 === 0) {
+          _tdr_bpm = Math.min(140, _tdr_bpm + 5);
+          clearInterval(_tdr_metroSync);
+          _tdr_startDrill();
+          return;
+        }
+      }
+      _tdr_spawnTarget();
+      _td_beep(880, 0.06, 0.08); // son métronome
+    }, beatMs);
+    _tdr_timer = setInterval(function() {
+      _tdr_sec--;
+      _tdr_updateScoreDisplay();
+      if (_tdr_sec <= 0) {
+        clearInterval(_tdr_timer);
+        clearInterval(_tdr_metroSync);
+        _tdr_endDrill();
+      }
+    }, 1000);
+  }
+  _tdr_status(_t('GO !','GO!'), '#2dc653');
+}
+
+function _tdr_updateScoreDisplay() {
+  var sc = document.getElementById('tdr_scoreLive');
+  var tm = document.getElementById('tdr_timeLive');
+  if (sc) sc.textContent = _tdr_score;
+  if (tm) tm.textContent = _tdr_sec + 's';
+}
+
+function _tdr_endDrill() {
+  _tdr_running = false;
+  _tdr_targets = [];
+  var avgRT = _tdr_reactionTimes.length > 0
+    ? Math.round(_tdr_reactionTimes.reduce(function(a,b){return a+b;},0) / _tdr_reactionTimes.length)
+    : 0;
+  // Afficher résultats
+  _tdr_showResults(_tdr_score, _tdr_hits, _tdr_total, avgRT);
+  _tdr_status(_t('Session terminée !','Session done!'), '#2dc653');
+  // Proposer sauvegarde
+  var btnSave = document.getElementById('tdr_btnSave');
+  if (btnSave) btnSave.style.display = 'flex';
+}
+
+function _tdr_showResults(score, hits, total, avgRT) {
+  var res = document.getElementById('tdr_results');
+  if (!res) return;
+  res.style.display = 'block';
+  var pct = total > 0 ? Math.round(hits/total*100) : 0;
+  var cls = pct >= 80 ? 'tr-hl' : pct >= 50 ? 'tr-warn' : 'tr-bad';
+  res.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">' +
+    '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">' + score + '</div><div class="tr-score-lbl">' + _t('SCORE','SCORE') + '</div></div>' +
+    '<div class="tr-score-box"><div class="tr-score-num"><span class="' + cls + '">' + pct + '%</span></div><div class="tr-score-lbl">' + _t('PRÉCISION','ACCURACY') + '</div></div>' +
+    '<div class="tr-score-box"><div class="tr-score-num">' + (avgRT > 0 ? avgRT+'ms' : '--') + '</div><div class="tr-score-lbl">' + _t('RÉACTION','REACTION') + '</div></div>' +
+    '</div>';
+}
+
+/* ── Save + History ───────────────────────────────────────────── */
+function _tdr_saveSession() {
+  var avgRT = _tdr_reactionTimes.length > 0
+    ? Math.round(_tdr_reactionTimes.reduce(function(a,b){return a+b;},0) / _tdr_reactionTimes.length) : 0;
+  var pct   = _tdr_total > 0 ? Math.round(_tdr_hits/_tdr_total*100) : 0;
+  var now   = new Date();
+  var d     = now.toLocaleDateString(window._lang==='en'?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  var modeLabel = _tdr_mode === 'rhythm' ? _t('Rythme','Rhythm') : _t('Réaction','Reaction');
+  _tdr_sessions.unshift({mode:modeLabel, score:_tdr_score, pct:pct, rt:avgRT, date:d});
+  _tr_saveProgress('dribble_reaction', {score:_tdr_score, pct:pct, rt:avgRT});
+  _tdr_renderHistory();
+  _tdr_stop();
+  var res = document.getElementById('tdr_results');
+  if (res) res.style.display = 'none';
+  var btnSave = document.getElementById('tdr_btnSave');
+  if (btnSave) btnSave.style.display = 'none';
+  _tdr_status(_t('Session sauvegardée ✅','Session saved ✅'), '#2dc653');
+}
+
+function _tdr_renderHistory() {
+  var el = document.getElementById('tdr_histList');
+  if (!el) return;
+  if (_tdr_sessions.length === 0) {
+    el.innerHTML = '<div class="tr-empty">' + _t('Aucune session','No sessions yet') + '</div>'; return;
+  }
+  el.innerHTML = _tdr_sessions.slice(0,8).map(function(s) {
+    var cls = s.pct >= 80 ? 'hi' : s.pct >= 50 ? 'mid' : 'lo';
+    return '<div class="tr-hist-item"><div class="tr-hist-left">' +
+      '<div class="tr-hi-name">🎯 ' + s.mode + '</div>' +
+      '<div class="tr-hi-meta">' + s.date + ' · ' + s.score + ' pts · ' + (s.rt||'--') + 'ms</div>' +
+      '</div><div class="tr-hist-score ' + cls + '">' + s.pct + '%</div></div>';
+  }).join('');
+}
+
+/* ── Utils ────────────────────────────────────────────────────── */
+function _tdr_status(msg, color) {
+  var el = document.getElementById('tdr_status');
+  if (el) { el.textContent = msg; el.style.color = color || '#7a8299'; }
+}
+</script>
 
 <script>
 if(typeof LANG_DATA!=='undefined'){
