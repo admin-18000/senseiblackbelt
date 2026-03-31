@@ -13770,7 +13770,7 @@ function _tsym_startRec() {
     var btn = document.getElementById('tsym_btnRec');
     if (btn) {
       var mm = Math.floor(_tsym_recSec/60), ss = _tsym_recSec%60;
-      btn.textContent = '\u23f9 ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
+      btn.textContent = '⏹ ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
         (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
     }
     if (_tsym_recSec >= _tsym_REC_LIMIT) {
@@ -13779,7 +13779,7 @@ function _tsym_startRec() {
   }, 1000);
   _tsym_updateRecBtn();
   var st = document.getElementById('tsym_status');
-  if (st) st.textContent = '\U0001f534 ' + _t('Enregistrement en cours...', 'Recording...');
+  if (st) st.textContent = '🔴 ' + _t('Enregistrement en cours...', 'Recording...');
 }
 
 function _tsym_stopRec() {
@@ -13793,10 +13793,10 @@ function _tsym_updateRecBtn() {
   var btn = document.getElementById('tsym_btnRec');
   if (!btn) return;
   if (_tsym_recActive) {
-    btn.textContent = '\u23f9 ' + _t('STOP REC','STOP REC');
+    btn.textContent = '⏹ ' + _t('STOP REC','STOP REC');
     btn.style.background = '#7a0000';
   } else {
-    btn.textContent = '\U0001f534 REC';
+    btn.textContent = '🔴 REC';
     btn.style.background = '#e63946';
   }
 }
@@ -13813,7 +13813,7 @@ function _tsym_saveBlob(blob) {
         title: 'SENSEI Symétrie',
         files: [file]
       }).then(function() {
-        if (st) { st.textContent = _t('Vidéo partagée \U0001f4f2','Video shared \U0001f4f2'); st.style.color='#2dc653'; }
+        if (st) { st.textContent = _t('Vidéo partagée 📲','Video shared 📲'); st.style.color='#2dc653'; }
       }).catch(function(e) {
         // Annulé ou non supporté → fallback ouverture blob
         if (e.name !== 'AbortError') _tsym_openBlobFallback(blob, filename);
@@ -13827,7 +13827,7 @@ function _tsym_saveBlob(blob) {
       var file2 = new File([blob], filename, {type: blob.type});
       if (navigator.canShare && navigator.canShare({files:[file2]})) {
         navigator.share({ title:'SENSEI Symétrie', files:[file2] })
-          .then(function(){ if(st){st.textContent=_t('Vidéo partagée \U0001f4f2','Video shared \U0001f4f2');st.style.color='#2dc653';} })
+          .then(function(){ if(st){st.textContent=_t('Vidéo partagée 📲','Video shared 📲');st.style.color='#2dc653';} })
           .catch(function(e){ if(e.name!=='AbortError')_tsym_downloadBlob(blob,filename,st); });
         return;
       }
@@ -13847,7 +13847,7 @@ function _tsym_downloadBlob(blob, filename, st) {
     link.download = filename;
     link.click();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
-    if (st) { st.textContent = _t('Vidéo téléchargée \U0001f4be','Video downloaded \U0001f4be'); st.style.color='#2dc653'; }
+    if (st) { st.textContent = _t('Vidéo téléchargée 💾','Video downloaded 💾'); st.style.color='#2dc653'; }
   } catch(e) {
     _tsym_openBlobFallback(blob, filename);
   }
