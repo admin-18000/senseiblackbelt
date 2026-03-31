@@ -11552,6 +11552,8 @@ window.addEventListener('resize',function(){
 
 function openTrainingTab(id, btn) {
   document.querySelectorAll('.tr-panel').forEach(function(p){ p.style.display='none'; });
+  // Arrêter l'enregistrement si on quitte sym
+  if(typeof _tsym_recActive!=='undefined'&&_tsym_recActive) _tsym_stopRec();
   var panel = document.getElementById('tr-'+id);
   if(panel) panel.style.display='block';
   document.querySelectorAll('.tr-tab').forEach(function(b){
@@ -13164,7 +13166,9 @@ function _trApplyLang() {
     else if(typeof _tsym_renderHistory==='function')_tsym_renderHistory();
     if(typeof _tr_drawProgressChart==='function')_tr_drawProgressChart('tsym_progressChart','symmetry','score','#4ecdc4');
     var bRec3=document.getElementById('tsym_btnRec');
-    if(bRec3&&bRec3.style.display!=='none')bRec3.textContent=_tsym_recActive?'⏹ '+(en?'STOP REC':'ARRÊTER REC'):'🔴 REC';
+    if(bRec3&&bRec3.style.display!=='none'){
+      bRec3.textContent=_tsym_recActive?'⏹ '+(en?'STOP REC':'ARRÊTER REC'):'🔴 REC';
+    }
     if(typeof _tsym_setMode==='function')_tsym_setMode(_tsym_mode||'dribble');
   });
 }
@@ -13646,39 +13650,236 @@ function _tsym_expandCanvas() {
   var cnt = document.getElementById('tsym_camContainer');
   if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
 }
-/* ── ENREGISTREMENT VIDÉO ─────────────────────────────────── */
-var _tsym_recorder=null,_tsym_recChunks=[],_tsym_recActive=false;
-function _tsym_toggleRec(){if(_tsym_recActive)_tsym_stopRec();else _tsym_startRec();}
-function _tsym_startRec(){
-  var cv=document.getElementById('tsym_canvas');if(!cv)return;
-  var stream=cv.captureStream?cv.captureStream(30):cv.mozCaptureStream?cv.mozCaptureStream(30):null;
-  if(!stream){alert(_t('Enregistrement non supporté','Recording not supported'));return;}
-  var types=['video/mp4;codecs=h264','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
-  var mimeType='';
-  for(var i=0;i<types.length;i++){if(typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(types[i])){mimeType=types[i];break;}}
-  try{_tsym_recorder=mimeType?new MediaRecorder(stream,{mimeType:mimeType}):new MediaRecorder(stream);}
-  catch(e){try{_tsym_recorder=new MediaRecorder(stream);}catch(e2){alert(_t('MediaRecorder non supporté','MediaRecorder not supported'));return;}}
-  _tsym_recChunks=[];
-  _tsym_recorder.ondataavailable=function(e){if(e.data&&e.data.size>0)_tsym_recChunks.push(e.data);};
-  _tsym_recorder.onstop=function(){
-    var blob=new Blob(_tsym_recChunks,{type:_tsym_recorder.mimeType||'video/webm'});
-    var url=URL.createObjectURL(blob);
-    var ext=blob.type.indexOf('mp4')>-1?'mp4':'webm';
-    var link=document.getElementById('tsym_dlLink');
-    if(link){link.href=url;link.download='SENSEI_symetrie_'+new Date().toISOString().slice(0,10)+'.'+ext;link.click();setTimeout(function(){URL.revokeObjectURL(url);},5000);}
-    _tsym_recActive=false;_tsym_recChunks=[];
-    var btn=document.getElementById('tsym_btnRec');
-    if(btn){btn.textContent='🔴 REC';btn.style.background='#e63946';}
-    var st=document.getElementById('tsym_status');
-    if(st)st.textContent=_t('Vidéo sauvegardée 📲','Video saved 📲');
-  };
-  _tsym_recorder.start(1000);_tsym_recActive=true;
-  var btn=document.getElementById('tsym_btnRec');
-  if(btn){btn.textContent='⏹ '+_t('ARRÊTER REC','STOP REC');btn.style.background='#7a0000';}
-  var st=document.getElementById('tsym_status');
-  if(st)st.textContent='🔴 '+_t('Enregistrement en cours...','Recording...');
+/* ── ENREGISTREMENT VIDÉO v2 ─────────────────────────────────
+   iOS Safari  → mp4 + navigator.share()
+   Android     → webm + navigator.share() si dispo
+   Desktop     → webm + <a download>
+   Fallback    → nouvel onglet avec instructions
+──────────────────────────────────────────────────────────── */
+var _tsym_recorder   = null;
+var _tsym_recChunks  = [];
+var _tsym_recActive  = false;
+var _tsym_recBlob    = null;
+var _tsym_recTimer   = null;
+var _tsym_recSec     = 0;
+var _tsym_REC_LIMIT  = 180; // 3 min max
+
+function _tsym_isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
-function _tsym_stopRec(){if(_tsym_recorder&&_tsym_recActive){try{_tsym_recorder.stop();}catch(e){}}}
+function _tsym_isAndroid() {
+  return /Android/.test(navigator.userAgent);
+}
+
+function _tsym_getBestMime() {
+  // iOS Safari : mp4 en priorité
+  if (_tsym_isIOS()) {
+    var iosMimes = ['video/mp4;codecs=avc1','video/mp4'];
+    for (var i=0; i<iosMimes.length; i++) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(iosMimes[i]))
+        return iosMimes[i];
+    }
+  }
+  // Ordre de préférence général
+  var mimes = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+    'video/mp4;codecs=avc1',
+    'video/mp4',
+    ''
+  ];
+  for (var j=0; j<mimes.length; j++) {
+    if (!mimes[j]) return '';
+    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mimes[j]))
+      return mimes[j];
+  }
+  return '';
+}
+
+function _tsym_toggleRec() {
+  if (_tsym_recActive) {
+    _tsym_stopRec();
+  } else {
+    _tsym_startRec();
+  }
+}
+
+function _tsym_startRec() {
+  // Vérifier support MediaRecorder
+  if (typeof MediaRecorder === 'undefined') {
+    _tsym_recError(_t(
+      'Enregistrement non supporté — mettez à jour votre navigateur',
+      'Recording not supported — please update your browser'
+    )); return;
+  }
+  var cv = document.getElementById('tsym_canvas');
+  if (!cv) return;
+  // Capturer le canvas (vidéo + squelette fusionnés)
+  var stream = null;
+  try {
+    stream = cv.captureStream ? cv.captureStream(25) :
+             cv.mozCaptureStream ? cv.mozCaptureStream(25) : null;
+  } catch(e) { stream = null; }
+  if (!stream) {
+    _tsym_recError(_t(
+      'Capture du canvas non supportée sur cet appareil',
+      'Canvas capture not supported on this device'
+    )); return;
+  }
+  var mimeType = _tsym_getBestMime();
+  try {
+    _tsym_recorder = mimeType
+      ? new MediaRecorder(stream, {mimeType: mimeType})
+      : new MediaRecorder(stream);
+  } catch(e) {
+    try { _tsym_recorder = new MediaRecorder(stream); }
+    catch(e2) {
+      _tsym_recError(_t(
+        'Impossible de démarrer l\'enregistrement',
+        'Unable to start recording'
+      )); return;
+    }
+  }
+  _tsym_recChunks = [];
+  _tsym_recBlob   = null;
+  _tsym_recSec    = 0;
+  _tsym_recorder.ondataavailable = function(e) {
+    if (e.data && e.data.size > 0) _tsym_recChunks.push(e.data);
+  };
+  _tsym_recorder.onstop = function() {
+    clearInterval(_tsym_recTimer);
+    _tsym_recBlob = new Blob(_tsym_recChunks, {
+      type: _tsym_recorder.mimeType || 'video/webm'
+    });
+    _tsym_recActive = false;
+    _tsym_recChunks = [];
+    _tsym_updateRecBtn();
+    _tsym_saveBlob(_tsym_recBlob);
+  };
+  _tsym_recorder.onerror = function(e) {
+    clearInterval(_tsym_recTimer);
+    _tsym_recError(_t('Erreur enregistrement: ','Recording error: ') + (e.error ? e.error.name : ''));
+  };
+  _tsym_recorder.start(1000);
+  _tsym_recActive = true;
+  // Timer + limite 3 min
+  _tsym_recTimer = setInterval(function() {
+    _tsym_recSec++;
+    var remaining = _tsym_REC_LIMIT - _tsym_recSec;
+    var btn = document.getElementById('tsym_btnRec');
+    if (btn) {
+      var mm = Math.floor(_tsym_recSec/60), ss = _tsym_recSec%60;
+      btn.textContent = '\u23f9 ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
+        (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+    }
+    if (_tsym_recSec >= _tsym_REC_LIMIT) {
+      _tsym_stopRec();
+    }
+  }, 1000);
+  _tsym_updateRecBtn();
+  var st = document.getElementById('tsym_status');
+  if (st) st.textContent = '\U0001f534 ' + _t('Enregistrement en cours...', 'Recording...');
+}
+
+function _tsym_stopRec() {
+  if (_tsym_recorder && _tsym_recActive) {
+    clearInterval(_tsym_recTimer);
+    try { _tsym_recorder.stop(); } catch(e) {}
+  }
+}
+
+function _tsym_updateRecBtn() {
+  var btn = document.getElementById('tsym_btnRec');
+  if (!btn) return;
+  if (_tsym_recActive) {
+    btn.textContent = '\u23f9 ' + _t('STOP REC','STOP REC');
+    btn.style.background = '#7a0000';
+  } else {
+    btn.textContent = '\U0001f534 REC';
+    btn.style.background = '#e63946';
+  }
+}
+
+function _tsym_saveBlob(blob) {
+  var st = document.getElementById('tsym_status');
+  var ext = blob.type.indexOf('mp4') > -1 ? 'mp4' : 'webm';
+  var filename = 'SENSEI_symetrie_' + new Date().toISOString().slice(0,10) + '.' + ext;
+  // iOS → navigator.share() avec File
+  if (_tsym_isIOS() && navigator.share && typeof File !== 'undefined') {
+    try {
+      var file = new File([blob], filename, {type: blob.type});
+      navigator.share({
+        title: 'SENSEI Symétrie',
+        files: [file]
+      }).then(function() {
+        if (st) { st.textContent = _t('Vidéo partagée \U0001f4f2','Video shared \U0001f4f2'); st.style.color='#2dc653'; }
+      }).catch(function(e) {
+        // Annulé ou non supporté → fallback ouverture blob
+        if (e.name !== 'AbortError') _tsym_openBlobFallback(blob, filename);
+      });
+      return;
+    } catch(e) { /* fallback ci-dessous */ }
+  }
+  // Android / Desktop avec share API
+  if (navigator.share && typeof File !== 'undefined' && _tsym_isAndroid()) {
+    try {
+      var file2 = new File([blob], filename, {type: blob.type});
+      if (navigator.canShare && navigator.canShare({files:[file2]})) {
+        navigator.share({ title:'SENSEI Symétrie', files:[file2] })
+          .then(function(){ if(st){st.textContent=_t('Vidéo partagée \U0001f4f2','Video shared \U0001f4f2');st.style.color='#2dc653';} })
+          .catch(function(e){ if(e.name!=='AbortError')_tsym_downloadBlob(blob,filename,st); });
+        return;
+      }
+    } catch(e) {}
+  }
+  // Desktop → téléchargement direct
+  _tsym_downloadBlob(blob, filename, st);
+}
+
+function _tsym_downloadBlob(blob, filename, st) {
+  try {
+    var url = URL.createObjectURL(blob);
+    var link = document.getElementById('tsym_dlLink');
+    if (!link) { link = document.createElement('a'); link.id='tsym_dlLink'; document.body.appendChild(link); }
+    link.style.display = 'none';
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+    if (st) { st.textContent = _t('Vidéo téléchargée \U0001f4be','Video downloaded \U0001f4be'); st.style.color='#2dc653'; }
+  } catch(e) {
+    _tsym_openBlobFallback(blob, filename);
+  }
+}
+
+function _tsym_openBlobFallback(blob, filename) {
+  // Ouvrir dans nouvel onglet avec instructions
+  var url = URL.createObjectURL(blob);
+  var w = window.open(url, '_blank');
+  var st = document.getElementById('tsym_status');
+  if (w) {
+    if (st) st.textContent = _t(
+      'Vidéo ouverte — appui long pour sauvegarder',
+      'Video opened — long press to save'
+    );
+  } else {
+    if (st) st.textContent = _t(
+      'Appuie sur partager puis "Enregistrer la vidéo"',
+      'Tap share then "Save Video"'
+    );
+  }
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+}
+
+function _tsym_recError(msg) {
+  var st = document.getElementById('tsym_status');
+  if (st) { st.textContent = '\u274c ' + msg; st.style.color = '#e63946'; }
+  _tsym_recActive = false;
+  clearInterval(_tsym_recTimer);
+  _tsym_updateRecBtn();
+}
+
 function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
