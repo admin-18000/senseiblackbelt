@@ -456,6 +456,151 @@ body.unlocked .sensei-only{display:revert !important}
 <style>
 .combo-layout { grid-template-columns: 1fr 1fr; }
 @media(max-width:768px){ .combo-layout{ grid-template-columns:1fr !important } }
+
+
+/* TRAINING MODE CSS */
+/* ══ TRAINING MODE CSS ══ */
+:root {
+  --tr-gold:#f5c518; --tr-green:#2dc653; --tr-red:#e63946;
+  --tr-dark:#080a0f; --tr-dark2:#0d1117; --tr-dark3:#131820;
+  --tr-border:#1e2535; --tr-muted:#7a8299; --tr-text:#f0f2f8;
+}
+
+/* Cards */
+.tr-card {
+  width:100%;background:var(--dark2);border:1px solid var(--border);
+  border-radius:14px;padding:clamp(14px,3vw,18px) 16px;margin-bottom:14px;
+}
+.tr-card-title {
+  font-size:clamp(10px,2.2vw,12px);letter-spacing:2px;color:var(--gold);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;font-family:var(--font-cond);font-weight:700;
+}
+
+/* Video thumbnails */
+.tr-card .vid-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;
+  scrollbar-width:none;-ms-overflow-style:none;}
+.tr-card .vid-scroll::-webkit-scrollbar{display:none;}
+.tr-card .vid-thumb{flex:0 0 auto;width:clamp(100px,28vw,130px);cursor:pointer;
+  border-radius:10px;border:2px solid #1e2535;overflow:hidden;
+  transition:all .2s;background:#131820;
+  position:static;padding-bottom:0;height:auto;}
+.tr-card .vid-thumb:hover,.tr-card .vid-thumb.selected{border-color:#f5c518;}
+.tr-card .vid-thumb.selected{box-shadow:0 0 0 2px rgba(245,197,24,.27);}
+.tr-card .vid-thumb img{position:static;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;display:block;transform:none;transition:none;}
+.tr-card .vid-thumb.vertical{width:clamp(80px,22vw,110px);}
+.tr-card .vid-thumb.vertical img{aspect-ratio:9/16;}
+.tr-card .vid-thumb-title{font-size:clamp(8px,1.8vw,9px);color:#7a8299;
+  padding:4px 6px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tr-card .vid-thumb.selected .vid-thumb-title{color:#f5c518;}
+
+/* Buttons */
+.tr-btn {
+  flex:1;padding:clamp(11px,2.8vw,14px);border-radius:10px;border:none;cursor:pointer;
+  font-family:var(--font-cond);font-weight:700;font-size:clamp(10px,2.3vw,12px);
+  letter-spacing:1px;transition:all .15s;user-select:none;text-transform:uppercase;
+}
+.tr-btn:active { transform:scale(.97); }
+.tr-btn-start { background:#2dc653;color:#080a0f; }
+.tr-btn-stop  { background:#e63946;color:#fff; }
+.tr-btn-save  { background:var(--gold);color:#080a0f; }
+.tr-btn-reset { background:var(--border);color:var(--muted);flex:.45; }
+.tr-btn-make  { background:#2dc653;color:#080a0f; }
+.tr-btn-miss  { background:#e63946;color:#fff; }
+.tr-btn:disabled { opacity:.35;cursor:default;transform:none !important; }
+
+.tr-btn-tap {
+  flex:2;padding:clamp(14px,3.5vw,18px);border-radius:12px;
+  border:2px solid rgba(245,197,24,.35);background:rgba(245,197,24,.06);
+  color:var(--gold);font-family:var(--font-cond);font-weight:700;
+  font-size:clamp(12px,3vw,15px);letter-spacing:2px;cursor:pointer;
+  transition:all .1s;user-select:none;text-transform:uppercase;
+}
+.tr-btn-tap:active { background:rgba(245,197,24,.18);transform:scale(.97); }
+
+.tr-btn-error {
+  padding:clamp(10px,2.5vw,13px) 14px;border-radius:10px;
+  border:1px solid rgba(230,57,70,.4);background:rgba(230,57,70,.08);
+  color:#e63946;font-family:var(--font-cond);font-weight:700;
+  font-size:clamp(10px,2.3vw,12px);letter-spacing:1px;cursor:pointer;
+  transition:all .1s;user-select:none;text-transform:uppercase;
+}
+.tr-btn-error:active { background:rgba(230,57,70,.2);transform:scale(.97); }
+
+.tr-btn-rep {
+  width:100%;padding:clamp(14px,3.5vw,18px);border-radius:12px;
+  border:2px solid rgba(45,198,83,.4);background:rgba(45,198,83,.08);
+  color:#2dc653;font-family:var(--font-cond);font-weight:700;
+  font-size:clamp(13px,3vw,16px);letter-spacing:2px;cursor:pointer;
+  transition:all .1s;user-select:none;text-transform:uppercase;display:block;
+}
+.tr-btn-rep:active { background:rgba(45,198,83,.2);transform:scale(.97); }
+
+/* Timer */
+.tr-timer-big {
+  font-size:clamp(40px,10vw,58px);font-weight:bold;color:var(--gold);
+  letter-spacing:4px;line-height:1;text-align:center;
+}
+.tr-timer-big.running { color:#2dc653; }
+.tr-timer-big.done    { color:var(--muted); }
+
+/* Score boxes */
+.tr-score-box {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:10px;padding:clamp(8px,2vw,12px) 6px;text-align:center;
+}
+.tr-score-val { font-size:clamp(16px,4vw,20px);font-weight:bold;color:var(--gold); }
+.tr-score-lbl { font-size:clamp(6px,1.4vw,8px);color:var(--muted);letter-spacing:.5px;margin-top:3px; }
+
+/* Zone boxes */
+.tr-zone-box {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:10px;padding:10px 6px;text-align:center;transition:border-color .2s;
+}
+.tr-zone-box.sel { border-color:var(--gold); }
+.tr-zb-name { font-size:clamp(7px,1.6vw,9px);color:var(--muted);letter-spacing:.5px;margin-bottom:3px; }
+.tr-zb-pct  { font-size:clamp(14px,3.5vw,18px);font-weight:bold; }
+.tr-zb-exp  { font-size:clamp(7px,1.6vw,9px);color:var(--muted);margin-top:2px; }
+.tr-zb-att  { font-size:clamp(7px,1.6vw,9px);color:var(--muted); }
+
+/* Mode buttons */
+.tr-mode-btn {
+  border:1px solid var(--border);border-radius:12px;
+  padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s;
+}
+.tr-mode-btn:hover { border-color:var(--gold); }
+.tr-mode-btn.sel   { border-color:var(--gold); }
+
+/* Drill options */
+.tr-drill-opt {
+  background:var(--dark3);border:1px solid var(--border);border-radius:10px;
+  padding:12px 10px;cursor:pointer;transition:all .2s;text-align:center;
+}
+.tr-drill-opt.sel { border-color:var(--gold);background:rgba(245,197,24,.06); }
+
+/* Insight */
+.tr-insight { font-size:clamp(10px,2.2vw,12px);color:var(--muted);line-height:1.8; }
+.tr-hl   { color:#2dc653;font-weight:bold; }
+.tr-warn { color:var(--gold); }
+.tr-bad  { color:#e63946; }
+
+/* History */
+.tr-hist-item {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:10px;padding:12px;display:flex;justify-content:space-between;
+  align-items:center;margin-bottom:8px;
+}
+.tr-hist-left .tr-hi-name { font-size:clamp(10px,2.2vw,12px);color:var(--text);font-weight:bold; }
+.tr-hist-left .tr-hi-meta { font-size:clamp(8px,1.8vw,9px);color:var(--muted);margin-top:3px; }
+.tr-hist-score { font-size:clamp(16px,4vw,20px);font-weight:bold; }
+.tr-hist-score.hi  { color:#2dc653; }
+.tr-hist-score.mid { color:var(--gold); }
+.tr-hist-score.lo  { color:#e63946; }
+.tr-empty { text-align:center;padding:20px;color:var(--muted);font-size:11px; }
+
+/* Override CSS app pour vid-thumb dans Training */
+.tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
+.tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
 </style>
 </head>
 <body>
@@ -469,6 +614,7 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="nav-links">
     <button class="nav-btn active" onclick="showSection('home',this)" data-i18n="nav_home">Home</button>
     <button class="nav-btn" onclick="showSection('belts',this)" data-i18n="nav_belts">Belts</button>
+    <button class="nav-btn" onclick="showSection('training',this)" data-i18n="nav_training">🏋️ Training</button>
     <button class="nav-btn" onclick="showSection('ballhandling',this)" data-i18n="nav_ballhandling">Ball Handling</button>
     <button class="nav-btn" onclick="showSection('shooting',this)" data-i18n="nav_shooting">Shooting</button>
     <button class="nav-btn" onclick="showSection('defense',this)" data-i18n="nav_defense">Defense</button>
@@ -961,6 +1107,272 @@ body.unlocked .sensei-only{display:revert !important}
 </div>
 
 <!-- ══ BALL HANDLING ══ -->
+
+<!-- ══════════════════════════════════════════════════════════
+     TRAINING MODE — 5 modules SENSEI
+     ══════════════════════════════════════════════════════════ -->
+<div id="s-training" class="section">
+<div style="max-width:860px;margin:0 auto">
+  <div class="sec-title">TRAINING <span>MODE</span></div>
+  <div class="sec-sub">Dribble · Shot Chart · Agility · Strength · Challenges</div>
+  <div class="sec-line"></div>
+
+  <!-- ONGLETS -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px">
+    <button onclick="openTrainingTab('dribble',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold)">🏀 Dribble</button>
+    <button onclick="openTrainingTab('shot',this)"    class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">🎯 Shot Chart</button>
+    <button onclick="openTrainingTab('agility',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">⚡ Agility</button>
+    <button onclick="openTrainingTab('sc',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">💪 Strength</button>
+    <button onclick="openTrainingTab('ch',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">🏆 Challenges</button>
+  </div>
+
+<div id="tr-dribble" class="tr-panel" style="display:block;max-width:480px;margin:0 auto;padding:0">
+  <div class="tr-card">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
+    <div class="vid-scroll" id="td_vidScroll"></div>
+    <div id="td_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="td_ytFrame" width="100%" style="aspect-ratio:16/9;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="td_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0;letter-spacing:1px"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">⏱ SESSION</div>
+    <div style="text-align:center;padding:8px 0 14px">
+      <div class="tr-timer-big" id="td_timerBig">00:00</div>
+      <div id="td_timerSub" style="font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px">Appuie sur START</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start" id="td_btnStart" onclick="_td_start()">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-stop"  id="td_btnStop"  onclick="_td_stop()" style="display:none">⏹ STOP</button>
+      <button class="tr-btn tr-btn-save"  id="td_btnSave"  onclick="_td_save()" style="display:none">💾 SAUVEGARDER</button>
+      <button class="tr-btn tr-btn-reset" onclick="_td_reset()">↺</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:8px">
+      <button class="tr-btn-tap" id="td_btnTap" onclick="_td_tap()" ontouchstart="">🤜 TAP DRIBBLE</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <button class="tr-btn-error" onclick="_td_addError()" ontouchstart="">⚠ ERREUR</button>
+        <div id="td_errCount" style="font-size:28px;font-weight:bold;color:var(--red);line-height:1.2">0</div>
+      </div>
+    </div>
+    <div id="td_tapCount" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:4px">0 dribbles</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📊 RYTHME DU DRIBBLE</div>
+    <canvas id="td_rhythmCv" width="448" height="90" style="width:100%;border-radius:8px;background:#080a0f;display:block;margin-top:8px"></canvas>
+    <div style="font-size:9px;color:var(--muted);margin-top:6px;text-align:center">Transformée de Fourier — régularité du signal</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">🎯 SCORE</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+      <div class="tr-score-box"><div class="tr-score-val" id="td_sDur">0s</div><div class="tr-score-lbl">DURÉE</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="td_sDrib">0</div><div class="tr-score-lbl">DRIBBLES</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="td_sErr">0</div><div class="tr-score-lbl">ERREURS</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="td_sCons" style="color:var(--muted)">--</div><div class="tr-score-lbl">CONSIST.</div></div>
+    </div>
+    <div style="margin-bottom:4px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between">
+      <span>Consistance du rythme</span><span id="td_consPct">--%</span>
+    </div>
+    <div style="height:8px;background:var(--dark3);border-radius:4px;overflow:hidden">
+      <div id="td_consFill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:width .8s;width:0%"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="td_insightText">Lance une session pour voir l'analyse...</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📅 HISTORIQUE</div>
+    <div id="td_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+</div>
+<div id="tr-shot" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+  <div class="tr-card">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL SHOOTING</div>
+    <div class="vid-scroll" id="tsc_vidScroll"></div>
+    <div id="tsc_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="tsc_ytFrame" width="100%" style="aspect-ratio:9/16;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="tsc_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">🏀 TERRAIN — TAPE UNE ZONE</div>
+    <div style="position:relative;width:100%;background:var(--dark3);border-radius:10px;overflow:hidden;cursor:crosshair;margin-bottom:10px"
+      onclick="(function(e){var r=this.getBoundingClientRect();_tsc_onCourtClick((e.clientX-r.left)*(448/r.width),(e.clientY-r.top)*(360/r.height));}).call(this,event)"
+      ontouchstart="(function(e){e.preventDefault();var r=this.getBoundingClientRect(),t=e.touches[0];_tsc_onCourtClick((t.clientX-r.left)*(448/r.width),(t.clientY-r.top)*(360/r.height));}).call(this,event)">
+      <canvas id="tsc_court" width="448" height="360" style="display:block;width:100%;height:auto"></canvas>
+    </div>
+    <div id="tsc_zoneInd" style="text-align:center;font-size:12px;color:var(--muted);min-height:22px;margin-bottom:10px">Sélectionne une zone sur le terrain</div>
+    <div style="display:flex;gap:10px">
+      <button class="tr-btn tr-btn-make" id="tsc_btnMake" onclick="_tsc_record(true)"  disabled>✅ RENTRÉ</button>
+      <button class="tr-btn tr-btn-miss" id="tsc_btnMiss" onclick="_tsc_record(false)" disabled>❌ RATÉ</button>
+      <button class="tr-btn tr-btn-reset" onclick="_tsc_resetAll()">↺</button>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📊 STATS PAR ZONE</div>
+    <div id="tsc_zonesGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--dark3);font-size:11px">
+      <span>TOTAL</span><span id="tsc_totalVal" style="color:var(--gold);font-weight:bold">0 tirs — 0%</span>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="tsc_insightText">Lance tes premiers tirs pour voir l'analyse...</div>
+  </div>
+</div>
+<div id="tr-agility" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+  <div class="tr-card">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL HAND-EYE</div>
+    <div class="vid-scroll" id="tag_vidScroll"></div>
+    <div id="tag_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="tag_ytFrame" width="100%" style="aspect-ratio:9/16;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="tag_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">🎮 CHOISIS TON MODE</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div class="tr-mode-btn sel" id="tag_btnModeReact" onclick="_tag_setMode('react')" style="background:rgba(245,197,24,.1);color:var(--gold)">
+        <div style="font-size:26px;margin-bottom:6px">⚡</div>
+        <div style="font-size:11px;font-weight:bold;letter-spacing:1px">RÉACTION</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:3px">Temps de réaction</div>
+      </div>
+      <div class="tr-mode-btn" id="tag_btnModeDrill" onclick="_tag_setMode('drill')" style="background:var(--dark3);color:var(--muted)">
+        <div style="font-size:26px;margin-bottom:6px">🎯</div>
+        <div style="font-size:11px;font-weight:bold;letter-spacing:1px">DRILL TIMER</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:3px">Chrono + reps</div>
+      </div>
+    </div>
+  </div>
+  <div id="tag_secReact">
+    <div class="tr-card">
+      <div class="tr-card-title">⚡ TEST DE RÉACTION</div>
+      <div id="tag_reactArea" onclick="_tag_reactTap()" ontouchstart=""
+        style="width:100%;border-radius:14px;background:#131820;border:2px solid var(--dark3);
+               display:flex;flex-direction:column;align-items:center;justify-content:center;
+               padding:32px 16px;cursor:pointer;user-select:none;min-height:180px;margin-bottom:12px;transition:all .15s">
+        <div id="tag_reactEmoji" style="font-size:52px;margin-bottom:10px">👁️</div>
+        <div id="tag_reactMsg" style="font-size:16px;font-weight:bold;letter-spacing:2px;text-align:center">TAP POUR COMMENCER</div>
+        <div id="tag_reactTime" style="display:none;font-size:44px;font-weight:bold;color:var(--gold);margin-top:8px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+        <div class="tr-score-box"><div class="tr-score-val" id="tag_rAvg">—</div><div class="tr-score-lbl">MOY. (ms)</div></div>
+        <div class="tr-score-box"><div class="tr-score-val" id="tag_rBest">—</div><div class="tr-score-lbl">MEILLEUR</div></div>
+        <div class="tr-score-box"><div class="tr-score-val" id="tag_rCount">0</div><div class="tr-score-lbl">ESSAIS</div></div>
+        <div class="tr-score-box"><div class="tr-score-val" id="tag_rLevel" style="color:var(--muted)">—</div><div class="tr-score-lbl">NIVEAU</div></div>
+      </div>
+      <button class="tr-btn tr-btn-reset" style="max-width:160px" onclick="_tag_resetReact()">↺ RESET</button>
+    </div>
+  </div>
+  <div id="tag_secDrill" style="display:none">
+    <div class="tr-card">
+      <div class="tr-card-title">🎯 DRILL TIMER</div>
+      <div id="tag_drillSelect" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;margin:8px 0 12px">
+        <canvas id="tag_timerCircle" width="140" height="140" style="display:block"></canvas>
+        <div class="tr-timer-big" id="tag_dTimerBig" style="margin-top:-8px">00:00</div>
+        <div id="tag_dTimerSub" style="font-size:11px;color:var(--muted);letter-spacing:1px">Appuie sur START</div>
+      </div>
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:52px;font-weight:bold" id="tag_dRepsNum">0</div>
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px">RÉPÉTITIONS</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <button class="tr-btn tr-btn-start" id="tag_dBtnStart" onclick="_tag_dStart()">▶ DÉMARRER</button>
+        <button class="tr-btn tr-btn-stop"  id="tag_dBtnStop"  onclick="_tag_dStop()" style="display:none">⏹ STOP</button>
+        <button class="tr-btn tr-btn-save"  id="tag_dBtnSave"  onclick="_tag_dSave()" style="display:none">💾 SAUVEGARDER</button>
+        <button class="tr-btn tr-btn-reset" onclick="_tag_dReset()">↺</button>
+      </div>
+      <button class="tr-btn-rep" onclick="_tag_dRep()" ontouchstart="">✅ RÉP RÉUSSIE</button>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="tag_insightText">Lance une session...</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📅 HISTORIQUE</div>
+    <div id="tag_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+</div>
+<div id="tr-sc" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+  <div class="tr-card">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL SC</div>
+    <div class="vid-scroll" id="tsc_scVidScroll"></div>
+    <div id="tsc_scVidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="tsc_scYtFrame" width="100%" style="aspect-ratio:9/16;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="tsc_scVidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">⏱ SESSION</div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin:8px 0 12px">
+      <canvas id="tsc_scTimerCircle" width="140" height="140" style="display:block"></canvas>
+      <div class="tr-timer-big" id="tsc_scTimerBig" style="margin-top:-8px">00:00</div>
+      <div id="tsc_scTimerSub" style="font-size:11px;color:var(--muted);letter-spacing:1px">Appuie sur START</div>
+    </div>
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:52px;font-weight:bold" id="tsc_scRepsNum">0</div>
+      <div style="font-size:9px;color:var(--muted);letter-spacing:1px">REPS</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start" id="tsc_scBtnStart" onclick="_tsc_scStart()">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-stop"  id="tsc_scBtnStop"  onclick="_tsc_scStop()" style="display:none">⏹ STOP</button>
+      <button class="tr-btn tr-btn-save"  id="tsc_scBtnSave"  onclick="_tsc_scSave()" style="display:none">💾 SAUVEGARDER</button>
+      <button class="tr-btn tr-btn-reset" onclick="_tsc_scReset()">↺</button>
+    </div>
+    <button class="tr-btn-rep" onclick="_tsc_scRep()" ontouchstart="">✅ RÉP RÉUSSIE</button>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="tsc_scInsight">Lance une session...</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📅 HISTORIQUE</div>
+    <div id="tsc_scHistList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+</div>
+<div id="tr-ch" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+  <div class="tr-card">
+    <div class="tr-card-title">🎬 CHOISIS TON CHALLENGE</div>
+    <div class="vid-scroll" id="tch_vidScroll"></div>
+    <div id="tch_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="tch_ytFrame" width="100%" style="aspect-ratio:16/9;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="tch_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">🏆 TENTATIVE</div>
+    <div id="tch_status" style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:14px;min-height:24px">Sélectionne un challenge et lance une tentative</div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start"   id="tch_btnStart"   onclick="_tch_startAttempt()">▶ NOUVELLE TENTATIVE</button>
+      <button class="tr-btn tr-btn-make"    id="tch_btnSuccess" onclick="_tch_result(true)"   style="display:none">✅ RÉUSSI</button>
+      <button class="tr-btn tr-btn-miss"    id="tch_btnFail"    onclick="_tch_result(false)"  style="display:none">❌ RATÉ</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="tr-btn" onclick="_tch_saveSession()" style="background:var(--gold);color:var(--dark);flex:1">💾 SAUVEGARDER SESSION</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="tr-score-box"><div class="tr-score-val" id="tch_statTotal">0</div><div class="tr-score-lbl">ESSAIS</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="tch_statWins" style="color:var(--green)">0</div><div class="tr-score-lbl">RÉUSSITES</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="tch_statRate" style="color:var(--muted)">—</div><div class="tr-score-lbl">TAUX</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="tch_statStreak">0</div><div class="tr-score-lbl">STREAK</div></div>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="tch_insightText">Lance ta première tentative !</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📅 HISTORIQUE</div>
+    <div id="tch_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+</div>
+
+</div>
+</div><!-- /s-training -->
+
+
 <div id="s-ballhandling" class="section">
   <div style="max-width:1100px;margin:0 auto">
     <div class="sec-title" data-i18n="sec_bh_title">BALL <span>HANDLING</span></div>
@@ -10908,6 +11320,1174 @@ window.applyLangVisuSci=function(){_fns.forEach(function(d){if(d.fn._t!==undefin
 var _prevAL=window.applyLang;
 if(typeof _prevAL==='function'){window.applyLang=function(lang){_prevAL(lang);window.applyLangVisuSci();};}
 })();
+</script>
+
+<script>
+/* TRAINING MODE */
+
+function openTrainingTab(id, btn) {
+  document.querySelectorAll('.tr-panel').forEach(function(p){ p.style.display='none'; });
+  var panel = document.getElementById('tr-'+id);
+  if(panel) panel.style.display='block';
+  document.querySelectorAll('.tr-tab').forEach(function(b){
+    b.style.background='var(--dark3)';b.style.color='var(--muted)';b.style.border='none';
+  });
+  if(btn){btn.style.background='rgba(245,197,24,.1)';btn.style.color='var(--gold)';btn.style.border='1px solid rgba(245,197,24,.5)';}
+  if(id==='dribble')  initTraining_d();
+  if(id==='shot')     initTraining_sc2();
+  if(id==='agility')  initTraining_ag2();
+  if(id==='sc')       initTraining_sc();
+  if(id==='ch')       initTraining_ch();
+}
+
+var _trInitDone=false;
+(function(){
+  var _o=window.showSection;
+  window.showSection=function(id,btn){
+    if(typeof _o==='function') _o.call(this,id,btn);
+    if(id==='training'&&!_trInitDone){
+      _trInitDone=true;
+      setTimeout(function(){initTraining_d();},80);
+    }
+  };
+})();
+
+/* DRIBBLE */
+/* ══ DRIBBLE TRACKER ══ */
+var _initTraining_d_done = false;
+function initTraining_d() {
+  if (_initTraining_d_done) return;
+  _initTraining_d_done = true;
+  _td_renderVids();
+  _td_drawRhythm();
+  _td_renderHistory();
+}
+
+function _t(fr, en) { return window._lang === 'en' ? en : fr; }
+
+var _td_VIDEOS = [
+  {id:'ttwQywcjF6s',title:'Drill #1'},{id:'BkMXA0Z8bLc',title:'Drill #2'},
+  {id:'tLthFdKJu9k',title:'Drill #3'},{id:'m1gctvzz6nc',title:'Drill #4'},
+  {id:'5WBIegdWthc',title:'Drill #5'},{id:'rrfc2hyF-hE',title:'Drill #6'},
+  {id:'7nQoX6DHV5c',title:'Drill #7'},{id:'6cbf8nMskmE',title:'Drill #8'},
+  {id:'gIeDne-5mUE',title:'Drill #9'},{id:'TnuT9lk7Fwk',title:'Drill #10'},
+  {id:'NacCJX1KFAc',title:'Drill #11'},{id:'l5xJnrnOEvk',title:'Drill #12'},
+  {id:'Em-ga58-bhY',title:'Drill #13'},{id:'-SYIMzIua14',title:'Drill #14'},
+  {id:'i5jFkZG_YfY',title:'Drill #15'},{id:'OyCu5RrZUaU',title:'Drill #16'},
+  {id:'HHc5cNSjuBw',title:'Drill #17'}
+];
+var _td_selVid=null, _td_running=false, _td_sec=0, _td_int=null;
+var _td_taps=[], _td_errors=0, _td_finished=false, _td_sessions=[];
+
+function _td_renderVids() {
+  var el = document.getElementById('td_vidScroll');
+  if (!el) return;
+  el.innerHTML = _td_VIDEOS.map(function(v,i) {
+    var sel = _td_selVid === i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _td_selectVid(i) {
+  _td_selVid = i;
+  var v = _td_VIDEOS[i];
+  var p = document.getElementById('td_vidPlayer');
+  var fr = document.getElementById('td_ytFrame');
+  if (!p || !fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  document.getElementById('td_vidLabel').textContent = v.title;
+  _td_renderVids();
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _td_start() {
+  if (_td_running) return;
+  _td_running = true; _td_finished = false;
+  _td_sec = 0; _td_taps = []; _td_errors = 0;
+  var ec = document.getElementById('td_errCount');
+  var tc = document.getElementById('td_tapCount');
+  if (ec) ec.textContent = '0';
+  if (tc) tc.textContent = '0 ' + _t('dribbles','dribbles');
+  document.getElementById('td_btnStart').style.display = 'none';
+  document.getElementById('td_btnStop').style.display = 'flex';
+  document.getElementById('td_btnSave').style.display = 'none';
+  document.getElementById('td_timerSub').textContent = _t('Session en cours...','Session running...');
+  document.getElementById('td_timerBig').className = 'tr-timer-big running';
+  _td_int = setInterval(function() { _td_sec++; _td_updateTimer(); _td_drawRhythm(); _td_updateScores(); }, 1000);
+}
+
+function _td_stop() {
+  if (!_td_running) return;
+  _td_running = false; _td_finished = true;
+  clearInterval(_td_int);
+  document.getElementById('td_btnStop').style.display = 'none';
+  document.getElementById('td_btnStart').style.display = 'flex';
+  document.getElementById('td_btnSave').style.display = 'flex';
+  document.getElementById('td_timerSub').textContent = _t('Terminé — sauvegarder ?','Done — save?');
+  document.getElementById('td_timerBig').className = 'tr-timer-big done';
+  _td_computeConsistency();
+  _td_updateInsight();
+}
+
+function _td_reset() {
+  _td_running = false; _td_finished = false;
+  clearInterval(_td_int);
+  _td_sec = 0; _td_taps = []; _td_errors = 0;
+  document.getElementById('td_timerBig').textContent = '00:00';
+  document.getElementById('td_timerBig').className = 'tr-timer-big';
+  document.getElementById('td_timerSub').textContent = _t('Appuie sur START','Press START');
+  document.getElementById('td_btnStart').style.display = 'flex';
+  document.getElementById('td_btnStart').innerHTML = '&#9654; ' + _t('DÉMARRER','START');
+  document.getElementById('td_btnStop').style.display = 'none';
+  document.getElementById('td_btnSave').style.display = 'none';
+  document.getElementById('td_errCount').textContent = '0';
+  document.getElementById('td_tapCount').textContent = '0 '+_t('dribbles','dribbles');
+  document.getElementById('td_consPct').textContent = '--%';
+  document.getElementById('td_consFill').style.width = '0%';
+  document.getElementById('td_sCons').textContent = '--';
+  document.getElementById('td_sCons').style.color = 'var(--tr-muted)';
+  document.getElementById('td_insightText').innerHTML = '<span>'+_t('Lance une session pour voir l\'analyse...','Start a session to see the analysis...')+'</span>';
+  _td_drawRhythm();
+  _td_updateScores();
+}
+
+function _td_tap() {
+  if (!_td_running) return;
+  _td_taps.push(Date.now());
+  var tc = document.getElementById('td_tapCount');
+  if (tc) tc.textContent = _td_taps.length + ' ' + _t('dribbles','dribbles');
+  var btn = document.getElementById('td_btnTap');
+  if (btn) { btn.style.background='rgba(245,197,24,.2)'; setTimeout(function(){btn.style.background='rgba(245,197,24,.06)';},80); }
+  _td_drawRhythm();
+  _td_updateScores();
+}
+
+function _td_addError() {
+  if (!_td_running) return;
+  _td_errors++;
+  var el = document.getElementById('td_errCount');
+  if (el) { el.textContent = _td_errors; el.style.color='#ff6b6b'; setTimeout(function(){el.style.color='var(--tr-red)';},200); }
+  _td_updateScores();
+}
+
+function _td_updateTimer() {
+  var m = Math.floor(_td_sec/60).toString().padStart(2,'0');
+  var s = (_td_sec%60).toString().padStart(2,'0');
+  var el = document.getElementById('td_timerBig');
+  if (el) el.textContent = m+':'+s;
+}
+
+function _td_updateScores() {
+  var m=Math.floor(_td_sec/60).toString().padStart(2,'0');
+  var s=(_td_sec%60).toString().padStart(2,'0');
+  var d=document.getElementById('td_sDur'); if(d)d.textContent=m+':'+s;
+  var dr=document.getElementById('td_sDrib'); if(dr)dr.textContent=_td_taps.length;
+  var er=document.getElementById('td_sErr'); if(er)er.textContent=_td_errors;
+}
+
+function _td_drawRhythm() {
+  var cv = document.getElementById('td_rhythmCv');
+  if (!cv) return;
+  var ctx = cv.getContext('2d'), W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
+  if (_td_taps.length < 2) {
+    ctx.fillStyle='#1e2535'; ctx.font='11px monospace'; ctx.textAlign='center';
+    ctx.fillText(_t('Tape le rythme pendant le drill...','Tap rhythm during the drill...'),W/2,H/2+4);
+    return;
+  }
+  var intervals=[];
+  for(var i=1;i<_td_taps.length;i++) intervals.push(_td_taps[i]-_td_taps[i-1]);
+  var avg=intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
+  var bpm=Math.round(60000/avg);
+  var refY=H*0.5;
+  ctx.strokeStyle='rgba(245,197,24,.2)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(10,refY); ctx.lineTo(W-10,refY); ctx.stroke();
+  ctx.setLineDash([]);
+  var bw=Math.min(20,(W-24)/(intervals.length+1));
+  intervals.forEach(function(iv,i){
+    var x=12+(i+1)*(W-24)/(intervals.length+1);
+    var dev=(iv-avg)/avg;
+    var barH=Math.min(H*0.38,Math.abs(dev)*H*2.2);
+    var col=Math.abs(dev)<0.12?'#2dc653':Math.abs(dev)<0.26?'#f5c518':'#e63946';
+    ctx.fillStyle=col+'aa'; ctx.fillRect(x-bw/2,refY-(dev>0?barH:0),bw,Math.max(2,barH));
+    ctx.strokeStyle=col; ctx.lineWidth=1; ctx.strokeRect(x-bw/2,refY-(dev>0?barH:0),bw,Math.max(2,barH));
+  });
+  ctx.fillStyle='#f5c518'; ctx.font='bold 11px monospace'; ctx.textAlign='right';
+  ctx.fillText(bpm+' BPM',W-8,14);
+  ctx.textAlign='left';
+}
+
+function _td_computeConsistency() {
+  if (_td_taps.length < 3) return 0;
+  var intervals=[];
+  for(var i=1;i<_td_taps.length;i++) intervals.push(_td_taps[i]-_td_taps[i-1]);
+  var avg=intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
+  var variance=intervals.reduce(function(a,b){return a+Math.pow(b-avg,2);},0)/intervals.length;
+  var cv=Math.sqrt(variance)/avg;
+  var score=Math.max(0,Math.min(100,Math.round((1-cv)*100)));
+  var color=score>=75?'var(--tr-green)':score>=50?'var(--tr-gold)':'var(--tr-red)';
+  var cp=document.getElementById('td_consPct'); if(cp)cp.textContent=score+'%';
+  var cf=document.getElementById('td_consFill'); if(cf)cf.style.width=score+'%';
+  var cs=document.getElementById('td_sCons');
+  if(cs){cs.textContent=score+'%'; cs.style.color=color;}
+  return score;
+}
+
+function _td_updateInsight() {
+  var el = document.getElementById('td_insightText');
+  if (!el) return;
+  if (_td_taps.length < 3) { el.innerHTML='<span>'+_t('Lance une session...','Start a session...')+'</span>'; return; }
+  var cons = _td_computeConsistency();
+  var intervals=[];
+  for(var i=1;i<_td_taps.length;i++) intervals.push(_td_taps[i]-_td_taps[i-1]);
+  var avg=intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
+  var bpm=Math.round(60000/avg);
+  var bpmCls=bpm>=90?'tr-hl':bpm>=70?'tr-warn':'tr-bad';
+  var bpmLbl=bpm>=90?_t('excellent','excellent'):bpm>=70?_t('bon rythme','good rhythm'):_t('accélère','speed up');
+  var consCls=cons>=75?'tr-hl':cons>=50?'tr-warn':'tr-bad';
+  var consLbl=cons>=75?_t('automatisé 🧠','automated 🧠'):cons>=50?_t('en cours','in progress'):_t('travaille la régularité','work on regularity');
+  el.innerHTML='<span class="'+bpmCls+'">'+bpm+' BPM — '+bpmLbl+'</span><br>'
+    +'<span class="'+consCls+'">'+cons+'% — '+consLbl+'</span>';
+}
+
+function _td_save() {
+  var cons = _td_computeConsistency();
+  var name = _td_selVid!==null?_td_VIDEOS[_td_selVid].title:'—';
+  var intervals=[];
+  for(var i=1;i<_td_taps.length;i++) intervals.push(_td_taps[i]-_td_taps[i-1]);
+  var bpm=_td_taps.length>1?Math.round(60000/(intervals.reduce(function(a,b){return a+b;},0)/intervals.length)):0;
+  var now=new Date();
+  var d=now.toLocaleDateString(window._lang==='en'?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  var m=Math.floor(_td_sec/60).toString().padStart(2,'0');
+  var s=(_td_sec%60).toString().padStart(2,'0');
+  _td_sessions.unshift({name:name,dur:m+':'+s,taps:_td_taps.length,errors:_td_errors,cons:cons,bpm:bpm,date:d});
+  _td_renderHistory();
+  _td_reset();
+}
+
+function _td_renderHistory() {
+  var el = document.getElementById('td_histList');
+  if (!el) return;
+  if (_td_sessions.length===0) { el.innerHTML='<div class="tr-empty">'+_t('Aucune session','No sessions yet')+'</div>'; return; }
+  el.innerHTML = _td_sessions.map(function(s){
+    var cls=s.cons>=75?'hi':s.cons>=50?'mid':'lo';
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'
+      +'<div class="tr-hi-name">🏀 '+s.name+'</div>'
+      +'<div class="tr-hi-meta">'+s.date+' · '+s.dur+' · '+s.taps+' drb · '+s.bpm+' BPM</div>'
+      +'</div><div class="tr-hist-score '+cls+'">'+s.cons+'%</div></div>';
+  }).join('');
+}
+
+
+/* SHOT CHART */
+/* ══ SHOT CHART ══ */
+var _initTraining_sc2_done = false;
+var _tsc_cv = null, _tsc_ctx = null;
+var _tsc_CW = 448, _tsc_CH = 360;
+
+function initTraining_sc2() {
+  if (_initTraining_sc2_done) return;
+  _initTraining_sc2_done = true;
+  _tsc_cv = document.getElementById('tsc_court');
+  _tsc_ctx = _tsc_cv ? _tsc_cv.getContext('2d') : null;
+  _tsc_renderVids();
+  _tsc_updateGrid();
+  _tsc_drawCourt();
+  _tsc_updateInsight();
+  (function loop(){_tsc_drawCourt();requestAnimationFrame(loop);})();
+}
+
+var _tsc_VIDEOS = [
+  {id:'RvyX7fXgqiM',title:'Shooting #1'},{id:'l9cbjvK8pN4',title:'Shooting #3'},
+  {id:'bPHoOLEELy8',title:'Shooting #4'},{id:'eU4FfpLk0FY',title:'Shooting #6'},
+  {id:'gaGkEYR0kIk',title:'Shooting #7'},{id:'a8TylCXbvUw',title:'Shooting #9'}
+];
+var _tsc_selVid = null;
+
+var _tsc_ZONES = [
+  {id:'layup',   pts:2,cx:.50,cy:.85,rx:.13,ry:.08},
+  {id:'paintL',  pts:2,cx:.36,cy:.73,rx:.10,ry:.09},
+  {id:'paintR',  pts:2,cx:.64,cy:.73,rx:.10,ry:.09},
+  {id:'midL',    pts:2,cx:.24,cy:.58,rx:.11,ry:.10},
+  {id:'midC',    pts:2,cx:.50,cy:.52,rx:.13,ry:.09},
+  {id:'midR',    pts:2,cx:.76,cy:.58,rx:.11,ry:.10},
+  {id:'c3L',     pts:3,cx:.07,cy:.60,rx:.08,ry:.16},
+  {id:'wingL',   pts:3,cx:.17,cy:.32,rx:.12,ry:.12},
+  {id:'top3',    pts:3,cx:.50,cy:.22,rx:.16,ry:.11},
+  {id:'wingR',   pts:3,cx:.83,cy:.32,rx:.12,ry:.12},
+  {id:'c3R',     pts:3,cx:.93,cy:.60,rx:.08,ry:.16}
+];
+var _tsc_stats = {};
+(function(){_tsc_ZONES.forEach(function(z){_tsc_stats[z.id]={made:0,total:0};});})();
+var _tsc_selZone = null, _tsc_lastShot = null;
+
+var _tsc_ZONE_NAMES_FR = {layup:'LAY-UP',paintL:'PEINTURE G',paintR:'PEINTURE D',midL:'MI-DIST G',midC:'MI-DIST CTR',midR:'MI-DIST D',c3L:'COIN 3 G',wingL:'AILE 3 G',top3:'TOP 3',wingR:'AILE 3 D',c3R:'COIN 3 D'};
+var _tsc_ZONE_NAMES_EN = {layup:'LAY-UP',paintL:'PAINT L',paintR:'PAINT R',midL:'MID L',midC:'MID CTR',midR:'MID R',c3L:'CORNER 3 L',wingL:'WING 3 L',top3:'TOP 3',wingR:'WING 3 R',c3R:'CORNER 3 R'};
+function _tsc_zname(id){return (window._lang==='en'?_tsc_ZONE_NAMES_EN:_tsc_ZONE_NAMES_FR)[id]||id;}
+
+function _tsc_renderVids() {
+  var el = document.getElementById('tsc_vidScroll');
+  if (!el) return;
+  el.innerHTML = _tsc_VIDEOS.map(function(v,i){
+    var sel = _tsc_selVid===i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tsc_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _tsc_selectVid(i) {
+  _tsc_selVid = i;
+  var v = _tsc_VIDEOS[i];
+  var p = document.getElementById('tsc_vidPlayer');
+  var fr = document.getElementById('tsc_ytFrame');
+  if (!p||!fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  document.getElementById('tsc_vidLabel').textContent = v.title;
+  _tsc_renderVids();
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _tsc_onCourtClick(x, y) {
+  for (var i=0;i<_tsc_ZONES.length;i++) {
+    var z=_tsc_ZONES[i];
+    var dx=(x/_tsc_CW-z.cx)/z.rx, dy=(y/_tsc_CH-z.cy)/z.ry;
+    if(dx*dx+dy*dy<=1){ _tsc_selZone=z; break; }
+  }
+  if (!_tsc_selZone) return;
+  var ind = document.getElementById('tsc_zoneInd');
+  if (ind) ind.innerHTML = (window._lang==='en'?'Zone: ':'Zone : ')+'<span style="color:var(--tr-gold)">'+_tsc_zname(_tsc_selZone.id)+' ('+_tsc_selZone.pts+'pts)</span>';
+  document.getElementById('tsc_btnMake').disabled = false;
+  document.getElementById('tsc_btnMiss').disabled = false;
+  _tsc_updateGrid();
+  _tsc_drawCourt();
+}
+
+function _tsc_record(made) {
+  if (!_tsc_selZone) return;
+  _tsc_stats[_tsc_selZone.id].total++;
+  if(made) _tsc_stats[_tsc_selZone.id].made++;
+  _tsc_lastShot={z:_tsc_selZone,made:made,t:Date.now()};
+  _tsc_updateGrid();
+  _tsc_updateInsight();
+}
+
+function _tsc_resetAll() {
+  _tsc_ZONES.forEach(function(z){_tsc_stats[z.id]={made:0,total:0};});
+  _tsc_selZone=null; _tsc_lastShot=null;
+  document.getElementById('tsc_btnMake').disabled=true;
+  document.getElementById('tsc_btnMiss').disabled=true;
+  var ind=document.getElementById('tsc_zoneInd');
+  if(ind) ind.textContent=_t('Sélectionne une zone sur le terrain','Select a zone on the court');
+  _tsc_updateGrid(); _tsc_drawCourt(); _tsc_updateInsight();
+}
+
+function _tsc_drawCourt() {
+  if (!_tsc_ctx) return;
+  var ctx=_tsc_ctx, W=_tsc_CW, H=_tsc_CH;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,W,H);
+  _tsc_ZONES.forEach(function(z){
+    var s=_tsc_stats[z.id], pct=s.total>0?s.made/s.total:-1;
+    var fill=s.total===0?'rgba(30,37,53,.55)':pct>=0.5?'rgba(45,198,83,'+(0.15+Math.min(1,(pct-.5)*2)*.35)+')':'rgba(230,57,70,'+(0.15+Math.min(1,(.5-pct)*2)*.35)+')';
+    var isSel=_tsc_selZone&&_tsc_selZone.id===z.id;
+    var px=z.cx*W,py=z.cy*H,rx=z.rx*W,ry=z.ry*H;
+    ctx.save(); ctx.beginPath(); ctx.ellipse(px,py,rx,ry,0,0,Math.PI*2);
+    ctx.fillStyle=fill; ctx.fill();
+    ctx.strokeStyle=isSel?'#f5c518':(s.total>0?(z.pts===3?'#e6394666':'#f5c51866'):'#1e253588');
+    ctx.lineWidth=isSel?2.5:1; ctx.stroke(); ctx.restore();
+    ctx.fillStyle=isSel?'#f5c518':(s.total>0?'#f0f2f8':'#7a8299');
+    ctx.textAlign='center';
+    if(s.total>0){
+      ctx.font='bold '+Math.min(12,rx*.28)+'px monospace';
+      ctx.fillText(Math.round(pct*100)+'%',px,py+1);
+      ctx.font='8px monospace'; ctx.fillStyle='#7a8299';
+      ctx.fillText('E='+(pct*z.pts).toFixed(2),px,py+12);
+    } else {
+      ctx.font='bold '+Math.min(10,rx*.26)+'px monospace';
+      ctx.fillText(z.pts+'pts',px,py+3);
+    }
+  });
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(16,H-14); ctx.lineTo(W-16,H-14); ctx.stroke();
+  ctx.beginPath(); ctx.rect(W*.32,H*.58,W*.36,H*.4); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W*.5,H*.58,W*.18,Math.PI,0,true); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W*.5,H*.88,W*.38,Math.PI+0.36,-0.36); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*.14,H*.88); ctx.lineTo(W*.14,H-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*.86,H*.88); ctx.lineTo(W*.86,H-14); ctx.stroke();
+  ctx.beginPath(); ctx.arc(W*.5,H*.88,W*.022,0,Math.PI*2);
+  ctx.strokeStyle='#f5c518'; ctx.lineWidth=2; ctx.stroke();
+  if(_tsc_lastShot){
+    var age=(Date.now()-_tsc_lastShot.t)/700;
+    if(age<1){
+      ctx.globalAlpha=1-age; ctx.fillStyle=_tsc_lastShot.made?'#2dc653':'#e63946';
+      ctx.font='bold 18px monospace'; ctx.textAlign='center';
+      ctx.fillText(_tsc_lastShot.made?'✓':'✗',_tsc_lastShot.z.cx*W,(_tsc_lastShot.z.cy-_tsc_lastShot.z.ry-.04)*H);
+      ctx.globalAlpha=1;
+    }
+  }
+  ctx.textAlign='left';
+}
+
+function _tsc_updateGrid() {
+  var el=document.getElementById('tsc_zonesGrid');
+  if(!el)return;
+  var totalM=0,totalA=0;
+  el.innerHTML=_tsc_ZONES.map(function(z){
+    var s=_tsc_stats[z.id]; totalM+=s.made; totalA+=s.total;
+    var pct=s.total>0?Math.round(s.made/s.total*100):'—';
+    var exp=s.total>0?(s.made/s.total*z.pts).toFixed(2):'—';
+    var col=s.total===0?'var(--tr-muted)':s.made/s.total>=0.5?'var(--tr-green)':'var(--tr-red)';
+    var isSel=_tsc_selZone&&_tsc_selZone.id===z.id;
+    return '<div class="tr-zone-box'+(isSel?' sel':'')+'"><div class="tr-zb-name">'+_tsc_zname(z.id)+'</div>'
+      +'<div class="tr-zb-pct" style="color:'+col+'">'+pct+(s.total>0?'%':'')+'</div>'
+      +'<div class="tr-zb-exp">E='+exp+'</div>'
+      +'<div class="tr-zb-att">'+s.total+' '+(window._lang==='en'?'shots':'tirs')+'</div></div>';
+  }).join('');
+  var tp=totalA>0?Math.round(totalM/totalA*100):0;
+  var tv=document.getElementById('tsc_totalVal');
+  if(tv) tv.textContent=totalA+' '+(window._lang==='en'?'shots':'tirs')+' — '+tp+'%';
+}
+
+function _tsc_updateInsight() {
+  var el=document.getElementById('tsc_insightText');
+  if(!el)return;
+  var totalA=_tsc_ZONES.reduce(function(a,z){return a+_tsc_stats[z.id].total;},0);
+  if(totalA<3){el.innerHTML='<span>'+_t('Lance tes premiers tirs pour voir l\'analyse...','Take your first shots to see the analysis...')+'</span>';return;}
+  var best=null,worst=null,bestExp=-1,worstExp=99;
+  _tsc_ZONES.forEach(function(z){
+    var s=_tsc_stats[z.id];
+    if(s.total>=2){var exp=s.made/s.total*z.pts;if(exp>bestExp){bestExp=exp;best=z;}if(exp<worstExp){worstExp=exp;worst=z;}}
+  });
+  var html='';
+  if(best) html+='<span class="tr-hl">🏆 '+_t('Zone forte: ','Best zone: ')+_tsc_zname(best.id)+'</span> — E='+bestExp.toFixed(2)+'<br>';
+  if(worst&&worst!==best) html+='<span class="tr-bad">⚠️ '+_t('Zone faible: ','Weak zone: ')+_tsc_zname(worst.id)+'</span> — E='+worstExp.toFixed(2)+'<br>';
+  if(totalA>=5){
+    var expG=_tsc_ZONES.reduce(function(acc,z){var s=_tsc_stats[z.id];return acc+(s.total>0?(s.made/s.total*z.pts)*(s.total/totalA):0);},0);
+    html+='<br>'+_t('Espérance globale: ','Global efficiency: ')+'<span class="'+(expG>1?'tr-hl':expG>0.8?'tr-warn':'tr-bad')+'">'+expG.toFixed(2)+' pts/'+_t('tir','shot')+'</span>';
+  }
+  el.innerHTML=html||'<span>'+_t('Continue...','Keep going...')+'</span>';
+}
+
+
+/* AGILITY */
+/* ══ AGILITY TRACKER ══ */
+var _initTraining_ag2_done = false;
+function initTraining_ag2() {
+  if (_initTraining_ag2_done) return;
+  _initTraining_ag2_done = true;
+  _tag_renderVids();
+  _tag_buildDrills();
+  _tag_drawCircle(0);
+  _tag_renderHistory();
+}
+
+var _tag_VIDEOS = [
+  {id:'xV0XuRGHsxo',title:'Hand-Eye #3'},{id:'KWmdHJ2A8pg',title:'Hand-Eye #4'},
+  {id:'x4mdV_OXHYU',title:'Hand-Eye #5'},{id:'fYJJpR9tn1U',title:'Hand-Eye #6'},
+  {id:'--xTNgPOLTw',title:'Hand-Eye #7'},{id:'M8INmDf2Np4',title:'Hand-Eye #8'},
+  {id:'TuU5BzcS1JA',title:'Hand-Eye #9'},{id:'bdzQwgSUjJk',title:'Hand-Eye #10'},
+  {id:'j_nrRxCCKek',title:'Hand-Eye #11'},{id:'sGcDY564gKE',title:'Hand-Eye #12'},
+  {id:'ZsyYuAx5d1U',title:'Hand-Eye #13'},{id:'vzbnTzUqAzQ',title:'Hand-Eye #14'},
+  {id:'0Mk9lefAW58',title:'Hand-Eye #15'}
+];
+var _tag_selVid = null;
+
+var _tag_DRILLS_FR = [
+  {icon:'🎾',name:'BALLES TENNIS',obj:'Réflexes',dur:30},
+  {icon:'⚡',name:'REACTION STICK',obj:'Temps de réaction',dur:30},
+  {icon:'📦',name:'CÔNES',obj:'Changements direction',dur:45},
+  {icon:'🪜',name:'ÉCHELLE',obj:'Rythme des pieds',dur:30},
+  {icon:'🦘',name:'JUMP SPOTS',obj:'Explosivité',dur:20},
+  {icon:'🔁',name:'SHUFFLE',obj:'Footwork défensif',dur:30}
+];
+var _tag_DRILLS_EN = [
+  {icon:'🎾',name:'TENNIS BALLS',obj:'Reflexes',dur:30},
+  {icon:'⚡',name:'REACTION STICK',obj:'Reaction time',dur:30},
+  {icon:'📦',name:'CONES',obj:'Change of direction',dur:45},
+  {icon:'🪜',name:'LADDER',obj:'Foot rhythm',dur:30},
+  {icon:'🦘',name:'JUMP SPOTS',obj:'Explosiveness',dur:20},
+  {icon:'🔁',name:'SHUFFLE',obj:'Defensive footwork',dur:30}
+];
+function _tag_drills(){return window._lang==='en'?_tag_DRILLS_EN:_tag_DRILLS_FR;}
+
+/* Mode */
+var _tag_mode = 'react';
+/* Reaction */
+var _tag_reactState='idle', _tag_reactTO=null, _tag_reactStart=null, _tag_reactTimes=[];
+/* Drill */
+var _tag_dSel=0, _tag_dRun=false, _tag_dSec=0, _tag_dInt=null, _tag_dReps=0, _tag_sessions=[];
+
+function _tag_renderVids() {
+  var el=document.getElementById('tag_vidScroll');
+  if(!el)return;
+  el.innerHTML=_tag_VIDEOS.map(function(v,i){
+    var sel=_tag_selVid===i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tag_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _tag_selectVid(i) {
+  _tag_selVid=i; var v=_tag_VIDEOS[i];
+  var p=document.getElementById('tag_vidPlayer'); var fr=document.getElementById('tag_ytFrame');
+  if(!p||!fr)return;
+  p.style.display='block'; fr.src='https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  document.getElementById('tag_vidLabel').textContent=v.title;
+  _tag_renderVids(); p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _tag_setMode(m) {
+  _tag_mode=m;
+  document.getElementById('tag_secReact').style.display=m==='react'?'block':'none';
+  document.getElementById('tag_secDrill').style.display=m==='drill'?'block':'none';
+  document.getElementById('tag_btnModeReact').style.background=m==='react'?'rgba(245,197,24,.1)':'var(--tr-dark3)';
+  document.getElementById('tag_btnModeReact').style.color=m==='react'?'var(--tr-gold)':'var(--tr-muted)';
+  document.getElementById('tag_btnModeDrill').style.background=m==='drill'?'rgba(245,197,24,.1)':'var(--tr-dark3)';
+  document.getElementById('tag_btnModeDrill').style.color=m==='drill'?'var(--tr-gold)':'var(--tr-muted)';
+}
+
+/* REACTION */
+function _tag_reactTap() {
+  if(_tag_reactState==='idle'){
+    _tag_reactState='waiting';
+    var area=document.getElementById('tag_reactArea');
+    area.style.background='#1a0808'; area.style.borderColor='var(--tr-red)';
+    document.getElementById('tag_reactEmoji').textContent='🔴';
+    document.getElementById('tag_reactMsg').textContent=_t('ATTENDS...','WAIT...');
+    document.getElementById('tag_reactTime').style.display='none';
+    _tag_reactTO=setTimeout(_tag_showSignal,1500+Math.random()*2500);
+  } else if(_tag_reactState==='waiting'){
+    clearTimeout(_tag_reactTO); _tag_reactState='idle';
+    var area=document.getElementById('tag_reactArea');
+    area.style.background='#131820'; area.style.borderColor='var(--tr-border)';
+    document.getElementById('tag_reactEmoji').textContent='😬';
+    document.getElementById('tag_reactMsg').textContent=_t('TROP TÔT !','TOO EARLY!');
+    setTimeout(function(){
+      document.getElementById('tag_reactEmoji').textContent='👁️';
+      document.getElementById('tag_reactMsg').textContent=_t('TAP POUR COMMENCER','TAP TO START');
+    },1500);
+  } else if(_tag_reactState==='go'){
+    var rt=Date.now()-_tag_reactStart;
+    _tag_reactTimes.push(rt); _tag_reactState='result';
+    _tag_showResult(rt);
+  } else if(_tag_reactState==='result'){
+    _tag_reactState='idle';
+    var area=document.getElementById('tag_reactArea');
+    area.style.background='#131820'; area.style.borderColor='var(--tr-border)';
+    document.getElementById('tag_reactEmoji').textContent='👁️';
+    document.getElementById('tag_reactMsg').textContent=_t('TAP POUR COMMENCER','TAP TO START');
+    document.getElementById('tag_reactTime').style.display='none';
+  }
+}
+
+function _tag_showSignal() {
+  _tag_reactState='go'; _tag_reactStart=Date.now();
+  var area=document.getElementById('tag_reactArea');
+  area.style.background='#081a08'; area.style.borderColor='var(--tr-green)';
+  document.getElementById('tag_reactEmoji').textContent='🟢';
+  document.getElementById('tag_reactMsg').textContent=_t('TAP MAINTENANT !','TAP NOW!');
+}
+
+function _tag_showResult(rt) {
+  var area=document.getElementById('tag_reactArea');
+  area.style.background='#0d1117'; area.style.borderColor='var(--tr-gold)';
+  document.getElementById('tag_reactEmoji').textContent=rt<250?'🚀':rt<350?'⚡':rt<450?'👍':'😤';
+  document.getElementById('tag_reactMsg').textContent=rt<250?'ELITE!':rt<300?'EXCELLENT':rt<350?_t('BON','GOOD'):rt<450?_t('MOYEN','AVERAGE'):_t('LENT','SLOW');
+  var tel=document.getElementById('tag_reactTime');
+  tel.textContent=rt+' ms'; tel.style.display='block';
+  tel.style.color=rt<250?'var(--tr-green)':rt<350?'var(--tr-gold)':'var(--tr-red)';
+  _tag_updateReactStats(); _tag_updateInsight();
+}
+
+function _tag_updateReactStats() {
+  if(_tag_reactTimes.length===0)return;
+  var avg=Math.round(_tag_reactTimes.reduce(function(a,b){return a+b;},0)/_tag_reactTimes.length);
+  var best=Math.min.apply(null,_tag_reactTimes);
+  var col=avg<300?'var(--tr-green)':avg<400?'var(--tr-gold)':'var(--tr-red)';
+  var lvl=avg<250?'ELITE':avg<300?'PRO':avg<350?_t('BON','GOOD'):avg<450?_t('MOYEN','AVG'):_t('LENT','SLOW');
+  var ra=document.getElementById('tag_rAvg'); if(ra){ra.textContent=avg;ra.style.color=col;}
+  var rb=document.getElementById('tag_rBest'); if(rb)rb.textContent=best;
+  var rc=document.getElementById('tag_rCount'); if(rc)rc.textContent=_tag_reactTimes.length;
+  var rl=document.getElementById('tag_rLevel'); if(rl){rl.textContent=lvl;rl.style.color=col;}
+}
+
+function _tag_resetReact() {
+  clearTimeout(_tag_reactTO); _tag_reactState='idle'; _tag_reactTimes=[];
+  var area=document.getElementById('tag_reactArea');
+  if(area){area.style.background='#131820';area.style.borderColor='var(--tr-border)';}
+  var re=document.getElementById('tag_reactEmoji'); if(re)re.textContent='👁️';
+  var rm=document.getElementById('tag_reactMsg'); if(rm)rm.textContent=_t('TAP POUR COMMENCER','TAP TO START');
+  var rt=document.getElementById('tag_reactTime'); if(rt)rt.style.display='none';
+  ['tag_rAvg','tag_rBest','tag_rLevel'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='—';});
+  var rc=document.getElementById('tag_rCount'); if(rc)rc.textContent='0';
+  _tag_updateInsight();
+}
+
+/* DRILL */
+function _tag_buildDrills() {
+  var el=document.getElementById('tag_drillSelect');
+  if(!el)return;
+  var drills=_tag_drills();
+  el.innerHTML=drills.map(function(d,i){
+    return '<div class="tr-drill-opt'+(i===_tag_dSel?' sel':'')+'" onclick="_tag_pickDrill('+i+')">'
+      +'<div style="font-size:22px">'+d.icon+'</div>'
+      +'<div style="font-size:10px;font-weight:bold;letter-spacing:.5px">'+d.name+'</div>'
+      +'<div style="font-size:8px;color:var(--tr-muted)">'+d.obj+'</div></div>';
+  }).join('');
+}
+
+function _tag_pickDrill(i){_tag_dSel=i;_tag_buildDrills();_tag_dReset();}
+
+function _tag_dStart() {
+  if(_tag_dRun)return;
+  _tag_dRun=true;_tag_dSec=0;_tag_dReps=0;
+  document.getElementById('tag_dRepsNum').textContent='0';
+  document.getElementById('tag_dBtnStart').style.display='none';
+  document.getElementById('tag_dBtnStop').style.display='flex';
+  document.getElementById('tag_dBtnSave').style.display='none';
+  document.getElementById('tag_dTimerSub').textContent=_t('Session en cours...','Session running...');
+  document.getElementById('tag_dTimerBig').className='tr-timer-big running';
+  _tag_dInt=setInterval(function(){_tag_dSec++;_tag_dUpdateTimer();},1000);
+}
+
+function _tag_dStop() {
+  if(!_tag_dRun)return;
+  _tag_dRun=false;clearInterval(_tag_dInt);
+  document.getElementById('tag_dBtnStop').style.display='none';
+  document.getElementById('tag_dBtnStart').style.display='flex';
+  document.getElementById('tag_dBtnSave').style.display='flex';
+  document.getElementById('tag_dTimerSub').textContent=_t('Terminé — sauvegarder ?','Done — save?');
+  document.getElementById('tag_dTimerBig').className='tr-timer-big done';
+  _tag_updateInsight();
+}
+
+function _tag_dReset() {
+  _tag_dRun=false;clearInterval(_tag_dInt);_tag_dSec=0;_tag_dReps=0;
+  document.getElementById('tag_dTimerBig').textContent='00:00';
+  document.getElementById('tag_dTimerBig').className='tr-timer-big';
+  document.getElementById('tag_dTimerSub').textContent=_t('Appuie sur START','Press START');
+  document.getElementById('tag_dBtnStart').style.display='flex';
+  document.getElementById('tag_dBtnStop').style.display='none';
+  document.getElementById('tag_dBtnSave').style.display='none';
+  document.getElementById('tag_dRepsNum').textContent='0';
+  _tag_drawCircle(0);
+}
+
+function _tag_dRep() {
+  if(!_tag_dRun)return;
+  _tag_dReps++;
+  var el=document.getElementById('tag_dRepsNum');
+  if(el){el.textContent=_tag_dReps;el.style.color='var(--tr-green)';setTimeout(function(){el.style.color='var(--tr-text)';},150);}
+}
+
+function _tag_dUpdateTimer() {
+  var m=Math.floor(_tag_dSec/60).toString().padStart(2,'0');
+  var s=(_tag_dSec%60).toString().padStart(2,'0');
+  document.getElementById('tag_dTimerBig').textContent=m+':'+s;
+  _tag_drawCircle(_tag_dSec/(_tag_drills()[_tag_dSel].dur||30));
+}
+
+function _tag_dSave() {
+  var d=_tag_drills()[_tag_dSel];
+  var rpm=_tag_dSec>0?Math.round(_tag_dReps/(_tag_dSec/60)):0;
+  var now=new Date();
+  var dt=now.toLocaleDateString(window._lang==='en'?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  var score=Math.min(100,Math.round((rpm/20)*100));
+  _tag_sessions.unshift({name:d.icon+' '+d.name,dur:_tag_dSec,reps:_tag_dReps,rpm:rpm,score:score,date:dt});
+  _tag_renderHistory();_tag_dReset();
+}
+
+function _tag_drawCircle(prog) {
+  var cv=document.getElementById('tag_timerCircle');
+  if(!cv)return;
+  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=58;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='var(--tr-border)';ctx.lineWidth=8;
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);ctx.stroke();
+  if(prog>0){
+    ctx.strokeStyle=prog<0.6?'var(--tr-green)':prog<0.9?'var(--tr-gold)':'var(--tr-red)';
+    ctx.lineWidth=8;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);ctx.stroke();
+  }
+}
+
+function _tag_renderHistory() {
+  var el=document.getElementById('tag_histList');
+  if(!el)return;
+  if(_tag_sessions.length===0){el.innerHTML='<div class="tr-empty">'+_t('Aucune session','No sessions yet')+'</div>';return;}
+  el.innerHTML=_tag_sessions.map(function(s){
+    var cls=s.score>=75?'hi':s.score>=50?'mid':'lo';
+    var m=Math.floor(s.dur/60).toString().padStart(2,'0'),sec=(s.dur%60).toString().padStart(2,'0');
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'
+      +'<div class="tr-hi-name">'+s.name+'</div>'
+      +'<div class="tr-hi-meta">'+s.date+' · '+m+':'+sec+' · '+s.reps+' reps · '+s.rpm+' r/min</div>'
+      +'</div><div class="tr-hist-score '+cls+'">'+s.score+'%</div></div>';
+  }).join('');
+}
+
+function _tag_updateInsight() {
+  var el=document.getElementById('tag_insightText');
+  if(!el)return;
+  if(_tag_mode==='react'){
+    if(_tag_reactTimes.length===0){el.innerHTML='<span>'+_t('Lance une tentative...','Start an attempt...')+'</span>';return;}
+    var avg=Math.round(_tag_reactTimes.reduce(function(a,b){return a+b;},0)/_tag_reactTimes.length);
+    var cls=avg<300?'tr-hl':avg<400?'tr-warn':'tr-bad';
+    var lbl=avg<250?_t('Réaction élite — plasticité neuronale optimale 🧠','Elite reaction — optimal neural plasticity 🧠')
+      :avg<300?_t('Niveau pro','Pro level'):avg<350?_t('Bon niveau','Good level')
+      :avg<450?_t('Niveau moyen','Average'):_t('Travaille les réflexes','Work on reflexes');
+    el.innerHTML='<span class="'+cls+'">'+avg+' ms — '+lbl+'</span>';
+  } else {
+    if(_tag_dSec<3){el.innerHTML='<span>'+_t('Lance une session...','Start a session...')+'</span>';return;}
+    var rpm=_tag_dSec>0?Math.round(_tag_dReps/(_tag_dSec/60)):0;
+    var cls2=rpm>=15?'tr-hl':rpm>=10?'tr-warn':'tr-bad';
+    var lbl2=rpm>=15?_t('Explosivité excellente 🔥','Excellent explosiveness 🔥')
+      :rpm>=10?_t('Bon rythme','Good pace'):_t('Ralentis et travaille la forme','Slow down and work on form');
+    el.innerHTML='<span class="'+cls2+'">'+rpm+' reps/min — '+lbl2+'</span>';
+  }
+}
+
+
+/* STRENGTH */
+/* ══ STRENGTH & CONDITIONING ══ */
+var _initTraining_sc_done = false;
+function initTraining_sc() {
+  if (_initTraining_sc_done) return;
+  _initTraining_sc_done = true;
+  _tsc_renderScVids();
+  _tsc_scDrawCircle(0);
+  _tsc_scRenderHistory();
+}
+
+var _tsc_SC_VIDS = [
+  {id:'5v6kVdAqbOc',title:'SC #1'},
+  {id:'P4_hDNmsrgs',title:'SC #2'},
+  {id:'CGbtfK7oBEY',title:'SC #3'}
+];
+var _tsc_scSelVid=null, _tsc_scRun=false, _tsc_scSec=0, _tsc_scInt=null;
+var _tsc_scReps=0, _tsc_scSessions=[];
+
+function _tsc_renderScVids() {
+  var el=document.getElementById('tsc_scVidScroll');
+  if(!el)return;
+  el.innerHTML=_tsc_SC_VIDS.map(function(v,i){
+    var sel=_tsc_scSelVid===i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tsc_scSelectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _tsc_scSelectVid(i) {
+  _tsc_scSelVid=i;var v=_tsc_SC_VIDS[i];
+  var p=document.getElementById('tsc_scVidPlayer');var fr=document.getElementById('tsc_scYtFrame');
+  if(!p||!fr)return;
+  p.style.display='block';fr.src='https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  document.getElementById('tsc_scVidLabel').textContent=v.title;
+  _tsc_renderScVids();p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _tsc_scStart() {
+  if(_tsc_scRun)return;
+  _tsc_scRun=true;_tsc_scSec=0;_tsc_scReps=0;
+  document.getElementById('tsc_scRepsNum').textContent='0';
+  document.getElementById('tsc_scBtnStart').style.display='none';
+  document.getElementById('tsc_scBtnStop').style.display='flex';
+  document.getElementById('tsc_scBtnSave').style.display='none';
+  document.getElementById('tsc_scTimerSub').textContent=_t('Session en cours...','Session running...');
+  document.getElementById('tsc_scTimerBig').className='tr-timer-big running';
+  _tsc_scInt=setInterval(function(){_tsc_scSec++;_tsc_scUpdateTimer();},1000);
+}
+
+function _tsc_scStop() {
+  if(!_tsc_scRun)return;
+  _tsc_scRun=false;clearInterval(_tsc_scInt);
+  document.getElementById('tsc_scBtnStop').style.display='none';
+  document.getElementById('tsc_scBtnStart').style.display='flex';
+  document.getElementById('tsc_scBtnSave').style.display='flex';
+  document.getElementById('tsc_scTimerSub').textContent=_t('Terminé — sauvegarder ?','Done — save?');
+  document.getElementById('tsc_scTimerBig').className='tr-timer-big done';
+  _tsc_scUpdateInsight();
+}
+
+function _tsc_scReset() {
+  _tsc_scRun=false;clearInterval(_tsc_scInt);_tsc_scSec=0;_tsc_scReps=0;
+  document.getElementById('tsc_scTimerBig').textContent='00:00';
+  document.getElementById('tsc_scTimerBig').className='tr-timer-big';
+  document.getElementById('tsc_scTimerSub').textContent=_t('Appuie sur START','Press START');
+  document.getElementById('tsc_scBtnStart').style.display='flex';
+  document.getElementById('tsc_scBtnStop').style.display='none';
+  document.getElementById('tsc_scBtnSave').style.display='none';
+  document.getElementById('tsc_scRepsNum').textContent='0';
+  _tsc_scDrawCircle(0);
+}
+
+function _tsc_scRep() {
+  if(!_tsc_scRun)return;
+  _tsc_scReps++;
+  var el=document.getElementById('tsc_scRepsNum');
+  if(el){el.textContent=_tsc_scReps;el.style.color='var(--tr-green)';setTimeout(function(){el.style.color='var(--tr-text)';},150);}
+}
+
+function _tsc_scUpdateTimer() {
+  var m=Math.floor(_tsc_scSec/60).toString().padStart(2,'0');
+  var s=(_tsc_scSec%60).toString().padStart(2,'0');
+  var el=document.getElementById('tsc_scTimerBig');if(el)el.textContent=m+':'+s;
+  _tsc_scDrawCircle(_tsc_scSec/60);
+}
+
+function _tsc_scDrawCircle(prog) {
+  var cv=document.getElementById('tsc_scTimerCircle');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=58;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='var(--tr-border)';ctx.lineWidth=8;
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);ctx.stroke();
+  if(prog>0){
+    ctx.strokeStyle=prog<0.6?'var(--tr-green)':prog<0.9?'var(--tr-gold)':'var(--tr-red)';
+    ctx.lineWidth=8;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);ctx.stroke();
+  }
+}
+
+function _tsc_scSave() {
+  var name=_tsc_scSelVid!==null?_tsc_SC_VIDS[_tsc_scSelVid].title:'—';
+  var rpm=_tsc_scSec>0?Math.round(_tsc_scReps/(_tsc_scSec/60)):0;
+  var now=new Date();
+  var d=now.toLocaleDateString(window._lang==='en'?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  _tsc_scSessions.unshift({name:name,dur:_tsc_scSec,reps:_tsc_scReps,rpm:rpm,date:d});
+  _tsc_scRenderHistory();_tsc_scReset();
+}
+
+function _tsc_scRenderHistory() {
+  var el=document.getElementById('tsc_scHistList');if(!el)return;
+  if(_tsc_scSessions.length===0){el.innerHTML='<div class="tr-empty">'+_t('Aucune session','No sessions yet')+'</div>';return;}
+  el.innerHTML=_tsc_scSessions.map(function(s){
+    var m=Math.floor(s.dur/60).toString().padStart(2,'0'),sec=(s.dur%60).toString().padStart(2,'0');
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'
+      +'<div class="tr-hi-name">💪 '+s.name+'</div>'
+      +'<div class="tr-hi-meta">'+s.date+' · '+m+':'+sec+' · '+s.reps+' reps · '+s.rpm+' r/min</div>'
+      +'</div><div class="tr-hist-score hi">'+s.reps+'</div></div>';
+  }).join('');
+}
+
+function _tsc_scUpdateInsight() {
+  var el=document.getElementById('tsc_scInsight');if(!el)return;
+  if(_tsc_scSec<5){el.innerHTML='<span>'+_t('Lance une session...','Start a session...')+'</span>';return;}
+  var rpm=_tsc_scSec>0?Math.round(_tsc_scReps/(_tsc_scSec/60)):0;
+  var cls=rpm>=15?'tr-hl':rpm>=10?'tr-warn':'tr-bad';
+  var lbl=rpm>=15?_t('Explosivité excellente 🔥','Excellent explosiveness 🔥')
+    :rpm>=10?_t('Bon rythme','Good pace'):_t('Ralentis, travaille la forme','Slow down, focus on form');
+  el.innerHTML='<span class="'+cls+'">'+rpm+' reps/min — '+lbl+'</span>';
+}
+
+
+/* CHALLENGES */
+/* ══ CHALLENGES TRACKER ══ */
+var _initTraining_ch_done = false;
+function initTraining_ch() {
+  if (_initTraining_ch_done) return;
+  _initTraining_ch_done = true;
+  _tch_renderVids();
+  _tch_renderHistory();
+}
+
+var _tch_VIDEOS = [
+  {id:'i5jFkZG_YfY',title:'Challenge #3'},
+  {id:'Yy-iaH4J8Uo', title:'Challenge #4'},
+  {id:'Kptf7S6qtSA', title:'Challenge #6'}
+];
+var _tch_selVid=null, _tch_attempts=[], _tch_inProgress=false, _tch_sessions=[];
+
+function _tch_renderVids() {
+  var el=document.getElementById('tch_vidScroll');if(!el)return;
+  el.innerHTML=_tch_VIDEOS.map(function(v,i){
+    var sel=_tch_selVid===i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tch_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _tch_selectVid(i) {
+  _tch_selVid=i;var v=_tch_VIDEOS[i];
+  var p=document.getElementById('tch_vidPlayer');var fr=document.getElementById('tch_ytFrame');
+  if(!p||!fr)return;
+  p.style.display='block';fr.src='https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  document.getElementById('tch_vidLabel').textContent=v.title;
+  _tch_renderVids();p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _tch_startAttempt() {
+  if(_tch_selVid===null){
+    var st=document.getElementById('tch_status');
+    if(st){st.textContent=_t('Sélectionne un challenge d\'abord','Select a challenge first');st.style.color='var(--tr-red)';}
+    return;
+  }
+  _tch_inProgress=true;
+  document.getElementById('tch_btnSuccess').style.display='flex';
+  document.getElementById('tch_btnFail').style.display='flex';
+  document.getElementById('tch_btnStart').style.display='none';
+  var st=document.getElementById('tch_status');
+  if(st){st.textContent=_t('Tentative en cours... tape le résultat !','Attempt in progress... tap the result!');st.style.color='var(--tr-gold)';}
+}
+
+function _tch_result(success) {
+  if(!_tch_inProgress)return;
+  _tch_inProgress=false;
+  _tch_attempts.push({success:success,vid:_tch_selVid,t:Date.now()});
+  document.getElementById('tch_btnSuccess').style.display='none';
+  document.getElementById('tch_btnFail').style.display='none';
+  document.getElementById('tch_btnStart').style.display='flex';
+  var st=document.getElementById('tch_status');
+  if(st){
+    st.textContent=success?'✅ '+_t('Réussi !','Success!'):'❌ '+_t('Raté — encore !','Failed — try again!');
+    st.style.color=success?'var(--tr-green)':'var(--tr-red)';
+  }
+  _tch_updateStats();
+}
+
+function _tch_updateStats() {
+  var total=_tch_attempts.length;
+  var wins=_tch_attempts.filter(function(a){return a.success;}).length;
+  var rate=total>0?Math.round(wins/total*100):0;
+  var col=rate>=70?'var(--tr-green)':rate>=40?'var(--tr-gold)':'var(--tr-red)';
+  var st=document.getElementById('tch_statTotal');if(st)st.textContent=total;
+  var sw=document.getElementById('tch_statWins');if(sw)sw.textContent=wins;
+  var sr=document.getElementById('tch_statRate');if(sr){sr.textContent=total>0?rate+'%':'—';sr.style.color=col;}
+  var streak=0;
+  for(var i=_tch_attempts.length-1;i>=0;i--){if(_tch_attempts[i].success)streak++;else break;}
+  var ss=document.getElementById('tch_statStreak');if(ss)ss.textContent=streak>0?streak+'🔥':'0';
+  var el=document.getElementById('tch_insightText');
+  if(!el)return;
+  if(total<2){el.innerHTML='<span>'+_t('Lance ta première tentative !','Start your first attempt!')+'</span>';return;}
+  var html='';
+  if(streak>=3)html+='<span class="tr-hl">'+streak+' '+_t('réussites consécutives 🔥','consecutive wins 🔥')+'</span><br>';
+  html+=_t('Taux : ','Rate: ')+'<span class="'+(rate>=70?'tr-hl':rate>=40?'tr-warn':'tr-bad')+'">'+rate+'%</span>';
+  if(rate>=70)html+=' — <span class="tr-hl">'+_t('Maîtrise en cours','Mastery in progress')+'</span>';
+  else if(rate<40)html+=' — <span class="tr-bad">'+_t('Continue, ça viendra','Keep going')+'</span>';
+  el.innerHTML=html;
+}
+
+function _tch_saveSession() {
+  if(_tch_attempts.length===0)return;
+  var wins=_tch_attempts.filter(function(a){return a.success;}).length;
+  var rate=Math.round(wins/_tch_attempts.length*100);
+  var name=_tch_selVid!==null?_tch_VIDEOS[_tch_selVid].title:'—';
+  var now=new Date();
+  var d=now.toLocaleDateString(window._lang==='en'?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  _tch_sessions.unshift({name:name,total:_tch_attempts.length,wins:wins,rate:rate,date:d});
+  _tch_attempts=[];_tch_inProgress=false;
+  _tch_updateStats();_tch_renderHistory();
+  document.getElementById('tch_btnSuccess').style.display='none';
+  document.getElementById('tch_btnFail').style.display='none';
+  document.getElementById('tch_btnStart').style.display='flex';
+  var st=document.getElementById('tch_status');
+  if(st){st.textContent=_t('Session sauvegardée ✅','Session saved ✅');st.style.color='var(--tr-green)';}
+}
+
+function _tch_renderHistory() {
+  var el=document.getElementById('tch_histList');if(!el)return;
+  if(_tch_sessions.length===0){el.innerHTML='<div class="tr-empty">'+_t('Aucune session','No sessions yet')+'</div>';return;}
+  el.innerHTML=_tch_sessions.map(function(s){
+    var cls=s.rate>=70?'hi':s.rate>=40?'mid':'lo';
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'
+      +'<div class="tr-hi-name">🏆 '+s.name+'</div>'
+      +'<div class="tr-hi-meta">'+s.date+' · '+s.total+' essais · '+s.wins+' réussites</div>'
+      +'</div><div class="tr-hist-score '+cls+'">'+s.rate+'%</div></div>';
+  }).join('');
+}
+
+
+
+/* ── Training Mode i18n COMPLET ── */
+function _trApplyLang() {
+  var en = window._lang === 'en';
+  function tx(id,fr,e){var el=document.getElementById(id);if(el)el.innerHTML=en?e:fr;}
+  function tc(id,fr,e){var el=document.getElementById(id);if(el)el.textContent=en?e:fr;}
+  function timerSubUpdate(id,runFr,runEn,doneFr,doneEn,idleFr,idleEn){
+    var el=document.getElementById(id);if(!el)return;
+    var t=el.textContent;
+    if(t.indexOf('cours')>-1||t.indexOf('running')>-1) el.textContent=en?runEn:runFr;
+    else if(t.indexOf('ermin')>-1||t.indexOf('Done')>-1||t.indexOf('sauvegar')>-1||t.indexOf('save')>-1) el.textContent=en?doneEn:doneFr;
+    else el.textContent=en?idleEn:idleFr;
+  }
+  function startBtn(id,fr,e){var el=document.getElementById(id);if(el&&el.style.display!=='none')el.innerHTML='&#9654; '+(en?e:fr);}
+
+  // Onglets
+  var tabL={dribble:'🏀 Dribble',shot:'🎯 Shot Chart',agility:'⚡ Agility',sc:'💪 Strength',ch:'🏆 Challenges'};
+  document.querySelectorAll('.tr-tab').forEach(function(b){
+    var m=(b.getAttribute('onclick')||'').match(/openTrainingTab\('(\w+)'/);
+    if(m&&tabL[m[1]])b.textContent=tabL[m[1]];
+  });
+
+  // ── DRIBBLE ──
+  var dP=document.getElementById('tr-dribble');
+  if(dP&&dP.style.display==='block'){
+    var dT=dP.querySelectorAll('.tr-card-title');
+    [en?'🎬 SELECT YOUR DRILL':'🎬 CHOISIS TON DRILL',
+     en?'⏱ SESSION':'⏱ SESSION',
+     en?'📊 DRIBBLE RHYTHM':'📊 RYTHME DU DRIBBLE',
+     en?'🎯 SCORE':'🎯 SCORE',
+     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+     en?'📅 HISTORY':'📅 HISTORIQUE'
+    ].forEach(function(v,i){if(dT[i])dT[i].textContent=v;});
+    startBtn('td_btnStart','DÉMARRER','START');
+    tx('td_btnStop','&#9209; STOP','&#9209; STOP');
+    tx('td_btnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
+    tx('td_btnTap','🤜 TAP DRIBBLE','🤜 TAP DRIBBLE');
+    var errB=dP.querySelector('[onclick="_td_addError()"]');
+    if(errB)errB.innerHTML='&#9888; '+(en?'ERROR':'ERREUR');
+    timerSubUpdate('td_timerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    tc('lbl_dur','DURÉE','DURATION');
+    tc('lbl_drib2','DRIBBLES','DRIBBLES');
+    tc('lbl_err2','ERREURS','ERRORS');
+    tc('lbl_cons','CONSIST.','CONSIST.');
+    var rCv=document.getElementById('td_rhythmCv');
+    if(rCv&&rCv.nextElementSibling)rCv.nextElementSibling.textContent=en?'Fourier Transform — signal regularity':'Transformée de Fourier — régularité du signal';
+    // Consistance label
+    var cPct=document.getElementById('td_consPct');
+    if(cPct&&cPct.previousElementSibling)
+      cPct.previousElementSibling.textContent=en?'Rhythm consistency':'Consistance du rythme';
+    var tcnt=document.getElementById('td_tapCount');
+    if(tcnt&&!tcnt.textContent.match(/[1-9]/))tcnt.textContent='0 dribbles';
+    var ins=document.getElementById('td_insightText');
+    if(ins){var insT=ins.textContent.trim();if(insT.indexOf('Lance')>-1||insT.indexOf('Start a session')>-1)ins.innerHTML='<span>'+(en?'Start a session to see the analysis...':'Lance une session pour voir l’analyse...')+'</span>';}
+    var hl=document.getElementById('td_histList');
+    if(hl&&hl.querySelector('.tr-empty'))hl.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _td_renderHistory();
+  }
+
+  // ── SHOT CHART ──
+  var sP=document.getElementById('tr-shot');
+  if(sP&&sP.style.display==='block'){
+    var sT=sP.querySelectorAll('.tr-card-title');
+    [en?'🎬 SELECT YOUR SHOOTING DRILL':'🎬 CHOISIS TON DRILL SHOOTING',
+     en?'🏀 COURT — TAP A ZONE':'🏀 TERRAIN — TAPE UNE ZONE',
+     en?'📊 STATS BY ZONE':'📊 STATS PAR ZONE',
+     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI'
+    ].forEach(function(v,i){if(sT[i])sT[i].textContent=v;});
+    var zi=document.getElementById('tsc_zoneInd');
+    if(zi&&!zi.querySelector('span[style]'))zi.textContent=en?'Select a zone on the court':'Sélectionne une zone sur le terrain';
+    tx('tsc_btnMake','✅ RENTRÉ','✅ MADE');
+    tx('tsc_btnMiss','❌ RATÉ','❌ MISSED');
+    var tv=document.getElementById('tsc_totalVal');
+    if(tv&&(tv.textContent==='0 tirs — 0%'||tv.textContent==='0 shots — 0%'))tv.textContent=en?'0 shots — 0%':'0 tirs — 0%';
+    var tlbl=sP.querySelector('.sec-total-lbl,div[style*="TOTAL"]');
+    _tsc_updateGrid();_tsc_updateInsight();
+    var si=document.getElementById('tsc_insightText');
+    if(si&&si.querySelector('span')&&!si.querySelector('.tr-hl'))
+      si.innerHTML='<span>'+(en?'Take your first shots to see the analysis...':'Lance tes premiers tirs pour voir l’analyse...')+'</span>';
+  }
+
+  // ── AGILITY ──
+  var aP=document.getElementById('tr-agility');
+  if(aP&&aP.style.display==='block'){
+    var aT=aP.querySelectorAll('.tr-card-title');
+    [en?'🎬 SELECT YOUR HAND-EYE DRILL':'🎬 CHOISIS TON DRILL HAND-EYE',
+     en?'🎮 SELECT YOUR MODE':'🎮 CHOISIS TON MODE',
+     en?'⚡ REACTION TEST':'⚡ TEST DE RÉACTION',
+     en?'🎯 DRILL TIMER':'🎯 DRILL TIMER',
+     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+     en?'📅 HISTORY':'📅 HISTORIQUE'
+    ].forEach(function(v,i){if(aT[i])aT[i].textContent=v;});
+    var mR=document.getElementById('tag_btnModeReact');
+    if(mR){var d2=mR.querySelectorAll('div');if(d2[1])d2[1].textContent=en?'REACTION':'RÉACTION';if(d2[2])d2[2].textContent=en?'Reaction time':'Temps de réaction';}
+    var mD=document.getElementById('tag_btnModeDrill');
+    if(mD){var d3=mD.querySelectorAll('div');if(d3[1])d3[1].textContent='DRILL TIMER';if(d3[2])d3[2].textContent=en?'Timer + reps':'Chrono + reps';}
+    var rm=document.getElementById('tag_reactMsg');
+    if(rm&&(rm.textContent==='TAP POUR COMMENCER'||rm.textContent==='TAP TO START'))rm.textContent=en?'TAP TO START':'TAP POUR COMMENCER';
+    var rBoxes=aP.querySelectorAll('#tag_secReact .tr-score-box .tr-score-lbl');
+    var rLbls=en?['AVG. (ms)','BEST','TRIES','LEVEL']:['MOY. (ms)','MEILLEUR','ESSAIS','NIVEAU'];
+    rBoxes.forEach(function(b,i){if(rLbls[i])b.textContent=rLbls[i];});
+    var rb=aP.querySelector('[onclick="_tag_resetReact()"]');
+    if(rb)rb.textContent='↺ RESET';
+    timerSubUpdate('tag_dTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    startBtn('tag_dBtnStart','DÉMARRER','START');
+    tx('tag_dBtnStop','&#9209; STOP','&#9209; STOP');
+    tx('tag_dBtnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
+    var drp=aP.querySelector('[onclick="_tag_dRep()"]');
+    if(drp)drp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
+    var rn=document.querySelector('#tag_dRepsNum + div');
+    if(rn)rn.textContent=en?'REPS':'RÉPÉTITIONS';
+    _tag_buildDrills();_tag_updateInsight();
+    var ahi=document.getElementById('tag_histList');
+    if(ahi&&ahi.querySelector('.tr-empty'))ahi.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tag_renderHistory();
+  }
+
+  // ── STRENGTH ──
+  var scP2=document.getElementById('tr-sc');
+  if(scP2&&scP2.style.display==='block'){
+    var scT=scP2.querySelectorAll('.tr-card-title');
+    [en?'🎬 SELECT YOUR SC DRILL':'🎬 CHOISIS TON DRILL SC',
+     en?'⏱ SESSION':'⏱ SESSION',
+     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+     en?'📅 HISTORY':'📅 HISTORIQUE'
+    ].forEach(function(v,i){if(scT[i])scT[i].textContent=v;});
+    timerSubUpdate('tsc_scTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    startBtn('tsc_scBtnStart','DÉMARRER','START');
+    tx('tsc_scBtnStop','&#9209; STOP','&#9209; STOP');
+    tx('tsc_scBtnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
+    var scrp=scP2.querySelector('[onclick="_tsc_scRep()"]');
+    if(scrp)scrp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
+    var scrn=document.querySelector('#tsc_scRepsNum + div');
+    if(scrn)scrn.textContent='REPS';
+    var sci=document.getElementById('tsc_scInsight');
+    if(sci){var sciT=sci.textContent.trim();if(sciT.indexOf('Lance')>-1||sciT.indexOf('Start')>-1||sciT.indexOf('session')>-1)sci.innerHTML='<span>'+(en?'Start a session...':'Lance une session...')+'</span>';}
+    var sch=document.getElementById('tsc_scHistList');
+    if(sch&&sch.querySelector('.tr-empty'))sch.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tsc_scRenderHistory();
+  }
+
+  // ── CHALLENGES ──
+  var chP2=document.getElementById('tr-ch');
+  if(chP2&&chP2.style.display==='block'){
+    var chT=chP2.querySelectorAll('.tr-card-title');
+    [en?'🎬 SELECT YOUR CHALLENGE':'🎬 CHOISIS TON CHALLENGE',
+     en?'🏆 ATTEMPT':'🏆 TENTATIVE',
+     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+     en?'📅 HISTORY':'📅 HISTORIQUE'
+    ].forEach(function(v,i){if(chT[i])chT[i].textContent=v;});
+    var cst=document.getElementById('tch_status');
+    if(cst&&!cst.textContent.match(/ussi|uccess|até|ailed|sauveg|saved/))
+      cst.textContent=en?'Select a challenge and start an attempt':'Sélectionne un challenge et lance une tentative';
+    tx('tch_btnStart','&#9654; NOUVELLE TENTATIVE','&#9654; NEW ATTEMPT');
+    tx('tch_btnSuccess','✅ RÉUSSI','✅ SUCCESS');
+    tx('tch_btnFail','❌ RATÉ','❌ FAILED');
+    var cbsv=chP2.querySelector('[onclick="_tch_saveSession()"]');
+    if(cbsv)cbsv.innerHTML='&#128190; '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');
+    var chSB=chP2.querySelectorAll('.tr-score-box .tr-score-lbl');
+    var chL=en?['TRIES','WINS','RATE','STREAK']:['ESSAIS','RÉUSSITES','TAUX','STREAK'];
+    chSB.forEach(function(b,i){if(chL[i])b.textContent=chL[i];});
+    var chi=document.getElementById('tch_insightText');
+    if(chi){var chiT=chi.textContent.trim();if(chiT.indexOf('Lance')>-1||chiT.indexOf('Start')>-1||chiT.indexOf('tentative')>-1||chiT.indexOf('attempt')>-1)chi.innerHTML='<span>'+(en?'Start your first attempt!':'Lance ta première tentative !')+'</span>';}
+    var chh=document.getElementById('tch_histList');
+    if(chh&&chh.querySelector('.tr-empty'))chh.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tch_renderHistory();
+  }
+}
+
+/* Hook applyLang */
+(function(){
+  var _oA=window.applyLang;
+  window.applyLang=function(lang){
+    if(typeof _oA==='function')_oA.call(this,lang);
+    var s=document.getElementById('s-training');
+    if(s&&s.classList.contains('active'))setTimeout(_trApplyLang,30);
+  };
+})();
+</script>
+
+<script>
+if(typeof LANG_DATA!=='undefined'){
+  if(LANG_DATA.fr) LANG_DATA.fr['nav_training']='🏋️ Training';
+  if(LANG_DATA.en) LANG_DATA.en['nav_training']='🏋️ Training';
+}
 </script>
 
 <script>
