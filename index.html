@@ -1134,8 +1134,149 @@ body.unlocked .sensei-only{display:revert !important}
     <button onclick="openTrainingTab('agility',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">⚡ Agility</button>
     <button onclick="openTrainingTab('sc',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">💪 Strength</button>
     <button onclick="openTrainingTab('ch',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">🏆 Challenges</button>
+  
+    <button onclick="openTrainingTab('sym',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">⚖️ Symétrie</button></div>
+
+<div id="tr-sym" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+
+  <!-- CAMÉRA + CANVAS -->
+  <div class="tr-card">
+    <div class="tr-card-title">📷 CAMÉRA — ANALYSE EN TEMPS RÉEL</div>
+    <div id="tsym_camContainer" style="display:none;width:100%;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
+      <video id="tsym_video" width="640" height="480" playsinline muted
+        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+      <canvas id="tsym_canvas" width="640" height="480"
+        style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
+    </div>
+    <div id="tsym_status" style="text-align:center;font-size:11px;color:#7a8299;margin-bottom:12px;min-height:18px;letter-spacing:.5px">
+      Appuie sur DÉMARRER pour activer la caméra
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start" id="tsym_btnStart" onclick="_tsym_startCamera()" ontouchstart="">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-stop"  id="tsym_btnStop"  onclick="_tsym_stopCamera()"  ontouchstart="" style="display:none">⏹ STOP</button>
+      <button class="tr-btn tr-btn-save"  id="tsym_btnSave"  onclick="_tsym_save()"         ontouchstart="" style="display:none">💾 SAUVEGARDER</button>
+    </div>
   </div>
 
+  <!-- MODE -->
+  <div class="tr-card">
+    <div class="tr-card-title">🎯 MODE D'ANALYSE</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      <button class="tsym-mode-btn" onclick="_tsym_setMode('dribble')"
+        style="padding:14px 10px;border-radius:10px;border:1px solid rgba(245,197,24,.5);
+               background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;text-align:center;
+               font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px">
+        <div style="font-size:22px;margin-bottom:4px">🏀</div>
+        <div id="tsym_lblDribble">DRIBBLE</div>
+      </button>
+      <button class="tsym-mode-btn" onclick="_tsym_setMode('shot')"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;
+               font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px">
+        <div style="font-size:22px;margin-bottom:4px">🎯</div>
+        <div id="tsym_lblShot">TIR</div>
+      </button>
+      <button class="tsym-mode-btn" onclick="_tsym_setMode('footwork')"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;
+               font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px">
+        <div style="font-size:22px;margin-bottom:4px">🦶</div>
+        <div id="tsym_lblFootwork">FOOTWORK</div>
+      </button>
+      <button class="tsym-mode-btn" onclick="_tsym_setMode('posture')"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;
+               font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px">
+        <div style="font-size:22px;margin-bottom:4px">🧍</div>
+        <div id="tsym_lblPosture">POSTURE</div>
+      </button>
+    </div>
+    <div id="tsym_modeDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:18px">
+      Compare la hauteur du poignet G vs D
+    </div>
+  </div>
+
+
+
+  <!-- SCORE TEMPS RÉEL -->
+  <div class="tr-card">
+    <div class="tr-card-title">⚖️ SCORE SYMÉTRIE</div>
+    <div style="text-align:center;padding:8px 0 14px">
+      <div id="tsym_scoreBig" style="font-size:58px;font-weight:bold;color:#7a8299;letter-spacing:4px;line-height:1">--%</div>
+      <div id="tsym_scoreLbl" style="font-size:11px;color:#7a8299;margin-top:6px;letter-spacing:1px">
+        Lance la caméra pour commencer
+      </div>
+    </div>
+    <!-- Légende G vs D -->
+    <div style="display:flex;justify-content:center;gap:20px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#4ecdc4">
+        <div style="width:12px;height:12px;border-radius:50%;background:#4ecdc4"></div>
+        <span id="tsym_lblLeft">GAUCHE</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e63946">
+        <div style="width:12px;height:12px;border-radius:50%;background:#e63946"></div>
+        <span id="tsym_lblRight">DROITE</span>
+      </div>
+    </div>
+    <!-- Barre de score -->
+    <div style="margin-bottom:6px;font-size:10px;color:#7a8299;display:flex;justify-content:space-between">
+      <span id="tsym_lblSymmetry">Symétrie</span>
+      <span id="tsym_scoreVal">--%</span>
+    </div>
+    <div style="height:8px;background:#1e2535;border-radius:4px;overflow:hidden">
+      <div id="tsym_scoreFill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#e63946,#f5c518,#2dc653);transition:width .3s;width:0%"></div>
+    </div>
+  </div>
+
+
+
+  <!-- GUIDE PLACEMENT -->
+  <div class="tr-card">
+    <div class="tr-card-title">📐 GUIDE PLACEMENT</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <div style="background:#131820;border:1px solid #1e2535;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">🏀</div>
+        <div style="font-size:9px;color:#f5c518;font-weight:bold;letter-spacing:.5px;margin-bottom:4px" id="tsym_guide1lbl">DRIBBLE / FOOTWORK</div>
+        <div style="font-size:9px;color:#7a8299" id="tsym_guide1txt">Téléphone posé FACE à toi · Corps entier visible</div>
+      </div>
+      <div style="background:#131820;border:1px solid #1e2535;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">🎯</div>
+        <div style="font-size:9px;color:#f5c518;font-weight:bold;letter-spacing:.5px;margin-bottom:4px" id="tsym_guide2lbl">TIR / POSTURE</div>
+        <div style="font-size:9px;color:#7a8299" id="tsym_guide2txt">Téléphone DE PROFIL · Bras + épaules visibles</div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ANALYSE -->
+  <div class="tr-card">
+    <div class="tr-card-title">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="tsym_insightText">Lance une session pour voir l'analyse...</div>
+  </div>
+
+
+
+  <!-- PROGRESSION -->
+  <div class="tr-card">
+    <div class="tr-card-title">📈 PROGRESSION</div>
+    <canvas id="tsym_progressChart" width="448" height="80"
+      style="width:100%;border-radius:8px;background:#080a0f;display:block"></canvas>
+    <div id="tsym_progressLbl" style="font-size:9px;color:#7a8299;text-align:center;margin-top:4px">
+      Score symétrie — 60 dernières sessions
+    </div>
+  </div>
+
+
+
+  <!-- HISTORIQUE -->
+  <div class="tr-card">
+    <div class="tr-card-title">📅 HISTORIQUE</div>
+    <div id="tsym_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+
+
+</div>
 <div id="tr-dribble" class="tr-panel" style="display:block;max-width:480px;margin:0 auto;padding:0">
   <div class="tr-card">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
@@ -1450,7 +1591,9 @@ body.unlocked .sensei-only{display:revert !important}
 </div>
 
 </div>
-</div><!-- /s-training -->
+</div>
+
+<!-- /s-training -->
 
 
 <div id="s-ballhandling" class="section">
@@ -11413,11 +11556,15 @@ function openTrainingTab(id, btn) {
     b.style.background='var(--dark3)';b.style.color='var(--muted)';b.style.border='none';
   });
   if(btn){btn.style.background='rgba(245,197,24,.1)';btn.style.color='var(--gold)';btn.style.border='1px solid rgba(245,197,24,.5)';}
+  // Scroller vers le panel actif
+  var onglets = document.querySelector('[onclick^="openTrainingTab"]');
+  if(onglets) onglets.scrollIntoView({behavior:'smooth',block:'start'});
   if(id==='dribble')  initTraining_d();
   if(id==='shot')     initTraining_sc2();
   if(id==='agility')  initTraining_ag2();
   if(id==='sc')       initTraining_sc();
   if(id==='ch')       initTraining_ch();
+  if(id==='sym')       initTraining_sym();
 }
 
 /* DRIBBLE */
@@ -12842,7 +12989,7 @@ function _trApplyLang() {
     else el.textContent=en?idleEn:idleFr;
   }
   // Onglets
-  var tabL={dribble:'🏀 Dribble',shot:'🎯 Shot Chart',agility:'⚡ Agility',sc:'💪 Strength',ch:'🏆 Challenges'};
+  var tabL={dribble:'🏀 Dribble',shot:'🎯 Shot Chart',agility:'⚡ Agility',sc:'💪 Strength',ch:'🏆 Challenges',sym:'⚖️ '+(en?'Symmetry':'Symétrie')};
   document.querySelectorAll('.tr-tab').forEach(function(b){
     var m=(b.getAttribute('onclick')||'').match(/openTrainingTab\('(\w+)'/);
     if(m&&tabL[m[1]])b.textContent=tabL[m[1]];
@@ -12988,6 +13135,42 @@ function _trApplyLang() {
     var chi=document.getElementById('tch_insightText');
     if(chi){var ct=chi.textContent.trim();if(ct.indexOf('Lance')>-1||ct.indexOf('Start')>-1||ct.indexOf('tentative')>-1)chi.innerHTML='<span>'+(en?'Start your first attempt!':'Lance ta première tentative !')+'</span>';}
   });
+  doPanel('tr-sym',[
+    en?'📷 CAMERA':'📷 CAMÉRA',
+    en?'🎯 ANALYSIS MODE':'🎯 MODE D’ANALYSE',
+    en?'⚖️ SYMMETRY SCORE':'⚖️ SCORE SYMÉTRIE',
+    en?'📐 CAMERA GUIDE':'📐 GUIDE PLACEMENT',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    en?'📈 PROGRESS':'📈 PROGRESSION',
+    en?'📅 HISTORY':'📅 HISTORIQUE'
+  ], function(p,en){
+    var st=document.getElementById('tsym_status');
+    if(st&&(st.textContent.indexOf('Appuie')>-1||st.textContent.indexOf('Press')>-1))
+      st.textContent=en?'Press START to activate camera':'Appuie sur DÉMARRER pour activer la caméra';
+    var bs=document.getElementById('tsym_btnStart');
+    if(bs&&bs.style.display!=='none')bs.innerHTML='&#9654; '+(en?'START':'DÉMARRER');
+    var bst=document.getElementById('tsym_btnStop'); if(bst)bst.innerHTML='&#9209; STOP';
+    var bsv=document.getElementById('tsym_btnSave'); if(bsv)bsv.innerHTML='&#128190; '+(en?'SAVE':'SAUVEGARDER');
+    var mL=['DRIBBLE',en?'SHOT':'TIR','FOOTWORK','POSTURE'];
+    ['tsym_lblDribble','tsym_lblShot','tsym_lblFootwork','tsym_lblPosture'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=mL[i];});
+    var sym2=document.getElementById('tsym_lblSymmetry'); if(sym2)sym2.textContent=en?'Symmetry':'Symétrie';
+    var ll=document.getElementById('tsym_lblLeft'); if(ll)ll.textContent=en?'LEFT':'GAUCHE';
+    var lr=document.getElementById('tsym_lblRight'); if(lr)lr.textContent=en?'RIGHT':'DROITE';
+    var g1t=document.getElementById('tsym_guide1txt'); if(g1t)g1t.textContent=en?'Phone FACING you':'Téléphone FACE à toi';
+    var g2=document.getElementById('tsym_guide2lbl'); if(g2)g2.textContent=en?'SHOT / POSTURE':'TIR / POSTURE';
+    var g2t=document.getElementById('tsym_guide2txt'); if(g2t)g2t.textContent=en?'Phone to the SIDE':'Téléphone DE PROFIL';
+    var pl=document.getElementById('tsym_progressLbl'); if(pl)pl.textContent=en?'Symmetry score':'Score symétrie';
+    var sl=document.getElementById('tsym_scoreLbl');
+    if(sl&&(sl.textContent.indexOf('Lance')>-1||sl.textContent.indexOf('Start')>-1))
+      sl.textContent=en?'Start camera to begin':'Lance la caméra pour commencer';
+    var ins=document.getElementById('tsym_insightText');
+    if(ins){var it=ins.textContent.trim();if(it.indexOf('Lance')>-1||it.indexOf('Start a')>-1)ins.innerHTML='<span>'+(en?'Start a session to see the analysis...':'Lance une session pour voir l’analyse...')+'</span>';}
+    var hl=document.getElementById('tsym_histList');
+    if(hl&&hl.querySelector('.tr-empty'))hl.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else if(typeof _tsym_renderHistory==='function')_tsym_renderHistory();
+    if(typeof _tr_drawProgressChart==='function')_tr_drawProgressChart('tsym_progressChart','symmetry','score','#4ecdc4');
+    if(typeof _tsym_setMode==='function')_tsym_setMode(_tsym_mode||'dribble');
+  });
 }
 
 
@@ -13044,7 +13227,396 @@ function _trApplyLang() {
     if (s && s.classList.contains('active')) setTimeout(_trApplyLang, 30);
   };
 })();
-</script>
+
+
+/* SYMÉTRIE */
+/* ══════════════════════════════════════════════════════════════
+   MODULE SYMÉTRIE — 6ème onglet Training Mode
+   TensorFlow.js MoveNet Lightning — 100% browser, 0 serveur
+   Analyse : dribble G/D · tir · footwork · posture
+══════════════════════════════════════════════════════════════ */
+
+var _initTraining_sym_done = false;
+var _tsym_detector = null;
+var _tsym_video = null;
+var _tsym_canvas = null;
+var _tsym_ctx = null;
+var _tsym_running = false;
+var _tsym_rafId = null;
+var _tsym_mode = 'dribble'; // dribble | shot | footwork | posture
+var _tsym_scores = []; // historique des scores
+var _tsym_frameScores = [];
+var _tsym_modelLoaded = false;
+var _tsym_stream = null;
+
+function initTraining_sym() {
+  if (_initTraining_sym_done) return;
+  _initTraining_sym_done = true;
+  _tsym_canvas = document.getElementById('tsym_canvas');
+  _tsym_ctx = _tsym_canvas ? _tsym_canvas.getContext('2d') : null;
+  _tsym_renderHistory();
+  _tsym_updateInsight();
+}
+
+/* ── Chargement TF.js + MoveNet ─────────────────────────────── */
+function _tsym_loadModel(cb) {
+  if (_tsym_modelLoaded && _tsym_detector) { cb && cb(); return; }
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Chargement du modèle IA...','Loading AI model...');
+
+  // Charger TF.js + MoveNet depuis CDN
+    var s1 = document.createElement('script');
+  s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js';
+  s1.onload = function() {
+    var s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
+    s2.onload = function() { _tsym_initDetector(cb); };
+    s2.onerror = function() { _tsym_onError('Model load error'); };
+    document.head.appendChild(s2);
+  };
+  s1.onerror = function() { _tsym_onError('TF.js load error'); };
+  document.head.appendChild(s1);
+}
+
+function _tsym_initDetector(cb) {
+  if (typeof poseDetection === 'undefined') {
+    _tsym_onError(_t('poseDetection non disponible','poseDetection unavailable')); return;
+  }
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Initialisation MoveNet...','Initializing MoveNet...');
+  poseDetection.createDetector(
+    poseDetection.SupportedModels.MoveNet,
+    { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
+  ).then(function(det) {
+    _tsym_detector = det;
+    _tsym_modelLoaded = true;
+    if (status) status.textContent = _t('Modèle prêt ✅','Model ready ✅');
+    cb && cb();
+  }).catch(function(e) {
+    _tsym_onError(_t('Erreur init détecteur','Detector init error') + ': ' + e.message);
+  });
+}
+
+/* ── Caméra ─────────────────────────────────────────────────── */
+function _tsym_startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    _tsym_onError(_t('Caméra non disponible','Camera not available')); return;
+  }
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
+
+  navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
+    .then(function(stream) {
+      _tsym_stream = stream;
+      _tsym_video = document.getElementById('tsym_video');
+      if (!_tsym_video) return;
+      _tsym_video.srcObject = stream;
+      _tsym_video.onloadedmetadata = function() {
+        _tsym_video.play();
+        if (status) status.textContent = _t('Chargement IA...','Loading AI...');
+        _tsym_loadModel(function() {
+          _tsym_startDetection();
+        });
+      };
+    })
+    .catch(function(e) {
+      _tsym_onError(_t('Permission caméra refusée','Camera permission denied'));
+    });
+}
+
+function _tsym_stopCamera() {
+  _tsym_running = false;
+  if (_tsym_rafId) { cancelAnimationFrame(_tsym_rafId); _tsym_rafId = null; }
+  if (_tsym_stream) { _tsym_stream.getTracks().forEach(function(t){t.stop();}); _tsym_stream = null; }
+  var vid = document.getElementById('tsym_video');
+  if (vid) vid.srcObject = null;
+  var cnt2=document.getElementById('tsym_camContainer');if(cnt2)cnt2.style.display='none';
+  var btnStart = document.getElementById('tsym_btnStart');
+  var btnStop  = document.getElementById('tsym_btnStop');
+  if (btnStart) btnStart.style.display = 'flex';
+  if (btnStop)  btnStop.style.display  = 'none';
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Caméra arrêtée','Camera stopped');
+}
+
+/* ── Boucle de détection ────────────────────────────────────── */
+function _tsym_startDetection() {
+  _tsym_running = true;
+  _tsym_frameScores = [];
+  var btnStart = document.getElementById('tsym_btnStart');
+  var btnStop  = document.getElementById('tsym_btnStop');
+  var btnSave  = document.getElementById('tsym_btnSave');
+  if (btnStart) btnStart.style.display = 'none';
+  if (btnStop)  btnStop.style.display  = 'flex';
+  if (btnSave)  btnSave.style.display  = 'none';
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Analyse en cours...','Analysis running...');
+  _tsym_detect();
+}
+
+function _tsym_detect() {
+  if (!_tsym_running || !_tsym_detector || !_tsym_video) return;
+  _tsym_detector.estimatePoses(_tsym_video).then(function(poses) {
+    _tsym_drawFrame(poses);
+    if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
+  }).catch(function() {
+    if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
+  });
+}
+
+/* ── Dessin + analyse ───────────────────────────────────────── */
+var _TSYM_KP = {
+  nose:0, leftEye:1, rightEye:2, leftEar:3, rightEar:4,
+  leftShoulder:5, rightShoulder:6, leftElbow:7, rightElbow:8,
+  leftWrist:9, rightWrist:10, leftHip:11, rightHip:12,
+  leftKnee:13, rightKnee:14, leftAnkle:15, rightAnkle:16
+};
+
+function _tsym_kp(poses, name) {
+  if (!poses || !poses[0] || !poses[0].keypoints) return null;
+  var kps = poses[0].keypoints;
+  var idx = _TSYM_KP[name];
+  if (idx === undefined) return null;
+  var k = kps[idx];
+  return (k && k.score > 0.35) ? k : null;
+}
+
+function _tsym_drawFrame(poses) {
+  if (!_tsym_ctx || !_tsym_canvas || !_tsym_video) return;
+  var W = _tsym_canvas.width, H = _tsym_canvas.height;
+  _tsym_ctx.clearRect(0, 0, W, H);
+  // Miroir vidéo
+  _tsym_ctx.save();
+  _tsym_ctx.scale(-1, 1);
+  _tsym_ctx.drawImage(_tsym_video, -W, 0, W, H);
+  _tsym_ctx.restore();
+
+  if (!poses || !poses[0]) return;
+  var kps = poses[0].keypoints;
+  var scaleX = W / _tsym_video.videoWidth;
+  var scaleY = H / _tsym_video.videoHeight;
+
+  // Dessiner le squelette
+  _tsym_drawSkeleton(kps, scaleX, scaleY, W);
+
+  // Calculer score symétrie selon le mode
+  var score = _tsym_computeSymmetry(poses, scaleX, scaleY, W);
+  if (score >= 0) {
+    _tsym_frameScores.push(score);
+    if (_tsym_frameScores.length > 60) _tsym_frameScores.shift();
+    var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
+    _tsym_updateScoreDisplay(avg);
+  }
+}
+
+var _TSYM_PAIRS = [
+  ['leftShoulder','rightShoulder'],['leftShoulder','leftElbow'],['rightShoulder','rightElbow'],
+  ['leftElbow','leftWrist'],['rightElbow','rightWrist'],['leftShoulder','leftHip'],
+  ['rightShoulder','rightHip'],['leftHip','rightHip'],['leftHip','leftKnee'],
+  ['rightHip','rightKnee'],['leftKnee','leftAnkle'],['rightKnee','rightAnkle']
+];
+
+function _tsym_drawSkeleton(kps, sx, sy, W) {
+  _tsym_ctx.lineWidth = 2;
+  _TSYM_PAIRS.forEach(function(pair) {
+    var i1 = _TSYM_KP[pair[0]], i2 = _TSYM_KP[pair[1]];
+    if (i1 === undefined || i2 === undefined) return;
+    var k1 = kps[i1], k2 = kps[i2];
+    if (!k1 || !k2 || k1.score < 0.35 || k2.score < 0.35) return;
+    _tsym_ctx.strokeStyle = 'rgba(245,197,24,.7)';
+    _tsym_ctx.beginPath();
+    _tsym_ctx.moveTo(W - k1.x * sx, k1.y * sy);
+    _tsym_ctx.lineTo(W - k2.x * sx, k2.y * sy);
+    _tsym_ctx.stroke();
+  });
+  // Points
+  kps.forEach(function(k) {
+    if (!k || k.score < 0.35) return;
+    var x = W - k.x * sx, y = k.y * sy;
+    // Colorier G en bleu, D en rouge
+    var isLeft = k.name && k.name.indexOf('left') > -1;
+    var isRight = k.name && k.name.indexOf('right') > -1;
+    _tsym_ctx.fillStyle = isLeft ? '#4ecdc4' : isRight ? '#e63946' : '#f5c518';
+    _tsym_ctx.beginPath();
+    _tsym_ctx.arc(x, y, 5, 0, Math.PI * 2);
+    _tsym_ctx.fill();
+  });
+}
+
+function _tsym_computeSymmetry(poses, sx, sy, W) {
+  /* Compare les distances et angles G vs D selon le mode */
+  var pairs = [];
+  if (_tsym_mode === 'dribble') {
+    // Comparer hauteur poignet G vs D
+    var lw = _tsym_kp(poses, 'leftWrist'),  rw = _tsym_kp(poses, 'rightWrist');
+    var ls = _tsym_kp(poses, 'leftShoulder'), rs = _tsym_kp(poses, 'rightShoulder');
+    if (lw && rw && ls && rs) {
+      var lNorm = (ls.y - lw.y) / (ls.y || 1);
+      var rNorm = (rs.y - rw.y) / (rs.y || 1);
+      var diff = Math.abs(lNorm - rNorm);
+      return Math.max(0, Math.min(100, Math.round((1 - diff * 3) * 100)));
+    }
+  } else if (_tsym_mode === 'shot') {
+    // Comparer angle coude G vs D
+    var le = _tsym_kp(poses,'leftElbow'),  re = _tsym_kp(poses,'rightElbow');
+    var ls2 = _tsym_kp(poses,'leftShoulder'), rs2 = _tsym_kp(poses,'rightShoulder');
+    var lw2 = _tsym_kp(poses,'leftWrist'),   rw2 = _tsym_kp(poses,'rightWrist');
+    if (le && re && ls2 && rs2 && lw2 && rw2) {
+      var aL = _tsym_angle(ls2, le, lw2), aR = _tsym_angle(rs2, re, rw2);
+      var diff2 = Math.abs(aL - aR) / 180;
+      return Math.max(0, Math.min(100, Math.round((1 - diff2 * 2) * 100)));
+    }
+  } else if (_tsym_mode === 'footwork') {
+    // Comparer hauteur genoux G vs D
+    var lk = _tsym_kp(poses,'leftKnee'),  rk = _tsym_kp(poses,'rightKnee');
+    var lh = _tsym_kp(poses,'leftHip'),   rh = _tsym_kp(poses,'rightHip');
+    if (lk && rk && lh && rh) {
+      var lKnorm = (lk.y - lh.y) / (Math.abs(lk.y - lh.y) || 1);
+      var rKnorm = (rk.y - rh.y) / (Math.abs(rk.y - rh.y) || 1);
+      var lAnk = _tsym_kp(poses,'leftAnkle'), rAnk = _tsym_kp(poses,'rightAnkle');
+      if (lAnk && rAnk) {
+        var lStep = Math.abs(lAnk.x - rAnk.x);
+        var lHipW = Math.abs(lh.x - rh.x) || 1;
+        var ratio = lStep / lHipW;
+        return Math.max(0, Math.min(100, Math.round((1 - Math.abs(ratio - 1.5) * 0.4) * 100)));
+      }
+    }
+  } else if (_tsym_mode === 'posture') {
+    // Comparer symétrie épaules + hanches
+    var ls3 = _tsym_kp(poses,'leftShoulder'), rs3 = _tsym_kp(poses,'rightShoulder');
+    var lh2 = _tsym_kp(poses,'leftHip'),      rh2 = _tsym_kp(poses,'rightHip');
+    if (ls3 && rs3 && lh2 && rh2) {
+      var shoulderDiff = Math.abs(ls3.y - rs3.y) / (Math.abs(ls3.x - rs3.x) || 1);
+      var hipDiff      = Math.abs(lh2.y - rh2.y) / (Math.abs(lh2.x - rh2.x) || 1);
+      var avgDiff = (shoulderDiff + hipDiff) / 2;
+      return Math.max(0, Math.min(100, Math.round((1 - avgDiff * 5) * 100)));
+    }
+  }
+  return -1;
+}
+
+function _tsym_angle(a, b, c) {
+  /* Angle en degrés entre 3 keypoints */
+  var ab = { x: a.x - b.x, y: a.y - b.y };
+  var cb = { x: c.x - b.x, y: c.y - b.y };
+  var dot = ab.x * cb.x + ab.y * cb.y;
+  var mag = Math.sqrt((ab.x*ab.x+ab.y*ab.y) * (cb.x*cb.x+cb.y*cb.y)) || 1;
+  return Math.round(Math.acos(Math.max(-1, Math.min(1, dot/mag))) * 180 / Math.PI);
+}
+
+/* ── Affichage score ────────────────────────────────────────── */
+function _tsym_updateScoreDisplay(score) {
+  var el = document.getElementById('tsym_scoreBig');
+  if (!el) return;
+  el.textContent = score + '%';
+  el.style.color = score >= 80 ? '#2dc653' : score >= 60 ? '#f5c518' : '#e63946';
+  var bar = document.getElementById('tsym_scoreFill');
+  if (bar) bar.style.width = score + '%';
+  var lbl = document.getElementById('tsym_scoreLbl');
+  if (lbl) {
+    lbl.textContent = score >= 80
+      ? _t('Excellente symétrie 🧬','Excellent symmetry 🧬')
+      : score >= 60
+      ? _t('Symétrie correcte','Decent symmetry')
+      : _t('Asymétrie détectée ⚠️','Asymmetry detected ⚠️');
+    lbl.style.color = score >= 80 ? '#2dc653' : score >= 60 ? '#f5c518' : '#e63946';
+  }
+}
+
+/* ── Mode selector ──────────────────────────────────────────── */
+function _tsym_setMode(m) {
+  _tsym_mode = m;
+  _tsym_frameScores = [];
+  document.querySelectorAll('.tsym-mode-btn').forEach(function(b, i) {
+    var modes = ['dribble','shot','footwork','posture'];
+    var active = modes[i] === m;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.borderColor = active ? 'rgba(245,197,24,.5)' : '#1e2535';
+  });
+  var desc = document.getElementById('tsym_modeDesc');
+  var descs = {
+    dribble:  _t('Compare la hauteur du poignet G vs D','Compares left vs right wrist height'),
+    shot:     _t('Compare l\'angle du coude G vs D','Compares left vs right elbow angle'),
+    footwork: _t('Analyse l\'écartement et la symétrie des pas','Analyzes step width and foot symmetry'),
+    posture:  _t('Compare le niveau des épaules et des hanches','Compares shoulder and hip alignment')
+  };
+  if (desc) desc.textContent = descs[m] || '';
+}
+
+/* ── Save + History ─────────────────────────────────────────── */
+var _tsym_sessions = [];
+
+function _tsym_save() {
+  if (_tsym_frameScores.length === 0) return;
+  var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
+  var modeLabels = {
+    dribble:  _t('Dribble','Dribble'),
+    shot:     _t('Tir','Shot'),
+    footwork: _t('Footwork','Footwork'),
+    posture:  _t('Posture','Posture')
+  };
+  var now = new Date();
+  var d = now.toLocaleDateString(window._lang === 'en' ? 'en-US' : 'fr-FR', {day:'numeric', month:'short'});
+  _tsym_sessions.unshift({ mode: modeLabels[_tsym_mode], score: avg, date: d });
+  _tr_saveProgress('symmetry', { score: avg, mode: _tsym_mode });
+  _tsym_renderHistory();
+  _tsym_stopCamera();
+  var btnSave = document.getElementById('tsym_btnSave');
+  if (btnSave) btnSave.style.display = 'none';
+  var status = document.getElementById('tsym_status');
+  if (status) {
+    status.textContent = _t('Session sauvegardée ✅','Session saved ✅');
+    status.style.color = '#2dc653';
+  }
+  _tsym_updateInsight();
+}
+
+function _tsym_renderHistory() {
+  var el = document.getElementById('tsym_histList');
+  if (!el) return;
+  if (_tsym_sessions.length === 0) {
+    el.innerHTML = '<div class="tr-empty">' + _t('Aucune session','No sessions yet') + '</div>';
+    return;
+  }
+  el.innerHTML = _tsym_sessions.map(function(s) {
+    var cls = s.score >= 80 ? 'hi' : s.score >= 60 ? 'mid' : 'lo';
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'
+      + '<div class="tr-hi-name">⚖️ ' + s.mode + '</div>'
+      + '<div class="tr-hi-meta">' + s.date + '</div>'
+      + '</div><div class="tr-hist-score ' + cls + '">' + s.score + '%</div></div>';
+  }).join('');
+}
+
+function _tsym_updateInsight() {
+  var el = document.getElementById('tsym_insightText');
+  if (!el) return;
+  if (_tsym_sessions.length === 0) {
+    el.innerHTML = '<span>' + _t('Lance une session pour voir l\'analyse...','Start a session to see the analysis...') + '</span>';
+    return;
+  }
+  var recent = _tsym_sessions.slice(0, 5);
+  var avg = Math.round(recent.reduce(function(a,b){return a+b.score;},0) / recent.length);
+  var cls = avg >= 80 ? 'tr-hl' : avg >= 60 ? 'tr-warn' : 'tr-bad';
+  var lbl = avg >= 80
+    ? _t('Symétrie optimale — mouvement équilibré 🧬','Optimal symmetry — balanced movement 🧬')
+    : avg >= 60
+    ? _t('Légère asymétrie — à surveiller','Slight asymmetry — monitor closely')
+    : _t('Asymétrie significative — risque de blessure ⚠️','Significant asymmetry — injury risk ⚠️');
+  el.innerHTML = '<span class="' + cls + '">' + avg + '% — ' + lbl + '</span>';
+}
+
+function _tsym_onError(msg) {
+  var status = document.getElementById('tsym_status');
+  if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
+  _tsym_running = false;
+}
+
+
+function _tsym_expandCanvas() {
+  var cnt = document.getElementById('tsym_camContainer');
+  if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
+}</script>
 
 <script>
 if(typeof LANG_DATA!=='undefined'){
