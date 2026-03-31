@@ -12939,6 +12939,9 @@ function _trApplyLang() {
     var drp=p.querySelector('[onclick="_tag_dRep()"]');
     if(drp)drp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
     _tag_buildDrills();_tag_updateInsight();
+    var ahi=document.getElementById('tag_histList');
+    if(ahi&&ahi.querySelector('.tr-empty'))ahi.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tag_renderHistory();
     _tr_drawProgressChart('tag_progressChart','agility','rpm','#f5c518');
   });
 
@@ -12954,6 +12957,9 @@ function _trApplyLang() {
     if(ss&&ss.style.display!=='none')ss.innerHTML='&#9654; '+(en?'START':'DÉMARRER');
     var srp=p.querySelector('[onclick="_tsc_scRep()"]');
     if(srp)srp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
+    var sch=document.getElementById('tsc_scHistList');
+    if(sch&&sch.querySelector('.tr-empty'))sch.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tsc_scRenderHistory();
     var sci=document.getElementById('tsc_scInsight');
     if(sci){var st=sci.textContent.trim();if(st.indexOf('Lance')>-1||st.indexOf('Start')>-1)sci.innerHTML='<span>'+(en?'Start a session...':'Lance une session...')+'</span>';}
   });
@@ -12975,7 +12981,10 @@ function _trApplyLang() {
     var chL=en?['TRIES','WINS','RATE','STREAK']:['ESSAIS','RÉUSSITES','TAUX','STREAK'];
     chSB.forEach(function(b,i){if(chL[i])b.textContent=chL[i];
     var cbsv=p.querySelector('[onclick="_tch_saveSession()"]');
-    if(cbsv)cbsv.innerHTML='💾 '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');});
+    if(cbsv)cbsv.innerHTML='💾 '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');
+    var chh=document.getElementById('tch_histList');
+    if(chh&&chh.querySelector('.tr-empty'))chh.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+    else _tch_renderHistory();});
     var chi=document.getElementById('tch_insightText');
     if(chi){var ct=chi.textContent.trim();if(ct.indexOf('Lance')>-1||ct.indexOf('Start')>-1||ct.indexOf('tentative')>-1)chi.innerHTML='<span>'+(en?'Start your first attempt!':'Lance ta première tentative !')+'</span>';}
   });
