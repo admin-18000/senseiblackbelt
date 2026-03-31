@@ -1155,6 +1155,8 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="tr-btn tr-btn-start" id="tsym_btnStart" onclick="_tsym_startCamera()" ontouchstart="">▶ DÉMARRER</button>
       <button class="tr-btn tr-btn-stop"  id="tsym_btnStop"  onclick="_tsym_stopCamera()"  ontouchstart="" style="display:none">⏹ STOP</button>
       <button class="tr-btn tr-btn-save"  id="tsym_btnSave"  onclick="_tsym_save()"         ontouchstart="" style="display:none">💾 SAUVEGARDER</button>
+      <button class="tr-btn" id="tsym_btnRec" onclick="_tsym_toggleRec()" ontouchstart="" style="display:none;background:#e63946;color:#fff;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 16px;border:none;border-radius:8px;cursor:pointer">🔴 REC</button>
+      <a id="tsym_dlLink" style="display:none"></a>
     </div>
   </div>
 
@@ -11536,16 +11538,16 @@ if(typeof _origSS==='function'){
 }
 
 /* Resize */
-window.addEventListener('resize',function(){_fns.forEach(function(d){var el=document.getElementById(d.id);if(!el)return;el.width=el.parentElement.clientWidth||600;el.height=260;});});
-
-/* Hook applyLang */
-window.applyLangVisuSci=function(){_fns.forEach(function(d){if(d.fn._t!==undefined)d.fn._t=0;});};
-var _prevAL=window.applyLang;
-if(typeof _prevAL==='function'){window.applyLang=function(lang){_prevAL(lang);window.applyLangVisuSci();};}
+window.addEventListener('resize',function(){
+  _fns.forEach(function(d){
+    var el=document.getElementById(d.id);if(!el)return;
+    var w=Math.max(200,el.parentElement.clientWidth||600);
+    var h=Math.max(160,el.parentElement.clientHeight||240);
+    if(el.width!==w||el.height!==h){el.width=w;el.height=h;}
+  });
+});
 })();
-</script>
 
-<script>
 /* TRAINING MODE */
 
 function openTrainingTab(id, btn) {
@@ -13076,6 +13078,8 @@ function _trApplyLang() {
     var drp=p.querySelector('[onclick="_tag_dRep()"]');
     if(drp)drp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
     _tag_buildDrills();_tag_updateInsight();
+    var agSv=p.querySelector('[onclick="_tag_dSave()"]');
+    if(agSv)agSv.innerHTML='💾 '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');
     var ahi=document.getElementById('tag_histList');
     if(ahi&&ahi.querySelector('.tr-empty'))ahi.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
     else _tag_renderHistory();
@@ -13159,6 +13163,8 @@ function _trApplyLang() {
     if(hl&&hl.querySelector('.tr-empty'))hl.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
     else if(typeof _tsym_renderHistory==='function')_tsym_renderHistory();
     if(typeof _tr_drawProgressChart==='function')_tr_drawProgressChart('tsym_progressChart','symmetry','score','#4ecdc4');
+    var bRec3=document.getElementById('tsym_btnRec');
+    if(bRec3&&bRec3.style.display!=='none')bRec3.textContent=_tsym_recActive?'⏹ '+(en?'STOP REC':'ARRÊTER REC'):'🔴 REC';
     if(typeof _tsym_setMode==='function')_tsym_setMode(_tsym_mode||'dribble');
   });
 }
@@ -13349,13 +13355,21 @@ function _tsym_stopCamera() {
   var btnStop  = document.getElementById('tsym_btnStop');
   if (btnStart) btnStart.style.display = 'flex';
   if (btnStop)  btnStop.style.display  = 'none';
-  var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Caméra arrêtée','Camera stopped');
+  var btnSv=document.getElementById('tsym_btnSave');
+  if(btnSv&&_tsym_frameScores.length>0)btnSv.style.display='flex';
+  var bRec2=document.getElementById('tsym_btnRec');if(bRec2)bRec2.style.display='none';
+  if(_tsym_recActive)_tsym_stopRec();
+  var status=document.getElementById('tsym_status');
+  if(status)status.textContent=_tsym_frameScores.length>0
+    ?_t('Analyse terminée — sauvegarde ?','Analysis done — save?')
+    :_t('Caméra arrêtée','Camera stopped');
 }
 
 /* ── Boucle de détection ────────────────────────────────────── */
 function _tsym_startDetection() {
-  _tsym_expandCanvas(); // afficher le canvas
+  _tsym_expandCanvas();
+  var bRec=document.getElementById('tsym_btnRec');
+  if(bRec)bRec.style.display='flex';
   _tsym_running = true;
   _tsym_frameScores = [];
   var btnStart = document.getElementById('tsym_btnStart');
@@ -13621,6 +13635,50 @@ function _tsym_updateInsight() {
   el.innerHTML = '<span class="' + cls + '">' + avg + '% — ' + lbl + '</span>';
 }
 
+function _tsym_onError(msg) {
+  var status = document.getElementById('tsym_status');
+  if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
+  _tsym_running = false;
+}
+
+
+function _tsym_expandCanvas() {
+  var cnt = document.getElementById('tsym_camContainer');
+  if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
+}
+/* ── ENREGISTREMENT VIDÉO ─────────────────────────────────── */
+var _tsym_recorder=null,_tsym_recChunks=[],_tsym_recActive=false;
+function _tsym_toggleRec(){if(_tsym_recActive)_tsym_stopRec();else _tsym_startRec();}
+function _tsym_startRec(){
+  var cv=document.getElementById('tsym_canvas');if(!cv)return;
+  var stream=cv.captureStream?cv.captureStream(30):cv.mozCaptureStream?cv.mozCaptureStream(30):null;
+  if(!stream){alert(_t('Enregistrement non supporté','Recording not supported'));return;}
+  var types=['video/mp4;codecs=h264','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+  var mimeType='';
+  for(var i=0;i<types.length;i++){if(typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(types[i])){mimeType=types[i];break;}}
+  try{_tsym_recorder=mimeType?new MediaRecorder(stream,{mimeType:mimeType}):new MediaRecorder(stream);}
+  catch(e){try{_tsym_recorder=new MediaRecorder(stream);}catch(e2){alert(_t('MediaRecorder non supporté','MediaRecorder not supported'));return;}}
+  _tsym_recChunks=[];
+  _tsym_recorder.ondataavailable=function(e){if(e.data&&e.data.size>0)_tsym_recChunks.push(e.data);};
+  _tsym_recorder.onstop=function(){
+    var blob=new Blob(_tsym_recChunks,{type:_tsym_recorder.mimeType||'video/webm'});
+    var url=URL.createObjectURL(blob);
+    var ext=blob.type.indexOf('mp4')>-1?'mp4':'webm';
+    var link=document.getElementById('tsym_dlLink');
+    if(link){link.href=url;link.download='SENSEI_symetrie_'+new Date().toISOString().slice(0,10)+'.'+ext;link.click();setTimeout(function(){URL.revokeObjectURL(url);},5000);}
+    _tsym_recActive=false;_tsym_recChunks=[];
+    var btn=document.getElementById('tsym_btnRec');
+    if(btn){btn.textContent='🔴 REC';btn.style.background='#e63946';}
+    var st=document.getElementById('tsym_status');
+    if(st)st.textContent=_t('Vidéo sauvegardée 📲','Video saved 📲');
+  };
+  _tsym_recorder.start(1000);_tsym_recActive=true;
+  var btn=document.getElementById('tsym_btnRec');
+  if(btn){btn.textContent='⏹ '+_t('ARRÊTER REC','STOP REC');btn.style.background='#7a0000';}
+  var st=document.getElementById('tsym_status');
+  if(st)st.textContent='🔴 '+_t('Enregistrement en cours...','Recording...');
+}
+function _tsym_stopRec(){if(_tsym_recorder&&_tsym_recActive){try{_tsym_recorder.stop();}catch(e){}}}
 function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
