@@ -655,6 +655,7 @@ body.unlocked .sensei-only{display:revert !important}
 <div class="mobile-menu" id="mobile-menu">
   <button class="mm-btn active" onclick="showSection('home',null);closeMenu()" data-i18n="mob_home">🏠 Home</button>
   <button class="mm-btn" onclick="showSection('belts',null);closeMenu()" data-i18n="mob_belts">🥋 Belts — Ceintures</button>
+  <button class="mm-btn" onclick="showSection('training',null);closeMenu()" data-i18n="mob_training">🏋️ Training Mode</button>
   <button class="mm-btn" onclick="showSection('ballhandling',null);closeMenu()" data-i18n="mob_ballhandling">🏀 Ball Handling Drills</button>
   <button class="mm-btn" onclick="showSection('shooting',null);closeMenu()" data-i18n="mob_shooting">🎯 Shooting</button>
   <button class="mm-btn" onclick="showSection('defense',null);closeMenu()" data-i18n="mob_defense">🛡️ Defense</button>
@@ -1117,6 +1118,15 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="sec-sub">Dribble · Shot Chart · Agility · Strength · Challenges</div>
   <div class="sec-line"></div>
 
+  <!-- OBJECTIFS HEBDO -->
+  <div class="tr-card" style="margin-bottom:20px">
+    <div class="tr-card-title" id="tr_goalsTitle">🏆 OBJECTIFS HEBDOMADAIRES</div>
+    <div id="tr_weeklyGoals">
+      <div style="font-size:11px;color:#7a8299;text-align:center;padding:10px">
+        Lance ta première session pour commencer le suivi
+      </div>
+    </div>
+  </div>
   <!-- ONGLETS -->
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px">
     <button onclick="openTrainingTab('dribble',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:var(--gold)">🏀 Dribble</button>
@@ -1157,6 +1167,33 @@ body.unlocked .sensei-only{display:revert !important}
     <div id="td_tapCount" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:4px">0 dribbles</div>
   </div>
   <div class="tr-card">
+    <div class="tr-card-title">🔊 MÉTRONOME &amp; 🎤 MICRO</div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button id="td_metroBtn" onclick="_td_toggleMetronome()" ontouchstart=""
+        style="flex:2;padding:12px;border-radius:10px;border:1px solid rgba(245,197,24,.3);
+        background:rgba(245,197,24,.08);color:#f5c518;font-family:var(--font-cond);
+        font-weight:700;font-size:11px;letter-spacing:1px;cursor:pointer;user-select:none">
+        🔊 MÉTRONOME 80 BPM
+      </button>
+      <button id="td_microBtn" onclick="_td_toggleMicro()" ontouchstart=""
+        style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(245,197,24,.3);
+        background:rgba(245,197,24,.08);color:#f5c518;font-family:var(--font-cond);
+        font-weight:700;font-size:11px;letter-spacing:1px;cursor:pointer;user-select:none">
+        🎤 MICRO
+      </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <span style="font-size:11px;color:#7a8299;flex:0 0 auto">BPM</span>
+      <input type="range" min="40" max="200" value="80" step="5" style="flex:1;accent-color:#f5c518"
+        oninput="_td_setBPM(this.value)">
+      <span id="td_bpmVal" style="font-size:16px;font-weight:bold;color:#f5c518;min-width:38px;text-align:right">80</span>
+    </div>
+    <div style="text-align:center;padding:8px 0">
+      <div id="td_microScore" style="font-size:38px;font-weight:bold;color:#7a8299">--</div>
+      <div id="td_microScoreLbl" style="font-size:9px;color:#7a8299;letter-spacing:1px">Score rythme micro</div>
+    </div>
+  </div>
+  <div class="tr-card">
     <div class="tr-card-title">📊 RYTHME DU DRIBBLE</div>
     <canvas id="td_rhythmCv" width="448" height="90" style="width:100%;border-radius:8px;background:#080a0f;display:block;margin-top:8px"></canvas>
     <div style="font-size:9px;color:var(--muted);margin-top:6px;text-align:center">Transformée de Fourier — régularité du signal</div>
@@ -1179,6 +1216,12 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="tr-card">
     <div class="tr-card-title">💡 ANALYSE SENSEI</div>
     <div class="tr-insight" id="td_insightText">Lance une session pour voir l'analyse...</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📈 PROGRESSION</div>
+    <canvas id="td_progressChart" width="448" height="80"
+      style="width:100%;border-radius:8px;background:#080a0f;display:block"></canvas>
+    <div id="td_progressLbl" style="font-size:9px;color:#7a8299;text-align:center;margin-top:4px">Consistance — 60 dernières sessions</div>
   </div>
   <div class="tr-card">
     <div class="tr-card-title">📅 HISTORIQUE</div>
@@ -1206,6 +1249,15 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="tr-btn tr-btn-make" id="tsc_btnMake" onclick="_tsc_record(true)"  disabled>✅ RENTRÉ</button>
       <button class="tr-btn tr-btn-miss" id="tsc_btnMiss" onclick="_tsc_record(false)" disabled>❌ RATÉ</button>
       <button class="tr-btn tr-btn-reset" onclick="_tsc_resetAll()">↺</button>
+      <button class="tr-btn tr-btn-save" onclick="_tsc_saveAndCompare()" style="flex:2">
+        💾 SAUVEGARDER &amp; COMPARER
+      </button>
+    </div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📊 COMPARAISON N vs N-1</div>
+    <div id="tsc_compareText" style="font-size:12px;color:#7a8299;text-align:center;padding:8px 0">
+      Sauvegarde une session pour voir la comparaison
     </div>
   </div>
   <div class="tr-card">
@@ -1247,6 +1299,28 @@ body.unlocked .sensei-only{display:revert !important}
   <div id="tag_secReact">
     <div class="tr-card">
       <div class="tr-card-title">⚡ TEST DE RÉACTION</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="tag-lvl-btn" onclick="_tag_setLevel(1)"
+          style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.3);
+          background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);
+          font-weight:700;font-size:10px;cursor:pointer;letter-spacing:.5px">
+          ⚡ NIV 1
+        </button>
+        <button class="tag-lvl-btn" onclick="_tag_setLevel(2)"
+          style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.3);
+          background:var(--dark3);color:#7a8299;font-family:var(--font-cond);
+          font-weight:700;font-size:10px;cursor:pointer;letter-spacing:.5px">
+          🧠 NIV 2
+        </button>
+        <button class="tag-lvl-btn" onclick="_tag_setLevel(3)"
+          style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.3);
+          background:var(--dark3);color:#7a8299;font-family:var(--font-cond);
+          font-weight:700;font-size:10px;cursor:pointer;letter-spacing:.5px">
+          🔥 NIV 3
+        </button>
+      </div>
+      <div id="tag_levelDesc" style="font-size:10px;color:#7a8299;text-align:center;
+        margin-bottom:10px;min-height:18px">Signal unique — tape quand vert</div>
       <div id="tag_reactArea" onclick="_tag_reactTap()" ontouchstart=""
         style="width:100%;border-radius:14px;background:#131820;border:2px solid var(--dark3);
                display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1289,6 +1363,12 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="tr-card">
     <div class="tr-card-title">💡 ANALYSE SENSEI</div>
     <div class="tr-insight" id="tag_insightText">Lance une session...</div>
+  </div>
+  <div class="tr-card">
+    <div class="tr-card-title">📈 PROGRESSION</div>
+    <canvas id="tag_progressChart" width="448" height="80"
+      style="width:100%;border-radius:8px;background:#080a0f;display:block"></canvas>
+    <div style="font-size:9px;color:#7a8299;text-align:center;margin-top:4px">Reps/min — 60 dernières sessions</div>
   </div>
   <div class="tr-card">
     <div class="tr-card-title">📅 HISTORIQUE</div>
@@ -11340,18 +11420,6 @@ function openTrainingTab(id, btn) {
   if(id==='ch')       initTraining_ch();
 }
 
-var _trInitDone=false;
-(function(){
-  var _o=window.showSection;
-  window.showSection=function(id,btn){
-    if(typeof _o==='function') _o.call(this,id,btn);
-    if(id==='training'&&!_trInitDone){
-      _trInitDone=true;
-      setTimeout(function(){initTraining_d();},80);
-    }
-  };
-})();
-
 /* DRIBBLE */
 /* ══ DRIBBLE TRACKER ══ */
 var _initTraining_d_done = false;
@@ -12302,189 +12370,677 @@ function _tch_renderHistory() {
   }).join('');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   TRAINING MODE — 7 NOUVELLES FEATURES
+   1. Métronome audio (Web Audio API)
+   2. Dribble au rythme micro (Web Audio API)
+   3. Vibration feedback
+   4. Réaction multi-niveaux
+   5. Progression longitudinale (localStorage)
+   6. Shot Chart N vs N-1
+   7. Objectifs hebdo
+══════════════════════════════════════════════════════════════ */
+
+/* ══ FEATURE 1+2+3 : MÉTRONOME + MICRO + VIBRATION (Dribble) ══ */
+var _td_audioCtx = null;
+var _td_metronome = null;
+var _td_metroActive = false;
+var _td_metroBPM = 80;
+var _td_microActive = false;
+var _td_analyser = null;
+var _td_microStream = null;
+var _td_lastDribbleTime = 0;
+var _td_dribbleTimes = [];
+var _td_dribbleScores = [];
+
+function _td_getAudioCtx() {
+  if (!_td_audioCtx) _td_audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _td_audioCtx;
+}
+
+function _td_beep(freq, dur, vol) {
+  try {
+    var ctx = _td_getAudioCtx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq || 880;
+    gain.gain.setValueAtTime(vol || 0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (dur || 0.1));
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + (dur || 0.1));
+  } catch(e) {}
+}
+
+function _td_startMetronome() {
+  if (_td_metroActive) return;
+  _td_metroActive = true;
+  var interval = 60000 / _td_metroBPM;
+  _td_metronome = setInterval(function() {
+    _td_beep(880, 0.08, 0.25);
+    if (navigator.vibrate) navigator.vibrate(20);
+  }, interval);
+  var btn = document.getElementById('td_metroBtn');
+  if (btn) { btn.style.background='rgba(245,197,24,.3)'; btn.textContent = '🔊 ' + _td_metroBPM + ' BPM ■'; }
+}
+
+function _td_stopMetronome() {
+  _td_metroActive = false;
+  clearInterval(_td_metronome);
+  var btn = document.getElementById('td_metroBtn');
+  if (btn) { btn.style.background='rgba(245,197,24,.08)'; btn.textContent = '🔊 ' + _t('MÉTRONOME','METRONOME') + ' ' + _td_metroBPM + ' BPM'; }
+}
+
+function _td_toggleMetronome() {
+  if (_td_metroActive) _td_stopMetronome();
+  else _td_startMetronome();
+}
+
+function _td_setBPM(val) {
+  _td_metroBPM = Math.max(40, Math.min(200, parseInt(val) || 80));
+  var lbl = document.getElementById('td_bpmVal');
+  if (lbl) lbl.textContent = _td_metroBPM;
+  if (_td_metroActive) { _td_stopMetronome(); _td_startMetronome(); }
+}
+
+/* Micro — détecter les rebonds du ballon */
+function _td_toggleMicro() {
+  if (_td_microActive) {
+    _td_stopMicro();
+  } else {
+    _td_startMicro();
+  }
+}
+
+function _td_startMicro() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert(_t('Micro non disponible sur cet appareil','Microphone not available'));
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
+    _td_microStream = stream;
+    _td_microActive = true;
+    var ctx = _td_getAudioCtx();
+    var source = ctx.createMediaStreamSource(stream);
+    _td_analyser = ctx.createAnalyser();
+    _td_analyser.fftSize = 256;
+    source.connect(_td_analyser);
+    _td_detectDribble();
+    var btn = document.getElementById('td_microBtn');
+    if (btn) { btn.style.background='rgba(45,198,83,.25)'; btn.textContent = '🎤 ' + _t('MICRO ACTIF','MIC ON') + ' ■'; }
+  }).catch(function() {
+    alert(_t('Permission micro refusée','Microphone permission denied'));
+  });
+}
+
+function _td_stopMicro() {
+  _td_microActive = false;
+  if (_td_microStream) { _td_microStream.getTracks().forEach(function(t){t.stop();}); _td_microStream = null; }
+  var btn = document.getElementById('td_microBtn');
+  if (btn) { btn.style.background='rgba(245,197,24,.08)'; btn.textContent = '🎤 ' + _t('MICRO','MIC'); }
+}
+
+var _td_detectThreshold = 0.15;
+var _td_detectCooldown = 0;
+
+function _td_detectDribble() {
+  if (!_td_microActive || !_td_analyser) return;
+  var data = new Uint8Array(_td_analyser.fftSize);
+  _td_analyser.getByteTimeDomainData(data);
+  var max = 0;
+  for (var i = 0; i < data.length; i++) {
+    var v = Math.abs(data[i] - 128) / 128;
+    if (v > max) max = v;
+  }
+  var now = Date.now();
+  if (max > _td_detectThreshold && now - _td_detectCooldown > 200) {
+    _td_detectCooldown = now;
+    _td_dribbleTimes.push(now);
+    // Score de précision vs métronome
+    var score = 100;
+    if (_td_metroActive && _td_dribbleTimes.length > 1) {
+      var metroInterval = 60000 / _td_metroBPM;
+      var lastDrib = _td_dribbleTimes[_td_dribbleTimes.length - 2];
+      var elapsed = now - lastDrib;
+      var deviation = Math.abs(elapsed - metroInterval) / metroInterval;
+      score = Math.max(0, Math.round((1 - deviation) * 100));
+      _td_dribbleScores.push(score);
+      // Feedback visuel + vibration
+      var feedbackEl = document.getElementById('td_microScore');
+      if (feedbackEl) {
+        feedbackEl.textContent = score + '%';
+        feedbackEl.style.color = score >= 80 ? '#2dc653' : score >= 50 ? '#f5c518' : '#e63946';
+        if (score < 50 && navigator.vibrate) navigator.vibrate([30, 10, 30]);
+        else if (score >= 80 && navigator.vibrate) navigator.vibrate(15);
+      }
+    }
+    // Mise à jour compteur
+    var tc = document.getElementById('td_tapCount');
+    if (tc) tc.textContent = _td_dribbleTimes.length + ' ' + _t('dribbles','dribbles') + ' 🎤';
+    _td_updateScores();
+  }
+  requestAnimationFrame(_td_detectDribble);
+}
+
+/* ══ FEATURE 4 : RÉACTION MULTI-NIVEAUX ══ */
+var _tag_reactionLevel = 1;
+var _tag_levelScores = { 1: [], 2: [], 3: [] };
+
+function _tag_setLevel(lvl) {
+  _tag_reactionLevel = lvl;
+  document.querySelectorAll('.tag-lvl-btn').forEach(function(b, i) {
+    b.style.background = (i + 1) === lvl ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
+    b.style.color = (i + 1) === lvl ? '#f5c518' : '#7a8299';
+  });
+  _tag_resetReact();
+  var desc = document.getElementById('tag_levelDesc');
+  var descs = {
+    1: _t('Signal unique — tape quand vert', 'Single signal — tap when green'),
+    2: _t('2 signaux — rouge = ne pas taper', '2 signals — red = don\'t tap'),
+    3: _t('3 signaux — décide vite !', '3 signals — decide fast!')
+  };
+  if (desc) desc.textContent = descs[lvl] || '';
+}
+
+var _tag_reactState_orig = _tag_reactState;
+
+function _tag_showSignal_multi() {
+  if (_tag_reactionLevel === 1) {
+    // Niveau 1 : vert = tap
+    _tag_reactState = 'go'; _tag_reactStart = Date.now();
+    var area = document.getElementById('tag_reactArea');
+    if (area) { area.style.background='#081a08'; area.style.borderColor='#2dc653'; }
+    var re = document.getElementById('tag_reactEmoji'); if (re) re.textContent = '🟢';
+    var rm = document.getElementById('tag_reactMsg');   if (rm) rm.textContent = _t('TAP MAINTENANT !','TAP NOW!');
+  } else if (_tag_reactionLevel === 2) {
+    // Niveau 2 : vert = tap, rouge = ne pas taper
+    var isGreen = Math.random() > 0.4;
+    _tag_reactState = isGreen ? 'go' : 'nogo';
+    _tag_reactStart = Date.now();
+    var area2 = document.getElementById('tag_reactArea');
+    if (area2) { area2.style.background = isGreen ? '#081a08' : '#1a0808'; area2.style.borderColor = isGreen ? '#2dc653' : '#e63946'; }
+    var re2 = document.getElementById('tag_reactEmoji'); if (re2) re2.textContent = isGreen ? '🟢' : '🔴';
+    var rm2 = document.getElementById('tag_reactMsg');   if (rm2) rm2.textContent = isGreen ? _t('TAP !','TAP!') : _t('NE PAS TAPER !','DON\'T TAP!');
+  } else {
+    // Niveau 3 : 3 couleurs
+    var colors = ['green','red','yellow'];
+    var col = colors[Math.floor(Math.random() * 3)];
+    var actions = { green: 'go', red: 'nogo', yellow: Math.random()>0.5?'go':'nogo' };
+    _tag_reactState = actions[col];
+    _tag_reactStart = Date.now();
+    var emojis = { green:'🟢', red:'🔴', yellow:'🟡' };
+    var msgs = {
+      green: _t('TAP !','TAP!'),
+      red:   _t('NE PAS TAPER !','DON\'T TAP!'),
+      yellow: _t('?? DÉCIDE ??','?? DECIDE ??')
+    };
+    var area3 = document.getElementById('tag_reactArea');
+    var bgs = { green:'#081a08', red:'#1a0808', yellow:'#1a1408' };
+    var borders = { green:'#2dc653', red:'#e63946', yellow:'#f5c518' };
+    if (area3) { area3.style.background = bgs[col]; area3.style.borderColor = borders[col]; }
+    var re3 = document.getElementById('tag_reactEmoji'); if (re3) re3.textContent = emojis[col];
+    var rm3 = document.getElementById('tag_reactMsg');   if (rm3) rm3.textContent = msgs[col];
+  }
+}
+
+/* Override _tag_showSignal pour le multi-niveau */
+var _tag_origShowSignal = _tag_showSignal;
+_tag_showSignal = _tag_showSignal_multi;
+
+/* Override _tag_reactTap pour gérer no-go */
+var _tag_origTap = _tag_reactTap;
+_tag_reactTap = function() {
+  if (_tag_reactState === 'nogo') {
+    // Tapé alors qu'il ne fallait pas
+    clearTimeout(_tag_reactTO);
+    _tag_reactState = 'idle';
+    var area = document.getElementById('tag_reactArea');
+    if (area) { area.style.background='#1a0808'; area.style.borderColor='#e63946'; }
+    var re = document.getElementById('tag_reactEmoji'); if (re) re.textContent = '❌';
+    var rm = document.getElementById('tag_reactMsg');   if (rm) rm.textContent = _t('ERREUR — ne pas taper sur rouge !','ERROR — don\'t tap on red!');
+    if (navigator.vibrate) navigator.vibrate([50,20,50]);
+    setTimeout(function(){
+      if(area){area.style.background='#131820';area.style.borderColor='var(--dark3)';}
+      if(re)re.textContent='👁️';
+      if(rm)rm.textContent=_t('TAP POUR COMMENCER','TAP TO START');
+    }, 1500);
+    return;
+  }
+  _tag_origTap();
+};
+
+/* ══ FEATURE 5 : PROGRESSION LONGITUDINALE ══ */
+var _tr_STORAGE_KEY = 'sensei_training_progress';
+
+function _tr_saveProgress(module, data) {
+  try {
+    var raw = localStorage.getItem(_tr_STORAGE_KEY);
+    var all = raw ? JSON.parse(raw) : {};
+    if (!all[module]) all[module] = [];
+    all[module].push({ date: Date.now(), data: data });
+    // Garder les 60 dernières sessions par module
+    if (all[module].length > 60) all[module] = all[module].slice(-60);
+    localStorage.setItem(_tr_STORAGE_KEY, JSON.stringify(all));
+  } catch(e) {}
+}
+
+function _tr_getProgress(module) {
+  try {
+    var raw = localStorage.getItem(_tr_STORAGE_KEY);
+    if (!raw) return [];
+    var all = JSON.parse(raw);
+    return all[module] || [];
+  } catch(e) { return []; }
+}
+
+function _tr_drawProgressChart(canvasId, module, metric, color) {
+  var cv = document.getElementById(canvasId);
+  if (!cv) return;
+  var sessions = _tr_getProgress(module);
+  var ctx2 = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  ctx2.clearRect(0,0,W,H);
+  ctx2.fillStyle='#0d1117'; ctx2.fillRect(0,0,W,H);
+
+  if (sessions.length < 2) {
+    ctx2.fillStyle='#7a8299'; ctx2.font='11px monospace'; ctx2.textAlign='center';
+    ctx2.fillText(_t('Pas encore assez de sessions','Not enough sessions yet'), W/2, H/2);
+    return;
+  }
+
+  var values = sessions.map(function(s){ return s.data[metric] || 0; });
+  var maxV = Math.max.apply(null, values) || 1;
+  var minV = Math.min.apply(null, values);
+
+  // Grille
+  ctx2.strokeStyle='rgba(255,255,255,.05)'; ctx2.lineWidth=1;
+  for (var g=0; g<=4; g++) {
+    var gy = H*0.1 + g*(H*0.8/4);
+    ctx2.beginPath(); ctx2.moveTo(0,gy); ctx2.lineTo(W,gy); ctx2.stroke();
+  }
+
+  // Courbe
+  ctx2.strokeStyle = color || '#f5c518'; ctx2.lineWidth=2;
+  ctx2.beginPath();
+  values.forEach(function(v, i) {
+    var x = (i/(values.length-1))*(W-20)+10;
+    var y = H*0.9 - ((v-minV)/(maxV-minV||1))*(H*0.8);
+    i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
+  });
+  ctx2.stroke();
+
+  // Points
+  values.forEach(function(v, i) {
+    var x = (i/(values.length-1))*(W-20)+10;
+    var y = H*0.9 - ((v-minV)/(maxV-minV||1))*(H*0.8);
+    ctx2.beginPath(); ctx2.arc(x,y,3,0,Math.PI*2);
+    ctx2.fillStyle = color || '#f5c518'; ctx2.fill();
+  });
+
+  // Dernière valeur
+  var last = values[values.length-1];
+  ctx2.fillStyle='#f0f2f8'; ctx2.font='bold 11px monospace'; ctx2.textAlign='right';
+  ctx2.fillText(Math.round(last), W-4, 14);
+}
+
+/* Hook sur save dribble pour sauvegarder la progression */
+var _td_origSave = _td_save;
+_td_save = function() {
+  var cons = _td_computeConsistency();
+  var intervals = [];
+  for(var i=1;i<_td_taps.length;i++) intervals.push(_td_taps[i]-_td_taps[i-1]);
+  var bpm = _td_taps.length>1 ? Math.round(60000/(intervals.reduce(function(a,b){return a+b;},0)/intervals.length)) : 0;
+  _tr_saveProgress('dribble', { cons: cons, bpm: bpm, taps: _td_taps.length, dur: _td_sec });
+  _td_origSave();
+  _tr_drawProgressChart('td_progressChart', 'dribble', 'cons', '#2dc653');
+};
+
+/* Hook sur save shot chart */
+var _tsc_origRecord = _tsc_record;
+// Hook save agility
+var _tag_origDSave = _tag_dSave;
+_tag_dSave = function() {
+  var rpm = _tag_dSec>0 ? Math.round(_tag_dReps/(_tag_dSec/60)) : 0;
+  _tr_saveProgress('agility', { rpm: rpm, reps: _tag_dReps, dur: _tag_dSec });
+  _tag_origDSave();
+  _tr_drawProgressChart('tag_progressChart', 'agility', 'rpm', '#f5c518');
+};
+
+/* ══ FEATURE 6 : SHOT CHART N vs N-1 ══ */
+var _tsc_prevSession = null;
+
+function _tsc_saveAndCompare() {
+  var totalA = _tsc_ZONES.reduce(function(a,z){return a+_tsc_stats[z.id].total;},0);
+  if (totalA === 0) return;
+  // Sauvegarder session actuelle
+  var sessionData = {};
+  _tsc_ZONES.forEach(function(z){ sessionData[z.id] = { made:_tsc_stats[z.id].made, total:_tsc_stats[z.id].total }; });
+  var totalM = _tsc_ZONES.reduce(function(a,z){return a+_tsc_stats[z.id].made;},0);
+  var pct = Math.round(totalM/totalA*100);
+  var expG = _tsc_ZONES.reduce(function(acc,z){
+    var s=_tsc_stats[z.id];
+    return acc+(s.total>0?(s.made/s.total*z.pts)*(s.total/totalA):0);
+  },0);
+  _tr_saveProgress('shot', { pct: pct, exp: expG, total: totalA, zones: sessionData });
+  // Afficher comparaison
+  var sessions = _tr_getProgress('shot');
+  if (sessions.length >= 2) {
+    var prev = sessions[sessions.length-2].data;
+    var curr = sessions[sessions.length-1].data;
+    var diff = curr.pct - prev.pct;
+    var diffExp = (curr.exp - prev.exp).toFixed(2);
+    var el = document.getElementById('tsc_compareText');
+    if (el) {
+      var cls = diff > 0 ? 'tr-hl' : diff < 0 ? 'tr-bad' : 'tr-warn';
+      el.innerHTML = _t('vs session précédente : ','vs last session: ')
+        + '<span class="'+cls+'">'+(diff>0?'+':'')+diff+'%</span>'
+        + ' · E: <span class="'+cls+'">'+(diffExp>0?'+':'')+diffExp+'</span>';
+    }
+  }
+  _tsc_resetAll();
+}
+
+/* ══ FEATURE 7 : OBJECTIFS HEBDO ══ */
+var _tr_GOALS_KEY = 'sensei_weekly_goals';
+
+function _tr_getWeekKey() {
+  var d = new Date();
+  var jan1 = new Date(d.getFullYear(), 0, 1);
+  var week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return d.getFullYear() + '-W' + week;
+}
+
+function _tr_recordSession(module) {
+  try {
+    var raw = localStorage.getItem(_tr_GOALS_KEY);
+    var goals = raw ? JSON.parse(raw) : {};
+    var key = _tr_getWeekKey();
+    if (!goals[key]) goals[key] = {};
+    if (!goals[key][module]) goals[key][module] = 0;
+    goals[key][module]++;
+    localStorage.setItem(_tr_GOALS_KEY, JSON.stringify(goals));
+    _tr_updateGoalsDisplay();
+  } catch(e) {}
+}
+
+function _tr_updateGoalsDisplay() {
+  var el = document.getElementById('tr_weeklyGoals');
+  if (!el) return;
+  try {
+    var raw = localStorage.getItem(_tr_GOALS_KEY);
+    var goals = raw ? JSON.parse(raw) : {};
+    var key = _tr_getWeekKey();
+    var week = goals[key] || {};
+    var TARGET = 5;
+    var modules = [
+      {id:'dribble', icon:'🏀', name:_t('Dribble','Dribble')},
+      {id:'shot',    icon:'🎯', name:_t('Shot','Shot')},
+      {id:'agility', icon:'⚡', name:_t('Agility','Agility')},
+      {id:'sc',      icon:'💪', name:_t('Force','Strength')},
+      {id:'ch',      icon:'🏆', name:_t('Challenges','Challenges')}
+    ];
+    var total = Object.values(week).reduce(function(a,b){return a+b;},0);
+    var html = '<div style="font-size:10px;color:#7a8299;letter-spacing:1px;margin-bottom:10px">'
+      + _t('OBJECTIF HEBDO — ','WEEKLY GOAL — ') + total + '/' + TARGET
+      + _t(' sessions cette semaine',' sessions this week') + '</div>';
+    // Barre globale
+    var pct = Math.min(100, Math.round(total/TARGET*100));
+    var col = pct>=100?'#2dc653':pct>=60?'#f5c518':'#e63946';
+    html += '<div style="height:6px;background:#1e2535;border-radius:3px;overflow:hidden;margin-bottom:12px">'
+      + '<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;transition:width .6s"></div></div>';
+    // Par module
+    html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">';
+    modules.forEach(function(m) {
+      var count = week[m.id] || 0;
+      var done = count >= 1;
+      html += '<div style="text-align:center;padding:8px 4px;background:'+(done?'rgba(45,198,83,.1)':'var(--dark3)')+';border-radius:8px;border:1px solid '+(done?'#2dc653':'#1e2535')+'">'
+        + '<div style="font-size:18px">'+m.icon+'</div>'
+        + '<div style="font-size:8px;color:'+(done?'#2dc653':'#7a8299')+';margin-top:3px">'+count+'×</div>'
+        + '</div>';
+    });
+    html += '</div>';
+    if (total >= TARGET) {
+      html += '<div style="text-align:center;margin-top:10px;font-size:12px;color:#f5c518;font-weight:bold">'
+        + '🏆 ' + _t('Objectif atteint cette semaine !','Weekly goal reached!') + ' 🏆</div>';
+      if (navigator.vibrate) navigator.vibrate([100,50,100,50,200]);
+    }
+    el.innerHTML = html;
+  } catch(e) {}
+}
+
+/* Hooker les saves pour enregistrer les objectifs hebdo */
+var _td_origSave2 = _td_save;
+_td_save = function() {
+  _td_origSave2();
+  _tr_recordSession('dribble');
+};
+var _tag_origDSave2 = _tag_dSave;
+_tag_dSave = function() {
+  _tag_origDSave2();
+  _tr_recordSession('agility');
+};
+var _tsc_origSaveCompare = _tsc_saveAndCompare;
+
+/* Init objectifs au chargement de Training */
+function _tr_initGoals() {
+  _tr_updateGoalsDisplay();
+}
 
 
-/* ── Training Mode i18n COMPLET ── */
+
+/* ══ i18n COMPLET ══ */
 function _trApplyLang() {
   var en = window._lang === 'en';
+  var gt=document.getElementById('tr_goalsTitle');
+  if(gt)gt.textContent='🏆 '+(en?'WEEKLY GOALS':'OBJECTIFS HEBDOMADAIRES');
   function tx(id,fr,e){var el=document.getElementById(id);if(el)el.innerHTML=en?e:fr;}
-  function tc(id,fr,e){var el=document.getElementById(id);if(el)el.textContent=en?e:fr;}
-  function timerSubUpdate(id,runFr,runEn,doneFr,doneEn,idleFr,idleEn){
+  function timerSub(id,runFr,runEn,doneFr,doneEn,idleFr,idleEn){
     var el=document.getElementById(id);if(!el)return;
     var t=el.textContent;
-    if(t.indexOf('cours')>-1||t.indexOf('running')>-1) el.textContent=en?runEn:runFr;
-    else if(t.indexOf('ermin')>-1||t.indexOf('Done')>-1||t.indexOf('sauvegar')>-1||t.indexOf('save')>-1) el.textContent=en?doneEn:doneFr;
+    if(t.indexOf('cours')>-1||t.indexOf('running')>-1)el.textContent=en?runEn:runFr;
+    else if(t.indexOf('ermin')>-1||t.indexOf('Done')>-1||t.indexOf('sauveg')>-1||t.indexOf('save')>-1)el.textContent=en?doneEn:doneFr;
     else el.textContent=en?idleEn:idleFr;
   }
-  function startBtn(id,fr,e){var el=document.getElementById(id);if(el&&el.style.display!=='none')el.innerHTML='&#9654; '+(en?e:fr);}
-
   // Onglets
   var tabL={dribble:'🏀 Dribble',shot:'🎯 Shot Chart',agility:'⚡ Agility',sc:'💪 Strength',ch:'🏆 Challenges'};
   document.querySelectorAll('.tr-tab').forEach(function(b){
     var m=(b.getAttribute('onclick')||'').match(/openTrainingTab\('(\w+)'/);
     if(m&&tabL[m[1]])b.textContent=tabL[m[1]];
   });
+  // Objectifs hebdo
+  _tr_updateGoalsDisplay();
 
-  // ── DRIBBLE ──
-  var dP=document.getElementById('tr-dribble');
-  if(dP&&dP.style.display==='block'){
-    var dT=dP.querySelectorAll('.tr-card-title');
-    [en?'🎬 SELECT YOUR DRILL':'🎬 CHOISIS TON DRILL',
-     en?'⏱ SESSION':'⏱ SESSION',
-     en?'📊 DRIBBLE RHYTHM':'📊 RYTHME DU DRIBBLE',
-     en?'🎯 SCORE':'🎯 SCORE',
-     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
-     en?'📅 HISTORY':'📅 HISTORIQUE'
-    ].forEach(function(v,i){if(dT[i])dT[i].textContent=v;});
-    startBtn('td_btnStart','DÉMARRER','START');
+  function doPanel(panelId, titles, fn) {
+    var p=document.getElementById(panelId);
+    if(!p||p.style.display!=='block')return;
+    var T=p.querySelectorAll('.tr-card-title');
+    titles.forEach(function(v,i){if(T[i])T[i].textContent=v;});
+    if(fn)fn(p,en);
+  }
+
+  // DRIBBLE
+  doPanel('tr-dribble',[
+    en?'🎬 SELECT YOUR DRILL':'🎬 CHOISIS TON DRILL',
+    en?'⏱ SESSION':'⏱ SESSION',
+    en?'🔊 METRONOME & 🎤 MIC':'🔊 MÉTRONOME & 🎤 MICRO',
+    en?'📊 DRIBBLE RHYTHM':'📊 RYTHME DU DRIBBLE',
+    en?'🎯 SCORE':'🎯 SCORE',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    en?'📈 PROGRESS':'📈 PROGRESSION',
+    en?'📅 HISTORY':'📅 HISTORIQUE'
+  ], function(p,en){
+    var bs=document.getElementById('td_btnStart');
+    if(bs&&bs.style.display!=='none')bs.innerHTML='&#9654; '+(en?'START':'DÉMARRER');
     tx('td_btnStop','&#9209; STOP','&#9209; STOP');
     tx('td_btnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
-    tx('td_btnTap','🤜 TAP DRIBBLE','🤜 TAP DRIBBLE');
-    var errB=dP.querySelector('[onclick="_td_addError()"]');
-    if(errB)errB.innerHTML='&#9888; '+(en?'ERROR':'ERREUR');
-    timerSubUpdate('td_timerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
-    tc('lbl_dur','DURÉE','DURATION');
-    tc('lbl_drib2','DRIBBLES','DRIBBLES');
-    tc('lbl_err2','ERREURS','ERRORS');
-    tc('lbl_cons','CONSIST.','CONSIST.');
+    var mb=document.getElementById('td_metroBtn');
+    // Labels micro + progression
+    var ml=document.getElementById('td_microScoreLbl');
+    if(ml)ml.textContent=en?'Micro rhythm score':'Score rythme micro';
+    var pl=document.getElementById('td_progressLbl');
+    if(pl)pl.textContent=en?'Consistency — last 60 sessions':'Consistance — 60 dernières sessions';
+    if(mb&&!_td_metroActive)mb.textContent='🔊 '+(en?'METRONOME':'MÉTRONOME')+' '+_td_metroBPM+' BPM';
+    var mic=document.getElementById('td_microBtn');
+    if(mic&&!_td_microActive)mic.textContent='🎤 '+(en?'MIC':'MICRO');
+    timerSub('td_timerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    var scoreLbls=p.querySelectorAll('.tr-score-box .tr-score-lbl');
+    var sL=en?['DURATION','DRIBBLES','ERRORS','CONSIST.']:['DURÉE','DRIBBLES','ERREURS','CONSIST.'];
+    scoreLbls.forEach(function(b,i){if(sL[i])b.textContent=sL[i];});
+    var cPct=document.getElementById('td_consPct');
+    if(cPct&&cPct.previousElementSibling)cPct.previousElementSibling.textContent=en?'Rhythm consistency':'Consistance du rythme';
     var rCv=document.getElementById('td_rhythmCv');
     if(rCv&&rCv.nextElementSibling)rCv.nextElementSibling.textContent=en?'Fourier Transform — signal regularity':'Transformée de Fourier — régularité du signal';
-    // Consistance label
-    var cPct=document.getElementById('td_consPct');
-    if(cPct&&cPct.previousElementSibling)
-      cPct.previousElementSibling.textContent=en?'Rhythm consistency':'Consistance du rythme';
-    var tcnt=document.getElementById('td_tapCount');
-    if(tcnt&&!tcnt.textContent.match(/[1-9]/))tcnt.textContent='0 dribbles';
     var ins=document.getElementById('td_insightText');
-    if(ins){var insT=ins.textContent.trim();if(insT.indexOf('Lance')>-1||insT.indexOf('Start a session')>-1)ins.innerHTML='<span>'+(en?'Start a session to see the analysis...':'Lance une session pour voir l’analyse...')+'</span>';}
+    if(ins){var it=ins.textContent.trim();if(it.indexOf('Lance')>-1||it.indexOf('Start a session')>-1)ins.innerHTML='<span>'+(en?'Start a session to see the analysis...':'Lance une session pour voir l’analyse...')+'</span>';}
     var hl=document.getElementById('td_histList');
     if(hl&&hl.querySelector('.tr-empty'))hl.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
     else _td_renderHistory();
-  }
+    _tr_drawProgressChart('td_progressChart','dribble','cons','#2dc653');
+  });
 
-  // ── SHOT CHART ──
-  var sP=document.getElementById('tr-shot');
-  if(sP&&sP.style.display==='block'){
-    var sT=sP.querySelectorAll('.tr-card-title');
-    [en?'🎬 SELECT YOUR SHOOTING DRILL':'🎬 CHOISIS TON DRILL SHOOTING',
-     en?'🏀 COURT — TAP A ZONE':'🏀 TERRAIN — TAPE UNE ZONE',
-     en?'📊 STATS BY ZONE':'📊 STATS PAR ZONE',
-     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI'
-    ].forEach(function(v,i){if(sT[i])sT[i].textContent=v;});
+  // SHOT CHART
+  doPanel('tr-shot',[
+    en?'🎬 SELECT YOUR SHOOTING DRILL':'🎬 CHOISIS TON DRILL SHOOTING',
+    en?'🏀 COURT — TAP A ZONE':'🏀 TERRAIN — TAPE UNE ZONE',
+    en?'📊 STATS BY ZONE':'📊 STATS PAR ZONE',
+    en?'📊 COMPARISON N vs N-1':'📊 COMPARAISON N vs N-1',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI'
+  ], function(p,en){
     var zi=document.getElementById('tsc_zoneInd');
     if(zi&&!zi.querySelector('span[style]'))zi.textContent=en?'Select a zone on the court':'Sélectionne une zone sur le terrain';
     tx('tsc_btnMake','✅ RENTRÉ','✅ MADE');
     tx('tsc_btnMiss','❌ RATÉ','❌ MISSED');
-    var tv=document.getElementById('tsc_totalVal');
-    if(tv&&(tv.textContent==='0 tirs — 0%'||tv.textContent==='0 shots — 0%'))tv.textContent=en?'0 shots — 0%':'0 tirs — 0%';
-    var tlbl=sP.querySelector('.sec-total-lbl,div[style*="TOTAL"]');
+    var sbtn=p.querySelector('[onclick="_tsc_saveAndCompare()"]');
+    if(sbtn)sbtn.innerHTML='💾 '+(en?'SAVE & COMPARE':'SAUVEGARDER & COMPARER');
+    var ct=document.getElementById('tsc_compareText');
+    if(ct&&(ct.textContent.indexOf('Sauvegarde')>-1||ct.textContent.indexOf('Save session')>-1))
+      ct.textContent=en?'Save a session to see the comparison':'Sauvegarde une session pour voir la comparaison';
     _tsc_updateGrid();_tsc_updateInsight();
-    var si=document.getElementById('tsc_insightText');
-    if(si&&si.querySelector('span')&&!si.querySelector('.tr-hl'))
-      si.innerHTML='<span>'+(en?'Take your first shots to see the analysis...':'Lance tes premiers tirs pour voir l’analyse...')+'</span>';
-  }
+  });
 
-  // ── AGILITY ──
-  var aP=document.getElementById('tr-agility');
-  if(aP&&aP.style.display==='block'){
-    var aT=aP.querySelectorAll('.tr-card-title');
-    [en?'🎬 SELECT YOUR HAND-EYE DRILL':'🎬 CHOISIS TON DRILL HAND-EYE',
-     en?'🎮 SELECT YOUR MODE':'🎮 CHOISIS TON MODE',
-     en?'⚡ REACTION TEST':'⚡ TEST DE RÉACTION',
-     en?'🎯 DRILL TIMER':'🎯 DRILL TIMER',
-     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
-     en?'📅 HISTORY':'📅 HISTORIQUE'
-    ].forEach(function(v,i){if(aT[i])aT[i].textContent=v;});
-    var mR=document.getElementById('tag_btnModeReact');
-    if(mR){var d2=mR.querySelectorAll('div');if(d2[1])d2[1].textContent=en?'REACTION':'RÉACTION';if(d2[2])d2[2].textContent=en?'Reaction time':'Temps de réaction';}
-    var mD=document.getElementById('tag_btnModeDrill');
-    if(mD){var d3=mD.querySelectorAll('div');if(d3[1])d3[1].textContent='DRILL TIMER';if(d3[2])d3[2].textContent=en?'Timer + reps':'Chrono + reps';}
+  // AGILITY
+  doPanel('tr-agility',[
+    en?'🎬 SELECT YOUR HAND-EYE DRILL':'🎬 CHOISIS TON DRILL HAND-EYE',
+    en?'🎮 SELECT YOUR MODE':'🎮 CHOISIS TON MODE',
+    en?'⚡ REACTION TEST':'⚡ TEST DE RÉACTION',
+    en?'🎯 DRILL TIMER':'🎯 DRILL TIMER',
+    en?'📈 PROGRESS':'📈 PROGRESSION',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    en?'📅 HISTORY':'📅 HISTORIQUE'
+  ], function(p,en){
+    var scoreBoxes=p.querySelectorAll('#tag_secReact .tr-score-box .tr-score-lbl');
+    var rL=en?['AVG. (ms)','BEST','TRIES','LEVEL']:['MOY. (ms)','MEILLEUR','ESSAIS','NIVEAU'];
+    scoreBoxes.forEach(function(b,i){if(rL[i])b.textContent=rL[i];});
     var rm=document.getElementById('tag_reactMsg');
     if(rm&&(rm.textContent==='TAP POUR COMMENCER'||rm.textContent==='TAP TO START'))rm.textContent=en?'TAP TO START':'TAP POUR COMMENCER';
-    var rBoxes=aP.querySelectorAll('#tag_secReact .tr-score-box .tr-score-lbl');
-    var rLbls=en?['AVG. (ms)','BEST','TRIES','LEVEL']:['MOY. (ms)','MEILLEUR','ESSAIS','NIVEAU'];
-    rBoxes.forEach(function(b,i){if(rLbls[i])b.textContent=rLbls[i];});
-    var rb=aP.querySelector('[onclick="_tag_resetReact()"]');
-    if(rb)rb.textContent='↺ RESET';
-    timerSubUpdate('tag_dTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
-    startBtn('tag_dBtnStart','DÉMARRER','START');
-    tx('tag_dBtnStop','&#9209; STOP','&#9209; STOP');
-    tx('tag_dBtnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
-    var drp=aP.querySelector('[onclick="_tag_dRep()"]');
+    timerSub('tag_dTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    var dbs=document.getElementById('tag_dBtnStart');
+    if(dbs&&dbs.style.display!=='none')dbs.innerHTML='&#9654; '+(en?'START':'DÉMARRER');
+    var drp=p.querySelector('[onclick="_tag_dRep()"]');
     if(drp)drp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
-    var rn=document.querySelector('#tag_dRepsNum + div');
-    if(rn)rn.textContent=en?'REPS':'RÉPÉTITIONS';
     _tag_buildDrills();_tag_updateInsight();
-    var ahi=document.getElementById('tag_histList');
-    if(ahi&&ahi.querySelector('.tr-empty'))ahi.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
-    else _tag_renderHistory();
-  }
+    _tr_drawProgressChart('tag_progressChart','agility','rpm','#f5c518');
+  });
 
-  // ── STRENGTH ──
-  var scP2=document.getElementById('tr-sc');
-  if(scP2&&scP2.style.display==='block'){
-    var scT=scP2.querySelectorAll('.tr-card-title');
-    [en?'🎬 SELECT YOUR SC DRILL':'🎬 CHOISIS TON DRILL SC',
-     en?'⏱ SESSION':'⏱ SESSION',
-     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
-     en?'📅 HISTORY':'📅 HISTORIQUE'
-    ].forEach(function(v,i){if(scT[i])scT[i].textContent=v;});
-    timerSubUpdate('tsc_scTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
-    startBtn('tsc_scBtnStart','DÉMARRER','START');
-    tx('tsc_scBtnStop','&#9209; STOP','&#9209; STOP');
-    tx('tsc_scBtnSave','&#128190; SAUVEGARDER','&#128190; SAVE');
-    var scrp=scP2.querySelector('[onclick="_tsc_scRep()"]');
-    if(scrp)scrp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
-    var scrn=document.querySelector('#tsc_scRepsNum + div');
-    if(scrn)scrn.textContent='REPS';
+  // STRENGTH
+  doPanel('tr-sc',[
+    en?'🎬 SELECT YOUR SC DRILL':'🎬 CHOISIS TON DRILL SC',
+    en?'⏱ SESSION':'⏱ SESSION',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    en?'📅 HISTORY':'📅 HISTORIQUE'
+  ], function(p,en){
+    timerSub('tsc_scTimerSub','Session en cours...','Session running...','Terminé — sauvegarder ?','Done — save?','Appuie sur START','Press START');
+    var ss=document.getElementById('tsc_scBtnStart');
+    if(ss&&ss.style.display!=='none')ss.innerHTML='&#9654; '+(en?'START':'DÉMARRER');
+    var srp=p.querySelector('[onclick="_tsc_scRep()"]');
+    if(srp)srp.innerHTML='✅ '+(en?'REP DONE':'RÉP RÉUSSIE');
     var sci=document.getElementById('tsc_scInsight');
-    if(sci){var sciT=sci.textContent.trim();if(sciT.indexOf('Lance')>-1||sciT.indexOf('Start')>-1||sciT.indexOf('session')>-1)sci.innerHTML='<span>'+(en?'Start a session...':'Lance une session...')+'</span>';}
-    var sch=document.getElementById('tsc_scHistList');
-    if(sch&&sch.querySelector('.tr-empty'))sch.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
-    else _tsc_scRenderHistory();
-  }
+    if(sci){var st=sci.textContent.trim();if(st.indexOf('Lance')>-1||st.indexOf('Start')>-1)sci.innerHTML='<span>'+(en?'Start a session...':'Lance une session...')+'</span>';}
+  });
 
-  // ── CHALLENGES ──
-  var chP2=document.getElementById('tr-ch');
-  if(chP2&&chP2.style.display==='block'){
-    var chT=chP2.querySelectorAll('.tr-card-title');
-    [en?'🎬 SELECT YOUR CHALLENGE':'🎬 CHOISIS TON CHALLENGE',
-     en?'🏆 ATTEMPT':'🏆 TENTATIVE',
-     en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
-     en?'📅 HISTORY':'📅 HISTORIQUE'
-    ].forEach(function(v,i){if(chT[i])chT[i].textContent=v;});
-    var cst=document.getElementById('tch_status');
-    if(cst&&!cst.textContent.match(/ussi|uccess|até|ailed|sauveg|saved/))
-      cst.textContent=en?'Select a challenge and start an attempt':'Sélectionne un challenge et lance une tentative';
+  // CHALLENGES
+  doPanel('tr-ch',[
+    en?'🎬 SELECT YOUR CHALLENGE':'🎬 CHOISIS TON CHALLENGE',
+    en?'🏆 ATTEMPT':'🏆 TENTATIVE',
+    en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    en?'📅 HISTORY':'📅 HISTORIQUE'
+  ], function(p,en){
+    var cst2=document.getElementById('tch_status');
+    if(cst2&&(cst2.textContent.indexOf('Sélectionne')>-1||cst2.textContent.indexOf('Select')>-1))
+      cst2.textContent=en?'Select a challenge and start an attempt':'Sélectionne un challenge et lance une tentative';
     tx('tch_btnStart','&#9654; NOUVELLE TENTATIVE','&#9654; NEW ATTEMPT');
     tx('tch_btnSuccess','✅ RÉUSSI','✅ SUCCESS');
     tx('tch_btnFail','❌ RATÉ','❌ FAILED');
-    var cbsv=chP2.querySelector('[onclick="_tch_saveSession()"]');
-    if(cbsv)cbsv.innerHTML='&#128190; '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');
-    var chSB=chP2.querySelectorAll('.tr-score-box .tr-score-lbl');
+    var chSB=p.querySelectorAll('.tr-score-box .tr-score-lbl');
     var chL=en?['TRIES','WINS','RATE','STREAK']:['ESSAIS','RÉUSSITES','TAUX','STREAK'];
-    chSB.forEach(function(b,i){if(chL[i])b.textContent=chL[i];});
+    chSB.forEach(function(b,i){if(chL[i])b.textContent=chL[i];
+    var cbsv=p.querySelector('[onclick="_tch_saveSession()"]');
+    if(cbsv)cbsv.innerHTML='💾 '+(en?'SAVE SESSION':'SAUVEGARDER SESSION');});
     var chi=document.getElementById('tch_insightText');
-    if(chi){var chiT=chi.textContent.trim();if(chiT.indexOf('Lance')>-1||chiT.indexOf('Start')>-1||chiT.indexOf('tentative')>-1||chiT.indexOf('attempt')>-1)chi.innerHTML='<span>'+(en?'Start your first attempt!':'Lance ta première tentative !')+'</span>';}
-    var chh=document.getElementById('tch_histList');
-    if(chh&&chh.querySelector('.tr-empty'))chh.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
-    else _tch_renderHistory();
-  }
+    if(chi){var ct=chi.textContent.trim();if(ct.indexOf('Lance')>-1||ct.indexOf('Start')>-1||ct.indexOf('tentative')>-1)chi.innerHTML='<span>'+(en?'Start your first attempt!':'Lance ta première tentative !')+'</span>';}
+  });
 }
 
-/* Hook applyLang */
+
+/* ══════════════════════════════════════════════════════════
+   HOOK UNIQUE — showSection + applyLang + Training init
+══════════════════════════════════════════════════════════ */
 (function(){
-  var _oA=window.applyLang;
-  window.applyLang=function(lang){
-    if(typeof _oA==='function')_oA.call(this,lang);
-    var s=document.getElementById('s-training');
-    if(s&&s.classList.contains('active'))setTimeout(_trApplyLang,30);
+  /* ── showSection hook ── */
+  var _trInited = false;
+  var _origShow = window.showSection;
+  window.showSection = function(id, btn) {
+    if (typeof _origShow === 'function') _origShow.call(this, id, btn);
+    if (id === 'training') {
+      // Toujours appeler openTrainingTab pour s'assurer que le panel actif est visible
+      if (!_trInited) {
+        _trInited = true;
+        setTimeout(function(){
+          // S'assurer que le panel dribble est affiché
+          document.querySelectorAll('.tr-panel').forEach(function(p){ p.style.display='none'; });
+          var dp = document.getElementById('tr-dribble');
+          if (dp) dp.style.display = 'block';
+          // Activer le premier onglet
+          var firstTab = document.querySelector('.tr-tab');
+          if (firstTab) {
+            firstTab.style.background='rgba(245,197,24,.1)';
+            firstTab.style.color='#f5c518';
+            firstTab.style.border='1px solid rgba(245,197,24,.5)';
+          }
+          initTraining_d();
+          _tr_initGoals();
+          _tr_drawProgressChart('td_progressChart','dribble','cons','#2dc653');
+        }, 80);
+      } else {
+        // Retour sur Training — réafficher le bon panel
+        var hasVisible = false;
+        document.querySelectorAll('.tr-panel').forEach(function(p){
+          if (p.style.display === 'block') hasVisible = true;
+        });
+        if (!hasVisible) {
+          var dp2 = document.getElementById('tr-dribble');
+          if (dp2) dp2.style.display = 'block';
+          initTraining_d();
+        }
+        _tr_updateGoalsDisplay();
+      }
+    }
+  };
+
+  /* ── applyLang hook ── */
+  var _origApply = window.applyLang;
+  window.applyLang = function(lang) {
+    if (typeof _origApply === 'function') _origApply.call(this, lang);
+    var s = document.getElementById('s-training');
+    if (s && s.classList.contains('active')) setTimeout(_trApplyLang, 30);
   };
 })();
 </script>
 
 <script>
 if(typeof LANG_DATA!=='undefined'){
+  if(LANG_DATA.fr) LANG_DATA.fr['mob_training']='🏋️ Training Mode';
+  if(LANG_DATA.en) LANG_DATA.en['mob_training']='🏋️ Training Mode';
   if(LANG_DATA.fr) LANG_DATA.fr['nav_training']='🏋️ Training';
   if(LANG_DATA.en) LANG_DATA.en['nav_training']='🏋️ Training';
 }
