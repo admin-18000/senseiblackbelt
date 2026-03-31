@@ -11581,15 +11581,9 @@ function initTraining_d() {
 function _t(fr, en) { return window._lang === 'en' ? en : fr; }
 
 var _td_VIDEOS = [
-  {id:'ttwQywcjF6s',title:'Drill #1'},{id:'BkMXA0Z8bLc',title:'Drill #2'},
-  {id:'tLthFdKJu9k',title:'Drill #3'},{id:'m1gctvzz6nc',title:'Drill #4'},
-  {id:'5WBIegdWthc',title:'Drill #5'},{id:'rrfc2hyF-hE',title:'Drill #6'},
-  {id:'7nQoX6DHV5c',title:'Drill #7'},{id:'6cbf8nMskmE',title:'Drill #8'},
-  {id:'gIeDne-5mUE',title:'Drill #9'},{id:'TnuT9lk7Fwk',title:'Drill #10'},
-  {id:'NacCJX1KFAc',title:'Drill #11'},{id:'l5xJnrnOEvk',title:'Drill #12'},
-  {id:'Em-ga58-bhY',title:'Drill #13'},{id:'-SYIMzIua14',title:'Drill #14'},
-  {id:'i5jFkZG_YfY',title:'Drill #15'},{id:'OyCu5RrZUaU',title:'Drill #16'},
-  {id:'HHc5cNSjuBw',title:'Drill #17'}
+  {id:'ttwQywcjF6s',title:'Drill #1'},
+  {id:'BkMXA0Z8bLc',title:'Drill #2'},
+  {id:'tLthFdKJu9k',title:'Drill #3'}
 ];
 var _td_selVid=null, _td_running=false, _td_sec=0, _td_int=null;
 var _td_taps=[], _td_errors=0, _td_finished=false, _td_sessions=[];
@@ -11817,9 +11811,9 @@ function initTraining_sc2() {
 }
 
 var _tsc_VIDEOS = [
-  {id:'RvyX7fXgqiM',title:'Shooting #1'},{id:'l9cbjvK8pN4',title:'Shooting #3'},
-  {id:'bPHoOLEELy8',title:'Shooting #4'},{id:'eU4FfpLk0FY',title:'Shooting #6'},
-  {id:'gaGkEYR0kIk',title:'Shooting #7'},{id:'a8TylCXbvUw',title:'Shooting #9'}
+  {id:'RvyX7fXgqiM',title:'Shooting #1'},
+  {id:'l9cbjvK8pN4',title:'Shooting #3'},
+  {id:'bPHoOLEELy8',title:'Shooting #4'}
 ];
 var _tsc_selVid = null;
 
@@ -12002,13 +11996,9 @@ function initTraining_ag2() {
 }
 
 var _tag_VIDEOS = [
-  {id:'xV0XuRGHsxo',title:'Hand-Eye #3'},{id:'KWmdHJ2A8pg',title:'Hand-Eye #4'},
-  {id:'x4mdV_OXHYU',title:'Hand-Eye #5'},{id:'fYJJpR9tn1U',title:'Hand-Eye #6'},
-  {id:'--xTNgPOLTw',title:'Hand-Eye #7'},{id:'M8INmDf2Np4',title:'Hand-Eye #8'},
-  {id:'TuU5BzcS1JA',title:'Hand-Eye #9'},{id:'bdzQwgSUjJk',title:'Hand-Eye #10'},
-  {id:'j_nrRxCCKek',title:'Hand-Eye #11'},{id:'sGcDY564gKE',title:'Hand-Eye #12'},
-  {id:'ZsyYuAx5d1U',title:'Hand-Eye #13'},{id:'vzbnTzUqAzQ',title:'Hand-Eye #14'},
-  {id:'0Mk9lefAW58',title:'Hand-Eye #15'}
+  {id:'xV0XuRGHsxo',title:'Hand-Eye #3'},
+  {id:'KWmdHJ2A8pg',title:'Hand-Eye #4'},
+  {id:'x4mdV_OXHYU',title:'Hand-Eye #5'}
 ];
 var _tag_selVid = null;
 
@@ -13262,16 +13252,26 @@ function initTraining_sym() {
 function _tsym_loadModel(cb) {
   if (_tsym_modelLoaded && _tsym_detector) { cb && cb(); return; }
   var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Chargement du modèle IA...','Loading AI model...');
-
-  // Charger TF.js + MoveNet depuis CDN
-    var s1 = document.createElement('script');
+  if (status) status.textContent = _t('Chargement IA...','Loading AI...');
+  // Si TF.js déjà chargé, éviter double-chargement
+  if (typeof tf !== 'undefined' && typeof poseDetection !== 'undefined') {
+    _tsym_initDetector(cb); return;
+  }
+  if (typeof tf !== 'undefined') {
+    var sp = document.createElement('script');
+    sp.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
+    sp.onload = function() { _tsym_initDetector(cb); };
+    sp.onerror = function() { _tsym_onError('Pose-detection error'); };
+    document.head.appendChild(sp); return;
+  }
+  // Charger TF.js complet + pose-detection
+  var s1 = document.createElement('script');
   s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js';
   s1.onload = function() {
     var s2 = document.createElement('script');
     s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
     s2.onload = function() { _tsym_initDetector(cb); };
-    s2.onerror = function() { _tsym_onError('Model load error'); };
+    s2.onerror = function() { _tsym_onError(_t('Erreur chargement modèle','Model load error')); };
     document.head.appendChild(s2);
   };
   s1.onerror = function() { _tsym_onError('TF.js load error'); };
@@ -13283,18 +13283,27 @@ function _tsym_initDetector(cb) {
     _tsym_onError(_t('poseDetection non disponible','poseDetection unavailable')); return;
   }
   var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Initialisation MoveNet...','Initializing MoveNet...');
-  poseDetection.createDetector(
-    poseDetection.SupportedModels.MoveNet,
-    { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
-  ).then(function(det) {
-    _tsym_detector = det;
-    _tsym_modelLoaded = true;
-    if (status) status.textContent = _t('Modèle prêt ✅','Model ready ✅');
-    cb && cb();
-  }).catch(function(e) {
-    _tsym_onError(_t('Erreur init détecteur','Detector init error') + ': ' + e.message);
-  });
+  var backends = ['webgl', 'cpu'];
+  function tryBackend(i) {
+    if (i >= backends.length) {
+      _tsym_onError(_t('Appareil non compatible','Device not compatible')); return;
+    }
+    var b = backends[i];
+    if (status) status.textContent = 'Backend ' + b + '...';
+    tf.setBackend(b).then(function(){ return tf.ready(); })
+    .then(function(){
+      return poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
+      );
+    }).then(function(det){
+      _tsym_detector = det;
+      _tsym_modelLoaded = true;
+      if (status) status.textContent = _t('Modèle prêt ✅','Model ready ✅') + ' (' + b + ')';
+      cb && cb();
+    }).catch(function(){ tryBackend(i + 1); });
+  }
+  tryBackend(0);
 }
 
 /* ── Caméra ─────────────────────────────────────────────────── */
@@ -13305,7 +13314,10 @@ function _tsym_startCamera() {
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
-  navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
+  var _vConstraints=[{width:640,height:480,facingMode:'user'},{facingMode:'user'},true];
+  function tryCamera(ci){
+    if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
+    navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
     .then(function(stream) {
       _tsym_stream = stream;
       _tsym_video = document.getElementById('tsym_video');
@@ -13314,14 +13326,16 @@ function _tsym_startCamera() {
       _tsym_video.onloadedmetadata = function() {
         _tsym_video.play();
         if (status) status.textContent = _t('Chargement IA...','Loading AI...');
+        var _lt=setTimeout(function(){_tsym_onError(_t('Chargement trop long — réessaie','Loading timeout — retry'));},12000);
         _tsym_loadModel(function() {
+          clearTimeout(_lt);
           _tsym_startDetection();
         });
       };
     })
-    .catch(function(e) {
-      _tsym_onError(_t('Permission caméra refusée','Camera permission denied'));
-    });
+    .catch(function(){tryCamera(ci+1);});
+  }
+  tryCamera(0);
 }
 
 function _tsym_stopCamera() {
