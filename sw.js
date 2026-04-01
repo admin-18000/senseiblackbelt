@@ -4,18 +4,22 @@
 //              Network-First pour index.html (toujours à jour)
 // ═══════════════════════════════════════════════════════════
 
-const CACHE_NAME     = 'sensei-v1';
+const CACHE_NAME     = 'sensei-v2';
 const OFFLINE_URL    = '/index.html';
 
 // Assets à mettre en cache immédiatement à l'installation
 const PRECACHE_URLS = [
   '/index.html',
   '/manifest.json',
-  '/logo.png',
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/icon-512x512-maskable.png',
-  // Fonts Google — mises en cache au premier accès via fetch
+];
+// CDN TF.js — mis en cache au premier accès (trop volumineux pour precache)
+const CDN_CACHE_NAME = 'sensei-cdn-v1';
+const CDN_PATTERNS = [
+  'cdn.jsdelivr.net/npm/@tensorflow',
+  'cdn.jsdelivr.net/npm/@tensorflow-models',
 ];
 
 // ── INSTALL : précache des assets critiques ─────────────────
@@ -55,6 +59,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // CDN TF.js → Cache-First dédié
+  if (CDN_PATTERNS.some(function(p){ return url.href.indexOf(p) > -1; })) {
+    event.respondWith(cdnCacheFirst(request));
+    return;
+  }
   // Assets statiques → Cache-First
   event.respondWith(cacheFirst(request));
 });
@@ -74,6 +83,20 @@ async function cacheFirst(request) {
   } catch {
     // Offline + pas en cache → fallback
     return caches.match(OFFLINE_URL);
+  }
+}
+
+// ── Stratégie CDN Cache-First (TF.js) ──────────────────────
+async function cdnCacheFirst(request) {
+  const cache = await caches.open(CDN_CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    return new Response('TF.js unavailable offline', {status: 503});
   }
 }
 

@@ -13510,32 +13510,52 @@ function initTraining_sym() {
 }
 
 /* ── Chargement TF.js + MoveNet ─────────────────────────────── */
+var _tsym_tfLoading = false;  // flag anti double-chargement concurrent
+var _tsym_tfCallbacks = [];   // file d'attente si chargement en cours
+
 function _tsym_loadModel(cb) {
+  // Déjà chargé et initialisé
   if (_tsym_modelLoaded && _tsym_detector) { cb && cb(); return; }
-  var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Chargement IA...','Loading AI...');
-  // Si TF.js déjà chargé, éviter double-chargement
+  // TF.js + poseDetection déjà disponibles
   if (typeof tf !== 'undefined' && typeof poseDetection !== 'undefined') {
     _tsym_initDetector(cb); return;
   }
+  // Chargement en cours — mettre cb en file d'attente
+  if (_tsym_tfLoading) {
+    if (cb) _tsym_tfCallbacks.push(cb);
+    return;
+  }
+  _tsym_tfLoading = true;
+  if (cb) _tsym_tfCallbacks.push(cb);
+  var status = document.getElementById('tsym_status');
+  if (status) status.textContent = _t('Chargement IA...','Loading AI...');
+  function _onAllLoaded() {
+    _tsym_tfLoading = false;
+    var cbs = _tsym_tfCallbacks.slice();
+    _tsym_tfCallbacks = [];
+    _tsym_initDetector(function() {
+      cbs.forEach(function(fn){ fn && fn(); });
+    });
+  }
+  // TF.js déjà là — charger seulement pose-detection
   if (typeof tf !== 'undefined') {
     var sp = document.createElement('script');
     sp.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
-    sp.onload = function() { _tsym_initDetector(cb); };
-    sp.onerror = function() { _tsym_onError('Pose-detection error'); };
+    sp.onload = _onAllLoaded;
+    sp.onerror = function() { _tsym_tfLoading=false; _tsym_onError('Pose-detection error'); };
     document.head.appendChild(sp); return;
   }
-  // Charger TF.js complet + pose-detection
+  // Charger TF.js + pose-detection
   var s1 = document.createElement('script');
   s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js';
   s1.onload = function() {
     var s2 = document.createElement('script');
     s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
-    s2.onload = function() { _tsym_initDetector(cb); };
-    s2.onerror = function() { _tsym_onError(_t('Erreur chargement modèle','Model load error')); };
+    s2.onload = _onAllLoaded;
+    s2.onerror = function() { _tsym_tfLoading=false; _tsym_onError(_t('Erreur chargement modèle','Model load error')); };
     document.head.appendChild(s2);
   };
-  s1.onerror = function() { _tsym_onError('TF.js load error'); };
+  s1.onerror = function() { _tsym_tfLoading=false; _tsym_onError('TF.js load error'); };
   document.head.appendChild(s1);
 }
 
@@ -13640,15 +13660,18 @@ function _tsym_startDetection() {
 
 function _tsym_detect() {
   if (!_tsym_running || !_tsym_detector || !_tsym_video) return;
-  // Mutex : ne pas tourner si tdr est actif
-  if (_tdr_camActive) { _tsym_rafId = requestAnimationFrame(_tsym_detect); return; }
+  // Mutex : attendre que tdr libère (setTimeout au lieu de RAF immédiat)
+  if (_tdr_camActive) {
+    _tsym_rafId = null;
+    setTimeout(function(){ if(_tsym_running) _tsym_detect(); }, 50);
+    return;
+  }
   // Throttle 20 FPS
   var now = Date.now();
   if (now - _tsym_lastFrame < 50) { _tsym_rafId = requestAnimationFrame(_tsym_detect); return; }
   _tsym_lastFrame = now;
   _tsym_camActive = true;
   _tsym_detector.estimatePoses(_tsym_video).then(function(poses) {
-    // Lissage 5 frames
     _tsym_smoothBuf.push(poses);
     if (_tsym_smoothBuf.length > 5) _tsym_smoothBuf.shift();
     _tsym_drawFrame(_tsym_smoothBuf[_tsym_smoothBuf.length-1]);
@@ -14471,15 +14494,18 @@ function _tdr_detect() {
   if (!_tsym_detector || !_tdr_video) {
     _tdr_rafId = requestAnimationFrame(_tdr_detect); return;
   }
-  // Mutex : ne pas tourner si sym est actif
-  if (_tsym_camActive) { _tdr_rafId = requestAnimationFrame(_tdr_detect); return; }
+  // Mutex : attendre que sym libère
+  if (_tsym_camActive) {
+    _tdr_rafId = null;
+    setTimeout(function(){ if(_tdr_video) _tdr_detect(); }, 50);
+    return;
+  }
   // Throttle 20 FPS
   var now2 = Date.now();
   if (now2 - _tdr_lastFrame < 50) { _tdr_rafId = requestAnimationFrame(_tdr_detect); return; }
   _tdr_lastFrame = now2;
   _tdr_camActive = true;
   _tsym_detector.estimatePoses(_tdr_video).then(function(poses) {
-    // Lissage 5 frames
     _tdr_smoothBuf.push(poses);
     if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
     var smoothPoses = _tdr_smoothBuf[_tdr_smoothBuf.length-1];
