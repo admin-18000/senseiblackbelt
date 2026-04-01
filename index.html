@@ -1309,7 +1309,32 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="font-size:18px;margin-bottom:3px">🎵</div>
         <div id="tdr_lblRhythm">RYTHME</div>
       </button>
-    </div>
+    
+      <!-- Tab HAUTEUR -->
+      <button class="tdr-mode-btn" data-mode="height" onclick="_tdr_setMode('height')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">📏</div>
+        <div id="tdr_lblHeight">HAUTEUR</div>
+      </button>
+      <!-- Tab 2 BALLONS -->
+      <button class="tdr-mode-btn" data-mode="twoball" onclick="_tdr_setMode('twoball')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🏀🏀</div>
+        <div id="tdr_lbl2Ball">2 BALLONS</div>
+      </button>
+      <!-- Tab STRING -->
+      <button class="tdr-mode-btn" data-mode="string" onclick="_tdr_setMode('string')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🎯</div>
+        <div id="tdr_lblString">STRING</div>
+      </button>
+</div>
 
     <!-- Panel Réaction : niveaux -->
     <div id="tdr_panelReaction">
@@ -1366,6 +1391,89 @@ body.unlocked .sensei-only{display:revert !important}
           <div id="tdr_lblChaos">CHAOS</div>
         </button>
       </div>
+    <!-- Panel HAUTEUR -->
+    <div id="tdr_panelHeight" style="display:none">
+      <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;margin-bottom:10px;font-size:10px;color:#7a8299;line-height:1.8">
+        📏 <span id="tdr_heightDesc">Dribble bas = meilleur contrôle. Score = % de dribbles sous le genou.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px">
+        <button class="tdr-hlvl-btn" data-hlvl="30" onclick="_tdr_setHLevel(30)"
+          style="padding:8px 4px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+                 background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">30s</div>
+          <div id="tdr_lblH30">DÉBUTANT</div>
+        </button>
+        <button class="tdr-hlvl-btn" data-hlvl="60" onclick="_tdr_setHLevel(60)"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">60s</div>
+          <div id="tdr_lblH60">AVANCÉ</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel 2 BALLONS -->
+    <div id="tdr_panel2Ball" style="display:none">
+      <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;margin-bottom:10px;font-size:10px;color:#7a8299;line-height:1.8">
+        🏀🏀 <span id="tdr_2ballDesc">Les 2 poignets analysés simultanément. Développe la coordination bilatérale.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+        <button class="tdr-tbmode-btn" data-tbmode="alternate" onclick="_tdr_setTBMode('alternate')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+                 background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">↔️</div>
+          <div id="tdr_lblAlternate">ALTERNÉ</div>
+        </button>
+        <button class="tdr-tbmode-btn" data-tbmode="simultaneous" onclick="_tdr_setTBMode('simultaneous')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">⬇️⬇️</div>
+          <div id="tdr_lblSimultaneous">SIMULTANÉ</div>
+        </button>
+        <button class="tdr-tbmode-btn" data-tbmode="chaos" onclick="_tdr_setTBMode('chaos')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🔀</div>
+          <div id="tdr_lblTBChaos">CHAOS</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel STRING -->
+    <div id="tdr_panelString" style="display:none">
+      <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;margin-bottom:10px;font-size:10px;color:#7a8299;line-height:1.8">
+        🎯 <span id="tdr_stringDesc">Suis la cible mobile avec ton poignet. La vitesse augmente par paliers.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+        <button class="tdr-spd-btn" data-spd="slow" onclick="_tdr_setStringSpeed('slow')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
+                 background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🐢</div>
+          <div id="tdr_lblSlow">LENT</div>
+        </button>
+        <button class="tdr-spd-btn" data-spd="medium" onclick="_tdr_setStringSpeed('medium')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🚶</div>
+          <div id="tdr_lblMedium">MOYEN</div>
+        </button>
+        <button class="tdr-spd-btn" data-spd="fast" onclick="_tdr_setStringSpeed('fast')"
+          style="padding:8px 4px;border-radius:8px;border:1px solid #1e2535;
+                 background:var(--dark3);color:#7a8299;cursor:pointer;
+                 font-family:var(--font-cond);font-size:9px;font-weight:700;text-align:center">
+          <div style="font-size:14px;margin-bottom:2px">🏃</div>
+          <div id="tdr_lblFast">RAPIDE</div>
+        </button>
+      </div>
+    </div>
+
       <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:10px" id="tdr_rhythmDesc">
         Cibles sur chaque beat — reste en rythme !
       </div>
@@ -10803,59 +10911,6 @@ function closePlayerLinkModal() {
 })();
 </script>
 
-
-<script>
-// Clés i18n FR manquantes — ajout pour symétrie complète FR/EN
-(function(){
-  var T = window.LANG_DATA; if (!T) return;
-  Object.assign(T.fr, {
-    mj_tab_pp: '⚡ Pin & Peel',
-    mj_tab_quiz: '🧠 Sensei IQ Quiz',
-    mj_tab_vak: '👁️ Profil VAK',
-    pr_tab_certif: '🎖️ Certificat',
-    pr_tab_combo: '🏋️ Ma Séance',
-    pr_tab_export: '📤 Export',
-    pr_tab_journal: '📓 Journal d\'entraînement',
-    pr_tab_tracker: '🥋 Ma Ceinture',
-    sec_battle_sub: 'Confrontations · 1v1 · Coach Sensei BlackBelt',
-    sec_battle_title: 'BATTLE <span style="color:var(--gold)">ROYAL</span>',
-    sec_chal_title: 'CHAL<span style="color:var(--gold)">LENGES</span>',
-    sec_coach_sub: 'Thibault NJECKIL · Certification Lean Six Sigma 6\u03c3',
-    sec_coach_title: 'LE <span style="color:var(--gold)">COACH</span>',
-    sec_ins_sub: 'Rejoindre le programme SENSEI · Tous niveaux · Toutes pratiques',
-    sec_ins_title: 'S\u2019IN<span style="color:var(--gold)">CRIRE</span>',
-    sec_mas_sub: 'Espace Sensei · Acc\u00e8s PIN · Outils coach exclusifs',
-    sec_mas_title: 'MAS<span style="color:var(--gold)">TERS</span>',
-    sec_res_sub: 'Choisissez votre formule · S\u00e9lectionnez votre cr\u00e9neau · Payez en s\u00e9curit\u00e9',
-    sec_res_title: 'R\u00c9<span style="color:var(--gold)">SERVER</span>',
-    sec_testi_sub: 'Ce que disent les athl\u00e8tes et les experts',
-    sec_testi_title: 'ILS EN <span style="color:var(--gold)">PARLENT</span>',
-    st_tab_chart: '📉 Control Chart',
-    st_tab_cpk: '📊 Indice Cpk',
-    st_tab_dmaic: '⚙️ DMAIC',
-    st_tab_pct: '🏅 Percentile',
-    st_tab_radar: '🕸️ Radar',
-  });
-})();
-</script>
-<style>
-/* ── VISUSCI ── */
-.vis-sh{font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:10px;margin:40px 0 18px}
-.vis-card{background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;overflow:hidden;transition:border-color .25s}
-.vis-card:hover{border-color:rgba(245,197,24,.25)}
-.vis-card-hd{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-.vis-card-title{font-family:var(--font-cond);font-size:15px;font-weight:700;letter-spacing:1px;color:var(--text)}
-.vis-formula{font-family:monospace;font-size:11px;color:var(--gold);margin-top:2px}
-.vis-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
-.vis-wrap{position:relative;width:100%;height:260px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)}
-.vis-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-.vis-tag{margin-left:auto;font-family:var(--font-cond);font-size:9px;font-weight:700;padding:4px 10px;border-radius:12px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
-.vis-tag-gold{background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);color:var(--gold)}
-.vis-tag-purple{background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);color:var(--purple-belt)}
-.vis-tag-green{background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);color:var(--green-belt)}
-.vis-tag-blue{background:rgba(0,119,182,.15);border:1px solid rgba(0,119,182,.3);color:var(--blue-belt)}
-.vis-tag-red{background:rgba(193,18,31,.15);border:1px solid rgba(193,18,31,.3);color:var(--red-belt)}
-</style>
 <script>
 (function(){
 var GOLD='#f5c518',MUTED='#7a8299',TEXT='#f0f2f8',RED='#e63946',GREEN='#2dc653',BLUE='#0077b6',PURPLE='#7b2d8b';
@@ -13327,6 +13382,35 @@ function _trApplyLang() {
   if(tdrHL&&tdrHL.querySelector('.tr-empty'))
     tdrHL.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
   else if(typeof _tdr_renderHistory==='function') _tdr_renderHistory();
+  // NOUVEAUX DRILLS tdr
+  var tdrNewLbls = {
+    'tdr_lblHeight':      en?'HEIGHT':'HAUTEUR',
+    'tdr_lbl2Ball':       en?'2 BALLS':'2 BALLONS',
+    'tdr_lblString':      'STRING',
+    'tdr_lblH30':         en?'BEGINNER':'DÉBUTANT',
+    'tdr_lblH60':         en?'ADVANCED':'AVANCÉ',
+    'tdr_lblAlternate':   en?'ALTERNATE':'ALTERNÉ',
+    'tdr_lblSimultaneous':en?'SIMULTANEOUS':'SIMULTANÉ',
+    'tdr_lblTBChaos':     'CHAOS',
+    'tdr_lblSlow':        en?'SLOW':'LENT',
+    'tdr_lblMedium':      en?'MEDIUM':'MOYEN',
+    'tdr_lblFast':        en?'FAST':'RAPIDE',
+  };
+  Object.keys(tdrNewLbls).forEach(function(id){
+    var el=document.getElementById(id); if(el)el.textContent=tdrNewLbls[id];
+  });
+  var tdrHD=document.getElementById('tdr_heightDesc');
+  if(tdrHD)tdrHD.textContent=en
+    ?'Dribble low = better control. Score = % of dribbles below knee.'
+    :'Dribble bas = meilleur contrôle. Score = % de dribbles sous le genou.';
+  var tdr2BD=document.getElementById('tdr_2ballDesc');
+  if(tdr2BD)tdr2BD.textContent=en
+    ?'Both wrists analyzed simultaneously. Builds bilateral coordination.'
+    :'Les 2 poignets analysés simultanément. Développe la coordination bilatérale.';
+  var tdrSD=document.getElementById('tdr_stringDesc');
+  if(tdrSD)tdrSD.textContent=en
+    ?'Follow the moving target with your wrist. Speed increases each level.'
+    :'Suis la cible mobile avec ton poignet. La vitesse augmente par paliers.';
 }
 
 
@@ -13545,10 +13629,22 @@ function _tsym_startDetection() {
 
 function _tsym_detect() {
   if (!_tsym_running || !_tsym_detector || !_tsym_video) return;
+  // Mutex : ne pas tourner si tdr est actif
+  if (_tdr_camActive) { _tsym_rafId = requestAnimationFrame(_tsym_detect); return; }
+  // Throttle 20 FPS
+  var now = Date.now();
+  if (now - _tsym_lastFrame < 50) { _tsym_rafId = requestAnimationFrame(_tsym_detect); return; }
+  _tsym_lastFrame = now;
+  _tsym_camActive = true;
   _tsym_detector.estimatePoses(_tsym_video).then(function(poses) {
-    _tsym_drawFrame(poses);
+    // Lissage 5 frames
+    _tsym_smoothBuf.push(poses);
+    if (_tsym_smoothBuf.length > 5) _tsym_smoothBuf.shift();
+    _tsym_drawFrame(_tsym_smoothBuf[_tsym_smoothBuf.length-1]);
+    _tsym_camActive = false;
     if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
   }).catch(function() {
+    _tsym_camActive = false;
     if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
   });
 }
@@ -14221,15 +14317,25 @@ function _tdr_detect() {
   if (!_tsym_detector || !_tdr_video) {
     _tdr_rafId = requestAnimationFrame(_tdr_detect); return;
   }
+  // Mutex : ne pas tourner si sym est actif
+  if (_tsym_camActive) { _tdr_rafId = requestAnimationFrame(_tdr_detect); return; }
+  // Throttle 20 FPS
+  var now2 = Date.now();
+  if (now2 - _tdr_lastFrame < 50) { _tdr_rafId = requestAnimationFrame(_tdr_detect); return; }
+  _tdr_lastFrame = now2;
+  _tdr_camActive = true;
   _tsym_detector.estimatePoses(_tdr_video).then(function(poses) {
-    // Lissage sur 5 frames
+    // Lissage 5 frames
     _tdr_smoothBuf.push(poses);
     if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
-    _tdr_poses = poses;
-    _tdr_drawFrame(poses);
-    if (_tdr_running) _tdr_checkHits(poses);
+    var smoothPoses = _tdr_smoothBuf[_tdr_smoothBuf.length-1];
+    _tdr_poses = smoothPoses;
+    _tdr_drawFrame(smoothPoses);
+    if (_tdr_running) _tdr_checkHits(smoothPoses);
+    _tdr_camActive = false;
     _tdr_rafId = requestAnimationFrame(_tdr_detect);
   }).catch(function() {
+    _tdr_camActive = false;
     _tdr_rafId = requestAnimationFrame(_tdr_detect);
   });
 }
@@ -14498,7 +14604,442 @@ function _tdr_status(msg, color) {
   var el = document.getElementById('tdr_status');
   if (el) { el.textContent = msg; el.style.color = color || '#7a8299'; }
 }
-</script>
+
+
+/* DRILLS HAUTEUR + 2 BALLONS + STRING */
+/* ═══════════════════════════════════════════════════════════════
+   OPTIMISATIONS PERFORMANCE
+   + 3 NOUVEAUX DRILLS : HAUTEUR / 2 BALLONS / STRING
+═══════════════════════════════════════════════════════════════ */
+
+/* ── MUTEX RAF ─────────────────────────────────────────────────
+   Empêche _tsym_detect et _tdr_detect de tourner simultanément  */
+var _tsym_camActive = false;
+var _tdr_camActive  = false;
+
+/* ── THROTTLE FPS ──────────────────────────────────────────────
+   Max 20 FPS = 50ms entre frames                               */
+var _tsym_lastFrame = 0;
+var _tdr_lastFrame  = 0;
+
+/* ── ÉTAT NOUVEAUX MODES ───────────────────────────────────────*/
+var _tdr_hLevel     = 30;       // durée hauteur : 30 | 60
+var _tdr_tbMode     = 'alternate'; // 2 ballons : alternate|simultaneous|chaos
+var _tdr_stringSpd  = 'slow';   // string speed : slow|medium|fast
+var _tdr_stringPos  = 0;        // index dans le pattern string
+var _tdr_stringT    = 0;        // timestamp dernier déplacement cible
+var _tdr_heightData = [];       // [{wristY, kneeY, low}] par frame
+var _tdr_tbExpect   = 'left';   // prochaine main attendue en mode chaos
+
+/* ── STRING PATTERN ────────────────────────────────────────────
+   Positions en fraction de W [x] et H [y]                     */
+var _TDR_STRING_PATTERN = [
+  {fx:0.25, fy:0.45},  // gauche
+  {fx:0.75, fy:0.45},  // droite
+  {fx:0.50, fy:0.25},  // haut centre
+  {fx:0.25, fy:0.65},  // bas gauche
+  {fx:0.75, fy:0.65},  // bas droite
+  {fx:0.50, fy:0.45},  // centre
+];
+
+/* ── SÉLECTEURS NOUVEAUX MODES ─────────────────────────────── */
+function _tdr_setHLevel(sec) {
+  _tdr_hLevel = sec;
+  document.querySelectorAll('.tdr-hlvl-btn').forEach(function(b) {
+    var active = parseInt(b.dataset.hlvl) === sec;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+function _tdr_setTBMode(m) {
+  _tdr_tbMode = m;
+  document.querySelectorAll('.tdr-tbmode-btn').forEach(function(b) {
+    var active = b.dataset.tbmode === m;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+function _tdr_setStringSpeed(s) {
+  _tdr_stringSpd = s;
+  document.querySelectorAll('.tdr-spd-btn').forEach(function(b) {
+    var active = b.dataset.spd === s;
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+}
+
+/* ── PATCH _tdr_setMode ────────────────────────────────────────
+   Extension pour les 3 nouveaux panels                        */
+var _tdr_setMode_orig = _tdr_setMode;
+_tdr_setMode = function(m) {
+  // Gérer les nouveaux panels
+  var newPanels = ['tdr_panelHeight','tdr_panel2Ball','tdr_panelString'];
+  newPanels.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  if (m === 'height') {
+    var el = document.getElementById('tdr_panelHeight');
+    if (el) el.style.display = 'block';
+    // Masquer panels existants
+    var pr = document.getElementById('tdr_panelReaction');
+    var rh = document.getElementById('tdr_panelRhythm');
+    if (pr) pr.style.display = 'none';
+    if (rh) rh.style.display = 'none';
+  } else if (m === 'twoball') {
+    var el2 = document.getElementById('tdr_panel2Ball');
+    if (el2) el2.style.display = 'block';
+    var pr2 = document.getElementById('tdr_panelReaction');
+    var rh2 = document.getElementById('tdr_panelRhythm');
+    if (pr2) pr2.style.display = 'none';
+    if (rh2) rh2.style.display = 'none';
+  } else if (m === 'string') {
+    var el3 = document.getElementById('tdr_panelString');
+    if (el3) el3.style.display = 'block';
+    var pr3 = document.getElementById('tdr_panelReaction');
+    var rh3 = document.getElementById('tdr_panelRhythm');
+    if (pr3) pr3.style.display = 'none';
+    if (rh3) rh3.style.display = 'none';
+  } else {
+    // Déléguer aux modes existants
+    _tdr_setMode_orig(m);
+    return;
+  }
+  _tdr_mode = m;
+  // Mettre à jour boutons
+  document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
+    var active = b.dataset.mode === m;
+    b.style.background = active ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+  });
+};
+
+/* ── PATCH _tdr_startDrill ─────────────────────────────────────
+   Router vers le bon drill selon _tdr_mode                    */
+var _tdr_startDrill_orig = _tdr_startDrill;
+_tdr_startDrill = function() {
+  if (_tdr_mode === 'height')  { _tdr_startHeight();  return; }
+  if (_tdr_mode === 'twoball') { _tdr_startTwoBall(); return; }
+  if (_tdr_mode === 'string')  { _tdr_startString();  return; }
+  _tdr_startDrill_orig();
+};
+
+/* ═══════════════════════════════════════════════════════════
+   DRILL 1 — HAUTEUR DU DRIBBLE
+   Mesure Y du poignet vs Y du genou → % dribbles bas
+═══════════════════════════════════════════════════════════ */
+function _tdr_startHeight() {
+  _tdr_running    = true;
+  _tdr_score      = 0;
+  _tdr_sec        = _tdr_hLevel;
+  _tdr_heightData = [];
+  _tdr_targets    = [];
+  _tdr_status(_t('GO — dribble bas !', 'GO — dribble low!'), '#2dc653');
+  _tdr_timer = setInterval(function() {
+    _tdr_sec--;
+    _tdr_updateScoreDisplay();
+    if (_tdr_sec <= 0) { clearInterval(_tdr_timer); _tdr_endHeight(); }
+  }, 1000);
+}
+
+function _tdr_analyzeHeight(poses) {
+  if (!_tdr_running || _tdr_mode !== 'height') return;
+  if (!poses || !poses[0] || !_tdr_canvas) return;
+  var W  = _tdr_canvas.width;
+  var H  = _tdr_canvas.height;
+  var sx = W / (_tdr_video ? _tdr_video.videoWidth  : W);
+  var sy = H / (_tdr_video ? _tdr_video.videoHeight : H);
+
+  var lw = _tsym_kp(poses, 'leftWrist');
+  var rw = _tsym_kp(poses, 'rightWrist');
+  var lk = _tsym_kp(poses, 'leftKnee');
+  var rk = _tsym_kp(poses, 'rightKnee');
+
+  if (!lw && !rw) return;
+  var wrist = lw || rw;
+  var knee  = lk || rk;
+  if (!knee) return;
+
+  var wy   = wrist.y * sy;
+  var ky   = knee.y  * sy;
+  var low  = wy > ky; // Y plus grand = plus bas sur l'écran (axe inversé)
+
+  _tdr_heightData.push({wy: wy, ky: ky, low: low});
+
+  // Feedback visuel en temps réel
+  var pct = _tdr_heightData.length > 0
+    ? Math.round(_tdr_heightData.filter(function(d){return d.low;}).length / _tdr_heightData.length * 100)
+    : 0;
+
+  _tdr_score = pct;
+  _tdr_updateScoreDisplay();
+
+  // Dessiner indicateur hauteur sur canvas
+  if (_tdr_ctx) {
+    var wx = (W - wrist.x * sx);
+    var color = low ? '#2dc653' : '#e63946';
+    _tdr_ctx.save();
+    _tdr_ctx.strokeStyle = color;
+    _tdr_ctx.lineWidth   = 3;
+    _tdr_ctx.beginPath();
+    _tdr_ctx.moveTo(0, ky); _tdr_ctx.lineTo(W, ky);
+    _tdr_ctx.stroke();
+    _tdr_ctx.fillStyle = color;
+    _tdr_ctx.beginPath();
+    _tdr_ctx.arc(wx, wy, 14, 0, Math.PI*2);
+    _tdr_ctx.fill();
+    _tdr_ctx.restore();
+  }
+}
+
+function _tdr_endHeight() {
+  _tdr_running = false;
+  var total = _tdr_heightData.length;
+  var low   = _tdr_heightData.filter(function(d){return d.low;}).length;
+  var pct   = total > 0 ? Math.round(low/total*100) : 0;
+  _tdr_score = pct;
+  _tdr_showResults(pct, low, total, 0);
+  var msg = pct >= 75
+    ? _t('Excellent contrôle ✅', 'Excellent control ✅')
+    : pct >= 50
+      ? _t('À améliorer — dribble plus bas', 'Keep working — dribble lower')
+      : _t('Dribble trop haut ⚠️', 'Dribble too high ⚠️');
+  _tdr_status(msg, pct >= 75 ? '#2dc653' : pct >= 50 ? '#f5c518' : '#e63946');
+  var btnSave = document.getElementById('tdr_btnSave');
+  if (btnSave) btnSave.style.display = 'flex';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DRILL 2 — 2 BALLONS
+   leftWrist + rightWrist : alternance / simultané / chaos
+═══════════════════════════════════════════════════════════ */
+var _tdr_tbHistory  = []; // {hand:'left'|'right', time}
+var _tdr_tbPrevLY   = 0;
+var _tdr_tbPrevRY   = 0;
+var _tdr_tbLDown    = false;
+var _tdr_tbRDown    = false;
+var _tdr_tbRhythm   = [];  // intervalles entre dribbles
+
+function _tdr_startTwoBall() {
+  _tdr_running    = true;
+  _tdr_score      = 0;
+  _tdr_hits       = 0;
+  _tdr_total      = 0;
+  _tdr_sec        = 30;
+  _tdr_targets    = [];
+  _tdr_tbHistory  = [];
+  _tdr_tbPrevLY   = 0;
+  _tdr_tbPrevRY   = 0;
+  _tdr_tbRhythm   = [];
+  _tdr_tbExpect   = 'left';
+  _tdr_status(_t('GO — 2 ballons !', 'GO — 2 balls!'), '#2dc653');
+  // Afficher l'indication main attendue en mode chaos
+  if (_tdr_tbMode === 'chaos') _tdr_tbShowExpect();
+  _tdr_timer = setInterval(function() {
+    _tdr_sec--;
+    _tdr_updateScoreDisplay();
+    if (_tdr_sec <= 0) { clearInterval(_tdr_timer); _tdr_endTwoBall(); }
+  }, 1000);
+}
+
+function _tdr_tbShowExpect() {
+  if (_tdr_mode !== 'twoball' || _tdr_tbMode !== 'chaos') return;
+  // Switcher la main attendue toutes les 2s
+  setTimeout(function() {
+    if (!_tdr_running) return;
+    _tdr_tbExpect = _tdr_tbExpect === 'left' ? 'right' : 'left';
+    _tdr_status(
+      (_tdr_tbExpect === 'left' ? '👈 ' : '👉 ') +
+      _t('Main : ', 'Hand: ') +
+      (_tdr_tbExpect === 'left' ? _t('GAUCHE', 'LEFT') : _t('DROITE', 'RIGHT')),
+      '#f5c518'
+    );
+    _tdr_tbShowExpect();
+  }, 2000);
+}
+
+function _tdr_analyzeTwoBall(poses) {
+  if (!_tdr_running || _tdr_mode !== 'twoball') return;
+  if (!poses || !poses[0] || !_tdr_canvas) return;
+  var H  = _tdr_canvas.height;
+  var sy = H / (_tdr_video ? _tdr_video.videoHeight : H);
+
+  var lw = _tsym_kp(poses, 'leftWrist');
+  var rw = _tsym_kp(poses, 'rightWrist');
+  if (!lw || !rw) return;
+
+  var ly = lw.y * sy;
+  var ry = rw.y * sy;
+  var now = Date.now();
+
+  // Détecter dribble gauche : poignet descend puis remonte
+  if (_tdr_tbPrevLY > 0) {
+    var ldiff = ly - _tdr_tbPrevLY;
+    if (ldiff > 8 && !_tdr_tbLDown) { _tdr_tbLDown = true; }
+    if (ldiff < -8 && _tdr_tbLDown) {
+      _tdr_tbLDown = false;
+      _tdr_tbHistory.push({hand:'left', time:now});
+      _tdr_tbScore();
+    }
+  }
+  // Détecter dribble droit
+  if (_tdr_tbPrevRY > 0) {
+    var rdiff = ry - _tdr_tbPrevRY;
+    if (rdiff > 8 && !_tdr_tbRDown) { _tdr_tbRDown = true; }
+    if (rdiff < -8 && _tdr_tbRDown) {
+      _tdr_tbRDown = false;
+      _tdr_tbHistory.push({hand:'right', time:now});
+      _tdr_tbScore();
+    }
+  }
+  _tdr_tbPrevLY = ly;
+  _tdr_tbPrevRY = ry;
+
+  // Feedback visuel
+  if (_tdr_ctx && _tdr_canvas) {
+    var W  = _tdr_canvas.width;
+    var sx = W / (_tdr_video ? _tdr_video.videoWidth : W);
+    var lx = W - lw.x * sx;
+    var rx = W - rw.x * sx;
+    _tdr_ctx.save();
+    _tdr_ctx.fillStyle = '#2dc653';
+    _tdr_ctx.beginPath(); _tdr_ctx.arc(lx, ly, 14, 0, Math.PI*2); _tdr_ctx.fill();
+    _tdr_ctx.fillStyle = '#e63946';
+    _tdr_ctx.beginPath(); _tdr_ctx.arc(rx, ry, 14, 0, Math.PI*2); _tdr_ctx.fill();
+    _tdr_ctx.restore();
+  }
+}
+
+function _tdr_tbScore() {
+  var h = _tdr_tbHistory;
+  if (h.length < 2) return;
+  var last = h[h.length-1];
+  var prev = h[h.length-2];
+
+  if (_tdr_tbMode === 'alternate') {
+    // Valide si les mains alternent
+    if (last.hand !== prev.hand) {
+      _tdr_score += 10;
+      _tdr_hits++;
+      _td_beep(660, 0.08, 0.08);
+    }
+    _tdr_total++;
+  } else if (_tdr_tbMode === 'simultaneous') {
+    // Valide si les deux mains bougent dans un intervalle < 100ms
+    if (last.hand !== prev.hand && Math.abs(last.time - prev.time) < 120) {
+      _tdr_score += 15;
+      _tdr_hits++;
+      _td_beep(880, 0.08, 0.08);
+    }
+    _tdr_total++;
+  } else { // chaos
+    if (last.hand === _tdr_tbExpect) {
+      _tdr_score += 20;
+      _tdr_hits++;
+      _td_beep(1000, 0.08, 0.08);
+    }
+    _tdr_total++;
+  }
+  _tdr_updateScoreDisplay();
+}
+
+function _tdr_endTwoBall() {
+  _tdr_running = false;
+  _tdr_showResults(_tdr_score, _tdr_hits, _tdr_total, 0);
+  _tdr_status(_t('Session terminée !', 'Session done!'), '#2dc653');
+  var btnSave = document.getElementById('tdr_btnSave');
+  if (btnSave) btnSave.style.display = 'flex';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DRILL 3 — STRING (cible mobile)
+   Pattern prédéfini, vitesse progressive
+═══════════════════════════════════════════════════════════ */
+var _tdr_stringTarget = null;
+var _tdr_stringLevel  = 0; // palier de vitesse actuel
+
+function _tdr_stringInterval() {
+  return _tdr_stringSpd === 'slow'   ? 2000 :
+         _tdr_stringSpd === 'medium' ? 1400 : 900;
+}
+
+function _tdr_startString() {
+  _tdr_running      = true;
+  _tdr_score        = 0;
+  _tdr_hits         = 0;
+  _tdr_total        = 0;
+  _tdr_sec          = 30;
+  _tdr_targets      = [];
+  _tdr_stringPos    = 0;
+  _tdr_stringLevel  = 0;
+  _tdr_reactionTimes = [];
+  _tdr_spawnStringTarget();
+  _tdr_status(_t('Suis la cible !', 'Follow the target!'), '#2dc653');
+  _tdr_timer = setInterval(function() {
+    _tdr_sec--;
+    _tdr_updateScoreDisplay();
+    // Accélérer toutes les 10s
+    if (_tdr_sec % 10 === 0 && _tdr_stringLevel < 3) {
+      _tdr_stringLevel++;
+    }
+    if (_tdr_sec <= 0) { clearInterval(_tdr_timer); _tdr_endString(); }
+  }, 1000);
+}
+
+function _tdr_spawnStringTarget() {
+  if (!_tdr_running || !_tdr_canvas) return;
+  var W = _tdr_canvas.width;
+  var H = _tdr_canvas.height;
+  var p = _TDR_STRING_PATTERN[_tdr_stringPos % _TDR_STRING_PATTERN.length];
+  // Effacer les anciennes cibles
+  _tdr_targets = [];
+  // Délai réduit selon le niveau
+  var ttl = Math.max(600, _tdr_stringInterval() - _tdr_stringLevel * 150);
+  _tdr_targets.push({
+    x: W * (1 - p.fx), // miroir
+    y: H * p.fy,
+    r: 36, color: '#4ecdc4',
+    born: Date.now(), ttl: ttl,
+    hit: false, hitTime: 0
+  });
+  _tdr_total++;
+  _tdr_stringPos++;
+  // Programmer la prochaine cible
+  setTimeout(function() {
+    if (_tdr_running && _tdr_mode === 'string') {
+      _tdr_spawnStringTarget();
+    }
+  }, ttl);
+}
+
+function _tdr_endString() {
+  _tdr_running = false;
+  _tdr_targets = [];
+  var pct = _tdr_total > 0 ? Math.round(_tdr_hits/_tdr_total*100) : 0;
+  _tdr_showResults(_tdr_score, _tdr_hits, _tdr_total, 0);
+  _tdr_status(_t('Session terminée !', 'Session done!'), '#2dc653');
+  var btnSave = document.getElementById('tdr_btnSave');
+  if (btnSave) btnSave.style.display = 'flex';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PATCH DÉTECTION — intégrer les nouveaux drills dans
+   la boucle RAF existante
+═══════════════════════════════════════════════════════════ */
+var _tdr_drawFrame_orig = _tdr_drawFrame;
+_tdr_drawFrame = function(poses) {
+  _tdr_drawFrame_orig(poses);
+  // Analyses spécifiques aux nouveaux modes
+  if (_tdr_mode === 'height')  _tdr_analyzeHeight(poses);
+  if (_tdr_mode === 'twoball') _tdr_analyzeTwoBall(poses);
+  // String utilise _tdr_checkHits existant via _tdr_targets
+};</script>
 
 <script>
 if(typeof LANG_DATA!=='undefined'){
