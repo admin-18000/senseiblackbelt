@@ -4726,6 +4726,7 @@ const SECTION_VIDEOS = {
     {id:'i5jFkZG_YfY', title:'Ball Handling Drill #15', vertical:false},
     {id:'OyCu5RrZUaU', title:'Ball Handling Drill #16', vertical:false},
     {id:'HHc5cNSjuBw', title:'Ball Handling Drill #17', vertical:false},
+    {id:'Q5Qy4qRg4X8', title:'Ball Handling Drill #18', vertical:false},
   ],
   hec: [
     {id:'l5xJnrnOEvk', title:'Hand-Eye Drill #1', vertical:false},
@@ -11993,9 +11994,9 @@ function initTraining_sc2() {
 }
 
 var _tsc_VIDEOS = [
-  {id:'RvyX7fXgqiM',title:'Shooting #1'},
-  {id:'l9cbjvK8pN4',title:'Shooting #3'},
-  {id:'bPHoOLEELy8',title:'Shooting #4'}
+  {id:'fBbKt6tPB-w',title:'Shot Chart #1'},
+  {id:'iz2SfzUd3wM',title:'Shot Chart #2'},
+  {id:'P0m8PIC7Vcg',title:'Shot Chart #3'}
 ];
 var _tsc_selVid = null;
 
@@ -12025,7 +12026,7 @@ function _tsc_renderVids() {
   if (!el) return;
   el.innerHTML = _tsc_VIDEOS.map(function(v,i){
     var sel = _tsc_selVid===i;
-    return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tsc_selectVid('+i+')">'
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tsc_selectVid('+i+')">'
       +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
