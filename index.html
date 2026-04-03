@@ -1227,6 +1227,14 @@ body.unlocked .sensei-only{display:revert !important}
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s">
         🌀 CHAOS<br><span style="font-size:9px;opacity:.7">aléatoire</span>
       </button>
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('sameheight')" data-tbmode="sameheight"
+        style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s;margin-top:6px">
+        ↔ <span id="dcog_lbl_sameheight">MÊME HAUTEUR</span><br><span style="font-size:9px;opacity:.7">ligne verte</span>
+      </button>
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('diffheight')" data-tbmode="diffheight"
+        style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s;margin-top:6px">
+        ↕ <span id="dcog_lbl_diffheight">HAUTEUR DIFF.</span><br><span style="font-size:9px;opacity:.7">2 lignes</span>
+      </button>
     </div>
   </div>
 
@@ -14930,6 +14938,8 @@ function _dcog_applyLang(en) {
     'dcog_lbl_low': en?'LOW':'BAS',
     'dcog_lbl_high': en?'HIGH':'HAUT',
     'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
+    'dcog_lbl_sameheight': en?'SAME HEIGHT':'MÊME HAUTEUR',
+    'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
     'dcog_lbl_sync': 'SYNC',
     'dcog_scoreTitle': en?'🎯 SCORE':'🎯 SCORE',
     'dcog_lbl_correct': en?'CORRECT':'CORRECTS',
@@ -15143,6 +15153,9 @@ function _dcog_launchDrill() {
   _dcog_sprintCount = 0; _dcog_sprintStart = Date.now();
   _dcog_heightFrames = 0; _dcog_heightInZone = 0;
   _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
+  _dcog_tbInZoneFrames = 0; _dcog_tbTotalFrames2 = 0;
+  _dcog_tbTargetLineY = null; _dcog_tbTargetLineL = null; _dcog_tbTargetLineR = null;
+  _dcog_tbLWristY = null; _dcog_tbRWristY = null;
   _dcog_running = true;
   // Update score display
   _dcog_updateScores();
@@ -15200,6 +15213,11 @@ function _dcog_drawFrame(poses) {
   // Draw math targets
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
+  }
+  // Draw two ball height lines on canvas
+  if (_dcog_drill === 'twoball' && _dcog_running &&
+      (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight')) {
+    _dcog_drawTwoBallLines(ctx, W, H);
   }
 }
 
@@ -15526,37 +15544,68 @@ var _dcog_prevRW_y = null;
 
 function _dcog_analyzeTwoBall(poses) {
   if (!poses || poses.length === 0) return;
-  var lW = _tsym_kp(poses, 'leftWrist');
-  var rW = _tsym_kp(poses, 'rightWrist');
+  var lW = _tsym_kp_fast(poses, 'leftWrist');
+  var rW = _tsym_kp_fast(poses, 'rightWrist');
   if (!lW || !rW) return;
 
-  var W = _dcog_canvas ? _dcog_canvas.width  : 640;
-  var H = _dcog_canvas ? _dcog_canvas.height : 480;
+  var W  = _dcog_canvas ? _dcog_canvas.width  : 640;
+  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
   var sy = H / (_dcog_video.videoHeight || 480);
   var lY = lW.y * sy;
   var rY = rW.y * sy;
 
-  // Wrist indicators
+  // Stocker positions Y pour drawTwoBallLines
+  _dcog_tbLWristY = lY;
+  _dcog_tbRWristY = rY;
+
+  // Wrist indicators (overlay HTML)
   var wL = document.getElementById('dcog_tbWristL');
   var wR = document.getElementById('dcog_tbWristR');
 
+  // ── Modes Same Height + Different Height ──────────────────────
+  if (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight') {
+    _dcog_tbTotalFrames2++;
+    var tolerance = H * 0.08;  // ±8% de la hauteur canvas
+    var inZone = false;
+    if (_dcog_tbMode === 'sameheight') {
+      if (_dcog_tbTargetLineY === null) _dcog_tbTargetLineY = H * 0.55;
+      var okL = Math.abs(lY - _dcog_tbTargetLineY) < tolerance;
+      var okR = Math.abs(rY - _dcog_tbTargetLineY) < tolerance;
+      inZone  = okL && okR;
+      if (wL) wL.style.opacity = okL ? '1' : '0.3';
+      if (wR) wR.style.opacity = okR ? '1' : '0.3';
+    } else {
+      if (_dcog_tbTargetLineL === null) _dcog_tbTargetLineL = H * 0.35;
+      if (_dcog_tbTargetLineR === null) _dcog_tbTargetLineR = H * 0.65;
+      var okL2 = Math.abs(lY - _dcog_tbTargetLineL) < tolerance;
+      var okR2 = Math.abs(rY - _dcog_tbTargetLineR) < tolerance;
+      inZone   = okL2 && okR2;
+      if (wL) wL.style.opacity = okL2 ? '1' : '0.3';
+      if (wR) wR.style.opacity = okR2 ? '1' : '0.3';
+    }
+    if (inZone) _dcog_tbInZoneFrames++;
+    // Score
+    var pctH = _dcog_tbTotalFrames2 > 0
+      ? Math.round(_dcog_tbInZoneFrames / _dcog_tbTotalFrames2 * 100) : 0;
+    var sc = document.getElementById('dcog_tbScoreBig');
+    if (sc) { sc.textContent = pctH+'%'; sc.style.color = pctH>=70?'#2dc653':pctH>=40?'#f5c518':'#e63946'; }
+    var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pctH+'%';
+    var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_tbTotalFrames2;
+    return;
+  }
+
+  // ── Modes direction : Alternate / Sync / Chaos ────────────────
   if (_dcog_prevLW_y !== null && _dcog_prevRW_y !== null) {
-    var dL = lY - _dcog_prevLW_y; // positive = moving down
+    var dL = lY - _dcog_prevLW_y;
     var dR = rY - _dcog_prevRW_y;
     var moving = Math.abs(dL) > 1 || Math.abs(dR) > 1;
     if (moving) {
       _dcog_tbFrames++;
       var isAntiphase = (dL > 0 && dR < 0) || (dL < 0 && dR > 0);
-      // For SYNC mode, invert scoring — reward same direction
       if (_dcog_tbMode === 'sync') isAntiphase = !isAntiphase;
       if (isAntiphase) _dcog_tbAntiphase++;
-      // Wrist glow
       if (wL) wL.style.opacity = Math.abs(dL)>2 ? '1' : '0.3';
       if (wR) wR.style.opacity = Math.abs(dR)>2 ? '1' : '0.3';
-    }
-    // Chaos: random cue to switch hand
-    if (_dcog_tbMode === 'chaos' && moving) {
-      // handled by separate timer
     }
   }
   _dcog_prevLW_y = lY;
@@ -15573,6 +15622,88 @@ function _dcog_analyzeTwoBall(poses) {
   var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pct+'%';
   var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_tbFrames;
   _dcog_updateScores();
+}
+
+/* ── Two Ball : Same Height + Different Height ───────────────── */
+// Lignes cibles dessinées sur le canvas (comme HomeCourt)
+var _dcog_tbTargetLineY  = null;  // Same Height : hauteur cible commune (px canvas)
+var _dcog_tbTargetLineL  = null;  // Diff Height : ligne cible poignet G (px canvas)
+var _dcog_tbTargetLineR  = null;  // Diff Height : ligne cible poignet D (px canvas)
+var _dcog_tbLWristY      = null;  // position Y actuelle poignet G (px canvas)
+var _dcog_tbRWristY      = null;  // position Y actuelle poignet D (px canvas)
+var _dcog_tbInZoneFrames = 0;     // frames dans la zone cible
+var _dcog_tbTotalFrames2 = 0;     // total frames mesurés (height modes)
+
+function _dcog_drawTwoBallLines(ctx, W, H) {
+  if (!ctx) return;
+  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 480) : 480);
+  ctx.save();
+
+  if (_dcog_tbMode === 'sameheight') {
+    // 1 ligne verte = hauteur cible commune
+    // Initialisée à hauteur hanches si pas encore set
+    if (_dcog_tbTargetLineY === null) _dcog_tbTargetLineY = H * 0.55;
+    var ly = _dcog_tbTargetLineY;
+    // Ligne cible verte
+    ctx.strokeStyle = '#2dc653';
+    ctx.lineWidth   = 3;
+    ctx.setLineDash([12, 6]);
+    ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
+    ctx.setLineDash([]);
+    // Label
+    ctx.fillStyle    = '#2dc653';
+    ctx.font         = 'bold 11px sans-serif';
+    ctx.textAlign    = 'right';
+    ctx.textBaseline = 'bottom';
+    var en = window._lang === 'en';
+    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', W - 8, ly - 4);
+    // Indicateurs poignets
+    if (_dcog_tbLWristY !== null) {
+      var okL = Math.abs(_dcog_tbLWristY - ly) < H * 0.08;
+      ctx.fillStyle = okL ? '#2dc653' : '#e63946';
+      ctx.beginPath(); ctx.arc(W * 0.25, _dcog_tbLWristY, 10, 0, Math.PI*2); ctx.fill();
+    }
+    if (_dcog_tbRWristY !== null) {
+      var okR = Math.abs(_dcog_tbRWristY - ly) < H * 0.08;
+      ctx.fillStyle = okR ? '#2dc653' : '#e63946';
+      ctx.beginPath(); ctx.arc(W * 0.75, _dcog_tbRWristY, 10, 0, Math.PI*2); ctx.fill();
+    }
+
+  } else if (_dcog_tbMode === 'diffheight') {
+    // 2 lignes : G en haut (30% H), D en bas (70% H)
+    if (_dcog_tbTargetLineL === null) _dcog_tbTargetLineL = H * 0.35;
+    if (_dcog_tbTargetLineR === null) _dcog_tbTargetLineR = H * 0.65;
+    var lL = _dcog_tbTargetLineL;
+    var lR = _dcog_tbTargetLineR;
+    // Ligne G (cyan)
+    ctx.strokeStyle = '#4ecdc4';
+    ctx.lineWidth   = 3;
+    ctx.setLineDash([12, 6]);
+    ctx.beginPath(); ctx.moveTo(0, lL); ctx.lineTo(W/2, lL); ctx.stroke();
+    // Ligne D (rouge)
+    ctx.strokeStyle = '#e63946';
+    ctx.beginPath(); ctx.moveTo(W/2, lR); ctx.lineTo(W, lR); ctx.stroke();
+    ctx.setLineDash([]);
+    // Labels
+    var en2 = window._lang === 'en';
+    ctx.font = 'bold 10px sans-serif'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#4ecdc4'; ctx.textAlign = 'left';
+    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', 8, lL - 4);
+    ctx.fillStyle = '#e63946'; ctx.textAlign = 'right';
+    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', W - 8, lR - 4);
+    // Indicateurs
+    if (_dcog_tbLWristY !== null) {
+      var okL2 = Math.abs(_dcog_tbLWristY - lL) < H * 0.08;
+      ctx.fillStyle = okL2 ? '#2dc653' : '#4ecdc4';
+      ctx.beginPath(); ctx.arc(W * 0.25, _dcog_tbLWristY, 10, 0, Math.PI*2); ctx.fill();
+    }
+    if (_dcog_tbRWristY !== null) {
+      var okR2 = Math.abs(_dcog_tbRWristY - lR) < H * 0.08;
+      ctx.fillStyle = okR2 ? '#2dc653' : '#e63946';
+      ctx.beginPath(); ctx.arc(W * 0.75, _dcog_tbRWristY, 10, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
 }
 
 function _dcog_tbScheduleChaos() {
