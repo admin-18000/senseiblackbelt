@@ -1192,7 +1192,7 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
     </div>
     <!-- Sprint target -->
-    <div id="dcog_optSprint" style="display:none;gap:8px">
+    <div id="dcog_optSprint" style="display:none">
       <button class="dcog-spr-btn" onclick="_dcog_setSprintTarget(300)" data-target="300"
         style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:12px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;transition:all .2s">
         300 DRIBBLES
@@ -1203,7 +1203,7 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
     </div>
     <!-- Height zone -->
-    <div id="dcog_optHeight" style="display:none;gap:8px">
+    <div id="dcog_optHeight" style="display:none">
       <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
         style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;text-align:center;transition:all .2s">
         ⬇ <span id="dcog_lbl_low">BAS</span><br><span style="font-size:9px;opacity:.7">sous le genou</span>
@@ -1214,7 +1214,7 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
     </div>
     <!-- Two ball mode -->
-    <div id="dcog_optTwoball" style="display:none;gap:8px">
+    <div id="dcog_optTwoball" style="display:none">
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('alternate')" data-tbmode="alternate"
         style="padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s">
         🔄 <span id="dcog_lbl_alternate">ALTERNÉ</span><br><span style="font-size:9px;opacity:.7">G puis D</span>
@@ -1226,6 +1226,10 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('chaos')" data-tbmode="chaos"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s">
         🌀 CHAOS<br><span style="font-size:9px;opacity:.7">aléatoire</span>
+      </button>
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('burnout')" data-tbmode="burnout"
+        style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s;margin-top:6px">
+        🔥 <span id="dcog_lbl_burnout">BURNOUT</span><br><span style="font-size:9px;opacity:.7">accélération</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('sameheight')" data-tbmode="sameheight"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s;margin-top:6px">
@@ -14899,6 +14903,8 @@ var _dcog_wrong      = 0;
 var _dcog_respTimes  = [];
 var _dcog_questionAt = 0;
 var _dcog_sprintCount= 0;
+var _dcog_sprintWristCount = 0;  // dribbles comptés via MoveNet
+var _dcog_sprintBaseCount  = 0;
 var _dcog_sprintStart= 0;
 var _dcog_sprintInt  = null;
 var _dcog_heightFrames = 0;
@@ -14915,8 +14921,14 @@ function initTraining_dcog() {
   _dcog_video  = document.getElementById('dcog_video');
   _dcog_canvas = document.getElementById('dcog_canvas');
   _dcog_ctx    = _dcog_canvas ? _dcog_canvas.getContext('2d') : null;
+  // Charger historique depuis localStorage
+  try {
+    var saved = localStorage.getItem('sensei_dcog_sessions');
+    if (saved) _dcog_sessions = JSON.parse(saved);
+  } catch(e) {}
   _dcog_selectDrill('math');
   _dcog_renderHistory();
+  _dcog_updateInsight();
 }
 
 /* ── i18n ────────────────────────────────────────────────────── */
@@ -14940,6 +14952,7 @@ function _dcog_applyLang(en) {
     'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
     'dcog_lbl_sameheight': en?'SAME HEIGHT':'MÊME HAUTEUR',
     'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
+    'dcog_lbl_burnout': en?'BURNOUT':'BURNOUT',
     'dcog_lbl_sync': 'SYNC',
     'dcog_scoreTitle': en?'🎯 SCORE':'🎯 SCORE',
     'dcog_lbl_correct': en?'CORRECT':'CORRECTS',
@@ -14970,6 +14983,7 @@ function _dcog_applyLang(en) {
   if (hl && hl.querySelector('.tr-empty'))
     hl.innerHTML = '<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
   else if (_dcog_inited) _dcog_renderHistory();
+  if (typeof _dcog_updateInsight === 'function') _dcog_updateInsight();
   // refresh drill desc
   _dcog_selectDrill(_dcog_drill, true);
 }
@@ -15005,7 +15019,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var optIds = {math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
-      if (el2) el2.style.display = d === drill ? 'flex' : 'none';
+      if (el2) { el2.style.display = d === drill ? 'flex' : 'none'; if (d === drill) el2.style.gap = '8px'; }
     });
     // Update opt title
     var optTitles = {
@@ -15125,6 +15139,7 @@ function _dcog_stop() {
   if (_dcog_video) _dcog_video.srcObject = null;
   clearInterval(_dcog_sprintInt);
   clearTimeout(_dcog_tbChaosTimer);
+  clearTimeout(_dcog_burnoutTimer);
   var cam = document.getElementById('dcog_camContainer');
   if (cam) cam.style.display = 'none';
   // Hide all overlays
@@ -15150,7 +15165,7 @@ function _dcog_stop() {
 function _dcog_launchDrill() {
   // Reset counters
   _dcog_correct = 0; _dcog_wrong = 0; _dcog_respTimes = []; _dcog_questionAt = 0;
-  _dcog_sprintCount = 0; _dcog_sprintStart = Date.now();
+  _dcog_sprintCount = 0; _dcog_sprintStart = Date.now(); _dcog_sprintWristCount = 0; _dcog_sprintPrevWristY = null; _dcog_sprintWristDir = 0;
   _dcog_heightFrames = 0; _dcog_heightInZone = 0;
   _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
   _dcog_tbInZoneFrames = 0; _dcog_tbTotalFrames2 = 0;
@@ -15172,7 +15187,8 @@ function _dcog_launchDrill() {
   // Drill-specific init — AVANT detect pour que les données soient prêtes au 1er frame
   if (_dcog_drill === 'math')    _dcog_nextQuestion();
   if (_dcog_drill === 'sprint')  _dcog_startSprintTimer();
-  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos') _dcog_tbScheduleChaos();
+  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos')   _dcog_tbScheduleChaos();
+  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'burnout') _dcog_startBurnout();
   // Show REC button
   var bRec = document.getElementById('dcog_btnRec');
   if (bRec) bRec.style.display = 'flex';
@@ -15192,6 +15208,7 @@ function _dcog_detect() {
     if (_dcog_drill === 'math')    _dcog_analyzeMathZone(poses);
     if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
     if (_dcog_drill === 'twoball') _dcog_analyzeTwoBall(poses);
+    if (_dcog_drill === 'sprint')  _dcog_analyzeSprintWrist(poses);
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
   }).catch(function() {
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
@@ -15218,6 +15235,10 @@ function _dcog_drawFrame(poses) {
   if (_dcog_drill === 'twoball' && _dcog_running &&
       (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight')) {
     _dcog_drawTwoBallLines(ctx, W, H);
+  }
+  // Draw height target line on canvas
+  if (_dcog_drill === 'height' && _dcog_running) {
+    _dcog_drawHeightLine(ctx, W, H);
   }
 }
 
@@ -15418,19 +15439,48 @@ function _dcog_updateMathBpm() {
 /* ═══════════════════════════════════════════
    DRILL 2 — 300 / 600 SPRINT
 ═══════════════════════════════════════════ */
+/* ── Sprint : comptage MoveNet poignet (fallback si micro absent) */
+var _dcog_sprintPrevWristY = null;
+var _dcog_sprintWristDir   = 0;  // 1=descend -1=monte 0=init
+
+function _dcog_analyzeSprintWrist(poses) {
+  if (!poses || !poses[0] || !_dcog_running) return;
+  var lW = _tsym_kp_fast(poses, 'leftWrist');
+  var rW = _tsym_kp_fast(poses, 'rightWrist');
+  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sy = H / (_dcog_video ? (_dcog_video.videoHeight||480) : 480);
+  // Poignet le plus bas = celui qui dribble
+  var wrist = null;
+  if (lW && rW) wrist = lW.y > rW.y ? lW : rW;
+  else if (lW) wrist = lW; else if (rW) wrist = rW;
+  if (!wrist) return;
+  var wy = wrist.y * sy;
+  if (_dcog_sprintPrevWristY !== null) {
+    var dy = wy - _dcog_sprintPrevWristY;
+    var newDir = dy > 2 ? 1 : dy < -2 ? -1 : 0;
+    // Un dribble = transition bas→haut (rebond)
+    if (_dcog_sprintWristDir === 1 && newDir === -1) {
+      _dcog_sprintWristCount++;
+    }
+    if (newDir !== 0) _dcog_sprintWristDir = newDir;
+  }
+  _dcog_sprintPrevWristY = wy;
+}
+
 function _dcog_startSprintTimer() {
   _dcog_sprintCount = 0;
   _dcog_sprintStart = Date.now();
+  _dcog_sprintBaseCount = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
   var goal = document.getElementById('dcog_sprintGoal');
   if (goal) goal.textContent = '/ '+_dcog_sprintTarget;
   var bar = document.getElementById('dcog_sprintBar');
   if (bar) bar.style.width = '0%';
-  // Watch micro dribble count
-  var baseCount = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
+  var baseCount = _dcog_sprintBaseCount;
   _dcog_sprintInt = setInterval(function() {
     if (!_dcog_running || _dcog_drill !== 'sprint') { clearInterval(_dcog_sprintInt); return; }
+    // Micro si actif, sinon MoveNet wrist count
     var cur = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
-    _dcog_sprintCount = cur - baseCount;
+    _dcog_sprintCount = (cur - baseCount) + _dcog_sprintWristCount;
     var countEl = document.getElementById('dcog_sprintCount');
     if (countEl) countEl.textContent = _dcog_sprintCount;
     // Clock
@@ -15512,14 +15562,10 @@ function _dcog_analyzeHeight(poses) {
   var inZone = normY >= zoneMin && normY <= zoneMax;
   _dcog_heightFrames++;
   if (inZone) _dcog_heightInZone++;
-
-  // Move zone line on overlay
-  var zoneLineEl = document.getElementById('dcog_heightZoneLine');
-  if (zoneLineEl) {
-    var pct = Math.min(95, Math.max(5, (zonePx / H) * 100));
-    zoneLineEl.style.top = pct + '%';
-    zoneLineEl.style.background = inZone ? 'rgba(45,198,83,.8)' : 'rgba(245,197,24,.6)';
-  }
+  // Stocker pour drawHeightLine (canvas)
+  _dcog_heightZonePx  = zonePx;
+  _dcog_heightWristPx = wristY;
+  _dcog_heightInZoneNow = inZone;
   // Score display
   var pctInZone = _dcog_heightFrames > 0
     ? Math.round(_dcog_heightInZone / _dcog_heightFrames * 100) : 0;
@@ -15532,6 +15578,40 @@ function _dcog_analyzeHeight(poses) {
   var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pctInZone+'%';
   var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_heightFrames;
   _dcog_updateScores();
+}
+
+/* ── Draw height target line on canvas ──────────────────────── */
+var _dcog_heightZonePx   = null;
+var _dcog_heightWristPx  = null;
+var _dcog_heightInZoneNow= false;
+
+function _dcog_drawHeightLine(ctx, W, H) {
+  if (!ctx || _dcog_heightZonePx === null) return;
+  var en  = window._lang === 'en';
+  var ly  = _dcog_heightZonePx;
+  var inZ = _dcog_heightInZoneNow;
+  ctx.save();
+  // Ligne cible verte/or selon si dans la zone
+  ctx.strokeStyle = inZ ? '#2dc653' : 'rgba(245,197,24,.8)';
+  ctx.lineWidth   = 3;
+  ctx.setLineDash([14, 6]);
+  ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
+  ctx.setLineDash([]);
+  // Label
+  ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
+  ctx.font         = 'bold 11px sans-serif';
+  ctx.textAlign    = 'right';
+  ctx.textBaseline = 'bottom';
+  var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
+  ctx.fillText(lbl, W - 8, ly - 4);
+  // Point poignet actif
+  if (_dcog_heightWristPx !== null) {
+    ctx.beginPath();
+    ctx.arc(W * 0.5, _dcog_heightWristPx, 10, 0, Math.PI*2);
+    ctx.fillStyle = inZ ? '#2dc653' : '#e63946';
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 /* ═══════════════════════════════════════════
@@ -15711,10 +15791,37 @@ function _dcog_tbScheduleChaos() {
   var delay = 1500 + Math.random() * 2000;
   _dcog_tbChaosTimer = setTimeout(function() {
     if (!_dcog_running) return;
-    // Beep to signal switch
     _td_beep(660, 0.08, 0.2);
     _dcog_tbScheduleChaos();
   }, delay);
+}
+
+/* ── Two Ball Burnout : métronome qui s'accélère ─────────────── */
+var _dcog_burnoutBpm    = 60;
+var _dcog_burnoutTimer  = null;
+var _dcog_burnoutTick   = 0;
+
+function _dcog_startBurnout() {
+  _dcog_burnoutBpm   = 60;
+  _dcog_burnoutTick  = 0;
+  _dcog_burnoutSchedule();
+}
+
+function _dcog_burnoutSchedule() {
+  if (!_dcog_running || _dcog_tbMode !== 'burnout') return;
+  var interval = Math.round(60000 / _dcog_burnoutBpm);
+  _dcog_burnoutTimer = setTimeout(function() {
+    if (!_dcog_running || _dcog_tbMode !== 'burnout') return;
+    _td_beep(880, 0.06, 0.08);
+    _dcog_burnoutTick++;
+    // Accélérer tous les 8 ticks (+5 BPM, max 180)
+    if (_dcog_burnoutTick % 8 === 0 && _dcog_burnoutBpm < 180) {
+      _dcog_burnoutBpm = Math.min(180, _dcog_burnoutBpm + 5);
+      var sc = document.getElementById('dcog_tbScoreBig');
+      if (sc) { sc.textContent = _dcog_burnoutBpm+' BPM'; sc.style.color = _dcog_burnoutBpm>140?'#e63946':_dcog_burnoutBpm>100?'#f5c518':'#2dc653'; }
+    }
+    _dcog_burnoutSchedule();
+  }, interval);
 }
 
 /* ── Score update / status ───────────────────────────────────── */
@@ -15766,14 +15873,27 @@ function _dcog_showResults() {
     html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_heightFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+(_dcog_heightZone==='low'?(en?'LOW':'BAS'):(en?'HIGH':'HAUT'))+'</div><div class="tr-score-lbl">'+(en?'ZONE':'ZONE')+'</div></div>';
   } else if (_dcog_drill === 'twoball') {
-    var pctTB = _dcog_tbFrames>0 ? Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100) : 0;
-    var clsTB = pctTB>=70?'tr-hl':pctTB>=40?'tr-warn':'tr-bad';
-    html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsTB+'">'+pctTB+'%</span></div><div class="tr-score-lbl">'+(en?'DISSOCIATION':'DISSOCIATION')+'</div></div>';
-    html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_tbFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
-    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_tbMode.toUpperCase()+'</div><div class="tr-score-lbl">MODE</div></div>';
+    if (_dcog_tbMode === 'burnout') {
+      html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#e63946">'+_dcog_burnoutBpm+'</div><div class="tr-score-lbl">BPM MAX</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_burnoutTick+'</div><div class="tr-score-lbl">'+(en?'BEATS':'BEATS')+'</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num">🔥</div><div class="tr-score-lbl">BURNOUT</div></div>';
+    } else if (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight') {
+      var pctH2 = _dcog_tbTotalFrames2>0 ? Math.round(_dcog_tbInZoneFrames/_dcog_tbTotalFrames2*100) : 0;
+      var clsH2 = pctH2>=70?'tr-hl':pctH2>=40?'tr-warn':'tr-bad';
+      html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsH2+'">'+pctH2+'%</span></div><div class="tr-score-lbl">'+(en?'IN ZONE':'EN ZONE')+'</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_tbTotalFrames2+'</div><div class="tr-score-lbl">FRAMES</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_tbMode.toUpperCase()+'</div><div class="tr-score-lbl">MODE</div></div>';
+    } else {
+      var pctTB = _dcog_tbFrames>0 ? Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100) : 0;
+      var clsTB = pctTB>=70?'tr-hl':pctTB>=40?'tr-warn':'tr-bad';
+      html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsTB+'">'+pctTB+'%</span></div><div class="tr-score-lbl">'+(en?'DISSOCIATION':'DISSOCIATION')+'</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_tbFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
+      html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_tbMode.toUpperCase()+'</div><div class="tr-score-lbl">MODE</div></div>';
+    }
   }
   html += '</div>';
   res.innerHTML = html;
+  _dcog_updateInsight();
 }
 
 /* ── Save & History ──────────────────────────────────────────── */
@@ -15794,10 +15914,20 @@ function _dcog_saveSession() {
     score = _dcog_heightFrames>0?Math.round(_dcog_heightInZone/_dcog_heightFrames*100):0;
     detail = score+'% '+(en?'in zone':'en zone')+' ('+(_dcog_heightZone==='low'?(en?'low':'bas'):(en?'high':'haut'))+')';
   } else {
-    score = _dcog_tbFrames>0?Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100):0;
-    detail = score+'% '+(en?'dissociation':'dissociation')+' ('+_dcog_tbMode+')';
+    if (_dcog_tbMode === 'burnout') {
+      score  = Math.round((_dcog_burnoutBpm - 60) / (180 - 60) * 100);
+      detail = _dcog_burnoutBpm+' BPM max — '+_dcog_burnoutTick+' beats';
+    } else if (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight') {
+      score  = _dcog_tbTotalFrames2>0?Math.round(_dcog_tbInZoneFrames/_dcog_tbTotalFrames2*100):0;
+      detail = score+'% '+(en?'in zone':'en zone')+' ('+_dcog_tbMode+')';
+    } else {
+      score  = _dcog_tbFrames>0?Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100):0;
+      detail = score+'% '+(en?'dissociation':'dissociation')+' ('+_dcog_tbMode+')';
+    }
   }
   _dcog_sessions.unshift({drill:drillLabel[_dcog_drill]||_dcog_drill, score:score, detail:detail, date:d});
+  if (_dcog_sessions.length > 30) _dcog_sessions = _dcog_sessions.slice(0,30);
+  try { localStorage.setItem('sensei_dcog_sessions', JSON.stringify(_dcog_sessions)); } catch(e) {}
   _tr_saveProgress('dcog_'+_dcog_drill, {score:score});
   _dcog_renderHistory();
   _dcog_setStatus(_t('Session sauvegardée ✅','Session saved ✅'), '#2dc653');
@@ -15894,6 +16024,48 @@ function _dcog_recError(msg) {
   var st=document.getElementById('dcog_status');
   if(st){st.textContent='❌ '+msg;st.style.color='#e63946';}
   _dcog_recActive=false; clearInterval(_dcog_recTimer); _dcog_updateRecBtn();
+}
+
+/* ── Analyse SENSEI — texte basé sur les résultats ──────────── */
+function _dcog_updateInsight() {
+  var el = document.getElementById('dcog_insightText');
+  if (!el) return;
+  var en  = window._lang === 'en';
+  var msg = '';
+  if (_dcog_drill === 'math') {
+    var total = _dcog_correct + _dcog_wrong;
+    if (total === 0) { el.textContent = en ? 'Start a session to see the analysis...' : 'Lance une session pour voir l\'analyse...'; return; }
+    var pct = Math.round(_dcog_correct/total*100);
+    var avgRT = _dcog_respTimes.length>0 ? Math.round(_dcog_respTimes.reduce(function(a,b){return a+b;},0)/_dcog_respTimes.length) : 0;
+    if (pct >= 90) msg = en ? '🔥 Excellent dual-task ability! Your brain stays sharp while your body works.' : '🔥 Excellent dual-task ! Ton cerveau reste alerte pendant le travail physique.';
+    else if (pct >= 70) msg = en ? '✅ Good cognitive-motor coordination. Keep pushing the difficulty.' : '✅ Bonne coordination cognitivo-motrice. Augmente la difficulté.';
+    else if (pct >= 50) msg = en ? '💪 You\'re building the connection. Focus on breathing and slowing down.' : '💪 Tu construis la connexion. Focus sur la respiration et ralentis.';
+    else msg = en ? '🎯 Dual-task is hard! Start with Easy level and build up.' : '🎯 Le dual-task est difficile ! Commence en Facile et progresse.';
+    if (avgRT > 0) msg += ' ' + (en ? 'Avg response: '+avgRT+'ms.' : 'Temps moy: '+avgRT+'ms.');
+  } else if (_dcog_drill === 'sprint') {
+    var done = _dcog_sprintCount >= _dcog_sprintTarget;
+    var elapsed = Math.round((Date.now()-_dcog_sprintStart)/1000);
+    if (done) msg = en ? '🏆 Goal reached in '+elapsed+'s! Top conditioning.' : '🏆 Objectif atteint en '+elapsed+'s ! Excellente condition physique.';
+    else msg = en ? '💪 '+_dcog_sprintCount+'/'+_dcog_sprintTarget+' dribbles. Keep training your endurance.' : '💪 '+_dcog_sprintCount+'/'+_dcog_sprintTarget+' dribbles. Continue à travailler ton endurance.';
+  } else if (_dcog_drill === 'height') {
+    var pctH = _dcog_heightFrames>0 ? Math.round(_dcog_heightInZone/_dcog_heightFrames*100) : 0;
+    if (pctH >= 80) msg = en ? '🎯 Excellent ball control! You master dribble height consistency.' : '🎯 Excellent contrôle ! Tu maîtrises la régularité de hauteur de dribble.';
+    else if (pctH >= 60) msg = en ? '✅ Good control. Work on keeping a steady rhythm.' : '✅ Bon contrôle. Travaille un rythme plus régulier.';
+    else msg = en ? '📏 Focus on the target line. Use the visual feedback to adjust.' : '📏 Concentre-toi sur la ligne cible. Utilise le feedback visuel pour t\'ajuster.';
+  } else if (_dcog_drill === 'twoball') {
+    if (_dcog_tbMode === 'burnout') {
+      msg = en ? '🔥 Max BPM reached: '+_dcog_burnoutBpm+'. Train this regularly to increase your threshold.' : '🔥 BPM max atteint: '+_dcog_burnoutBpm+'. Entraîne-toi régulièrement pour repousser ta limite.';
+    } else if (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight') {
+      var pctTB2 = _dcog_tbTotalFrames2>0 ? Math.round(_dcog_tbInZoneFrames/_dcog_tbTotalFrames2*100) : 0;
+      if (pctTB2 >= 70) msg = en ? '🎯 Great bilateral coordination! Both hands working at target height.' : '🎯 Excellente coordination bilatérale ! Les deux mains à la hauteur cible.';
+      else msg = en ? '💪 Keep working on independent hand control.' : '💪 Continue à travailler le contrôle indépendant des mains.';
+    } else {
+      var pctTB = _dcog_tbFrames>0 ? Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100) : 0;
+      if (pctTB >= 70) msg = en ? '🔥 Strong motor dissociation! Your hands work independently.' : '🔥 Forte dissociation motrice ! Tes mains travaillent indépendamment.';
+      else msg = en ? '🎯 Motor dissociation takes time. Be patient and consistent.' : '🎯 La dissociation motrice prend du temps. Sois patient et régulier.';
+    }
+  }
+  if (msg) el.textContent = msg;
 }
 
 function _dcog_renderHistory() {
