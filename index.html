@@ -1255,9 +1255,9 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- CAMERA CANVAS -->
   <div class="tr-card" style="padding:12px;position:relative">
     <div id="dcog_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
-      <video id="dcog_video" width="640" height="480" playsinline muted
+      <video id="dcog_video" width="1280" height="720" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="dcog_canvas" width="640" height="480"
+      <canvas id="dcog_canvas" width="1280" height="720"
         style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
       <!-- Math overlay — absolute over canvas -->
       <div id="dcog_mathOverlay"
@@ -1382,9 +1382,9 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="tr-card">
     <div class="tr-card-title">📷 CAMÉRA — ANALYSE EN TEMPS RÉEL</div>
     <div id="tsym_camContainer" style="display:none;width:100%;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tsym_video" width="640" height="480" playsinline muted
+      <video id="tsym_video" width="1280" height="720" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="tsym_canvas" width="640" height="480"
+      <canvas id="tsym_canvas" width="1280" height="720"
         style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
     </div>
     <div id="tsym_status" style="text-align:center;font-size:11px;color:#7a8299;margin-bottom:12px;min-height:18px;letter-spacing:.5px">
@@ -1619,9 +1619,9 @@ body.unlocked .sensei-only{display:revert !important}
 
     <!-- Canvas caméra -->
     <div id="tdr_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tdr_video" width="640" height="480" playsinline muted
+      <video id="tdr_video" width="1280" height="720" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="tdr_canvas" width="640" height="480"
+      <canvas id="tdr_canvas" width="1280" height="720"
         style="width:100%;height:100%;display:block;background:#0d1117"></canvas>
     </div>
 
@@ -1632,6 +1632,7 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <div style="font-size:11px;color:#f5c518;font-family:var(--font-cond);font-weight:700">
         <span id="tdr_scoreLive">0</span> pts &nbsp;
+        <span id="tdr_streakLive" style="font-size:12px;font-weight:700;letter-spacing:1px"></span> &nbsp;
         <span id="tdr_timeLive" style="color:#7a8299"></span>
       </div>
     </div>
@@ -13566,6 +13567,7 @@ function _trApplyLang() {
   var tdrSt=document.getElementById('tdr_status');
   if(tdrSt&&(tdrSt.textContent.indexOf('Appuie')>-1||tdrSt.textContent.indexOf('Press')>-1))
     tdrSt.textContent=en?'Press START':'Appuie sur DÉMARRER';
+  var tdrSk=document.getElementById('tdr_streakLive'); if(tdrSk&&!tdrSk.textContent) tdrSk.textContent='';
   var tdrHL=document.getElementById('tdr_histList');
   if(tdrHL&&tdrHL.querySelector('.tr-empty'))
     tdrHL.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
@@ -13750,7 +13752,7 @@ function _tsym_startCamera() {
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
-  var _vConstraints=[{width:640,height:480,facingMode:'user'},{facingMode:'user'},true];
+  var _vConstraints=[{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:1280},height:{ideal:720},facingMode:'user'},{facingMode:'user'},true];
   function tryCamera(ci){
     if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
@@ -14086,7 +14088,7 @@ function _tdr_startRec(){
   try{stream=cv.captureStream?cv.captureStream(25):cv.mozCaptureStream?cv.mozCaptureStream(25):null;}catch(e){}
   if(!stream){_tdr_recError(_t('Capture impossible','Capture failed'));return;}
   var mime=_tsym_getBestMime();
-  try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);}
+  try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}):new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000});}
   catch(e){try{_tdr_recorder=new MediaRecorder(stream);}catch(e2){_tdr_recError('start failed');return;}}
   _tdr_recChunks=[];_tdr_recSec=0;
   _tdr_recorder.ondataavailable=function(e){if(e.data&&e.data.size>0)_tdr_recChunks.push(e.data);};
@@ -14236,10 +14238,10 @@ function _tsym_startRec() {
   var mimeType = _tsym_getBestMime();
   try {
     _tsym_recorder = mimeType
-      ? new MediaRecorder(stream, {mimeType: mimeType})
-      : new MediaRecorder(stream);
+      ? new MediaRecorder(stream, {mimeType: mimeType, videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000})
+      : new MediaRecorder(stream, {videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000});
   } catch(e) {
-    try { _tsym_recorder = new MediaRecorder(stream); }
+    try { _tsym_recorder = new MediaRecorder(stream, {videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000}); }
     catch(e2) {
       _tsym_recError(_t(
         'Impossible de démarrer l\'enregistrement',
@@ -14424,6 +14426,7 @@ var _tdr_score      = 0;
 var _tdr_hits       = 0;
 var _tdr_total      = 0;
 var _tdr_reactionTimes = [];
+var _tdr_streak     = 0;          // hits consécutifs
 var _tdr_lastSpawn  = 0;
 var _tdr_sec        = 0;
 var _tdr_duration   = 30;
@@ -14485,7 +14488,7 @@ function _tdr_start() {
     _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
   _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
-  var constraints = [{video:{facingMode:'user',width:640,height:480}},{video:{facingMode:'user'}},{video:true}];
+  var constraints = [{video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}},{video:{facingMode:'user'}},{video:true}];
   function tryC(i) {
     if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
@@ -14650,10 +14653,13 @@ function _tdr_drawTargets(ctx, W, H) {
     ctx.stroke();
     ctx.restore();
   });
-  // Flash hit
+  // Flash hit + reset streak si target expirée
+  var hadMiss = false;
   _tdr_targets = _tdr_targets.filter(function(t) {
+    if (!t.hit && Date.now()-t.born > t.ttl) { hadMiss = true; return false; }
     return !t.hit || (Date.now() - t.hitTime < 300);
   });
+  if (hadMiss) { _tdr_streak = 0; _tdr_updateScoreDisplay(); }
 }
 
 /* ── Spawn cibles ─────────────────────────────────────────────── */
@@ -14675,7 +14681,7 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      r: 42, color: p.color,
+      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 1280) * 0.050), color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -14710,12 +14716,18 @@ function _tdr_checkHits(poses) {
         var rt = Date.now() - t.born;
         _tdr_reactionTimes.push(rt);
         _tdr_hits++;
-        // Score : plus vite = plus de points
+        _tdr_streak++;
+        // Score : plus vite = plus de points + bonus streak
         var bonus = Math.max(0, Math.round((2000-rt)/200));
-        _tdr_score += 10 + bonus;
+        var streakBonus = _tdr_streak >= 5 ? 5 : 0;
+        _tdr_score += 10 + bonus + streakBonus;
         _tdr_flashHit(t);
-        _td_beep(660, 0.1, 0.1); // son court
-        if (navigator.vibrate) navigator.vibrate(30);
+        // Son différencié : rapide=aigu, lent=grave
+        var freq = rt < 500 ? 880 : rt < 1000 ? 660 : 440;
+        var vol  = rt < 500 ? 0.15 : 0.08;
+        _td_beep(freq, 0.1, vol);
+        if (_tdr_streak >= 5) _td_beep(1100, 0.05, 0.1); // son bonus streak
+        if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
         _tdr_updateScoreDisplay();
       }
     });
@@ -14739,6 +14751,7 @@ function _tdr_startDrill() {
   _tdr_running = true;
   _tdr_score   = 0;
   _tdr_hits    = 0;
+  _tdr_streak  = 0;
   _tdr_total   = 0;
   _tdr_sec     = _tdr_duration;
   _tdr_targets = [];
@@ -14791,8 +14804,13 @@ function _tdr_startDrill() {
 function _tdr_updateScoreDisplay() {
   var sc = document.getElementById('tdr_scoreLive');
   var tm = document.getElementById('tdr_timeLive');
+  var sk = document.getElementById('tdr_streakLive');
   if (sc) sc.textContent = _tdr_score;
   if (tm) tm.textContent = _tdr_sec + 's';
+  if (sk) {
+    sk.textContent = _tdr_streak >= 3 ? '🔥 x'+_tdr_streak : '';
+    sk.style.color = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
+  }
 }
 
 function _tdr_endDrill() {
@@ -15094,7 +15112,8 @@ function _dcog_start() {
   }
   _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [
-    {video:{facingMode:'user',width:640,height:480}},
+    {video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'}},
+    {video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}},
     {video:{facingMode:'user'}},
     {video:true}
   ];
@@ -15166,6 +15185,7 @@ function _dcog_launchDrill() {
   // Reset counters
   _dcog_correct = 0; _dcog_wrong = 0; _dcog_respTimes = []; _dcog_questionAt = 0;
   _dcog_sprintCount = 0; _dcog_sprintStart = Date.now(); _dcog_sprintWristCount = 0; _dcog_sprintPrevWristY = null; _dcog_sprintWristDir = 0;
+  _dcog_wristBpmTimes = []; _dcog_wristBpmLive = 0; _dcog_wristPrevY = null; _dcog_wristPrevDir = 0;
   _dcog_heightFrames = 0; _dcog_heightInZone = 0;
   _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
   _dcog_tbInZoneFrames = 0; _dcog_tbTotalFrames2 = 0;
@@ -15209,6 +15229,7 @@ function _dcog_detect() {
     if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
     if (_dcog_drill === 'twoball') _dcog_analyzeTwoBall(poses);
     if (_dcog_drill === 'sprint')  _dcog_analyzeSprintWrist(poses);
+    _dcog_detectWristBpm(poses);  // BPM MoveNet — tous les drills
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
   }).catch(function() {
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
@@ -15264,9 +15285,9 @@ function _dcog_nextQuestion() {
   _dcog_mathChoices = _dcog_genChoices(q.answer);
   // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
   var cv = _dcog_canvas;
-  var W  = cv ? cv.width  : 640;
-  var H  = cv ? cv.height : 480;
-  var r  = 50;
+  var W  = cv ? cv.width  : 1280;
+  var H  = cv ? cv.height : 720;
+  var r  = Math.round(W * 0.055);  // ~70px sur 1280
   var y  = Math.round(H * 0.70);
   var colors = ['#2dc653','#f5c518','#e63946'];
   _dcog_mathTargets = [
@@ -15285,8 +15306,8 @@ function _dcog_analyzeMathZone(poses) {
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
-  var sx = W / (_dcog_video.videoWidth  || 640);
-  var sy = H / (_dcog_video.videoHeight || 480);
+  var sx = W / (_dcog_video.videoWidth  || 1280);
+  var sy = H / (_dcog_video.videoHeight || 720);
   ['leftWrist','rightWrist'].forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
@@ -15420,19 +15441,62 @@ function _dcog_answerMath(val, idx) {
   setTimeout(_dcog_nextQuestion, 800);
 }
 
+/* ── Speed Dribble BPM — calcul via MoveNet wrist bounce ────── */
+var _dcog_wristBpmTimes  = [];   // timestamps des rebonds détectés
+var _dcog_wristBpmLive   = 0;
+var _dcog_wristPrevY     = null;
+var _dcog_wristPrevDir   = 0;
+
+function _dcog_detectWristBpm(poses) {
+  if (!poses || !poses[0] || !_dcog_canvas || !_dcog_video) return;
+  var H  = _dcog_canvas.height;
+  var sy = H / (_dcog_video.videoHeight || 720);
+  var lW = _tsym_kp_fast(poses, 'leftWrist');
+  var rW = _tsym_kp_fast(poses, 'rightWrist');
+  // Poignet le plus bas = celui qui dribble
+  var w = null;
+  if (lW && rW) w = lW.y > rW.y ? lW : rW;
+  else if (lW) w = lW; else if (rW) w = rW;
+  if (!w) return;
+  var wy = w.y * sy;
+  if (_dcog_wristPrevY !== null) {
+    var dy = wy - _dcog_wristPrevY;
+    var dir = dy > 2 ? 1 : dy < -2 ? -1 : 0;
+    // Rebond = transition descente→montée
+    if (_dcog_wristPrevDir === 1 && dir === -1) {
+      var now = Date.now();
+      _dcog_wristBpmTimes.push(now);
+      // Garder 8 derniers rebonds
+      if (_dcog_wristBpmTimes.length > 8) _dcog_wristBpmTimes.shift();
+      // Calculer BPM sur les 4 derniers intervalles
+      if (_dcog_wristBpmTimes.length >= 3) {
+        var n = _dcog_wristBpmTimes.length;
+        var intervals = [];
+        for (var i=1;i<n;i++) intervals.push(_dcog_wristBpmTimes[i]-_dcog_wristBpmTimes[i-1]);
+        var avg = intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
+        _dcog_wristBpmLive = Math.round(60000/avg);
+      }
+    }
+    if (dir !== 0) _dcog_wristPrevDir = dir;
+  }
+  _dcog_wristPrevY = wy;
+}
+
 function _dcog_updateMathBpm() {
   var bpmEl = document.getElementById('dcog_mathBpmLive');
   if (!bpmEl) return;
-  // Read from global micro dribble times
+  // Micro en priorité, MoveNet en fallback
+  var bpm = 0;
   if (typeof _td_dribbleTimes !== 'undefined' && _td_dribbleTimes.length > 2) {
     var times = _td_dribbleTimes.slice(-6);
     var intervals = [];
     for (var i=1;i<times.length;i++) intervals.push(times[i]-times[i-1]);
     var avg = intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
-    bpmEl.textContent = Math.round(60000/avg);
-  } else {
-    bpmEl.textContent = '--';
+    bpm = Math.round(60000/avg);
+  } else if (_dcog_wristBpmLive > 0) {
+    bpm = _dcog_wristBpmLive;
   }
+  bpmEl.textContent = bpm > 0 ? bpm : '--';
   if (_dcog_running && _dcog_drill==='math') setTimeout(_dcog_updateMathBpm, 1000);
 }
 
@@ -15447,7 +15511,7 @@ function _dcog_analyzeSprintWrist(poses) {
   if (!poses || !poses[0] || !_dcog_running) return;
   var lW = _tsym_kp_fast(poses, 'leftWrist');
   var rW = _tsym_kp_fast(poses, 'rightWrist');
-  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
+  var H  = _dcog_canvas ? _dcog_canvas.height : 720;
   var sy = H / (_dcog_video ? (_dcog_video.videoHeight||480) : 480);
   // Poignet le plus bas = celui qui dribble
   var wrist = null;
@@ -15516,10 +15580,10 @@ function _dcog_startSprintTimer() {
 function _dcog_analyzeHeight(poses) {
   if (!poses || poses.length === 0) return;
   var kps  = poses[0].keypoints;
-  var W    = _dcog_canvas ? _dcog_canvas.width  : 640;
-  var H    = _dcog_canvas ? _dcog_canvas.height : 480;
-  var sx   = W / (_dcog_video.videoWidth  || 640);
-  var sy   = H / (_dcog_video.videoHeight || 480);
+  var W    = _dcog_canvas ? _dcog_canvas.width  : 1280;
+  var H    = _dcog_canvas ? _dcog_canvas.height : 720;
+  var sx   = W / (_dcog_video.videoWidth  || 1280);
+  var sy   = H / (_dcog_video.videoHeight || 720);
 
   function kp(name) { return _tsym_kp(poses, name); }
 
@@ -15628,9 +15692,9 @@ function _dcog_analyzeTwoBall(poses) {
   var rW = _tsym_kp_fast(poses, 'rightWrist');
   if (!lW || !rW) return;
 
-  var W  = _dcog_canvas ? _dcog_canvas.width  : 640;
-  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
-  var sy = H / (_dcog_video.videoHeight || 480);
+  var W  = _dcog_canvas ? _dcog_canvas.width  : 1280;
+  var H  = _dcog_canvas ? _dcog_canvas.height : 720;
+  var sy = H / (_dcog_video.videoHeight || 720);
   var lY = lW.y * sy;
   var rY = rW.y * sy;
 
@@ -15716,7 +15780,7 @@ var _dcog_tbTotalFrames2 = 0;     // total frames mesurés (height modes)
 
 function _dcog_drawTwoBallLines(ctx, W, H) {
   if (!ctx) return;
-  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 480) : 480);
+  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 720) : 480);
   ctx.save();
 
   if (_dcog_tbMode === 'sameheight') {
@@ -15959,7 +16023,7 @@ function _dcog_startRec() {
   try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
   if (!stream) { _dcog_recError(_t('Capture impossible','Capture failed')); return; }
   var mime = _tsym_getBestMime();
-  try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream); }
+  try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000}); }
   catch(e) { try { _dcog_recorder = new MediaRecorder(stream); } catch(e2) { _dcog_recError('start failed'); return; } }
   _dcog_recChunks = []; _dcog_recSec = 0;
   _dcog_recorder.ondataavailable = function(e) { if(e.data && e.data.size>0) _dcog_recChunks.push(e.data); };
