@@ -23,6 +23,9 @@
   <meta name="apple-mobile-web-app-title" content="SENSEI">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- TF.js + MoveNet préchargés statiquement — disponibles pour tous les modules caméra -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js"></script>
 <style>
 :root{
   --black:#080a0f;
@@ -1135,8 +1138,232 @@ body.unlocked .sensei-only{display:revert !important}
     <button onclick="openTrainingTab('sc',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">💪 Strength</button>
     <button onclick="openTrainingTab('ch',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">🏆 Challenges</button>
   
-    <button onclick="openTrainingTab('sym',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">⚖️ Symétrie</button></div>
+    <button onclick="openTrainingTab('sym',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap" data-i18n="tab_sym">⚖️ Symétrie</button>
+    <button onclick="openTrainingTab('dcog',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap" data-i18n="tab_dcog">🧠 Cognitif</button></div>
 
+<div id="tr-dcog" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
+
+  <!-- DRILL SELECTOR -->
+  <div class="tr-card">
+    <div class="tr-card-title" id="dcog_cardTitle">🧠 COGNITIVE DRIBBLE TRAINING</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
+        style="padding:14px 10px;border-radius:10px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">🧮</div>
+        <div id="dcog_lbl_math">DRIBBLE MATH</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('sprint')" id="dcog_btn_sprint"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">⏱</div>
+        <div id="dcog_lbl_sprint">300 / 600</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('height')" id="dcog_btn_height"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">📏</div>
+        <div id="dcog_lbl_height">DRIBBLE HEIGHT</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('twoball')" id="dcog_btn_twoball"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">🔄</div>
+        <div id="dcog_lbl_twoball">TWO BALL</div>
+      </button>
+    </div>
+    <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
+      Résous des opérations en dribblant — entraînement cognitif-moteur
+    </div>
+  </div>
+
+  <!-- SUB-OPTIONS -->
+  <div class="tr-card" id="dcog_optCard">
+    <div class="tr-card-title" id="dcog_optTitle">🎚 DIFFICULTÉ</div>
+    <!-- Math levels -->
+    <div id="dcog_optMath" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="dcog-lvl-btn" onclick="_dcog_setMathLevel('easy')" data-level="easy"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        ➕ <span id="dcog_lbl_easy">FACILE</span><br><span style="font-size:9px;opacity:.7">+ −</span>
+      </button>
+      <button class="dcog-lvl-btn" onclick="_dcog_setMathLevel('medium')" data-level="medium"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        ✖ <span id="dcog_lbl_medium">MOYEN</span><br><span style="font-size:9px;opacity:.7">× ÷</span>
+      </button>
+      <button class="dcog-lvl-btn" onclick="_dcog_setMathLevel('hard')" data-level="hard"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        🔥 <span id="dcog_lbl_hard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">enchaîné</span>
+      </button>
+    </div>
+    <!-- Sprint target -->
+    <div id="dcog_optSprint" style="display:none;gap:8px">
+      <button class="dcog-spr-btn" onclick="_dcog_setSprintTarget(300)" data-target="300"
+        style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:12px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;transition:all .2s">
+        300 DRIBBLES
+      </button>
+      <button class="dcog-spr-btn" onclick="_dcog_setSprintTarget(600)" data-target="600"
+        style="flex:1;padding:12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:12px;font-weight:700;cursor:pointer;width:calc(50% - 4px);transition:all .2s">
+        600 DRIBBLES
+      </button>
+    </div>
+    <!-- Height zone -->
+    <div id="dcog_optHeight" style="display:none;gap:8px">
+      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
+        style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;text-align:center;transition:all .2s">
+        ⬇ <span id="dcog_lbl_low">BAS</span><br><span style="font-size:9px;opacity:.7">sous le genou</span>
+      </button>
+      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('high')" data-zone="high"
+        style="flex:1;padding:12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:700;cursor:pointer;width:calc(50% - 4px);text-align:center;transition:all .2s">
+        ⬆ <span id="dcog_lbl_high">HAUT</span><br><span style="font-size:9px;opacity:.7">hauteur hanches</span>
+      </button>
+    </div>
+    <!-- Two ball mode -->
+    <div id="dcog_optTwoball" style="display:none;gap:8px">
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('alternate')" data-tbmode="alternate"
+        style="padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s">
+        🔄 <span id="dcog_lbl_alternate">ALTERNÉ</span><br><span style="font-size:9px;opacity:.7">G puis D</span>
+      </button>
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('sync')" data-tbmode="sync"
+        style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s">
+        ⚡ <span id="dcog_lbl_sync">SYNC</span><br><span style="font-size:9px;opacity:.7">ensemble</span>
+      </button>
+      <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('chaos')" data-tbmode="chaos"
+        style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s">
+        🌀 CHAOS<br><span style="font-size:9px;opacity:.7">aléatoire</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CAMERA GUIDE -->
+  <div class="tr-card">
+    <div class="tr-card-title" id="dcog_guideTitle">📐 GUIDE PLACEMENT</div>
+    <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;font-size:9px;color:#7a8299;line-height:1.8">
+      📱 <span id="dcog_guide1">Pose le téléphone à 2-3m face à toi</span><br>
+      👤 <span id="dcog_guide2">Corps entier visible dans le cadre</span><br>
+      💡 <span id="dcog_guide3">Bonne luminosité requise</span>
+    </div>
+  </div>
+
+  <!-- CAMERA CANVAS -->
+  <div class="tr-card" style="padding:12px;position:relative">
+    <div id="dcog_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
+      <video id="dcog_video" width="640" height="480" playsinline muted
+        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+      <canvas id="dcog_canvas" width="640" height="480"
+        style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
+      <!-- Math overlay — absolute over canvas -->
+      <div id="dcog_mathOverlay"
+        style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
+        <div id="dcog_mathQuestion"
+          style="font-family:var(--font-display);font-size:clamp(26px,8vw,48px);color:#fff;letter-spacing:3px;text-shadow:0 2px 16px rgba(0,0,0,.9);margin-bottom:16px;text-align:center">
+          ? × ? = ?
+        </div>
+        <!-- zones dessinées dans le canvas — hint text seulement -->
+        <div id="dcog_mathZoneHint" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px;text-align:center">
+          Touche la bonne target avec ta main en dribblant
+        </div>
+        <!-- Dual-task live feedback -->
+        <div style="margin-top:14px;font-size:10px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:1px;text-align:center">
+          <span id="dcog_mathBpmLabel">DRIBBLE BPM</span>: <span id="dcog_mathBpmLive" style="color:#f5c518;font-weight:700">--</span>
+        </div>
+      </div>
+      <!-- Sprint overlay -->
+      <div id="dcog_sprintOverlay"
+        style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.3)">
+        <div id="dcog_sprintCount"
+          style="font-family:var(--font-display);font-size:clamp(48px,14vw,90px);color:#f5c518;letter-spacing:4px;text-shadow:0 2px 20px rgba(0,0,0,.9);line-height:1">0</div>
+        <div id="dcog_sprintGoal" style="font-size:14px;color:rgba(245,197,24,.6);font-family:var(--font-cond);letter-spacing:2px">/ 300</div>
+        <div id="dcog_sprintClock" style="font-size:clamp(22px,6vw,32px);color:#fff;font-family:var(--font-display);margin-top:8px;letter-spacing:4px">00:00</div>
+        <!-- Progress bar -->
+        <div style="width:80%;height:6px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:14px;overflow:hidden">
+          <div id="dcog_sprintBar" style="height:100%;background:#2dc653;border-radius:3px;transition:width .3s;width:0%"></div>
+        </div>
+      </div>
+      <!-- Height overlay -->
+      <div id="dcog_heightOverlay"
+        style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none">
+        <!-- Zone target line -->
+        <div id="dcog_heightZoneLine"
+          style="position:absolute;left:5%;right:5%;height:3px;background:rgba(245,197,24,.7);border-radius:2px;transition:top .15s;top:50%">
+          <span style="position:absolute;right:0;top:-18px;font-size:9px;color:#f5c518;font-family:var(--font-cond);letter-spacing:.5px" id="dcog_heightZoneLbl">ZONE CIBLE</span>
+        </div>
+        <!-- Live score top right -->
+        <div style="position:absolute;top:10px;right:12px;text-align:right">
+          <div id="dcog_heightScoreBig" style="font-family:var(--font-display);font-size:clamp(28px,8vw,42px);color:#2dc653;text-shadow:0 2px 12px rgba(0,0,0,.8);line-height:1">--%</div>
+          <div id="dcog_heightScoreLbl" style="font-size:9px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px">DANS LA ZONE</div>
+        </div>
+      </div>
+      <!-- Two ball overlay -->
+      <div id="dcog_twoballOverlay"
+        style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none">
+        <!-- Dissociation score top center -->
+        <div style="position:absolute;top:10px;left:0;right:0;text-align:center">
+          <div id="dcog_tbScoreBig" style="font-family:var(--font-display);font-size:clamp(28px,8vw,42px);color:#f5c518;text-shadow:0 2px 12px rgba(0,0,0,.8);line-height:1">--%</div>
+          <div id="dcog_tbScoreLbl" style="font-size:9px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px">DISSOCIATION</div>
+        </div>
+        <!-- L/R wrist indicators -->
+        <div style="position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:space-around">
+          <div style="text-align:center">
+            <div id="dcog_tbWristL" style="width:20px;height:20px;border-radius:50%;background:#4ecdc4;margin:0 auto 4px;opacity:.4;transition:opacity .1s"></div>
+            <div style="font-size:9px;color:#4ecdc4;font-family:var(--font-cond)" id="dcog_tbLbl_L">G</div>
+          </div>
+          <div style="text-align:center">
+            <div id="dcog_tbWristR" style="width:20px;height:20px;border-radius:50%;background:#e63946;margin:0 auto 4px;opacity:.4;transition:opacity .1s"></div>
+            <div style="font-size:9px;color:#e63946;font-family:var(--font-cond)" id="dcog_tbLbl_R">D</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status line -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div id="dcog_status" style="font-size:11px;color:#7a8299;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <div style="font-size:11px;color:#f5c518;font-family:var(--font-cond);font-weight:700">
+        <span id="dcog_scoreLive">0</span> pts
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="tr-btn tr-btn-start" id="dcog_btnStart" onclick="_dcog_start()" ontouchstart="" style="flex:1">▶ <span id="dcog_lblStart">DÉMARRER</span></button>
+      <button class="tr-btn tr-btn-stop"  id="dcog_btnStop"  onclick="_dcog_stop()"  ontouchstart="" style="display:none;flex:1">⏹ STOP</button>
+      <button class="tr-btn tr-btn-save"  id="dcog_btnSave"  onclick="_dcog_saveSession()" ontouchstart="" style="display:none;flex:1">💾 <span id="dcog_lblSave">SAUVEGARDER</span></button>
+      <button id="dcog_btnRec" onclick="_dcog_toggleRec()" ontouchstart="" style="display:none;background:#e63946;color:#fff;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 16px;border:none;border-radius:8px;cursor:pointer">🔴 REC</button>
+      <a id="dcog_dlLink" style="display:none"></a>
+    </div>
+
+    <!-- Results -->
+    <div id="dcog_results" style="display:none;margin-bottom:10px"></div>
+  </div>
+
+  <!-- LIVE SCORES -->
+  <div class="tr-card">
+    <div class="tr-card-title" id="dcog_scoreTitle">🎯 SCORE</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+      <div class="tr-score-box"><div class="tr-score-val" id="dcog_sCorrect" style="color:#2dc653">0</div><div class="tr-score-lbl" id="dcog_lbl_correct">CORRECTS</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="dcog_sWrong" style="color:#e63946">0</div><div class="tr-score-lbl" id="dcog_lbl_wrong">ERREURS</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="dcog_sTime" style="color:var(--muted)">--</div><div class="tr-score-lbl" id="dcog_lbl_time">TEMPS RÉP.</div></div>
+    </div>
+    <!-- Dual-task bar (math + sprint) -->
+    <div id="dcog_dualTaskBar" style="display:none">
+      <div style="margin-bottom:4px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between">
+        <span id="dcog_dualLbl">Score cognitif-moteur</span><span id="dcog_dualPct">--%</span>
+      </div>
+      <div style="height:8px;background:var(--dark3);border-radius:4px;overflow:hidden">
+        <div id="dcog_dualFill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#e63946,#f5c518,#2dc653);transition:width .6s;width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENSEI INSIGHT -->
+  <div class="tr-card">
+    <div class="tr-card-title" id="dcog_insightTitle">💡 ANALYSE SENSEI</div>
+    <div class="tr-insight" id="dcog_insightText">Lance une session pour voir l'analyse...</div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="tr-card">
+    <div class="tr-card-title" id="dcog_histTitle">📅 HISTORIQUE</div>
+    <div id="dcog_histList"><div class="tr-empty">Aucune session</div></div>
+  </div>
+
+</div>
 <div id="tr-sym" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
 
   <!-- CAMÉRA + CANVAS -->
@@ -11695,6 +11922,7 @@ function openTrainingTab(id, btn) {
   if(id==='sc')       initTraining_sc();
   if(id==='ch')       initTraining_ch();
   if(id==='sym')       initTraining_sym();
+  if(id==='dcog')      { initTraining_dcog(); _tsym_loadModel(null, null); }
 }
 
 /* DRIBBLE */
@@ -13330,6 +13558,13 @@ function _trApplyLang() {
   if(tdrHL&&tdrHL.querySelector('.tr-empty'))
     tdrHL.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
   else if(typeof _tdr_renderHistory==='function') _tdr_renderHistory();
+  // ── Cognitive tab label ──
+  var dcogTab=document.querySelector('[data-i18n="tab_dcog"]');
+  if(dcogTab) dcogTab.textContent='🧠 '+(en?'Cognitive':'Cognitif');
+  var symTab=document.querySelector('[data-i18n="tab_sym"]');
+  if(symTab) symTab.textContent='⚖️ '+(en?'Symmetry':'Symétrie');
+  // ── dcog panel strings ──
+  if(typeof _dcog_applyLang==='function') _dcog_applyLang(en);
 }
 
 
@@ -14447,7 +14682,7 @@ function _tdr_checkHits(poses) {
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r + 20) {
+      if (Math.sqrt(dx*dx+dy*dy) < t.r + 35) {
         t.hit = true;
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
@@ -14617,6 +14852,943 @@ if(typeof LANG_DATA!=='undefined'){
 </script>
 
 <script>
+/* ════════════════════════════════════════════════════════════════
+   MODULE _dcog_ — COGNITIVE DRIBBLE TRAINING
+   4 drills : Dribble Math · 300/600 Sprint · Dribble Height · Two Ball
+   Caméra : stream indépendant _dcog_stream / video#dcog_video / canvas#dcog_canvas
+   IA     : réutilise _tsym_detector (partagé, jamais rechargé)
+   Micro  : réutilise _td_dribbleTimes / _td_metroBPM via globals
+════════════════════════════════════════════════════════════════ */
+
+/* ── État global ─────────────────────────────────────────────── */
+var _dcog_stream      = null;
+var _dcog_video       = null;
+var _dcog_canvas      = null;
+var _dcog_ctx         = null;
+var _dcog_rafId       = null;
+var _dcog_running     = false;
+var _dcog_drill       = 'math';       // 'math' | 'sprint' | 'height' | 'twoball'
+var _dcog_mathLevel   = 'easy';       // 'easy' | 'medium' | 'hard'
+var _dcog_sprintTarget= 300;
+var _dcog_heightZone  = 'low';        // 'low' | 'high'
+var _dcog_tbMode      = 'alternate';  // 'alternate' | 'sync' | 'chaos'
+var _dcog_sessions    = [];
+var _dcog_inited      = false;
+
+/* ── Scores session ──────────────────────────────────────────── */
+var _dcog_correct    = 0;
+var _dcog_wrong      = 0;
+var _dcog_respTimes  = [];
+var _dcog_questionAt = 0;
+var _dcog_sprintCount= 0;
+var _dcog_sprintStart= 0;
+var _dcog_sprintInt  = null;
+var _dcog_heightFrames = 0;
+var _dcog_heightInZone = 0;
+var _dcog_tbFrames   = 0;
+var _dcog_tbAntiphase= 0;
+var _dcog_tbChaosNext= 'L';
+var _dcog_tbChaosTimer=null;
+
+/* ── Init ────────────────────────────────────────────────────── */
+function initTraining_dcog() {
+  if (_dcog_inited) return;
+  _dcog_inited = true;
+  _dcog_video  = document.getElementById('dcog_video');
+  _dcog_canvas = document.getElementById('dcog_canvas');
+  _dcog_ctx    = _dcog_canvas ? _dcog_canvas.getContext('2d') : null;
+  _dcog_selectDrill('math');
+  _dcog_renderHistory();
+}
+
+/* ── i18n ────────────────────────────────────────────────────── */
+function _dcog_applyLang(en) {
+  var map = {
+    'dcog_cardTitle': en?'🧠 COGNITIVE DRIBBLE TRAINING':'🧠 ENTRAÎNEMENT COGNITIF',
+    'dcog_guideTitle': en?'📐 CAMERA GUIDE':'📐 GUIDE PLACEMENT',
+    'dcog_guide1': en?'Place phone 2-3m facing you':'Pose le téléphone à 2-3m face à toi',
+    'dcog_guide2': en?'Full body visible in frame':'Corps entier visible dans le cadre',
+    'dcog_guide3': en?'Good lighting required':'Bonne luminosité requise',
+    'dcog_lbl_math': 'DRIBBLE MATH',
+    'dcog_lbl_sprint': '300 / 600',
+    'dcog_lbl_height': en?'DRIBBLE HEIGHT':'HAUTEUR DRIBBLE',
+    'dcog_lbl_twoball': en?'TWO BALL':'DEUX BALLONS',
+    'dcog_optTitle': en?'🎚 DIFFICULTY':'🎚 DIFFICULTÉ',
+    'dcog_lbl_easy': en?'EASY':'FACILE',
+    'dcog_lbl_medium': en?'MEDIUM':'MOYEN',
+    'dcog_lbl_hard': en?'HARD':'DIFFICILE',
+    'dcog_lbl_low': en?'LOW':'BAS',
+    'dcog_lbl_high': en?'HIGH':'HAUT',
+    'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
+    'dcog_lbl_sync': 'SYNC',
+    'dcog_scoreTitle': en?'🎯 SCORE':'🎯 SCORE',
+    'dcog_lbl_correct': en?'CORRECT':'CORRECTS',
+    'dcog_lbl_wrong': en?'ERRORS':'ERREURS',
+    'dcog_lbl_time': en?'AVG TIME':'TEMPS RÉP.',
+    'dcog_insightTitle': en?'💡 SENSEI ANALYSIS':'💡 ANALYSE SENSEI',
+    'dcog_histTitle': en?'📅 HISTORY':'📅 HISTORIQUE',
+    'dcog_lblStart': en?'START':'DÉMARRER',
+    'dcog_lblSave': en?'SAVE':'SAUVEGARDER',
+    'dcog_mathBpmLabel': en?'DRIBBLE BPM':'BPM DRIBBLE',
+    'dcog_tbLbl_L': en?'L':'G',
+    'dcog_tbLbl_R': en?'R':'D',
+    'dcog_zlbl_L': en?'LEFT':'GAUCHE',
+    'dcog_zlbl_C': en?'CENTER':'CENTRE',
+    'dcog_zlbl_R': en?'RIGHT':'DROITE',
+    'dcog_mathZoneHint': en?'Touch the correct target while dribbling':'Touche la bonne target avec ta main en dribblant',
+    'dcog_dualLbl': en?'Cognitive-motor score':'Score cognitif-moteur',
+    'dcog_heightZoneLbl': en?'TARGET ZONE':'ZONE CIBLE',
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.textContent = map[id];
+  });
+  // Desc drill
+  var st = document.getElementById('dcog_status');
+  if (st && (st.textContent.indexOf('Appuie')>-1 || st.textContent.indexOf('Press')>-1))
+    st.textContent = en ? 'Press START' : 'Appuie sur DÉMARRER';
+  var hl = document.getElementById('dcog_histList');
+  if (hl && hl.querySelector('.tr-empty'))
+    hl.innerHTML = '<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
+  else if (_dcog_inited) _dcog_renderHistory();
+  // refresh drill desc
+  _dcog_selectDrill(_dcog_drill, true);
+}
+
+/* ── Sélection drill ─────────────────────────────────────────── */
+function _dcog_selectDrill(drill, langOnly) {
+  _dcog_drill = drill;
+  var en = window._lang === 'en';
+  var descs = {
+    math:    en ? 'Solve math problems while dribbling — dual-task cognitive training'
+               : 'Résous des opérations en dribblant — entraînement cognitif-moteur',
+    sprint:  en ? 'Dribble as fast as possible — reach your target before time runs out'
+               : 'Dribble le plus vite possible — atteins ton objectif avant la fin du temps',
+    height:  en ? 'Keep the ball in the target zone — control dribble height'
+               : 'Garde le ballon dans la zone cible — contrôle la hauteur de dribble',
+    twoball: en ? 'Analyze left/right wrist dissociation — two-ball motor training'
+               : 'Analyse la dissociation poignet G/D — entraînement moteur deux ballons'
+  };
+  var el = document.getElementById('dcog_drillDesc');
+  if (el) el.textContent = descs[drill] || '';
+
+  if (!langOnly) {
+    // Highlight selected drill button
+    ['math','sprint','height','twoball'].forEach(function(d) {
+      var btn = document.getElementById('dcog_btn_'+d);
+      if (!btn) return;
+      var active = d === drill;
+      btn.style.border  = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+      btn.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+      btn.style.color   = active ? '#f5c518' : '#7a8299';
+    });
+    // Show correct sub-options
+    var optIds = {math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball'};
+    Object.keys(optIds).forEach(function(d) {
+      var el2 = document.getElementById(optIds[d]);
+      if (el2) el2.style.display = d === drill ? 'flex' : 'none';
+    });
+    // Update opt title
+    var optTitles = {
+      math:    en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
+      sprint:  en ? '⏱ TARGET'          : '⏱ OBJECTIF',
+      height:  en ? '📏 HEIGHT ZONE'    : '📏 ZONE DE HAUTEUR',
+      twoball: en ? '🔄 MODE'           : '🔄 MODE'
+    };
+    var ot = document.getElementById('dcog_optTitle');
+    if (ot) ot.textContent = optTitles[drill] || '';
+    // Score labels
+    var scoreLabels = {
+      math:    [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
+      sprint:  [en?'DRIBBLES':'DRIBBLES', en?'TARGET':'OBJECTIF',   en?'TIME':'TEMPS'],
+      height:  [en?'IN ZONE %':'% EN ZONE', en?'FRAMES':'FRAMES',   en?'TIME':'TEMPS'],
+      twoball: [en?'ANTIPHASE %':'% ANTIPHASE', en?'FRAMES':'FRAMES', en?'TIME':'TEMPS']
+    };
+    var lbls = scoreLabels[drill] || ['--','--','--'];
+    ['dcog_lbl_correct','dcog_lbl_wrong','dcog_lbl_time'].forEach(function(id,i){
+      var e2=document.getElementById(id); if(e2) e2.textContent=lbls[i];
+    });
+    // dual task bar: show only for math
+    var db = document.getElementById('dcog_dualTaskBar');
+    if (db) db.style.display = drill === 'math' ? 'block' : 'none';
+  }
+}
+
+/* ── Sub-option setters ──────────────────────────────────────── */
+function _dcog_setMathLevel(lvl) {
+  _dcog_mathLevel = lvl;
+  document.querySelectorAll('.dcog-lvl-btn').forEach(function(b){
+    var active = b.dataset.level === lvl;
+    b.style.border = active?'1px solid rgba(245,197,24,.5)':'1px solid #1e2535';
+    b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
+    b.style.color = active?'#f5c518':'#7a8299';
+  });
+}
+function _dcog_setSprintTarget(n) {
+  _dcog_sprintTarget = n;
+  document.querySelectorAll('.dcog-spr-btn').forEach(function(b){
+    var active = parseInt(b.dataset.target)===n;
+    b.style.border = active?'1px solid rgba(245,197,24,.5)':'1px solid #1e2535';
+    b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
+    b.style.color = active?'#f5c518':'#7a8299';
+  });
+  var goal = document.getElementById('dcog_sprintGoal');
+  if (goal) goal.textContent = '/ '+n;
+}
+function _dcog_setHeightZone(zone) {
+  _dcog_heightZone = zone;
+  document.querySelectorAll('.dcog-ht-btn').forEach(function(b){
+    var active = b.dataset.zone === zone;
+    b.style.border = active?'1px solid rgba(245,197,24,.5)':'1px solid #1e2535';
+    b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
+    b.style.color = active?'#f5c518':'#7a8299';
+  });
+}
+function _dcog_setTwoBallMode(mode) {
+  _dcog_tbMode = mode;
+  document.querySelectorAll('.dcog-tb-btn').forEach(function(b){
+    var active = b.dataset.tbmode === mode;
+    b.style.border = active?'1px solid rgba(245,197,24,.5)':'1px solid #1e2535';
+    b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
+    b.style.color = active?'#f5c518':'#7a8299';
+  });
+}
+
+/* ── Caméra — stream indépendant ─────────────────────────────── */
+function _dcog_start() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    _dcog_setStatus(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
+  }
+  _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
+  var constraints = [
+    {video:{facingMode:'user',width:640,height:480}},
+    {video:{facingMode:'user'}},
+    {video:true}
+  ];
+  function tryC(i) {
+    if (i >= constraints.length) {
+      _dcog_setStatus(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return;
+    }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
+      _dcog_stream = stream;
+      _dcog_video  = document.getElementById('dcog_video');
+      if (!_dcog_video) return;
+      _dcog_video.srcObject = stream;
+      _dcog_video.onloadedmetadata = function() {
+        _dcog_video.play();
+        // Attendre le modèle IA — même pattern que _tdr_calibrate
+        if (!_tsym_detector) {
+          _dcog_setStatus(_t('Chargement IA...','Loading AI...'), '#f5c518');
+          _tsym_loadModel(
+            function() { _dcog_launchDrill(); },
+            function(err) { _dcog_setStatus('❌ '+(err||_t('Erreur IA','AI error')), '#e63946'); }
+          );
+        } else {
+          _dcog_launchDrill();
+        }
+      };
+    }).catch(function() { tryC(i+1); });
+  }
+  tryC(0);
+  // Show camera container + update buttons
+  var cam = document.getElementById('dcog_camContainer');
+  if (cam) cam.style.display = 'block';
+  var btnS = document.getElementById('dcog_btnStart');
+  var btnT = document.getElementById('dcog_btnStop');
+  if (btnS) btnS.style.display = 'none';
+  if (btnT) btnT.style.display = 'flex';
+}
+
+function _dcog_stop() {
+  _dcog_running = false;
+  if (_dcog_rafId) { cancelAnimationFrame(_dcog_rafId); _dcog_rafId = null; }
+  if (_dcog_stream) { _dcog_stream.getTracks().forEach(function(t){t.stop();}); _dcog_stream = null; }
+  if (_dcog_video) _dcog_video.srcObject = null;
+  clearInterval(_dcog_sprintInt);
+  clearTimeout(_dcog_tbChaosTimer);
+  var cam = document.getElementById('dcog_camContainer');
+  if (cam) cam.style.display = 'none';
+  // Hide all overlays
+  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  // Stop recording if active
+  if (typeof _dcog_recActive !== 'undefined' && _dcog_recActive) _dcog_stopRec();
+  var bRec2 = document.getElementById('dcog_btnRec');
+  if (bRec2) bRec2.style.display = 'none';
+  var btnS = document.getElementById('dcog_btnStart');
+  var btnT = document.getElementById('dcog_btnStop');
+  var btnSv= document.getElementById('dcog_btnSave');
+  if (btnS) btnS.style.display = 'flex';
+  if (btnT) btnT.style.display = 'none';
+  if (btnSv && (_dcog_correct+_dcog_wrong+_dcog_sprintCount+_dcog_heightFrames+_dcog_tbFrames)>0)
+    btnSv.style.display = 'flex';
+  _dcog_setStatus(_t('Session terminée','Session done'), '#2dc653');
+  _dcog_showResults();
+}
+
+/* ── Launch drill after camera + AI ready ────────────────────── */
+function _dcog_launchDrill() {
+  // Reset counters
+  _dcog_correct = 0; _dcog_wrong = 0; _dcog_respTimes = []; _dcog_questionAt = 0;
+  _dcog_sprintCount = 0; _dcog_sprintStart = Date.now();
+  _dcog_heightFrames = 0; _dcog_heightInZone = 0;
+  _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
+  _dcog_running = true;
+  // Update score display
+  _dcog_updateScores();
+  // Show correct overlay
+  var overlays = {
+    math:'dcog_mathOverlay', sprint:'dcog_sprintOverlay',
+    height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay'
+  };
+  Object.keys(overlays).forEach(function(d){
+    var el = document.getElementById(overlays[d]);
+    if (!el) return;
+    el.style.display = d === _dcog_drill ? 'flex' : 'none';
+  });
+  // Drill-specific init — AVANT detect pour que les données soient prêtes au 1er frame
+  if (_dcog_drill === 'math')    _dcog_nextQuestion();
+  if (_dcog_drill === 'sprint')  _dcog_startSprintTimer();
+  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos') _dcog_tbScheduleChaos();
+  // Show REC button
+  var bRec = document.getElementById('dcog_btnRec');
+  if (bRec) bRec.style.display = 'flex';
+  _dcog_setStatus(_t('GO !','GO!'), '#2dc653');
+  // Petit délai pour laisser le DOM se mettre à jour avant le 1er frame
+  setTimeout(function() { if (_dcog_running) _dcog_detect(); }, 50);
+}
+
+/* ── Detection loop (MoveNet) ────────────────────────────────── */
+function _dcog_detect() {
+  if (!_dcog_running || !_tsym_detector || !_dcog_video) {
+    if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
+    return;
+  }
+  _tsym_detector.estimatePoses(_dcog_video).then(function(poses) {
+    _dcog_drawFrame(poses);
+    if (_dcog_drill === 'math')    _dcog_analyzeMathZone(poses);
+    if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
+    if (_dcog_drill === 'twoball') _dcog_analyzeTwoBall(poses);
+    if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
+  }).catch(function() {
+    if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
+  });
+}
+
+/* ── Draw frame on canvas ────────────────────────────────────── */
+function _dcog_drawFrame(poses) {
+  var cv = _dcog_canvas, ctx = _dcog_ctx;
+  if (!cv || !ctx || !_dcog_video) return;
+  var W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  // Mirror video
+  ctx.save();
+  ctx.scale(-1, 1);
+  ctx.drawImage(_dcog_video, -W, 0, W, H);
+  ctx.restore();
+  // Draw skeleton (reuse _tsym_ keypoints + skeleton drawer)
+  if (poses && poses.length > 0) {
+    var kps = poses[0].keypoints;
+    var sx = W / (_dcog_video.videoWidth  || 640);
+    var sy = H / (_dcog_video.videoHeight || 480);
+    if (typeof _tsym_drawSkeleton === 'function') _tsym_drawSkeleton(kps, sx, sy, W);
+  }
+  // Draw math targets
+  if (_dcog_drill === 'math' && _dcog_running) {
+    _dcog_drawMathTargets(ctx, W, H);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DRILL 1 — DRIBBLE MATH
+   Réutilise le moteur _tdr_ (targets + hit detection).
+   3 targets fixes positionnées sur le canvas,
+   le joueur touche la bonne avec son poignet.
+═══════════════════════════════════════════ */
+var _dcog_mathAnswer    = 0;
+var _dcog_mathChoices   = [];
+var _dcog_mathTargets   = [];   // variable propre au module — n'interfère pas avec _tdr_targets
+var _dcog_mathAnswering = false;
+
+function _dcog_nextQuestion() {
+  if (!_dcog_running || _dcog_drill !== 'math') return;
+  _dcog_questionAt    = Date.now();
+  _dcog_mathAnswering = false;
+  var q = _dcog_genQuestion();
+  _dcog_mathAnswer  = q.answer;
+  var qEl = document.getElementById('dcog_mathQuestion');
+  if (qEl) qEl.textContent = q.text;
+  _dcog_mathChoices = _dcog_genChoices(q.answer);
+  // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
+  var cv = _dcog_canvas;
+  var W  = cv ? cv.width  : 640;
+  var H  = cv ? cv.height : 480;
+  var r  = 50;
+  var y  = Math.round(H * 0.70);
+  var colors = ['#2dc653','#f5c518','#e63946'];
+  _dcog_mathTargets = [
+    Math.round(W/6), Math.round(W/2), Math.round(5*W/6)
+  ].map(function(x, i) {
+    return {x:x, y:y, r:r, color:colors[i],
+            born:Date.now(), ttl:99999, hit:false, hitTime:0,
+            mathVal:_dcog_mathChoices[i], mathIdx:i};
+  });
+  _dcog_updateMathBpm();
+}
+
+/* ── Hit detection — utilise _tdr_targets directement ───────── */
+function _dcog_analyzeMathZone(poses) {
+  if (!poses || !poses[0] || _dcog_mathAnswering) return;
+  if (!_dcog_canvas || !_dcog_video) return;
+  var W  = _dcog_canvas.width;
+  var H  = _dcog_canvas.height;
+  var sx = W / (_dcog_video.videoWidth  || 640);
+  var sy = H / (_dcog_video.videoHeight || 480);
+  ['leftWrist','rightWrist'].forEach(function(name) {
+    var kp = _tsym_kp(poses, name);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    _dcog_mathTargets.forEach(function(t) {
+      if (t.hit) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      if (Math.sqrt(dx*dx + dy*dy) < t.r + 35) {
+        t.hit = true; t.hitTime = Date.now();
+        _td_beep(660, 0.1, 0.1);
+        if (navigator.vibrate) navigator.vibrate(30);
+        _dcog_answerMath(t.mathVal, t.mathIdx);
+      }
+    });
+  });
+}
+
+/* _dcog_drawMathTargets — calqué sur _tdr_drawTargets
+   Seule différence : affiche mathVal (chiffre) au lieu de la croix */
+function _dcog_drawMathTargets(ctx, W, H) {
+  var now = Date.now();
+  _dcog_mathTargets.forEach(function(t) {
+    if (t.hit && (now - t.hitTime) > 400) return;
+    var age   = (now - t.born) / t.ttl;
+    var alpha = Math.max(0, 1 - age);
+    var pulse = 1 + 0.1 * Math.sin(now / 120);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    // Cercle extérieur pulsant — identique à _tdr_
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
+    ctx.strokeStyle = t.hit ? '#fff' : t.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Cercle intérieur plein
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r, 0, Math.PI*2);
+    ctx.fillStyle = t.hit
+      ? (t.mathVal === _dcog_mathAnswer ? '#2dc653' : '#e63946')
+      : t.color;
+    ctx.fill();
+    // Chiffre au centre — au lieu de la croix
+    ctx.globalAlpha  = 1;
+    ctx.fillStyle    = '#fff';
+    ctx.font         = 'bold ' + Math.round(t.r * 0.75) + 'px sans-serif';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor  = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur   = 4;
+    ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), t.x, t.y);
+    ctx.shadowBlur   = 0;
+    ctx.restore();
+  });
+}
+function _dcog_drawMathZones() {}
+
+function _dcog_genQuestion() {
+  var a, b, op, answer, text;
+  if (_dcog_mathLevel === 'easy') {
+    op = Math.random() < 0.5 ? '+' : '-';
+    a = Math.floor(Math.random()*20)+1;
+    b = op==='-' ? Math.floor(Math.random()*a)+1 : Math.floor(Math.random()*20)+1;
+    answer = op==='+' ? a+b : a-b;
+    text = a+' '+op+' '+b+' = ?';
+  } else if (_dcog_mathLevel === 'medium') {
+    op = Math.random() < 0.5 ? '×' : '÷';
+    a = Math.floor(Math.random()*10)+2;
+    b = Math.floor(Math.random()*9)+2;
+    if (op === '÷') { answer = b; var tmp=a*b; a=tmp; } else { answer = a*b; }
+    text = a+' '+op+' '+b+' = ?';
+  } else { // hard — chained
+    var ops = ['+','-','×'];
+    op = ops[Math.floor(Math.random()*ops.length)];
+    a = Math.floor(Math.random()*12)+2;
+    b = Math.floor(Math.random()*8)+2;
+    var c = Math.floor(Math.random()*5)+1;
+    var op2 = Math.random()<0.5?'+':'-';
+    if (op==='×') answer=(a*b)+op2==='+' ? c : -c;
+    else answer=(op==='+'?a+b:a-b)+(op2==='+'?c:-c);
+    text = a+' '+op+' '+b+' '+op2+' '+c+' = ?';
+  }
+  return {text:text, answer:answer};
+}
+
+function _dcog_genChoices(correct) {
+  var choices = [correct];
+  var attempts = 0;
+  while (choices.length < 3 && attempts < 50) {
+    attempts++;
+    var delta = Math.floor(Math.random()*10)+1;
+    var distractor = correct + (Math.random()<0.5 ? delta : -delta);
+    if (choices.indexOf(distractor) === -1) choices.push(distractor);
+  }
+  // Shuffle
+  for (var i=choices.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=choices[i];choices[i]=choices[j];choices[j]=tmp;}
+  return choices;
+}
+
+function _dcog_answerMath(val, idx) {
+  if (!_dcog_running || _dcog_drill !== 'math' || _dcog_mathAnswering) return;
+  _dcog_mathAnswering = true;
+  var rt = Date.now() - _dcog_questionAt;
+  _dcog_respTimes.push(rt);
+  var correct = (val === _dcog_mathAnswer);
+  if (correct) {
+    _dcog_correct++;
+    _td_beep(880, 0.1, 0.2);
+    if (navigator.vibrate) navigator.vibrate(30);
+  } else {
+    _dcog_wrong++;
+    _td_beep(220, 0.12, 0.2);
+    if (navigator.vibrate) navigator.vibrate([40,10,40]);
+  }
+  // Vider les targets après 500ms (flash _tdr_ visible) puis question suivante
+  setTimeout(function() {
+    _dcog_mathTargets = [];
+    setTimeout(_dcog_nextQuestion, 200);
+  }, 500);
+  _dcog_updateScores();
+  // Score panel live
+  var total = _dcog_correct + _dcog_wrong;
+  var pct   = total > 0 ? Math.round(_dcog_correct/total*100) : 0;
+  var fill  = document.getElementById('dcog_dualFill');
+  var pctEl = document.getElementById('dcog_dualPct');
+  if (fill)  fill.style.width   = pct+'%';
+  if (pctEl) pctEl.textContent  = pct+'%';
+  // Next question after 800ms (time to see feedback and move away)
+  setTimeout(_dcog_nextQuestion, 800);
+}
+
+function _dcog_updateMathBpm() {
+  var bpmEl = document.getElementById('dcog_mathBpmLive');
+  if (!bpmEl) return;
+  // Read from global micro dribble times
+  if (typeof _td_dribbleTimes !== 'undefined' && _td_dribbleTimes.length > 2) {
+    var times = _td_dribbleTimes.slice(-6);
+    var intervals = [];
+    for (var i=1;i<times.length;i++) intervals.push(times[i]-times[i-1]);
+    var avg = intervals.reduce(function(a,b){return a+b;},0)/intervals.length;
+    bpmEl.textContent = Math.round(60000/avg);
+  } else {
+    bpmEl.textContent = '--';
+  }
+  if (_dcog_running && _dcog_drill==='math') setTimeout(_dcog_updateMathBpm, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   DRILL 2 — 300 / 600 SPRINT
+═══════════════════════════════════════════ */
+function _dcog_startSprintTimer() {
+  _dcog_sprintCount = 0;
+  _dcog_sprintStart = Date.now();
+  var goal = document.getElementById('dcog_sprintGoal');
+  if (goal) goal.textContent = '/ '+_dcog_sprintTarget;
+  var bar = document.getElementById('dcog_sprintBar');
+  if (bar) bar.style.width = '0%';
+  // Watch micro dribble count
+  var baseCount = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
+  _dcog_sprintInt = setInterval(function() {
+    if (!_dcog_running || _dcog_drill !== 'sprint') { clearInterval(_dcog_sprintInt); return; }
+    var cur = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
+    _dcog_sprintCount = cur - baseCount;
+    var countEl = document.getElementById('dcog_sprintCount');
+    if (countEl) countEl.textContent = _dcog_sprintCount;
+    // Clock
+    var elapsed = Date.now() - _dcog_sprintStart;
+    var mm = Math.floor(elapsed/60000);
+    var ss = Math.floor((elapsed%60000)/1000);
+    var clockEl = document.getElementById('dcog_sprintClock');
+    if (clockEl) clockEl.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    // Progress bar
+    var pct = Math.min(100, Math.round(_dcog_sprintCount/_dcog_sprintTarget*100));
+    var bar2 = document.getElementById('dcog_sprintBar');
+    if (bar2) bar2.style.width = pct+'%';
+    // Score panel
+    var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = _dcog_sprintCount;
+    var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_sprintTarget;
+    var sT = document.getElementById('dcog_sTime');
+    if(sT) sT.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    // Goal reached
+    if (_dcog_sprintCount >= _dcog_sprintTarget) {
+      clearInterval(_dcog_sprintInt);
+      _td_beep(1046, 0.3, 0.4);
+      _dcog_setStatus(_t('OBJECTIF ATTEINT ! 🎉','GOAL REACHED! 🎉'), '#2dc653');
+      _dcog_stop();
+    }
+  }, 500);
+}
+
+/* ═══════════════════════════════════════════
+   DRILL 3 — DRIBBLE HEIGHT
+   Mesure la hauteur normalisée du poignet actif
+   vs distance épaule-sol
+═══════════════════════════════════════════ */
+function _dcog_analyzeHeight(poses) {
+  if (!poses || poses.length === 0) return;
+  var kps  = poses[0].keypoints;
+  var W    = _dcog_canvas ? _dcog_canvas.width  : 640;
+  var H    = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sx   = W / (_dcog_video.videoWidth  || 640);
+  var sy   = H / (_dcog_video.videoHeight || 480);
+
+  function kp(name) { return _tsym_kp(poses, name); }
+
+  var lW = kp('leftWrist');   var rW = kp('rightWrist');
+  var lS = kp('leftShoulder'); var rS = kp('rightShoulder');
+  var lH = kp('leftHip');      var rH = kp('rightHip');
+  var lK = kp('leftKnee');     var rK = kp('rightKnee');
+  var lA = kp('leftAnkle');    var rA = kp('rightAnkle');
+
+  if (!lS || !rS) return;
+  // Active wrist = the lower one (the one dribbling)
+  var activeWrist = null;
+  if (lW && rW) activeWrist = lW.y > rW.y ? lW : rW;
+  else if (lW) activeWrist = lW;
+  else if (rW) activeWrist = rW;
+  if (!activeWrist) return;
+
+  // Normalize: 0=shoulder level, 1=ankle level
+  var shoulderY = ((lS.y*sx + rS.y*sx) / 2) || (H * 0.3);
+  var ankleY    = lA ? lA.y*sy : rA ? rA.y*sy : H * 0.9;
+  var kneeY     = lK ? lK.y*sy : rK ? rK.y*sy : (shoulderY + ankleY)/2;
+  var hipY      = lH ? lH.y*sy : rH ? rH.y*sy : (shoulderY + ankleY)*0.55;
+  var bodyH     = Math.abs(ankleY - shoulderY) || 200;
+
+  var wristY    = activeWrist.y * sy;
+  var normY     = (wristY - shoulderY) / bodyH; // 0=shoulder, 1=ankle
+
+  // Target zone thresholds
+  var zoneMin, zoneMax, zonePx;
+  if (_dcog_heightZone === 'low') {
+    zoneMin = (kneeY - shoulderY) / bodyH;  // knee level
+    zoneMax = (ankleY - shoulderY) / bodyH; // ankle level
+    zonePx  = kneeY + (ankleY - kneeY) * 0.4;
+  } else {
+    zoneMin = (hipY - shoulderY) / bodyH * 0.7;
+    zoneMax = (hipY - shoulderY) / bodyH * 1.1;
+    zonePx  = hipY;
+  }
+
+  var inZone = normY >= zoneMin && normY <= zoneMax;
+  _dcog_heightFrames++;
+  if (inZone) _dcog_heightInZone++;
+
+  // Move zone line on overlay
+  var zoneLineEl = document.getElementById('dcog_heightZoneLine');
+  if (zoneLineEl) {
+    var pct = Math.min(95, Math.max(5, (zonePx / H) * 100));
+    zoneLineEl.style.top = pct + '%';
+    zoneLineEl.style.background = inZone ? 'rgba(45,198,83,.8)' : 'rgba(245,197,24,.6)';
+  }
+  // Score display
+  var pctInZone = _dcog_heightFrames > 0
+    ? Math.round(_dcog_heightInZone / _dcog_heightFrames * 100) : 0;
+  var scoreBig = document.getElementById('dcog_heightScoreBig');
+  if (scoreBig) {
+    scoreBig.textContent = pctInZone + '%';
+    scoreBig.style.color = pctInZone >= 70 ? '#2dc653' : pctInZone >= 40 ? '#f5c518' : '#e63946';
+  }
+  // Score panel
+  var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pctInZone+'%';
+  var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_heightFrames;
+  _dcog_updateScores();
+}
+
+/* ═══════════════════════════════════════════
+   DRILL 4 — TWO BALL
+   Dissociation motrice : mesure l'antiphase G/D
+   (quand poignet G descend, D monte et vice versa)
+═══════════════════════════════════════════ */
+var _dcog_prevLW_y = null;
+var _dcog_prevRW_y = null;
+
+function _dcog_analyzeTwoBall(poses) {
+  if (!poses || poses.length === 0) return;
+  var lW = _tsym_kp(poses, 'leftWrist');
+  var rW = _tsym_kp(poses, 'rightWrist');
+  if (!lW || !rW) return;
+
+  var W = _dcog_canvas ? _dcog_canvas.width  : 640;
+  var H = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sy = H / (_dcog_video.videoHeight || 480);
+  var lY = lW.y * sy;
+  var rY = rW.y * sy;
+
+  // Wrist indicators
+  var wL = document.getElementById('dcog_tbWristL');
+  var wR = document.getElementById('dcog_tbWristR');
+
+  if (_dcog_prevLW_y !== null && _dcog_prevRW_y !== null) {
+    var dL = lY - _dcog_prevLW_y; // positive = moving down
+    var dR = rY - _dcog_prevRW_y;
+    var moving = Math.abs(dL) > 1 || Math.abs(dR) > 1;
+    if (moving) {
+      _dcog_tbFrames++;
+      var isAntiphase = (dL > 0 && dR < 0) || (dL < 0 && dR > 0);
+      // For SYNC mode, invert scoring — reward same direction
+      if (_dcog_tbMode === 'sync') isAntiphase = !isAntiphase;
+      if (isAntiphase) _dcog_tbAntiphase++;
+      // Wrist glow
+      if (wL) wL.style.opacity = Math.abs(dL)>2 ? '1' : '0.3';
+      if (wR) wR.style.opacity = Math.abs(dR)>2 ? '1' : '0.3';
+    }
+    // Chaos: random cue to switch hand
+    if (_dcog_tbMode === 'chaos' && moving) {
+      // handled by separate timer
+    }
+  }
+  _dcog_prevLW_y = lY;
+  _dcog_prevRW_y = rY;
+
+  // Score
+  var pct = _dcog_tbFrames > 0
+    ? Math.round(_dcog_tbAntiphase / _dcog_tbFrames * 100) : 0;
+  var scoreBig = document.getElementById('dcog_tbScoreBig');
+  if (scoreBig) {
+    scoreBig.textContent = pct + '%';
+    scoreBig.style.color = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
+  }
+  var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pct+'%';
+  var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_tbFrames;
+  _dcog_updateScores();
+}
+
+function _dcog_tbScheduleChaos() {
+  if (!_dcog_running || _dcog_drill !== 'twoball') return;
+  var delay = 1500 + Math.random() * 2000;
+  _dcog_tbChaosTimer = setTimeout(function() {
+    if (!_dcog_running) return;
+    // Beep to signal switch
+    _td_beep(660, 0.08, 0.2);
+    _dcog_tbScheduleChaos();
+  }, delay);
+}
+
+/* ── Score update / status ───────────────────────────────────── */
+function _dcog_updateScores() {
+  var en = window._lang === 'en';
+  if (_dcog_drill === 'math') {
+    var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = _dcog_correct;
+    var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_wrong;
+    var avgRT = _dcog_respTimes.length > 0
+      ? Math.round(_dcog_respTimes.reduce(function(a,b){return a+b;},0)/_dcog_respTimes.length)
+      : 0;
+    var sT = document.getElementById('dcog_sTime'); if(sT) sT.textContent = avgRT>0 ? avgRT+'ms' : '--';
+    var sLive = document.getElementById('dcog_scoreLive');
+    if (sLive) sLive.textContent = _dcog_correct*10 - _dcog_wrong*3;
+  }
+}
+
+function _dcog_setStatus(msg, color) {
+  var el = document.getElementById('dcog_status');
+  if (el) { el.textContent = msg; el.style.color = color || '#7a8299'; }
+}
+
+/* ── Results ─────────────────────────────────────────────────── */
+function _dcog_showResults() {
+  var res = document.getElementById('dcog_results');
+  if (!res) return;
+  res.style.display = 'block';
+  var en = window._lang === 'en';
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  if (_dcog_drill === 'math') {
+    var total = _dcog_correct + _dcog_wrong;
+    var pct   = total > 0 ? Math.round(_dcog_correct/total*100) : 0;
+    var avgRT = _dcog_respTimes.length > 0
+      ? Math.round(_dcog_respTimes.reduce(function(a,b){return a+b;},0)/_dcog_respTimes.length) : 0;
+    var cls   = pct>=80?'tr-hl':pct>=50?'tr-warn':'tr-bad';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_correct+'</div><div class="tr-score-lbl">'+(en?'CORRECT':'CORRECTS')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+cls+'">'+pct+'%</span></div><div class="tr-score-lbl">'+(en?'ACCURACY':'PRÉCISION')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num">'+(avgRT>0?avgRT+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG TIME':'TEMPS MOY.')+'</div></div>';
+  } else if (_dcog_drill === 'sprint') {
+    var elapsed = Math.round((Date.now()-_dcog_sprintStart)/1000);
+    var done = _dcog_sprintCount >= _dcog_sprintTarget;
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_sprintCount+'</div><div class="tr-score-lbl">DRIBBLES</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:'+(done?'#2dc653':'#e63946')+'">'+_dcog_sprintTarget+'</div><div class="tr-score-lbl">'+(en?'TARGET':'OBJECTIF')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num">'+elapsed+'s</div><div class="tr-score-lbl">'+(en?'TIME':'TEMPS')+'</div></div>';
+  } else if (_dcog_drill === 'height') {
+    var pctH = _dcog_heightFrames>0 ? Math.round(_dcog_heightInZone/_dcog_heightFrames*100) : 0;
+    var clsH = pctH>=70?'tr-hl':pctH>=40?'tr-warn':'tr-bad';
+    html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsH+'">'+pctH+'%</span></div><div class="tr-score-lbl">'+(en?'IN ZONE':'EN ZONE')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_heightFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+(_dcog_heightZone==='low'?(en?'LOW':'BAS'):(en?'HIGH':'HAUT'))+'</div><div class="tr-score-lbl">'+(en?'ZONE':'ZONE')+'</div></div>';
+  } else if (_dcog_drill === 'twoball') {
+    var pctTB = _dcog_tbFrames>0 ? Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100) : 0;
+    var clsTB = pctTB>=70?'tr-hl':pctTB>=40?'tr-warn':'tr-bad';
+    html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsTB+'">'+pctTB+'%</span></div><div class="tr-score-lbl">'+(en?'DISSOCIATION':'DISSOCIATION')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_tbFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcog_tbMode.toUpperCase()+'</div><div class="tr-score-lbl">MODE</div></div>';
+  }
+  html += '</div>';
+  res.innerHTML = html;
+}
+
+/* ── Save & History ──────────────────────────────────────────── */
+function _dcog_saveSession() {
+  var en  = window._lang === 'en';
+  var now = new Date();
+  var d   = now.toLocaleDateString(en?'en-US':'fr-FR',{day:'numeric',month:'short'});
+  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons'};
+  var score = 0, detail = '';
+  if (_dcog_drill==='math') {
+    var t=_dcog_correct+_dcog_wrong;
+    score = t>0?Math.round(_dcog_correct/t*100):0;
+    detail = _dcog_correct+'/'+(t)+' — '+(score)+'%';
+  } else if (_dcog_drill==='sprint') {
+    score = _dcog_sprintCount>=_dcog_sprintTarget?100:Math.round(_dcog_sprintCount/_dcog_sprintTarget*100);
+    detail = _dcog_sprintCount+' / '+_dcog_sprintTarget+' dribbles';
+  } else if (_dcog_drill==='height') {
+    score = _dcog_heightFrames>0?Math.round(_dcog_heightInZone/_dcog_heightFrames*100):0;
+    detail = score+'% '+(en?'in zone':'en zone')+' ('+(_dcog_heightZone==='low'?(en?'low':'bas'):(en?'high':'haut'))+')';
+  } else {
+    score = _dcog_tbFrames>0?Math.round(_dcog_tbAntiphase/_dcog_tbFrames*100):0;
+    detail = score+'% '+(en?'dissociation':'dissociation')+' ('+_dcog_tbMode+')';
+  }
+  _dcog_sessions.unshift({drill:drillLabel[_dcog_drill]||_dcog_drill, score:score, detail:detail, date:d});
+  _tr_saveProgress('dcog_'+_dcog_drill, {score:score});
+  _dcog_renderHistory();
+  _dcog_setStatus(_t('Session sauvegardée ✅','Session saved ✅'), '#2dc653');
+  var btnSv = document.getElementById('dcog_btnSave'); if(btnSv) btnSv.style.display='none';
+  var res   = document.getElementById('dcog_results'); if(res) res.style.display='none';
+}
+
+/* ═══════════════════════════════════════════
+   RECORDING — même pattern que _tdr_ et _tsym_
+   Canvas captureStream → MediaRecorder → blob
+   iOS: share API  |  Android: share API  |  Desktop: download
+═══════════════════════════════════════════ */
+var _dcog_recorder  = null;
+var _dcog_recChunks = [];
+var _dcog_recActive = false;
+var _dcog_recTimer  = null;
+var _dcog_recSec    = 0;
+
+function _dcog_toggleRec() {
+  if (_dcog_recActive) _dcog_stopRec(); else _dcog_startRec();
+}
+
+function _dcog_startRec() {
+  if (typeof MediaRecorder === 'undefined') {
+    _dcog_recError(_t('Non supporté','Not supported')); return;
+  }
+  var cv = document.getElementById('dcog_canvas'); if (!cv) return;
+  var stream = null;
+  try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
+  if (!stream) { _dcog_recError(_t('Capture impossible','Capture failed')); return; }
+  var mime = _tsym_getBestMime();
+  try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream); }
+  catch(e) { try { _dcog_recorder = new MediaRecorder(stream); } catch(e2) { _dcog_recError('start failed'); return; } }
+  _dcog_recChunks = []; _dcog_recSec = 0;
+  _dcog_recorder.ondataavailable = function(e) { if(e.data && e.data.size>0) _dcog_recChunks.push(e.data); };
+  _dcog_recorder.onstop = function() {
+    clearInterval(_dcog_recTimer);
+    var blob = new Blob(_dcog_recChunks, {type: _dcog_recorder.mimeType||'video/webm'});
+    _dcog_recActive = false; _dcog_recChunks = []; _dcog_updateRecBtn();
+    var ext = blob.type.indexOf('mp4')>-1 ? 'mp4' : 'webm';
+    var fn  = 'SENSEI_cognitive_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    var st  = document.getElementById('dcog_status');
+    if (_tsym_isIOS() && navigator.share && typeof File!=='undefined') {
+      try { var f=new File([blob],fn,{type:blob.type});
+        navigator.share({title:'SENSEI',files:[f]})
+          .then(function(){if(st){st.textContent=_t('Partagé 📲','Shared 📲');st.style.color='#2dc653';}})
+          .catch(function(e){if(e.name!=='AbortError')_dcog_dlBlob(blob,fn,st);}); return; } catch(e) {}
+    }
+    if (navigator.share && typeof File!=='undefined' && _tsym_isAndroid()) {
+      try { var f2=new File([blob],fn,{type:blob.type});
+        if (navigator.canShare && navigator.canShare({files:[f2]})) {
+          navigator.share({title:'SENSEI',files:[f2]})
+            .then(function(){if(st){st.textContent=_t('Partagé 📲','Shared 📲');st.style.color='#2dc653';}})
+            .catch(function(e){if(e.name!=='AbortError')_dcog_dlBlob(blob,fn,st);}); return; } } catch(e) {}
+    }
+    _dcog_dlBlob(blob, fn, st);
+  };
+  _dcog_recorder.onerror = function(e) { clearInterval(_dcog_recTimer); _dcog_recError('error'+(e.error?': '+e.error.name:'')); };
+  _dcog_recorder.start(1000); _dcog_recActive = true;
+  _dcog_recTimer = setInterval(function() {
+    _dcog_recSec++;
+    var rem = 180 - _dcog_recSec;
+    var btn = document.getElementById('dcog_btnRec');
+    if (btn) { var mm=Math.floor(_dcog_recSec/60),ss=_dcog_recSec%60;
+      btn.textContent = '⏹ '+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+(rem<=30?' (⚠️ '+rem+'s)':''); }
+    if (_dcog_recSec >= 180) _dcog_stopRec();
+  }, 1000);
+  _dcog_updateRecBtn();
+  var st2 = document.getElementById('dcog_status');
+  if (st2) st2.textContent = '🔴 '+_t('Enregistrement...','Recording...');
+}
+
+function _dcog_stopRec() {
+  if (_dcog_recorder && _dcog_recActive) { clearInterval(_dcog_recTimer); try { _dcog_recorder.stop(); } catch(e) {} }
+}
+
+function _dcog_updateRecBtn() {
+  var btn = document.getElementById('dcog_btnRec'); if (!btn) return;
+  if (_dcog_recActive) { btn.textContent='⏹ STOP REC'; btn.style.background='#7a0000'; }
+  else                 { btn.textContent='🔴 REC';      btn.style.background='#e63946'; }
+}
+
+function _dcog_dlBlob(blob, fn, st) {
+  try { var url=URL.createObjectURL(blob);
+    var a=document.getElementById('dcog_dlLink');
+    if(!a){a=document.createElement('a');a.id='dcog_dlLink';document.body.appendChild(a);}
+    a.style.display='none'; a.href=url; a.download=fn; a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},10000);
+    if(st){st.textContent=_t('Téléchargé 💾','Downloaded 💾');st.style.color='#2dc653';}
+  } catch(e) { window.open(URL.createObjectURL(blob),'_blank'); }
+}
+
+function _dcog_recError(msg) {
+  var st=document.getElementById('dcog_status');
+  if(st){st.textContent='❌ '+msg;st.style.color='#e63946';}
+  _dcog_recActive=false; clearInterval(_dcog_recTimer); _dcog_updateRecBtn();
+}
+
+function _dcog_renderHistory() {
+  var el = document.getElementById('dcog_histList');
+  if (!el) return;
+  var en = window._lang === 'en';
+  if (_dcog_sessions.length === 0) {
+    el.innerHTML = '<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>'; return;
+  }
+  el.innerHTML = _dcog_sessions.slice(0,8).map(function(s) {
+    var cls = s.score>=80?'hi':s.score>=50?'mid':'lo';
+    return '<div class="tr-hist-item"><div class="tr-hist-left">'+
+      '<div class="tr-hi-name">🧠 '+s.drill+'</div>'+
+      '<div class="tr-hi-meta">'+s.date+' · '+s.detail+'</div>'+
+      '</div><div class="tr-hist-score '+cls+'">'+s.score+'%</div></div>';
+  }).join('');
+}
+</script>
+<script>
+// Initialiser le modèle IA dès le chargement de la page
+// Les scripts TF.js + MoveNet étant statiques, ils sont déjà disponibles
+// Initialiser le modèle IA dès que tous les scripts sont chargés
+window.addEventListener('load', function() {
+  if (typeof _tsym_loadModel === 'function') {
+    _tsym_loadModel(function() {
+      console.log('[SENSEI AI] Modèle prêt ✅');
+    }, function(err) {
+      console.warn('[SENSEI AI] Erreur:', err);
+    });
+  }
+});
+
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('/sw.js')
