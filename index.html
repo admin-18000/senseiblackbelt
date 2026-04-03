@@ -13819,6 +13819,16 @@ var _TSYM_KP = {
   leftKnee:13, rightKnee:14, leftAnkle:15, rightAnkle:16
 };
 
+// Lecture keypoint avec seuil bas pour poignets rapides
+function _tsym_kp_fast(poses, name) {
+  if (!poses || !poses[0] || !poses[0].keypoints) return null;
+  var kps = poses[0].keypoints;
+  var idx = _TSYM_KP[name];
+  if (idx === undefined) return null;
+  var k = kps[idx];
+  return (k && k.score > 0.15) ? k : null;  // seuil 0.15 vs 0.35 pour poignets rapides
+}
+
 function _tsym_kp(poses, name) {
   if (!poses || !poses[0] || !poses[0].keypoints) return null;
   var kps = poses[0].keypoints;
@@ -13863,30 +13873,31 @@ var _TSYM_PAIRS = [
   ['rightHip','rightKnee'],['leftKnee','leftAnkle'],['rightKnee','rightAnkle']
 ];
 
-function _tsym_drawSkeleton(kps, sx, sy, W) {
-  _tsym_ctx.lineWidth = 2;
+function _tsym_drawSkeleton(kps, sx, sy, W, ctx) {
+  // ctx optionnel — si non fourni utilise _tsym_ctx (module Symétrie)
+  var c2d = ctx || _tsym_ctx;
+  if (!c2d) return;
+  c2d.lineWidth = 2;
   _TSYM_PAIRS.forEach(function(pair) {
     var i1 = _TSYM_KP[pair[0]], i2 = _TSYM_KP[pair[1]];
     if (i1 === undefined || i2 === undefined) return;
     var k1 = kps[i1], k2 = kps[i2];
     if (!k1 || !k2 || k1.score < 0.35 || k2.score < 0.35) return;
-    _tsym_ctx.strokeStyle = 'rgba(245,197,24,.7)';
-    _tsym_ctx.beginPath();
-    _tsym_ctx.moveTo(W - k1.x * sx, k1.y * sy);
-    _tsym_ctx.lineTo(W - k2.x * sx, k2.y * sy);
-    _tsym_ctx.stroke();
+    c2d.strokeStyle = 'rgba(245,197,24,.7)';
+    c2d.beginPath();
+    c2d.moveTo(W - k1.x * sx, k1.y * sy);
+    c2d.lineTo(W - k2.x * sx, k2.y * sy);
+    c2d.stroke();
   });
-  // Points
   kps.forEach(function(k) {
     if (!k || k.score < 0.35) return;
     var x = W - k.x * sx, y = k.y * sy;
-    // Colorier G en bleu, D en rouge
-    var isLeft = k.name && k.name.indexOf('left') > -1;
+    var isLeft  = k.name && k.name.indexOf('left')  > -1;
     var isRight = k.name && k.name.indexOf('right') > -1;
-    _tsym_ctx.fillStyle = isLeft ? '#4ecdc4' : isRight ? '#e63946' : '#f5c518';
-    _tsym_ctx.beginPath();
-    _tsym_ctx.arc(x, y, 5, 0, Math.PI * 2);
-    _tsym_ctx.fill();
+    c2d.fillStyle = isLeft ? '#4ecdc4' : isRight ? '#e63946' : '#f5c518';
+    c2d.beginPath();
+    c2d.arc(x, y, 5, 0, Math.PI * 2);
+    c2d.fill();
   });
 }
 
@@ -14563,7 +14574,7 @@ function _tdr_detect() {
   if (!_tsym_detector || !_tdr_video) {
     _tdr_rafId = requestAnimationFrame(_tdr_detect); return;
   }
-  _tsym_detector.estimatePoses(_tdr_video).then(function(poses) {
+  _tsym_detector.estimatePoses(_tdr_video, {maxPoses:1, flipHorizontal:false}).then(function(poses) {
     // Lissage sur 5 frames
     _tdr_smoothBuf.push(poses);
     if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
@@ -14584,8 +14595,7 @@ function _tdr_drawFrame(poses) {
   ctx.clearRect(0,0,W,H);
   // Miroir vidéo
   ctx.save(); ctx.scale(-1,1); ctx.drawImage(_tdr_video,-W,0,W,H); ctx.restore();
-  // Squelette léger
-  if (poses && poses[0]) _tsym_drawSkeleton(poses[0].keypoints, W/_tdr_video.videoWidth, H/_tdr_video.videoHeight, W);
+  // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
   // Score overlay
@@ -14638,13 +14648,13 @@ function _tdr_drawTargets(ctx, W, H) {
 function _tdr_spawnTarget() {
   if (!_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  var cx = W * (1 - _tdr_centerX); // miroir
+  // Positions fixes en % du canvas — indépendantes de la calibration
   var positions = [
-    {x: cx - _tdr_scale*0.5, y: H*0.45, color:'#2dc653'},  // gauche
-    {x: cx + _tdr_scale*0.5, y: H*0.45, color:'#e63946'},  // droite
-    {x: cx,                  y: H*0.25, color:'#f5c518'},  // haut
-    {x: cx - _tdr_scale*0.3, y: H*0.65, color:'#4ecdc4'},  // bas-gauche
-    {x: cx + _tdr_scale*0.3, y: H*0.65, color:'#7b2d8b'},  // bas-droite
+    {x: W*0.25, y: H*0.50, color:'#2dc653'},  // gauche milieu
+    {x: W*0.75, y: H*0.50, color:'#e63946'},  // droite milieu
+    {x: W*0.50, y: H*0.30, color:'#f5c518'},  // centre haut
+    {x: W*0.25, y: H*0.70, color:'#4ecdc4'},  // gauche bas
+    {x: W*0.75, y: H*0.70, color:'#7b2d8b'},  // droite bas
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -14653,7 +14663,7 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      r: 32, color: p.color,
+      r: 42, color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -14675,14 +14685,14 @@ function _tdr_checkHits(poses) {
   // Les deux poignets
   var wrists = ['leftWrist','rightWrist'];
   wrists.forEach(function(name) {
-    var kp = _tsym_kp(poses, name);
+    var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
     var wx = W - kp.x * sx; // miroir
     var wy = kp.y * sy;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r + 35) {
+      if (Math.sqrt(dx*dx+dy*dy) < t.r + 40) {  // tolérance max
         t.hit = true;
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
@@ -15164,7 +15174,7 @@ function _dcog_detect() {
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
     return;
   }
-  _tsym_detector.estimatePoses(_dcog_video).then(function(poses) {
+  _tsym_detector.estimatePoses(_dcog_video, {maxPoses:1, flipHorizontal:false}).then(function(poses) {
     _dcog_drawFrame(poses);
     if (_dcog_drill === 'math')    _dcog_analyzeMathZone(poses);
     if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
@@ -15186,13 +15196,7 @@ function _dcog_drawFrame(poses) {
   ctx.scale(-1, 1);
   ctx.drawImage(_dcog_video, -W, 0, W, H);
   ctx.restore();
-  // Draw skeleton (reuse _tsym_ keypoints + skeleton drawer)
-  if (poses && poses.length > 0) {
-    var kps = poses[0].keypoints;
-    var sx = W / (_dcog_video.videoWidth  || 640);
-    var sy = H / (_dcog_video.videoHeight || 480);
-    if (typeof _tsym_drawSkeleton === 'function') _tsym_drawSkeleton(kps, sx, sy, W);
-  }
+  // Pas de squelette dans Cognitif — inutile et visuellement gênant
   // Draw math targets
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
@@ -15245,14 +15249,14 @@ function _dcog_analyzeMathZone(poses) {
   var sx = W / (_dcog_video.videoWidth  || 640);
   var sy = H / (_dcog_video.videoHeight || 480);
   ['leftWrist','rightWrist'].forEach(function(name) {
-    var kp = _tsym_kp(poses, name);
+    var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
     var wx = W - kp.x * sx;
     var wy = kp.y * sy;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r + 35) {
+      if (Math.sqrt(dx*dx + dy*dy) < t.r + 40) {  // tolérance max
         t.hit = true; t.hitTime = Date.now();
         _td_beep(660, 0.1, 0.1);
         if (navigator.vibrate) navigator.vibrate(30);
@@ -15358,11 +15362,13 @@ function _dcog_answerMath(val, idx) {
     _td_beep(220, 0.12, 0.2);
     if (navigator.vibrate) navigator.vibrate([40,10,40]);
   }
-  // Vider les targets après 500ms (flash _tdr_ visible) puis question suivante
+  // Vider les targets après 800ms (flash visible) puis question suivante
   setTimeout(function() {
     _dcog_mathTargets = [];
-    setTimeout(_dcog_nextQuestion, 200);
-  }, 500);
+    setTimeout(function() {
+      if (_dcog_running && _dcog_drill === 'math') _dcog_nextQuestion();
+    }, 700);
+  }, 800);
   _dcog_updateScores();
   // Score panel live
   var total = _dcog_correct + _dcog_wrong;
