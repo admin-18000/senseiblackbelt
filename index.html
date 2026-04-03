@@ -11689,7 +11689,7 @@ function openTrainingTab(id, btn) {
   // Scroller vers le panel actif
   var onglets = document.querySelector('[onclick^="openTrainingTab"]');
   if(onglets) onglets.scrollIntoView({behavior:'smooth',block:'start'});
-  if(id==='dribble')  { initTraining_d(); initTraining_dr(); }
+  if(id==='dribble')  { initTraining_d(); initTraining_dr(); _tsym_loadModel(null, null); }
   if(id==='shot')     initTraining_sc2();
   if(id==='agility')  initTraining_ag2();
   if(id==='sc')       initTraining_sc();
@@ -13359,8 +13359,11 @@ function _trApplyLang() {
             firstTab.style.border='1px solid rgba(245,197,24,.5)';
           }
           initTraining_d();
+          initTraining_dr();
           _tr_initGoals();
           _tr_drawProgressChart('td_progressChart','dribble','cons','#2dc653');
+          // Précharger le modèle IA en arrière-plan dès l'arrivée dans Training
+          _tsym_loadModel(null, null);
         }, 80);
       } else {
         // Retour sur Training — réafficher le bon panel
@@ -13418,62 +13421,79 @@ function initTraining_sym() {
 }
 
 /* ── Chargement TF.js + MoveNet ─────────────────────────────── */
-function _tsym_loadModel(cb) {
+/*
+ * SHARED MODEL LOADER — utilisé par Symétrie ET Dribble Réaction.
+ * N'écrit plus dans tsym_status (élément absent quand appelé depuis Dribble).
+ * Gère une file d'attente : appels concurrents OK, un seul chargement réel.
+ * Signature : _tsym_loadModel(cb, onErr)
+ *   cb    : appelé quand le modèle est prêt (peut être null)
+ *   onErr : appelé si erreur fatale (optionnel)
+ */
+var _ai_loading = false;
+var _ai_queue   = [];
+
+function _tsym_loadModel(cb, onErr) {
   if (_tsym_modelLoaded && _tsym_detector) { cb && cb(); return; }
-  var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Chargement IA...','Loading AI...');
-  // Si TF.js déjà chargé, éviter double-chargement
+  _ai_queue.push({ cb: cb, onErr: onErr });
+  if (_ai_loading) return;
+  _ai_loading = true;
+
+  function _flushOk() {
+    _ai_loading = false;
+    var q = _ai_queue.slice(); _ai_queue = [];
+    q.forEach(function(e) { e.cb && e.cb(); });
+  }
+  function _flushErr(msg) {
+    _ai_loading = false;
+    var q = _ai_queue.slice(); _ai_queue = [];
+    q.forEach(function(e) { e.onErr ? e.onErr(msg) : console.warn('[SENSEI AI]', msg); });
+  }
+
+  function _initDetector() {
+    if (typeof poseDetection === 'undefined') { _flushErr('poseDetection unavailable'); return; }
+    var backends = ['webgl', 'cpu'];
+    function tryBackend(i) {
+      if (i >= backends.length) { _flushErr(_t('Appareil non compatible','Device not compatible')); return; }
+      tf.setBackend(backends[i]).then(function(){ return tf.ready(); })
+      .then(function(){
+        return poseDetection.createDetector(
+          poseDetection.SupportedModels.MoveNet,
+          { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
+        );
+      }).then(function(det){
+        _tsym_detector    = det;
+        _tsym_modelLoaded = true;
+        _flushOk();
+      }).catch(function(){ tryBackend(i + 1); });
+    }
+    tryBackend(0);
+  }
+
   if (typeof tf !== 'undefined' && typeof poseDetection !== 'undefined') {
-    _tsym_initDetector(cb); return;
+    _initDetector(); return;
   }
   if (typeof tf !== 'undefined') {
     var sp = document.createElement('script');
     sp.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
-    sp.onload = function() { _tsym_initDetector(cb); };
-    sp.onerror = function() { _tsym_onError('Pose-detection error'); };
+    sp.onload = _initDetector;
+    sp.onerror = function() { _flushErr('pose-detection load error'); };
     document.head.appendChild(sp); return;
   }
-  // Charger TF.js complet + pose-detection
   var s1 = document.createElement('script');
   s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js';
   s1.onload = function() {
     var s2 = document.createElement('script');
     s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js';
-    s2.onload = function() { _tsym_initDetector(cb); };
-    s2.onerror = function() { _tsym_onError(_t('Erreur chargement modèle','Model load error')); };
+    s2.onload = _initDetector;
+    s2.onerror = function() { _flushErr(_t('Erreur chargement modèle','Model load error')); };
     document.head.appendChild(s2);
   };
-  s1.onerror = function() { _tsym_onError('TF.js load error'); };
+  s1.onerror = function() { _flushErr('TF.js load error'); };
   document.head.appendChild(s1);
 }
 
-function _tsym_initDetector(cb) {
-  if (typeof poseDetection === 'undefined') {
-    _tsym_onError(_t('poseDetection non disponible','poseDetection unavailable')); return;
-  }
-  var status = document.getElementById('tsym_status');
-  var backends = ['webgl', 'cpu'];
-  function tryBackend(i) {
-    if (i >= backends.length) {
-      _tsym_onError(_t('Appareil non compatible','Device not compatible')); return;
-    }
-    var b = backends[i];
-    if (status) status.textContent = 'Backend ' + b + '...';
-    tf.setBackend(b).then(function(){ return tf.ready(); })
-    .then(function(){
-      return poseDetection.createDetector(
-        poseDetection.SupportedModels.MoveNet,
-        { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
-      );
-    }).then(function(det){
-      _tsym_detector = det;
-      _tsym_modelLoaded = true;
-      if (status) status.textContent = _t('Modèle prêt ✅','Model ready ✅') + ' (' + b + ')';
-      cb && cb();
-    }).catch(function(){ tryBackend(i + 1); });
-  }
-  tryBackend(0);
-}
+/* Alias conservé pour compatibilité avec tout appel existant à _tsym_initDetector */
+function _tsym_initDetector(cb) { _tsym_loadModel(cb); }
 
 /* ── Caméra ─────────────────────────────────────────────────── */
 function _tsym_startCamera() {
@@ -14217,8 +14237,9 @@ function _tdr_start() {
       _tdr_video.srcObject = stream;
       _tdr_video.onloadedmetadata = function() {
         _tdr_video.play();
-        _tdr_status(_t('Chargement IA...','Loading AI...'), '#f5c518');
-        _tsym_loadModel(function() { _tdr_calibrate(); });
+        // La caméra tourne : on lance la calibration directement.
+        // _tdr_calibrate() gère elle-même l'attente du modèle IA si besoin.
+        _tdr_calibrate();
       };
     }).catch(function() { tryC(i+1); });
   }
@@ -14257,6 +14278,15 @@ function _tdr_stop() {
 
 /* ── Calibration 3s ───────────────────────────────────────────── */
 function _tdr_calibrate() {
+  // Attendre que le modèle IA soit prêt avant de démarrer la calibration
+  if (!_tsym_detector) {
+    _tdr_status(_t('Chargement IA...','Loading AI...'), '#f5c518');
+    _tsym_loadModel(
+      function() { _tdr_calibrate(); },
+      function(err) { _tdr_status('❌ ' + (err || _t('Erreur IA','AI error')), '#e63946'); }
+    );
+    return;
+  }
   _tdr_calibrated = false;
   _tdr_smoothBuf  = [];
   var remaining   = 3;
