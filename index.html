@@ -15768,8 +15768,22 @@ function _dcog_analyzeMathZone(poses) {
       var dx = wx - t.x, dy = wy - t.y;
       if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) {
         t.hit = true; t.hitTime = Date.now();
-        _td_beep(660, 0.1, 0.1);
-        if (navigator.vibrate) navigator.vibrate(30);
+        var rt = Date.now() - t.born;
+        // Son différencié identique à TDR
+        var freq = rt < 500 ? 880 : rt < 1000 ? 660 : 440;
+        var vol  = rt < 500 ? 0.15 : 0.08;
+        _td_beep(freq, 0.1, vol);
+        if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
+        // Flash visuel identique à TDR
+        if (_dcog_ctx) {
+          _dcog_ctx.save();
+          _dcog_ctx.globalAlpha = 0.7;
+          _dcog_ctx.fillStyle = t.color;
+          _dcog_ctx.beginPath();
+          _dcog_ctx.arc(t.x, t.y, t.r*2, 0, Math.PI*2);
+          _dcog_ctx.fill();
+          _dcog_ctx.restore();
+        }
         _dcog_answerMath(t.mathVal, t.mathIdx);
       }
     });
