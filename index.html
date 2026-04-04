@@ -15048,6 +15048,7 @@ function _tdr_calibrate() {
   }
   _tdr_calibrated = false;
   _tdr_smoothBuf  = [];
+  _tdr_running    = true; // activer le RAF pendant la calibration
   var remaining   = 3;
   _tdr_status(_t('Calibration 3...','Calibrating 3...'), '#f5c518');
   _tdr_detect(); // Démarrer la détection pour collecter les poses
@@ -15065,10 +15066,16 @@ function _tdr_calibrate() {
         var rs = _tsym_kp(lastPoses, 'rightShoulder');
         var lh = _tsym_kp(lastPoses, 'leftHip');
         if (ls && rs && lh && _tdr_canvas) {
-          var W = _tdr_canvas.width;
-          _tdr_centerX = ((ls.x + rs.x) / 2) / W;
-          var shoulderW = Math.abs(ls.x - rs.x);
-          _tdr_scale   = shoulderW / 0.4; // épaules ≈ 40% de la largeur
+          var W  = _tdr_canvas.width;
+          var H  = _tdr_canvas.height;
+          // Convertir coords vidéo → canvas (MoveNet retourne en coords vidéo)
+          var vW = _tdr_video ? (_tdr_video.videoWidth  || W) : W;
+          var vH = _tdr_video ? (_tdr_video.videoHeight || H) : H;
+          var sx = W / vW;
+          // Miroir X : le joueur se voit en miroir → centreX aussi mirrorisé
+          _tdr_centerX = 1.0 - ((ls.x + rs.x) / 2) / vW;
+          var shoulderW = Math.abs(ls.x - rs.x) * sx; // en pixels canvas
+          _tdr_scale   = shoulderW / 0.4; // épaules ≈ 40% de la largeur canvas
           _tdr_calibrated = true;
         }
       }
@@ -15095,7 +15102,7 @@ function _tdr_detect() {
     if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
     _tdr_poses = poses;
     _tdr_drawFrame(poses);
-    _tdr_checkHits(poses);
+    if (_tdr_calibrated) _tdr_checkHits(poses); // pas de hit pendant calibration
     _tdr_rafId = requestAnimationFrame(_tdr_detect);
   }).catch(function() {
     if (_tdr_running) _tdr_rafId = requestAnimationFrame(_tdr_detect);
@@ -15104,6 +15111,7 @@ function _tdr_detect() {
 
 /* ── Dessin ───────────────────────────────────────────────────── */
 function _tdr_drawFrame(poses) {
+  if (_tdr_countdownActive) return; // countdown en cours — ne pas écraser
   var cv = _tdr_canvas, ctx = _tdr_ctx;
   if (!cv || !ctx || !_tdr_video) return;
   var W = cv.width, H = cv.height;
@@ -15152,12 +15160,17 @@ function _tdr_drawFrame(poses) {
 
 function _tdr_drawTargets(ctx, W, H) {
   var now = Date.now();
-  // Proximity feedback : distance poignets → targets (pour ring d'approche)
+  // Proximity feedback : position wrists du frame courant (pas N-1)
   var wristPositions = [];
-  ['leftWrist','rightWrist'].forEach(function(name){
-    var p = _tdr_prevWrist[name];
-    if(p) wristPositions.push(p);
-  });
+  if (_tdr_poses && _tdr_poses[0] && _tdr_canvas && _tdr_video) {
+    var _pW = _tdr_canvas.width, _pH = _tdr_canvas.height;
+    var _psx = _pW / (_tdr_video.videoWidth  || _pW);
+    var _psy = _pH / (_tdr_video.videoHeight || _pH);
+    ['leftWrist','rightWrist'].forEach(function(name){
+      var kp = _tsym_kp_fast(_tdr_poses, name);
+      if(kp) wristPositions.push({x: _pW - kp.x*_psx, y: kp.y*_psy});
+    });
+  }
 
   _tdr_targets.forEach(function(t) {
     if (t.hit) return;
@@ -15234,7 +15247,8 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.08), color: p.color,
+      // Rayon adaptatif : ~6.5% largeur — réduit vs avant pour compenser résolution native
+      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.065), color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -15264,12 +15278,14 @@ function _tdr_checkHits(poses) {
     var prev = _tdr_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdr_prevWrist[name] = {x:wx, y:wy};
-    if (moved < 15) return; // seuil légèrement plus bas pour TDR (réaction rapide)
+    // Seuil adaptatif : ~1.5% de la largeur canvas (15px sur 1000px, 10px sur 640px)
+    var moveThresh = Math.max(8, Math.round(W * 0.015));
+    if (moved < moveThresh) return;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r * 1.25) {
-        t.hit = true;
+      if (Math.sqrt(dx*dx+dy*dy) < t.r * 1.35) { // 1.35 : équilibre précision/tolérance
+        t.hit = true; // marquer immédiatement pour éviter double-hit G+D
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         _tdr_reactionTimes.push(rt);
@@ -15345,6 +15361,7 @@ function _tdr_drawParticles(ctx) {
 }
 
 /* ── Drill ────────────────────────────────────────────────────── */
+var _tdr_countdownActive = false; // flag dédié — ne touche pas _tdr_running
 function _tdr_countdown(cb) {
   // Countdown 3-2-1 HomeCourt-style dessiné sur le canvas
   var cv = _tdr_canvas, ctx = _tdr_ctx;
@@ -15352,6 +15369,7 @@ function _tdr_countdown(cb) {
   var W = cv.width, H = cv.height;
   var n = 3;
   var en = window._lang === 'en';
+  _tdr_countdownActive = true; // bloque le dessin dans _tdr_drawFrame sans tuer le RAF
   function drawN(num) {
     _drawVideoMirror(ctx, _tdr_video, W, H);
     ctx.save();
@@ -15374,7 +15392,10 @@ function _tdr_countdown(cb) {
     if(navigator.vibrate) navigator.vibrate(num===1?30:15);
   }
   function tick() {
-    if (n <= 0) { cb(); return; }
+    if (n <= 0) {
+      _tdr_countdownActive = false;
+      cb(); return;
+    }
     drawN(n--);
     setTimeout(tick, 900);
   }
@@ -15549,6 +15570,7 @@ var _dcog_canvas      = null;
 var _dcog_ctx         = null;
 var _dcog_rafId       = null;
 var _dcog_running     = false;
+var _dcog_poses       = null;  // dernières poses MoveNet — pour proximity
 var _dcog_drill       = 'math';       // 'math' | 'sprint' | 'height' | 'twoball'
 var _dcog_mathLevel   = 'easy';       // 'easy' | 'medium' | 'hard'
 var _dcog_sprintTarget= 300;
@@ -15910,6 +15932,7 @@ function _dcog_detect() {
     return;
   }
   _tsym_detector.estimatePoses(_dcog_video, {maxPoses:1, flipHorizontal:false}).then(function(poses) {
+    _dcog_poses = poses; // stocker pour proximity feedback
     _dcog_drawFrame(poses);
     if (_dcog_drill === 'math')    _dcog_analyzeMathZone(poses);
     if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
@@ -15927,8 +15950,8 @@ function _dcog_drawFrame(poses) {
   var cv = _dcog_canvas, ctx = _dcog_ctx;
   if (!cv || !ctx || !_dcog_video) return;
   var W = cv.width, H = cv.height;
-  // Video affichée par le <video> HTML en dessous — canvas overlay transparent
-  ctx.clearRect(0, 0, W, H);
+  // Dessiner la vidéo miroir sur le canvas (le <video> est display:none)
+  _drawVideoMirror(ctx, _dcog_video, W, H);
   // Pas de squelette dans Cognitif — inutile et visuellement gênant
   // Draw math targets + particules
   if (_dcog_drill === 'math' && _dcog_running) {
@@ -15976,7 +15999,7 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.08);
+  var r  = Math.round(W * 0.065); // adaptatif résolution native
   var colors = ['#2dc653','#f5c518','#e63946'];
   // 9 zones aléatoires — grille 3x3 évitant les bords
   var zones = [
@@ -16011,11 +16034,13 @@ function _dcog_analyzeMathZone(poses) {
     var prev = _dcog_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _dcog_prevWrist[name] = {x:wx, y:wy};
-    if (moved < 15) return;
+    // Seuil adaptatif : ~1.5% de la largeur canvas
+    var moveThresh = Math.max(8, Math.round(W * 0.015));
+    if (moved < moveThresh) return;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.5) {
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.35) { // aligné avec _tdr_
         t.hit = true; t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         // Son différencié identique à TDR
@@ -16051,14 +16076,14 @@ function _dcog_analyzeMathZone(poses) {
    Seule différence : affiche mathVal (chiffre) au lieu de la croix */
 function _dcog_drawMathTargets(ctx, W, H) {
   var now = Date.now();
-  // Positions poignets pour proximity feedback
+  // Positions poignets courantes pour proximity feedback
   var dcWrists = [];
-  if (_dcog_canvas && _dcog_video) {
-    var sx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
-    var sy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
+  if (_dcog_poses && _dcog_poses[0] && _dcog_canvas && _dcog_video) {
+    var _dsx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
+    var _dsy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
     ['leftWrist','rightWrist'].forEach(function(name){
-      var p = (_dcog_prevWrist||{})[name];
-      if(p) dcWrists.push({x: _dcog_canvas.width - p.x*sx, y: p.y*sy});
+      var kp = _tsym_kp_fast(_dcog_poses, name);
+      if(kp) dcWrists.push({x: _dcog_canvas.width - kp.x*_dsx, y: kp.y*_dsy});
     });
   }
   _dcog_mathTargets.forEach(function(t) {
