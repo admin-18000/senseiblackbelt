@@ -15749,31 +15749,25 @@ function _dcog_nextQuestion() {
 /* ── Hit detection — utilise _tdr_targets directement ───────── */
 function _dcog_analyzeMathZone(poses) {
   if (!poses || !poses[0] || _dcog_mathAnswering) return;
-  if (Date.now() - _dcog_lastAnswerTime < 800) return; // cooldown après réponse
-  if (Date.now() - _dcog_questionAt < 500) return;   // délai lecture question
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
-  var vw = (_dcog_video && _dcog_video.videoWidth)  ? _dcog_video.videoWidth  : 640;
-  var vh = (_dcog_video && _dcog_video.videoHeight) ? _dcog_video.videoHeight : 480;
-  var sx = W / vw;
-  var sy = H / vh;
+  var sx = W / (_dcog_video.videoWidth  || 640);
+  var sy = H / (_dcog_video.videoHeight || 480);
   ['leftWrist','rightWrist'].forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);
     if (!kp) return;
     var wx = W - kp.x * sx;
     var wy = kp.y * sy;
-    // Vélocité : hit uniquement si poignet en mouvement (>20px depuis frame précédente)
     var prev = _dcog_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _dcog_prevWrist[name] = {x:wx, y:wy};
-    if (moved < 20) return; // poignet immobile → pas de hit
+    if (moved < 15) return;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
       if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) {
         t.hit = true; t.hitTime = Date.now();
-        _dcog_lastAnswerTime = Date.now();
         _td_beep(660, 0.1, 0.1);
         if (navigator.vibrate) navigator.vibrate(30);
         _dcog_answerMath(t.mathVal, t.mathIdx);
