@@ -15733,13 +15733,19 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.08);   // 8% de W = 51px sur 640
-  var y  = Math.round(H * 0.72);
+  var r  = Math.round(W * 0.08);
   var colors = ['#2dc653','#f5c518','#e63946'];
-  _dcog_mathTargets = [
-    Math.round(W*0.20), Math.round(W*0.50), Math.round(W*0.80)
-  ].map(function(x, i) {
-    return {x:x, y:y, r:r, color:colors[i],
+  // 9 zones aléatoires — grille 3x3 évitant les bords
+  var zones = [
+    {x:W*0.20,y:H*0.25},{x:W*0.50,y:H*0.25},{x:W*0.80,y:H*0.25},
+    {x:W*0.20,y:H*0.55},{x:W*0.50,y:H*0.55},{x:W*0.80,y:H*0.55},
+    {x:W*0.20,y:H*0.80},{x:W*0.50,y:H*0.80},{x:W*0.80,y:H*0.80}
+  ];
+  // Choisir 3 zones différentes aléatoirement
+  var shuffled = zones.slice().sort(function(){return Math.random()-0.5;});
+  var picked = shuffled.slice(0,3);
+  _dcog_mathTargets = picked.map(function(z, i) {
+    return {x:Math.round(z.x), y:Math.round(z.y), r:r, color:colors[i],
             born:Date.now(), ttl:99999, hit:false, hitTime:0,
             mathVal:_dcog_mathChoices[i], mathIdx:i};
   });
@@ -15766,7 +15772,7 @@ function _dcog_analyzeMathZone(poses) {
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) {
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.5) {
         t.hit = true; t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         // Son différencié identique à TDR
@@ -15886,23 +15892,20 @@ function _dcog_answerMath(val, idx) {
     _td_beep(220, 0.12, 0.2);
     if (navigator.vibrate) navigator.vibrate([40,10,40]);
   }
-  // Vider les targets après 800ms (flash visible) puis question suivante
-  setTimeout(function() {
-    _dcog_mathTargets = [];
-    setTimeout(function() {
-      if (_dcog_running && _dcog_drill === 'math') _dcog_nextQuestion();
-    }, 700);
-  }, 800);
   _dcog_updateScores();
-  // Score panel live
   var total = _dcog_correct + _dcog_wrong;
   var pct   = total > 0 ? Math.round(_dcog_correct/total*100) : 0;
   var fill  = document.getElementById('dcog_dualFill');
   var pctEl = document.getElementById('dcog_dualPct');
   if (fill)  fill.style.width   = pct+'%';
   if (pctEl) pctEl.textContent  = pct+'%';
-  // Next question after 800ms (time to see feedback and move away)
-  setTimeout(_dcog_nextQuestion, 800);
+  // Transition propre : 1200ms feedback visible, puis vider, puis nouvelle question
+  setTimeout(function() {
+    _dcog_mathTargets = [];
+    setTimeout(function() {
+      if (_dcog_running && _dcog_drill === 'math') _dcog_nextQuestion();
+    }, 300);
+  }, 1200);
 }
 
 /* ── Speed Dribble BPM — calcul via MoveNet wrist bounce ────── */
