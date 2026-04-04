@@ -14983,14 +14983,40 @@ function _tdr_drawFrame(poses) {
   // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
-  // Score overlay
+  // Score overlay — style HomeCourt
   if (_tdr_running) {
+    var fs = Math.round(W * 0.038); // taille font adaptative
+    ctx.save();
+
+    // Fond semi-transparent en haut
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(0, 0, W, Math.round(W * 0.075));
+
+    // Score à gauche
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold 18px monospace';
+    ctx.font = 'bold ' + fs + 'px Arial Narrow, Arial, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(_tdr_score + ' pts', 10, 28);
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 6;
+    ctx.fillText(_tdr_score, Math.round(W*0.025), Math.round(W*0.038));
+
+    // Chrono à droite
+    ctx.fillStyle = '#fff';
     ctx.textAlign = 'right';
-    ctx.fillText(_tdr_sec + 's', W-10, 28);
+    var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
+    ctx.fillText((mm>0?(mm+':'):'') + (ss<10?'0':'')+ss, W - Math.round(W*0.025), Math.round(W*0.038));
+
+    // Streak au centre si >= 3
+    if (_tdr_streak >= 3) {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
+      ctx.font = 'bold ' + Math.round(fs*0.85) + 'px Arial Narrow, Arial, sans-serif';
+      ctx.fillText('🔥 ×' + _tdr_streak, W/2, Math.round(W*0.038));
+    }
+
+    ctx.shadowBlur = 0;
+    ctx.restore();
   }
 }
 
