@@ -66,7 +66,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center;flex-wrap:wrap}
 .nav-admin{display:flex;align-items:center;gap:4px;flex-shrink:0;border-left:1px solid rgba(245,197,24,.3);padding-left:8px}
 .nav-sep{display:none}
-.nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s}
+.nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media(min-width:1100px){.nav-btn{font-size:11px;padding:5px 9px}}
 @media(min-width:1400px){.nav-btn{font-size:12px;padding:5px 10px;letter-spacing:.5px}}
 .nav-btn:hover,.nav-btn.active{background:rgba(245,197,24,.1);color:var(--gold)}
@@ -4829,6 +4829,69 @@ document.addEventListener('DOMContentLoaded', () => {
 @media(max-width:768px){
   .eco-intro-grid { grid-template-columns:1fr !important; }
   .network-form-grid { grid-template-columns:1fr !important; }
+}
+
+/* ══════════════════════════════════════════════
+   MODE PORTRAIT MOBILE — Optimisations UX
+   Ciblé : smartphone tenu verticalement
+══════════════════════════════════════════════ */
+@media (max-width:480px) and (orientation:portrait) {
+
+  /* Navigation — menu hamburger prioritaire, nav horizontale masquée */
+  .nav-links { display:none !important; }
+  #hamburger { display:flex !important; }
+
+  /* Hero section — plus compact en portrait */
+  .hero { min-height:85vh; padding-top:80px; }
+  .hero-title { font-size:clamp(36px,12vw,56px) !important; }
+  .hero-sub   { font-size:clamp(11px,3.5vw,14px) !important; }
+
+  /* Sections — padding réduit */
+  .section { padding:16px 12px !important; }
+  .sec-title { font-size:clamp(28px,9vw,40px) !important; }
+
+  /* Training panels — pleine largeur */
+  #s-training .tr-panel { padding:0 4px !important; }
+  .tr-card { padding:12px 10px !important; border-radius:10px; }
+  .tr-card-title { font-size:10px !important; }
+
+  /* Training tabs — scroll horizontal */
+  #s-training > div > div:first-child > div {
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+    flex-wrap:nowrap !important;
+    padding-bottom:6px;
+  }
+
+  /* Canvas caméra — hauteur adaptée portrait */
+  #dcog_canvas, #tdr_canvas, #tsym_canvas {
+    max-height:55vw !important;
+    height:auto !important;
+  }
+
+  /* Score boxes — 2 colonnes en portrait */
+  .tr-score-box { padding:8px 4px !important; }
+  .tr-score-val { font-size:clamp(14px,4.5vw,18px) !important; }
+  .tr-score-lbl { font-size:6px !important; }
+
+  /* Belt cards — 1 colonne forcée */
+  .belts-grid { grid-template-columns:1fr !important; }
+
+  /* Boutons nav mobiles — plus grands pour les doigts */
+  .mm-btn { padding:16px 20px !important; font-size:14px !important; }
+
+  /* Puzzle grid — masqué en portrait très étroit */
+  #puzzle-grid-preview canvas { max-width:28vw !important; }
+
+  /* Onboarding — adapté portrait */
+  #onboarding-overlay > div { padding:24px 18px !important; max-width:95vw !important; }
+}
+
+/* Portrait tablette (481-768px) — ajustements légers */
+@media (min-width:481px) and (max-width:768px) and (orientation:portrait) {
+  .section { padding:20px 16px !important; }
+  #dcog_canvas, #tdr_canvas, #tsym_canvas { max-height:45vw !important; }
+  .tr-panel { max-width:100% !important; }
 }
 </style>
 
@@ -15351,6 +15414,26 @@ function _dcog_selectDrill(drill, langOnly) {
   }
 }
 
+/* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  // tr-tab : onglets Training
+  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn').forEach(function(btn) {
+    btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
+  });
+  // tr-btn : boutons START/STOP/SAVE
+  document.querySelectorAll('.tr-btn,.tr-btn-tap').forEach(function(btn) {
+    btn.addEventListener('touchstart', function(){ _vibe(12); }, {passive:true});
+  });
+  // belt-card
+  document.querySelectorAll('.belt-card').forEach(function(card) {
+    card.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
+  });
+  // btn-primary, btn-secondary
+  document.querySelectorAll('.btn-primary,.btn-secondary').forEach(function(btn) {
+    btn.addEventListener('touchstart', function(){ _vibe(10); }, {passive:true});
+  });
+});
+
 /* ── Sub-option setters ──────────────────────────────────────── */
 function _dcog_setMathLevel(lvl) {
   _dcog_mathLevel = lvl;
@@ -16447,6 +16530,18 @@ window.addEventListener('load', function() {
     });
   }
 });
+
+// ── Haptique léger sur tous les boutons interactifs ──
+function _vibe(ms) { if(navigator.vibrate) navigator.vibrate(ms||8); }
+
+// Patch showSection pour haptique nav
+(function(){
+  var _origShowSec = window.showSection;
+  window.showSection = function(id, btn) {
+    _vibe(8);
+    if(typeof _origShowSec==='function') _origShowSec.call(this,id,btn);
+  };
+})();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
