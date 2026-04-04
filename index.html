@@ -14188,8 +14188,6 @@ function _tsym_startDetection() {
 
 function _tsym_detect() {
   if (!_tsym_running || !_tsym_detector || !_tsym_video) return;
-  _cam_frameSkip = (_cam_frameSkip + 1) % 2; // traiter 1 frame sur 2 sur mobile
-  if (_cam_frameSkip !== 0) { requestAnimationFrame(_tsym_loop); return; }
   _tsym_detector.estimatePoses(_tsym_video).then(function(poses) {
     _tsym_drawFrame(poses);
     if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
@@ -14213,7 +14211,7 @@ function _tsym_kp_fast(poses, name) {
   var idx = _TSYM_KP[name];
   if (idx === undefined) return null;
   var k = kps[idx];
-  return (k && k.score > 0.15) ? k : null;  // seuil 0.15 vs 0.35 pour poignets rapides
+  return (k && k.score > 0.30) ? k : null;  // seuil 0.30 — moins de faux positifs
 }
 
 function _tsym_kp(poses, name) {
@@ -14248,11 +14246,8 @@ function _tsym_drawFrame(poses) {
   if (!_tsym_ctx || !_tsym_canvas || !_tsym_video) return;
   var W = _tsym_canvas.width, H = _tsym_canvas.height;
   _tsym_ctx.clearRect(0, 0, W, H);
-  // Miroir vidéo
-  _tsym_ctx.save();
-  _tsym_ctx.scale(-1, 1);
+  // Miroir vidéo — géré en interne par _drawVideoMirror
   _drawVideoMirror(_tsym_ctx, _tsym_video, W, H);
-  _tsym_ctx.restore();
 
   if (!poses || !poses[0]) return;
   var kps = poses[0].keypoints;
@@ -15713,11 +15708,13 @@ var _dcog_mathAnswer    = 0;
 var _dcog_mathChoices   = [];
 var _dcog_mathTargets   = [];   // variable propre au module — n'interfère pas avec _tdr_targets
 var _dcog_mathAnswering = false;
+var _dcog_lastAnswerTime = 0; // cooldown entre hits
 
 function _dcog_nextQuestion() {
   if (!_dcog_running || _dcog_drill !== 'math') return;
   _dcog_questionAt    = Date.now();
   _dcog_mathAnswering = false;
+  _dcog_lastAnswerTime = 0;
   var q = _dcog_genQuestion();
   _dcog_mathAnswer  = q.answer;
   var qEl = document.getElementById('dcog_mathQuestion');
@@ -15725,7 +15722,7 @@ function _dcog_nextQuestion() {
   _dcog_mathChoices = _dcog_genChoices(q.answer);
   // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
   var cv = _dcog_canvas;
-  var W  = cv ? cv.width  : 480;
+  var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
   var r  = Math.round(W * 0.08);   // 8% de W = 51px sur 640
   var y  = Math.round(H * 0.72);
@@ -15743,6 +15740,8 @@ function _dcog_nextQuestion() {
 /* ── Hit detection — utilise _tdr_targets directement ───────── */
 function _dcog_analyzeMathZone(poses) {
   if (!poses || !poses[0] || _dcog_mathAnswering) return;
+  if (Date.now() - _dcog_lastAnswerTime < 800) return; // cooldown après réponse
+  if (Date.now() - _dcog_questionAt < 500) return;   // délai lecture question
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
@@ -15760,6 +15759,7 @@ function _dcog_analyzeMathZone(poses) {
       var dx = wx - t.x, dy = wy - t.y;
       if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) { // tolérance proportionnelle
         t.hit = true; t.hitTime = Date.now();
+        _dcog_lastAnswerTime = Date.now(); // cooldown
         _td_beep(660, 0.1, 0.1);
         if (navigator.vibrate) navigator.vibrate(30);
         _dcog_answerMath(t.mathVal, t.mathIdx);
