@@ -1254,11 +1254,11 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- CAMERA CANVAS -->
   <div class="tr-card" style="padding:12px;position:relative">
-    <div id="dcog_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
+    <div id="dcog_camContainer" style="display:none;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
       <video id="dcog_video" width="640" height="480" playsinline muted
-        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
       <canvas id="dcog_canvas" width="640" height="480"
-        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
+        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
       <!-- Math overlay — absolute over canvas -->
       <div id="dcog_mathOverlay"
         style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
@@ -1381,11 +1381,11 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- CAMÉRA + CANVAS -->
   <div class="tr-card">
     <div class="tr-card-title">📷 CAMÉRA — ANALYSE EN TEMPS RÉEL</div>
-    <div id="tsym_camContainer" style="display:none;width:100%;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tsym_video" width="640" height="480" playsinline muted
-        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+    <div id="tsym_camContainer" style="position:relative;display:none;width:100%;aspect-ratio:4/3;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
+            <video id="tsym_video" width="640" height="480" playsinline muted
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
       <canvas id="tsym_canvas" width="640" height="480"
-        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
+        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
     </div>
     <div id="tsym_status" style="text-align:center;font-size:11px;color:#7a8299;margin-bottom:12px;min-height:18px;letter-spacing:.5px">
       Appuie sur DÉMARRER pour activer la caméra
@@ -1618,11 +1618,11 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
 
     <!-- Canvas caméra -->
-    <div id="tdr_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tdr_video" width="640" height="480" playsinline muted
-        style="display:none;width:100%;height:100%;object-fit:cover"></video>
+    <div id="tdr_camContainer" style="position:relative;display:none;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
+            <video id="tdr_video" width="640" height="480" playsinline muted
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
       <canvas id="tdr_canvas" width="640" height="480"
-        style="width:100%;height:auto;display:block;background:#0d1117"></canvas>
+        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
     </div>
 
     <!-- Status + score live -->
@@ -4909,7 +4909,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Portrait tablette (481-768px) — ajustements légers */
 @media (min-width:481px) and (max-width:768px) and (orientation:portrait) {
   .section { padding:20px 16px !important; }
-  #dcog_canvas, #tdr_canvas, #tsym_canvas { max-height:45vw !important; }
+  #dcog_canvas, #tdr_canvas, #tsym_canvas {  }
   .tr-panel { max-width:100% !important; }
 }
 </style>
@@ -14222,6 +14222,9 @@ function _tsym_kp(poses, name) {
   return (k && k.score > 0.35) ? k : null;
 }
 
+
+// Dessine la video en crop centré (pas d'étirement) + miroir
+
 function _tsym_drawFrame(poses) {
   if (!_tsym_ctx || !_tsym_canvas || !_tsym_video) return;
   var W = _tsym_canvas.width, H = _tsym_canvas.height;
@@ -14229,7 +14232,7 @@ function _tsym_drawFrame(poses) {
   // Miroir vidéo
   _tsym_ctx.save();
   _tsym_ctx.scale(-1, 1);
-  _tsym_ctx.drawImage(_tsym_video, -W, 0, W, H);
+  _tsym_ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
   _tsym_ctx.restore();
 
   if (!poses || !poses[0]) return;
@@ -14979,7 +14982,7 @@ function _tdr_drawFrame(poses) {
   var W = cv.width, H = cv.height;
   ctx.clearRect(0,0,W,H);
   // Miroir vidéo
-  ctx.save(); ctx.scale(-1,1); ctx.drawImage(_tdr_video,-W,0,W,H); ctx.restore();
+  ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
   // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
@@ -15662,7 +15665,7 @@ function _dcog_drawFrame(poses) {
   // Mirror video
   ctx.save();
   ctx.scale(-1, 1);
-  ctx.drawImage(_dcog_video, -W, 0, W, H);
+  ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
   ctx.restore();
   // Pas de squelette dans Cognitif — inutile et visuellement gênant
   // Draw math targets
@@ -15704,7 +15707,7 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 480;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.13);   // ~94px sur 720 → ~50px affiché sur mobile
+  var r  = Math.round(W * 0.042);  // 4.2% de W = 27px sur 640
   var y  = Math.round(H * 0.72);
   var colors = ['#2dc653','#f5c518','#e63946'];
   _dcog_mathTargets = [
