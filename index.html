@@ -66,7 +66,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center;flex-wrap:wrap}
 .nav-admin{display:flex;align-items:center;gap:4px;flex-shrink:0;border-left:1px solid rgba(245,197,24,.3);padding-left:8px}
 .nav-sep{display:none}
-.nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s}
 @media(min-width:1100px){.nav-btn{font-size:11px;padding:5px 9px}}
 @media(min-width:1400px){.nav-btn{font-size:12px;padding:5px 10px;letter-spacing:.5px}}
 .nav-btn:hover,.nav-btn.active{background:rgba(245,197,24,.1);color:var(--gold)}
@@ -4132,14 +4132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     <button onclick="openStatsTab('percentile',this)" class="st-tab" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="st_tab_pct">🏅 Percentile</button>
   </div>
 
-  <!-- Bouton export PDF -->
-  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-    <button onclick="statsExportPDF()" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 20px;border-radius:7px;border:1px solid rgba(245,197,24,.4);background:rgba(245,197,24,.08);color:var(--gold);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s" onmouseenter="this.style.background='rgba(245,197,24,.18)'" onmouseleave="this.style.background='rgba(245,197,24,.08)'" id="stats-export-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 8v2h14v-2H5z"/></svg>
-      <span id="stats-export-lbl">📄 Export PDF</span>
-    </button>
-  </div>
-
   <!-- ══ TAB 1 : RADAR CHART ══ -->
   <div id="st-radar" class="st-panel">
     <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start" class="stats-layout">
@@ -4837,80 +4829,6 @@ document.addEventListener('DOMContentLoaded', () => {
 @media(max-width:768px){
   .eco-intro-grid { grid-template-columns:1fr !important; }
   .network-form-grid { grid-template-columns:1fr !important; }
-}
-
-/* ══════════════════════════════════════════════
-   CSS PRINT — Export PDF My Stats
-══════════════════════════════════════════════ */
-@media print {
-  /* Masquer tout sauf la section stats */
-  body > *:not(#print-stats-overlay) { display:none !important; }
-  #print-stats-overlay { display:block !important; position:static !important; }
-  nav, #session-toolbar, #dojo-btn, #notif-banner { display:none !important; }
-  @page { margin:10mm; size:A4 portrait; }
-}
-
-/* ══════════════════════════════════════════════
-   MODE PORTRAIT MOBILE — Optimisations UX
-   Ciblé : smartphone tenu verticalement
-══════════════════════════════════════════════ */
-@media (max-width:480px) and (orientation:portrait) {
-
-  /* Navigation — menu hamburger prioritaire, nav horizontale masquée */
-  .nav-links { display:none !important; }
-  #hamburger { display:flex !important; }
-
-  /* Hero section — plus compact en portrait */
-  .hero { min-height:85vh; padding-top:80px; }
-  .hero-title { font-size:clamp(36px,12vw,56px) !important; }
-  .hero-sub   { font-size:clamp(11px,3.5vw,14px) !important; }
-
-  /* Sections — padding réduit */
-  .section { padding:16px 12px !important; }
-  .sec-title { font-size:clamp(28px,9vw,40px) !important; }
-
-  /* Training panels — pleine largeur */
-  #s-training .tr-panel { padding:0 4px !important; }
-  .tr-card { padding:12px 10px !important; border-radius:10px; }
-  .tr-card-title { font-size:10px !important; }
-
-  /* Training tabs — scroll horizontal */
-  #s-training > div > div:first-child > div {
-    overflow-x:auto !important;
-    -webkit-overflow-scrolling:touch;
-    flex-wrap:nowrap !important;
-    padding-bottom:6px;
-  }
-
-  /* Canvas caméra — hauteur adaptée portrait */
-  #dcog_canvas, #tdr_canvas, #tsym_canvas {
-    max-height:55vw !important;
-    height:auto !important;
-  }
-
-  /* Score boxes — 2 colonnes en portrait */
-  .tr-score-box { padding:8px 4px !important; }
-  .tr-score-val { font-size:clamp(14px,4.5vw,18px) !important; }
-  .tr-score-lbl { font-size:6px !important; }
-
-  /* Belt cards — 1 colonne forcée */
-  .belts-grid { grid-template-columns:1fr !important; }
-
-  /* Boutons nav mobiles — plus grands pour les doigts */
-  .mm-btn { padding:16px 20px !important; font-size:14px !important; }
-
-  /* Puzzle grid — masqué en portrait très étroit */
-  #puzzle-grid-preview canvas { max-width:28vw !important; }
-
-  /* Onboarding — adapté portrait */
-  #onboarding-overlay > div { padding:24px 18px !important; max-width:95vw !important; }
-}
-
-/* Portrait tablette (481-768px) — ajustements légers */
-@media (min-width:481px) and (max-width:768px) and (orientation:portrait) {
-  .section { padding:20px 16px !important; }
-  #dcog_canvas, #tdr_canvas, #tsym_canvas { max-height:45vw !important; }
-  .tr-panel { max-width:100% !important; }
 }
 </style>
 
@@ -13936,8 +13854,6 @@ function _trApplyLang() {
   if(tdrSt&&(tdrSt.textContent.indexOf('Appuie')>-1||tdrSt.textContent.indexOf('Press')>-1))
     tdrSt.textContent=en?'Press START':'Appuie sur DÉMARRER';
   var tdrSk=document.getElementById('tdr_streakLive'); if(tdrSk&&!tdrSk.textContent) tdrSk.textContent='';
-  var expLbl=document.getElementById('stats-export-lbl'); if(expLbl) expLbl.textContent='📄 '+(en?'Export PDF':'Export PDF');
-  var expBtn=document.getElementById('stats-export-btn'); if(expBtn) expBtn.title=en?'Export stats as PDF':'Exporter les stats en PDF';
   var tdrHL=document.getElementById('tdr_histList');
   if(tdrHL&&tdrHL.querySelector('.tr-empty'))
     tdrHL.innerHTML='<div class="tr-empty">'+(en?'No sessions yet':'Aucune session')+'</div>';
@@ -15435,26 +15351,6 @@ function _dcog_selectDrill(drill, langOnly) {
   }
 }
 
-/* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
-document.addEventListener('DOMContentLoaded', function() {
-  // tr-tab : onglets Training
-  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn').forEach(function(btn) {
-    btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
-  });
-  // tr-btn : boutons START/STOP/SAVE
-  document.querySelectorAll('.tr-btn,.tr-btn-tap').forEach(function(btn) {
-    btn.addEventListener('touchstart', function(){ _vibe(12); }, {passive:true});
-  });
-  // belt-card
-  document.querySelectorAll('.belt-card').forEach(function(card) {
-    card.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
-  });
-  // btn-primary, btn-secondary
-  document.querySelectorAll('.btn-primary,.btn-secondary').forEach(function(btn) {
-    btn.addEventListener('touchstart', function(){ _vibe(10); }, {passive:true});
-  });
-});
-
 /* ── Sub-option setters ──────────────────────────────────────── */
 function _dcog_setMathLevel(lvl) {
   _dcog_mathLevel = lvl;
@@ -16551,146 +16447,6 @@ window.addEventListener('load', function() {
     });
   }
 });
-
-// ══════════════════════════════════════════════════════
-// 📄 EXPORT PDF — My Stats
-// Génère un canvas composite A4 avec toutes les stats
-// puis ouvre window.print()
-// ══════════════════════════════════════════════════════
-function statsExportPDF() {
-  var en = window._lang === 'en';
-  var btn = document.getElementById('stats-export-btn');
-  if (btn) { btn.style.opacity='0.5'; btn.style.pointerEvents='none'; }
-
-  // Récupérer données
-  var globalScore = document.getElementById('radar-global') ? document.getElementById('radar-global').textContent : '—';
-  var verdict     = document.getElementById('radar-verdict') ? document.getElementById('radar-verdict').textContent : '';
-  var beltIdx     = parseInt(localStorage.getItem('sensei_belt_idx') || '0');
-  var beltNames   = en
-    ? ['White','Yellow','Orange','Green','Blue','Purple','Brown','Black','Red']
-    : ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
-  var beltColors  = ['#f8f9fa','#ffd60a','#ff6d00','#2dc653','#0077b6','#7b2d8b','#cd853f','#888','#e63946'];
-  var beltName    = beltNames[beltIdx] || beltNames[0];
-  var beltColor   = beltColors[beltIdx] || '#f5c518';
-  var date        = new Date().toLocaleDateString(en?'en-US':'fr-FR',{day:'numeric',month:'long',year:'numeric'});
-
-  // Récupérer image radar
-  var radarCanvas = document.getElementById('radar-canvas');
-  var radarImg    = radarCanvas ? radarCanvas.toDataURL('image/png') : null;
-
-  // Récupérer image control chart
-  var chartCanvas = document.getElementById('chart-canvas');
-  var chartImg    = chartCanvas ? chartCanvas.toDataURL('image/png') : null;
-
-  // Récupérer sliders radar
-  var sliderData = [];
-  document.querySelectorAll('#radar-sliders input[type=range]').forEach(function(inp) {
-    var lbl = inp.parentElement ? inp.parentElement.querySelector('span,label') : null;
-    sliderData.push({
-      name: lbl ? lbl.textContent : inp.id,
-      val:  inp.value
-    });
-  });
-
-  // Récupérer percentile
-  var pctEl = document.getElementById('st-percentile-label');
-  var pctVal = document.getElementById('st-percentile-content');
-  var pctText = pctVal ? pctVal.textContent.replace(/\s+/g,' ').trim().slice(0,120) : '';
-
-  // Construire HTML de la page d'impression
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
-  html += '<title>SENSEI BlackBelt — Stats</title>';
-  html += '<style>';
-  html += 'body{margin:0;padding:20px;font-family:Arial Narrow,sans-serif;background:#fff;color:#080a0f}';
-  html += 'h1{font-size:28px;letter-spacing:4px;color:#080a0f;margin:0 0 4px}';
-  html += 'h2{font-size:14px;letter-spacing:2px;color:#888;margin:0 0 20px;font-weight:400}';
-  html += '.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #f5c518;padding-bottom:12px;margin-bottom:20px}';
-  html += '.belt-badge{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;color:#fff;background:'+beltColor+'}';
-  html += '.score-big{font-size:64px;font-weight:900;color:#f5c518;line-height:1;text-align:right}';
-  html += '.score-lbl{font-size:10px;letter-spacing:2px;color:#888;text-align:right}';
-  html += '.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}';
-  html += '.card{border:1px solid #e0e0e0;border-radius:8px;padding:14px}';
-  html += '.card h3{font-size:10px;letter-spacing:2px;color:#888;margin:0 0 10px;text-transform:uppercase}';
-  html += 'img{max-width:100%;height:auto;display:block;margin:0 auto}';
-  html += '.bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}';
-  html += '.bar-lbl{font-size:11px;width:120px;color:#333}';
-  html += '.bar-bg{flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden}';
-  html += '.bar-fill{height:100%;border-radius:4px;background:#f5c518}';
-  html += '.bar-val{font-size:11px;font-weight:700;color:#f5c518;width:24px;text-align:right}';
-  html += '.footer{margin-top:20px;border-top:1px solid #eee;padding-top:10px;display:flex;justify-content:space-between;font-size:9px;color:#aaa;letter-spacing:1px}';
-  html += '@media print{body{padding:10px}@page{margin:8mm;size:A4}}';
-  html += '</style></head><body>';
-
-  // Header
-  html += '<div class="header">';
-  html += '<div><h1>SENSEI BLACKBELT</h1><h2>'+(en?'MY STATS REPORT':'RAPPORT MES STATS')+'</h2>';
-  html += '<span class="belt-badge">🥋 '+(en?'Belt':'Ceinture')+' '+beltName+'</span></div>';
-  html += '<div><div class="score-big">'+globalScore+'</div><div class="score-lbl">'+(en?'GLOBAL SCORE':'SCORE GLOBAL')+'</div>';
-  if (verdict) html += '<div style="font-size:10px;color:#888;text-align:right;margin-top:4px">'+verdict+'</div>';
-  html += '</div></div>';
-
-  // Grid : Radar + Axes
-  html += '<div class="grid">';
-  html += '<div class="card"><h3>'+(en?'TECHNICAL RADAR':'RADAR TECHNIQUE')+'</h3>';
-  if (radarImg) html += '<img src="'+radarImg+'" style="max-height:200px">';
-  html += '</div>';
-  html += '<div class="card"><h3>'+(en?'AXES (0-10)':'AXES (0-10)')+'</h3>';
-  sliderData.forEach(function(s) {
-    var pct = Math.round(parseInt(s.val||0)/10*100);
-    html += '<div class="bar-wrap"><div class="bar-lbl">'+s.name+'</div>';
-    html += '<div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div>';
-    html += '<div class="bar-val">'+s.val+'</div></div>';
-  });
-  html += '</div></div>';
-
-  // Control chart si disponible
-  if (chartImg) {
-    html += '<div class="card" style="margin-bottom:16px"><h3>CONTROL CHART — '+(en?'PROGRESSION':'PROGRESSION')+'</h3>';
-    html += '<img src="'+chartImg+'" style="max-height:160px">';
-    html += '</div>';
-  }
-
-  // Percentile
-  if (pctText) {
-    html += '<div class="card" style="margin-bottom:16px"><h3>'+(en?'PERCENTILE SENSEI':'PERCENTILE SENSEI')+'</h3>';
-    html += '<p style="font-size:11px;color:#555;line-height:1.6">'+pctText+'</p></div>';
-  }
-
-  // Footer
-  html += '<div class="footer">';
-  html += '<span>SENSEI BLACKBELT — senseiblackbelt.com</span>';
-  html += '<span>'+date+'</span>';
-  html += '</div>';
-  html += '</body></html>';
-
-  // Ouvrir dans une nouvelle fenêtre et imprimer
-  var win = window.open('', '_blank', 'width=900,height=1200');
-  if (!win) {
-    alert(en?'Please allow popups to export PDF':'Autorisez les popups pour exporter en PDF');
-    if (btn) { btn.style.opacity='1'; btn.style.pointerEvents=''; }
-    return;
-  }
-  win.document.write(html);
-  win.document.close();
-  win.onload = function() {
-    setTimeout(function() {
-      win.print();
-      if (btn) { btn.style.opacity='1'; btn.style.pointerEvents=''; }
-    }, 500);
-  };
-}
-
-// ── Haptique léger sur tous les boutons interactifs ──
-function _vibe(ms) { if(navigator.vibrate) navigator.vibrate(ms||8); }
-
-// Patch showSection pour haptique nav
-(function(){
-  var _origShowSec = window.showSection;
-  window.showSection = function(id, btn) {
-    _vibe(8);
-    if(typeof _origShowSec==='function') _origShowSec.call(this,id,btn);
-  };
-})();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
