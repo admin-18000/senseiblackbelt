@@ -14809,6 +14809,7 @@ var _tdr_scale      = 1;          // pixels par cm approximatif
 var _tdr_centerX    = 0.5;        // centre joueur en fraction de W
 var _tdr_calibrated = false;
 var _tdr_targets    = [];         // [{x,y,r,color,born,hit}]
+var _tdr_prevWrist  = {};         // vélocité poignet
 var _tdr_score      = 0;
 var _tdr_hits       = 0;
 var _tdr_total      = 0;
@@ -15117,14 +15118,19 @@ function _tdr_checkHits(poses) {
   // Les deux poignets
   var wrists = ['leftWrist','rightWrist'];
   wrists.forEach(function(name) {
-    var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
+    var kp = _tsym_kp_fast(poses, name);
     if (!kp) return;
-    var wx = W - kp.x * sx; // miroir JS aligné avec drawImage
+    var wx = W - kp.x * sx;
     var wy = kp.y * sy;
+    // Vélocité : hit uniquement si poignet en mouvement (>15px)
+    var prev = _tdr_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _tdr_prevWrist[name] = {x:wx, y:wy};
+    if (moved < 15) return; // seuil légèrement plus bas pour TDR (réaction rapide)
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r * 1.25) { // tolérance proportionnelle
+      if (Math.sqrt(dx*dx+dy*dy) < t.r * 1.25) {
         t.hit = true;
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
@@ -15168,7 +15174,8 @@ function _tdr_startDrill() {
   _tdr_streak  = 0;
   _tdr_total   = 0;
   _tdr_sec     = _tdr_duration;
-  _tdr_targets = [];
+  _tdr_targets   = [];
+  _tdr_prevWrist  = {};
   _tdr_reactionTimes = [];
   _tdr_bpm = _td_metroBPM || 80;
 
@@ -15709,12 +15716,14 @@ var _dcog_mathChoices   = [];
 var _dcog_mathTargets   = [];   // variable propre au module — n'interfère pas avec _tdr_targets
 var _dcog_mathAnswering = false;
 var _dcog_lastAnswerTime = 0; // cooldown entre hits
+var _dcog_prevWrist = {}; // {leftWrist:{x,y}, rightWrist:{x,y}} frame précédente
 
 function _dcog_nextQuestion() {
   if (!_dcog_running || _dcog_drill !== 'math') return;
   _dcog_questionAt    = Date.now();
   _dcog_mathAnswering = false;
   _dcog_lastAnswerTime = 0;
+  _dcog_prevWrist = {};
   var q = _dcog_genQuestion();
   _dcog_mathAnswer  = q.answer;
   var qEl = document.getElementById('dcog_mathQuestion');
@@ -15750,16 +15759,21 @@ function _dcog_analyzeMathZone(poses) {
   var sx = W / vw;
   var sy = H / vh;
   ['leftWrist','rightWrist'].forEach(function(name) {
-    var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
+    var kp = _tsym_kp_fast(poses, name);
     if (!kp) return;
-    var wx = W - kp.x * sx; // miroir JS aligné avec drawImage
+    var wx = W - kp.x * sx;
     var wy = kp.y * sy;
+    // Vélocité : hit uniquement si poignet en mouvement (>20px depuis frame précédente)
+    var prev = _dcog_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dcog_prevWrist[name] = {x:wx, y:wy};
+    if (moved < 20) return; // poignet immobile → pas de hit
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) { // tolérance proportionnelle
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) {
         t.hit = true; t.hitTime = Date.now();
-        _dcog_lastAnswerTime = Date.now(); // cooldown
+        _dcog_lastAnswerTime = Date.now();
         _td_beep(660, 0.1, 0.1);
         if (navigator.vibrate) navigator.vibrate(30);
         _dcog_answerMath(t.mathVal, t.mathIdx);
@@ -16134,7 +16148,7 @@ function _dcog_analyzeTwoBall(poses) {
   var rW = _tsym_kp_fast(poses, 'rightWrist');
   if (!lW || !rW) return;
 
-  var W  = _dcog_canvas ? _dcog_canvas.width  : 480;
+  var W  = _dcog_canvas ? _dcog_canvas.width  : 640;
   var H  = _dcog_canvas ? _dcog_canvas.height : 480;
   var sy = H / (_dcog_video.videoHeight || 480);
   var lY = lW.y * sy;
