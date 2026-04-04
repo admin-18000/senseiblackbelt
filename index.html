@@ -14237,8 +14237,8 @@ function _tsym_drawFrame(poses) {
 
   if (!poses || !poses[0]) return;
   var kps = poses[0].keypoints;
-  var scaleX = W / _tsym_video.videoWidth;
-  var scaleY = H / _tsym_video.videoHeight;
+  var scaleX = W / (_tsym_video.videoWidth  || 640);
+  var scaleY = H / (_tsym_video.videoHeight || 480);
 
   // Dessiner le squelette
   _tsym_drawSkeleton(kps, scaleX, scaleY, W);
@@ -15046,9 +15046,10 @@ function _tdr_drawTargets(ctx, W, H) {
     // Croix centrale
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
+    var cs = Math.round(t.r * 0.4);
     ctx.beginPath();
-    ctx.moveTo(t.x-8, t.y); ctx.lineTo(t.x+8, t.y);
-    ctx.moveTo(t.x, t.y-8); ctx.lineTo(t.x, t.y+8);
+    ctx.moveTo(t.x-cs, t.y); ctx.lineTo(t.x+cs, t.y);
+    ctx.moveTo(t.x, t.y-cs); ctx.lineTo(t.x, t.y+cs);
     ctx.stroke();
     ctx.restore();
   });
@@ -15104,7 +15105,7 @@ function _tdr_checkHits(poses) {
   wrists.forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
-    var wx = W - kp.x * sx; // miroir
+    var wx = kp.x * sx; // miroir géré par CSS transform:scaleX(-1)
     var wy = kp.y * sy;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
@@ -15726,17 +15727,19 @@ function _dcog_analyzeMathZone(poses) {
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
-  var sx = W / (_dcog_video.videoWidth  || 640);
-  var sy = H / (_dcog_video.videoHeight || 480);
+  var vw = (_dcog_video && _dcog_video.videoWidth)  ? _dcog_video.videoWidth  : 640;
+  var vh = (_dcog_video && _dcog_video.videoHeight) ? _dcog_video.videoHeight : 480;
+  var sx = W / vw;
+  var sy = H / vh;
   ['leftWrist','rightWrist'].forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
-    var wx = W - kp.x * sx;
+    var wx = kp.x * sx; // miroir géré par CSS transform:scaleX(-1)
     var wy = kp.y * sy;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r + 40) {  // tolérance max
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.25) { // tolérance proportionnelle
         t.hit = true; t.hitTime = Date.now();
         _td_beep(660, 0.1, 0.1);
         if (navigator.vibrate) navigator.vibrate(30);
