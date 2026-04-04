@@ -5246,6 +5246,10 @@ const IQ_ITEMS = [
 
 // ══ NAVIGATION ══════════════════════════════════════
 function showSection(id, btn) {
+  // Arrêter toutes les caméras actives si on change de section
+  if (typeof _tsym_running !== 'undefined' && _tsym_running && typeof _tsym_stopCamera === 'function') _tsym_stopCamera();
+  if (typeof _tdr_running  !== 'undefined' && _tdr_running  && typeof _tdr_stop       === 'function') _tdr_stop();
+  if (typeof _dcog_running !== 'undefined' && _dcog_running && typeof _dcog_stop       === 'function') _dcog_stop();
   if (ytActivePlayer) {
     try { ytActivePlayer.destroy(); } catch(e) {}
     ytActivePlayer = null;
@@ -12294,7 +12298,10 @@ window.addEventListener('resize',function(){
 
 function openTrainingTab(id, btn) {
   document.querySelectorAll('.tr-panel').forEach(function(p){ p.style.display='none'; });
-  // Arrêter l'enregistrement si on quitte sym
+  // Arrêter caméras et enregistrement si on change d'onglet
+  if(typeof _tsym_running !=='undefined'&&_tsym_running  &&typeof _tsym_stopCamera==='function') _tsym_stopCamera();
+  if(typeof _tdr_running  !=='undefined'&&_tdr_running   &&typeof _tdr_stop       ==='function') _tdr_stop();
+  if(typeof _dcog_running !=='undefined'&&_dcog_running  &&typeof _dcog_stop      ==='function') _dcog_stop();
   if(typeof _tsym_recActive!=='undefined'&&_tsym_recActive) _tsym_stopRec();
   var panel = document.getElementById('tr-'+id);
   if(panel) panel.style.display='block';
@@ -13282,6 +13289,26 @@ function _td_getAudioCtx() {
   return _td_audioCtx;
 }
 
+/* ── Voix coaching Sensei (speechSynthesis) ──────────────────── */
+var _sensei_speaking = false;
+var _sensei_lastSpeak = 0;
+function _sensei_speak(text, minInterval) {
+  if (!window.speechSynthesis) return;
+  var now = Date.now();
+  var gap = minInterval || 3000;
+  if (_sensei_speaking || now - _sensei_lastSpeak < gap) return;
+  _sensei_speaking = true;
+  _sensei_lastSpeak = now;
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = window._lang === 'en' ? 'en-US' : 'fr-FR';
+  utt.rate  = 1.1;
+  utt.pitch = 1.0;
+  utt.volume = 0.85;
+  utt.onend = function() { _sensei_speaking = false; };
+  utt.onerror = function() { _sensei_speaking = false; };
+  window.speechSynthesis.speak(utt);
+}
+
 function _td_beep(freq, dur, vol) {
   try {
     var ctx = _td_getAudioCtx();
@@ -14036,6 +14063,7 @@ var _tsym_rafId = null;
 var _tsym_mode = 'dribble'; // dribble | shot | footwork | posture
 var _tsym_scores = []; // historique des scores
 var _tsym_frameScores = [];
+var _tsym_lastAudioScore = 0; // feedback audio franchissement seuil
 var _tsym_modelLoaded = false;
 var _tsym_stream = null;
 
@@ -14132,6 +14160,7 @@ function _tsym_startCamera() {
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
   var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:640},height:{ideal:480},facingMode:'user'},{facingMode:'user'},true];
+  var _tsym_loadTimeout = null; // fix : _lt annulable depuis stopCamera
   function tryCamera(ci){
     if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
@@ -14143,9 +14172,14 @@ function _tsym_startCamera() {
       _tsym_video.onloadedmetadata = function() {
         _tsym_video.play();
         if (status) status.textContent = _t('Chargement IA...','Loading AI...');
-        var _lt=setTimeout(function(){_tsym_onError(_t('Chargement trop long — réessaie','Loading timeout — retry'));},12000);
+        _tsym_loadTimeout = setTimeout(function(){
+          _tsym_loadTimeout = null;
+          if (_tsym_running === false) return; // caméra déjà arrêtée
+          _tsym_onError(_t('Chargement trop long — réessaie','Loading timeout — retry'));
+        }, 12000);
         _tsym_loadModel(function() {
-          clearTimeout(_lt);
+          if (_tsym_loadTimeout) { clearTimeout(_tsym_loadTimeout); _tsym_loadTimeout = null; }
+          if (!_tsym_stream) return; // stopCamera appelé entre-temps
           _tsym_startDetection();
         });
       };
@@ -14183,6 +14217,7 @@ function _tsym_startDetection() {
   if(bRec)bRec.style.display='flex';
   _tsym_running = true;
   _tsym_frameScores = [];
+  _tsym_lastAudioScore = 0;
   var btnStart = document.getElementById('tsym_btnStart');
   var btnStop  = document.getElementById('tsym_btnStop');
   var btnSave  = document.getElementById('tsym_btnSave');
@@ -14190,8 +14225,30 @@ function _tsym_startDetection() {
   if (btnStop)  btnStop.style.display  = 'flex';
   if (btnSave)  btnSave.style.display  = 'none';
   var status = document.getElementById('tsym_status');
-  if (status) status.textContent = _t('Analyse en cours...','Analysis running...');
-  _tsym_detect();
+  // Countdown 3-2-1 sur canvas
+  (function tsymCd(n){
+    if (!_tsym_running) return;
+    if (n <= 0) {
+      if(status) status.textContent = _t('Analyse en cours...','Analysis running...');
+      _tsym_detect(); return;
+    }
+    if(_tsym_canvas && _tsym_ctx) {
+      var W=_tsym_canvas.width, H=_tsym_canvas.height, ctx=_tsym_ctx;
+      _drawVideoMirror(ctx, _tsym_video, W, H);
+      ctx.save();
+      ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#f5c518';
+      ctx.font='bold '+Math.round(W*0.32)+'px Arial Narrow,Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
+      ctx.fillText(String(n), W/2, H/2);
+      ctx.shadowBlur=0; ctx.restore();
+    }
+    _td_beep(n===1?880:660, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(n===1?30:15);
+    if(status) status.textContent = String(n)+'...';
+    setTimeout(function(){ tsymCd(n-1); }, 900);
+  })(3);
 }
 
 function _tsym_detect() {
@@ -14272,6 +14329,41 @@ function _tsym_drawFrame(poses) {
     if (_tsym_frameScores.length > 60) _tsym_frameScores.shift();
     var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
     _tsym_updateScoreDisplay(avg);
+
+    // Score overlay sur canvas (HomeCourt-style : lisible sans baisser les yeux)
+    var fs = Math.round(W * 0.052);
+    var barH = Math.round(W * 0.10);
+    _tsym_ctx.save();
+    _tsym_ctx.fillStyle = 'rgba(0,0,0,0.52)';
+    _tsym_ctx.fillRect(0, 0, W, barH);
+    // Score à gauche
+    var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
+    _tsym_ctx.fillStyle = col;
+    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'left';
+    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
+    _tsym_ctx.fillText(avg+'%', Math.round(W*0.025), barH/2);
+    // Mode à droite
+    _tsym_ctx.fillStyle = '#fff';
+    _tsym_ctx.textAlign = 'right';
+    _tsym_ctx.font = 'bold '+Math.round(fs*0.65)+'px Arial Narrow,Arial,sans-serif';
+    var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
+    _tsym_ctx.fillText(modeLabel, W-Math.round(W*0.025), barH/2);
+    _tsym_ctx.shadowBlur = 0;
+    _tsym_ctx.restore();
+
+    // Feedback audio symétrie : bip discret quand score franchit 80%
+    if (!_tsym_lastAudioScore) _tsym_lastAudioScore = 0;
+    if (avg >= 80 && _tsym_lastAudioScore < 80) {
+      _td_beep(880, 0.06, 0.08);
+      if(navigator.vibrate) navigator.vibrate(15);
+      _sensei_speak(window._lang==='en'?'Excellent symmetry!':'Excellente symétrie !', 5000);
+    } else if (avg < 50 && _tsym_lastAudioScore >= 50) {
+      _td_beep(330, 0.08, 0.06);
+      _sensei_speak(window._lang==='en'?'Adjust your position':'Ajuste ta position', 5000);
+    }
+    _tsym_lastAudioScore = avg;
   }
 }
 
@@ -14401,6 +14493,15 @@ function _tsym_setMode(m) {
     b.style.color      = active ? '#f5c518' : '#7a8299';
     b.style.borderColor = active ? 'rgba(245,197,24,.5)' : '#1e2535';
   });
+  // Voix coaching : annonce le mode sélectionné
+  var modeVoice = {
+    dribble: {fr:'Mode dribble. Garde ta symétrie.', en:'Dribble mode. Keep your symmetry.'},
+    shot:    {fr:'Mode tir. Aligne tes bras.', en:'Shot mode. Align your arms.'},
+    footwork:{fr:'Mode footwork. Garde tes hanches alignées.', en:'Footwork mode. Keep your hips level.'},
+    posture: {fr:'Mode posture. Tiens-toi droit.', en:'Posture mode. Stand tall.'}
+  };
+  var mv = modeVoice[m];
+  if(mv) setTimeout(function(){ _sensei_speak(window._lang==='en'?mv.en:mv.fr, 0); }, 500);
   var desc = document.getElementById('tsym_modeDesc');
   var descs = {
     dribble:  _t('Compare la hauteur du poignet G vs D','Compares left vs right wrist height'),
@@ -14552,6 +14653,14 @@ function _tsym_onError(msg) {
 function _tsym_expandCanvas() {
   var cnt = document.getElementById('tsym_camContainer');
   if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
+  // Adapter canvas à la résolution réelle du stream
+  var cv  = document.getElementById('tsym_canvas');
+  var vid = document.getElementById('tsym_video');
+  if (cv && vid && vid.videoWidth) {
+    cv.width  = vid.videoWidth;
+    cv.height = vid.videoHeight;
+    _tsym_canvas = cv;
+  }
 }
 /* ── ENREGISTREMENT VIDÉO v2 ─────────────────────────────────
    iOS Safari  → mp4 + navigator.share()
@@ -14805,6 +14914,7 @@ var _tdr_scale      = 1;          // pixels par cm approximatif
 var _tdr_centerX    = 0.5;        // centre joueur en fraction de W
 var _tdr_calibrated = false;
 var _tdr_targets    = [];         // [{x,y,r,color,born,hit}]
+var _tdr_particles  = [];         // [{x,y,vx,vy,r,color,born,life}] — explosion hit
 var _tdr_prevWrist  = {};         // vélocité poignet
 var _tdr_score      = 0;
 var _tdr_hits       = 0;
@@ -14882,8 +14992,11 @@ function _tdr_start() {
       _tdr_video.srcObject = stream;
       _tdr_video.onloadedmetadata = function() {
         _tdr_video.play();
-        // La caméra tourne : on lance la calibration directement.
-        // _tdr_calibrate() gère elle-même l'attente du modèle IA si besoin.
+        // Adapter canvas à la résolution réelle du stream
+        if (_tdr_canvas && _tdr_video.videoWidth) {
+          _tdr_canvas.width  = _tdr_video.videoWidth;
+          _tdr_canvas.height = _tdr_video.videoHeight;
+        }
         _tdr_calibrate();
       };
     }).catch(function() { tryC(i+1); });
@@ -14901,6 +15014,7 @@ function _tdr_start() {
 
 function _tdr_stop() {
   _tdr_running = false;
+  _tdr_particles = []; // nettoyer particules résiduelles
   clearInterval(_tdr_timer);
   clearInterval(_tdr_metroSync);
   clearTimeout(_tdr_calTimer);
@@ -14963,26 +15077,28 @@ function _tdr_calibrate() {
         _tdr_centerX = 0.5; _tdr_scale = 200; _tdr_calibrated = true;
       }
       _tdr_status(_t('Prêt ! GO !','Ready! GO!'), '#2dc653');
-      setTimeout(function() { _tdr_startDrill(); }, 500);
+      // Countdown 3-2-1 avant démarrage
+      _tdr_countdown(function() { _tdr_startDrill(); });
     }
   }, 1000);
 }
 
 /* ── Boucle détection ─────────────────────────────────────────── */
 function _tdr_detect() {
+  if (!_tdr_running) return; // fix RAF orphelin
   if (!_tsym_detector || !_tdr_video) {
     _tdr_rafId = requestAnimationFrame(_tdr_detect); return;
   }
   _tsym_detector.estimatePoses(_tdr_video, {maxPoses:1, flipHorizontal:false}).then(function(poses) {
-    // Lissage sur 5 frames
+    if (!_tdr_running) return; // guard post-async
     _tdr_smoothBuf.push(poses);
     if (_tdr_smoothBuf.length > 5) _tdr_smoothBuf.shift();
     _tdr_poses = poses;
     _tdr_drawFrame(poses);
-    if (_tdr_running) _tdr_checkHits(poses);
+    _tdr_checkHits(poses);
     _tdr_rafId = requestAnimationFrame(_tdr_detect);
   }).catch(function() {
-    _tdr_rafId = requestAnimationFrame(_tdr_detect);
+    if (_tdr_running) _tdr_rafId = requestAnimationFrame(_tdr_detect);
   });
 }
 
@@ -15036,18 +15152,42 @@ function _tdr_drawFrame(poses) {
 
 function _tdr_drawTargets(ctx, W, H) {
   var now = Date.now();
+  // Proximity feedback : distance poignets → targets (pour ring d'approche)
+  var wristPositions = [];
+  ['leftWrist','rightWrist'].forEach(function(name){
+    var p = _tdr_prevWrist[name];
+    if(p) wristPositions.push(p);
+  });
+
   _tdr_targets.forEach(function(t) {
     if (t.hit) return;
     var age   = (now - t.born) / t.ttl;
     var alpha = Math.max(0, 1 - age);
-    var pulse = 1 + 0.1 * Math.sin(now / 120);
+    // Proximity : plus proche → ring plus vif
+    var proximity = 0;
+    wristPositions.forEach(function(w){
+      var dist = Math.sqrt(Math.pow(w.x-t.x,2)+Math.pow(w.y-t.y,2));
+      var prox = Math.max(0, 1 - dist/(t.r*5));
+      if(prox > proximity) proximity = prox;
+    });
+    var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
     ctx.save();
     ctx.globalAlpha = alpha;
+    // Ring d'approche : s'intensifie quand poignet s'approche
+    if(proximity > 0.15) {
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, t.r * 2.2, 0, Math.PI*2);
+      ctx.strokeStyle = t.color;
+      ctx.globalAlpha = alpha * proximity * 0.5;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = alpha;
+    }
     // Cercle extérieur pulsant
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
     ctx.strokeStyle = t.color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 + proximity*2;
     ctx.stroke();
     // Cercle intérieur plein
     ctx.beginPath();
@@ -15064,7 +15204,9 @@ function _tdr_drawTargets(ctx, W, H) {
     ctx.stroke();
     ctx.restore();
   });
-  // Flash hit + reset streak si target expirée
+  // Particules explosion
+  _tdr_drawParticles(ctx);
+  // Expiration targets
   var hadMiss = false;
   _tdr_targets = _tdr_targets.filter(function(t) {
     if (!t.hit && Date.now()-t.born > t.ttl) { hadMiss = true; return false; }
@@ -15142,7 +15284,7 @@ function _tdr_checkHits(poses) {
         var freq = rt < 500 ? 880 : rt < 1000 ? 660 : 440;
         var vol  = rt < 500 ? 0.15 : 0.08;
         _td_beep(freq, 0.1, vol);
-        if (_tdr_streak >= 5) _td_beep(1100, 0.05, 0.1); // son bonus streak
+        if (_tdr_streak >= 5) { _td_beep(1100, 0.05, 0.1); _sensei_speak(window._lang==='en'?'On fire!':'En feu !', 4000); }
         if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
         _tdr_updateScoreDisplay();
       }
@@ -15151,18 +15293,94 @@ function _tdr_checkHits(poses) {
 }
 
 function _tdr_flashHit(t) {
-  if (!_tdr_ctx || !_tdr_canvas) return;
-  var ctx = _tdr_ctx;
-  ctx.save();
-  ctx.globalAlpha = 0.7;
-  ctx.fillStyle = t.color;
-  ctx.beginPath();
-  ctx.arc(t.x, t.y, t.r*2, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
+  // Explosion HomeCourt-style : 12 particules + ring expansif
+  var n = 12;
+  for (var i=0; i<n; i++) {
+    var angle = (i/n) * Math.PI*2;
+    var speed = 2.5 + Math.random()*3;
+    _tdr_particles.push({
+      x: t.x, y: t.y,
+      vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+      r: 3 + Math.random()*4,
+      color: t.color,
+      born: Date.now(), life: 500 + Math.random()*200
+    });
+  }
+  // Ring expansif
+  _tdr_particles.push({
+    x:t.x, y:t.y, vx:0, vy:0,
+    r: t.r, color:t.color,
+    born:Date.now(), life:400,
+    ring:true, maxR: t.r*3
+  });
+}
+
+function _tdr_drawParticles(ctx) {
+  var now = Date.now();
+  _tdr_particles = _tdr_particles.filter(function(p) {
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life;
+    var alpha = 1 - progress;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    if (p.ring) {
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 3 * (1-progress);
+      ctx.stroke();
+    } else {
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r*(1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
 }
 
 /* ── Drill ────────────────────────────────────────────────────── */
+function _tdr_countdown(cb) {
+  // Countdown 3-2-1 HomeCourt-style dessiné sur le canvas
+  var cv = _tdr_canvas, ctx = _tdr_ctx;
+  if (!cv || !ctx) { cb(); return; }
+  var W = cv.width, H = cv.height;
+  var n = 3;
+  var en = window._lang === 'en';
+  function drawN(num) {
+    _drawVideoMirror(ctx, _tdr_video, W, H);
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold '+Math.round(W*0.35)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 20;
+    ctx.fillText(String(num), W/2, H/2);
+    if (num === 1) {
+      ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(W*0.22));
+    }
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    _td_beep(num===1?880:660, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(num===1?30:15);
+  }
+  function tick() {
+    if (n <= 0) { cb(); return; }
+    drawN(n--);
+    setTimeout(tick, 900);
+  }
+  tick();
+}
+
 function _tdr_startDrill() {
   _tdr_running = true;
   _tdr_score   = 0;
@@ -15171,6 +15389,7 @@ function _tdr_startDrill() {
   _tdr_total   = 0;
   _tdr_sec     = _tdr_duration;
   _tdr_targets   = [];
+  _tdr_particles  = [];
   _tdr_prevWrist  = {};
   _tdr_reactionTimes = [];
   _tdr_bpm = _td_metroBPM || 80;
@@ -15239,6 +15458,12 @@ function _tdr_endDrill() {
   // Afficher résultats
   _tdr_showResults(_tdr_score, _tdr_hits, _tdr_total, avgRT);
   _tdr_status(_t('Session terminée !','Session done!'), '#2dc653');
+  // Voix coaching : annonce le score final
+  var pctEnd = _tdr_total > 0 ? Math.round(_tdr_hits/_tdr_total*100) : 0;
+  var msg = window._lang==='en'
+    ? 'Session done. Score '+_tdr_score+'. '+pctEnd+' percent accuracy.'
+    : 'Session terminée. Score '+_tdr_score+'. '+pctEnd+' pourcent de précision.';
+  setTimeout(function(){ _sensei_speak(msg, 0); }, 400);
   // Proposer sauvegarde
   var btnSave = document.getElementById('tdr_btnSave');
   if (btnSave) btnSave.style.display = 'flex';
@@ -15566,6 +15791,11 @@ function _dcog_start() {
       _dcog_video.srcObject = stream;
       _dcog_video.onloadedmetadata = function() {
         _dcog_video.play();
+        // Adapter canvas à la résolution réelle du stream
+        if (_dcog_canvas && _dcog_video.videoWidth) {
+          _dcog_canvas.width  = _dcog_video.videoWidth;
+          _dcog_canvas.height = _dcog_video.videoHeight;
+        }
         // Attendre le modèle IA — même pattern que _tdr_calibrate
         if (!_tsym_detector) {
           _dcog_setStatus(_t('Chargement IA...','Loading AI...'), '#f5c518');
@@ -15591,6 +15821,7 @@ function _dcog_start() {
 
 function _dcog_stop() {
   _dcog_running = false;
+  _dcog_particles = []; // nettoyer particules résiduelles
   if (_dcog_rafId) { cancelAnimationFrame(_dcog_rafId); _dcog_rafId = null; }
   if (_dcog_stream) { _dcog_stream.getTracks().forEach(function(t){t.stop();}); _dcog_stream = null; }
   if (_dcog_video) _dcog_video.srcObject = null;
@@ -15651,8 +15882,25 @@ function _dcog_launchDrill() {
   var bRec = document.getElementById('dcog_btnRec');
   if (bRec) bRec.style.display = 'flex';
   _dcog_setStatus(_t('GO !','GO!'), '#2dc653');
-  // Petit délai pour laisser le DOM se mettre à jour avant le 1er frame
-  setTimeout(function() { if (_dcog_running) _dcog_detect(); }, 50);
+  // Countdown 3-2-1 puis démarrage détection
+  (function dcogCountdown(n){
+    if (!_dcog_running) return;
+    var cv=_dcog_canvas, ctx=_dcog_ctx;
+    if (!cv || !ctx || n<=0) { setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50); return; }
+    var W=cv.width, H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#f5c518';
+    ctx.font='bold '+Math.round(W*0.32)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
+    ctx.fillText(String(n), W/2, H/2);
+    ctx.shadowBlur=0; ctx.restore();
+    _td_beep(n===1?880:660, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(n===1?30:15);
+    setTimeout(function(){ dcogCountdown(n-1); }, 900);
+  })(3);
 }
 
 /* ── Detection loop (MoveNet) ────────────────────────────────── */
@@ -15679,17 +15927,15 @@ function _dcog_drawFrame(poses) {
   var cv = _dcog_canvas, ctx = _dcog_ctx;
   if (!cv || !ctx || !_dcog_video) return;
   var W = cv.width, H = cv.height;
-  _drawVideoMirror(ctx, _dcog_video, W, H);
-  // Mirror video
-  ctx.save();
-  ctx.scale(-1, 1);
-  ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
-  ctx.restore();
+  // Video affichée par le <video> HTML en dessous — canvas overlay transparent
+  ctx.clearRect(0, 0, W, H);
   // Pas de squelette dans Cognitif — inutile et visuellement gênant
-  // Draw math targets
+  // Draw math targets + particules
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
   }
+  // Particules explosion toujours dessinées (persistent après hit)
+  if (_dcog_particles.length > 0) _dcog_drawParticles(ctx);
   // Draw two ball height lines on canvas
   if (_dcog_drill === 'twoball' && _dcog_running &&
       (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight')) {
@@ -15707,6 +15953,7 @@ function _dcog_drawFrame(poses) {
    3 targets fixes positionnées sur le canvas,
    le joueur touche la bonne avec son poignet.
 ═══════════════════════════════════════════ */
+var _dcog_particles     = []; // explosion hit math targets
 var _dcog_mathAnswer    = 0;
 var _dcog_mathChoices   = [];
 var _dcog_mathTargets   = [];   // variable propre au module — n'interfère pas avec _tdr_targets
@@ -15776,6 +16023,14 @@ function _dcog_analyzeMathZone(poses) {
         var vol  = rt < 500 ? 0.15 : 0.08;
         _td_beep(freq, 0.1, vol);
         if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
+        _dcog_flashHit(t, _dcog_ctx); // explosion particules
+        // Voix coaching sur réponse
+        if (t.mathVal === _dcog_mathAnswer) {
+          if(rt < 600) _sensei_speak(window._lang==='en'?'Fast!':'Rapide !', 2500);
+          else _sensei_speak(window._lang==='en'?'Good':'Bien', 2500);
+        } else {
+          _sensei_speak(window._lang==='en'?'Wrong answer':'Mauvaise réponse', 2500);
+        }
         // Flash visuel identique à TDR
         if (_dcog_ctx) {
           _dcog_ctx.save();
@@ -15796,18 +16051,43 @@ function _dcog_analyzeMathZone(poses) {
    Seule différence : affiche mathVal (chiffre) au lieu de la croix */
 function _dcog_drawMathTargets(ctx, W, H) {
   var now = Date.now();
+  // Positions poignets pour proximity feedback
+  var dcWrists = [];
+  if (_dcog_canvas && _dcog_video) {
+    var sx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
+    var sy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
+    ['leftWrist','rightWrist'].forEach(function(name){
+      var p = (_dcog_prevWrist||{})[name];
+      if(p) dcWrists.push({x: _dcog_canvas.width - p.x*sx, y: p.y*sy});
+    });
+  }
   _dcog_mathTargets.forEach(function(t) {
     if (t.hit && (now - t.hitTime) > 400) return;
     var age   = (now - t.born) / t.ttl;
     var alpha = Math.max(0, 1 - age);
-    var pulse = 1 + 0.1 * Math.sin(now / 120);
+    // Proximity feedback
+    var proximity = 0;
+    dcWrists.forEach(function(w){
+      var dist = Math.sqrt(Math.pow(w.x-t.x,2)+Math.pow(w.y-t.y,2));
+      var prox = Math.max(0, 1 - dist/(t.r*5));
+      if(prox > proximity) proximity = prox;
+    });
+    var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
     ctx.save();
     ctx.globalAlpha = alpha;
+    if(!t.hit && proximity > 0.15) {
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, t.r * 2.2, 0, Math.PI*2);
+      ctx.strokeStyle = t.color;
+      ctx.globalAlpha = alpha * proximity * 0.5;
+      ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.globalAlpha = alpha;
+    }
     // Cercle extérieur pulsant — identique à _tdr_
     ctx.beginPath();
     ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
     ctx.strokeStyle = t.hit ? '#fff' : t.color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 + (t.hit ? 0 : proximity*2);
     ctx.stroke();
     // Cercle intérieur plein
     ctx.beginPath();
@@ -15830,6 +16110,43 @@ function _dcog_drawMathTargets(ctx, W, H) {
   });
 }
 function _dcog_drawMathZones() {}
+
+function _dcog_flashHit(t, ctx) {
+  var n = 10;
+  for (var i=0; i<n; i++) {
+    var angle = (i/n)*Math.PI*2;
+    var speed = 2 + Math.random()*2.5;
+    _dcog_particles.push({
+      x:t.x, y:t.y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+      r:3+Math.random()*3, color:t.color,
+      born:Date.now(), life:450+Math.random()*150
+    });
+  }
+  _dcog_particles.push({
+    x:t.x, y:t.y, vx:0, vy:0, r:t.r, color:t.color,
+    born:Date.now(), life:350, ring:true, maxR:t.r*2.8
+  });
+}
+
+function _dcog_drawParticles(ctx) {
+  var now = Date.now();
+  _dcog_particles = _dcog_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age/p.life, alpha = 1-progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring) {
+      var curR = p.r + (p.maxR-p.r)*progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 2.5*(1-progress); ctx.stroke();
+    } else {
+      p.x+=p.vx; p.y+=p.vy; p.vx*=0.91; p.vy*=0.91;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r*(1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore(); return true;
+  });
+}
 
 function _dcog_genQuestion() {
   var a, b, op, answer, text;
@@ -16030,6 +16347,7 @@ function _dcog_startSprintTimer() {
       clearInterval(_dcog_sprintInt);
       _td_beep(1046, 0.3, 0.4);
       _dcog_setStatus(_t('OBJECTIF ATTEINT ! 🎉','GOAL REACHED! 🎉'), '#2dc653');
+      _sensei_speak(window._lang==='en'?'Goal reached! Amazing work!':'Objectif atteint ! Excellent travail !', 0);
       _dcog_stop();
     }
   }, 500);
@@ -16089,6 +16407,19 @@ function _dcog_analyzeHeight(poses) {
   var inZone = normY >= zoneMin && normY <= zoneMax;
   _dcog_heightFrames++;
   if (inZone) _dcog_heightInZone++;
+  // Audio feedback : bip court à l'entrée dans la zone
+  if (inZone && !_dcog_heightInZoneNow) {
+    _td_beep(660, 0.05, 0.07);
+    if(navigator.vibrate) navigator.vibrate(10);
+    _dcog_heightZoneEnterTime = Date.now();
+  } else if (!inZone) {
+    _dcog_heightZoneEnterTime = 0;
+  }
+  // Voix coaching : "Well done" après 3s dans la zone
+  if (inZone && _dcog_heightZoneEnterTime > 0 && Date.now()-_dcog_heightZoneEnterTime > 3000) {
+    _sensei_speak(window._lang==='en'?'Perfect height, keep it up!':'Parfaite hauteur, continue !', 6000);
+    _dcog_heightZoneEnterTime = Date.now(); // reset pour éviter spam
+  }
   // Stocker pour drawHeightLine (canvas)
   _dcog_heightZonePx  = zonePx;
   _dcog_heightWristPx = wristY;
@@ -16111,6 +16442,7 @@ function _dcog_analyzeHeight(poses) {
 var _dcog_heightZonePx   = null;
 var _dcog_heightWristPx  = null;
 var _dcog_heightInZoneNow= false;
+var _dcog_heightZoneEnterTime = 0; // timestamp entrée en zone
 
 function _dcog_drawHeightLine(ctx, W, H) {
   if (!ctx || _dcog_heightZonePx === null) return;
