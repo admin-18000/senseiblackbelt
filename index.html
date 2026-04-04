@@ -1254,11 +1254,11 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- CAMERA CANVAS -->
   <div class="tr-card" style="padding:12px;position:relative">
-    <div id="dcog_camContainer" style="display:none;width:100%;aspect-ratio:3/4;max-height:70vh;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
-      <video id="dcog_video" width="720" height="960" playsinline muted
+    <div id="dcog_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
+      <video id="dcog_video" width="640" height="480" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="dcog_canvas" width="720" height="960"
-        style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
+      <canvas id="dcog_canvas" width="640" height="480"
+        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
       <!-- Math overlay — absolute over canvas -->
       <div id="dcog_mathOverlay"
         style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
@@ -1381,11 +1381,11 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- CAMÉRA + CANVAS -->
   <div class="tr-card">
     <div class="tr-card-title">📷 CAMÉRA — ANALYSE EN TEMPS RÉEL</div>
-    <div id="tsym_camContainer" style="display:none;width:100%;aspect-ratio:3/4;max-height:70vh;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tsym_video" width="720" height="960" playsinline muted
+    <div id="tsym_camContainer" style="display:none;width:100%;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
+      <video id="tsym_video" width="640" height="480" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="tsym_canvas" width="720" height="960"
-        style="width:100%;height:100%;display:block;background:#0d1117;border-radius:10px"></canvas>
+      <canvas id="tsym_canvas" width="640" height="480"
+        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
     </div>
     <div id="tsym_status" style="text-align:center;font-size:11px;color:#7a8299;margin-bottom:12px;min-height:18px;letter-spacing:.5px">
       Appuie sur DÉMARRER pour activer la caméra
@@ -1618,11 +1618,11 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
 
     <!-- Canvas caméra -->
-    <div id="tdr_camContainer" style="display:none;width:100%;aspect-ratio:3/4;max-height:70vh;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
-      <video id="tdr_video" width="720" height="960" playsinline muted
+    <div id="tdr_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
+      <video id="tdr_video" width="640" height="480" playsinline muted
         style="display:none;width:100%;height:100%;object-fit:cover"></video>
-      <canvas id="tdr_canvas" width="720" height="960"
-        style="width:100%;height:100%;display:block;background:#0d1117"></canvas>
+      <canvas id="tdr_canvas" width="640" height="480"
+        style="width:100%;height:auto;display:block;background:#0d1117"></canvas>
     </div>
 
     <!-- Status + score live -->
@@ -14122,7 +14122,7 @@ function _tsym_startCamera() {
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
-  var _vConstraints=[{width:{ideal:720},height:{ideal:960},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:720},height:{ideal:480},facingMode:'user'},{facingMode:'user'},true];
+  var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:640},height:{ideal:480},facingMode:'user'},{facingMode:'user'},true];
   function tryCamera(ci){
     if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
@@ -14858,7 +14858,7 @@ function _tdr_start() {
     _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
   _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
-  var constraints = [{video:{width:{ideal:720},height:{ideal:960},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:720},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
   function tryC(i) {
     if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
@@ -15529,8 +15529,8 @@ function _dcog_start() {
   _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [
     {video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'}},
-    {video:{width:{ideal:720},height:{ideal:960},frameRate:{ideal:30},facingMode:'user'}},
-    {video:{facingMode:'user',width:{ideal:720},height:{ideal:480}}},
+    {video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},
+    {video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},
     {video:{facingMode:'user'}},
     {video:true}
   ];
@@ -15702,10 +15702,10 @@ function _dcog_nextQuestion() {
   _dcog_mathChoices = _dcog_genChoices(q.answer);
   // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
   var cv = _dcog_canvas;
-  var W  = cv ? cv.width  : 960;
-  var H  = cv ? cv.height : 960;
+  var W  = cv ? cv.width  : 480;
+  var H  = cv ? cv.height : 480;
   var r  = Math.round(W * 0.13);   // ~94px sur 720 → ~50px affiché sur mobile
-  var y  = Math.round(H * 0.75);
+  var y  = Math.round(H * 0.72);
   var colors = ['#2dc653','#f5c518','#e63946'];
   _dcog_mathTargets = [
     Math.round(W/6), Math.round(W/2), Math.round(5*W/6)
@@ -15723,8 +15723,8 @@ function _dcog_analyzeMathZone(poses) {
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
-  var sx = W / (_dcog_video.videoWidth  || 720);
-  var sy = H / (_dcog_video.videoHeight || 960);
+  var sx = W / (_dcog_video.videoWidth  || 640);
+  var sy = H / (_dcog_video.videoHeight || 480);
   ['leftWrist','rightWrist'].forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
@@ -15867,7 +15867,7 @@ var _dcog_wristPrevDir   = 0;
 function _dcog_detectWristBpm(poses) {
   if (!poses || !poses[0] || !_dcog_canvas || !_dcog_video) return;
   var H  = _dcog_canvas.height;
-  var sy = H / (_dcog_video.videoHeight || 960);
+  var sy = H / (_dcog_video.videoHeight || 480);
   var lW = _tsym_kp_fast(poses, 'leftWrist');
   var rW = _tsym_kp_fast(poses, 'rightWrist');
   // Poignet le plus bas = celui qui dribble
@@ -15928,7 +15928,7 @@ function _dcog_analyzeSprintWrist(poses) {
   if (!poses || !poses[0] || !_dcog_running) return;
   var lW = _tsym_kp_fast(poses, 'leftWrist');
   var rW = _tsym_kp_fast(poses, 'rightWrist');
-  var H  = _dcog_canvas ? _dcog_canvas.height : 960;
+  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
   var sy = H / (_dcog_video ? (_dcog_video.videoHeight||480) : 480);
   // Poignet le plus bas = celui qui dribble
   var wrist = null;
@@ -15997,10 +15997,10 @@ function _dcog_startSprintTimer() {
 function _dcog_analyzeHeight(poses) {
   if (!poses || poses.length === 0) return;
   var kps  = poses[0].keypoints;
-  var W    = _dcog_canvas ? _dcog_canvas.width  : 960;
-  var H    = _dcog_canvas ? _dcog_canvas.height : 960;
-  var sx   = W / (_dcog_video.videoWidth  || 720);
-  var sy   = H / (_dcog_video.videoHeight || 960);
+  var W    = _dcog_canvas ? _dcog_canvas.width  : 480;
+  var H    = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sx   = W / (_dcog_video.videoWidth  || 640);
+  var sy   = H / (_dcog_video.videoHeight || 480);
 
   function kp(name) { return _tsym_kp(poses, name); }
 
@@ -16109,9 +16109,9 @@ function _dcog_analyzeTwoBall(poses) {
   var rW = _tsym_kp_fast(poses, 'rightWrist');
   if (!lW || !rW) return;
 
-  var W  = _dcog_canvas ? _dcog_canvas.width  : 960;
-  var H  = _dcog_canvas ? _dcog_canvas.height : 960;
-  var sy = H / (_dcog_video.videoHeight || 960);
+  var W  = _dcog_canvas ? _dcog_canvas.width  : 480;
+  var H  = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sy = H / (_dcog_video.videoHeight || 480);
   var lY = lW.y * sy;
   var rY = rW.y * sy;
 
@@ -16197,7 +16197,7 @@ var _dcog_tbTotalFrames2 = 0;     // total frames mesurés (height modes)
 
 function _dcog_drawTwoBallLines(ctx, W, H) {
   if (!ctx) return;
-  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 960) : 480);
+  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 480) : 480);
   ctx.save();
 
   if (_dcog_tbMode === 'sameheight') {
