@@ -1254,11 +1254,11 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- CAMERA CANVAS -->
   <div class="tr-card" style="padding:12px;position:relative">
-    <div id="dcog_camContainer" style="display:none;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
+    <div id="dcog_camContainer" style="display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2);position:relative;background:#0d1117">
       <video id="dcog_video" width="640" height="480" playsinline muted
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
+        style="display:none"></video>
       <canvas id="dcog_canvas" width="640" height="480"
-        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
+        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
       <!-- Math overlay — absolute over canvas -->
       <div id="dcog_mathOverlay"
         style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
@@ -1381,11 +1381,11 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- CAMÉRA + CANVAS -->
   <div class="tr-card">
     <div class="tr-card-title">📷 CAMÉRA — ANALYSE EN TEMPS RÉEL</div>
-    <div id="tsym_camContainer" style="position:relative;display:none;width:100%;aspect-ratio:4/3;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
+    <div id="tsym_camContainer" style="position:relative;display:none;width:100%;height:300px;background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(245,197,24,.2)">
             <video id="tsym_video" width="640" height="480" playsinline muted
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
+        style="display:none"></video>
       <canvas id="tsym_canvas" width="640" height="480"
-        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
+        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
     </div>
     <div id="tsym_status" style="text-align:center;font-size:11px;color:#7a8299;margin-bottom:12px;min-height:18px;letter-spacing:.5px">
       Appuie sur DÉMARRER pour activer la caméra
@@ -1618,11 +1618,11 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
 
     <!-- Canvas caméra -->
-    <div id="tdr_camContainer" style="position:relative;display:none;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
+    <div id="tdr_camContainer" style="position:relative;display:none;width:100%;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(245,197,24,.2)">
             <video id="tdr_video" width="640" height="480" playsinline muted
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;transform:scaleX(-1)"></video>
+        style="display:none"></video>
       <canvas id="tdr_canvas" width="640" height="480"
-        style="position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;border-radius:10px"></canvas>
+        style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
     </div>
 
     <!-- Status + score live -->
@@ -14018,6 +14018,7 @@ function _trApplyLang() {
 ══════════════════════════════════════════════════════════════ */
 
 var _initTraining_sym_done = false;
+var _cam_frameSkip = 0; // throttle MoveNet mobile
 var _tsym_detector = null;
 var _tsym_video = null;
 var _tsym_canvas = null;
@@ -14187,6 +14188,8 @@ function _tsym_startDetection() {
 
 function _tsym_detect() {
   if (!_tsym_running || !_tsym_detector || !_tsym_video) return;
+  _cam_frameSkip = (_cam_frameSkip + 1) % 2; // traiter 1 frame sur 2 sur mobile
+  if (_cam_frameSkip !== 0) { requestAnimationFrame(_tsym_loop); return; }
   _tsym_detector.estimatePoses(_tsym_video).then(function(poses) {
     _tsym_drawFrame(poses);
     if (_tsym_running) _tsym_rafId = requestAnimationFrame(_tsym_detect);
@@ -14225,6 +14228,22 @@ function _tsym_kp(poses, name) {
 
 // Dessine la video en crop centré (pas d'étirement) + miroir
 
+function _drawVideoMirror(ctx, video, W, H) {
+  if (!video || !video.videoWidth || video.readyState < 2) {
+    ctx.clearRect(0, 0, W, H);
+    return;
+  }
+  var vw = video.videoWidth, vh = video.videoHeight;
+  var cr = W / H, vr = vw / vh;
+  var sx, sy, sw, sh;
+  if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw-sw)/2; sy = 0; }
+  else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh-sh)/2; }
+  ctx.save();
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, sx, sy, sw, sh, -W, 0, W, H);
+  ctx.restore();
+}
+
 function _tsym_drawFrame(poses) {
   if (!_tsym_ctx || !_tsym_canvas || !_tsym_video) return;
   var W = _tsym_canvas.width, H = _tsym_canvas.height;
@@ -14232,7 +14251,7 @@ function _tsym_drawFrame(poses) {
   // Miroir vidéo
   _tsym_ctx.save();
   _tsym_ctx.scale(-1, 1);
-  _tsym_ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
+  _drawVideoMirror(_tsym_ctx, _tsym_video, W, H);
   _tsym_ctx.restore();
 
   if (!poses || !poses[0]) return;
@@ -14982,7 +15001,7 @@ function _tdr_drawFrame(poses) {
   var W = cv.width, H = cv.height;
   ctx.clearRect(0,0,W,H);
   // Miroir vidéo
-  ctx.clearRect(0, 0, W, H); // video affichée en HTML, canvas transparent
+  _drawVideoMirror(ctx, _tdr_video, W, H);
   // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
@@ -15081,7 +15100,7 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.06), color: p.color,
+      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.08), color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -15105,7 +15124,7 @@ function _tdr_checkHits(poses) {
   wrists.forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
-    var wx = kp.x * sx; // miroir géré par CSS transform:scaleX(-1)
+    var wx = W - kp.x * sx; // miroir JS aligné avec drawImage
     var wy = kp.y * sy;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
@@ -15662,7 +15681,7 @@ function _dcog_drawFrame(poses) {
   var cv = _dcog_canvas, ctx = _dcog_ctx;
   if (!cv || !ctx || !_dcog_video) return;
   var W = cv.width, H = cv.height;
-  ctx.clearRect(0, 0, W, H);
+  _drawVideoMirror(ctx, _dcog_video, W, H);
   // Mirror video
   ctx.save();
   ctx.scale(-1, 1);
@@ -15708,11 +15727,11 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 480;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.06);   // 6% de W = 38px sur 640
+  var r  = Math.round(W * 0.08);   // 8% de W = 51px sur 640
   var y  = Math.round(H * 0.72);
   var colors = ['#2dc653','#f5c518','#e63946'];
   _dcog_mathTargets = [
-    Math.round(W/6), Math.round(W/2), Math.round(5*W/6)
+    Math.round(W*0.20), Math.round(W*0.50), Math.round(W*0.80)
   ].map(function(x, i) {
     return {x:x, y:y, r:r, color:colors[i],
             born:Date.now(), ttl:99999, hit:false, hitTime:0,
@@ -15734,7 +15753,7 @@ function _dcog_analyzeMathZone(poses) {
   ['leftWrist','rightWrist'].forEach(function(name) {
     var kp = _tsym_kp_fast(poses, name);  // seuil bas pour mouvement rapide
     if (!kp) return;
-    var wx = kp.x * sx; // miroir géré par CSS transform:scaleX(-1)
+    var wx = W - kp.x * sx; // miroir JS aligné avec drawImage
     var wy = kp.y * sy;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
