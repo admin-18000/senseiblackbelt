@@ -14653,14 +14653,6 @@ function _tsym_onError(msg) {
 function _tsym_expandCanvas() {
   var cnt = document.getElementById('tsym_camContainer');
   if (cnt) { cnt.style.display = 'block'; cnt.style.height = '300px'; }
-  // Adapter canvas à la résolution réelle du stream
-  var cv  = document.getElementById('tsym_canvas');
-  var vid = document.getElementById('tsym_video');
-  if (cv && vid && vid.videoWidth) {
-    cv.width  = vid.videoWidth;
-    cv.height = vid.videoHeight;
-    _tsym_canvas = cv;
-  }
 }
 /* ── ENREGISTREMENT VIDÉO v2 ─────────────────────────────────
    iOS Safari  → mp4 + navigator.share()
@@ -14992,11 +14984,6 @@ function _tdr_start() {
       _tdr_video.srcObject = stream;
       _tdr_video.onloadedmetadata = function() {
         _tdr_video.play();
-        // Adapter canvas à la résolution réelle du stream
-        if (_tdr_canvas && _tdr_video.videoWidth) {
-          _tdr_canvas.width  = _tdr_video.videoWidth;
-          _tdr_canvas.height = _tdr_video.videoHeight;
-        }
         _tdr_calibrate();
       };
     }).catch(function() { tryC(i+1); });
@@ -15247,8 +15234,7 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      // Rayon adaptatif : ~6.5% largeur — réduit vs avant pour compenser résolution native
-      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.065), color: p.color,
+      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.08), color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -15813,11 +15799,6 @@ function _dcog_start() {
       _dcog_video.srcObject = stream;
       _dcog_video.onloadedmetadata = function() {
         _dcog_video.play();
-        // Adapter canvas à la résolution réelle du stream
-        if (_dcog_canvas && _dcog_video.videoWidth) {
-          _dcog_canvas.width  = _dcog_video.videoWidth;
-          _dcog_canvas.height = _dcog_video.videoHeight;
-        }
         // Attendre le modèle IA — même pattern que _tdr_calibrate
         if (!_tsym_detector) {
           _dcog_setStatus(_t('Chargement IA...','Loading AI...'), '#f5c518');
@@ -15999,7 +15980,7 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.065); // adaptatif résolution native
+  var r  = Math.round(W * 0.08);
   var colors = ['#2dc653','#f5c518','#e63946'];
   // 9 zones aléatoires — grille 3x3 évitant les bords
   var zones = [
