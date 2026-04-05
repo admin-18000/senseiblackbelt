@@ -15891,7 +15891,8 @@ function _dcog_launchDrill() {
     var cv=_dcog_canvas, ctx=_dcog_ctx;
     if (!cv || !ctx || n<=0) { setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50); return; }
     var W=cv.width, H=cv.height;
-    ctx.clearRect(0,0,W,H);
+    // Vidéo en fond avant l'overlay (évite l'écran noir au démarrage)
+    _drawVideoMirror(ctx, _dcog_video, W, H);
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#f5c518';
