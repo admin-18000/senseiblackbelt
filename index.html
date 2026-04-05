@@ -14288,6 +14288,24 @@ function _tsym_kp(poses, name) {
   return (k && k.score > 0.35) ? k : null;
 }
 
+// Extrapole la position de la MAIN depuis le vecteur coude→poignet (+25%)
+// Corrige le décalage systématique entre poignet MoveNet et point de contact réel
+function _tsym_kp_hand(poses, side) {
+  // side : 'left' ou 'right'
+  var elbowName  = side + 'Elbow';
+  var wristName  = side + 'Wrist';
+  var elbow = _tsym_kp_fast(poses, elbowName);
+  var wrist = _tsym_kp_fast(poses, wristName);
+  if (!wrist) return null;
+  if (!elbow) return wrist; // fallback : poignet brut si coude non détecté
+  // Prolonger le vecteur coude→poignet de 25% au-delà du poignet
+  return {
+    x: wrist.x + (wrist.x - elbow.x) * 0.25,
+    y: wrist.y + (wrist.y - elbow.y) * 0.25,
+    score: wrist.score
+  };
+}
+
 
 // Dessine la video en crop centré (pas d'étirement) + miroir
 
@@ -15219,13 +15237,16 @@ function _tdr_drawTargets(ctx, W, H) {
 function _tdr_spawnTarget() {
   if (!_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  // Positions fixes en % du canvas — indépendantes de la calibration
+  // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
+  // Si non calibré : centerX = 0.5 (fallback symétrique)
+  var cx = (_tdr_calibrated && _tdr_centerX) ? _tdr_centerX : 0.5;
+  var spread = 0.28; // écart gauche/droite depuis le centre
   var positions = [
-    {x: W*0.25, y: H*0.50, color:'#2dc653'},  // gauche milieu
-    {x: W*0.75, y: H*0.50, color:'#e63946'},  // droite milieu
-    {x: W*0.50, y: H*0.30, color:'#f5c518'},  // centre haut
-    {x: W*0.25, y: H*0.70, color:'#4ecdc4'},  // gauche bas
-    {x: W*0.75, y: H*0.70, color:'#7b2d8b'},  // droite bas
+    {x: W*(cx - spread), y: H*0.50, color:'#2dc653'},  // gauche milieu
+    {x: W*(cx + spread), y: H*0.50, color:'#e63946'},  // droite milieu
+    {x: W*cx,            y: H*0.28, color:'#f5c518'},  // centre haut
+    {x: W*(cx - spread), y: H*0.72, color:'#4ecdc4'},  // gauche bas
+    {x: W*(cx + spread), y: H*0.72, color:'#7b2d8b'},  // droite bas
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -15254,13 +15275,15 @@ function _tdr_checkHits(poses) {
   var sx = W / (_tdr_video ? _tdr_video.videoWidth : W);
   var sy = H / (_tdr_video ? _tdr_video.videoHeight : H);
   // Les deux poignets
-  var wrists = ['leftWrist','rightWrist'];
-  wrists.forEach(function(name) {
-    var kp = _tsym_kp_fast(poses, name);
+  var sides = ['left','right'];
+  sides.forEach(function(side) {
+    var name = side + 'Wrist';
+    // Extrapoler la position de la main (coude→poignet +25%) pour corriger le décalage MoveNet
+    var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var wx = W - kp.x * sx;
     var wy = kp.y * sy;
-    // Vélocité : hit uniquement si poignet en mouvement (>15px)
+    // Vélocité : hit uniquement si main en mouvement
     var prev = _tdr_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdr_prevWrist[name] = {x:wx, y:wy};
@@ -16008,8 +16031,10 @@ function _dcog_analyzeMathZone(poses) {
   var H  = _dcog_canvas.height;
   var sx = W / (_dcog_video.videoWidth  || 640);
   var sy = H / (_dcog_video.videoHeight || 480);
-  ['leftWrist','rightWrist'].forEach(function(name) {
-    var kp = _tsym_kp_fast(poses, name);
+  ['left','right'].forEach(function(side) {
+    var name = side + 'Wrist';
+    // Extrapoler la position de la main (coude→poignet +25%)
+    var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var wx = W - kp.x * sx;
     var wy = kp.y * sy;
