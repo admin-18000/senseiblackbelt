@@ -2390,6 +2390,68 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
     </div>
 
+    <!-- ── SH7 : THÉORÈME DE SHANNON ── -->
+    <div class="vis-sh" data-i18n="vis_sh7">🎯 THÉORÈME DE SHANNON &amp; DRIBBLE</div>
+
+    <div class="vis-card" id="vis-card-shannon">
+      <div class="vis-card-hd">
+        <span style="font-size:22px">🧮</span>
+        <div>
+          <div class="vis-card-title" data-i18n="vis_card19_title">THÉORÈME DU DRIBBLE À N BALLONS</div>
+          <div class="vis-formula">(F + D) × H = (V + D) × N</div>
+        </div>
+        <span class="vis-tag vis-tag-green" data-i18n="vis_tag19">🧮 SHANNON 1980</span>
+      </div>
+      <div class="vis-desc" data-i18n="vis_card19_desc">Claude Shannon — père de la théorie de l'information — a prouvé mathématiquement les limites du jonglage. Appliqué au basketball : plus D (contact main/ballon) est court, plus on peut gérer de ballons simultanément — mais la fenêtre d'erreur se réduit exponentiellement. Kyrie Irving : D ≈ 0.08s. Joueur moyen : D ≈ 0.18s.</div>
+      <div class="vis-wrap" style="height:clamp(280px,55vw,360px)">
+        <canvas id="visu-shannon"></canvas>
+      </div>
+      <!-- Contrôles -->
+      <div id="shannon_controls" style="margin-top:14px">
+        <!-- Sélecteur ballons -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+          <span style="font-family:var(--font-cond);font-size:10px;letter-spacing:1px;color:var(--muted)" data-i18n="sh_lbl_balls">BALLONS :</span>
+          <button id="sh_btn2" onclick="_sh_setBalls(2)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid rgba(45,198,83,.5);background:rgba(45,198,83,.15);color:#2dc653;cursor:pointer">2</button>
+          <button id="sh_btn3" onclick="_sh_setBalls(3)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">3</button>
+        </div>
+        <!-- Slider dwell -->
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-family:var(--font-cond);font-size:10px;letter-spacing:1px;color:var(--muted)" data-i18n="sh_lbl_dwell">D — CONTACT MAIN/BALLON</span>
+            <span style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#f5c518"><span id="sh_dwellval">0.12</span>s</span>
+          </div>
+          <input type="range" id="sh_dwell" min="5" max="40" value="12" step="1" style="width:100%;accent-color:#f5c518">
+        </div>
+        <!-- Stats Shannon -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <div style="flex:1;min-width:100px;background:rgba(45,198,83,.08);border:1px solid rgba(45,198,83,.2);border-radius:8px;padding:10px">
+            <div style="font-family:var(--font-cond);font-size:9px;letter-spacing:1px;color:rgba(45,198,83,.7)" data-i18n="sh_lbl_flight">TEMPS DE VOL F</div>
+            <div style="font-family:var(--font-cond);font-size:20px;font-weight:900;color:#2dc653" id="sh_flight">--</div>
+          </div>
+          <div style="flex:1;min-width:100px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.15);border-radius:8px;padding:10px">
+            <div style="font-family:var(--font-cond);font-size:9px;letter-spacing:1px;color:rgba(245,197,24,.7)" data-i18n="sh_lbl_vacant">TEMPS VACANT V</div>
+            <div style="font-family:var(--font-cond);font-size:20px;font-weight:900;color:#f5c518" id="sh_vacant">--</div>
+          </div>
+          <div style="flex:1;min-width:100px;background:rgba(230,57,70,.08);border:1px solid rgba(230,57,70,.2);border-radius:8px;padding:10px">
+            <div style="font-family:var(--font-cond);font-size:9px;letter-spacing:1px;color:rgba(230,57,70,.7)" data-i18n="sh_lbl_margin">MARGE D'ERREUR</div>
+            <div style="font-family:var(--font-cond);font-size:20px;font-weight:900" id="sh_margin">--</div>
+          </div>
+        </div>
+        <!-- Bouton vidéo -->
+        <button onclick="openVideoModal('NacCJX1KFAc', window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt', true)" ontouchstart=""
+          style="width:100%;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,.3);background:rgba(245,197,24,.08);color:#f5c518;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          <span style="font-size:16px">▶</span>
+          <span data-i18n="sh_btn_video">VOIR LE DRILL EN VIDÉO</span>
+        </button>
+        <style>
+          @media(max-width:500px){
+            #vis-card-shannon{padding:16px 12px!important;}
+            #shannon_controls{padding:0 4px;}
+          }
+        </style>
+      </div>
+    </div>
+
   </div>
 </div>
 <div id="s-shooting" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_shoot_title">SHOOTING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_shoot_sub">Tirs · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-shooting"><div class="coming-soon"><div class="cs-icon">🏀</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_shoot">Les vidéos de shoot arrivent bientôt — Coach Sensei BlackBelt</div></div></div></div></div>
@@ -10170,6 +10232,16 @@ function applyLangTracker(lang) {
     rw_lbl_ecart: 'ÉCART DE POINTS',
     rw_lbl_proba: 'PROBABILITÉ DE VICTOIRE',
     rw_btn_sim: 'SIMULER',
+    vis_sh7: '🎯 THÉORÈME DE SHANNON &amp; DRIBBLE',
+    vis_card19_title: 'THÉORÈME DU DRIBBLE À N BALLONS',
+    vis_card19_desc: "Claude Shannon a prouvé mathématiquement les limites du jonglage. Appliqué au basketball : plus D est court, plus on peut gérer de ballons — mais la marge d'erreur se réduit exponentiellement.",
+    vis_tag19: '🧮 SHANNON 1980',
+    sh_lbl_balls: 'BALLONS :',
+    sh_lbl_dwell: 'D — CONTACT MAIN/BALLON',
+    sh_lbl_flight: 'TEMPS DE VOL F',
+    sh_lbl_vacant: 'TEMPS VACANT V',
+    sh_lbl_margin: "MARGE D'ERREUR",
+    sh_btn_video: 'VOIR LE DRILL EN VIDÉO',
     vis_sh6: '⚛️ MÉCANIQUE QUANTIQUE &amp; TERRAIN',
     vis_card18_title: 'DENSITÉ QUANTIQUE DES JOUEURS',
     vis_card18_desc: "Cornell University (Nature, 2025) applique la théorie de la fonctionnelle de la densité — technique Nobel en physique quantique — au basketball NBA. Chaque joueur génère un champ gaussien de 5ft. Les 10 champs combinés prédisent la probabilité de tir à 2 ou 3 points.",
@@ -10245,6 +10317,16 @@ function applyLangTracker(lang) {
     rw_lbl_ecart: 'POINT SPREAD',
     rw_lbl_proba: 'WIN PROBABILITY',
     rw_btn_sim: 'SIMULATE',
+    vis_sh7: '🎯 SHANNON THEOREM &amp; DRIBBLING',
+    vis_card19_title: 'N-BALL DRIBBLE THEOREM',
+    vis_card19_desc: "Claude Shannon mathematically proved the limits of juggling. Applied to basketball: the shorter D (hand-ball contact), the more balls you can handle — but the error margin shrinks exponentially. Kyrie Irving: D ≈ 0.08s. Average player: D ≈ 0.18s.",
+    vis_tag19: '🧮 SHANNON 1980',
+    sh_lbl_balls: 'BALLS:',
+    sh_lbl_dwell: 'D — HAND/BALL CONTACT',
+    sh_lbl_flight: 'FLIGHT TIME F',
+    sh_lbl_vacant: 'VACANT TIME V',
+    sh_lbl_margin: 'ERROR MARGIN',
+    sh_btn_video: 'WATCH THE DRILL',
     vis_sh6: '⚛️ QUANTUM MECHANICS &amp; THE COURT',
     vis_card18_title: 'QUANTUM PLAYER DENSITY',
     vis_card18_desc: "Cornell University (Nature, 2025) applies density-functional theory — a Nobel Prize physics technique — to NBA basketball. Each player generates a 5ft Gaussian field. The 10 combined fields predict 2-point and 3-point shot probability. Steph Curry bends defensive space like a star curves spacetime.",
@@ -12392,7 +12474,8 @@ var _fns=[
   {id:'visu-bayes',fn:drawBayes},{id:'visu-graphe',fn:drawGraphe},{id:'visu-cog',fn:drawCOG},
   {id:'visu-regression',fn:drawReg},
   {id:'visu-marche',fn:drawRandomWalk},
-  {id:'visu-dfft',fn:drawDFFT}
+  {id:'visu-dfft',fn:drawDFFT},
+  {id:'visu-shannon',fn:drawShannon}
 ];
 /* ── VISU 17 : MARCHE ALÉATOIRE & VICTOIRE ── */
 function drawRandomWalk() {
@@ -12479,7 +12562,14 @@ function drawRandomWalk() {
 
     cv._rw_draw = function(){
       if(!W||!H) resize();
-      if(simStep<simTotal) simStep=Math.min(simStep+3,simTotal);
+      // Auto-relance : pause 60 frames à la fin puis nouvelle simulation
+      if(simStep<simTotal){
+        simStep=Math.min(simStep+3,simTotal);
+      } else {
+        if(!cv._rw_pauseT) cv._rw_pauseT=0;
+        cv._rw_pauseT++;
+        if(cv._rw_pauseT>60){ newSim(); cv._rw_pauseT=0; }
+      }
       ctx.clearRect(0,0,W,H);
 
       // Proportions : timeline 25%, séparateur 2px, sim 44%, séparateur 2px, jauge reste
@@ -12629,36 +12719,38 @@ function drawDFFT() {
     var W, H;
     var en = function(){ return window._lang==='en'; };
 
-    // ── Terrain NBA : 47ft × 50ft (demi-terrain) ──
-    // Coordonnées normalisées [0..1] sur la largeur, [0..1] sur la hauteur
-    // On affiche le demi-terrain attaque
-
-    // Joueurs : [x,y] normalisés, équipe, rôle
+    // Joueurs : positions initiales non chevauchantes + Doncic décalé du bord
     var players = [
-      // Attaque (rouge) — positions initiales réalistes
-      {x:0.5,  y:0.18, team:'off', role:'C',  name:'Center',    dragging:false},
-      {x:0.25, y:0.45, team:'off', role:'PF', name:'Curry',     dragging:false, isStar:true},
-      {x:0.75, y:0.45, team:'off', role:'SF', name:'Doncic',    dragging:false},
-      {x:0.15, y:0.80, team:'off', role:'SG', name:'GAS',       dragging:false},
-      {x:0.85, y:0.80, team:'off', role:'PG', name:'Forward',   dragging:false},
-      // Défense (bleu)
-      {x:0.50, y:0.25, team:'def', role:'C',  name:'Def-C',     dragging:false},
-      {x:0.28, y:0.52, team:'def', role:'PF', name:'Def-PF',    dragging:false},
-      {x:0.72, y:0.52, team:'def', role:'SF', name:'Def-SF',    dragging:false},
-      {x:0.18, y:0.85, team:'def', role:'SG', name:'Def-SG',    dragging:false},
-      {x:0.82, y:0.85, team:'def', role:'PG', name:'Def-PG',    dragging:false},
+      // Attaque (rouge)
+      {x:0.50, y:0.16, team:'off', role:'C',  name:'Center', dragging:false},
+      {x:0.25, y:0.45, team:'off', role:'PF', name:'Curry',  dragging:false, isStar:true},
+      {x:0.68, y:0.45, team:'off', role:'SF', name:'Doncic', dragging:false},  // décalé bord droit
+      {x:0.15, y:0.78, team:'off', role:'SG', name:'GAS',    dragging:false},
+      {x:0.82, y:0.78, team:'off', role:'PG', name:'Fwd',    dragging:false},
+      // Défense (bleu) — décalés des attaquants
+      {x:0.50, y:0.32, team:'def', role:'C',  name:'Def-C',  dragging:false},
+      {x:0.32, y:0.58, team:'def', role:'PF', name:'Def-PF', dragging:false},
+      {x:0.68, y:0.58, team:'def', role:'SF', name:'Def-SF', dragging:false},
+      {x:0.20, y:0.86, team:'def', role:'SG', name:'Def-SG', dragging:false},
+      {x:0.80, y:0.86, team:'def', role:'PG', name:'Def-PG', dragging:false},
     ];
 
     var dragIdx = -1;
     var densityCache = null;
     var cacheW = 0, cacheH = 0;
     var animT = 0;
+    var everDragged = false;      // true dès le 1er drag
+    var invitePhase = 0;          // 0=attente, 1=animation Curry, 2=fini
+    var inviteT = 0;              // frames depuis démarrage
+    var inviteStartX = 0.25, inviteStartY = 0.45;  // position initiale Curry
+    var inviteEndX   = 0.60, inviteEndY   = 0.38;  // destination invitation
 
     function resize(){
-      var r = cv.parentElement.getBoundingClientRect();
-      W = cv.width  = Math.round(r.width);
-      H = cv.height = Math.round(r.height);
-      densityCache = null;
+      // startVS a déjà fixé cv.width/cv.height — on les lit directement
+      // getBoundingClientRect retourne 0 si la section est display:none au premier render
+      var bw = cv.width  || cv.parentElement.getBoundingClientRect().width  || 600;
+      var bh = cv.height || cv.parentElement.getBoundingClientRect().height || 420;
+      if(bw!==W || bh!==H){ W=Math.round(bw); H=Math.round(bh); densityCache=null; }
     }
     resize();
 
@@ -12752,7 +12844,7 @@ function drawDFFT() {
       var gEl=document.getElementById('dfft_statval');
       if(p2El) p2El.textContent=probs.p2+'%';
       if(p3El) p3El.textContent=probs.p3+'%';
-      if(gEl) gEl.textContent=computeCurryGravity();
+      if(gEl) gEl.textContent=computeCurryGravity()+' BE';
     }
 
     // ── Dessin terrain ──
@@ -12796,12 +12888,12 @@ function drawDFFT() {
           var off=d.offD[idx], def=d.defD[idx];
           var maxVal=1.5;
           var oN=Math.min(1,off/maxVal), dN=Math.min(1,def/maxVal);
-          if(oN>0.05){
-            ctx.fillStyle='rgba(229,57,70,'+((oN*0.55).toFixed(2))+')';
+          if(oN>0.12){
+            ctx.fillStyle='rgba(229,57,70,'+((oN*0.6).toFixed(2))+')';
             ctx.fillRect(gx*cellW,gy*cellH,cellW+1,cellH+1);
           }
-          if(dN>0.05){
-            ctx.fillStyle='rgba(30,120,220,'+((dN*0.55).toFixed(2))+')';
+          if(dN>0.12){
+            ctx.fillStyle='rgba(30,120,220,'+((dN*0.6).toFixed(2))+')';
             ctx.fillRect(gx*cellW,gy*cellH,cellW+1,cellH+1);
           }
         }
@@ -12891,13 +12983,63 @@ function drawDFFT() {
     }
 
     cv._dfft_draw = function(){
-      if(!W||!H) resize();
+      // Récupérer les dims à chaque frame (cv.width peut changer après startVS)
+      var cw = cv.width||0, ch = cv.height||0;
+      if(cw>0 && ch>0 && (cw!==W || ch!==H)){ W=cw; H=ch; densityCache=null; }
+      if(!W||!H){ resize(); if(!W||!H) return; }
       animT++;
       ctx.clearRect(0,0,W,H);
       drawCourt(ctx,W,H);
       if(_dfft_mode==='density') drawDensityField(ctx,W,H);
       else drawGravityField(ctx,W,H);
+
+      // ── Animation d'invitation : Curry glisse automatiquement pendant 90 frames ──
+      if(!everDragged && dragIdx<0){
+        inviteT++;
+        var curry=players.find(function(p){return p.isStar;});
+        if(curry){
+          if(inviteT < 60){
+            // Attendre 60 frames avant de bouger
+          } else if(inviteT < 120){
+            // Phase aller : Curry glisse vers inviteEnd
+            var t = (inviteT-60)/60;
+            var ease = t<0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
+            curry.x = inviteStartX + (inviteEndX-inviteStartX)*ease;
+            curry.y = inviteStartY + (inviteEndY-inviteStartY)*ease;
+            densityCache=null;
+          } else if(inviteT < 180){
+            // Phase retour
+            var t2 = (inviteT-120)/60;
+            var ease2 = t2<0.5 ? 2*t2*t2 : -1+(4-2*t2)*t2;
+            curry.x = inviteEndX + (inviteStartX-inviteEndX)*ease2;
+            curry.y = inviteEndY + (inviteStartY-inviteEndY)*ease2;
+            densityCache=null;
+          } else {
+            // Fin de l'animation : repositionner proprement
+            curry.x = inviteStartX; curry.y = inviteStartY;
+            densityCache=null; inviteT=0; // boucle 1 seule fois puis stoppe
+            inviteT = 0; // boucle jusqu'au premier drag
+          }
+        }
+      }
+
       drawPlayers(ctx,W,H);
+
+      // Label d'invitation "↔ DRAG" si jamais dragué
+      if(!everDragged && inviteT > 10 && inviteT < 160){
+        var curry2=players.find(function(p){return p.isStar;});
+        if(curry2){
+          var fade = inviteT<30 ? inviteT/30 : inviteT>140 ? (160-inviteT)/20 : 1;
+          ctx.save();
+          ctx.globalAlpha = fade*0.9;
+          ctx.fillStyle='#f5c518';
+          ctx.font='700 '+Math.round(W*0.025)+'px Barlow Condensed,sans-serif';
+          ctx.textAlign='center'; ctx.textBaseline='top';
+          var rBase=Math.max(10,Math.min(18,W*0.032));
+          ctx.fillText(en()?'↔ DRAG':'↔ GLISSE', curry2.x*W, curry2.y*H+rBase+10);
+          ctx.restore();
+        }
+      }
       // Légende mode density
       if(_dfft_mode==='density'){
         ctx.fillStyle='rgba(230,57,70,0.7)'; ctx.fillRect(W*0.05,H*0.88,12,12);
@@ -12935,7 +13077,11 @@ function drawDFFT() {
     function onDown(e){
       var pos=getXY(e);
       dragIdx=getPlayerAt(pos.x,pos.y);
-      if(dragIdx>=0){players[dragIdx].dragging=true; e.preventDefault();}
+      if(dragIdx>=0){
+        players[dragIdx].dragging=true;
+        everDragged=true; // stoppe l'animation d'invitation
+        e.preventDefault();
+      }
     }
     function onMove(e){
       if(dragIdx<0) return;
@@ -12955,12 +13101,272 @@ function drawDFFT() {
     cv.addEventListener('touchmove',onMove,{passive:false});
     cv.addEventListener('touchend',onUp);
     cv.style.cursor='grab';
+    cv.addEventListener('mousedown', function(){ cv.style.cursor='grabbing'; });
+    cv.addEventListener('mouseup',   function(){ cv.style.cursor='grab'; });
     // Init tabs
     _dfft_setMode('density');
     updateStats();
   }
   var c2=document.getElementById('visu-dfft');
   if(c2&&c2._dfft_draw) c2._dfft_draw();
+}
+
+/* ── VISU 19 : THÉORÈME DE SHANNON — DRIBBLE N BALLONS ── */
+var _sh_balls = 2;
+function _sh_setBalls(n){
+  _sh_balls = n;
+  [2,3].forEach(function(k){
+    var btn=document.getElementById('sh_btn'+k);
+    if(!btn) return;
+    var active=k===n;
+    btn.style.background = active?'rgba(45,198,83,.15)':'var(--dark3)';
+    btn.style.color      = active?'#2dc653':'#7a8299';
+    btn.style.borderColor= active?'rgba(45,198,83,.5)':'var(--border)';
+  });
+}
+
+function drawShannon() {
+  var cv = document.getElementById('visu-shannon');
+  if(!cv) return;
+  if(!cv._sh_inited){
+    cv._sh_inited = true;
+    var ctx = cv.getContext('2d');
+    var W, H;
+    var en = function(){ return window._lang==='en'; };
+
+    // ── Paramètres Shannon ──
+    // (F+D)*H = (V+D)*N  →  H=2 mains
+    // D = dwell (contact), F = vol, V = vacant
+    // On fixe F relatif (tempo du dribble), D est le slider
+    // V = F*H/N - D (résout le théorème)
+    var D = 0.12;  // dwell en secondes
+    var H = 2;     // mains
+    var animT = 0;
+    var autoD = 0.12;     // valeur D pour animation auto
+    var autoDDir = 1;     // direction d'évolution
+    var userInteracted = false;
+
+    // Ballons : position normalisée [0..1]
+    // Chaque ballon : phase dans son cycle
+    function makeBalls(N){
+      var balls = [];
+      for(var i=0;i<N;i++){
+        balls.push({
+          phase: i/N,  // déphasage uniforme
+          x: 0, y: 0,
+          hand: i%2    // 0=gauche, 1=droite
+        });
+      }
+      return balls;
+    }
+    var balls = makeBalls(2);
+
+    function computeShannon(D, N){
+      // Fixer un tempo de base T = 0.4s (période entre deux dribbles d'une main)
+      // Théorème : (F+D)*H = (V+D)*N
+      // On fixe F = T - D pour que ça soit physiquement cohérent
+      // V = (F+D)*H/N - D
+      var T = Math.max(0.25, D * 3.5); // tempo dépend de D
+      var F = Math.max(0.05, T - D);
+      var V = Math.max(0, (F+D)*H/N - D);
+      var period = F + D; // durée d'un cycle ballon
+      var margin = V; // marge = temps vacant (si V→0, collision imminente)
+      return {F:F, V:V, T:T, period:period, margin:margin};
+    }
+
+    function updateStats(){
+      var N = _sh_balls;
+      var s = computeShannon(D, N);
+      var fEl=document.getElementById('sh_flight');
+      var vEl=document.getElementById('sh_vacant');
+      var mEl=document.getElementById('sh_margin');
+      var dwEl=document.getElementById('sh_dwellval');
+      if(fEl) fEl.textContent = s.F.toFixed(2)+'s';
+      if(vEl) vEl.textContent = s.V.toFixed(2)+'s';
+      if(dwEl) dwEl.textContent = D.toFixed(2);
+      // Marge d'erreur : couleur selon V
+      if(mEl){
+        var pct = Math.round(s.margin/s.T*100);
+        mEl.textContent = pct+'%';
+        mEl.style.color = pct>30?'#2dc653':pct>10?'#f5c518':'#e63946';
+      }
+    }
+
+    function resize(){
+      var bw=cv.width||cv.parentElement.getBoundingClientRect().width||600;
+      var bh=cv.height||cv.parentElement.getBoundingClientRect().height||360;
+      if(bw!==W||bh!==H){ W=Math.round(bw); H=Math.round(bh); }
+    }
+    resize();
+
+    // Brancher slider
+    var slider=document.getElementById('sh_dwell');
+    if(slider && !slider._sh_bound){
+      slider._sh_bound=true;
+      slider.addEventListener('input',function(){
+        D=parseInt(this.value)/100;
+        userInteracted=true;
+        updateStats();
+      });
+    }
+    updateStats();
+
+    cv._sh_draw = function(){
+      var cw=cv.width||0, ch=cv.height||0;
+      if(cw>0&&ch>0&&(cw!==W||ch!==H)){W=cw;H=ch;}
+      if(!W||!H){resize();if(!W||!H)return;}
+      animT++;
+
+      // Animation auto : D oscille entre 0.06 et 0.30 si pas d'interaction
+      if(!userInteracted){
+        autoD += autoDDir*0.0008;
+        if(autoD>0.30){autoD=0.30;autoDDir=-1;}
+        if(autoD<0.06){autoD=0.06;autoDDir=1;}
+        D=autoD;
+        var sl=document.getElementById('sh_dwell');
+        if(sl) sl.value=Math.round(D*100);
+        updateStats();
+      }
+
+      var N=_sh_balls;
+      var s=computeShannon(D,N);
+      ctx.clearRect(0,0,W,H);
+
+      // ── Fond ──
+      ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
+
+      // ── Zone de jeu : deux mains en bas, arcs paraboliques ──
+      var handY = H*0.88;
+      var handLX = W*0.28;  // main gauche
+      var handRX = W*0.72;  // main droite
+      var peakY  = H*0.08;  // sommet des arcs
+
+      // Dessiner les mains
+      function drawHand(hx, hy, hasball){
+        ctx.beginPath(); ctx.arc(hx,hy,W*0.04,0,Math.PI*2);
+        ctx.fillStyle = hasball?'rgba(245,197,24,0.3)':'rgba(255,255,255,0.08)';
+        ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.font='600 '+Math.round(W*0.022)+'px Barlow Condensed,sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(hx<W/2?(en()?'L':'G'):(en()?'R':'D'),hx,hy);
+      }
+
+      // ── Dessiner l'équation animée ──
+      var eqY = H*0.08;
+      var col = s.margin/s.T>0.30?'#2dc653':s.margin/s.T>0.10?'#f5c518':'#e63946';
+      ctx.font='700 '+Math.round(W*0.028)+'px Barlow Condensed,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillStyle='rgba(255,255,255,0.5)';
+      ctx.fillText('(F+D)×H = (V+D)×N', W/2, eqY);
+      ctx.font='600 '+Math.round(W*0.022)+'px Barlow Condensed,sans-serif';
+      ctx.fillStyle=col;
+      var vals='('+s.F.toFixed(2)+'+'+D.toFixed(2)+')×'+H+' = ('+s.V.toFixed(2)+'+'+D.toFixed(2)+')×'+N;
+      ctx.fillText(vals, W/2, eqY+Math.round(W*0.032));
+
+      // ── Arcs de trajectoire (tracés en fond) ──
+      var arcAlpha=0.12;
+      for(var ai=0;ai<N;ai++){
+        var startX=ai%2===0?handLX:handRX;
+        var endX  =ai%2===0?handRX:handLX;
+        ctx.beginPath();
+        ctx.moveTo(startX,handY);
+        ctx.quadraticCurveTo(W/2,peakY,endX,handY);
+        ctx.strokeStyle='rgba(245,197,24,'+arcAlpha+')';
+        ctx.lineWidth=1; ctx.setLineDash([4,6]); ctx.stroke(); ctx.setLineDash([]);
+      }
+
+      // ── Animer les ballons ──
+      var period = s.period;
+      var speedFactor = 60; // frames pour 1 seconde
+      var ballColors=['#f5c518','#2dc653','#e63946'];
+      var handHasBall=[false,false];
+
+      for(var bi=0;bi<N;bi++){
+        // Phase globale normalisée [0..1] dans la période
+        var phase=(animT/speedFactor/period + bi/N) % 1;
+        var flightFrac = s.F/period;
+        var dwellFrac  = D/period;
+
+        var bx,by,col2;
+        col2=ballColors[bi%ballColors.length];
+
+        if(phase<flightFrac){
+          // En vol : parabole entre les deux mains
+          var t=phase/flightFrac;
+          var startX=bi%2===0?handLX:handRX;
+          var endX  =bi%2===0?handRX:handLX;
+          bx=startX+(endX-startX)*t;
+          // Parabole : y = handY - 4*h*t*(1-t)
+          by=handY - (handY-peakY)*4*t*(1-t);
+        } else {
+          // En main : dwell
+          var t2=(phase-flightFrac)/dwellFrac;
+          bx=bi%2===0?handRX:handLX;
+          by=handY;
+          handHasBall[bi%2===0?1:0]=true;
+          // Légère oscillation en main
+          by=handY+Math.sin(t2*Math.PI)*W*0.008;
+        }
+
+        // Ombre
+        ctx.beginPath(); ctx.ellipse(bx,handY+4,W*0.02,W*0.006,0,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.fill();
+        // Ballon
+        ctx.beginPath(); ctx.arc(bx,by,W*0.028,0,Math.PI*2);
+        ctx.fillStyle=col2; ctx.fill();
+        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+        // Lignes ballon
+        ctx.strokeStyle='rgba(0,0,0,0.2)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(bx-W*0.018,by); ctx.lineTo(bx+W*0.018,by); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx,by-W*0.018); ctx.lineTo(bx,by+W*0.018); ctx.stroke();
+
+        // N° ballon
+        ctx.fillStyle='rgba(0,0,0,0.6)';
+        ctx.font='700 '+Math.round(W*0.018)+'px Barlow Condensed,sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(bi+1,bx,by);
+      }
+
+      // Mains
+      drawHand(handLX,handY,handHasBall[0]);
+      drawHand(handRX,handY,handHasBall[1]);
+
+      // ── Indicateur de vitesse ──
+      var barW=W*0.35;
+      var barX=W/2-barW/2;
+      var barY=H*0.78;
+      ctx.fillStyle='rgba(255,255,255,0.06)';
+      ctx.beginPath(); ctx.roundRect?ctx.roundRect(barX,barY,barW,8,4):ctx.fillRect(barX,barY,barW,8); ctx.fill();
+      var pct=Math.min(1,(0.30-D)/(0.30-0.05));
+      var barCol=pct>0.7?'#e63946':pct>0.4?'#f5c518':'#2dc653';
+      ctx.fillStyle=barCol;
+      ctx.beginPath(); ctx.roundRect?ctx.roundRect(barX,barY,barW*pct,8,4):ctx.fillRect(barX,barY,barW*pct,8); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.3)';
+      ctx.font='600 '+Math.round(W*0.02)+'px Barlow Condensed,sans-serif';
+      ctx.textAlign='left'; ctx.textBaseline='bottom';
+      ctx.fillText(en()?'SLOW':'LENT',barX,barY-2);
+      ctx.textAlign='right';
+      ctx.fillText(en()?'FAST ↑ RISK':'VITE ↑ RISQUE',barX+barW,barY-2);
+
+      // ── Label statut ──
+      var status='';
+      var pctM=s.margin/s.T;
+      if(pctM>0.30) status=en()?'Stable — comfortable margin':'Stable — marge confortable';
+      else if(pctM>0.10) status=en()?'Demanding — elite level':'Exigeant — niveau élite';
+      else status=en()?'Critical — collision risk!':'Critique — risque de collision !';
+      ctx.fillStyle=col;
+      ctx.font='700 '+Math.round(W*0.025)+'px Barlow Condensed,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(status, W/2, H*0.79+14);
+
+      // Maj stats toutes les 15 frames
+      if(animT%15===0) updateStats();
+    };
+  }
+  var c2=document.getElementById('visu-shannon');
+  if(c2&&c2._sh_draw) c2._sh_draw();
 }
 
 /* IntersectionObserver — ne dessine que les canvas dans le viewport */
