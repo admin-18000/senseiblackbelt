@@ -2302,33 +2302,42 @@ body.unlocked .sensei-only{display:revert !important}
         <canvas id="visu-marche"></canvas>
       </div>
       <!-- Contrôles sous le canvas — hors du vis-wrap pour ne jamais déborder -->
-      <div id="rw_controls" style="margin-top:16px;padding:14px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(245,197,24,0.08)">
+      <div id="rw_controls" style="margin-top:16px;padding:14px 16px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(245,197,24,0.08)">
         <!-- Slider minutes -->
         <div style="margin-bottom:14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="font-family:var(--font-cond);font-size:10px;letter-spacing:1px;color:var(--muted)" data-i18n="rw_lbl_min">MINUTES RESTANTES</span>
             <span style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:#f5c518"><span id="rw_minlbl">24</span> min</span>
           </div>
-          <input type="range" id="rw_min" min="0" max="48" value="24" step="1" style="width:100%;accent-color:#f5c518">
+          <input type="range" id="rw_min" min="0" max="48" value="24" step="1" style="width:100%;accent-color:#f5c518;display:block">
         </div>
         <!-- Slider écart -->
-        <div style="margin-bottom:14px">
+        <div style="margin-bottom:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="font-family:var(--font-cond);font-size:10px;letter-spacing:1px;color:var(--muted)" data-i18n="rw_lbl_ecart">ÉCART DE POINTS</span>
             <span style="font-family:var(--font-cond);font-size:13px;font-weight:700" id="rw_ecartval">+10 pts</span>
           </div>
-          <input type="range" id="rw_ecart" min="-30" max="30" value="10" step="1" style="width:100%;accent-color:#f5c518">
+          <input type="range" id="rw_ecart" min="-30" max="30" value="10" step="1" style="width:100%;accent-color:#f5c518;display:block">
         </div>
-        <!-- Bouton + probabilité en ligne -->
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <button id="rw_simBtn" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 20px;border-radius:8px;border:1px solid rgba(245,197,24,.4);background:rgba(245,197,24,.1);color:#f5c518;cursor:pointer;flex-shrink:0">↺ <span data-i18n="rw_btn_sim">SIMULER</span></button>
-          <div style="text-align:right;flex:1">
+        <!-- Bouton + probabilité : colonne sur mobile, ligne sur desktop -->
+        <div id="rw_bottom_row" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <button id="rw_simBtn" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 20px;border-radius:8px;border:1px solid rgba(245,197,24,.4);background:rgba(245,197,24,.1);color:#f5c518;cursor:pointer;flex-shrink:0;min-width:110px">↺ <span data-i18n="rw_btn_sim">SIMULER</span></button>
+          <div class="rw-proba-block" style="flex:1;text-align:right;min-width:0">
             <div style="font-family:var(--font-cond);font-size:9px;letter-spacing:1px;color:var(--muted)" data-i18n="rw_lbl_proba">PROBABILITÉ DE VICTOIRE</div>
-            <div style="font-family:var(--font-cond);font-size:28px;font-weight:900;line-height:1" id="rw_pctLabel">79%</div>
-            <div style="font-family:var(--font-cond);font-size:10px;color:var(--muted)" id="rw_verdictLabel">Avance confortable</div>
+            <div style="font-family:var(--font-cond);font-size:clamp(22px,6vw,32px);font-weight:900;line-height:1" id="rw_pctLabel">79%</div>
+            <div style="font-family:var(--font-cond);font-size:10px" id="rw_verdictLabel">Avance confortable</div>
           </div>
         </div>
       </div>
+      <style>
+        @media (max-width:500px) {
+          #vis-card-marche { padding:16px 12px !important; }
+          #rw_controls { padding:12px !important; }
+          #rw_bottom_row { flex-direction:column; align-items:stretch; gap:10px; }
+          #rw_bottom_row .rw-proba-block { text-align:center; width:100%; }
+          #rw_bottom_row #rw_simBtn { width:100%; }
+        }
+      </style>
     </div>
 
   </div>
