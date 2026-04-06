@@ -1331,11 +1331,22 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
     </div>
 
+    <!-- Sélecteur durée + status -->
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+      <span style="font-size:10px;color:#7a8299;font-family:var(--font-cond);letter-spacing:.5px;flex-shrink:0" id="dcog_durLbl">DURÉE :</span>
+      <button id="dcog_dur60"  onclick="_dcog_setDuration(60)"  style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer">60s</button>
+      <button id="dcog_dur90"  onclick="_dcog_setDuration(90)"  style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">90s</button>
+      <button id="dcog_dur120" onclick="_dcog_setDuration(120)" style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">2min</button>
+      <button id="dcog_durInf" onclick="_dcog_setDuration(0)"   style="font-family:var(--font-cond);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">∞</button>
+    </div>
     <!-- Status line -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div id="dcog_status" style="font-size:11px;color:#7a8299;letter-spacing:.5px">Appuie sur DÉMARRER</div>
-      <div style="font-size:11px;color:#f5c518;font-family:var(--font-cond);font-weight:700">
-        <span id="dcog_scoreLive">0</span> pts
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="dcog_timerDisplay" style="display:none;font-size:14px;color:#f5c518;font-family:var(--font-cond);font-weight:700;letter-spacing:2px">01:00</span>
+        <div style="font-size:11px;color:#f5c518;font-family:var(--font-cond);font-weight:700">
+          <span id="dcog_scoreLive">0</span> pts
+        </div>
       </div>
     </div>
 
@@ -15171,8 +15182,8 @@ function _tdr_drawTargets(ctx, W, H) {
     var _pW = _tdr_canvas.width, _pH = _tdr_canvas.height;
     var _psx = _pW / (_tdr_video.videoWidth  || _pW);
     var _psy = _pH / (_tdr_video.videoHeight || _pH);
-    ['leftWrist','rightWrist'].forEach(function(name){
-      var kp = _tsym_kp_fast(_tdr_poses, name);
+    ['left','right'].forEach(function(side){
+      var kp = _tsym_kp_hand(_tdr_poses, side); // extrapolation main
       if(kp) wristPositions.push({x: _pW - kp.x*_psx, y: kp.y*_psy});
     });
   }
@@ -15612,6 +15623,7 @@ function initTraining_dcog() {
   _dcog_video  = document.getElementById('dcog_video');
   _dcog_canvas = document.getElementById('dcog_canvas');
   _dcog_ctx    = _dcog_canvas ? _dcog_canvas.getContext('2d') : null;
+  _dcog_setDuration(60); // durée par défaut : 60s
   // Charger historique depuis localStorage
   try {
     var saved = localStorage.getItem('sensei_dcog_sessions');
@@ -15848,6 +15860,9 @@ function _dcog_start() {
 function _dcog_stop() {
   _dcog_running = false;
   _dcog_particles = []; // nettoyer particules résiduelles
+  clearInterval(_dcog_mathTimer); _dcog_mathTimer = null;
+  var disp = document.getElementById('dcog_timerDisplay');
+  if(disp) disp.style.display = 'none';
   if (_dcog_rafId) { cancelAnimationFrame(_dcog_rafId); _dcog_rafId = null; }
   if (_dcog_stream) { _dcog_stream.getTracks().forEach(function(t){t.stop();}); _dcog_stream = null; }
   if (_dcog_video) _dcog_video.srcObject = null;
@@ -15876,6 +15891,70 @@ function _dcog_stop() {
 }
 
 /* ── Launch drill after camera + AI ready ────────────────────── */
+/* ── Timer math drill ────────────────────────────────────────── */
+var _dcog_mathDuration = 60;  // secondes (0 = infini)
+var _dcog_mathSec      = 0;
+var _dcog_mathTimer    = null;
+
+function _dcog_setDuration(sec) {
+  _dcog_mathDuration = sec;
+  var ids = {60:'dcog_dur60', 90:'dcog_dur90', 120:'dcog_dur120', 0:'dcog_durInf'};
+  Object.keys(ids).forEach(function(k){
+    var btn = document.getElementById(ids[k]);
+    if (!btn) return;
+    var active = parseInt(k) === sec;
+    btn.style.background    = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    btn.style.color         = active ? '#f5c518' : '#7a8299';
+    btn.style.borderColor   = active ? 'rgba(245,197,24,.5)' : 'var(--border)';
+  });
+}
+
+function _dcog_startTimer() {
+  if (_dcog_mathDuration === 0) {
+    // Infini : juste afficher un chrono montant
+    _dcog_mathSec = 0;
+    var disp = document.getElementById('dcog_timerDisplay');
+    if (disp) disp.style.display = 'none';
+    return;
+  }
+  _dcog_mathSec = _dcog_mathDuration;
+  _dcog_updateTimerDisplay();
+  var disp = document.getElementById('dcog_timerDisplay');
+  if (disp) disp.style.display = 'inline-block';
+  clearInterval(_dcog_mathTimer);
+  _dcog_mathTimer = setInterval(function() {
+    if (!_dcog_running || _dcog_drill !== 'math') { clearInterval(_dcog_mathTimer); return; }
+    _dcog_mathSec--;
+    _dcog_updateTimerDisplay();
+    if (_dcog_mathSec <= 0) {
+      clearInterval(_dcog_mathTimer);
+      // Fin automatique
+      _td_beep(440, 0.3, 0.25);
+      if(navigator.vibrate) navigator.vibrate([100,50,100,50,200]);
+      _sensei_speak(window._lang==='en'?'Time up!':'Temps écoulé !', 0);
+      _dcog_mathTargets = [];
+      _dcog_stop();
+      _dcog_showResults();
+      var btnSv = document.getElementById('dcog_btnSave');
+      if(btnSv) btnSv.style.display = 'flex';
+    }
+  }, 1000);
+}
+
+function _dcog_updateTimerDisplay() {
+  var disp = document.getElementById('dcog_timerDisplay');
+  if (!disp || _dcog_mathDuration === 0) return;
+  var mm = Math.floor(_dcog_mathSec/60);
+  var ss = _dcog_mathSec % 60;
+  disp.textContent = (mm>0?(mm<10?'0'+mm:mm)+':':'') + (ss<10?'0'+ss:ss);
+  // Rouge dans les 10 dernières secondes
+  disp.style.color = _dcog_mathSec <= 10 ? '#e63946' : '#f5c518';
+  if(_dcog_mathSec <= 10 && _dcog_mathSec > 0) {
+    _td_beep(880, 0.04, 0.06); // tick sonore
+    if(navigator.vibrate) navigator.vibrate(5);
+  }
+}
+
 function _dcog_launchDrill() {
   // Reset counters
   _dcog_correct = 0; _dcog_wrong = 0; _dcog_respTimes = []; _dcog_questionAt = 0;
@@ -15887,6 +15966,8 @@ function _dcog_launchDrill() {
   _dcog_tbTargetLineY = null; _dcog_tbTargetLineL = null; _dcog_tbTargetLineR = null;
   _dcog_tbLWristY = null; _dcog_tbRWristY = null;
   _dcog_running = true;
+  // Démarrer le timer si drill math
+  if (_dcog_drill === 'math') _dcog_startTimer();
   // Update score display
   _dcog_updateScores();
   // Show correct overlay
@@ -16088,8 +16169,8 @@ function _dcog_drawMathTargets(ctx, W, H) {
   if (_dcog_poses && _dcog_poses[0] && _dcog_canvas && _dcog_video) {
     var _dsx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
     var _dsy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
-    ['leftWrist','rightWrist'].forEach(function(name){
-      var kp = _tsym_kp_fast(_dcog_poses, name);
+    ['left','right'].forEach(function(side){
+      var kp = _tsym_kp_hand(_dcog_poses, side); // extrapolation main
       if(kp) dcWrists.push({x: _dcog_canvas.width - kp.x*_dsx, y: kp.y*_dsy});
     });
   }
