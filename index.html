@@ -2438,7 +2438,7 @@ body.unlocked .sensei-only{display:revert !important}
           </div>
         </div>
         <!-- Bouton vidéo -->
-        <button onclick="openVideoModal('NacCJX1KFAc', window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt', true)" ontouchstart=""
+        <button onclick="openVideoModal('NacCJX1KFAc', window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt', false)" ontouchstart=""
           style="width:100%;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,.3);background:rgba(245,197,24,.08);color:#f5c518;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
           <span style="font-size:16px">▶</span>
           <span data-i18n="sh_btn_video">VOIR LE DRILL EN VIDÉO</span>
@@ -13134,74 +13134,50 @@ function drawShannon() {
     var W, H;
     var en = function(){ return window._lang==='en'; };
 
-    // ── Paramètres Shannon ──
-    // (F+D)*H = (V+D)*N  →  H=2 mains
-    // D = dwell (contact), F = vol, V = vacant
-    // On fixe F relatif (tempo du dribble), D est le slider
-    // V = F*H/N - D (résout le théorème)
-    var D = 0.12;  // dwell en secondes
-    var H = 2;     // mains
+    var D = 0.14;          // dwell time (s) — contact main/ballon
+    var HANDS = 2;
     var animT = 0;
-    var autoD = 0.12;     // valeur D pour animation auto
-    var autoDDir = 1;     // direction d'évolution
+    var autoD = 0.14, autoDDir = 1;
     var userInteracted = false;
 
-    // Ballons : position normalisée [0..1]
-    // Chaque ballon : phase dans son cycle
-    function makeBalls(N){
-      var balls = [];
-      for(var i=0;i<N;i++){
-        balls.push({
-          phase: i/N,  // déphasage uniforme
-          x: 0, y: 0,
-          hand: i%2    // 0=gauche, 1=droite
-        });
-      }
-      return balls;
-    }
-    var balls = makeBalls(2);
-
+    // ── Shannon : calcul physiquement réaliste ──
+    // Tempo humain réaliste : 1.5 à 3.5 dribbles/seconde/main
+    // periode_main = F + D (un cycle complet par main)
+    // (F+D)*H = (V+D)*N  →  V = (F+D)*H/N - D
     function computeShannon(D, N){
-      // Fixer un tempo de base T = 0.4s (période entre deux dribbles d'une main)
-      // Théorème : (F+D)*H = (V+D)*N
-      // On fixe F = T - D pour que ça soit physiquement cohérent
-      // V = (F+D)*H/N - D
-      var T = Math.max(0.25, D * 3.5); // tempo dépend de D
-      var F = Math.max(0.05, T - D);
-      var V = Math.max(0, (F+D)*H/N - D);
-      var period = F + D; // durée d'un cycle ballon
-      var margin = V; // marge = temps vacant (si V→0, collision imminente)
-      return {F:F, V:V, T:T, period:period, margin:margin};
+      // Période réaliste entre deux dribbles d'une même main : 0.28s (3.5/s) à 0.65s (1.5/s)
+      var periodHand = Math.max(0.28, Math.min(0.65, 0.28 + (D - 0.05) * 3.0));
+      var F = Math.max(0.08, periodHand - D);
+      var V = Math.max(0, (F + D) * HANDS / N - D);
+      var margin = V;
+      return {F:F, V:V, periodHand:periodHand, margin:margin};
     }
 
     function updateStats(){
-      var N = _sh_balls;
-      var s = computeShannon(D, N);
+      var N=_sh_balls, s=computeShannon(D,N);
       var fEl=document.getElementById('sh_flight');
       var vEl=document.getElementById('sh_vacant');
       var mEl=document.getElementById('sh_margin');
       var dwEl=document.getElementById('sh_dwellval');
-      if(fEl) fEl.textContent = s.F.toFixed(2)+'s';
-      if(vEl) vEl.textContent = s.V.toFixed(2)+'s';
-      if(dwEl) dwEl.textContent = D.toFixed(2);
-      // Marge d'erreur : couleur selon V
+      if(fEl) fEl.textContent=s.F.toFixed(2)+'s';
+      if(vEl) vEl.textContent=s.V.toFixed(2)+'s';
+      if(dwEl) dwEl.textContent=D.toFixed(2);
       if(mEl){
-        var pct = Math.round(s.margin/s.T*100);
-        mEl.textContent = pct+'%';
-        mEl.style.color = pct>30?'#2dc653':pct>10?'#f5c518':'#e63946';
+        var pct=Math.round(s.margin/s.periodHand*100);
+        mEl.textContent=pct+'%';
+        mEl.style.color=pct>30?'#2dc653':pct>10?'#f5c518':'#e63946';
       }
     }
 
     function resize(){
       var bw=cv.width||cv.parentElement.getBoundingClientRect().width||600;
       var bh=cv.height||cv.parentElement.getBoundingClientRect().height||360;
-      if(bw!==W||bh!==H){ W=Math.round(bw); H=Math.round(bh); }
+      if(bw!==W||bh!==H){W=Math.round(bw);H=Math.round(bh);}
     }
     resize();
 
-    // Brancher slider
     var slider=document.getElementById('sh_dwell');
-    if(slider && !slider._sh_bound){
+    if(slider&&!slider._sh_bound){
       slider._sh_bound=true;
       slider.addEventListener('input',function(){
         D=parseInt(this.value)/100;
@@ -13211,163 +13187,217 @@ function drawShannon() {
     }
     updateStats();
 
+    // ── Silhouette joueur (canvas path) ──
+    function drawPlayer(cx, groundY, scale){
+      var s=scale||1;
+      ctx.save();
+      ctx.translate(cx, groundY);
+      ctx.fillStyle='rgba(255,255,255,0.12)';
+      ctx.strokeStyle='rgba(255,255,255,0.25)';
+      ctx.lineWidth=1.5*s;
+      ctx.lineJoin='round';
+      ctx.lineCap='round';
+
+      // Corps : jambes légèrement fléchies (position dribble)
+      // Tête
+      ctx.beginPath(); ctx.arc(0,-H*0.52*s,H*0.055*s,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      // Torse
+      ctx.beginPath();
+      ctx.moveTo(-H*0.06*s,-H*0.46*s);
+      ctx.lineTo( H*0.06*s,-H*0.46*s);
+      ctx.lineTo( H*0.07*s,-H*0.28*s);
+      ctx.lineTo(-H*0.07*s,-H*0.28*s);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // Jambe gauche (légèrement fléchie)
+      ctx.beginPath();
+      ctx.moveTo(-H*0.04*s,-H*0.28*s);
+      ctx.lineTo(-H*0.06*s,-H*0.14*s);
+      ctx.lineTo(-H*0.04*s,0);
+      ctx.stroke();
+      // Jambe droite
+      ctx.beginPath();
+      ctx.moveTo( H*0.04*s,-H*0.28*s);
+      ctx.lineTo( H*0.06*s,-H*0.14*s);
+      ctx.lineTo( H*0.04*s,0);
+      ctx.stroke();
+      // Pieds
+      ctx.beginPath();
+      ctx.moveTo(-H*0.04*s,0); ctx.lineTo(-H*0.09*s,0);
+      ctx.moveTo( H*0.04*s,0); ctx.lineTo( H*0.09*s,0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ── Positions des mains selon nombre de ballons ──
+    function getHandPositions(N, groundY){
+      var cx = W/2;
+      // Position du joueur : centré horizontalement
+      // Bras baissés en position dribble
+      var armY = groundY - H*0.31; // hauteur des mains (~taille)
+      if(N===2){
+        // 2 ballons : une main de chaque côté, écartement naturel
+        return [
+          {x: cx - W*0.15, y: armY, ball: 0},
+          {x: cx + W*0.15, y: armY, ball: 1}
+        ];
+      } else {
+        // 3 ballons : 2 à gauche, 1 à droite (pattern réel Sensei)
+        return [
+          {x: cx - W*0.18, y: armY, ball: 0},
+          {x: cx - W*0.06, y: armY, ball: 1},
+          {x: cx + W*0.15, y: armY, ball: 2}
+        ];
+      }
+    }
+
     cv._sh_draw = function(){
-      var cw=cv.width||0, ch=cv.height||0;
+      var cw=cv.width||0,ch=cv.height||0;
       if(cw>0&&ch>0&&(cw!==W||ch!==H)){W=cw;H=ch;}
       if(!W||!H){resize();if(!W||!H)return;}
       animT++;
 
-      // Animation auto : D oscille entre 0.06 et 0.30 si pas d'interaction
+      // Animation auto D
       if(!userInteracted){
-        autoD += autoDDir*0.0008;
-        if(autoD>0.30){autoD=0.30;autoDDir=-1;}
-        if(autoD<0.06){autoD=0.06;autoDDir=1;}
+        autoD += autoDDir*0.0005;
+        if(autoD>0.28){autoD=0.28;autoDDir=-1;}
+        if(autoD<0.08){autoD=0.08;autoDDir=1;}
         D=autoD;
         var sl=document.getElementById('sh_dwell');
         if(sl) sl.value=Math.round(D*100);
-        updateStats();
+        if(animT%20===0) updateStats();
       }
 
       var N=_sh_balls;
       var s=computeShannon(D,N);
       ctx.clearRect(0,0,W,H);
-
-      // ── Fond ──
       ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
 
-      // ── Zone de jeu : deux mains en bas, arcs paraboliques ──
-      var handY = H*0.88;
-      var handLX = W*0.28;  // main gauche
-      var handRX = W*0.72;  // main droite
-      var peakY  = H*0.08;  // sommet des arcs
+      // Sol
+      var groundY=H*0.92;
+      ctx.strokeStyle='rgba(245,197,24,0.15)';
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(W*0.05,groundY); ctx.lineTo(W*0.95,groundY); ctx.stroke();
 
-      // Dessiner les mains
-      function drawHand(hx, hy, hasball){
-        ctx.beginPath(); ctx.arc(hx,hy,W*0.04,0,Math.PI*2);
-        ctx.fillStyle = hasball?'rgba(245,197,24,0.3)':'rgba(255,255,255,0.08)';
-        ctx.fill();
-        ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,0.3)';
-        ctx.font='600 '+Math.round(W*0.022)+'px Barlow Condensed,sans-serif';
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(hx<W/2?(en()?'L':'G'):(en()?'R':'D'),hx,hy);
-      }
-
-      // ── Dessiner l'équation animée ──
-      var eqY = H*0.08;
-      var col = s.margin/s.T>0.30?'#2dc653':s.margin/s.T>0.10?'#f5c518':'#e63946';
-      ctx.font='700 '+Math.round(W*0.028)+'px Barlow Condensed,sans-serif';
+      // Équation en haut
+      var col=s.margin/s.periodHand>0.30?'#2dc653':s.margin/s.periodHand>0.10?'#f5c518':'#e63946';
+      var fs=Math.round(W*0.026);
+      ctx.font='700 '+fs+'px Barlow Condensed,sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='top';
-      ctx.fillStyle='rgba(255,255,255,0.5)';
-      ctx.fillText('(F+D)×H = (V+D)×N', W/2, eqY);
-      ctx.font='600 '+Math.round(W*0.022)+'px Barlow Condensed,sans-serif';
+      ctx.fillStyle='rgba(255,255,255,0.45)';
+      ctx.fillText('(F+D)×H = (V+D)×N', W/2, H*0.03);
+      ctx.font='600 '+Math.round(fs*0.82)+'px Barlow Condensed,sans-serif';
       ctx.fillStyle=col;
-      var vals='('+s.F.toFixed(2)+'+'+D.toFixed(2)+')×'+H+' = ('+s.V.toFixed(2)+'+'+D.toFixed(2)+')×'+N;
-      ctx.fillText(vals, W/2, eqY+Math.round(W*0.032));
+      ctx.fillText('('+s.F.toFixed(2)+'+'+D.toFixed(2)+')×2 = ('+s.V.toFixed(2)+'+'+D.toFixed(2)+')×'+N, W/2, H*0.03+fs*1.3);
 
-      // ── Arcs de trajectoire (tracés en fond) ──
-      var arcAlpha=0.12;
-      for(var ai=0;ai<N;ai++){
-        var startX=ai%2===0?handLX:handRX;
-        var endX  =ai%2===0?handRX:handLX;
-        ctx.beginPath();
-        ctx.moveTo(startX,handY);
-        ctx.quadraticCurveTo(W/2,peakY,endX,handY);
-        ctx.strokeStyle='rgba(245,197,24,'+arcAlpha+')';
-        ctx.lineWidth=1; ctx.setLineDash([4,6]); ctx.stroke(); ctx.setLineDash([]);
-      }
+      // Silhouette joueur
+      drawPlayer(W/2, groundY, 1);
 
-      // ── Animer les ballons ──
-      var period = s.period;
-      var speedFactor = 60; // frames pour 1 seconde
+      // Positions mains
+      var hands=getHandPositions(N,groundY);
       var ballColors=['#f5c518','#2dc653','#e63946'];
-      var handHasBall=[false,false];
 
-      for(var bi=0;bi<N;bi++){
-        // Phase globale normalisée [0..1] dans la période
-        var phase=(animT/speedFactor/period + bi/N) % 1;
-        var flightFrac = s.F/period;
-        var dwellFrac  = D/period;
+      // Bras (lignes torse→main)
+      hands.forEach(function(h){
+        ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(W/2+(h.x<W/2?-1:1)*W*0.065, groundY-H*0.38);
+        ctx.lineTo(h.x, h.y);
+        ctx.stroke();
+      });
 
-        var bx,by,col2;
-        col2=ballColors[bi%ballColors.length];
+      // ── Ballons : rebonds sol ──
+      // Un dribble = ballon descend de la main au sol, remonte à la main
+      // Période = F(vol aller) + D(contact main) : cycle complet
+      // 60 fps → speedFactor = 60 frames/seconde réelle
+      var fps = 60;
+      var totalPeriod = s.periodHand; // période d'une main en secondes
 
-        if(phase<flightFrac){
-          // En vol : parabole entre les deux mains
-          var t=phase/flightFrac;
-          var startX=bi%2===0?handLX:handRX;
-          var endX  =bi%2===0?handRX:handLX;
-          bx=startX+(endX-startX)*t;
-          // Parabole : y = handY - 4*h*t*(1-t)
-          by=handY - (handY-peakY)*4*t*(1-t);
+      hands.forEach(function(h, bi){
+        // Déphasage entre les mains pour éviter les collisions
+        var phaseOffset = bi/N;
+        var phase = ((animT/fps/totalPeriod) + phaseOffset) % 1.0;
+
+        var flightFrac = s.F / totalPeriod; // fraction en vol
+        var dwellFrac  = D  / totalPeriod;  // fraction en main
+
+        var bx, by;
+        var inHand = phase >= flightFrac;
+
+        if(!inHand){
+          // Vol : parabole main → sol → main
+          var t = phase / flightFrac; // 0→1 pendant le vol
+          bx = h.x;
+          if(t < 0.5){
+            // Descente vers le sol
+            var td = t / 0.5;
+            by = h.y + (groundY - h.y) * td * td;
+          } else {
+            // Remontée depuis le sol
+            var tu = (t - 0.5) / 0.5;
+            by = groundY - (groundY - h.y) * tu * tu;
+          }
         } else {
-          // En main : dwell
-          var t2=(phase-flightFrac)/dwellFrac;
-          bx=bi%2===0?handRX:handLX;
-          by=handY;
-          handHasBall[bi%2===0?1:0]=true;
-          // Légère oscillation en main
-          by=handY+Math.sin(t2*Math.PI)*W*0.008;
+          // En main : légère oscillation
+          var td2 = (phase - flightFrac) / dwellFrac;
+          bx = h.x;
+          by = h.y - Math.sin(td2*Math.PI)*H*0.02;
         }
 
-        // Ombre
-        ctx.beginPath(); ctx.ellipse(bx,handY+4,W*0.02,W*0.006,0,0,Math.PI*2);
-        ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.fill();
+        // Ombre au sol
+        var shadowScale = Math.max(0.2, 1 - (groundY-by)/(groundY-h.y+0.01)*0.8);
+        ctx.beginPath();
+        ctx.ellipse(h.x, groundY, W*0.025*shadowScale, W*0.007*shadowScale, 0, 0, Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,'+(0.4*shadowScale).toFixed(2)+')';
+        ctx.fill();
+
         // Ballon
-        ctx.beginPath(); ctx.arc(bx,by,W*0.028,0,Math.PI*2);
-        ctx.fillStyle=col2; ctx.fill();
-        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+        var br = W*0.026;
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2);
+        ctx.fillStyle=ballColors[bi%ballColors.length]; ctx.fill();
+        ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=1.5; ctx.stroke();
         // Lignes ballon
-        ctx.strokeStyle='rgba(0,0,0,0.2)'; ctx.lineWidth=1;
-        ctx.beginPath(); ctx.moveTo(bx-W*0.018,by); ctx.lineTo(bx+W*0.018,by); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(bx,by-W*0.018); ctx.lineTo(bx,by+W*0.018); ctx.stroke();
-
-        // N° ballon
-        ctx.fillStyle='rgba(0,0,0,0.6)';
-        ctx.font='700 '+Math.round(W*0.018)+'px Barlow Condensed,sans-serif';
+        ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.arc(bx,by,br,0.2,Math.PI-0.2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx-br*0.8,by); ctx.lineTo(bx+br*0.8,by); ctx.stroke();
+        // Numéro
+        ctx.fillStyle='rgba(0,0,0,0.7)';
+        ctx.font='700 '+Math.round(br*0.9)+'px Barlow Condensed,sans-serif';
         ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(bi+1,bx,by);
-      }
+        ctx.fillText(bi+1, bx, by);
+      });
 
-      // Mains
-      drawHand(handLX,handY,handHasBall[0]);
-      drawHand(handRX,handY,handHasBall[1]);
-
-      // ── Indicateur de vitesse ──
-      var barW=W*0.35;
-      var barX=W/2-barW/2;
-      var barY=H*0.78;
-      ctx.fillStyle='rgba(255,255,255,0.06)';
-      ctx.beginPath(); ctx.roundRect?ctx.roundRect(barX,barY,barW,8,4):ctx.fillRect(barX,barY,barW,8); ctx.fill();
-      var pct=Math.min(1,(0.30-D)/(0.30-0.05));
-      var barCol=pct>0.7?'#e63946':pct>0.4?'#f5c518':'#2dc653';
-      ctx.fillStyle=barCol;
-      ctx.beginPath(); ctx.roundRect?ctx.roundRect(barX,barY,barW*pct,8,4):ctx.fillRect(barX,barY,barW*pct,8); ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,0.3)';
-      ctx.font='600 '+Math.round(W*0.02)+'px Barlow Condensed,sans-serif';
-      ctx.textAlign='left'; ctx.textBaseline='bottom';
+      // ── Barre de vitesse ──
+      var barW=W*0.32, barX=W/2-barW/2, barY=H*0.82;
+      ctx.fillStyle='rgba(255,255,255,0.05)';
+      ctx.fillRect(barX,barY,barW,6);
+      var pct=Math.min(1,(0.28-D)/(0.28-0.08));
+      ctx.fillStyle=pct>0.7?'#e63946':pct>0.4?'#f5c518':'#2dc653';
+      ctx.fillRect(barX,barY,barW*pct,6);
+      ctx.fillStyle='rgba(255,255,255,0.25)';
+      ctx.font='600 '+Math.round(W*0.019)+'px Barlow Condensed,sans-serif';
+      ctx.textAlign='left';ctx.textBaseline='bottom';
       ctx.fillText(en()?'SLOW':'LENT',barX,barY-2);
       ctx.textAlign='right';
       ctx.fillText(en()?'FAST ↑ RISK':'VITE ↑ RISQUE',barX+barW,barY-2);
 
-      // ── Label statut ──
-      var status='';
-      var pctM=s.margin/s.T;
-      if(pctM>0.30) status=en()?'Stable — comfortable margin':'Stable — marge confortable';
-      else if(pctM>0.10) status=en()?'Demanding — elite level':'Exigeant — niveau élite';
-      else status=en()?'Critical — collision risk!':'Critique — risque de collision !';
+      // Statut
+      var pctM=s.margin/s.periodHand;
+      var status=pctM>0.30?(en()?'Stable — comfortable margin':'Stable — marge confortable')
+        :pctM>0.10?(en()?'Demanding — elite level':'Exigeant — niveau élite')
+        :(en()?'Critical — collision risk!':'Critique — risque de collision !');
       ctx.fillStyle=col;
-      ctx.font='700 '+Math.round(W*0.025)+'px Barlow Condensed,sans-serif';
-      ctx.textAlign='center'; ctx.textBaseline='top';
-      ctx.fillText(status, W/2, H*0.79+14);
+      ctx.font='700 '+Math.round(W*0.023)+'px Barlow Condensed,sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='top';
+      ctx.fillText(status, W/2, H*0.84);
 
-      // Maj stats toutes les 15 frames
-      if(animT%15===0) updateStats();
+      if(animT%20===0) updateStats();
     };
   }
   var c2=document.getElementById('visu-shannon');
   if(c2&&c2._sh_draw) c2._sh_draw();
 }
+
 
 /* IntersectionObserver — ne dessine que les canvas dans le viewport */
 var _io = null;
