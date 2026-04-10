@@ -75,19 +75,34 @@ body{font-family:var(--font);background:var(--black);color:var(--text);min-heigh
 ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:4px 12px;display:flex;align-items:center;gap:8px;min-height:56px;height:auto;flex-wrap:nowrap}
-.nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center;flex-wrap:wrap}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:8px;min-height:72px;height:72px;flex-wrap:nowrap}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center;flex-wrap:nowrap;height:100%}
 .nav-admin{display:flex;align-items:center;gap:4px;flex-shrink:0;border-left:1px solid rgba(245,197,24,.3);padding-left:8px}
 .nav-sep{display:none}
-.nav-btn{font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-@media(min-width:1100px){.nav-btn{font-size:11px;padding:5px 9px}}
-@media(min-width:1400px){.nav-btn{font-size:12px;padding:5px 10px;letter-spacing:.5px}}
+/* Bouton nav de base */
+.nav-btn{font-family:var(--font-cond);font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:6px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;height:100%;display:flex;align-items:center}
+@media(min-width:1200px){.nav-btn{font-size:16px;padding:6px 16px}}
+@media(min-width:1500px){.nav-btn{font-size:18px;padding:6px 18px;letter-spacing:.6px}}
 .nav-btn:hover,.nav-btn.active{background:rgba(245,197,24,.1);color:var(--gold)}
-.nav-join{background:var(--gold);color:var(--black);padding:6px 12px;border-radius:4px;font-family:var(--font-cond);font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;transition:all .2s;white-space:nowrap;flex-shrink:0}
+/* Dropdown container */
+.nav-drop{position:relative;height:100%;display:flex;align-items:center}
+.nav-drop-btn{font-family:var(--font-cond);font-size:15px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:6px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;height:100%;display:flex;align-items:center;gap:5px}
+@media(min-width:1200px){.nav-drop-btn{font-size:16px;padding:6px 16px}}
+@media(min-width:1500px){.nav-drop-btn{font-size:18px;padding:6px 18px}}
+.nav-drop-btn::after{content:"▾";font-size:9px;opacity:.6;transition:transform .2s}
+.nav-drop:hover .nav-drop-btn,.nav-drop-btn.active{background:rgba(245,197,24,.1);color:var(--gold)}
+.nav-drop:hover .nav-drop-btn::after{transform:rotate(180deg)}
+/* Dropdown menu */
+.nav-drop-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%);min-width:200px;background:rgba(8,10,15,.98);border:1px solid rgba(245,197,24,.2);border-radius:8px;padding:6px 0;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.nav-drop:hover .nav-drop-menu{opacity:1;visibility:visible}
+.nav-drop-item{display:block;width:100%;font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:9px 18px;border:none;background:transparent;color:var(--muted);cursor:pointer;text-align:left;white-space:nowrap;transition:all .15s}
+.nav-drop-item:hover,.nav-drop-item.active{background:rgba(245,197,24,.08);color:var(--gold)}
+.nav-drop-separator{height:1px;background:rgba(245,197,24,.12);margin:4px 0}
+.nav-join{background:var(--gold);color:var(--black);padding:7px 14px;border-radius:4px;font-family:var(--font-cond);font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .nav-join:hover{background:var(--gold2);transform:scale(1.03)}
 
 /* ── SECTIONS ── */
-.section{display:none;min-height:100vh;padding:95px 20px 40px}
+.section{display:none;min-height:100vh;padding:80px 20px 40px}
 .section.active{display:block}
 
 /* ── HERO ── */
@@ -139,10 +154,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SECTION TITLE ── */
-.sec-title{font-family:var(--font-display);font-size:clamp(36px,6vw,64px);letter-spacing:4px;color:var(--text);margin-bottom:8px}
+.sec-title{font-family:var(--font-display);font-size:clamp(64px,9vw,120px);letter-spacing:4px;color:var(--text);margin-bottom:8px}
 .sec-title span{color:var(--gold)}
-.sec-sub{font-family:var(--font-cond);font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:40px}
-.sec-line{width:60px;height:3px;background:var(--gold);margin-bottom:40px}
+.sec-sub{font-family:var(--font-cond);font-size:16px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:40px}
+.sec-line{width:70px;height:4px;background:var(--gold);margin-bottom:40px}
 
 /* ── BELTS SECTION ── */
 .belts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
@@ -281,7 +296,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
 .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
 .hamburger.open span:nth-child(2){opacity:0}
 .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
-.mobile-menu{display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(8,10,15,.98);z-index:99;overflow-y:auto;padding:16px}
+.mobile-menu{display:none;position:fixed;top:72px;left:0;right:0;bottom:0;background:rgba(8,10,15,.98);z-index:99;overflow-y:auto;padding:16px}
 .mobile-menu.open{display:block}
 .mm-btn{display:block;width:100%;text-align:left;font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:14px 16px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:all .2s}
 .mm-btn:hover,.mm-btn.active{color:var(--gold);background:rgba(245,197,24,.06)}
@@ -296,7 +311,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
   .prog-track{gap:0}
   .prog-line{width:14px}
   .g2{grid-template-columns:1fr}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
   .hamburger{display:flex}
   .hero-title{font-size:clamp(52px,15vw,90px)}
@@ -307,7 +322,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
   .coach-wrap{grid-template-columns:1fr}
   .coach-name{font-size:36px}
   .time-slots{grid-template-columns:repeat(2,1fr)}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
   .hamburger{display:flex}
   .hero-title{font-size:clamp(52px,15vw,90px)}
@@ -318,7 +333,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.95)
   .g2{grid-template-columns:1fr}
   .krow{grid-template-columns:repeat(2,1fr)}
   .notation-wrap{padding:18px}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
 
 /* ── COACH ── */
@@ -623,31 +638,62 @@ body.unlocked .sensei-only{display:revert !important}
     <span style="font-family:var(--font-display);font-size:20px;letter-spacing:3px;color:var(--gold)">SENSEI</span>
   </div>
   <div class="nav-links">
+    <!-- Directs -->
     <button class="nav-btn active" onclick="showSection('home',this)" data-i18n="nav_home">Home</button>
     <button class="nav-btn" onclick="showSection('belts',this)" data-i18n="nav_belts">Belts</button>
-    <button class="nav-btn" onclick="showSection('training',this)" data-i18n="nav_training">🏋️ Training</button>
-    <button class="nav-btn" onclick="showSection('ballhandling',this)" data-i18n="nav_ballhandling">Ball Handling</button>
-    <button class="nav-btn" onclick="showSection('shooting',this)" data-i18n="nav_shooting">Shooting</button>
-    <button class="nav-btn" onclick="showSection('defense',this)" data-i18n="nav_defense">Defense</button>
-    <button class="nav-btn" onclick="showSection('rebounding',this)" data-i18n="nav_rebounding">Rebounding</button>
-    <button class="nav-btn" onclick="showSection('hec',this)" data-i18n="nav_hec">Hand-Eye Coordination</button>
-    <button class="nav-btn" onclick="showSection('iq',this)" data-i18n="nav_iq">Basketball IQ</button>
-    <button class="nav-btn" onclick="showSection('sc',this)" data-i18n="nav_sc">Strength &amp; Conditioning</button>
-    <button class="nav-btn" onclick="showSection('tutorials',this)" data-i18n="nav_tutorials">Tutorials</button>
-    <button class="nav-btn sensei-only" onclick="showSection('programs',this)" data-i18n="nav_programs">Training Programs</button>
-    <button class="nav-btn sensei-only" onclick="showSection('data',this)" data-i18n="nav_data">Data Science</button>
-    <button class="nav-btn" onclick="showSection('challenges',this)" data-i18n="nav_challenges">Challenges</button>
-    <button class="nav-btn" onclick="showSection('battle',this)" data-i18n="nav_battle">Battle Royal</button>
-    <button class="nav-btn" onclick="showSection('vulga',this)" data-i18n="nav_vulga">Science</button>
-    <button class="nav-btn" onclick="showSection('neuro',this)" data-i18n="nav_neuro">Neurosciences</button>
-    <button class="nav-btn" onclick="showSection('visusci',this)" data-i18n="nav_visusci">Visualisation</button>
-    <button class="nav-btn" onclick="showSection('profil',this)" data-i18n="nav_profil" >🏅 Mon Profil</button>
-    <button class="nav-btn" onclick="showSection('minijeux',this)" data-i18n="nav_minijeux" >🎮 Mini-Jeux</button>
-    <button class="nav-btn" onclick="showSection('stats',this)" data-i18n="nav_stats" >📈 Mes Stats</button>
-    <button class="nav-btn" onclick="showSection('piliers',this)" data-i18n="nav_piliers" >🏆 7 Piliers</button>
-    <button class="nav-btn" onclick="showSection('eco',this)" data-i18n="nav_eco" >🌿 Eco Dynamics</button>
-    <button class="nav-btn" onclick="showSection('network',this)" data-i18n="nav_network" >🌍 Network</button>
-    <button class="nav-btn" onclick="showSection('coach',this)" data-i18n="nav_coach">Le Coach</button>
+    <button class="nav-btn sensei-only" onclick="showSection('programs',this)" data-i18n="nav_programs">Programs</button>
+
+    <!-- TRAIN dropdown -->
+    <div class="nav-drop">
+      <button class="nav-drop-btn" data-i18n="nav_drop_train">Train</button>
+      <div class="nav-drop-menu">
+        <button class="nav-drop-item" onclick="showSection('training',this)" data-i18n="nav_training" style="color:var(--gold)">🎥 Training Mode</button>
+        <div class="nav-drop-separator"></div>
+        <button class="nav-drop-item" onclick="showSection('ballhandling',this)" data-i18n="nav_ballhandling">Ball Handling</button>
+        <button class="nav-drop-item" onclick="showSection('shooting',this)" data-i18n="nav_shooting">Shooting</button>
+        <button class="nav-drop-item" onclick="showSection('defense',this)" data-i18n="nav_defense">Defense</button>
+        <button class="nav-drop-item" onclick="showSection('rebounding',this)" data-i18n="nav_rebounding">Rebounding</button>
+        <button class="nav-drop-item" onclick="showSection('hec',this)" data-i18n="nav_hec">Hand-Eye</button>
+        <button class="nav-drop-item" onclick="showSection('sc',this)" data-i18n="nav_sc">Strength &amp; Conditioning</button>
+      </div>
+    </div>
+
+    <!-- SCIENCES dropdown -->
+    <div class="nav-drop">
+      <button class="nav-drop-btn" data-i18n="nav_drop_sciences">Sciences</button>
+      <div class="nav-drop-menu">
+        <button class="nav-drop-item" onclick="showSection('vulga',this)" data-i18n="nav_vulga">Science</button>
+        <button class="nav-drop-item" onclick="showSection('neuro',this)" data-i18n="nav_neuro">Neurosciences</button>
+        <button class="nav-drop-item" onclick="showSection('visusci',this)" data-i18n="nav_visusci">Visual Science</button>
+        <button class="nav-drop-item sensei-only" onclick="showSection('data',this)" data-i18n="nav_data">Data Science</button>
+        <button class="nav-drop-item" onclick="showSection('iq',this)" data-i18n="nav_iq">Basketball IQ</button>
+      </div>
+    </div>
+
+    <!-- PROGRESSION dropdown -->
+    <div class="nav-drop">
+      <button class="nav-drop-btn" data-i18n="nav_drop_progression">Progression</button>
+      <div class="nav-drop-menu">
+        <button class="nav-drop-item" onclick="showSection('profil',this)" data-i18n="nav_profil">🏅 Mon Profil</button>
+        <button class="nav-drop-item" onclick="showSection('stats',this)" data-i18n="nav_stats">📈 Mes Stats</button>
+        <button class="nav-drop-item" onclick="showSection('minijeux',this)" data-i18n="nav_minijeux">🎮 Mini-Jeux</button>
+        <div class="nav-drop-separator"></div>
+        <button class="nav-drop-item" onclick="showSection('challenges',this)" data-i18n="nav_challenges">Challenges</button>
+        <button class="nav-drop-item" onclick="showSection('battle',this)" data-i18n="nav_battle">Battle Royal</button>
+      </div>
+    </div>
+
+    <!-- COMMUNITY dropdown -->
+    <div class="nav-drop">
+      <button class="nav-drop-btn" data-i18n="nav_drop_community">Community</button>
+      <div class="nav-drop-menu">
+        <button class="nav-drop-item" onclick="showSection('network',this)" data-i18n="nav_network">🌍 Network</button>
+        <button class="nav-drop-item" onclick="showSection('piliers',this)" data-i18n="nav_piliers">🏆 7 Piliers</button>
+        <button class="nav-drop-item" onclick="showSection('eco',this)" data-i18n="nav_eco">🌿 Eco Dynamics</button>
+        <button class="nav-drop-item" onclick="showSection('coach',this)" data-i18n="nav_coach">Le Coach</button>
+        <button class="nav-drop-item" onclick="showSection('tutorials',this)" data-i18n="nav_tutorials">Tutorials</button>
+      </div>
+    </div>
   </div>
   <div class="nav-admin">
     <button class="nav-btn sensei-only" onclick="showSection('masters',this)" style="color:var(--gold)" data-i18n="nav_masters">🔒 Masters</button>
@@ -5425,6 +5471,17 @@ const IQ_ITEMS = [
 
 // ══ NAVIGATION ══════════════════════════════════════
 function showSection(id, btn) {
+  // Si le bouton cliqué est un nav-drop-item, marquer aussi le nav-drop-btn parent
+  if(btn && btn.classList && btn.classList.contains('nav-drop-item')){
+    var dropParent = btn.closest('.nav-drop');
+    if(dropParent){
+      document.querySelectorAll('.nav-drop-btn').forEach(function(b){b.classList.remove('active');});
+      var parentBtn = dropParent.querySelector('.nav-drop-btn');
+      if(parentBtn) parentBtn.classList.add('active');
+    }
+  } else if(btn){
+    document.querySelectorAll('.nav-drop-btn').forEach(function(b){b.classList.remove('active');});
+  }
   // Arrêter toutes les caméras actives si on change de section
   if (typeof _tsym_running !== 'undefined' && _tsym_running && typeof _tsym_stopCamera === 'function') _tsym_stopCamera();
   if (typeof _tdr_running  !== 'undefined' && _tdr_running  && typeof _tdr_stop       === 'function') _tdr_stop();
@@ -8380,7 +8437,7 @@ fr: {
   nav_shooting:'Shooting', nav_defense:'Defense', nav_rebounding:'Rebounding',
   nav_hec:'Hand-Eye Coordination', nav_iq:'Basketball IQ',
   nav_sc:'Strength &amp; Conditioning', nav_tutorials:'Tutorials',
-  nav_programs:'Training Programs', nav_data:'Data Science',
+  nav_programs:'Programs', nav_data:'Data Science',
   nav_challenges:'Challenges', nav_battle:'Battle Royal',
   nav_vulga:'Science', nav_neuro:'Neurosciences', nav_visusci:'Visualisation',
   nav_profil:'🏅 Mon Profil', nav_minijeux:'🎮 Mini-Jeux', nav_stats:'📈 Mes Stats',
@@ -8480,7 +8537,7 @@ en: {
   nav_shooting:'Shooting', nav_defense:'Defense', nav_rebounding:'Rebounding',
   nav_hec:'Hand-Eye Coordination', nav_iq:'Basketball IQ',
   nav_sc:'Strength &amp; Conditioning', nav_tutorials:'Tutorials',
-  nav_programs:'Training Programs', nav_data:'Data Science',
+  nav_programs:'Programs', nav_data:'Data Science',
   nav_challenges:'Challenges', nav_battle:'Battle Royal',
   nav_vulga:'Science', nav_neuro:'Neurosciences', nav_visusci:'Visual Science',
   nav_profil:'🏅 My Profile', nav_minijeux:'🎮 Games', nav_stats:'📈 My Stats',
@@ -10232,6 +10289,12 @@ function applyLangTracker(lang) {
     rw_lbl_ecart: 'ÉCART DE POINTS',
     rw_lbl_proba: 'PROBABILITÉ DE VICTOIRE',
     rw_btn_sim: 'SIMULER',
+    nav_drop_train: 'Train',
+    nav_drop_sciences: 'Sciences',
+    nav_drop_progression: 'Progression',
+    nav_drop_community: 'Communauté',
+    nav_programs: 'Programmes',
+    nav_training: '🎥 Training Mode',
     vis_sh7: '🎯 THÉORÈME DE SHANNON &amp; DRIBBLE',
     vis_card19_title: 'THÉORÈME DU DRIBBLE À N BALLONS',
     vis_card19_desc: "Claude Shannon a prouvé mathématiquement les limites du jonglage. Appliqué au basketball : plus D est court, plus on peut gérer de ballons — mais la marge d'erreur se réduit exponentiellement.",
@@ -10317,6 +10380,12 @@ function applyLangTracker(lang) {
     rw_lbl_ecart: 'POINT SPREAD',
     rw_lbl_proba: 'WIN PROBABILITY',
     rw_btn_sim: 'SIMULATE',
+    nav_drop_train: 'Train',
+    nav_drop_sciences: 'Sciences',
+    nav_drop_progression: 'Progression',
+    nav_drop_community: 'Community',
+    nav_programs: 'Programs',
+    nav_training: '🎥 Training Mode',
     vis_sh7: '🎯 SHANNON THEOREM &amp; DRIBBLING',
     vis_card19_title: 'N-BALL DRIBBLE THEOREM',
     vis_card19_desc: "Claude Shannon mathematically proved the limits of juggling. Applied to basketball: the shorter D (hand-ball contact), the more balls you can handle — but the error margin shrinks exponentially. Kyrie Irving: D ≈ 0.08s. Average player: D ≈ 0.18s.",
