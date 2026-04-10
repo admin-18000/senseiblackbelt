@@ -5505,7 +5505,11 @@ function showSection(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  // Désactiver smooth scroll le temps du scroll instantané
+  document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0,0);
+  // Réactiver après
+  setTimeout(function(){ document.documentElement.style.scrollBehavior = ''; }, 50);
   // Initialiser les animations canvas au premier affichage
   if (id === 'visusci' && !window._visuSciInited) {
     window._visuSciInited = true;
