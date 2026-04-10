@@ -66,7 +66,7 @@
   --tr-text:#f0f2f8;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:72px}@media(max-width:900px){html{scroll-padding-top:56px}}
 body{font-family:var(--font);background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 /* ── SCROLLBAR ── */
@@ -102,7 +102,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.97)
 .nav-join:hover{background:var(--gold2);transform:scale(1.03)}
 
 /* ── SECTIONS ── */
-.section{display:none;min-height:100vh;padding:80px 20px 40px}
+.section{display:none;min-height:100vh;padding:88px 20px 40px}
 .section.active{display:block}
 
 /* ── HERO ── */
@@ -311,7 +311,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.97)
   .prog-track{gap:0}
   .prog-line{width:14px}
   .g2{grid-template-columns:1fr}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
   .hamburger{display:flex}
   .hero-title{font-size:clamp(52px,15vw,90px)}
@@ -322,7 +322,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.97)
   .coach-wrap{grid-template-columns:1fr}
   .coach-name{font-size:36px}
   .time-slots{grid-template-columns:repeat(2,1fr)}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
   .hamburger{display:flex}
   .hero-title{font-size:clamp(52px,15vw,90px)}
@@ -333,7 +333,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,10,15,.97)
   .g2{grid-template-columns:1fr}
   .krow{grid-template-columns:repeat(2,1fr)}
   .notation-wrap{padding:18px}
-  .section{padding:70px 14px 40px}
+  .section{padding:72px 14px 40px}
 }
 
 /* ── COACH ── */
@@ -5505,11 +5505,7 @@ function showSection(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  // Désactiver smooth scroll le temps du scroll instantané
-  document.documentElement.style.scrollBehavior = 'auto';
-  window.scrollTo(0,0);
-  // Réactiver après
-  setTimeout(function(){ document.documentElement.style.scrollBehavior = ''; }, 50);
+  window.scrollTo({top:0, behavior:"instant"});
   // Initialiser les animations canvas au premier affichage
   if (id === 'visusci' && !window._visuSciInited) {
     window._visuSciInited = true;
@@ -5757,6 +5753,8 @@ function closeMenu(){
   document.getElementById('mobile-menu').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
   document.body.style.overflow = '';
+  // Scroll vers le haut après fermeture du menu mobile
+  setTimeout(function(){ window.scrollTo(0,0); }, 50);
 }
 
 // ══ ANIMATION CEINTURES ═════════════════════════════
