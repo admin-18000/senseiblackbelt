@@ -13112,9 +13112,9 @@ function drawDFFT() {
 }
 
 /* ── VISU 19 : THÉORÈME DE SHANNON — DRIBBLE N BALLONS ── */
-var _sh_balls = 2;
-function _sh_setBalls(n){
-  _sh_balls = n;
+window._sh_balls = 2;
+window._sh_setBalls = function(n){
+  window._sh_balls = n;
   [2,3].forEach(function(k){
     var btn=document.getElementById('sh_btn'+k);
     if(!btn) return;
@@ -13154,7 +13154,7 @@ function drawShannon() {
     }
 
     function updateStats(){
-      var N=_sh_balls, s=computeShannon(D,N);
+      var N=window._sh_balls, s=computeShannon(D,N);
       var fEl=document.getElementById('sh_flight');
       var vEl=document.getElementById('sh_vacant');
       var mEl=document.getElementById('sh_margin');
@@ -13268,7 +13268,7 @@ function drawShannon() {
         if(animT%20===0) updateStats();
       }
 
-      var N=_sh_balls;
+      var N=window._sh_balls;
       var s=computeShannon(D,N);
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle='#080a0f'; ctx.fillRect(0,0,W,H);
