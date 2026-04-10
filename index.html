@@ -5753,11 +5753,15 @@ function toggleMenu(){
   document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
 }
 function closeMenu(){
-  document.getElementById('mobile-menu').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
+  var menu = document.getElementById('mobile-menu');
+  var btn  = document.getElementById('hamburger');
+  menu.classList.remove('open');
+  btn.classList.remove('open');
   document.body.style.overflow = '';
-  // Scroll vers le haut après fermeture du menu mobile
-  setTimeout(function(){ window.scrollTo(0,0); }, 50);
+  // Attendre que le navigateur mobile relâche le scroll avant de remonter
+  setTimeout(function(){
+    window.scrollTo({top:0, behavior:'instant'});
+  }, 100);
 }
 
 // ══ ANIMATION CEINTURES ═════════════════════════════
