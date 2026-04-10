@@ -177,6 +177,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .sec-title span{color:var(--gold)}
 .sec-sub{font-family:var(--font-cond);font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:40px}
 .sec-line{width:60px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));margin-bottom:40px;border-radius:2px;box-shadow:0 0 8px rgba(245,197,24,.3)}
+/* Badge mobile — remplace le grand titre sur petit écran */
+.sec-badge{display:none;align-items:center;gap:6px;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.25);padding:5px 12px;border-radius:var(--radius-xl);margin-bottom:10px;backdrop-filter:blur(8px)}
 
 /* ── BELTS SECTION ── */
 .belts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:40px}
@@ -325,8 +327,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .mm-btn:hover,.mm-btn.active{color:var(--gold);background:rgba(245,197,24,.06)}
 .mm-join{display:block;margin:16px;padding:14px;background:var(--gold);color:var(--black);font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;text-align:center;border-radius:6px;text-decoration:none}
 @media(max-width:900px){
-  .sec-title{margin-bottom:4px}
-  .sec-sub{margin-bottom:16px;font-size:11px}
+  .sec-title{display:none}
+  .sec-badge{display:inline-flex!important}
+  .sec-sub{margin-bottom:12px;font-size:11px}
   .sec-line{margin-bottom:16px}
   .nav-links{display:none}
   .nav-admin .nav-btn{display:none}
@@ -1139,7 +1142,8 @@ body.unlocked .sensei-only{display:revert !important}
   <div style="padding:60px 20px;background:var(--dark);border-top:1px solid var(--border)">
     <div style="max-width:1100px;margin:0 auto">
       <div style="text-align:center;margin-bottom:48px">
-        <div class="sec-title" data-i18n="sec_belts_title">LE <span>SYSTÈME</span></div>
+        <div class="sec-badge" aria-hidden="true">🥋 <span data-i18n="sec_belts_title_badge">Ceintures</span></div>
+    <div class="sec-title" data-i18n="sec_belts_title">LE <span>SYSTÈME</span></div>
         <div class="sec-sub" data-i18n="sec_belts_sub">Coach Sensei BlackBelt · Méthode scientifique · Tous niveaux</div>
         <div class="sec-line" style="margin:0 auto"></div>
       </div>
@@ -1172,6 +1176,7 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ BELTS ══ -->
 <div id="s-belts" class="section">
   <div style="max-width:900px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🥋 <span data-i18n="sec_belts_title_badge">Ceintures</span></div>
     <div class="sec-title" data-i18n="sec_belts_title">SYSTÈME DE <span>CEINTURES</span></div>
     <div class="sec-sub" data-i18n="sec_belts_sub">9 niveaux de maîtrise — Seuil de passage : 7.5 / 10</div>
     <div class="sec-line"></div>
@@ -2056,6 +2061,7 @@ body.unlocked .sensei-only{display:revert !important}
 
 <div id="s-ballhandling" class="section">
   <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🏀 <span data-i18n="sec_bh_title_badge">Ball Handling</span></div>
     <div class="sec-title" data-i18n="sec_bh_title">BALL <span>HANDLING</span></div>
     <div class="sec-sub" data-i18n="sec_bh_sub">Drills · Coach Sensei BlackBelt</div>
     <div class="sec-line"></div>
@@ -2086,6 +2092,7 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ DATA SCIENCE ══ -->
 <div id="s-data" class="section">
   <div style="max-width:700px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">📊 <span data-i18n="sec_data_title_badge">Data Science</span></div>
     <div class="sec-title" data-i18n="sec_data_title">DATA <span>SCIENCE</span></div>
     <div class="sec-sub" data-i18n="sec_data_sub" >Notation Sensei · Barème officiel · Auto-évaluation</div>
     <div class="sec-line"></div>
@@ -2149,6 +2156,7 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ NEUROSCIENCES ══ -->
 <div id="s-neuro" class="section">
   <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🧠 <span data-i18n="sec_neuro_title_badge">Neurosciences</span></div>
     <div class="sec-title" data-i18n="sec_neuro_title">NEURO<span>SCIENCES</span></div>
     <div class="sec-sub" data-i18n="sec_neuro_sub">Littérature scientifique · Dribble · Motricité · Apprentissage · Coach Sensei BlackBelt</div>
     <div class="sec-line"></div>
@@ -2159,6 +2167,7 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ VULGARISATION SCIENTIFIQUE ══ -->
 <div id="s-vulga" class="section">
   <div style="max-width:800px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🔬 <span data-i18n="sec_vulga_title_badge">Science</span></div>
     <div class="sec-title" data-i18n="sec_vulga_title">VULGARISATION <span>SCIENTIFIQUE</span></div>
     <div class="sec-sub" data-i18n="sec_vulga_sub">Physique · Mathématiques · Basket · Par Coach Sensei BlackBelt</div>
     <div class="sec-line"></div>
@@ -2169,6 +2178,7 @@ body.unlocked .sensei-only{display:revert !important}
 <!-- ══ BASKETBALL IQ ══ -->
 <div id="s-iq" class="section">
   <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🏆 <span data-i18n="sec_iq_title_badge">Basketball IQ</span></div>
     <div class="sec-title" data-i18n="sec_iq_title">BASKETBALL <span>IQ</span></div>
     <div class="sec-sub" data-i18n="sec_iq_sub">Intelligence du jeu · Lecture de terrain · Décision</div>
     <div class="sec-line"></div>
@@ -2180,6 +2190,7 @@ body.unlocked .sensei-only{display:revert !important}
 <div id="s-visusci" class="section">
   <div style="max-width:1100px;margin:0 auto">
 
+    <div class="sec-badge" aria-hidden="true">⚗️ <span data-i18n="sec_vis_title_badge">Visual Science</span></div>
     <div class="sec-title" data-i18n="sec_vis_title">VISUALISATION <span>SCIENTIFIQUE</span></div>
     <div class="sec-sub" data-i18n="sec_vis_sub">Physique · Neurosciences · Maths · Le basket autrement</div>
     <div class="sec-line"></div>
@@ -2526,15 +2537,22 @@ body.unlocked .sensei-only{display:revert !important}
 
   </div>
 </div>
-<div id="s-shooting" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_shoot_title">SHOOTING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_shoot_sub">Tirs · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-shooting"><div class="coming-soon"><div class="cs-icon">🏀</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_shoot">Les vidéos de shoot arrivent bientôt — Coach Sensei BlackBelt</div></div></div></div></div>
-<div id="s-defense" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_def_title">DEFENSE <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_def_sub">Défense · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-defense"><div class="coming-soon"><div class="cs-icon">🛡️</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_defense">Les vidéos de défense arrivent bientôt</div></div></div></div></div>
-<div id="s-rebounding" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_reb_title">REBOUNDING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_reb_sub">Rebond · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-rebounding"><div class="coming-soon"><div class="cs-icon">💪</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_rebound">Les vidéos de rebond arrivent bientôt</div></div></div></div></div>
-<div id="s-hec" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_hec_title">HAND-EYE <span>COORDINATION</span></div><div class="sec-sub" data-i18n="sec_hec_sub">Coordination oculo-manuelle · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-hec"></div></div></div>
-<div id="s-sc" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_sc_title">STRENGTH &amp; <span>CONDITIONING</span></div><div class="sec-sub" data-i18n="sec_sc_sub">Préparation physique · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-sc"></div></div></div>
-<div id="s-tutorials" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_tut_title">TUTO<span>RIALS</span></div><div class="sec-sub" data-i18n="sec_tut_sub">Tutoriels techniques · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-tutorials"></div></div></div>
+<div id="s-shooting" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">🎯 <span data-i18n="sec_shoot_title_badge">Shooting</span></div>
+    <div class="sec-title" data-i18n="sec_shoot_title">SHOOTING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_shoot_sub">Tirs · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-shooting"><div class="coming-soon"><div class="cs-icon">🏀</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_shoot">Les vidéos de shoot arrivent bientôt — Coach Sensei BlackBelt</div></div></div></div></div>
+<div id="s-defense" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">🛡️ <span data-i18n="sec_def_title_badge">Defense</span></div>
+    <div class="sec-title" data-i18n="sec_def_title">DEFENSE <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_def_sub">Défense · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-defense"><div class="coming-soon"><div class="cs-icon">🛡️</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_defense">Les vidéos de défense arrivent bientôt</div></div></div></div></div>
+<div id="s-rebounding" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">💪 <span data-i18n="sec_reb_title_badge">Rebounding</span></div>
+    <div class="sec-title" data-i18n="sec_reb_title">REBOUNDING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_reb_sub">Rebond · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-rebounding"><div class="coming-soon"><div class="cs-icon">💪</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_rebound">Les vidéos de rebond arrivent bientôt</div></div></div></div></div>
+<div id="s-hec" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">👁️ <span data-i18n="sec_hec_title_badge">Hand-Eye</span></div>
+    <div class="sec-title" data-i18n="sec_hec_title">HAND-EYE <span>COORDINATION</span></div><div class="sec-sub" data-i18n="sec_hec_sub">Coordination oculo-manuelle · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-hec"></div></div></div>
+<div id="s-sc" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">⚡ <span data-i18n="sec_sc_title_badge">Strength</span></div>
+    <div class="sec-title" data-i18n="sec_sc_title">STRENGTH &amp; <span>CONDITIONING</span></div><div class="sec-sub" data-i18n="sec_sc_sub">Préparation physique · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-sc"></div></div></div>
+<div id="s-tutorials" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">📚 <span data-i18n="sec_tut_title_badge">Tutorials</span></div>
+    <div class="sec-title" data-i18n="sec_tut_title">TUTO<span>RIALS</span></div><div class="sec-sub" data-i18n="sec_tut_sub">Tutoriels techniques · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-tutorials"></div></div></div>
 <div id="s-programs" class="section">
 <div style="max-width:1100px;margin:0 auto">
-  <div class="sec-title" data-i18n="sec_prog_title">TRAINING <span>PROGRAMS</span></div>
+  <div class="sec-badge" aria-hidden="true">🥋 <span data-i18n="sec_prog_title_badge">Programs</span></div>
+    <div class="sec-title" data-i18n="sec_prog_title">TRAINING <span>PROGRAMS</span></div>
   <div class="sec-sub" data-i18n="sec_prog_sub">Programmes scientifiques · Coach Sensei BlackBelt</div>
   <div class="sec-line"></div>
 
@@ -2916,7 +2934,8 @@ document.addEventListener('DOMContentLoaded', () => { calcBench(); });
      ══════════════════════════════════════════════════════ -->
 <div id="s-minijeux" class="section">
 <div style="max-width:1100px;margin:0 auto">
-  <div class="sec-title" data-i18n="sec_mj_title">MINI-<span>JEUX</span></div>
+  <div class="sec-badge" aria-hidden="true">🎮 <span data-i18n="sec_mj_title_badge">Mini-Jeux</span></div>
+    <div class="sec-title" data-i18n="sec_mj_title">MINI-<span>JEUX</span></div>
   <div class="sec-sub" data-i18n="sec_mj_sub">Entraîne ton cerveau · Temps de réaction · IQ Sensei · Profil VAK</div>
   <div class="sec-line"></div>
 
@@ -3688,7 +3707,8 @@ function shuffleArray(arr) {
      ══════════════════════════════════════════════════════ -->
 <div id="s-profil" class="section">
 <div style="max-width:1100px;margin:0 auto">
-  <div class="sec-title" data-i18n="sec_profil_title">MON <span data-i18n="mj_profil_span">PROFIL</span></div>
+  <div class="sec-badge" aria-hidden="true">🏅 <span data-i18n="sec_profil_title_badge">Mon Profil</span></div>
+    <div class="sec-title" data-i18n="sec_profil_title">MON <span data-i18n="mj_profil_span">PROFIL</span></div>
   <div class="sec-sub" data-i18n="sec_profil_sub">Tracker de ceinture · Journal de séance · Certificat · Export</div>
   <div class="sec-line"></div>
 
@@ -4378,7 +4398,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="s-stats" class="section">
 <div style="max-width:1100px;margin:0 auto">
-  <div class="sec-title" data-i18n="sec_stats_title">MES <span>STATS</span></div>
+  <div class="sec-badge" aria-hidden="true">📈 <span data-i18n="sec_stats_title_badge">Mes Stats</span></div>
+    <div class="sec-title" data-i18n="sec_stats_title">MES <span>STATS</span></div>
   <div class="sec-sub" data-i18n="sec_stats_sub">Radar · Progression · DMAIC · Lean Six Sigma σ appliqué au basket</div>
   <div class="sec-line"></div>
 
@@ -4981,7 +5002,8 @@ document.addEventListener('DOMContentLoaded', () => {
      ══════════════════════════════════════════════════ -->
 <div id="s-piliers" class="section">
 <div style="max-width:1100px;margin:0 auto">
-  <div class="sec-title" data-i18n="sec_pil_title">7 PILIERS DU <span>TRANSFERT</span></div>
+  <div class="sec-badge" aria-hidden="true">🏆 <span data-i18n="sec_pil_title_badge">7 Piliers</span></div>
+    <div class="sec-title" data-i18n="sec_pil_title">7 PILIERS DU <span>TRANSFERT</span></div>
   <div class="sec-sub" data-i18n="sec_pil_sub">De l'entraînement à la performance en match · Sensei BlackBelt</div>
   <div class="sec-line"></div>
 
@@ -10327,6 +10349,15 @@ function applyLangTracker(lang) {
     nav_drop_sciences: 'Sciences',
     nav_drop_progression: 'Progression',
     nav_drop_community: 'Communauté',
+    sec_bh_title_badge:'🏀 Ball Handling', sec_shoot_title_badge:'🎯 Shooting',
+    sec_def_title_badge:'🛡️ Défense', sec_reb_title_badge:'💪 Rebond',
+    sec_hec_title_badge:'👁️ Hand-Eye', sec_sc_title_badge:'⚡ Strength',
+    sec_tut_title_badge:'📚 Tutorials', sec_prog_title_badge:'🥋 Programmes',
+    sec_data_title_badge:'📊 Data Science', sec_neuro_title_badge:'🧠 Neurosciences',
+    sec_vulga_title_badge:'🔬 Science', sec_iq_title_badge:'🏆 Basketball IQ',
+    sec_vis_title_badge:'⚗️ Visual Science', sec_mj_title_badge:'🎮 Mini-Jeux',
+    sec_profil_title_badge:'🏅 Mon Profil', sec_stats_title_badge:'📈 Mes Stats',
+    sec_pil_title_badge:'🏆 7 Piliers', sec_belts_title_badge:'🥋 Ceintures',
     nav_programs: 'Programmes',
     nav_training: '🎥 Training Mode',
     vis_sh7: '🎯 THÉORÈME DE SHANNON &amp; DRIBBLE',
@@ -10418,6 +10449,15 @@ function applyLangTracker(lang) {
     nav_drop_sciences: 'Sciences',
     nav_drop_progression: 'Progression',
     nav_drop_community: 'Community',
+    sec_bh_title_badge:'🏀 Ball Handling', sec_shoot_title_badge:'🎯 Shooting',
+    sec_def_title_badge:'🛡️ Defense', sec_reb_title_badge:'💪 Rebounding',
+    sec_hec_title_badge:'👁️ Hand-Eye', sec_sc_title_badge:'⚡ Strength',
+    sec_tut_title_badge:'📚 Tutorials', sec_prog_title_badge:'🥋 Programs',
+    sec_data_title_badge:'📊 Data Science', sec_neuro_title_badge:'🧠 Neurosciences',
+    sec_vulga_title_badge:'🔬 Science', sec_iq_title_badge:'🏆 Basketball IQ',
+    sec_vis_title_badge:'⚗️ Visual Science', sec_mj_title_badge:'🎮 Games',
+    sec_profil_title_badge:'🏅 My Profile', sec_stats_title_badge:'📈 My Stats',
+    sec_pil_title_badge:'🏆 7 Pillars', sec_belts_title_badge:'🥋 Belt System',
     nav_programs: 'Programs',
     nav_training: '🎥 Training Mode',
     vis_sh7: '🎯 SHANNON THEOREM &amp; DRIBBLING',
