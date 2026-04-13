@@ -324,9 +324,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .mobile-menu::-webkit-scrollbar{width:3px}
 .mobile-menu::-webkit-scrollbar-thumb{background:rgba(245,197,24,.3);border-radius:2px}
 .mm-btn{display:block;width:100%;text-align:left;font-family:var(--font-cond);font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:14px 16px;border:none;border-left:3px solid transparent;background:transparent;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:all .2s}
-.mm-btn:hover{color:var(--gold);background:rgba(245,197,24,.04)}
+.mm-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .mm-btn.active{color:var(--gold);background:rgba(245,197,24,.08);border-left:3px solid var(--gold)}
-.mm-btn:not(.active):hover{border-left:3px solid transparent}
+.mm-btn:not(.active):hover{border-left:3px solid rgba(255,255,255,.1)}
 .mm-join{display:block;margin:16px;padding:14px;background:var(--gold);color:var(--black);font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;text-align:center;border-radius:6px;text-decoration:none}
 @media(max-width:900px){
   .sec-title{display:none}
@@ -5605,10 +5605,11 @@ function showSection(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.nav-drop-item').forEach(b => b.classList.remove('active'));
-  // Sync mm-btn mobile avec la section active
+  // Sync mm-btn mobile avec la section active — extraction exacte de l'id
   document.querySelectorAll('.mm-btn').forEach(function(b){
     var fn = b.getAttribute('onclick') || '';
-    if(fn.indexOf("'"+id+"'") > -1 || fn.indexOf('"'+id+'"') > -1){
+    var match = fn.match(/showSection\(['"]([^'"]+)['"]/);
+    if(match && match[1] === id){
       b.classList.add('active');
     }
   });
@@ -5862,6 +5863,10 @@ function toggleMenu(){
   menu.classList.toggle('open');
   btn.classList.toggle('open');
   document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  // Fermer tous les dropdowns desktop quand le menu mobile s'ouvre
+  if(menu.classList.contains('open')){
+    document.querySelectorAll('.nav-drop-item').forEach(function(b){ b.classList.remove('active'); });
+  }
 }
 function closeMenu(){
   document.getElementById('mobile-menu').classList.remove('open');
