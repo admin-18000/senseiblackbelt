@@ -173,10 +173,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SECTION TITLE ── */
-.sec-title{font-family:var(--font-display);font-size:clamp(24px,6vw,64px);letter-spacing:4px;color:var(--text);margin-bottom:8px;line-height:1.05}
+.sec-title{font-family:var(--font-display);font-size:clamp(24px,6vw,64px);letter-spacing:4px;color:var(--text);margin-bottom:8px;line-height:1.05;text-align:center}
 .sec-title span{color:var(--gold)}
-.sec-sub{font-family:var(--font-cond);font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:40px}
-.sec-line{width:60px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));margin-bottom:40px;border-radius:2px;box-shadow:0 0 8px rgba(245,197,24,.3)}
+.sec-sub{font-family:var(--font-cond);font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:40px;text-align:center}
+.sec-line{width:60px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));margin-bottom:40px;border-radius:2px;box-shadow:0 0 8px rgba(245,197,24,.3);margin-left:auto;margin-right:auto}
 /* Badge mobile — remplace le grand titre sur petit écran */
 .sec-badge{display:none;align-items:center;gap:6px;font-family:var(--font-cond);font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.25);padding:5px 12px;border-radius:var(--radius-xl);margin-bottom:10px;backdrop-filter:blur(8px)}
 
@@ -194,16 +194,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .belt-card.brown::before{background:var(--brown-belt)}
 .belt-card.black::before{background:linear-gradient(to bottom,#fff,#000)}
 .belt-card.red::before{background:var(--red-belt)}
-.belt-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid rgba(255,255,255,.1)}
-.belt-card.white .belt-icon{background:rgba(248,249,250,.15)}
-.belt-card.yellow .belt-icon{background:rgba(255,214,10,.15)}
-.belt-card.orange .belt-icon{background:rgba(255,109,0,.15)}
-.belt-card.green .belt-icon{background:rgba(45,198,83,.15)}
-.belt-card.blue .belt-icon{background:rgba(0,119,182,.15)}
-.belt-card.purple .belt-icon{background:rgba(123,45,139,.15)}
-.belt-card.brown .belt-icon{background:rgba(139,69,19,.15)}
-.belt-card.black .belt-icon{background:rgba(255,255,255,.05)}
-.belt-card.red .belt-icon{background:rgba(193,18,31,.15)}
+.belt-icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+
+
+
+
+
+
+
+
 .belt-info{flex:1}
 .belt-name{font-family:var(--font-cond);font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
 .belt-card.white .belt-name{color:var(--white-belt)}
@@ -731,7 +731,7 @@ body.unlocked .sensei-only{display:revert !important}
     <button class="nav-btn" onclick="showSection('inscription',this)" data-i18n="nav_inscription">S'inscrire</button>
     <div class="nav-sep"></div>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
-    <button id="lang-toggle" onclick="toggleLang()" aria-label="Switch language" style="font-family:var(--font-cond);font-size:11px;font-weight:900;letter-spacing:1px;padding:5px 10px;border-radius:4px;border:1px solid rgba(245,197,24,.4);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0">🌐 EN</button>
+    <button id="lang-toggle" onclick="toggleLang()" aria-label="Switch language" style="font-family:var(--font-cond);font-size:11px;font-weight:900;letter-spacing:1px;padding:5px 10px;border-radius:4px;border:1px solid rgba(245,197,24,.4);background:rgba(245,197,24,.1);color:var(--gold);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0">🌐 FR</button>
 <a href="https://www.instagram.com/sensei_blackbelt/" target="_blank" class="nav-join" data-i18n="nav_join">Rejoindre →</a>
   </div>
 </nav>
@@ -1189,6 +1189,45 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <div style="overflow-x:auto;padding-bottom:8px"><div class="prog-track" id="prog-track"></div></div>
       <div style="font-size:11px;color:var(--muted);font-family:var(--font-cond);margin-top:12px;text-align:center" id="anim-label" data-i18n="belts_score_hint">Votre ceinture actuelle est déterminée par votre score en Data Science</div>
+      <!-- ── Escalier de progression des ceintures ── -->
+      <div style="margin:20px 0 8px;overflow-x:auto">
+        <svg id="belt-stair-svg" viewBox="0 0 380 120" width="100%" style="max-width:580px;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gStairFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f5c518" stop-opacity=".12"/>
+              <stop offset="100%" stop-color="#f5c518" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Fond escalier -->
+          <path d="M0,118 L42,118 L42,98 L84,98 L84,80 L126,80 L126,64 L168,64 L168,50 L210,50 L210,38 L252,38 L252,28 L294,28 L294,18 L336,18 L336,10 L380,10 L380,120 Z"
+            fill="url(#gStairFill)"/>
+          <!-- Ligne escalier animée -->
+          <path d="M0,118 L42,118 L42,98 L84,98 L84,80 L126,80 L126,64 L168,64 L168,50 L210,50 L210,38 L252,38 L252,28 L294,28 L294,18 L336,18 L336,10 L380,10"
+            fill="none" stroke="#f5c518" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"
+            stroke-dasharray="2000" stroke-dashoffset="2000"
+            style="animation:drawLine 4s ease forwards 0.3s"/>
+          <!-- Points ceintures -->
+          <circle cx="0"   cy="118" r="5" fill="#f8f9fa" style="animation:dotPop .4s ease both 0.8s"/>
+          <circle cx="42"  cy="98"  r="5" fill="#ffd60a" style="animation:dotPop .4s ease both 1.3s"/>
+          <circle cx="84"  cy="80"  r="5" fill="#ff6d00" style="animation:dotPop .4s ease both 1.8s"/>
+          <circle cx="126" cy="64"  r="5" fill="#2dc653" style="animation:dotPop .4s ease both 2.3s"/>
+          <circle cx="168" cy="50"  r="5" fill="#0077b6" style="animation:dotPop .4s ease both 2.8s"/>
+          <circle cx="210" cy="38"  r="6" fill="#7b2d8b" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .4s ease both 3.2s"/>
+          <circle cx="252" cy="28"  r="5" fill="#8b4513" style="animation:dotPop .4s ease both 3.6s"/>
+          <circle cx="294" cy="18"  r="6" fill="#1a1a1a" stroke="rgba(255,255,255,.5)" stroke-width="1.5" style="animation:dotPop .4s ease both 4s"/>
+          <circle cx="336" cy="10"  r="6" fill="#c1121f" stroke="#f5c518" stroke-width="1.5" style="animation:dotPop .4s ease both 4.4s"/>
+          <!-- Labels sous les marches -->
+          <text x="21"  y="115" fill="#f8f9fa"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">BLANCHE</text>
+          <text x="63"  y="95"  fill="#ffd60a"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">JAUNE</text>
+          <text x="105" y="77"  fill="#ff6d00"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">ORANGE</text>
+          <text x="147" y="61"  fill="#2dc653"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">VERTE</text>
+          <text x="189" y="47"  fill="#0077b6"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">BLEUE</text>
+          <text x="231" y="35"  fill="#9b5dd0"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">VIOLETTE</text>
+          <text x="273" y="25"  fill="#c87941"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">MARRON</text>
+          <text x="315" y="15"  fill="#e0e0e0"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">NOIRE</text>
+          <text x="358" y="7"   fill="#c1121f"  font-size="6" font-family="sans-serif" font-weight="700" text-anchor="middle" opacity="0.8">ROUGE</text>
+        </svg>
+      </div>
     </div>
 
     <div class="belts-grid" id="belts-grid"></div>
@@ -5476,6 +5515,17 @@ function makeCard(v) {
 
 
 // ══ DATA ══════════════════════════════════════════════
+var _BELT_SVG = {
+  'white': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%23d0d0d0%22%20opacity%3D%220.95%22%20stroke%3D%22%23999%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%23d0d0d0%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'yellow': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%23ffd60a%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%23ffd60a%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'orange': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%23ff6d00%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%23ff6d00%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'green': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%232dc653%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%232dc653%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'blue': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%230077b6%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%230077b6%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'purple': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%237b2d8b%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%237b2d8b%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'brown': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%238b4513%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%238b4513%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'black': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%23111111%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%23111111%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+  'red': 'data:image/svg+xml,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20viewBox%3D%220%200%2036%2036%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L30%2C10%20L30%2C32%20L6%2C32%20Z%22%20fill%3D%22%23e8e8e8%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M6%2C10%20L18%2C6%20L18%2C22%20L10%2C32%20L6%2C32%20Z%22%20fill%3D%22%23d0d0d0%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Cpath%20d%3D%22M30%2C10%20L18%2C6%20L18%2C22%20L26%2C32%20L30%2C32%20Z%22%20fill%3D%22%23c8c8c8%22%20stroke%3D%22%23bbb%22%20stroke-width%3D%220.5%22/%3E%3Crect%20x%3D%225%22%20y%3D%2220%22%20width%3D%2226%22%20height%3D%224%22%20rx%3D%221%22%20fill%3D%22%23c1121f%22%20opacity%3D%220.95%22/%3E%3Crect%20x%3D%2215%22%20y%3D%2219%22%20width%3D%226%22%20height%3D%226%22%20rx%3D%221%22%20fill%3D%22%23c1121f%22/%3E%3Crect%20x%3D%2216.5%22%20y%3D%2220.5%22%20width%3D%223%22%20height%3D%223%22%20rx%3D%220.5%22%20fill%3D%22rgba%280%2C0%2C0%2C0.2%29%22/%3E%3C/svg%3E',
+};
 const BELTS = [
   {id:'white',  name:'Blanche', level:'Niveau 1 — Débutant',      emoji:'🥋⚪', color:'var(--white-belt)',  desc:'Fondamentaux du dribble, prise en main du ballon, coordination de base'},
   {id:'yellow', name:'Jaune',   level:'Niveau 2 — Initié',        emoji:'🥋🟡', color:'var(--yellow-belt)', desc:'Dribble en mouvement, changements de direction simples, rythme de base'},
@@ -5552,6 +5602,14 @@ function showSection(id, btn) {
   document.getElementById('s-'+id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mm-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-drop-item').forEach(b => b.classList.remove('active'));
+  // Sync mm-btn mobile avec la section active
+  document.querySelectorAll('.mm-btn').forEach(function(b){
+    var fn = b.getAttribute('onclick') || '';
+    if(fn.indexOf("'"+id+"'") > -1 || fn.indexOf('"'+id+'"') > -1){
+      b.classList.add('active');
+    }
+  });
   if (btn) btn.classList.add('active');
   // Navigation vers l'ancre — Safari iOS traite ça comme une vraie navigation
   // et repositionne correctement sans scroll résiduel
@@ -5610,7 +5668,7 @@ function buildBelts() {
     const card = document.createElement('div');
     card.className = 'belt-card ' + b.id;
     card.innerHTML = `
-      <div class="belt-icon">${b.emoji}</div>
+      <div class="belt-icon" style="background:transparent;border:none"><img src="${_BELT_SVG[b.id]||''}" width="40" height="40" alt="${b.name}" style="display:block"></div>
       <div class="belt-info">
         <div class="belt-name">${b.name}</div>
         <div class="belt-level">${b.level}</div>
@@ -7024,7 +7082,7 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 </div>
 
 <!-- ── BARRE OUTILS SÉANCE (Timer + Métronome) ── -->
-<div id="session-toolbar" style="position:fixed;bottom:120px;left:20px;z-index:996;display:flex;flex-direction:column;gap:6px">
+<div id="session-toolbar" style="position:fixed;bottom:120px;right:70px;z-index:996;display:flex;flex-direction:column;gap:6px">
   <button onclick="timerToggle()" title="Timer Drill" style="width:40px;height:40px;border-radius:50%;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(245,197,24,.3)'" onmouseleave="this.style.background='rgba(245,197,24,.15)'">⏱️</button>
   <button onclick="metroToggle()" title="Metronome" style="width:40px;height:40px;border-radius:50%;background:rgba(0,119,182,.15);border:1px solid rgba(0,119,182,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(0,119,182,.3)'" onmouseleave="this.style.background='rgba(0,119,182,.15)'">🥁</button>
   <button onclick="shareInsta()" title="Share on Instagram" style="width:40px;height:40px;border-radius:50%;background:rgba(193,18,31,.15);border:1px solid rgba(193,18,31,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;backdrop-filter:blur(8px)" onmouseenter="this.style.background='rgba(193,18,31,.3)'" onmouseleave="this.style.background='rgba(193,18,31,.15)'">📸</button>
@@ -8703,7 +8761,7 @@ function applyLang(lang) {
 
   // Bouton toggle
   const btn = document.getElementById('lang-toggle');
-  if (btn) btn.textContent = lang === 'fr' ? '🌐 EN' : '🌐 FR';
+  if (btn) btn.textContent = lang === 'fr' ? '🌐 FR' : '🌐 EN';
 
   // Données JS dynamiques — BELTS
   applyLangBelts(lang);
