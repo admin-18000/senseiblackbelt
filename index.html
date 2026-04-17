@@ -1311,7 +1311,7 @@ body.unlocked .sensei-only{display:revert !important}
               <div style="overflow:hidden;height:360px">
                 <div style="animation:vidScroll 10s linear infinite">
                   <div style="height:110px;position:relative;border-bottom:2px solid var(--dark2);overflow:hidden">
-                    <img id="thumb-1c" alt="" role="presentation" src="https://img.youtube.com/vi/m1gctvzz6nc/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/m1gctvzz6nc/hqdefault.jpg'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
+                    <img id="thumb-1c" alt="" role="presentation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
                     <div style="position:absolute;bottom:5px;left:8px;font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--gold);background:rgba(0,0,0,.6);padding:2px 5px;border-radius:2px" data-i18n="home_drill4">DRILL #4</div>
                   </div>
                   <div style="padding:6px 10px;background:var(--dark3);border-bottom:1px solid var(--border)">
@@ -1319,7 +1319,7 @@ body.unlocked .sensei-only{display:revert !important}
                     <div style="font-family:var(--font-cond);font-size:7px;color:var(--orange-belt)" data-i18n="mock_belt_orange">CEINTURE ORANGE</div>
                   </div>
                   <div style="height:110px;position:relative;border-bottom:2px solid var(--dark2);overflow:hidden">
-                    <img id="thumb-2c" alt="" role="presentation" src="https://img.youtube.com/vi/5WBIegdWthc/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/5WBIegdWthc/hqdefault.jpg'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
+                    <img id="thumb-2c" alt="" role="presentation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
                     <div style="position:absolute;bottom:5px;left:8px;font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--green-belt);background:rgba(0,0,0,.6);padding:2px 5px;border-radius:2px" data-i18n="home_drill5">DRILL #5</div>
                   </div>
                   <div style="padding:6px 10px;background:var(--dark3);border-bottom:1px solid var(--border)">
@@ -1327,7 +1327,7 @@ body.unlocked .sensei-only{display:revert !important}
                     <div style="font-family:var(--font-cond);font-size:7px;color:var(--green-belt)" data-i18n="mock_belt_green">CEINTURE VERTE</div>
                   </div>
                   <div style="height:110px;position:relative;overflow:hidden">
-                    <img id="thumb-3c" alt="" role="presentation" src="https://img.youtube.com/vi/rrfc2hyF-hE/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/rrfc2hyF-hE/hqdefault.jpg'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
+                    <img id="thumb-3c" alt="" role="presentation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85">
                     <div style="position:absolute;bottom:5px;left:8px;font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--blue-belt);background:rgba(0,0,0,.6);padding:2px 5px;border-radius:2px" data-i18n="home_drill6">DRILL #6</div>
                   </div>
                   <div style="padding:6px 10px;background:var(--dark3)">
@@ -6411,37 +6411,30 @@ window.addEventListener('load', () => {
   // ══ MOCKUPS : charger les vraies thumbnails YouTube ══
   const ids = SECTION_VIDEOS.ballhandling;
   if (ids && ids.length >= 7) {
-    const picks = [ids[0], ids[3], ids[6]];
-    const thumbEls = ['thumb-1','thumb-2','thumb-3','thumb-1b','thumb-2b','thumb-3b'];
-    picks.forEach((v, i) => {
-      const el = document.getElementById(thumbEls[i]);
-      if (el) {
-        el.src = 'https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg';
-        el.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg'; };
-      }
-      // Mobile aussi
-      const mob = document.querySelector('.thumb-mobile-' + (i+1));
-      if (mob) {
-        mob.src = 'https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg';
-        mob.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg'; };
-      }
-    });
-    // Mockup bloc 01 BallAI — drills 4, 5, 6 (délai pour s'assurer du DOM)
-    var _bh_ids = ids;
-    function _loadThumbC() {
-      var picksC = [_bh_ids[3], _bh_ids[4], _bh_ids[5]];
-      var thumbElsC = ['thumb-1c','thumb-2c','thumb-3c'];
-      picksC.forEach(function(v, i) {
-        var el = document.getElementById(thumbElsC[i]);
-        if (el && !el.src) {
-          el.src = 'https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg';
-          el.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg'; };
+    // Tous les mockups en une seule passe
+    const allPicks = [
+      {vid:ids[0], els:['thumb-1','thumb-1b'], mob:1},
+      {vid:ids[3], els:['thumb-2','thumb-2b','thumb-1c'], mob:2},
+      {vid:ids[6], els:['thumb-3','thumb-3b'], mob:3},
+      {vid:ids[4], els:['thumb-2c'], mob:null},
+      {vid:ids[5], els:['thumb-3c'], mob:null},
+    ];
+    allPicks.forEach(function(item) {
+      item.els.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.src = 'https://img.youtube.com/vi/' + item.vid.id + '/maxresdefault.jpg';
+          el.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg'; };
         }
       });
-    }
-    _loadThumbC();
-    // Relancer après 500ms au cas où le DOM n'était pas prêt
-    setTimeout(_loadThumbC, 500);
+      if (item.mob) {
+        var mob = document.querySelector('.thumb-mobile-' + item.mob);
+        if (mob) {
+          mob.src = 'https://img.youtube.com/vi/' + item.vid.id + '/maxresdefault.jpg';
+          mob.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg'; };
+        }
+      }
+    });
   }
 
   // ══ MOCKUPS : compteur score 0 → 9.2 à partir de 5.5s ══
