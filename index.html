@@ -19807,13 +19807,17 @@ function _tdr_spawnTarget() {
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
   var cx = (_tdr_calibrated && _tdr_centerX) ? _tdr_centerX : 0.5;
-  var spread = 0.28; // écart gauche/droite depuis le centre
+  var landscape = W > H; // mode paysage
+  var spread = landscape ? 0.32 : 0.28;
+  var yTop    = landscape ? 0.22 : 0.28;
+  var yMid    = landscape ? 0.55 : 0.50;
+  var yBot    = landscape ? 0.80 : 0.72;
   var positions = [
-    {x: W*(cx - spread), y: H*0.50, color:'#2dc653'},  // gauche milieu
-    {x: W*(cx + spread), y: H*0.50, color:'#e63946'},  // droite milieu
-    {x: W*cx,            y: H*0.28, color:'#f5c518'},  // centre haut
-    {x: W*(cx - spread), y: H*0.72, color:'#4ecdc4'},  // gauche bas
-    {x: W*(cx + spread), y: H*0.72, color:'#7b2d8b'},  // droite bas
+    {x: W*(cx - spread), y: H*yMid, color:'#2dc653'},  // gauche milieu
+    {x: W*(cx + spread), y: H*yMid, color:'#e63946'},  // droite milieu
+    {x: W*cx,            y: H*yTop, color:'#f5c518'},  // centre haut
+    {x: W*(cx - spread), y: H*yBot, color:'#4ecdc4'},  // gauche bas
+    {x: W*(cx + spread), y: H*yBot, color:'#7b2d8b'},  // droite bas
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -20631,8 +20635,14 @@ function _dcog_nextQuestion() {
   var H  = cv ? cv.height : 480;
   var r  = Math.round(W * 0.12);
   var colors = ['#2dc653','#f5c518','#e63946'];
-  // 9 zones aléatoires — grille 3x3 évitant les bords
-  var zones = [
+  // Grille adaptative portrait/paysage
+  var landscape = W > H;
+  var zones = landscape ? [
+    // Paysage : grille 3x2 bien répartie sur toute la largeur
+    {x:W*0.18,y:H*0.30},{x:W*0.50,y:H*0.30},{x:W*0.82,y:H*0.30},
+    {x:W*0.18,y:H*0.70},{x:W*0.50,y:H*0.70},{x:W*0.82,y:H*0.70}
+  ] : [
+    // Portrait : grille 3x3 originale
     {x:W*0.20,y:H*0.25},{x:W*0.50,y:H*0.25},{x:W*0.80,y:H*0.25},
     {x:W*0.20,y:H*0.55},{x:W*0.50,y:H*0.55},{x:W*0.80,y:H*0.55},
     {x:W*0.20,y:H*0.80},{x:W*0.50,y:H*0.80},{x:W*0.80,y:H*0.80}
