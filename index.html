@@ -661,6 +661,10 @@ body.unlocked .sensei-only{display:revert !important}
 /* Override CSS app pour vid-thumb dans Training */
 .tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
 .tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
+
+#tdr_camContainer{background:#000}
+#tdr_camContainer:fullscreen,#tdr_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
+#tdr_camContainer:fullscreen #tdr_canvas,#tdr_camContainer:-webkit-full-screen #tdr_canvas{width:100%!important;height:100%!important;object-fit:cover}
 </style>
 </head>
 <body>
@@ -19574,13 +19578,25 @@ function _tdr_start() {
       _tdr_video.srcObject = stream;
       _tdr_video.onloadedmetadata = function() {
         _tdr_video.play();
+        var cv = document.getElementById('tdr_canvas');
+        if (cv && _tdr_video.videoWidth && _tdr_video.videoHeight) {
+          cv.width  = _tdr_video.videoWidth;
+          cv.height = _tdr_video.videoHeight;
+        }
         _tdr_calibrate();
       };
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
   var container = document.getElementById('tdr_camContainer');
-  if (container) container.style.display = 'block';
+  if (container) {
+    container.style.display = 'block';
+    if (container.requestFullscreen) { container.requestFullscreen().catch(function(){}); }
+    else if (container.webkitRequestFullscreen) { container.webkitRequestFullscreen(); }
+  }
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(function(){});
+  }
   var bRec=document.getElementById('tdr_btnRec');
   if(bRec)bRec.style.display='flex';
   var btnStart = document.getElementById('tdr_btnStart');
@@ -19599,7 +19615,12 @@ function _tdr_stop() {
   if (_tdr_stream) { _tdr_stream.getTracks().forEach(function(t){t.stop();}); _tdr_stream = null; }
   if (_tdr_video) _tdr_video.srcObject = null;
   var container = document.getElementById('tdr_camContainer');
-  if (container) container.style.display = 'none';
+  if (container) {
+    container.style.display = 'none';
+    if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
+    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+  }
+  if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
   if(typeof _tdr_recActive!=='undefined'&&_tdr_recActive)_tdr_stopRec();
   var bRec2=document.getElementById('tdr_btnRec');
   if(bRec2)bRec2.style.display='none';
@@ -19757,7 +19778,7 @@ function _tdr_drawTargets(ctx, W, H) {
     var proximity = 0;
     wristPositions.forEach(function(w){
       var dist = Math.sqrt(Math.pow(w.x-t.x,2)+Math.pow(w.y-t.y,2));
-      var prox = Math.max(0, 1 - dist/(t.r*5));
+      var prox = Math.max(0, 1 - dist/(t.r*3.5));
       if(prox > proximity) proximity = prox;
     });
     var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
@@ -19827,7 +19848,7 @@ function _tdr_spawnTarget() {
     _tdr_targets.push({
       x: p.x + (Math.random()-0.5)*20,
       y: p.y + (Math.random()-0.5)*20,
-      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.08), color: p.color,
+      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.12), color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
@@ -19860,12 +19881,12 @@ function _tdr_checkHits(poses) {
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdr_prevWrist[name] = {x:wx, y:wy};
     // Seuil adaptatif : ~1.5% de la largeur canvas (15px sur 1000px, 10px sur 640px)
-    var moveThresh = Math.max(8, Math.round(W * 0.015));
+    var moveThresh = Math.max(4, Math.round(W * 0.008));
     if (moved < moveThresh) return;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r * 1.35) { // 1.35 : équilibre précision/tolérance
+      if (Math.sqrt(dx*dx+dy*dy) < t.r * 2.0) { // 2.0 zone élargie mobile
         t.hit = true; // marquer immédiatement pour éviter double-hit G+D
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
