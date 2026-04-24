@@ -18786,6 +18786,9 @@ function _tsym_startCamera() {
           cvs.width  = _tsym_video.videoWidth;
           cvs.height = _tsym_video.videoHeight;
         }
+        var cntfs = document.getElementById('tsym_camContainer');
+        if (cntfs) { cntfs.classList.add('sensei-cam-fullscreen'); document.body.style.overflow='hidden'; }
+        if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(function(){}); }
         if (status) status.textContent = _t('Chargement IA...','Loading AI...');
         _tsym_loadTimeout = setTimeout(function(){
           _tsym_loadTimeout = null;
@@ -18803,14 +18806,8 @@ function _tsym_startCamera() {
   }
   tryCamera(0);
   // Plein écran paysage style HomeCourt
-  var cnt = document.getElementById('tsym_camContainer');
-  if (cnt) {
-    cnt.classList.add('sensei-cam-fullscreen');
-    document.body.style.overflow = 'hidden';
-  }
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(function(){});
-  }
+  var cnt_pre = document.getElementById('tsym_camContainer');
+  if (cnt_pre) cnt_pre.style.display = 'block';
 }
 
 function _tsym_stopCamera() {
@@ -19640,19 +19637,16 @@ function _tdr_start() {
           cv.width  = _tdr_video.videoWidth;
           cv.height = _tdr_video.videoHeight;
         }
+        var cont = document.getElementById('tdr_camContainer');
+        if (cont) { cont.classList.add('sensei-cam-fullscreen'); document.body.style.overflow='hidden'; }
+        if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(function(){}); }
         _tdr_calibrate();
       };
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
   var container = document.getElementById('tdr_camContainer');
-  if (container) {
-    container.classList.add('sensei-cam-fullscreen');
-    document.body.style.overflow = 'hidden';
-  }
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(function(){});
-  }
+  if (container) container.style.display = 'block';
   var bRec=document.getElementById('tdr_btnRec');
   if(bRec)bRec.style.display='flex';
   var btnStart = document.getElementById('tdr_btnStart');
@@ -20479,7 +20473,10 @@ function _dcog_start() {
           cvcog.width  = _dcog_video.videoWidth;
           cvcog.height = _dcog_video.videoHeight;
         }
-        // Attendre le modèle IA — même pattern que _tdr_calibrate
+        var camcog = document.getElementById('dcog_camContainer');
+        if (camcog) { camcog.classList.add('sensei-cam-fullscreen'); document.body.style.overflow='hidden'; }
+        if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('landscape').catch(function(){}); }
+        // Attendre le modele IA
         if (!_tsym_detector) {
           _dcog_setStatus(_t('Chargement IA...','Loading AI...'), '#f5c518');
           _tsym_loadModel(
@@ -20494,13 +20491,7 @@ function _dcog_start() {
   }
   tryC(0);
   var cam = document.getElementById('dcog_camContainer');
-  if (cam) {
-    cam.classList.add('sensei-cam-fullscreen');
-    document.body.style.overflow = 'hidden';
-  }
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(function(){});
-  }
+  if (cam) cam.style.display = 'block';
   var btnS = document.getElementById('dcog_btnStart');
   var btnT = document.getElementById('dcog_btnStop');
   if (btnS) btnS.style.display = 'none';
