@@ -18767,14 +18767,17 @@ function _tsym_startCamera() {
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
-    var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'},{width:{ideal:640},height:{ideal:480},facingMode:'environment'},{facingMode:'environment'},{facingMode:'user',width:{ideal:640},height:{ideal:480}},{facingMode:'user'},{width:{ideal:640}}];
+    var _vConstraints=[{width:{ideal:1280},height:{ideal:720},facingMode:{exact:'environment'}},{facingMode:{exact:'environment'}},{width:{ideal:1280},height:{ideal:720},facingMode:'environment'},{facingMode:'environment'},{facingMode:'user'},{width:{ideal:640}}];
   var _tsym_loadTimeout = null; // fix : _lt annulable depuis stopCamera
   function tryCamera(ci){
     if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
     .then(function(stream) {
       _tsym_stream = stream;
-      window._sensei_camFacing = _vConstraints[ci] && _vConstraints[ci].facingMode === 'environment' ? 'environment' : 'user';
+      var _track1 = stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+      var _settings1 = _track1 && _track1.getSettings ? _track1.getSettings() : {};
+      var _fm1 = _settings1.facingMode || (_vConstraints[ci] && (typeof _vConstraints[ci].facingMode === 'object' ? _vConstraints[ci].facingMode.exact : _vConstraints[ci].facingMode)) || 'user';
+      window._sensei_camFacing = _fm1;
       _tsym_video = document.getElementById('tsym_video');
       if (!_tsym_video) return;
       _tsym_video.srcObject = stream;
@@ -19621,12 +19624,15 @@ function _tdr_start() {
     _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
   _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
-  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'}},{video:{width:{ideal:640},height:{ideal:480},facingMode:'environment'}},{video:{facingMode:'environment'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:true}];
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:{exact:'environment'}}},{video:{facingMode:{exact:'environment'}}},{video:{width:{ideal:1280},height:{ideal:720},facingMode:'environment'}},{video:{facingMode:'environment'}},{video:{facingMode:'user'}},{video:true}];
   function tryC(i) {
     if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _tdr_stream = stream;
-      window._sensei_camFacing = constraints[i] && constraints[i].video && constraints[i].video.facingMode === 'environment' ? 'environment' : 'user';
+      var _track2 = stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+      var _settings2 = _track2 && _track2.getSettings ? _track2.getSettings() : {};
+      var _fm2 = _settings2.facingMode || (constraints[i] && constraints[i].video && (typeof constraints[i].video.facingMode === 'object' ? constraints[i].video.facingMode.exact : constraints[i].video.facingMode)) || 'user';
+      window._sensei_camFacing = _fm2;
       _tdr_video  = document.getElementById('tdr_video');
       if (!_tdr_video) return;
       _tdr_video.srcObject = stream;
@@ -20449,10 +20455,11 @@ function _dcog_start() {
   }
   _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [
-    {video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'}},
-    {video:{width:{ideal:640},height:{ideal:480},facingMode:'environment'}},
+    {video:{width:{ideal:1280},height:{ideal:720},facingMode:{exact:'environment'}}},
+    {video:{facingMode:{exact:'environment'}}},
+    {video:{width:{ideal:1280},height:{ideal:720},facingMode:'environment'}},
     {video:{facingMode:'environment'}},
-    {video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},
+    {video:{facingMode:'user'}},
     {video:true}
   ];
   function tryC(i) {
@@ -20461,7 +20468,10 @@ function _dcog_start() {
     }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _dcog_stream = stream;
-      window._sensei_camFacing = constraints[i] && constraints[i].video && constraints[i].video.facingMode === 'environment' ? 'environment' : 'user';
+      var _track3 = stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+      var _settings3 = _track3 && _track3.getSettings ? _track3.getSettings() : {};
+      var _fm3 = _settings3.facingMode || (constraints[i] && constraints[i].video && (typeof constraints[i].video.facingMode === 'object' ? constraints[i].video.facingMode.exact : constraints[i].video.facingMode)) || 'user';
+      window._sensei_camFacing = _fm3;
       _dcog_video  = document.getElementById('dcog_video');
       if (!_dcog_video) return;
       _dcog_video.srcObject = stream;
