@@ -665,6 +665,14 @@ body.unlocked .sensei-only{display:revert !important}
 #tdr_camContainer{background:#000}
 #tdr_camContainer:fullscreen,#tdr_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
 #tdr_camContainer:fullscreen #tdr_canvas,#tdr_camContainer:-webkit-full-screen #tdr_canvas{width:100%!important;height:100%!important;object-fit:cover}
+
+#dcog_camContainer{background:#000}
+#dcog_camContainer:fullscreen,#dcog_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
+#dcog_camContainer:fullscreen #dcog_canvas,#dcog_camContainer:-webkit-full-screen #dcog_canvas{width:100%!important;height:100%!important;object-fit:cover}
+
+#tsym_camContainer{background:#000}
+#tsym_camContainer:fullscreen,#tsym_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
+#tsym_camContainer:fullscreen #tsym_canvas,#tsym_camContainer:-webkit-full-screen #tsym_canvas{width:100%!important;height:100%!important;object-fit:cover}
 </style>
 </head>
 <body>
@@ -18747,6 +18755,12 @@ function _tsym_startCamera() {
       _tsym_video.srcObject = stream;
       _tsym_video.onloadedmetadata = function() {
         _tsym_video.play();
+        // Adapter canvas à la résolution réelle (paysage)
+        var cvs = document.getElementById('tsym_canvas');
+        if (cvs && _tsym_video.videoWidth && _tsym_video.videoHeight) {
+          cvs.width  = _tsym_video.videoWidth;
+          cvs.height = _tsym_video.videoHeight;
+        }
         if (status) status.textContent = _t('Chargement IA...','Loading AI...');
         _tsym_loadTimeout = setTimeout(function(){
           _tsym_loadTimeout = null;
@@ -18763,6 +18777,16 @@ function _tsym_startCamera() {
     .catch(function(){tryCamera(ci+1);});
   }
   tryCamera(0);
+  // Plein écran paysage style HomeCourt
+  var cnt = document.getElementById('tsym_camContainer');
+  if (cnt) {
+    cnt.style.display = 'block';
+    if (cnt.requestFullscreen) { cnt.requestFullscreen().catch(function(){}); }
+    else if (cnt.webkitRequestFullscreen) { cnt.webkitRequestFullscreen(); }
+  }
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(function(){});
+  }
 }
 
 function _tsym_stopCamera() {
@@ -18771,7 +18795,13 @@ function _tsym_stopCamera() {
   if (_tsym_stream) { _tsym_stream.getTracks().forEach(function(t){t.stop();}); _tsym_stream = null; }
   var vid = document.getElementById('tsym_video');
   if (vid) vid.srcObject = null;
-  var cnt2=document.getElementById('tsym_camContainer');if(cnt2)cnt2.style.display='none';
+  var cnt2=document.getElementById('tsym_camContainer');
+  if(cnt2){
+    cnt2.style.display='none';
+    if(document.exitFullscreen){document.exitFullscreen().catch(function(){});}
+    else if(document.webkitExitFullscreen){document.webkitExitFullscreen();}
+  }
+  if(screen.orientation&&screen.orientation.unlock){screen.orientation.unlock();}
   var btnStart = document.getElementById('tsym_btnStart');
   var btnStop  = document.getElementById('tsym_btnStop');
   if (btnStart) btnStart.style.display = 'flex';
@@ -20416,6 +20446,12 @@ function _dcog_start() {
       _dcog_video.srcObject = stream;
       _dcog_video.onloadedmetadata = function() {
         _dcog_video.play();
+        // Adapter canvas à la résolution réelle
+        var cvcog = document.getElementById('dcog_canvas');
+        if (cvcog && _dcog_video.videoWidth && _dcog_video.videoHeight) {
+          cvcog.width  = _dcog_video.videoWidth;
+          cvcog.height = _dcog_video.videoHeight;
+        }
         // Attendre le modèle IA — même pattern que _tdr_calibrate
         if (!_tsym_detector) {
           _dcog_setStatus(_t('Chargement IA...','Loading AI...'), '#f5c518');
@@ -20430,9 +20466,15 @@ function _dcog_start() {
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
-  // Show camera container + update buttons
   var cam = document.getElementById('dcog_camContainer');
-  if (cam) cam.style.display = 'block';
+  if (cam) {
+    cam.style.display = 'block';
+    if (cam.requestFullscreen) { cam.requestFullscreen().catch(function(){}); }
+    else if (cam.webkitRequestFullscreen) { cam.webkitRequestFullscreen(); }
+  }
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(function(){});
+  }
   var btnS = document.getElementById('dcog_btnStart');
   var btnT = document.getElementById('dcog_btnStop');
   if (btnS) btnS.style.display = 'none';
@@ -20452,7 +20494,12 @@ function _dcog_stop() {
   clearTimeout(_dcog_tbChaosTimer);
   clearTimeout(_dcog_burnoutTimer);
   var cam = document.getElementById('dcog_camContainer');
-  if (cam) cam.style.display = 'none';
+  if (cam) {
+    cam.style.display = 'none';
+    if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
+    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+  }
+  if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
   // Hide all overlays
   ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none';
@@ -20667,7 +20714,7 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.08);
+  var r  = Math.round(W * 0.12);
   var colors = ['#2dc653','#f5c518','#e63946'];
   // 9 zones aléatoires — grille 3x3 évitant les bords
   var zones = [
@@ -20704,13 +20751,13 @@ function _dcog_analyzeMathZone(poses) {
     var prev = _dcog_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _dcog_prevWrist[name] = {x:wx, y:wy};
-    // Seuil adaptatif : ~1.5% de la largeur canvas
-    var moveThresh = Math.max(8, Math.round(W * 0.015));
+    // Seuil adaptatif réduit pour mobile
+    var moveThresh = Math.max(4, Math.round(W * 0.008));
     if (moved < moveThresh) return;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.35) { // aligné avec _tdr_
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 2.0) { // 2.0 zone élargie mobile
         t.hit = true; t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         // Son différencié identique à TDR
@@ -20764,7 +20811,7 @@ function _dcog_drawMathTargets(ctx, W, H) {
     var proximity = 0;
     dcWrists.forEach(function(w){
       var dist = Math.sqrt(Math.pow(w.x-t.x,2)+Math.pow(w.y-t.y,2));
-      var prox = Math.max(0, 1 - dist/(t.r*5));
+      var prox = Math.max(0, 1 - dist/(t.r*3.5));
       if(prox > proximity) proximity = prox;
     });
     var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
