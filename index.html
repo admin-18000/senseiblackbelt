@@ -662,6 +662,20 @@ body.unlocked .sensei-only{display:revert !important}
 .tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
 .tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
 
+/* ── Caméra plein écran paysage — iOS + Android ── */
+.sensei-cam-fullscreen {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  display: block !important;
+}
+.sensei-cam-fullscreen canvas {
+  width: 100% !important; height: 100% !important;
+  object-fit: cover !important;
+}
 #tdr_camContainer{background:#000}
 #tdr_camContainer:fullscreen,#tdr_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
 #tdr_camContainer:fullscreen #tdr_canvas,#tdr_camContainer:-webkit-full-screen #tdr_canvas{width:100%!important;height:100%!important;object-fit:cover}
@@ -673,6 +687,16 @@ body.unlocked .sensei-only{display:revert !important}
 #tsym_camContainer{background:#000}
 #tsym_camContainer:fullscreen,#tsym_camContainer:-webkit-full-screen{width:100vw!important;height:100vh!important;border-radius:0!important}
 #tsym_camContainer:fullscreen #tsym_canvas,#tsym_camContainer:-webkit-full-screen #tsym_canvas{width:100%!important;height:100%!important;object-fit:cover}
+
+.sensei-cam-fullscreen ~ .sensei-cam-stop,
+.sensei-cam-fullscreen .sensei-cam-stop { display:block !important; }
+.sensei-cam-stop {
+  position:fixed; top:16px; right:16px; z-index:10000;
+  background:rgba(230,57,70,.9); color:#fff;
+  font-family:var(--font-cond,sans-serif); font-size:14px; font-weight:900;
+  padding:10px 18px; border-radius:30px; cursor:pointer;
+  letter-spacing:1px; border:none; display:none;
+}
 </style>
 </head>
 <body>
@@ -18743,13 +18767,14 @@ function _tsym_startCamera() {
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
-  var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:640},height:{ideal:480},facingMode:'user'},{facingMode:'user'},true];
+    var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'},{width:{ideal:640},height:{ideal:480},facingMode:'environment'},{facingMode:'environment'},{facingMode:'user',width:{ideal:640},height:{ideal:480}},{facingMode:'user'},{width:{ideal:640}}];
   var _tsym_loadTimeout = null; // fix : _lt annulable depuis stopCamera
   function tryCamera(ci){
     if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
     .then(function(stream) {
       _tsym_stream = stream;
+      window._sensei_camFacing = _vConstraints[ci] && _vConstraints[ci].facingMode === 'environment' ? 'environment' : 'user';
       _tsym_video = document.getElementById('tsym_video');
       if (!_tsym_video) return;
       _tsym_video.srcObject = stream;
@@ -18780,9 +18805,8 @@ function _tsym_startCamera() {
   // Plein écran paysage style HomeCourt
   var cnt = document.getElementById('tsym_camContainer');
   if (cnt) {
-    cnt.style.display = 'block';
-    if (cnt.requestFullscreen) { cnt.requestFullscreen().catch(function(){}); }
-    else if (cnt.webkitRequestFullscreen) { cnt.webkitRequestFullscreen(); }
+    cnt.classList.add('sensei-cam-fullscreen');
+    document.body.style.overflow = 'hidden';
   }
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape').catch(function(){});
@@ -18797,9 +18821,9 @@ function _tsym_stopCamera() {
   if (vid) vid.srcObject = null;
   var cnt2=document.getElementById('tsym_camContainer');
   if(cnt2){
+    cnt2.classList.remove('sensei-cam-fullscreen');
     cnt2.style.display='none';
-    if(document.exitFullscreen){document.exitFullscreen().catch(function(){});}
-    else if(document.webkitExitFullscreen){document.webkitExitFullscreen();}
+    document.body.style.overflow = '';
   }
   if(screen.orientation&&screen.orientation.unlock){screen.orientation.unlock();}
   var btnStart = document.getElementById('tsym_btnStart');
@@ -18925,9 +18949,11 @@ function _drawVideoMirror(ctx, video, W, H) {
   var sx, sy, sw, sh;
   if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw-sw)/2; sy = 0; }
   else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh-sh)/2; }
+  // Miroir uniquement si caméra frontale (environment = pas de miroir)
+  var isFront = window._sensei_camFacing !== 'environment';
   ctx.save();
-  ctx.scale(-1, 1);
-  ctx.drawImage(video, sx, sy, sw, sh, -W, 0, W, H);
+  if (isFront) { ctx.scale(-1, 1); ctx.drawImage(video, sx, sy, sw, sh, -W, 0, W, H); }
+  else          { ctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H); }
   ctx.restore();
 }
 
@@ -19598,11 +19624,12 @@ function _tdr_start() {
     _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
   _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
-  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'}},{video:{width:{ideal:640},height:{ideal:480},facingMode:'environment'}},{video:{facingMode:'environment'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:true}];
   function tryC(i) {
     if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _tdr_stream = stream;
+      window._sensei_camFacing = constraints[i] && constraints[i].video && constraints[i].video.facingMode === 'environment' ? 'environment' : 'user';
       _tdr_video  = document.getElementById('tdr_video');
       if (!_tdr_video) return;
       _tdr_video.srcObject = stream;
@@ -19620,9 +19647,8 @@ function _tdr_start() {
   tryC(0);
   var container = document.getElementById('tdr_camContainer');
   if (container) {
-    container.style.display = 'block';
-    if (container.requestFullscreen) { container.requestFullscreen().catch(function(){}); }
-    else if (container.webkitRequestFullscreen) { container.webkitRequestFullscreen(); }
+    container.classList.add('sensei-cam-fullscreen');
+    document.body.style.overflow = 'hidden';
   }
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape').catch(function(){});
@@ -19646,9 +19672,9 @@ function _tdr_stop() {
   if (_tdr_video) _tdr_video.srcObject = null;
   var container = document.getElementById('tdr_camContainer');
   if (container) {
+    container.classList.remove('sensei-cam-fullscreen');
     container.style.display = 'none';
-    if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
-    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+    document.body.style.overflow = '';
   }
   if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
   if(typeof _tdr_recActive!=='undefined'&&_tdr_recActive)_tdr_stopRec();
@@ -20429,10 +20455,10 @@ function _dcog_start() {
   }
   _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [
-    {video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'}},
-    {video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},
+    {video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'environment'}},
+    {video:{width:{ideal:640},height:{ideal:480},facingMode:'environment'}},
+    {video:{facingMode:'environment'}},
     {video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},
-    {video:{facingMode:'user'}},
     {video:true}
   ];
   function tryC(i) {
@@ -20441,6 +20467,7 @@ function _dcog_start() {
     }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _dcog_stream = stream;
+      window._sensei_camFacing = constraints[i] && constraints[i].video && constraints[i].video.facingMode === 'environment' ? 'environment' : 'user';
       _dcog_video  = document.getElementById('dcog_video');
       if (!_dcog_video) return;
       _dcog_video.srcObject = stream;
@@ -20468,9 +20495,8 @@ function _dcog_start() {
   tryC(0);
   var cam = document.getElementById('dcog_camContainer');
   if (cam) {
-    cam.style.display = 'block';
-    if (cam.requestFullscreen) { cam.requestFullscreen().catch(function(){}); }
-    else if (cam.webkitRequestFullscreen) { cam.webkitRequestFullscreen(); }
+    cam.classList.add('sensei-cam-fullscreen');
+    document.body.style.overflow = 'hidden';
   }
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape').catch(function(){});
@@ -20495,9 +20521,9 @@ function _dcog_stop() {
   clearTimeout(_dcog_burnoutTimer);
   var cam = document.getElementById('dcog_camContainer');
   if (cam) {
+    cam.classList.remove('sensei-cam-fullscreen');
     cam.style.display = 'none';
-    if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
-    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+    document.body.style.overflow = '';
   }
   if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
   // Hide all overlays
@@ -22019,5 +22045,40 @@ if('serviceWorker' in navigator){
 })();
 
 </script>
+
+<!-- ── Bouton STOP caméra plein écran ── -->
+<button id="sensei-cam-stop-btn" 
+  style="display:none;position:fixed;top:16px;right:16px;z-index:10000;
+         background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;
+         padding:12px 22px;border-radius:30px;border:none;cursor:pointer;
+         font-family:sans-serif;letter-spacing:1px;backdrop-filter:blur(8px)"
+  onclick="if(typeof _tdr_stop==='function')_tdr_stop();
+           if(typeof _dcog_stop==='function')_dcog_stop();
+           if(typeof _tsym_stopCamera==='function')_tsym_stopCamera();
+           this.style.display='none'">✕ STOP</button>
+<script>
+// Afficher/masquer le bouton STOP selon le fullscreen des containers
+(function(){
+  var ids = ['tdr_camContainer','dcog_camContainer','tsym_camContainer'];
+  var btn = document.getElementById('sensei-cam-stop-btn');
+  function checkCam(){
+    if(!btn) return;
+    var active = ids.some(function(id){
+      var el = document.getElementById(id);
+      return el && el.classList.contains('sensei-cam-fullscreen');
+    });
+    btn.style.display = active ? 'block' : 'none';
+  }
+  // Observer les changements de classe
+  var obs = new MutationObserver(checkCam);
+  document.addEventListener('DOMContentLoaded', function(){
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) obs.observe(el, {attributes:true, attributeFilter:['class','style']});
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
