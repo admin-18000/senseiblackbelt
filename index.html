@@ -27,6 +27,7 @@
   <script src="https://www.youtube.com/iframe_api" async></script>
   <!-- TF.js + MoveNet préchargés statiquement — disponibles pour tous les modules caméra -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.2.0/dist/tf-backend-wasm.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js" defer></script>
 <style>
 ::selection{background:rgba(245,197,24,.25);color:var(--text)}
@@ -15882,7 +15883,8 @@ var _fns=[
   {id:'visu-connectome',fn:drawConnectome},{id:'visu-memoire',fn:drawMemoire},
   {id:'visu-dualtask',fn:drawDualTask},{id:'visu-saut',fn:drawSaut},
   {id:'visu-dijkstra',fn:drawDijkstra},{id:'visu-gamma',fn:drawGamma},
-  {id:'visu-fractal',fn:drawFractal}
+  {id:'visu-fractal',fn:drawFractal},
+  {id:'visu-b',fn:drawNeuro}
 ];
 /* ── VISU 17 : MARCHE ALÉATOIRE & VICTOIRE ── */
 function drawRandomWalk() {
@@ -18684,7 +18686,7 @@ function _tsym_loadModel(cb, onErr) {
 
   function _initDetector() {
     if (typeof poseDetection === 'undefined') { _flushErr('poseDetection unavailable'); return; }
-    var backends = ['webgl', 'cpu'];
+    var backends = ['wasm', 'webgl', 'cpu'];
     function tryBackend(i) {
       if (i >= backends.length) { _flushErr(_t('Appareil non compatible','Device not compatible')); return; }
       tf.setBackend(backends[i]).then(function(){ return tf.ready(); })
@@ -19169,7 +19171,7 @@ var _tdr_recorder=null,_tdr_recChunks=[],_tdr_recActive=false,_tdr_recTimer=null
 function _tdr_toggleRec(){if(_tdr_recActive)_tdr_stopRec();else _tdr_startRec();}
 function _tdr_startRec(){
   if(typeof MediaRecorder==='undefined'){_tdr_recError(_t('Non supporté','Not supported'));return;}
-  var cv=document.getElementById('tdr_canvas');if(!cv)return;
+  var cv=document.getElementById('sensei-cam-canvas')||document.getElementById('tdr_canvas');if(!cv)return;
   var stream=null;
   try{stream=cv.captureStream?cv.captureStream(25):cv.mozCaptureStream?cv.mozCaptureStream(25):null;}catch(e){}
   if(!stream){_tdr_recError(_t('Capture impossible','Capture failed'));return;}
@@ -20628,6 +20630,9 @@ function _dcog_nextQuestion() {
   _dcog_mathAnswer  = q.answer;
   var qEl = document.getElementById('dcog_mathQuestion');
   if (qEl) qEl.textContent = q.text;
+  // Afficher aussi dans l'overlay plein écran
+  var qOv = document.getElementById('sensei-cam-question');
+  if (qOv) { qOv.textContent = q.text; qOv.style.display = 'block'; }
   _dcog_mathChoices = _dcog_genChoices(q.answer);
   // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
   var cv = _dcog_canvas;
@@ -21480,7 +21485,7 @@ function _dcog_startRec() {
   if (typeof MediaRecorder === 'undefined') {
     _dcog_recError(_t('Non supporté','Not supported')); return;
   }
-  var cv = document.getElementById('dcog_canvas'); if (!cv) return;
+  var cv = document.getElementById('sensei-cam-canvas') || document.getElementById('dcog_canvas'); if (!cv) return;
   var stream = null;
   try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
   if (!stream) { _dcog_recError(_t('Capture impossible','Capture failed')); return; }
@@ -21944,8 +21949,9 @@ if('serviceWorker' in navigator){
 
 </script>
 
-<div id="sensei-cam-overlay"><video id="sensei-cam-video" playsinline muted></video><canvas id="sensei-cam-canvas"></canvas></div>
+<div id="sensei-cam-overlay"><video id="sensei-cam-video" playsinline muted></video><canvas id="sensei-cam-canvas"></canvas><div id="sensei-cam-question" style="display:none;position:absolute;top:5%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;font-size:clamp(22px,5vw,48px);font-weight:900;padding:14px 32px;border-radius:16px;letter-spacing:2px;text-align:center;z-index:10;border:2px solid rgba(245,197,24,.6);text-shadow:0 2px 8px rgba(0,0,0,.8)"></div></div>
 <button id="sensei-cam-stop-btn" onclick="senseiCamStop()">&#10005; STOP</button>
+<button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:fixed;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
 function senseiCamShow(mod,stream){
@@ -21956,8 +21962,17 @@ function senseiCamShow(mod,stream){
   _scam.canvas=document.getElementById('sensei-cam-canvas');
   _scam.ctx=_scam.canvas?_scam.canvas.getContext('2d'):null;
   if(!ov||!_scam.video||!_scam.canvas)return;
+  // Check getUserMedia disponible (HTTPS requis sur iOS Safari)
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    var msg=window._lang==='en'
+      ?'Camera requires HTTPS. Please access this page via https://'
+      :'La caméra nécessite HTTPS. Accédez à cette page via https://';
+    alert(msg); return;
+  }
   ov.style.display='block';
   if(sb)sb.style.display='block';
+  var rb=document.getElementById('sensei-cam-rec-btn');
+  if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
   if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});
   _scam.video.srcObject=stream;
@@ -21970,11 +21985,24 @@ function senseiCamShow(mod,stream){
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
+function senseiCamToggleRec(){
+  var rb=document.getElementById('sensei-cam-rec-btn');
+  if(!_scam.module)return;
+  if(_scam.module==='tdr'){
+    if(typeof _tdr_recActive!=='undefined'&&_tdr_recActive){if(typeof _tdr_stopRec==='function')_tdr_stopRec();rb&&(rb.style.background='rgba(230,57,70,.92)');rb&&(rb.textContent='\u25CF REC');}
+    else{if(typeof _tdr_startRec==='function')_tdr_startRec();rb&&(rb.style.background='rgba(200,0,0,1)');rb&&(rb.textContent='\u23F9 STOP REC');}
+  }
+  if(_scam.module==='dcog'){
+    if(typeof _dcog_recActive!=='undefined'&&_dcog_recActive){if(typeof _dcog_stopRec==='function')_dcog_stopRec();rb&&(rb.style.background='rgba(230,57,70,.92)');rb&&(rb.textContent='\u25CF REC');}
+    else{if(typeof _dcog_startRec==='function')_dcog_startRec();rb&&(rb.style.background='rgba(200,0,0,1)');rb&&(rb.textContent='\u23F9 STOP REC');}
+  }
+}
 function senseiCamStop(){
   var ov=document.getElementById('sensei-cam-overlay');
   var sb=document.getElementById('sensei-cam-stop-btn');
   if(ov)ov.style.display='none';
   if(sb)sb.style.display='none';
+  var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
   document.body.style.overflow='';
   if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
   if(_scam.stream){_scam.stream.getTracks().forEach(function(t){t.stop();});_scam.stream=null;}
