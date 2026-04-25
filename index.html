@@ -23,12 +23,14 @@
   <meta name="apple-mobile-web-app-title" content="SENSEI">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://www.youtube.com/iframe_api" async></script>
   <!-- TF.js + MoveNet préchargés statiquement — disponibles pour tous les modules caméra -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.2.0/dist/tf-backend-wasm.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.2.0/dist/tf-backend-wasm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js"></script>
 <style>
 ::selection{background:rgba(245,197,24,.25);color:var(--text)}
 ::-moz-selection{background:rgba(245,197,24,.25);color:var(--text)}
@@ -3427,8 +3429,8 @@ body.unlocked .sensei-only{display:revert !important}
         <!-- Sélecteur ballons -->
         <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
           <span style="font-family:var(--font-cond);font-size:10px;letter-spacing:1px;color:var(--muted)" data-i18n="sh_lbl_balls">BALLONS :</span>
-          <button id="sh_btn2" onclick="_sh_setBalls(2)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid rgba(45,198,83,.5);background:rgba(45,198,83,.15);color:#2dc653;cursor:pointer">2</button>
-          <button id="sh_btn3" onclick="_sh_setBalls(3)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">3</button>
+          <button id="sh_btn2" onclick="window._sh_setBalls(2)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid rgba(45,198,83,.5);background:rgba(45,198,83,.15);color:#2dc653;cursor:pointer">2</button>
+          <button id="sh_btn3" onclick="window._sh_setBalls(3)" ontouchstart="" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);color:#7a8299;cursor:pointer">3</button>
         </div>
         <!-- Slider dwell -->
         <div style="margin-bottom:14px">
@@ -3454,7 +3456,7 @@ body.unlocked .sensei-only{display:revert !important}
           </div>
         </div>
         <!-- Bouton vidéo -->
-        <button id="sh_video_btn" onclick="openVideoModal('NacCJX1KFAc',window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt',false)" ontouchstart=""
+        <button id="sh_drill_btn" ontouchstart=""
           style="width:100%;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;padding:10px;border-radius:8px;border:1px solid rgba(245,197,24,.3);background:rgba(245,197,24,.08);color:#f5c518;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
           <span style="font-size:16px">▶</span>
           <span data-i18n="sh_btn_video">VOIR LE DRILL EN VIDÉO</span>
@@ -9704,6 +9706,16 @@ showSection = function(id, btn) {
 // Init DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
   testiPublicRender();
+  // Précharger MoveNet quand TF est disponible (polling léger)
+  (function tryPreload(attempt) {
+    if (typeof _tsym_loadModel === 'function' &&
+        typeof tf !== 'undefined' &&
+        typeof poseDetection !== 'undefined') {
+      _tsym_loadModel(null, null);
+    } else if (attempt < 30) {
+      setTimeout(function(){ tryPreload(attempt+1); }, 1000);
+    }
+  })(0);
 });
 </script>
 
@@ -13561,6 +13573,12 @@ function closePlayerLinkModal() {
 .vis-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
 .vis-wrap{position:relative;width:100%;height:260px;border-radius:10px;overflow:hidden;background:#080a0f;border:1px solid rgba(245,197,24,.08)}
 .vis-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+@media(max-width:640px){
+  .vis-card-title{font-size:clamp(12px,4vw,15px)!important}
+  .vis-formula{font-size:clamp(10px,3vw,12px)!important}
+  .vis-desc{font-size:clamp(12px,3.5vw,14px)!important}
+  .vis-wrap{height:200px!important}
+}
 .vis-tag{margin-left:auto;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:4px 12px;border-radius:var(--radius-xl);letter-spacing:1px;white-space:nowrap;flex-shrink:0;transition:var(--transition-fast)}
 .vis-tag-gold{background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);color:var(--gold)}
 .vis-tag-purple{background:rgba(123,45,139,.15);border:1px solid rgba(123,45,139,.3);color:var(--purple-belt)}
@@ -20241,16 +20259,21 @@ window._sh_setBalls = function(n){
     btn.style.color      = active?'#2dc653':'#7a8299';
     btn.style.borderColor= active?'rgba(45,198,83,.5)':'var(--border)';
   });
-  var vb=document.getElementById('sh_video_btn');
-  if(vb){
+  var db=document.getElementById('sh_drill_btn');
+  if(db){
     if(n===3){
-      vb.setAttribute('onclick',"openVideoModal('ELD5AlM9AaY',window._lang==='en'?'3-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 3 Ballons — SENSEI BlackBelt',false)");
+      db.onclick=function(){openVideoModal('ELD5AlM9AaY',window._lang==='en'?'3-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 3 Ballons — SENSEI BlackBelt',false);};
     } else {
-      vb.setAttribute('onclick',"openVideoModal('NacCJX1KFAc',window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt',false)");
+      db.onclick=function(){openVideoModal('NacCJX1KFAc',window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt',false);};
     }
   }
 }
 
+// Init bouton drill à 2 ballons par défaut
+document.addEventListener('DOMContentLoaded', function(){
+  var db=document.getElementById('sh_drill_btn');
+  if(db) db.onclick=function(){openVideoModal('NacCJX1KFAc',window._lang==='en'?'2-Ball Dribble Drill — SENSEI BlackBelt':'Drill Dribble 2 Ballons — SENSEI BlackBelt',false);};
+});
 window._sh_openVideo = function(){
   var n = window._sh_balls || 2;
   var v = window._sh_videos[n] || window._sh_videos[2];
@@ -20616,8 +20639,12 @@ function openTrainingTab(id, btn) {
   if(id==='agility')  initTraining_ag2();
   if(id==='sc')       initTraining_sc();
   if(id==='ch')       initTraining_ch();
-  if(id==='sym')       initTraining_sym();
+  if(id==='sym')       { initTraining_sym(); _tsym_loadModel(null, null); }
   if(id==='dcog')      { initTraining_dcog(); _tsym_loadModel(null, null); }
+  // Précharger pour tous les tabs caméra même si pas encore ouvert
+  if(['dribble','sym','dcog'].indexOf(id)===-1 && typeof _tsym_loadModel==='function') {
+    _tsym_loadModel(null, null);
+  }
 }
 
 /* DRIBBLE */
@@ -22395,6 +22422,12 @@ function _tsym_loadModel(cb, onErr) {
 
   function _flushOk() {
     _ai_loading = false;
+    // Warm-up : 1 inférence sur canvas vide pour compiler les shaders GPU
+    try {
+      var wc = document.createElement('canvas');
+      wc.width = 192; wc.height = 192;
+      _tsym_detector.estimatePoses(wc).catch(function(){});
+    } catch(e) {}
     var q = _ai_queue.slice(); _ai_queue = [];
     q.forEach(function(e) { e.cb && e.cb(); });
   }
@@ -22904,7 +22937,7 @@ function _tdr_startRec(){
     clearInterval(_tdr_recTimer);
     var blob=new Blob(_tdr_recChunks,{type:_tdr_recorder.mimeType||'video/webm'});
     _tdr_recActive=false;_tdr_recChunks=[];_tdr_updateRecBtn();
-    var ext=blob.type.indexOf('mp4')>-1?'mp4':'webm';
+    var ext='mp4';
     var fn='SENSEI_dribble_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st=document.getElementById('tdr_status');
     if(_tsym_isIOS()&&navigator.share&&typeof File!=='undefined'){
@@ -23119,7 +23152,7 @@ function _tsym_updateRecBtn() {
 
 function _tsym_saveBlob(blob) {
   var st = document.getElementById('tsym_status');
-  var ext = blob.type.indexOf('mp4') > -1 ? 'mp4' : 'webm';
+  var ext = 'mp4';
   var filename = 'SENSEI_symetrie_' + new Date().toISOString().slice(0,10) + '.' + ext;
   // iOS → navigator.share() avec File
   if (_tsym_isIOS() && navigator.share && typeof File !== 'undefined') {
@@ -24358,7 +24391,7 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * 0.12);
+  var r  = Math.round(W * (window.innerWidth <= 768 ? 0.17 : 0.12));
   var colors = ['#2dc653','#f5c518','#e63946'];
   // Grille adaptative portrait/paysage
   var landscape = W > H;
@@ -25217,7 +25250,7 @@ function _dcog_startRec() {
     clearInterval(_dcog_recTimer);
     var blob = new Blob(_dcog_recChunks, {type: _dcog_recorder.mimeType||'video/webm'});
     _dcog_recActive = false; _dcog_recChunks = []; _dcog_updateRecBtn();
-    var ext = blob.type.indexOf('mp4')>-1 ? 'mp4' : 'webm';
+    var ext = 'mp4';
     var fn  = 'SENSEI_cognitive_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st  = document.getElementById('dcog_status');
     if (_tsym_isIOS() && navigator.share && typeof File!=='undefined') {
@@ -25668,7 +25701,7 @@ if('serviceWorker' in navigator){
 
 </script>
 
-<div id="sensei-cam-overlay"><video id="sensei-cam-video" playsinline muted></video><canvas id="sensei-cam-canvas"></canvas><div id="sensei-cam-question" style="display:none;position:absolute;top:5%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;font-size:clamp(22px,5vw,48px);font-weight:900;padding:14px 32px;border-radius:16px;letter-spacing:2px;text-align:center;z-index:10;border:2px solid rgba(245,197,24,.6);text-shadow:0 2px 8px rgba(0,0,0,.8)"></div></div>
+<div id="sensei-cam-overlay"><video id="sensei-cam-video" playsinline muted></video><canvas id="sensei-cam-canvas"></canvas><div id="sensei-cam-question" style="display:none;position:absolute;top:5%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;font-size:clamp(28px,7vw,56px);font-weight:900;padding:14px 32px;border-radius:16px;letter-spacing:2px;text-align:center;z-index:10;border:2px solid rgba(245,197,24,.6);text-shadow:0 2px 8px rgba(0,0,0,.8)"></div></div>
 <button id="sensei-cam-stop-btn" onclick="senseiCamStop()">&#10005; STOP</button>
 <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:fixed;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
 <script>
@@ -25725,6 +25758,12 @@ window.addEventListener('resize',function(){
 });
 </script>
 <script>
+function senseiCamToggleRec(){
+  var m = window._scam && window._scam.module;
+  if(m==='tdr' && typeof _tdr_toggleRec==='function') _tdr_toggleRec();
+  else if(m==='tsym' && typeof _tsym_toggleRec==='function') _tsym_toggleRec();
+  else if(m==='dcog' && typeof _dcog_toggleRec==='function') _dcog_toggleRec();
+}
 function shPlayVideo(){
   var btn = document.getElementById('sh_video_btn');
   var id = (btn && btn.getAttribute('data-vid')) || 'NacCJX1KFAc';
