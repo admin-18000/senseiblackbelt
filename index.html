@@ -23033,27 +23033,20 @@ function _tsym_isAndroid() {
 }
 
 function _tsym_getBestMime() {
-  // iOS Safari : mp4 en priorité
-  if (_tsym_isIOS()) {
-    var iosMimes = ['video/mp4;codecs=avc1','video/mp4'];
-    for (var i=0; i<iosMimes.length; i++) {
-      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(iosMimes[i]))
-        return iosMimes[i];
-    }
-  }
-  // Ordre de préférence général
+  if (typeof MediaRecorder === 'undefined') return '';
+  // MP4/H.264 en priorité absolue (vrai MP4, pas WebM renommé)
   var mimes = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4;codecs=avc1',
+    'video/mp4',
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
-    'video/mp4;codecs=avc1',
-    'video/mp4',
     ''
   ];
-  for (var j=0; j<mimes.length; j++) {
-    if (!mimes[j]) return '';
-    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mimes[j]))
-      return mimes[j];
+  for (var i=0; i<mimes.length; i++) {
+    if (!mimes[i]) return '';
+    if (MediaRecorder.isTypeSupported(mimes[i])) return mimes[i];
   }
   return '';
 }
