@@ -630,40 +630,64 @@ body.unlocked .sensei-only{display:revert !important}
 .tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
 .tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
 
-/* ── SENSEI CAM OVERLAY — HomeCourt style fullscreen landscape ── */
-#sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;background:#000;overflow:hidden}
-/* Vidéo en fond plein écran, centrée, cover — comme HomeCourt */
+/* ══ SENSEI CAM OVERLAY — HomeCourt fullscreen landscape ══ */
+#sensei-cam-overlay{
+  display:none;position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:10000;background:#000;overflow:hidden;
+  /* Forcer le rendu paysage même sur iOS portrait */
+  touch-action:none;
+}
+/* ── Mode PORTRAIT détecté : rotate l'overlay entier en paysage ──
+   L'overlay fait 100vw × 100vh en portrait → on le pivote -90deg
+   et on le repositionne pour remplir l'écran comme si c'était landscape.
+   Tous les enfants (vidéo, canvas, boutons) tournent avec lui. */
+@media(orientation:portrait){
+  #sensei-cam-overlay{
+    width:100vh;height:100vw;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) rotate(-90deg);
+    transform-origin:center center;
+  }
+}
+/* ── Vidéo en fond cover — miroir horizontal (scaleX(-1)) ── */
 #sensei-cam-video{
   position:absolute;top:0;left:0;width:100%;height:100%;
   display:block;object-fit:cover;
-  /* Miroir horizontal : le joueur se voit comme dans un miroir */
-  transform:scaleX(-1)
+  transform:scaleX(-1);
+  -webkit-transform:scaleX(-1);
 }
-/* Canvas overlay transparent par-dessus la vidéo */
-#sensei-cam-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-/* Bouton STOP : coin bas-gauche en paysage, bien accessible */
+/* ── Canvas overlay transparent par-dessus ── */
+#sensei-cam-canvas{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+}
+/* ── Bouton STOP ── coin bas-droit, accessible en landscape ── */
 #sensei-cam-stop-btn{
   display:none;position:fixed;
   bottom:calc(18px + env(safe-area-inset-bottom,0px));
   right:calc(18px + env(safe-area-inset-right,0px));
   z-index:10002;
-  background:rgba(230,57,70,.95);color:#fff;font-family:'Barlow Condensed',sans-serif;
-  font-weight:900;font-size:15px;letter-spacing:1px;
+  background:rgba(230,57,70,.95);color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:15px;letter-spacing:1px;
   padding:12px 24px;border-radius:30px;border:none;cursor:pointer;
   box-shadow:0 4px 20px rgba(0,0,0,.5);backdrop-filter:blur(8px);
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
+/* ── Bouton REC ── coin bas-gauche ── */
 #sensei-cam-rec-btn{
   position:fixed;
   bottom:calc(18px + env(safe-area-inset-bottom,0px));
   left:calc(18px + env(safe-area-inset-left,0px));
   z-index:10002;
-  font-family:'Barlow Condensed',sans-serif;
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:15px;letter-spacing:1px;
+  padding:12px 24px;border-radius:30px;border:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
 }
-/* Sur portrait forcé (certains iOS) : rotation du layout */
-@media(orientation:portrait){
-  #sensei-cam-overlay{transform-origin:center center}
-}
+/* ── En mode portrait : les boutons sont dans l'overlay roté ──
+   → ils sont déjà en paysage, pas besoin de les déplacer ── */
 </style>
 </head>
 <body>
@@ -18847,14 +18871,18 @@ function _tsym_drawFrame(poses) {
 
   if (!poses || !poses[0]) return;
   var kps = poses[0].keypoints;
-  var scaleX = W / (_tsym_video.videoWidth  || 640);
-  var scaleY = H / (_tsym_video.videoHeight || 480);
+  // Mapping paysage unifié — gère iOS portrait automatiquement
+  var _sc = _scam_getScale();
+  var scaleX = _sc.sx;
+  var scaleY = _sc.sy;
+  // En mode portrait iOS : les axes sont swappés dans _tsym_drawSkeleton
+  // _scam_getScale retourne les bons ratios pour le canvas landscape
 
   // Dessiner le squelette
-  _tsym_drawSkeleton(kps, scaleX, scaleY, W);
+  _tsym_drawSkeleton(kps, scaleX, scaleY, W, null, _sc.portrait);
 
   // Calculer score symétrie selon le mode
-  var score = _tsym_computeSymmetry(poses, scaleX, scaleY, W);
+  var score = _tsym_computeSymmetry(poses, scaleX, scaleY, W, _sc.portrait);
   if (score >= 0) {
     _tsym_frameScores.push(score);
     if (_tsym_frameScores.length > 60) _tsym_frameScores.shift();
@@ -18905,35 +18933,41 @@ var _TSYM_PAIRS = [
   ['rightHip','rightKnee'],['leftKnee','leftAnkle'],['rightKnee','rightAnkle']
 ];
 
-function _tsym_drawSkeleton(kps, sx, sy, W, ctx) {
+function _tsym_drawSkeleton(kps, sx, sy, W, ctx, portrait) {
   // ctx optionnel — si non fourni utilise _tsym_ctx (module Symétrie)
   var c2d = ctx || _tsym_ctx;
   if (!c2d) return;
+  // Fonction de mapping keypoint → canvas (gère portrait iOS)
+  function kpXY(k) {
+    var m = _scam_kpToCanvas(k);
+    return m ? {x: m.x, y: m.y} : {x: W - k.x * sx, y: k.y * sy};
+  }
   c2d.lineWidth = 2;
   _TSYM_PAIRS.forEach(function(pair) {
     var i1 = _TSYM_KP[pair[0]], i2 = _TSYM_KP[pair[1]];
     if (i1 === undefined || i2 === undefined) return;
     var k1 = kps[i1], k2 = kps[i2];
     if (!k1 || !k2 || k1.score < 0.35 || k2.score < 0.35) return;
+    var p1 = kpXY(k1), p2 = kpXY(k2);
     c2d.strokeStyle = 'rgba(245,197,24,.7)';
     c2d.beginPath();
-    c2d.moveTo(W - k1.x * sx, k1.y * sy);
-    c2d.lineTo(W - k2.x * sx, k2.y * sy);
+    c2d.moveTo(p1.x, p1.y);
+    c2d.lineTo(p2.x, p2.y);
     c2d.stroke();
   });
   kps.forEach(function(k) {
     if (!k || k.score < 0.35) return;
-    var x = W - k.x * sx, y = k.y * sy;
+    var p = kpXY(k);
     var isLeft  = k.name && k.name.indexOf('left')  > -1;
     var isRight = k.name && k.name.indexOf('right') > -1;
     c2d.fillStyle = isLeft ? '#4ecdc4' : isRight ? '#e63946' : '#f5c518';
     c2d.beginPath();
-    c2d.arc(x, y, 5, 0, Math.PI * 2);
+    c2d.arc(p.x, p.y, 5, 0, Math.PI * 2);
     c2d.fill();
   });
 }
 
-function _tsym_computeSymmetry(poses, sx, sy, W) {
+function _tsym_computeSymmetry(poses, sx, sy, W, portrait) { /* portrait ignoré — ratios relatifs */
   /* Compare les distances et angles G vs D selon le mode */
   var pairs = [];
   if (_tsym_mode === 'dribble') {
@@ -19581,14 +19615,17 @@ function _tdr_calibrate() {
         if (ls && rs && lh && _tdr_canvas) {
           var W  = _tdr_canvas.width;
           var H  = _tdr_canvas.height;
-          // Convertir coords vidéo → canvas (MoveNet retourne en coords vidéo)
-          var vW = _tdr_video ? (_tdr_video.videoWidth  || W) : W;
-          var vH = _tdr_video ? (_tdr_video.videoHeight || H) : H;
-          var sx = W / vW;
-          // Miroir X : le joueur se voit en miroir → centreX aussi mirrorisé
-          _tdr_centerX = 1.0 - ((ls.x + rs.x) / 2) / vW;
-          var shoulderW = Math.abs(ls.x - rs.x) * sx; // en pixels canvas
-          _tdr_scale   = shoulderW / 0.4; // épaules ≈ 40% de la largeur canvas
+          // Mapping unifié : convertir les épaules via _scam_kpToCanvas
+          var lsMapped = _scam_kpToCanvas(ls);
+          var rsMapped = _scam_kpToCanvas(rs);
+          if (lsMapped && rsMapped) {
+            // centerX en fraction du canvas (0=gauche, 1=droite)
+            _tdr_centerX = ((lsMapped.x + rsMapped.x) / 2) / W;
+            var shoulderW = Math.abs(lsMapped.x - rsMapped.x);
+            _tdr_scale   = shoulderW / 0.4;
+          } else {
+            _tdr_centerX = 0.5; _tdr_scale = 200;
+          }
           _tdr_calibrated = true;
         }
       }
@@ -19676,12 +19713,10 @@ function _tdr_drawTargets(ctx, W, H) {
   // Proximity feedback : position wrists du frame courant (pas N-1)
   var wristPositions = [];
   if (_tdr_poses && _tdr_poses[0] && _tdr_canvas && _tdr_video) {
-    var _pW = _tdr_canvas.width, _pH = _tdr_canvas.height;
-    var _psx = _pW / (_tdr_video.videoWidth  || _pW);
-    var _psy = _pH / (_tdr_video.videoHeight || _pH);
     ['left','right'].forEach(function(side){
-      var kp = _tsym_kp_hand(_tdr_poses, side); // extrapolation main
-      if(kp) wristPositions.push({x: _pW - kp.x*_psx, y: kp.y*_psy});
+      var kp = _tsym_kp_hand(_tdr_poses, side);
+      var mapped = _scam_kpToCanvas(kp);
+      if(mapped) wristPositions.push(mapped);
     });
   }
 
@@ -19784,17 +19819,17 @@ function _tdr_spawnTarget() {
 function _tdr_checkHits(poses) {
   if (!poses || !poses[0] || !_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  var sx = W / (_tdr_video ? _tdr_video.videoWidth : W);
-  var sy = H / (_tdr_video ? _tdr_video.videoHeight : H);
   // Les deux poignets
   var sides = ['left','right'];
   sides.forEach(function(side) {
     var name = side + 'Wrist';
-    // Extrapoler la position de la main (coude→poignet +25%) pour corriger le décalage MoveNet
+    // Extrapoler la position de la main (coude→poignet +25%) + mapping paysage unifié
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
-    var wx = W - kp.x * sx;
-    var wy = kp.y * sy;
+    var mapped = _scam_kpToCanvas(kp);
+    if (!mapped) return;
+    var wx = mapped.x;
+    var wy = mapped.y;
     // Vélocité : hit uniquement si main en mouvement
     var prev = _tdr_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
@@ -20608,15 +20643,14 @@ function _dcog_analyzeMathZone(poses) {
   if (!_dcog_canvas || !_dcog_video) return;
   var W  = _dcog_canvas.width;
   var H  = _dcog_canvas.height;
-  var sx = W / (_dcog_video.videoWidth  || 640);
-  var sy = H / (_dcog_video.videoHeight || 480);
   ['left','right'].forEach(function(side) {
     var name = side + 'Wrist';
-    // Extrapoler la position de la main (coude→poignet +25%)
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
-    var wx = W - kp.x * sx;
-    var wy = kp.y * sy;
+    var mapped = _scam_kpToCanvas(kp);
+    if (!mapped) return;
+    var wx = mapped.x;
+    var wy = mapped.y;
     var prev = _dcog_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _dcog_prevWrist[name] = {x:wx, y:wy};
@@ -20664,11 +20698,10 @@ function _dcog_drawMathTargets(ctx, W, H) {
   // Positions poignets courantes pour proximity feedback
   var dcWrists = [];
   if (_dcog_poses && _dcog_poses[0] && _dcog_canvas && _dcog_video) {
-    var _dsx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
-    var _dsy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
     ['left','right'].forEach(function(side){
-      var kp = _tsym_kp_hand(_dcog_poses, side); // extrapolation main
-      if(kp) dcWrists.push({x: _dcog_canvas.width - kp.x*_dsx, y: kp.y*_dsy});
+      var kp = _tsym_kp_hand(_dcog_poses, side);
+      var mapped = _scam_kpToCanvas(kp);
+      if(mapped) dcWrists.push(mapped);
     });
   }
   _dcog_mathTargets.forEach(function(t) {
@@ -20840,15 +20873,15 @@ var _dcog_wristPrevDir   = 0;
 function _dcog_detectWristBpm(poses) {
   if (!poses || !poses[0] || !_dcog_canvas || !_dcog_video) return;
   var H  = _dcog_canvas.height;
-  var sy = H / (_dcog_video.videoHeight || 480);
   var lW = _tsym_kp_fast(poses, 'leftWrist');
   var rW = _tsym_kp_fast(poses, 'rightWrist');
-  // Poignet le plus bas = celui qui dribble
-  var w = null;
-  if (lW && rW) w = lW.y > rW.y ? lW : rW;
-  else if (lW) w = lW; else if (rW) w = rW;
-  if (!w) return;
-  var wy = w.y * sy;
+  // Poignet le plus bas — coordonnées canvas landscape
+  var mL = _scam_kpToCanvas(lW), mR = _scam_kpToCanvas(rW);
+  var w = null, mw = null;
+  if (mL && mR) { w = mL.y > mR.y ? lW : rW; mw = mL.y > mR.y ? mL : mR; }
+  else if (mL) { w = lW; mw = mL; } else if (mR) { w = rW; mw = mR; }
+  if (!mw) return;
+  var wy = mw.y;
   if (_dcog_wristPrevY !== null) {
     var dy = wy - _dcog_wristPrevY;
     var dir = dy > 2 ? 1 : dy < -2 ? -1 : 0;
@@ -20902,13 +20935,13 @@ function _dcog_analyzeSprintWrist(poses) {
   var lW = _tsym_kp_fast(poses, 'leftWrist');
   var rW = _tsym_kp_fast(poses, 'rightWrist');
   var H  = _dcog_canvas ? _dcog_canvas.height : 480;
-  var sy = H / (_dcog_video ? (_dcog_video.videoHeight||480) : 480);
-  // Poignet le plus bas = celui qui dribble
-  var wrist = null;
-  if (lW && rW) wrist = lW.y > rW.y ? lW : rW;
-  else if (lW) wrist = lW; else if (rW) wrist = rW;
-  if (!wrist) return;
-  var wy = wrist.y * sy;
+  // Poignet le plus bas — coordonnées canvas landscape
+  var mL2 = _scam_kpToCanvas(lW), mR2 = _scam_kpToCanvas(rW);
+  var wrist = null, mwrist = null;
+  if (mL2 && mR2) { wrist = mL2.y > mR2.y ? lW : rW; mwrist = mL2.y > mR2.y ? mL2 : mR2; }
+  else if (mL2) { wrist = lW; mwrist = mL2; } else if (mR2) { wrist = rW; mwrist = mR2; }
+  if (!mwrist) return;
+  var wy = mwrist.y;
   if (_dcog_sprintPrevWristY !== null) {
     var dy = wy - _dcog_sprintPrevWristY;
     var newDir = dy > 2 ? 1 : dy < -2 ? -1 : 0;
@@ -20973,11 +21006,9 @@ function _dcog_analyzeHeight(poses) {
   var kps  = poses[0].keypoints;
   var W    = _dcog_canvas ? _dcog_canvas.width  : 480;
   var H    = _dcog_canvas ? _dcog_canvas.height : 480;
-  var sx   = W / (_dcog_video.videoWidth  || 640);
-  var sy   = H / (_dcog_video.videoHeight || 480);
-
-  // Seuil 0.30 (cohérent avec _tsym_kp_fast) — meilleure détection en conditions réelles
+  // Mapping paysage unifié — _scam_kpToCanvas gère portrait iOS
   function kp(name) { return _tsym_kp_fast(poses, name); }
+  function kpY(k)   { var m = _scam_kpToCanvas(k); return m ? m.y : null; }
 
   var lW = kp('leftWrist');   var rW = kp('rightWrist');
   var lS = kp('leftShoulder'); var rS = kp('rightShoulder');
@@ -20986,21 +21017,23 @@ function _dcog_analyzeHeight(poses) {
   var lA = kp('leftAnkle');    var rA = kp('rightAnkle');
 
   if (!lS || !rS) return;
-  // Active wrist = the lower one (the one dribbling)
-  var activeWrist = null;
-  if (lW && rW) activeWrist = lW.y > rW.y ? lW : rW;
-  else if (lW) activeWrist = lW;
-  else if (rW) activeWrist = rW;
-  if (!activeWrist) return;
+  // Active wrist = le plus bas en coords canvas landscape
+  var mLW = _scam_kpToCanvas(lW), mRW = _scam_kpToCanvas(rW);
+  var activeWrist = null, mActiveWrist = null;
+  if (mLW && mRW) { activeWrist = mLW.y > mRW.y ? lW : rW; mActiveWrist = mLW.y > mRW.y ? mLW : mRW; }
+  else if (mLW)   { activeWrist = lW; mActiveWrist = mLW; }
+  else if (mRW)   { activeWrist = rW; mActiveWrist = mRW; }
+  if (!mActiveWrist) return;
 
-  // Normalize: 0=shoulder level, 1=ankle level
-  var shoulderY = ((lS.y*sx + rS.y*sx) / 2) || (H * 0.3);
-  var ankleY    = lA ? lA.y*sy : rA ? rA.y*sy : H; // fallback = bord bas si chevilles hors cadre
-  var kneeY     = lK ? lK.y*sy : rK ? rK.y*sy : (shoulderY + ankleY)/2;
-  var hipY      = lH ? lH.y*sy : rH ? rH.y*sy : (shoulderY + ankleY)*0.55;
+  // Normalize: 0=shoulder level, 1=ankle level — tout en coords canvas landscape
+  var mLS = _scam_kpToCanvas(lS), mRS = _scam_kpToCanvas(rS);
+  var shoulderY = (mLS && mRS) ? ((mLS.y + mRS.y) / 2) : (H * 0.3);
+  var ankleY    = kpY(lA) || kpY(rA) || H;
+  var kneeY     = kpY(lK) || kpY(rK) || (shoulderY + ankleY)/2;
+  var hipY      = kpY(lH) || kpY(rH) || (shoulderY + ankleY)*0.55;
   var bodyH     = Math.abs(ankleY - shoulderY) || 200;
 
-  var wristY    = activeWrist.y * sy;
+  var wristY    = mActiveWrist.y;
   var normY     = (wristY - shoulderY) / bodyH; // 0=shoulder, 1=ankle
 
   // Target zone thresholds
@@ -21100,9 +21133,9 @@ function _dcog_analyzeTwoBall(poses) {
 
   var W  = _dcog_canvas ? _dcog_canvas.width  : 640;
   var H  = _dcog_canvas ? _dcog_canvas.height : 480;
-  var sy = H / (_dcog_video.videoHeight || 480);
-  var lY = lW.y * sy;
-  var rY = rW.y * sy;
+  var mL = _scam_kpToCanvas(lW), mR = _scam_kpToCanvas(rW);
+  var lY = mL ? mL.y : H * 0.5;
+  var rY = mR ? mR.y : H * 0.5;
 
   // Stocker positions Y pour drawTwoBallLines
   _dcog_tbLWristY = lY;
@@ -21186,7 +21219,7 @@ var _dcog_tbTotalFrames2 = 0;     // total frames mesurés (height modes)
 
 function _dcog_drawTwoBallLines(ctx, W, H) {
   if (!ctx) return;
-  var sy = H / (_dcog_video ? (_dcog_video.videoHeight || 480) : 480);
+  // Les positions _dcog_tbLWristY/_dcog_tbRWristY sont déjà en coords canvas landscape
   ctx.save();
 
   if (_dcog_tbMode === 'sameheight') {
@@ -21902,6 +21935,64 @@ if('serviceWorker' in navigator){
 <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:fixed;bottom:18px;left:18px;z-index:10002;background:rgba(230,57,70,.95);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;padding:12px 24px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(0,0,0,.5)">&#9679; REC</button>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
+/* ════════════════════════════════════════════════════════════════
+   SENSEI CAM — Système de coordonnées landscape unifié
+   ════════════════════════════════════════════════════════════════
+   Le canvas est TOUJOURS en landscape (CW > CH).
+   La vidéo peut être livrée en portrait par iOS (vW < vH).
+   _scam_kpToCanvas(kp) fait le mapping correct dans tous les cas :
+   - vidéo landscape : mapping direct + miroir X
+   - vidéo portrait  : rotation 90° des coords + miroir
+   Tous les modules (tdr, dcog, tsym) utilisent cette fonction.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Retourne {x, y} en coordonnées canvas à partir d'un keypoint MoveNet.
+   kp : {x, y} en pixels vidéo natifs.
+   Gère la rotation iOS (vidéo portrait → canvas landscape). */
+function _scam_kpToCanvas(kp) {
+  if (!kp || !_scam.video || !_scam.canvas) return null;
+  var vW = _scam.video.videoWidth  || _scam.canvas.width;
+  var vH = _scam.video.videoHeight || _scam.canvas.height;
+  var CW = _scam.canvas.width;   // toujours landscape (>CH)
+  var CH = _scam.canvas.height;
+  var cx, cy;
+  if (vW >= vH) {
+    // ── Vidéo landscape : mapping direct + miroir X ──
+    var sx = CW / vW, sy = CH / vH;
+    cx = CW - kp.x * sx;   // miroir X (vidéo CSS scaleX(-1))
+    cy = kp.y * sy;
+  } else {
+    // ── Vidéo portrait (iOS) : rotation -90° des coords + miroir ──
+    // MoveNet retourne (x,y) dans l'espace portrait (vW×vH, ex 720×1280)
+    // L'overlay CSS est roté -90deg → le joueur voit landscape
+    // On mappe les coords portrait → landscape :
+    //   x_landscape = y_portrait * (CW / vH)
+    //   y_landscape = (vW - x_portrait) * (CH / vW)
+    // + miroir (le CSS scaleX(-1) est appliqué AVANT la rotation CSS)
+    // Le miroir X en portrait = miroir sur l'axe x_portrait
+    var sW = CW / vH;   // ratio largeur canvas / hauteur vidéo portrait
+    var sH = CH / vW;   // ratio hauteur canvas / largeur vidéo portrait
+    cx = kp.y * sW;               // y_portrait → x_landscape
+    cy = (vW - kp.x) * sH;       // miroir + x_portrait → y_landscape
+  }
+  return {x: cx, y: cy};
+}
+
+/* Retourne {sx, sy} pour le dessin du squelette (TSYM uniquement).
+   En mode portrait iOS, les ratios sont échangés. */
+function _scam_getScale() {
+  if (!_scam.video || !_scam.canvas) return {sx:1, sy:1, portrait:false};
+  var vW = _scam.video.videoWidth  || _scam.canvas.width;
+  var vH = _scam.video.videoHeight || _scam.canvas.height;
+  var CW = _scam.canvas.width, CH = _scam.canvas.height;
+  if (vW >= vH) {
+    return {sx: CW/vW, sy: CH/vH, portrait: false};
+  } else {
+    // Portrait : les axes sont swappés
+    return {sx: CW/vH, sy: CH/vW, portrait: true};
+  }
+}
+
 function senseiCamShow(mod,stream){
   _scam.module=mod; _scam.stream=stream;
   var ov=document.getElementById('sensei-cam-overlay');
@@ -21911,36 +22002,35 @@ function senseiCamShow(mod,stream){
   _scam.ctx=_scam.canvas?_scam.canvas.getContext('2d'):null;
   if(!ov||!_scam.video||!_scam.canvas)return;
 
-  // ── Affichage plein écran HomeCourt ──
+  // ── Plein écran ──
   ov.style.display='block';
   if(sb)sb.style.display='block';
   var rb=document.getElementById('sensei-cam-rec-btn');
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.95)';}
   document.body.style.overflow='hidden';
 
-  // ── Forcer orientation paysage (mobile) ──
+  // ── Orientation lock (si supporté — Android Chrome, PWA iOS 16.4+) ──
   if(screen.orientation&&screen.orientation.lock){
-    screen.orientation.lock('landscape').catch(function(){});
+    screen.orientation.lock('landscape').catch(function(){
+      // iOS bloque orientation.lock → le CSS @media(orientation:portrait) prend le relais
+    });
   }
 
-  // ── Caméra frontale → vidéo en fond ──
+  // ── Stream vidéo ──
   _scam.video.srcObject=stream;
   _scam.video.setAttribute('playsinline','');
   _scam.video.muted=true;
 
   function _scam_initCanvas(){
-    // Dimensions paysage : on prend toujours le max entre largeur/hauteur
-    var vw=_scam.video.videoWidth  || window.innerWidth;
-    var vh=_scam.video.videoHeight || window.innerHeight;
-    // Canvas en coordonnées paysage
-    var CW = Math.max(vw, vh);  // largeur = la grande dimension
-    var CH = Math.min(vw, vh);  // hauteur = la petite dimension
-    // Fallback si vidéo pas encore disponible
-    if(CW<10){ CW=window.innerWidth; CH=window.innerHeight; }
-    if(CW<CH){ var tmp=CW; CW=CH; CH=tmp; } // garantir paysage
+    var vw = _scam.video.videoWidth  || 1280;
+    var vh = _scam.video.videoHeight || 720;
+    // Canvas TOUJOURS en landscape — c'est le référentiel des cibles
+    var CW = Math.max(vw, vh);
+    var CH = Math.min(vw, vh);
+    if(CW < 100){ CW = 1280; CH = 720; }  // fallback total
     _scam.canvas.width  = CW;
     _scam.canvas.height = CH;
-    // Callbacks modules — ils reçoivent la vidéo + canvas dimensionné
+    // Déclencher les modules
     if(mod==='tdr' &&typeof _tdr_onCamReady ==='function')_tdr_onCamReady (_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -21950,8 +22040,7 @@ function senseiCamShow(mod,stream){
     _scam.video.play().catch(function(){});
     _scam_initCanvas();
   };
-  // Fallback si metadata déjà chargées
-  if(_scam.video.readyState>=1) _scam_initCanvas();
+  if(_scam.video.readyState>=1)_scam_initCanvas();
 }
 function senseiCamToggleRec(){
   var rb=document.getElementById('sensei-cam-rec-btn');
@@ -21990,11 +22079,10 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas||!_scam.video)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  var vw=_scam.video.videoWidth  || window.innerWidth;
-  var vh=_scam.video.videoHeight || window.innerHeight;
+  var vw=_scam.video.videoWidth  || 1280;
+  var vh=_scam.video.videoHeight || 720;
   var CW=Math.max(vw,vh), CH=Math.min(vw,vh);
-  if(CW<10){CW=Math.max(window.innerWidth,window.innerHeight);CH=Math.min(window.innerWidth,window.innerHeight);}
-  if(CW<CH){var tmp=CW;CW=CH;CH=tmp;}
+  if(CW<100){CW=1280;CH=720;}
   if(_scam.canvas.width!==CW||_scam.canvas.height!==CH){
     _scam.canvas.width=CW;_scam.canvas.height=CH;
   }
