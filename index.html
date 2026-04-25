@@ -630,10 +630,40 @@ body.unlocked .sensei-only{display:revert !important}
 .tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
 .tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
 
-#sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;background:#000;overflow:hidden}
-#sensei-cam-overlay canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-#sensei-cam-overlay video{display:none}
-#sensei-cam-stop-btn{display:none;position:fixed;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px}
+/* ── SENSEI CAM OVERLAY — HomeCourt style fullscreen landscape ── */
+#sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;background:#000;overflow:hidden}
+/* Vidéo en fond plein écran, centrée, cover — comme HomeCourt */
+#sensei-cam-video{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  display:block;object-fit:cover;
+  /* Miroir horizontal : le joueur se voit comme dans un miroir */
+  transform:scaleX(-1)
+}
+/* Canvas overlay transparent par-dessus la vidéo */
+#sensei-cam-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+/* Bouton STOP : coin bas-gauche en paysage, bien accessible */
+#sensei-cam-stop-btn{
+  display:none;position:fixed;
+  bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  right:calc(18px + env(safe-area-inset-right,0px));
+  z-index:10002;
+  background:rgba(230,57,70,.95);color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-weight:900;font-size:15px;letter-spacing:1px;
+  padding:12px 24px;border-radius:30px;border:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);backdrop-filter:blur(8px);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+#sensei-cam-rec-btn{
+  position:fixed;
+  bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  left:calc(18px + env(safe-area-inset-left,0px));
+  z-index:10002;
+  font-family:'Barlow Condensed',sans-serif;
+}
+/* Sur portrait forcé (certains iOS) : rotation du layout */
+@media(orientation:portrait){
+  #sensei-cam-overlay{transform-origin:center center}
+}
 </style>
 </head>
 <body>
@@ -18802,19 +18832,10 @@ function _tsym_kp_hand(poses, side) {
 // Dessine la video en crop centré (pas d'étirement) + miroir
 
 function _drawVideoMirror(ctx, video, W, H) {
-  if (!video || !video.videoWidth || video.readyState < 2) {
-    ctx.clearRect(0, 0, W, H);
-    return;
-  }
-  var vw = video.videoWidth, vh = video.videoHeight;
-  var cr = W / H, vr = vw / vh;
-  var sx, sy, sw, sh;
-  if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw-sw)/2; sy = 0; }
-  else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh-sh)/2; }
-  ctx.save();
-  ctx.scale(-1, 1);
-  ctx.drawImage(video, sx, sy, sw, sh, -W, 0, W, H);
-  ctx.restore();
+  // La vidéo est maintenant affichée en fond CSS (position:absolute, object-fit:cover,
+  // transform:scaleX(-1) pour le miroir). Le canvas overlay est transparent.
+  // Cette fonction efface simplement le canvas pour les cibles/squelettes par-dessus.
+  ctx.clearRect(0, 0, W, H);
 }
 
 function _tsym_drawFrame(poses) {
@@ -21867,9 +21888,18 @@ if('serviceWorker' in navigator){
 
 </script>
 
-<div id="sensei-cam-overlay"><video id="sensei-cam-video" playsinline muted></video><canvas id="sensei-cam-canvas"></canvas><div id="sensei-cam-question" style="display:none;position:absolute;top:5%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;font-size:clamp(22px,5vw,48px);font-weight:900;padding:14px 32px;border-radius:16px;letter-spacing:2px;text-align:center;z-index:10;border:2px solid rgba(245,197,24,.6);text-shadow:0 2px 8px rgba(0,0,0,.8)"></div></div>
+<div id="sensei-cam-overlay">
+  <!-- Vidéo caméra frontale en fond plein écran -->
+  <video id="sensei-cam-video" playsinline muted autoplay></video>
+  <!-- Canvas overlay : squelette + cibles (transparent, dessiné sans miroir car vidéo déjà miroir) -->
+  <canvas id="sensei-cam-canvas"></canvas>
+  <!-- Question overlay (mode Cognitif) — centrée, bien visible en paysage -->
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:12%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,6vw,56px);font-weight:900;padding:14px 36px;border-radius:14px;letter-spacing:2px;text-align:center;z-index:15;border:2px solid rgba(245,197,24,.7);text-shadow:0 2px 8px rgba(0,0,0,.9);white-space:nowrap;pointer-events:none"></div>
+</div>
+<!-- Bouton STOP — coin bas-droit, accessible en paysage -->
 <button id="sensei-cam-stop-btn" onclick="senseiCamStop()">&#10005; STOP</button>
-<button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:fixed;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
+<!-- Bouton REC — coin bas-gauche -->
+<button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:fixed;bottom:18px;left:18px;z-index:10002;background:rgba(230,57,70,.95);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;padding:12px 24px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(0,0,0,.5)">&#9679; REC</button>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
 function senseiCamShow(mod,stream){
@@ -21880,28 +21910,48 @@ function senseiCamShow(mod,stream){
   _scam.canvas=document.getElementById('sensei-cam-canvas');
   _scam.ctx=_scam.canvas?_scam.canvas.getContext('2d'):null;
   if(!ov||!_scam.video||!_scam.canvas)return;
-  // Check getUserMedia disponible (HTTPS requis sur iOS Safari)
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    var msg=window._lang==='en'
-      ?'Camera requires HTTPS. Please access this page via https://'
-      :'La caméra nécessite HTTPS. Accédez à cette page via https://';
-    alert(msg); return;
-  }
+
+  // ── Affichage plein écran HomeCourt ──
   ov.style.display='block';
   if(sb)sb.style.display='block';
   var rb=document.getElementById('sensei-cam-rec-btn');
-  if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
+  if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.95)';}
   document.body.style.overflow='hidden';
-  if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});
+
+  // ── Forcer orientation paysage (mobile) ──
+  if(screen.orientation&&screen.orientation.lock){
+    screen.orientation.lock('landscape').catch(function(){});
+  }
+
+  // ── Caméra frontale → vidéo en fond ──
   _scam.video.srcObject=stream;
-  _scam.video.onloadedmetadata=function(){
-    _scam.video.play();
-    _scam.canvas.width=ov.offsetWidth||window.innerWidth;
-    _scam.canvas.height=ov.offsetHeight||window.innerHeight;
-    if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+  _scam.video.setAttribute('playsinline','');
+  _scam.video.muted=true;
+
+  function _scam_initCanvas(){
+    // Dimensions paysage : on prend toujours le max entre largeur/hauteur
+    var vw=_scam.video.videoWidth  || window.innerWidth;
+    var vh=_scam.video.videoHeight || window.innerHeight;
+    // Canvas en coordonnées paysage
+    var CW = Math.max(vw, vh);  // largeur = la grande dimension
+    var CH = Math.min(vw, vh);  // hauteur = la petite dimension
+    // Fallback si vidéo pas encore disponible
+    if(CW<10){ CW=window.innerWidth; CH=window.innerHeight; }
+    if(CW<CH){ var tmp=CW; CW=CH; CH=tmp; } // garantir paysage
+    _scam.canvas.width  = CW;
+    _scam.canvas.height = CH;
+    // Callbacks modules — ils reçoivent la vidéo + canvas dimensionné
+    if(mod==='tdr' &&typeof _tdr_onCamReady ==='function')_tdr_onCamReady (_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+  }
+
+  _scam.video.onloadedmetadata=function(){
+    _scam.video.play().catch(function(){});
+    _scam_initCanvas();
   };
+  // Fallback si metadata déjà chargées
+  if(_scam.video.readyState>=1) _scam_initCanvas();
 }
 function senseiCamToggleRec(){
   var rb=document.getElementById('sensei-cam-rec-btn');
@@ -21921,21 +21971,33 @@ function senseiCamStop(){
   if(ov)ov.style.display='none';
   if(sb)sb.style.display='none';
   var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
+  // Question overlay reset
+  var qOv=document.getElementById('sensei-cam-question');
+  if(qOv){qOv.style.display='none';qOv.textContent='';}
   document.body.style.overflow='';
-  if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();
+  // Unlock orientation : retour portrait/auto
+  try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
+  // Stopper les tracks caméra
   if(_scam.stream){_scam.stream.getTracks().forEach(function(t){t.stop();});_scam.stream=null;}
-  if(_scam.video)_scam.video.srcObject=null;
-  var m=_scam.module; _scam.module=null;
-  if(m==='tdr'&&typeof _tdr_stop==='function')_tdr_stop();
-  if(m==='dcog'&&typeof _dcog_stop==='function')_dcog_stop();
-  if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
+  if(_scam.video){_scam.video.srcObject=null;_scam.video.pause();}
+  // Stopper le module actif
+  var m=_scam.module; _scam.module=null; _scam.canvas=null; _scam.ctx=null; _scam.video=null;
+  if(m==='tdr' &&typeof _tdr_stop         ==='function')_tdr_stop();
+  if(m==='dcog'&&typeof _dcog_stop        ==='function')_dcog_stop();
+  if(m==='tsym'&&typeof _tsym_stopCamera  ==='function')_tsym_stopCamera();
 }
 window.addEventListener('resize',function(){
-  if(!_scam.canvas)return;
+  if(!_scam.canvas||!_scam.video)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  _scam.canvas.width=ov.offsetWidth||window.innerWidth;
-  _scam.canvas.height=ov.offsetHeight||window.innerHeight;
+  var vw=_scam.video.videoWidth  || window.innerWidth;
+  var vh=_scam.video.videoHeight || window.innerHeight;
+  var CW=Math.max(vw,vh), CH=Math.min(vw,vh);
+  if(CW<10){CW=Math.max(window.innerWidth,window.innerHeight);CH=Math.min(window.innerWidth,window.innerHeight);}
+  if(CW<CH){var tmp=CW;CW=CH;CH=tmp;}
+  if(_scam.canvas.width!==CW||_scam.canvas.height!==CH){
+    _scam.canvas.width=CW;_scam.canvas.height=CH;
+  }
 });
 </script>
 </body>
