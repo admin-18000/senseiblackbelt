@@ -25735,11 +25735,21 @@ function senseiCamShow(mod,stream){
   var rb=document.getElementById('sensei-cam-rec-btn');
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
-  // Détection portrait/landscape — message si portrait
+  // Détection portrait/landscape
+  var _scam_drillStarted = false;
   function _scam_checkOrientation() {
     var pw = document.getElementById('sensei-cam-portrait-warn');
     var isPortrait = window.innerHeight > window.innerWidth;
     if (pw) pw.style.display = isPortrait ? 'flex' : 'none';
+    // Dès que landscape : démarrer le drill si pas encore fait
+    if (!isPortrait && !_scam_drillStarted && _scam.video && _scam.video.readyState >= 2) {
+      _scam_drillStarted = true;
+      _scam.canvas.width  = window.innerWidth;
+      _scam.canvas.height = window.innerHeight;
+      if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+      if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+      if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    }
   }
   _scam_checkOrientation();
   if(window._scam_orientCb) window.removeEventListener('resize', window._scam_orientCb);
@@ -25752,9 +25762,15 @@ function senseiCamShow(mod,stream){
     _scam.video.play();
     _scam.canvas.width  = window.innerWidth;
     _scam.canvas.height = window.innerHeight;
-    if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
-    if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
-    if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    var isPortrait = window.innerHeight > window.innerWidth;
+    if (!isPortrait) {
+      // Landscape : démarrer immédiatement
+      _scam_drillStarted = true;
+      if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+      if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+      if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    }
+    // Si portrait : on attend que l'utilisateur tourne → _scam_checkOrientation le déclenchera
   };
 }
 function senseiCamStop(){
