@@ -22710,7 +22710,7 @@ function _tsym_drawFrame(poses) {
     // Score symétrie — haut gauche pivoté -90°
     var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
     _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.06), Math.round(H*0.06));
+    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = col;
     _tsym_ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
@@ -22736,7 +22736,7 @@ function _tsym_drawFrame(poses) {
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
     var timerFs2 = Math.round(H * 0.10);
     _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.18), Math.round(H*0.06));
+    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
     _tsym_ctx.font = 'bold '+timerFs2+'px Arial Narrow,Arial,sans-serif';
@@ -23501,13 +23501,13 @@ function _tdr_drawFrame(poses) {
 
     // Fond semi-transparent en haut
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, 0, W, Math.round(H * 0.14));
+    ctx.fillRect(0, Math.round(H*0.70), W, Math.round(H * 0.20));
 
     var timerFs = Math.round(H * 0.10);
 
     // Score — haut gauche, pivoté -90°
     ctx.save();
-    ctx.translate(Math.round(W*0.06), Math.round(H*0.06));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
     ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
@@ -23520,7 +23520,7 @@ function _tdr_drawFrame(poses) {
     var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
     var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
     ctx.save();
-    ctx.translate(Math.round(W*0.18), Math.round(H*0.06));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#fff';
     ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
@@ -24442,7 +24442,7 @@ function _dcog_drawFrame(poses) {
     if (_dcog_qTimerSec > 0) {
       var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
       ctx.save();
-      ctx.translate(Math.round(W*0.08), Math.round(H*0.06));
+      ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
       ctx.rotate(-Math.PI/2);
       ctx.fillStyle = timerColor;
       ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -24485,7 +24485,7 @@ function _dcog_drawFrame(poses) {
     var _smm = Math.floor(_sr/60), _sss = _sr % 60;
     var _st = _smm+':'+(_sss<10?'0':'')+_sss;
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.06));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = _sr <= 10 ? '#e63946' : '#fff';
     ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -25910,14 +25910,17 @@ function senseiCamShow(mod,stream){
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
 
+  // Cacher les divs HTML DCOG (remplacés par le dessin canvas)
+  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.style.display='none';
+  });
   _scam.video.srcObject=stream;
   _scam.video.setAttribute('playsinline','');
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    var _vvp = window.visualViewport || {width: window.innerWidth, height: window.innerHeight};
-    _scam.canvas.width  = Math.round(_vvp.width);
-    _scam.canvas.height = Math.round(_vvp.height);
+    _scam.canvas.width  = window.innerWidth;
+    _scam.canvas.height = window.innerHeight;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -25945,9 +25948,8 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  var _vvp2 = window.visualViewport || {width: window.innerWidth, height: window.innerHeight};
-  _scam.canvas.width  = Math.round(_vvp2.width);
-  _scam.canvas.height = Math.round(_vvp2.height);
+  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
+  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
 });
 </script>
 <script>
