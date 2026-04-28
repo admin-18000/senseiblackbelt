@@ -24542,15 +24542,26 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  // 2 cibles style HomeCourt : gauche et droite, bien espacées
+  // 2 cibles style HomeCourt : positions aléatoires comme dans Dribble
   var r  = Math.round(W * (W > H ? 0.10 : 0.17));
   var colors = ['#2dc653', '#e63946']; // vert = bonne, rouge = mauvaise (shuffled)
-  // Positions fixes gauche/droite, centrées verticalement
-  var zones = [
-    {x: W * 0.22, y: H * 0.55},
-    {x: W * 0.78, y: H * 0.55}
+  // Pool de positions aléatoires — éviter les bords et le chevauchement
+  var margin = r + Math.round(W * 0.05);
+  var allZones = [
+    {x: W*0.22, y: H*0.25}, {x: W*0.70, y: H*0.20},
+    {x: W*0.22, y: H*0.55}, {x: W*0.78, y: H*0.55},
+    {x: W*0.22, y: H*0.78}, {x: W*0.72, y: H*0.75},
+    {x: W*0.50, y: H*0.20}, {x: W*0.50, y: H*0.80},
   ];
-  var picked = zones.slice(0, 2);
+  // Choisir 2 zones non adjacentes aléatoirement
+  var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
+  var z1 = shuffledZ[0], z2 = shuffledZ[1];
+  // Garantir qu'elles ne se chevauchent pas
+  while (Math.abs(z1.x-z2.x) < r*2.5 && Math.abs(z1.y-z2.y) < r*2.5) {
+    shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
+    z1 = shuffledZ[0]; z2 = shuffledZ[1];
+  }
+  var picked = [z1, z2];
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
