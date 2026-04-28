@@ -23716,15 +23716,27 @@ function _tdr_countdown(cb) {
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold '+Math.round(W*0.35)+'px Arial Narrow,Arial,sans-serif';
+    // Rotation 90° — téléphone posé à l'horizontal
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font = 'bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 20;
-    ctx.fillText(String(num), W/2, H/2);
+    ctx.fillText(String(num), 0, 0);
+    ctx.restore();
     if (num === 1) {
       ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
+      ctx.save();
+      ctx.translate(W/2, H/2 + Math.round(W*0.22));
+      ctx.rotate(-Math.PI/2);
+      ctx.font = Math.round(H*0.12)+'px Arial Narrow,Arial,sans-serif';
       ctx.fillStyle = '#fff';
-      ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(W*0.22));
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(en?'GET READY':'PRÊT ?', 0, 0);
+      ctx.restore();
     }
     ctx.shadowBlur = 0;
     ctx.restore();
@@ -25711,7 +25723,7 @@ if('serviceWorker' in navigator){
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
   <!-- Question math — affichée en phase 1 puis cachée -->
-  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(48px,12vw,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none"></div>
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none"></div>
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
@@ -25737,11 +25749,8 @@ function senseiCamShow(mod,stream){
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    // Toujours landscape : largeur = max, hauteur = min
-    var W = Math.max(window.innerWidth, window.innerHeight);
-    var H = Math.min(window.innerWidth, window.innerHeight);
-    _scam.canvas.width  = W;
-    _scam.canvas.height = H;
+    _scam.canvas.width  = window.innerWidth;
+    _scam.canvas.height = window.innerHeight;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -25769,10 +25778,8 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  var _rW = Math.max(window.innerWidth, window.innerHeight);
-  var _rH = Math.min(window.innerWidth, window.innerHeight);
-  _scam.canvas.width  = _rW;
-  _scam.canvas.height = _rH;
+  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
+  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
 });
 </script>
 <script>
