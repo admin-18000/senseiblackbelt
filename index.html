@@ -22577,10 +22577,13 @@ function _tsym_startDetection() {
       ctx.save();
       ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#f5c518';
-      ctx.font='bold '+Math.round(W*0.32)+'px Arial Narrow,Arial,sans-serif';
+      ctx.save();
+      ctx.translate(W/2, H/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
-      ctx.fillText(String(n), W/2, H/2);
+      ctx.fillText(String(n), 0, 0);
       ctx.shadowBlur=0; ctx.restore();
     }
     _td_beep(n===1?880:660, 0.08, 0.12);
@@ -24320,10 +24323,13 @@ function _dcog_launchDrill() {
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#f5c518';
-    ctx.font='bold '+Math.round(W*0.32)+'px Arial Narrow,Arial,sans-serif';
+    ctx.save();
+    ctx.translate(W/2, H/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
-    ctx.fillText(String(n), W/2, H/2);
+    ctx.fillText(String(n), 0, 0);
     ctx.shadowBlur=0; ctx.restore();
     _td_beep(n===1?880:660, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(n===1?30:15);
