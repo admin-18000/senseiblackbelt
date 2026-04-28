@@ -22539,8 +22539,19 @@ function _tsym_stopCamera() {
 }
 
 /* ── Boucle de détection ────────────────────────────────────── */
+function _tsym_startSessTimer(){
+  _tsym_sessSec = 0;
+  if (_tsym_sessTimer) clearInterval(_tsym_sessTimer);
+  _tsym_sessTimer = setInterval(function(){
+    _tsym_sessSec++;
+    if (_tsym_sessSec >= _tsym_sessDur) {
+      clearInterval(_tsym_sessTimer); _tsym_sessTimer = null;
+    }
+  }, 1000);
+}
 function _tsym_onCamReady(video,canvas,ctx){
   _tsym_video=video; _tsym_canvas=canvas; _tsym_ctx=ctx;
+  _tsym_startSessTimer();
   var status=document.getElementById('tsym_status');
   if(status)status.textContent=_t('Chargement IA...','Loading AI...');
   var _lt=setTimeout(function(){_tsym_onError(_t('Chargement trop long','Loading timeout'));},12000);
@@ -22710,6 +22721,23 @@ function _tsym_drawFrame(poses) {
     _tsym_ctx.font = 'bold '+Math.round(fs*0.65)+'px Arial Narrow,Arial,sans-serif';
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
     _tsym_ctx.fillText(modeLabel, W-Math.round(W*0.025), barH/2);
+    // Timer session — centré dans la barre
+    var remaining = Math.max(0, _tsym_sessDur - _tsym_sessSec);
+    var mm = Math.floor(remaining/60);
+    var ss = remaining % 60;
+    var timerStr = mm+':'+(ss<10?'0':'')+ss;
+    _tsym_ctx.save();
+    _tsym_ctx.translate(W/2, barH/2);
+    _tsym_ctx.rotate(-Math.PI/2);
+    _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
+    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center';
+    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
+    _tsym_ctx.fillText(timerStr, 0, 0);
+    _tsym_ctx.shadowBlur = 0;
+    _tsym_ctx.restore();
+
     _tsym_ctx.shadowBlur = 0;
     _tsym_ctx.restore();
 
@@ -23025,6 +23053,9 @@ var _tsym_recChunks  = [];
 var _tsym_recActive  = false;
 var _tsym_recBlob    = null;
 var _tsym_recTimer   = null;
+var _tsym_sessTimer  = null;
+var _tsym_sessSec    = 0;
+var _tsym_sessDur    = 60; // 60s par défaut
 var _tsym_recSec     = 0;
 var _tsym_REC_LIMIT  = 180; // 3 min max
 
@@ -24211,6 +24242,9 @@ function _dcog_stop() {
 var _dcog_mathDuration = 60;  // secondes (0 = infini)
 var _dcog_mathSec      = 0;
 var _dcog_mathTimer    = null;
+var _dcog_qTimer       = null;  // timer par question
+var _dcog_qTimerSec    = 0;
+var _dcog_qTimerDur    = 5;     // 5s par question
 
 function _dcog_setDuration(sec) {
   _dcog_mathDuration = sec;
@@ -24368,6 +24402,21 @@ function _dcog_drawFrame(poses) {
   // Draw math targets + particules
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
+    // Timer question — affiché en haut à droite, pivoté -90°
+    if (_dcog_qTimerSec > 0) {
+      var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
+      ctx.save();
+      ctx.translate(W - Math.round(W*0.06), Math.round(H*0.15));
+      ctx.rotate(-Math.PI/2);
+      ctx.fillStyle = timerColor;
+      ctx.font = 'bold ' + Math.round(H*0.20) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 12;
+      ctx.fillText(String(_dcog_qTimerSec), 0, 0);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
   }
   // Particules explosion toujours dessinées (persistent après hit)
   if (_dcog_particles.length > 0) _dcog_drawParticles(ctx);
@@ -24402,6 +24451,21 @@ function _dcog_nextQuestion() {
   _dcog_mathAnswering = false;
   _dcog_lastAnswerTime = 0;
   _dcog_prevWrist = {};
+  // Timer par question
+  if (_dcog_qTimer) clearInterval(_dcog_qTimer);
+  _dcog_qTimerSec = _dcog_qTimerDur;
+  _dcog_qTimer = setInterval(function(){
+    _dcog_qTimerSec--;
+    if (_dcog_qTimerSec <= 0) {
+      clearInterval(_dcog_qTimer); _dcog_qTimer = null;
+      // Temps écoulé → question suivante
+      if (_dcog_running && _dcog_drill === 'math') {
+        _dcog_wrong++;
+        _dcog_updateScores();
+        setTimeout(_dcog_nextQuestion, 400);
+      }
+    }
+  }, 1000);
   var q = _dcog_genQuestion();
   _dcog_mathAnswer  = q.answer;
   var qEl = document.getElementById('dcog_mathQuestion');
@@ -25732,7 +25796,7 @@ if('serviceWorker' in navigator){
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
   <!-- Question math — affichée en phase 1 puis cachée -->
-  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none"></div>
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none;white-space:nowrap;width:max-content"></div>
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
