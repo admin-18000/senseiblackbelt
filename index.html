@@ -22721,10 +22721,10 @@ function _tsym_drawFrame(poses) {
     // Mode — haut centre pivoté -90°
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
     _tsym_ctx.save();
-    _tsym_ctx.translate(W*0.50, Math.round(H*0.06));
+    _tsym_ctx.translate(Math.round(W*0.45), Math.round(H*0.06));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = '#fff';
-    _tsym_ctx.font = 'bold '+Math.round(H*0.08)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.font = 'bold '+Math.round(W*0.055)+'px Arial Narrow,Arial,sans-serif';
     _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
     _tsym_ctx.fillText(modeLabel, 0, 0);
@@ -24470,10 +24470,10 @@ function _dcog_drawFrame(poses) {
     var en_s = window._lang === 'en';
     var sprintLbl = en_s ? 'SPRINT' : 'SPRINT';
     ctx.save();
-    ctx.translate(W * 0.50, Math.round(H*0.06));
+    ctx.translate(Math.round(W*0.45), Math.round(H*0.06));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
+    ctx.font = 'bold ' + Math.round(W*0.055) + 'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
     ctx.fillText(sprintLbl, 0, 0);
@@ -25906,14 +25906,14 @@ function senseiCamShow(mod,stream){
   if(!ov||!_scam.video||!_scam.canvas)return;
   ov.style.display='block';
   if(sb)sb.style.display='block';
+  window.scrollTo(0, 1); // force Safari à cacher sa barre d'adresse
   var rb=document.getElementById('sensei-cam-rec-btn');
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
 
-  // Cacher les divs HTML DCOG (remplacés par le dessin canvas)
-  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.style.display='none';
-  });
+  // Cacher tout le panel DCOG (les scores/overlays HTML débordent sinon)
+  var _dcog_panel = document.getElementById('tr-dcog');
+  if (_dcog_panel) _dcog_panel.style.visibility = 'hidden';
   _scam.video.srcObject=stream;
   _scam.video.setAttribute('playsinline','');
   _scam.video.muted=true;
@@ -25943,6 +25943,8 @@ function senseiCamStop(){
   if(m==='tdr'&&typeof _tdr_stop==='function')_tdr_stop();
   if(m==='dcog'&&typeof _dcog_stop==='function')_dcog_stop();
   if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
+  // Restaurer le panel DCOG
+  var _dp=document.getElementById('tr-dcog'); if(_dp)_dp.style.visibility='';
 }
 window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
