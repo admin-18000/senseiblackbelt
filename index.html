@@ -635,17 +635,6 @@ body.unlocked .sensei-only{display:revert !important}
 #sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;background:#000;overflow:hidden}
 #sensei-cam-overlay canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #sensei-cam-overlay video{display:none}
-/* Forcer landscape sur mobile portrait via rotation CSS */
-@media(orientation:portrait) and (max-width:768px){
-  #sensei-cam-overlay{
-    width:100vh;
-    height:100vw;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%) rotate(90deg);
-    transform-origin:center center;
-  }
-}
 #sensei-cam-stop-btn{display:none;position:absolute;top:14px;right:14px;z-index:10002;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px}
 </style>
 </head>
@@ -24401,34 +24390,34 @@ function _dcog_nextQuestion() {
   if (qEl) qEl.textContent = q.text;
   // Afficher aussi dans l'overlay plein écran
   var qOv = document.getElementById('sensei-cam-question');
+  // PHASE 1 : afficher question seule, grande, centrée (style HomeCourt)
   if (qOv) { qOv.textContent = q.text; qOv.style.display = 'block'; }
   _dcog_mathChoices = _dcog_genChoices(q.answer);
+  // Vider les cibles pendant la phase 1
+  _dcog_mathTargets = [];
   // Injecter directement dans _tdr_targets — utilise le moteur existant tel quel
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  var r  = Math.round(W * (window.innerWidth <= 768 ? 0.17 : 0.12));
-  var colors = ['#2dc653','#f5c518','#e63946'];
-  // Grille adaptative portrait/paysage
-  var landscape = W > H;
-  var zones = landscape ? [
-    // Paysage : grille 3x2 bien répartie sur toute la largeur
-    {x:W*0.18,y:H*0.30},{x:W*0.50,y:H*0.30},{x:W*0.82,y:H*0.30},
-    {x:W*0.18,y:H*0.70},{x:W*0.50,y:H*0.70},{x:W*0.82,y:H*0.70}
-  ] : [
-    // Portrait : grille 3x3 originale
-    {x:W*0.20,y:H*0.25},{x:W*0.50,y:H*0.25},{x:W*0.80,y:H*0.25},
-    {x:W*0.20,y:H*0.55},{x:W*0.50,y:H*0.55},{x:W*0.80,y:H*0.55},
-    {x:W*0.20,y:H*0.80},{x:W*0.50,y:H*0.80},{x:W*0.80,y:H*0.80}
+  // 2 cibles style HomeCourt : gauche et droite, bien espacées
+  var r  = Math.round(W * (W > H ? 0.10 : 0.17));
+  var colors = ['#2dc653', '#e63946']; // vert = bonne, rouge = mauvaise (shuffled)
+  // Positions fixes gauche/droite, centrées verticalement
+  var zones = [
+    {x: W * 0.22, y: H * 0.55},
+    {x: W * 0.78, y: H * 0.55}
   ];
-  // Choisir 3 zones différentes aléatoirement
-  var shuffled = zones.slice().sort(function(){return Math.random()-0.5;});
-  var picked = shuffled.slice(0,3);
-  _dcog_mathTargets = picked.map(function(z, i) {
-    return {x:Math.round(z.x), y:Math.round(z.y), r:r, color:colors[i],
-            born:Date.now(), ttl:99999, hit:false, hitTime:0,
-            mathVal:_dcog_mathChoices[i], mathIdx:i};
-  });
+  var picked = zones.slice(0, 2);
+  // PHASE 2 : après 2s, cacher la question et afficher les cibles
+  var _dcog_qOvRef = document.getElementById('sensei-cam-question');
+  setTimeout(function(){
+    if (_dcog_qOvRef) _dcog_qOvRef.style.display = 'none';
+    _dcog_mathTargets = picked.map(function(z, i) {
+      return {x:Math.round(z.x), y:Math.round(z.y), r:r, color:colors[i % colors.length],
+              born:Date.now(), ttl:99999, hit:false, hitTime:0,
+              mathVal:_dcog_mathChoices[i], mathIdx:i};
+    });
+  }, 2000);
   _dcog_updateMathBpm();
 }
 
@@ -24616,11 +24605,12 @@ function _dcog_genQuestion() {
 }
 
 function _dcog_genChoices(correct) {
+  // 2 choix seulement : 1 correct + 1 mauvais (style HomeCourt)
   var choices = [correct];
   var attempts = 0;
-  while (choices.length < 3 && attempts < 50) {
+  while (choices.length < 2 && attempts < 50) {
     attempts++;
-    var delta = Math.floor(Math.random()*10)+1;
+    var delta = Math.floor(Math.random()*8)+2; // delta min 2 pour éviter confusion
     var distractor = correct + (Math.random()<0.5 ? delta : -delta);
     if (choices.indexOf(distractor) === -1) choices.push(distractor);
   }
@@ -25720,8 +25710,13 @@ if('serviceWorker' in navigator){
 <div id="sensei-cam-overlay">
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
-  <div id="sensei-cam-question" style="display:none;position:absolute;top:5%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;font-size:clamp(22px,4vw,44px);font-weight:900;padding:12px 28px;border-radius:14px;letter-spacing:2px;text-align:center;z-index:10;border:2px solid rgba(245,197,24,.6);text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap"></div>
-  <!-- Boutons dans l'overlay = suivent la rotation CSS -->
+  <!-- Question math — affichée en phase 1 puis cachée -->
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(48px,12vw,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none"></div>
+  <!-- Message portrait -->
+  <div id="sensei-cam-portrait-warn" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:20;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:clamp(20px,5vw,32px);font-weight:900;text-align:center;gap:20px">
+    <div style="font-size:clamp(48px,12vw,80px)">📱↔️</div>
+    <div data-i18n="cam_rotate_msg">Pose ton téléphone<br>à l'horizontal</div>
+  </div>
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
 </div>
@@ -25740,22 +25735,23 @@ function senseiCamShow(mod,stream){
   var rb=document.getElementById('sensei-cam-rec-btn');
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
-  if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});
+  // Détection portrait/landscape — message si portrait
+  function _scam_checkOrientation() {
+    var pw = document.getElementById('sensei-cam-portrait-warn');
+    var isPortrait = window.innerHeight > window.innerWidth;
+    if (pw) pw.style.display = isPortrait ? 'flex' : 'none';
+  }
+  _scam_checkOrientation();
+  if(window._scam_orientCb) window.removeEventListener('resize', window._scam_orientCb);
+  window._scam_orientCb = _scam_checkOrientation;
+  window.addEventListener('resize', _scam_checkOrientation);
   _scam.video.srcObject=stream;
   _scam.video.setAttribute('playsinline','');
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    // En portrait sur mobile : le canvas doit être en format landscape (rotation CSS)
-    var isPortrait = window.innerHeight > window.innerWidth;
-    var isMobileDevice = window.innerWidth <= 768;
-    if (isPortrait && isMobileDevice) {
-      _scam.canvas.width  = window.innerHeight;
-      _scam.canvas.height = window.innerWidth;
-    } else {
-      _scam.canvas.width  = window.innerWidth;
-      _scam.canvas.height = window.innerHeight;
-    }
+    _scam.canvas.width  = window.innerWidth;
+    _scam.canvas.height = window.innerHeight;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -25770,6 +25766,7 @@ function senseiCamStop(){
   var qOv=document.getElementById('sensei-cam-question');
   if(qOv){qOv.style.display='none';qOv.textContent='';}
   document.body.style.overflow='';
+  if(window._scam_orientCb){window.removeEventListener('resize',window._scam_orientCb);window._scam_orientCb=null;}
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
   if(_scam.stream){_scam.stream.getTracks().forEach(function(t){t.stop();});_scam.stream=null;}
   if(_scam.video){_scam.video.srcObject=null;_scam.video.pause();}
@@ -25782,9 +25779,8 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  var isP = window.innerHeight > window.innerWidth && window.innerWidth <= 768;
-  _scam.canvas.width  = isP ? window.innerHeight : (ov.offsetWidth||window.innerWidth);
-  _scam.canvas.height = isP ? window.innerWidth  : (ov.offsetHeight||window.innerHeight);
+  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
+  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
 });
 </script>
 <script>
@@ -25794,6 +25790,13 @@ function senseiCamToggleRec(){
   else if(m==='tsym' && typeof _tsym_toggleRec==='function') _tsym_toggleRec();
   else if(m==='dcog' && typeof _dcog_toggleRec==='function') _dcog_toggleRec();
 }
+// i18n portrait warning
+(function(){
+  var T=window.LANG_DATA;
+  if(!T) return;
+  if(T.fr) T.fr.cam_rotate_msg='Pose ton téléphoneà l’horizontal';
+  if(T.en) T.en.cam_rotate_msg='Hold your phone horizontally';
+})();
 function shPlayVideo(){
   var btn = document.getElementById('sh_video_btn');
   var id = (btn && btn.getAttribute('data-vid')) || 'NacCJX1KFAc';
