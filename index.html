@@ -632,7 +632,7 @@ body.unlocked .sensei-only{display:revert !important}
 .tr-card .vid-thumb{position:static !important;padding-bottom:0 !important;height:auto !important;}
 .tr-card .vid-thumb img{position:static !important;height:auto !important;transform:none !important;}
 
-#sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;background:#000;overflow:hidden}
+#sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;background:#000;overflow:hidden;transform-origin:top left}
 #sensei-cam-overlay canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #sensei-cam-overlay video{display:none}
 #sensei-cam-stop-btn{display:none;position:absolute;top:14px;right:14px;z-index:10002;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px}
@@ -25737,8 +25737,11 @@ function senseiCamShow(mod,stream){
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    _scam.canvas.width  = window.innerWidth;
-    _scam.canvas.height = window.innerHeight;
+    // Toujours landscape : largeur = max, hauteur = min
+    var W = Math.max(window.innerWidth, window.innerHeight);
+    var H = Math.min(window.innerWidth, window.innerHeight);
+    _scam.canvas.width  = W;
+    _scam.canvas.height = H;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -25766,8 +25769,10 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
-  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
+  var _rW = Math.max(window.innerWidth, window.innerHeight);
+  var _rH = Math.min(window.innerWidth, window.innerHeight);
+  _scam.canvas.width  = _rW;
+  _scam.canvas.height = _rH;
 });
 </script>
 <script>
