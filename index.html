@@ -24255,6 +24255,9 @@ var _dcog_mathTimer    = null;
 var _dcog_qTimer       = null;  // timer par question
 var _dcog_qTimerSec    = 0;
 var _dcog_qTimerDur    = 5;     // 5s par question
+var _dcog_sessTimer    = null;  // timer session (sprint/height/twoball)
+var _dcog_sessSec      = 0;
+var _dcog_sessDur      = 60;    // 60s
 
 function _dcog_setDuration(sec) {
   _dcog_mathDuration = sec;
@@ -24350,6 +24353,15 @@ function _dcog_launchDrill() {
   // Drill-specific init — AVANT detect pour que les données soient prêtes au 1er frame
   if (_dcog_drill === 'math')    _dcog_nextQuestion();
   if (_dcog_drill === 'sprint')  _dcog_startSprintTimer();
+  // Timer session pour les drills non-math (sprint/height/twoball)
+  if (_dcog_drill !== 'math') {
+    _dcog_sessSec = 0;
+    if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
+    _dcog_sessTimer = setInterval(function(){
+      _dcog_sessSec++;
+      if (_dcog_sessSec >= _dcog_sessDur) { clearInterval(_dcog_sessTimer); _dcog_sessTimer = null; }
+    }, 1000);
+  }
   if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos')   _dcog_tbScheduleChaos();
   if (_dcog_drill === 'twoball' && _dcog_tbMode === 'burnout') _dcog_startBurnout();
   // Show REC button
@@ -24438,6 +24450,21 @@ function _dcog_drawFrame(poses) {
   // Draw height target line on canvas
   if (_dcog_drill === 'height' && _dcog_running) {
     _dcog_drawHeightLine(ctx, W, H);
+  }
+  // Timer session — haut droit, pivoté -90° (sprint/height/twoball)
+  if (_dcog_drill !== 'math' && _dcog_running) {
+    var _sr = Math.max(0, _dcog_sessDur - _dcog_sessSec);
+    var _smm = Math.floor(_sr/60), _sss = _sr % 60;
+    var _st = _smm+':'+(_sss<10?'0':'')+_sss;
+    ctx.save();
+    ctx.translate(W - Math.round(H*0.06), Math.round(H*0.06));
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = _sr <= 10 ? '#e63946' : '#fff';
+    ctx.font = 'bold ' + Math.round(H*0.10) + 'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+    ctx.fillText(_st, 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
   }
 }
 
@@ -24981,13 +25008,17 @@ function _dcog_drawHeightLine(ctx, W, H) {
   ctx.setLineDash([14, 6]);
   ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
   ctx.setLineDash([]);
-  // Label
-  ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
-  ctx.font         = 'bold 11px sans-serif';
-  ctx.textAlign    = 'right';
-  ctx.textBaseline = 'bottom';
+  // Label pivoté -90°
   var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
-  ctx.fillText(lbl, W - 8, ly - 4);
+  ctx.save();
+  ctx.translate(W - Math.round(H*0.04), ly);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
+  ctx.font         = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(lbl, 0, 0);
+  ctx.restore();
   // Point poignet actif
   if (_dcog_heightWristPx !== null) {
     ctx.beginPath();
@@ -25120,7 +25151,14 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.textAlign    = 'right';
     ctx.textBaseline = 'bottom';
     var en = window._lang === 'en';
-    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', W - 8, ly - 4);
+    ctx.save();
+    ctx.translate(W - Math.round(H*0.04), ly);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#2dc653';
+    ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', 0, 0);
+    ctx.restore();
     // Indicateurs poignets
     if (_dcog_tbLWristY !== null) {
       var okL = Math.abs(_dcog_tbLWristY - ly) < H * 0.08;
@@ -25151,10 +25189,22 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     // Labels
     var en2 = window._lang === 'en';
     ctx.font = 'bold 10px sans-serif'; ctx.textBaseline = 'bottom';
-    ctx.fillStyle = '#4ecdc4'; ctx.textAlign = 'left';
-    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', 8, lL - 4);
-    ctx.fillStyle = '#e63946'; ctx.textAlign = 'right';
-    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', W - 8, lR - 4);
+    ctx.save();
+    ctx.translate(Math.round(H*0.04), lL);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#4ecdc4';
+    ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(W - Math.round(H*0.04), lR);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#e63946';
+    ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', 0, 0);
+    ctx.restore();
     // Indicateurs
     if (_dcog_tbLWristY !== null) {
       var okL2 = Math.abs(_dcog_tbLWristY - lL) < H * 0.08;
