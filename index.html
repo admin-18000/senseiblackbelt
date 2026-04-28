@@ -24545,12 +24545,15 @@ function _dcog_drawMathTargets(ctx, W, H) {
     // Chiffre au centre — au lieu de la croix
     ctx.globalAlpha  = 1;
     ctx.fillStyle    = '#fff';
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    ctx.rotate(-Math.PI/2);
     ctx.font         = 'bold ' + Math.round(t.r * 0.75) + 'px sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor  = 'rgba(0,0,0,0.8)';
     ctx.shadowBlur   = 4;
-    ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), t.x, t.y);
+    ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), 0, 0);
     ctx.shadowBlur   = 0;
     ctx.restore();
   });
