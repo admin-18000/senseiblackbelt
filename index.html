@@ -25911,9 +25911,11 @@ function senseiCamShow(mod,stream){
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
   document.body.style.overflow='hidden';
 
-  // Cacher tout le panel DCOG (les scores/overlays HTML débordent sinon)
-  var _dcog_panel = document.getElementById('tr-dcog');
-  if (_dcog_panel) _dcog_panel.style.visibility = 'hidden';
+  // Cacher tous les panels tr-panel (scores HTML débordent sinon)
+  document.querySelectorAll('.tr-panel').forEach(function(p){
+    if(p.style.display !== 'none') p.setAttribute('data-cam-hidden','1');
+    p.style.visibility = 'hidden';
+  });
   _scam.video.srcObject=stream;
   _scam.video.setAttribute('playsinline','');
   _scam.video.muted=true;
@@ -25943,8 +25945,11 @@ function senseiCamStop(){
   if(m==='tdr'&&typeof _tdr_stop==='function')_tdr_stop();
   if(m==='dcog'&&typeof _dcog_stop==='function')_dcog_stop();
   if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
-  // Restaurer le panel DCOG
-  var _dp=document.getElementById('tr-dcog'); if(_dp)_dp.style.visibility='';
+  // Restaurer tous les panels tr-panel
+  document.querySelectorAll('.tr-panel').forEach(function(p){
+    p.style.visibility = '';
+    p.removeAttribute('data-cam-hidden');
+  });
 }
 window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
