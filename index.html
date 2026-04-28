@@ -22721,22 +22721,21 @@ function _tsym_drawFrame(poses) {
     _tsym_ctx.font = 'bold '+Math.round(fs*0.65)+'px Arial Narrow,Arial,sans-serif';
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
     _tsym_ctx.fillText(modeLabel, W-Math.round(W*0.025), barH/2);
-    // Timer session — centré dans la barre
+    // Timer session — haut droit, pivoté -90°, même style que TDR
     var remaining = Math.max(0, _tsym_sessDur - _tsym_sessSec);
     var mm = Math.floor(remaining/60);
     var ss = remaining % 60;
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
+    var timerFs2 = Math.round(H * 0.10);
     _tsym_ctx.save();
-    _tsym_ctx.translate(W/2, barH/2);
+    _tsym_ctx.translate(W - Math.round(H*0.06), Math.round(H*0.06));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
-    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'center';
-    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.font = 'bold '+timerFs2+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
     _tsym_ctx.fillText(timerStr, 0, 0);
-    _tsym_ctx.shadowBlur = 0;
-    _tsym_ctx.restore();
+    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
 
     _tsym_ctx.shadowBlur = 0;
     _tsym_ctx.restore();
@@ -23494,22 +23493,33 @@ function _tdr_drawFrame(poses) {
 
     // Fond semi-transparent en haut
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, 0, W, Math.round(W * 0.10));
+    ctx.fillRect(0, 0, W, Math.round(H * 0.12));
 
-    // Score à gauche
+    var timerFs = Math.round(H * 0.10);
+
+    // Score — haut gauche, pivoté -90°
+    ctx.save();
+    ctx.translate(Math.round(H*0.06), Math.round(H*0.06));
+    ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + fs + 'px Arial Narrow, Arial, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 6;
-    ctx.fillText(_tdr_score, Math.round(W*0.025), Math.round(W*0.055));
+    ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
+    ctx.fillText(String(_tdr_score), 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
 
-    // Chrono à droite
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'right';
+    // Chrono — haut droite, pivoté -90°
     var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
-    ctx.fillText((mm>0?(mm+':'):'') + (ss<10?'0':'')+ss, W - Math.round(W*0.025), Math.round(W*0.055));
+    var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
+    ctx.save();
+    ctx.translate(W - Math.round(H*0.06), Math.round(H*0.06));
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
+    ctx.fillText(chronoStr, 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
 
     // Streak au centre si >= 3
     if (_tdr_streak >= 3) {
@@ -24406,10 +24416,10 @@ function _dcog_drawFrame(poses) {
     if (_dcog_qTimerSec > 0) {
       var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
       ctx.save();
-      ctx.translate(W - Math.round(W*0.06), Math.round(H*0.08));
+      ctx.translate(W - Math.round(H*0.06), Math.round(H*0.06));
       ctx.rotate(-Math.PI/2);
       ctx.fillStyle = timerColor;
-      ctx.font = 'bold ' + Math.round(H*0.15) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.font = 'bold ' + Math.round(H*0.10) + 'px Arial Narrow,Arial,sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 12;
