@@ -22707,20 +22707,28 @@ function _tsym_drawFrame(poses) {
     _tsym_ctx.save();
     _tsym_ctx.fillStyle = 'rgba(0,0,0,0.52)';
     _tsym_ctx.fillRect(0, 0, W, barH);
-    // Score à gauche
+    // Score symétrie — haut gauche pivoté -90°
     var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
+    _tsym_ctx.save();
+    _tsym_ctx.translate(Math.round(H*0.06), Math.round(H*0.06));
+    _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = col;
-    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'left';
-    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
-    _tsym_ctx.fillText(avg+'%', Math.round(W*0.025), barH/2);
-    // Mode à droite
-    _tsym_ctx.fillStyle = '#fff';
-    _tsym_ctx.textAlign = 'right';
-    _tsym_ctx.font = 'bold '+Math.round(fs*0.65)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.fillText(avg+'%', 0, 0);
+    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
+    // Mode — haut centre pivoté -90°
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
-    _tsym_ctx.fillText(modeLabel, W-Math.round(W*0.025), barH/2);
+    _tsym_ctx.save();
+    _tsym_ctx.translate(W*0.50, Math.round(H*0.06));
+    _tsym_ctx.rotate(-Math.PI/2);
+    _tsym_ctx.fillStyle = '#fff';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.08)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
+    _tsym_ctx.fillText(modeLabel, 0, 0);
+    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
     // Timer session — haut droit, pivoté -90°, même style que TDR
     var remaining = Math.max(0, _tsym_sessDur - _tsym_sessSec);
     var mm = Math.floor(remaining/60);
@@ -22728,7 +22736,7 @@ function _tsym_drawFrame(poses) {
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
     var timerFs2 = Math.round(H * 0.10);
     _tsym_ctx.save();
-    _tsym_ctx.translate(W - Math.round(H*0.12), Math.round(H*0.06));
+    _tsym_ctx.translate(Math.round(H*0.22), Math.round(H*0.06));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
     _tsym_ctx.font = 'bold '+timerFs2+'px Arial Narrow,Arial,sans-serif';
@@ -23508,11 +23516,11 @@ function _tdr_drawFrame(poses) {
     ctx.fillText(String(_tdr_score), 0, 0);
     ctx.shadowBlur = 0; ctx.restore();
 
-    // Chrono — haut droite, pivoté -90°
+    // Chrono — haut gauche après score, pivoté -90°
     var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
     var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
     ctx.save();
-    ctx.translate(W - Math.round(H*0.12), Math.round(H*0.06));
+    ctx.translate(Math.round(H*0.22), Math.round(H*0.06));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#fff';
     ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
@@ -23526,7 +23534,12 @@ function _tdr_drawFrame(poses) {
       ctx.textAlign = 'center';
       ctx.fillStyle = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
       ctx.font = 'bold ' + Math.round(fs*0.85) + 'px Arial Narrow, Arial, sans-serif';
-      ctx.fillText('🔥 ×' + _tdr_streak, W/2, Math.round(W*0.055));
+      ctx.save();
+      ctx.translate(W/2, Math.round(H*0.06));
+      ctx.rotate(-Math.PI/2);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🔥 ×' + _tdr_streak, 0, 0);
+      ctx.restore();
     }
 
     ctx.shadowBlur = 0;
@@ -23773,14 +23786,15 @@ function _tdr_countdown(cb) {
     if (num === 1) {
       ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
       ctx.save();
-      ctx.translate(W/2, H/2 + Math.round(W*0.22));
+      ctx.translate(W/2, H/2 + Math.round(H*0.25));
       ctx.rotate(-Math.PI/2);
-      ctx.font = Math.round(H*0.12)+'px Arial Narrow,Arial,sans-serif';
+      ctx.font = Math.round(H*0.10)+'px Arial Narrow,Arial,sans-serif';
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
       ctx.fillText(en?'GET READY':'PRÊT ?', 0, 0);
-      ctx.restore();
+      ctx.shadowBlur = 0; ctx.restore();
     }
     ctx.shadowBlur = 0;
     ctx.restore();
@@ -24428,7 +24442,7 @@ function _dcog_drawFrame(poses) {
     if (_dcog_qTimerSec > 0) {
       var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
       ctx.save();
-      ctx.translate(W - Math.round(H*0.12), Math.round(H*0.06));
+      ctx.translate(Math.round(H*0.22), Math.round(H*0.06));
       ctx.rotate(-Math.PI/2);
       ctx.fillStyle = timerColor;
       ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -24454,9 +24468,9 @@ function _dcog_drawFrame(poses) {
   // Label sprint — centré en haut
   if (_dcog_drill === 'sprint' && _dcog_running) {
     var en_s = window._lang === 'en';
-    var sprintLbl = en_s ? 'DRIBBLE SPRINT' : 'SPRINT DRIBBLE';
+    var sprintLbl = en_s ? 'SPRINT' : 'SPRINT';
     ctx.save();
-    ctx.translate(W * 0.5, Math.round(H*0.12));
+    ctx.translate(W * 0.5, Math.round(H*0.06));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
     ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
@@ -24471,7 +24485,7 @@ function _dcog_drawFrame(poses) {
     var _smm = Math.floor(_sr/60), _sss = _sr % 60;
     var _st = _smm+':'+(_sss<10?'0':'')+_sss;
     ctx.save();
-    ctx.translate(W - Math.round(H*0.12), Math.round(H*0.06));
+    ctx.translate(Math.round(H*0.22), Math.round(H*0.06));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = _sr <= 10 ? '#e63946' : '#fff';
     ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -25025,7 +25039,7 @@ function _dcog_drawHeightLine(ctx, W, H) {
   // Label pivoté -90° — centré sur la ligne, loin des bords
   var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
   ctx.save();
-  ctx.translate(Math.round(W*0.75), ly);
+  ctx.translate(Math.round(W*0.60), ly);
   ctx.rotate(-Math.PI/2);
   ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
   ctx.font         = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
@@ -25168,7 +25182,7 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.textBaseline = 'bottom';
     var en = window._lang === 'en';
     ctx.save();
-    ctx.translate(Math.round(W*0.75), ly);
+    ctx.translate(Math.round(W*0.60), ly);
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#2dc653';
     ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
@@ -25216,7 +25230,7 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', 0, 0);
     ctx.shadowBlur = 0; ctx.restore();
     ctx.save();
-    ctx.translate(Math.round(W*0.75), lR);
+    ctx.translate(Math.round(W*0.60), lR);
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#e63946';
     ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
