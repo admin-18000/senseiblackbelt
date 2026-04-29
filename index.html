@@ -24449,17 +24449,12 @@ function _tdr_spawnTarget() {
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
-  var cx = (_tdr_calibrated && _tdr_centerX) ? _tdr_centerX : 0.5;
-  var landscape = W > H; // mode paysage
-  var spread = landscape ? 0.32 : 0.28;
-  var yTop    = landscape ? 0.18 : 0.15;
-  var yMid    = landscape ? 0.40 : 0.30;
-  var yBot    = landscape ? 0.60 : 0.45; // non utilisé mais gardé
+  // Positions fixes — 4 coins haut uniquement, bien répartis gauche/droite
   var positions = [
-    {x: W*(cx - spread), y: H*yTop, color:'#2dc653'},  // gauche haut
-    {x: W*(cx + spread), y: H*yTop, color:'#e63946'},  // droite haut
-    {x: W*(cx - spread), y: H*yMid, color:'#f5c518'},  // gauche milieu
-    {x: W*(cx + spread), y: H*yMid, color:'#4ecdc4'},  // droite milieu
+    {x: W*0.18, y: H*0.15, color:'#2dc653'},  // gauche haut
+    {x: W*0.82, y: H*0.15, color:'#e63946'},  // droite haut
+    {x: W*0.18, y: H*0.32, color:'#f5c518'},  // gauche milieu-haut
+    {x: W*0.82, y: H*0.32, color:'#4ecdc4'},  // droite milieu-haut
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -25441,20 +25436,24 @@ function _dcog_nextQuestion() {
   var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
+  // Réduire le rayon pour éviter le chevauchement
+  r = Math.round(W * 0.10);
   var allZones = [
-    // Toutes dans le tiers supérieur — loin du corps et des mains
-    {x: W*0.20, y: H*0.15}, {x: W*0.50, y: H*0.12}, {x: W*0.80, y: H*0.15},
-    {x: W*0.15, y: H*0.30}, {x: W*0.85, y: H*0.30},
-    {x: W*0.35, y: H*0.25}, {x: W*0.65, y: H*0.25},
+    // 6 zones bien espacées — tiers supérieur uniquement
+    {x: W*0.18, y: H*0.13},  // gauche haut
+    {x: W*0.82, y: H*0.13},  // droite haut
+    {x: W*0.50, y: H*0.10},  // centre haut
+    {x: W*0.18, y: H*0.30},  // gauche milieu-haut
+    {x: W*0.82, y: H*0.30},  // droite milieu-haut
+    {x: W*0.50, y: H*0.27},  // centre milieu-haut
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
   var z1 = shuffledZ[0], z2 = shuffledZ[1], z3 = shuffledZ[2];
   var attempts = 0;
-  while (attempts++ < 20 && (
-    (Math.abs(z1.x-z2.x) < r*2.5 && Math.abs(z1.y-z2.y) < r*2.5) ||
-    (Math.abs(z1.x-z3.x) < r*2.5 && Math.abs(z1.y-z3.y) < r*2.5) ||
-    (Math.abs(z2.x-z3.x) < r*2.5 && Math.abs(z2.y-z3.y) < r*2.5)
+  function _dist(a,b){return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2));}
+  while (attempts++ < 50 && (
+    _dist(z1,z2) < r*3 || _dist(z1,z3) < r*3 || _dist(z2,z3) < r*3
   )) {
     shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
     z1 = shuffledZ[0]; z2 = shuffledZ[1]; z3 = shuffledZ[2];
