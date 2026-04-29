@@ -23675,13 +23675,20 @@ function _tdr_checkHits(poses) {
     var prev = _tdr_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdr_prevWrist[name] = {x:wx, y:wy};
-    // Seuil adaptatif : ~1.5% de la largeur canvas (15px sur 1000px, 10px sur 640px)
-    var moveThresh = Math.max(4, Math.round(W * 0.008));
+    // Seuil adaptatif : geste intentionnel requis
+    var moveThresh = Math.max(8, Math.round(W * 0.02));
     if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
     _tdr_targets.forEach(function(t) {
       if (t.hit) return;
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx+dy*dy) < t.r * 2.0) {
+      var dist = Math.sqrt(dx*dx+dy*dy);
+      if (dist >= t.r * 2.0) return;
+      // Détection directionnelle : la main doit se diriger VERS la cible
+      var dot = (-dx)*vx + (-dy)*vy; // vecteur vers cible · vecteur mouvement
+      if (dot <= 0) return; // main s'éloigne ou perpendiculaire → ignorer
+      if (true) {
         t.hit = true; // marquer immédiatement pour éviter double-hit G+D
         t.hitTime = Date.now();
         var rt = Date.now() - t.born;
@@ -24587,10 +24594,12 @@ function _dcog_nextQuestion() {
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
   var allZones = [
-    {x: W*0.22, y: H*0.25}, {x: W*0.70, y: H*0.20},
-    {x: W*0.22, y: H*0.55}, {x: W*0.78, y: H*0.55},
-    {x: W*0.22, y: H*0.78}, {x: W*0.72, y: H*0.75},
-    {x: W*0.50, y: H*0.20}, {x: W*0.50, y: H*0.80},
+    // Haut gauche, haut droite, haut centre
+    {x: W*0.22, y: H*0.20}, {x: W*0.78, y: H*0.20}, {x: W*0.50, y: H*0.18},
+    // Milieu gauche, milieu droite (côtés uniquement — pas le centre)
+    {x: W*0.18, y: H*0.50}, {x: W*0.82, y: H*0.50},
+    // Bas gauche, bas droite (côtés — pas le centre bas où est le corps)
+    {x: W*0.18, y: H*0.78}, {x: W*0.82, y: H*0.78},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
@@ -24637,11 +24646,18 @@ function _dcog_analyzeMathZone(poses) {
     _dcog_prevWrist[name] = {x:wx, y:wy};
     var moveThresh = Math.max(8, Math.round(W * 0.02)); // plus élevé que TDR : geste intentionnel requis
     if (moved < moveThresh) return;
+    var vxd = prev ? wx - prev.x : 0;
+    var vyd = prev ? wy - prev.y : 0;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       if (Date.now() - t.born < 500) return; // délai minimum avant détection
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.2) { // zone plus précise que TDR
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 1.2) return;
+      // Détection directionnelle : la main doit se diriger VERS la cible
+      var dot = (-dx)*vxd + (-dy)*vyd;
+      if (dot <= 0) return;
+      if (true) { // zone plus précise que TDR
         t.hit = true; t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         // Son différencié identique à TDR
