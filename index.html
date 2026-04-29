@@ -22546,6 +22546,10 @@ function _tsym_startSessTimer(){
     _tsym_sessSec++;
     if (_tsym_sessSec >= _tsym_sessDur) {
       clearInterval(_tsym_sessTimer); _tsym_sessTimer = null;
+      // Fin session symétrie
+      _td_beep(440, 0.3, 0.25);
+      _sensei_speak(window._lang==='en'?'Session done!':'Session terminée !', 0);
+      _senseiEndSession(3000);
     }
   }, 1000);
 }
@@ -23894,6 +23898,8 @@ function _tdr_endDrill() {
   // Proposer sauvegarde
   var btnSave = document.getElementById('tdr_btnSave');
   if (btnSave) btnSave.style.display = 'flex';
+  // Fermer caméra automatiquement après 4s
+  _senseiEndSession(4000);
 }
 
 function _tdr_showResults(score, hits, total, avgRT) {
@@ -24310,6 +24316,7 @@ function _dcog_startTimer() {
       _dcog_showResults();
       var btnSv = document.getElementById('dcog_btnSave');
       if(btnSv) btnSv.style.display = 'flex';
+      _senseiEndSession(4000);
     }
   }, 1000);
 }
@@ -24369,7 +24376,18 @@ function _dcog_launchDrill() {
     if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
     _dcog_sessTimer = setInterval(function(){
       _dcog_sessSec++;
-      if (_dcog_sessSec >= _dcog_sessDur) { clearInterval(_dcog_sessTimer); _dcog_sessTimer = null; }
+      if (_dcog_sessSec >= _dcog_sessDur) {
+        clearInterval(_dcog_sessTimer); _dcog_sessTimer = null;
+        // Fin session
+        _td_beep(440, 0.3, 0.25);
+        if(navigator.vibrate) navigator.vibrate([100,50,100]);
+        _sensei_speak(window._lang==='en'?'Session done!':'Session terminée !', 0);
+        _dcog_stop();
+        _dcog_showResults();
+        var btnSv2 = document.getElementById('dcog_btnSave');
+        if(btnSv2) btnSv2.style.display = 'flex';
+        _senseiEndSession(4000);
+      }
     }, 1000);
   }
   if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos')   _dcog_tbScheduleChaos();
@@ -24475,6 +24493,27 @@ function _dcog_drawFrame(poses) {
     ctx.fillText(sprintLbl, 0, 0);
     ctx.shadowBlur = 0; ctx.restore();
   }
+  // Score correct/incorrect — bas gauche canvas
+  if (_dcog_drill === 'math' && _dcog_running) {
+    ctx.save();
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.70));
+    ctx.rotate(-Math.PI/2);
+    ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+    ctx.fillStyle = '#2dc653';
+    ctx.fillText('✓ '+_dcog_correct, 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
+    ctx.save();
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.50));
+    ctx.rotate(-Math.PI/2);
+    ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+    ctx.fillStyle = '#e63946';
+    ctx.fillText('✗ '+_dcog_wrong, 0, 0);
+    ctx.shadowBlur = 0; ctx.restore();
+  }
   // Timer session — haut droit, pivoté -90° (sprint/height/twoball)
   if (_dcog_drill !== 'math' && _dcog_running) {
     var _sr = Math.max(0, _dcog_sessDur - _dcog_sessSec);
@@ -24544,7 +24583,7 @@ function _dcog_nextQuestion() {
   var H  = cv ? cv.height : 480;
   // 2 cibles style HomeCourt : positions aléatoires comme dans Dribble
   var r  = Math.round(W * (W > H ? 0.10 : 0.17));
-  var colors = ['#2dc653', '#e63946']; // vert = bonne, rouge = mauvaise (shuffled)
+  var colors = ['#2dc653', '#e63946', '#e63946']; // vert = bonne, 2 rouges = mauvaises
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
   var allZones = [
@@ -24553,15 +24592,19 @@ function _dcog_nextQuestion() {
     {x: W*0.22, y: H*0.78}, {x: W*0.72, y: H*0.75},
     {x: W*0.50, y: H*0.20}, {x: W*0.50, y: H*0.80},
   ];
-  // Choisir 2 zones non adjacentes aléatoirement
+  // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-  var z1 = shuffledZ[0], z2 = shuffledZ[1];
-  // Garantir qu'elles ne se chevauchent pas
-  while (Math.abs(z1.x-z2.x) < r*2.5 && Math.abs(z1.y-z2.y) < r*2.5) {
+  var z1 = shuffledZ[0], z2 = shuffledZ[1], z3 = shuffledZ[2];
+  var attempts = 0;
+  while (attempts++ < 20 && (
+    (Math.abs(z1.x-z2.x) < r*2.5 && Math.abs(z1.y-z2.y) < r*2.5) ||
+    (Math.abs(z1.x-z3.x) < r*2.5 && Math.abs(z1.y-z3.y) < r*2.5) ||
+    (Math.abs(z2.x-z3.x) < r*2.5 && Math.abs(z2.y-z3.y) < r*2.5)
+  )) {
     shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-    z1 = shuffledZ[0]; z2 = shuffledZ[1];
+    z1 = shuffledZ[0]; z2 = shuffledZ[1]; z3 = shuffledZ[2];
   }
-  var picked = [z1, z2];
+  var picked = [z1, z2, z3];
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
@@ -24762,10 +24805,10 @@ function _dcog_genQuestion() {
 }
 
 function _dcog_genChoices(correct) {
-  // 2 choix seulement : 1 correct + 1 mauvais (style HomeCourt)
+  // 3 choix : 1 correct + 2 mauvais
   var choices = [correct];
   var attempts = 0;
-  while (choices.length < 2 && attempts < 50) {
+  while (choices.length < 3 && attempts < 50) {
     attempts++;
     var delta = Math.floor(Math.random()*8)+2; // delta min 2 pour éviter confusion
     var distractor = correct + (Math.random()<0.5 ? delta : -delta);
@@ -25903,6 +25946,14 @@ if('serviceWorker' in navigator){
 </div>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
+
+// Helper : fermer la caméra proprement après fin de session
+function _senseiEndSession(delay) {
+  delay = delay || 3000;
+  setTimeout(function() {
+    if (typeof senseiCamStop === 'function') senseiCamStop();
+  }, delay);
+}
 function senseiCamShow(mod,stream){
   _scam.module=mod; _scam.stream=stream;
   var ov=document.getElementById('sensei-cam-overlay');
