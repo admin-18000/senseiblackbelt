@@ -23504,7 +23504,7 @@ function _tsym_drawFrame(poses) {
     // Score symétrie — haut gauche pivoté -90°
     var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
     _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
+    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.12));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = col;
     _tsym_ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
@@ -23549,7 +23549,7 @@ function _tsym_drawFrame(poses) {
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
     var timerFs2 = Math.round(H * 0.10);
     _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
+    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.25));
     _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
     _tsym_ctx.font = 'bold '+timerFs2+'px Arial Narrow,Arial,sans-serif';
@@ -24316,7 +24316,7 @@ function _tdr_drawFrame(poses) {
 
     // Score — haut gauche, pivoté -90°
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.12));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
     ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
@@ -24346,7 +24346,7 @@ function _tdr_drawFrame(poses) {
     var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
     var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
+    ctx.translate(Math.round(W*0.18), Math.round(H*0.12));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#fff';
     ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
@@ -24452,9 +24452,9 @@ function _tdr_spawnTarget() {
   var cx = (_tdr_calibrated && _tdr_centerX) ? _tdr_centerX : 0.5;
   var landscape = W > H; // mode paysage
   var spread = landscape ? 0.32 : 0.28;
-  var yTop    = landscape ? 0.22 : 0.28;
-  var yMid    = landscape ? 0.55 : 0.50;
-  var yBot    = landscape ? 0.80 : 0.72;
+  var yTop    = landscape ? 0.18 : 0.15;
+  var yMid    = landscape ? 0.40 : 0.30;
+  var yBot    = landscape ? 0.60 : 0.45; // non utilisé mais gardé
   var positions = [
     {x: W*(cx - spread), y: H*yTop, color:'#2dc653'},  // gauche haut
     {x: W*(cx + spread), y: H*yTop, color:'#e63946'},  // droite haut
@@ -25288,7 +25288,7 @@ function _dcog_drawFrame(poses) {
     if (_dcog_qTimerSec > 0) {
       var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
       ctx.save();
-      ctx.translate(Math.round(W*0.08), Math.round(H*0.88));
+      ctx.translate(Math.round(W*0.25), Math.round(H*0.12));
       ctx.rotate(-Math.PI/2);
       ctx.fillStyle = timerColor;
       ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -25348,7 +25348,7 @@ function _dcog_drawFrame(poses) {
   // Score correct/incorrect — bas gauche canvas
   if (_dcog_drill === 'math' && _dcog_running) {
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.70));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.25));
     ctx.rotate(-Math.PI/2);
     ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -25372,7 +25372,7 @@ function _dcog_drawFrame(poses) {
     var _smm = Math.floor(_sr/60), _sss = _sr % 60;
     var _st = _smm+':'+(_sss<10?'0':'')+_sss;
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.72));
+    ctx.translate(Math.round(W*0.08), Math.round(H*0.38));
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = _sr <= 10 ? '#e63946' : '#fff';
     ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
@@ -25442,14 +25442,10 @@ function _dcog_nextQuestion() {
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
   var allZones = [
-    // Gauche haut, gauche milieu-haut (x petit = gauche en landscape)
-    {x: W*0.18, y: H*0.22}, {x: W*0.18, y: H*0.55},
-    // Droite haut, droite milieu-haut
-    {x: W*0.82, y: H*0.22}, {x: W*0.82, y: H*0.55},
-    // Milieu gauche, milieu droite (haut seulement)
-    {x: W*0.35, y: H*0.18}, {x: W*0.65, y: H*0.18},
-    // Extrêmes côtés
-    {x: W*0.10, y: H*0.38},
+    // Toutes dans le tiers supérieur — loin du corps et des mains
+    {x: W*0.20, y: H*0.15}, {x: W*0.50, y: H*0.12}, {x: W*0.80, y: H*0.15},
+    {x: W*0.15, y: H*0.30}, {x: W*0.85, y: H*0.30},
+    {x: W*0.35, y: H*0.25}, {x: W*0.65, y: H*0.25},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
