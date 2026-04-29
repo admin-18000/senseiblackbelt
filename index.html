@@ -24635,13 +24635,13 @@ function _dcog_analyzeMathZone(poses) {
     var prev = _dcog_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _dcog_prevWrist[name] = {x:wx, y:wy};
-    var moveThresh = Math.max(4, Math.round(W * 0.008));
+    var moveThresh = Math.max(8, Math.round(W * 0.02)); // plus élevé que TDR : geste intentionnel requis
     if (moved < moveThresh) return;
     _dcog_mathTargets.forEach(function(t) {
       if (t.hit) return;
       if (Date.now() - t.born < 500) return; // délai minimum avant détection
       var dx = wx - t.x, dy = wy - t.y;
-      if (Math.sqrt(dx*dx + dy*dy) < t.r * 2.0) {
+      if (Math.sqrt(dx*dx + dy*dy) < t.r * 1.2) { // zone plus précise que TDR
         t.hit = true; t.hitTime = Date.now();
         var rt = Date.now() - t.born;
         // Son différencié identique à TDR
