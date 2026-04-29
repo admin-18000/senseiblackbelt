@@ -23519,12 +23519,12 @@ function _tsym_drawFrame(poses) {
       var _m=Math.floor(_s/60),_ss=_s%60;
       var _tStr=_m+':'+(_ss<10?'0':'')+_ss;
       _tsym_ctx.save();
-      _tsym_ctx.translate(Math.round(W*0.06),Math.round(H*0.20));
+      _tsym_ctx.translate(Math.round(W*0.12),Math.round(H*0.12));
       _tsym_ctx.rotate(-Math.PI/2);
-      _tsym_ctx.fillStyle='rgba(0,0,0,0.45)';
-      _tsym_ctx.beginPath();_tsym_ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);_tsym_ctx.fill();
-      _tsym_ctx.fillStyle=_s<=10?'#e63946':'rgba(255,255,255,0.75)';
-      _tsym_ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+      _tsym_ctx.fillStyle='rgba(0,0,0,0.6)';
+      _tsym_ctx.beginPath();_tsym_ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);_tsym_ctx.fill();
+      _tsym_ctx.fillStyle=_s<=10?'#e63946':'#fff';
+      _tsym_ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
       _tsym_ctx.textAlign='center';_tsym_ctx.textBaseline='middle';
       _tsym_ctx.shadowColor='rgba(0,0,0,0.8)';_tsym_ctx.shadowBlur=4;
       _tsym_ctx.fillText(_tStr,0,0);
@@ -24330,13 +24330,13 @@ function _tdr_drawFrame(poses) {
     // Timer général — haut-gauche, petit, discret
     var _tStr = (function(){var _s=Math.max(0,_tdr_sec);var _m=Math.floor(_s/60);var _ss=_s%60;return _m+':'+(_ss<10?'0':'')+_ss;})();
     ctx.save();
-    ctx.translate(Math.round(W*0.06), Math.round(H*0.20));
+    ctx.translate(Math.round(W*0.12), Math.round(H*0.12));
     ctx.rotate(-Math.PI/2);
     // Fond discret
-    ctx.fillStyle='rgba(0,0,0,0.45)';
-    ctx.beginPath();ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);ctx.fill();
-    ctx.fillStyle=_tdr_sec<=10?"#e63946":"rgba(255,255,255,0.75)";
-    ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+    ctx.fillStyle='rgba(0,0,0,0.6)';
+    ctx.beginPath();ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);ctx.fill();
+    ctx.fillStyle=_tdr_sec<=10?"#e63946":"#fff";
+    ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
     ctx.fillText(_tStr,0,0);
@@ -25333,12 +25333,12 @@ function _dcog_drawFrame(poses) {
     var _dm=Math.floor(_ds/60),_dss=_ds%60;
     var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
     ctx.save();
-    ctx.translate(Math.round(W*0.06),Math.round(H*0.20));
+    ctx.translate(Math.round(W*0.12),Math.round(H*0.12));
     ctx.rotate(-Math.PI/2);
-    ctx.fillStyle='rgba(0,0,0,0.45)';
-    ctx.beginPath();ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);ctx.fill();
-    ctx.fillStyle=_ds<=10?'#e63946':'rgba(255,255,255,0.75)';
-    ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+    ctx.fillStyle='rgba(0,0,0,0.6)';
+    ctx.beginPath();ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);ctx.fill();
+    ctx.fillStyle=_ds<=10?'#e63946':'#fff';
+    ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
     ctx.fillText(_dtStr,0,0);
@@ -25442,12 +25442,14 @@ function _dcog_nextQuestion() {
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
   var allZones = [
-    // Haut uniquement — loin des mains en dribble
-    {x: W*0.22, y: H*0.20}, {x: W*0.78, y: H*0.20}, {x: W*0.50, y: H*0.18},
-    // Milieu côtés uniquement
-    {x: W*0.15, y: H*0.50}, {x: W*0.85, y: H*0.50},
-    // Milieu-haut côtés
-    {x: W*0.15, y: H*0.35}, {x: W*0.85, y: H*0.35},
+    // Gauche haut, gauche milieu-haut (x petit = gauche en landscape)
+    {x: W*0.18, y: H*0.22}, {x: W*0.18, y: H*0.55},
+    // Droite haut, droite milieu-haut
+    {x: W*0.82, y: H*0.22}, {x: W*0.82, y: H*0.55},
+    // Milieu gauche, milieu droite (haut seulement)
+    {x: W*0.35, y: H*0.18}, {x: W*0.65, y: H*0.18},
+    // Extrêmes côtés
+    {x: W*0.10, y: H*0.38},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
