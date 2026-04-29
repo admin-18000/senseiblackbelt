@@ -2516,14 +2516,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('phys-college')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#4ecdc4"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_phys_college">Collège (6ème–3ème)</span>
-        <span class="vis-acc-count">5</span>
+        <span class="vis-acc-count">6</span>
         <span class="vis-acc-arrow" id="arrow-phys-college">▶</span>
       </button>
       <div class="vis-acc-body" id="body-phys-college" style="display:none">
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🏃</span>
-            <div><div class="vis-card-title" data-i18n="vis_vitesse_title">VITESSE DU JOUEUR</div><div class="vis-formula">v = d / t   |   v_max ≈ 10 m/s</div></div>
+            <div><div class="vis-card-title" data-i18n="vis_vitesse_title">VITESSE DU JOUEUR
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🏀</span>
+            <div><div class="vis-card-title" data-i18n="vis_restitution_title">REBOND DU BALLON — COEFFICIENT e</div><div class="vis-formula">e = v_rebond / v_impact   |   e ≈ 0,75</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_restitution_tag">📐 MÉCANIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_restitution_desc">Un ballon NBA lâché de 1,80m rebondit à 1,35m — coefficient e=0,75. Animation de la perte d'énergie à chaque rebond.</div>
+          <div class="vis-wrap"><canvas id="visu-restitution"></canvas></div>
+        </div>
+      </div><div class="vis-formula">v = d / t   |   v_max ≈ 10 m/s</div></div>
             <span class="vis-tag vis-tag-gold" data-i18n="vis_vitesse_tag">⚡ CINÉMATIQUE</span>
           </div>
           <div class="vis-desc" data-i18n="vis_vitesse_desc">Un joueur NBA sprint à ~10 m/s. La simulation compare marche, trot et sprint — vitesse = distance ÷ temps.</div>
@@ -2571,14 +2581,42 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('phys-lycee')" aria-expanded="true">
         <span class="vis-acc-dot" style="background:#C49A00"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_phys-lycee">Lycée</span>
-        <span class="vis-acc-count">7</span>
+        <span class="vis-acc-count">14</span>
         <span class="vis-acc-arrow" id="arrow-phys-lycee">▼</span>
       </button>
       <div class="vis-acc-body" id="body-phys-lycee" style="display:block">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🏀</span>
-        <div><div class="vis-card-title" data-i18n="vis_card1_title">LA PARABOLE DU TIR</div><div class="vis-formula">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_card1_title">LA PARABOLE DU TIR
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">⚡</span>
+            <div><div class="vis-card-title" data-i18n="vis_newton3_title">3 LOIS DE NEWTON — DRIBBLE & SAUT</div><div class="vis-formula">F=ma  |  p=mv  |  F₁₂=−F₂₁</div></div>
+            <span class="vis-tag vis-tag-green" data-i18n="vis_newton3_tag">📐 MÉCANIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_newton3_desc">Inertie du ballon, F=ma au push-off, action/réaction sol-joueur. 3 animations simultanées.</div>
+          <div class="vis-wrap"><canvas id="visu-newton3"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🎯</span>
+            <div><div class="vis-card-title" data-i18n="vis_balistique_title">TIR BALISTIQUE — ANGLE OPTIMAL</div><div class="vis-formula">θ_opt = 45° + arctan(h/d)/2   |   y = v₀sinθ·t − ½gt²</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_balistique_tag">⚡ BALISTIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_balistique_desc">Trajectoire parabolique complète avec air drag et backspin. L'angle optimal NBA ≈ 52°.</div>
+          <div class="vis-wrap"><canvas id="visu-balistique"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🔊</span>
+            <div><div class="vis-card-title" data-i18n="vis_doppler_title">EFFET DOPPLER — SON DU BALLON</div><div class="vis-formula">f' = f·(v±v_obs)/(v±v_src)   |   v_son = 343 m/s</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_doppler_tag">🌊 ONDES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_doppler_desc">Le son du ballon change de fréquence quand le joueur court vers ou s'éloigne du panier — effet Doppler illustré.</div>
+          <div class="vis-wrap"><canvas id="visu-doppler"></canvas></div>
+        </div>
+      </div><div class="vis-formula">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div></div>
         <span class="vis-tag vis-tag-gold" data-i18n="vis_tag1">⚡ PHYSIQUE BALISTIQUE</span>
       </div>
       <div class="vis-desc" data-i18n="vis_card1_desc">Chaque tir suit une trajectoire parabolique. L'angle optimal est 45° — ni trop plat, ni trop vertical.</div>
@@ -2680,14 +2718,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('phys-licence')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#C0570A"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_phys-licence">Licence</span>
-        <span class="vis-acc-count">2</span>
+        <span class="vis-acc-count">3</span>
         <span class="vis-acc-arrow" id="arrow-phys-licence">▶</span>
       </button>
       <div class="vis-acc-body" id="body-phys-licence" style="display:none">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🌊</span>
-        <div><div class="vis-card-title" data-i18n="vis_bernoulli_title">BERNOULLI — AÉRODYNAMIQUE</div><div class="vis-formula">P + ½ρv² + ρgh = cte</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_bernoulli_title">BERNOULLI — AÉRODYNAMIQUE
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">💨</span>
+            <div><div class="vis-card-title" data-i18n="vis_pression_atm_title">PRESSION DU BALLON — GAZ PARFAITS</div><div class="vis-formula">PV = nRT   |   P_int ≈ 8 PSI ≈ 55 kPa</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_pression_atm_tag">💨 THERMODYNAMIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_pression_atm_desc">La loi des gaz parfaits explique pourquoi un ballon se dégonfle par temps froid. Simulation P, V, T interactifs.</div>
+          <div class="vis-wrap"><canvas id="visu-pression-atm"></canvas></div>
+        </div>
+      </div><div class="vis-formula">P + ½ρv² + ρgh = cte</div></div>
         <span class="vis-tag vis-tag-gold" data-i18n="vis_bernoulli_tag">⚡ AÉRODYNAMIQUE</span>
       </div>
       <div class="vis-desc" data-i18n="vis_bernoulli_desc">Flux rapide → pression basse → portance (backspin = Magnus).</div>
@@ -2708,14 +2756,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('phys-master')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_phys-master">Master</span>
-        <span class="vis-acc-count">5</span>
+        <span class="vis-acc-count">6</span>
         <span class="vis-acc-arrow" id="arrow-phys-master">▶</span>
       </button>
       <div class="vis-acc-body" id="body-phys-master" style="display:none">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">〰️</span>
-        <div><div class="vis-card-title" data-i18n="vis_oscillation_title">OSCILLATIONS — RYTHME DE DRIBBLE</div><div class="vis-formula">x(t) = A·cos(ωt+φ)   f = ω/2π</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_oscillation_title">OSCILLATIONS — RYTHME DE DRIBBLE
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📡</span>
+            <div><div class="vis-card-title" data-i18n="vis_bruit_title">BRUIT BLANC & FILTRAGE DU SIGNAL</div><div class="vis-formula">SNR = P_signal / P_bruit   |   x_filtré = Σ h(k)·x(n-k)</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_bruit_tag">📡 SIGNAL</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_bruit_desc">MoveNet génère du bruit sur les keypoints. Filtrage passe-bas appliqué au signal de dribble — avant/après.</div>
+          <div class="vis-wrap"><canvas id="visu-bruit"></canvas></div>
+        </div>
+      </div><div class="vis-formula">x(t) = A·cos(ωt+φ)   f = ω/2π</div></div>
         <span class="vis-tag vis-tag-gold" data-i18n="vis_oscillation_tag">⚡ MÉCANIQUE VIBRATOIRE</span>
       </div>
       <div class="vis-desc" data-i18n="vis_oscillation_desc">Dribble = oscillateur harmonique. Expert : 4-6 Hz. Débutant : 1-2 Hz.</div>
@@ -2793,7 +2851,7 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('maths-college')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#4ecdc4"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_maths_college">Collège (6ème–3ème)</span>
-        <span class="vis-acc-count">7</span>
+        <span class="vis-acc-count">10</span>
         <span class="vis-acc-arrow" id="arrow-maths-college">▶</span>
       </button>
       <div class="vis-acc-body" id="body-maths-college" style="display:none">
@@ -2893,14 +2951,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('maths-lycee')" aria-expanded="true">
         <span class="vis-acc-dot" style="background:#C49A00"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_maths-lycee">Lycée — Géométrie</span>
-        <span class="vis-acc-count">6</span>
+        <span class="vis-acc-count">7</span>
         <span class="vis-acc-arrow" id="arrow-maths-lycee">▼</span>
       </button>
       <div class="vis-acc-body" id="body-maths-lycee" style="display:block">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">⏱️</span>
-        <div><div class="vis-card-title" data-i18n="vis_card6_title">LE TIR AU BUZZER</div><div class="vis-formula">t ∈ [tₙ, tₙ₊₁[ — discrétisation du temps</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_card6_title">LE TIR AU BUZZER
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🔢</span>
+            <div><div class="vis-card-title" data-i18n="vis_complexes_title">NOMBRES COMPLEXES — ROTATION 2D</div><div class="vis-formula">z = re^iθ   |   rotation = multiplication par e^iθ</div></div>
+            <span class="vis-tag vis-tag-green" data-i18n="vis_complexes_tag">📐 ALGÈBRE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_complexes_desc">Tourner son corps de θ° = multiplier par e^iθ dans le plan complexe. Animation du pivot et du fadeaway.</div>
+          <div class="vis-wrap"><canvas id="visu-complexes"></canvas></div>
+        </div>
+      </div><div class="vis-formula">t ∈ [tₙ, tₙ₊₁[ — discrétisation du temps</div></div>
         <span class="vis-tag vis-tag-red" data-i18n="vis_tag6">📐 ANALYSE NUMÉRIQUE</span>
       </div>
       <div class="vis-desc" data-i18n="vis_card6_desc">L'arbitre cherche dans quel intervalle discret le ballon a quitté la main.</div>
@@ -2957,14 +3025,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('maths-licence')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#C0570A"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_maths-licence">Licence</span>
-        <span class="vis-acc-count">3</span>
+        <span class="vis-acc-count">14</span>
         <span class="vis-acc-arrow" id="arrow-maths-licence">▶</span>
       </button>
       <div class="vis-acc-body" id="body-maths-licence" style="display:none">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">📊</span>
-        <div><div class="vis-card-title" data-i18n="vis_correlation_title">CORRÉLATION DE PEARSON</div><div class="vis-formula">r = Σ(x-x̄)(y-ȳ)/√[Σ(x-x̄)²·Σ(y-ȳ)²]</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_correlation_title">CORRÉLATION DE PEARSON
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🎵</span>
+            <div><div class="vis-card-title" data-i18n="vis_serie_fourier_title">SÉRIES DE FOURIER — DÉCOMPOSITION DU GESTE</div><div class="vis-formula">f(t) = a₀/2 + Σ aₙcos(nωt) + bₙsin(nωt)</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_serie_fourier_tag">🌊 ANALYSE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_serie_fourier_desc">Le rythme de dribble décomposé en harmoniques — séries de Fourier reconstruisent progressivement le signal périodique.</div>
+          <div class="vis-wrap"><canvas id="visu-serie-fourier"></canvas></div>
+        </div>
+      </div><div class="vis-formula">r = Σ(x-x̄)(y-ȳ)/√[Σ(x-x̄)²·Σ(y-ȳ)²]</div></div>
         <span class="vis-tag vis-tag-blue" data-i18n="vis_correlation_tag">📊 STATISTIQUES</span>
       </div>
       <div class="vis-desc" data-i18n="vis_correlation_desc">r=0.78 entre volume d'entraînement et régularité du geste — forte corrélation.</div>
@@ -3084,14 +3162,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('maths-master')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_maths-master">Master</span>
-        <span class="vis-acc-count">2</span>
+        <span class="vis-acc-count">3</span>
         <span class="vis-acc-arrow" id="arrow-maths-master">▶</span>
       </button>
       <div class="vis-acc-body" id="body-maths-master" style="display:none">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">📉</span>
-        <div><div class="vis-card-title" data-i18n="vis_derivee_title">DÉRIVÉE — VITESSE INSTANTANÉE</div><div class="vis-formula">f'(t) = lim[f(t+h)-f(t)]/h   h→0</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_derivee_title">DÉRIVÉE — VITESSE INSTANTANÉE
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📊</span>
+            <div><div class="vis-card-title" data-i18n="vis_loi_puissance_title">LOI PUISSANCE — DISTRIBUTION DES SCORES NBA</div><div class="vis-formula">P(x) ∝ x^{-α}   |   α ≈ 1,5–2 (Zipf/Pareto)</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_loi_puissance_tag">📊 STATISTIQUES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_loi_puissance_desc">Les scores NBA suivent une loi puissance : 20% des joueurs font 80% des points. Distribution Zipf animée.</div>
+          <div class="vis-wrap"><canvas id="visu-loi-puissance"></canvas></div>
+        </div>
+      </div><div class="vis-formula">f'(t) = lim[f(t+h)-f(t)]/h   h→0</div></div>
         <span class="vis-tag vis-tag-red" data-i18n="vis_derivee_tag">📐 ANALYSE</span>
       </div>
       <div class="vis-desc" data-i18n="vis_derivee_desc">Tangente animée = vitesse instantanée du poignet. Expert : 8-12 m/s.</div>
@@ -3114,14 +3202,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('neuro-master')" aria-expanded="true">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_neuro-master">Master</span>
-        <span class="vis-acc-count">1</span>
+        <span class="vis-acc-count">2</span>
         <span class="vis-acc-arrow" id="arrow-neuro-master">▼</span>
       </button>
       <div class="vis-acc-body" id="body-neuro-master" style="display:block">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🧠</span>
-        <div><div class="vis-card-title" data-i18n="vis_neuro_title">PLASTICITÉ NEURONALE</div><div class="vis-formula">ΔW = η · δ · x (règle de Hebb)</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_neuro_title">PLASTICITÉ NEURONALE
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">❤️</span>
+            <div><div class="vis-card-title" data-i18n="vis_hrv_title">HRV — VARIABILITÉ CARDIAQUE & RÉCUPÉRATION</div><div class="vis-formula">RMSSD = √(Σ(RR_{n+1}−RR_n)²/N)   |   HF/LF ratio</div></div>
+            <span class="vis-tag vis-tag-green" data-i18n="vis_hrv_tag">❤️ PHYSIOLOGIE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_hrv_desc">La variabilité cardiaque (HRV) mesure la récupération du joueur — haute HRV = système nerveux autonome équilibré = prêt à performer.</div>
+          <div class="vis-wrap"><canvas id="visu-hrv"></canvas></div>
+        </div>
+      </div><div class="vis-formula">ΔW = η · δ · x (règle de Hebb)</div></div>
         <span class="vis-tag vis-tag-purple" data-i18n="vis_tag2">🧬 NEUROSCIENCES</span>
       </div>
       <div class="vis-desc" data-i18n="vis_card2_desc">La répétition renforce les connexions synaptiques. Le geste devient automatique. Base neurologique de la ceinture noire.</div>
@@ -3133,14 +3231,42 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('neuro-master2')" aria-expanded="true">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_neuro-master2">Master — Approfondissement</span>
-        <span class="vis-acc-count">3</span>
+        <span class="vis-acc-count">6</span>
         <span class="vis-acc-arrow" id="arrow-neuro-master2">▼</span>
       </button>
       <div class="vis-acc-body" id="body-neuro-master2" style="display:block">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🧠</span>
-        <div><div class="vis-card-title" data-i18n="vis_connectome_title">CONNECTOME MOTEUR</div><div class="vis-formula">Cortex → Cervelet → Moelle → Muscle</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_connectome_title">CONNECTOME MOTEUR
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🕐</span>
+            <div><div class="vis-card-title" data-i18n="vis_chronobio_title">CHRONOBIOLOGIE — HEURE OPTIMALE DE PERFORMANCE</div><div class="vis-formula">T_core(t) = 36,5 + 0,5·sin(2π(t-14)/24)</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_chronobio_tag">⏰ CHRONOBIO</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_chronobio_desc">La température corporelle suit un rythme circadien — le pic de performance physique est entre 15h et 19h. Mélatonine et cortisol animés.</div>
+          <div class="vis-wrap"><canvas id="visu-chronobio"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🦾</span>
+            <div><div class="vis-card-title" data-i18n="vis_proprioception_title">PROPRIOCEPTION — CAPTEURS MUSCULAIRES</div><div class="vis-formula">Fuseau neuromusculaire → α-motoneurone → contraction</div></div>
+            <span class="vis-tag vis-tag-green" data-i18n="vis_proprioception_tag">🧠 NEUROSCIENCES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_proprioception_desc">Les fuseaux neuromusculaires détectent l'étirement et déclenchent la contraction réflexe — base du dribble automatisé sans regarder le ballon.</div>
+          <div class="vis-wrap"><canvas id="visu-proprioception"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🔦</span>
+            <div><div class="vis-card-title" data-i18n="vis_attention_title">ATTENTION SÉLECTIVE — MODÈLE SPOTLIGHT</div><div class="vis-formula">A(x) = exp(-‖x−x_focus‖²/2σ²)</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_attention_tag">🧠 COGNITION</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_attention_desc">Un joueur expert focalise son attention (spotlight) sur 2-3 zones clés — le reste du terrain est traité en vision périphérique.</div>
+          <div class="vis-wrap"><canvas id="visu-attention"></canvas></div>
+        </div>
+      </div><div class="vis-formula">Cortex → Cervelet → Moelle → Muscle</div></div>
         <span class="vis-tag vis-tag-purple" data-i18n="vis_connectome_tag">🧬 NEUROSCIENCES COMPUTATIONNELLES</span>
       </div>
       <div class="vis-desc" data-i18n="vis_connectome_desc">10 000 rép. myélinisent la boucle Cortex→Cervelet. Conduction 100× plus rapide.</div>
@@ -3191,14 +3317,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('data-licence')" aria-expanded="true">
         <span class="vis-acc-dot" style="background:#C0570A"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_data-licence">Licence</span>
-        <span class="vis-acc-count">6</span>
+        <span class="vis-acc-count">7</span>
         <span class="vis-acc-arrow" id="arrow-data-licence">▼</span>
       </button>
       <div class="vis-acc-body" id="body-data-licence" style="display:block">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🎲</span>
-        <div><div class="vis-card-title" data-i18n="vis_card12_title">ESPÉRANCE — 2 PTS VS 3 PTS</div><div class="vis-formula">E = p × valeur</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_card12_title">ESPÉRANCE — 2 PTS VS 3 PTS
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🎲</span>
+            <div><div class="vis-card-title" data-i18n="vis_vraisemblance_title">MAXIMUM DE VRAISEMBLANCE — FG% RÉEL</div><div class="vis-formula">L(p) = pˣ(1-p)^{n-x}   |   p̂ = x/n</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_vraisemblance_tag">📊 INFÉRENCE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_vraisemblance_desc">Estimer le vrai FG% d'un joueur avec seulement 10 tirs observés — courbe de vraisemblance animée.</div>
+          <div class="vis-wrap"><canvas id="visu-vraisemblance"></canvas></div>
+        </div>
+      </div><div class="vis-formula">E = p × valeur</div></div>
         <span class="vis-tag vis-tag-blue" data-i18n="vis_tag12">📊 PROBABILITÉS</span>
       </div>
       <div class="vis-desc" data-i18n="vis_card12_desc">E₂ = 0.80 pts/tir, E₃ = 0.99 pts/tir. Le 3pts est statistiquement supérieur.</div>
@@ -3255,14 +3391,24 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('data-master')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_data-master">Master</span>
-        <span class="vis-acc-count">4</span>
+        <span class="vis-acc-count">12</span>
         <span class="vis-acc-arrow" id="arrow-data-master">▶</span>
       </button>
       <div class="vis-acc-body" id="body-data-master" style="display:none">
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🥁</span>
-        <div><div class="vis-card-title" data-i18n="vis_card11_title">FOURIER & RYTHME DE DRIBBLE</div><div class="vis-formula">X(f) = ∫ x(t)·e⁻²πft dt</div></div>
+        <div><div class="vis-card-title" data-i18n="vis_card11_title">FOURIER & RYTHME DE DRIBBLE
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🔄</span>
+            <div><div class="vis-card-title" data-i18n="vis_convolution_title">CONVOLUTION — FILTRAGE DU MOUVEMENT</div><div class="vis-formula">(f*g)(t) = ∫ f(τ)g(t-τ)dτ</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_convolution_tag">📡 SIGNAL</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_convolution_desc">La convolution glisse un filtre sur le signal de dribble pour lisser le mouvement et détecter les patterns rythmiques.</div>
+          <div class="vis-wrap"><canvas id="visu-convolution"></canvas></div>
+        </div>
+      </div><div class="vis-formula">X(f) = ∫ x(t)·e⁻²πft dt</div></div>
         <span class="vis-tag vis-tag-blue" data-i18n="vis_tag11">📡 TRAITEMENT DU SIGNAL</span>
       </div>
       <div class="vis-desc" data-i18n="vis_card11_desc">Le dribble est un signal périodique. Fourier révèle la régularité du rythme.</div>
@@ -3407,7 +3553,7 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('data-doct')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#C0392B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_data-doct">Doctorat</span>
-        <span class="vis-acc-count">3</span>
+        <span class="vis-acc-count">7</span>
         <span class="vis-acc-arrow" id="arrow-data-doct">▶</span>
       </button>
       <div class="vis-acc-body" id="body-data-doct" style="display:none">
@@ -3415,7 +3561,44 @@ body.unlocked .sensei-only{display:revert !important}
       <div class="vis-card-hd">
         <span style="font-size:22px">🧮</span>
         <div>
-          <div class="vis-card-title" data-i18n="vis_card19_title">THÉORÈME DU DRIBBLE À N BALLONS</div>
+          <div class="vis-card-title" data-i18n="vis_card19_title">THÉORÈME DU DRIBBLE À N BALLONS
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🌐</span>
+            <div><div class="vis-card-title" data-i18n="vis_topologie_title">TOPOLOGIE — ESPACE DES TACTIQUES</div><div class="vis-formula">π₁(X) — groupe fondamental   |   déformation continue</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_topologie_tag">🔬 TOPOLOGIE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_topologie_desc">L'espace des configurations tactiques est un espace topologique — deux tactiques sont équivalentes si on peut passer de l'une à l'autre continûment.</div>
+          <div class="vis-wrap"><canvas id="visu-topologie"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📏</span>
+            <div><div class="vis-card-title" data-i18n="vis_theorie_mesure_title">THÉORIE DE LA MESURE — PERFORMANCE</div><div class="vis-formula">μ(A∪B) = μ(A)+μ(B)   |   σ-additivité</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_mesure_tag">📐 MESURE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_theorie_mesure_desc">Mesurer la performance d'un joueur rigoureusement — théorie de Lebesgue appliquée aux espaces de stats basketball.</div>
+          <div class="vis-wrap"><canvas id="visu-theorie-mesure"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🌀</span>
+            <div><div class="vis-card-title" data-i18n="vis_riemannien_title">GÉOMÉTRIE RIEMANNIENNE — MOUVEMENTS SPORTIFS</div><div class="vis-formula">ds² = gᵢⱼdxⁱdxʲ   |   courbure K</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_riemannien_tag">🔬 GÉOMÉTRIE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_riemannien_desc">L'espace des mouvements d'un joueur est courbé — la géodésique riemannienne donne le chemin optimal entre deux postures.</div>
+          <div class="vis-wrap"><canvas id="visu-riemannien"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📶</span>
+            <div><div class="vis-card-title" data-i18n="vis_theorie_info_title">CAPACITÉ DU CANAL — CERVEAU DU JOUEUR</div><div class="vis-formula">C = B·log₂(1 + SNR)   |   Shannon 1948</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_info_tag">📡 INFORMATION</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_theorie_info_desc">Combien d'informations le cerveau peut-il traiter en dribblant et lisant la défense ? Capacité du canal de Shannon.</div>
+          <div class="vis-wrap"><canvas id="visu-theorie-info"></canvas></div>
+        </div>
+      </div>
           <div class="vis-formula">(F + D) × H = (V + D) × N</div>
         </div>
         <span class="vis-tag vis-tag-green" data-i18n="vis_tag19">🧮 SHANNON 1980</span>
@@ -3589,7 +3772,7 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('ia-master2')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#6B2D8B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_ia-master2">Master — Algorithmes</span>
-        <span class="vis-acc-count">3</span>
+        <span class="vis-acc-count">7</span>
         <span class="vis-acc-arrow" id="arrow-ia-master2">▶</span>
       </button>
       <div class="vis-acc-body" id="body-ia-master2" style="display:none">
@@ -3662,7 +3845,7 @@ body.unlocked .sensei-only{display:revert !important}
       <button class="vis-acc-btn" onclick="toggleVisAcc('ia-doct2')" aria-expanded="false">
         <span class="vis-acc-dot" style="background:#C0392B"></span>
         <span class="vis-acc-label" data-i18n="vis_lvl_ia-doct2">Doctorat — Deep Learning</span>
-        <span class="vis-acc-count">3</span>
+        <span class="vis-acc-count">12</span>
         <span class="vis-acc-arrow" id="arrow-ia-doct2">▶</span>
       </button>
       <div class="vis-acc-body" id="body-ia-doct2" style="display:none">
@@ -19541,6 +19724,594 @@ function drawModeleMixte(){
   c.fillText(t('Progression FG% — chaque joueur a sa propre trajectoire + tendance commune','FG% progression — each player has own trajectory + common trend'),W*0.05,H*0.94);
 }
 
+
+// ══ NOUVELLES VISUS 2025 ══
+
+function drawRestitution(){
+  var c=initC('visu-restitution');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawRestitution._t)drawRestitution._t=0;
+  drawRestitution._t=(drawRestitution._t+0.6)%300;
+  var T=drawRestitution._t;
+  var GOLD='#f5c518';
+  var floorY=H*0.88, r=W*0.045;
+  var e=[1,0.75,0.56,0.42,0.32];
+  // Dessiner les 5 rebonds
+  for(var i=0;i<5;i++){
+    var hMax=H*0.7*e[i];
+    var xB=W*(0.12+i*0.16);
+    c.strokeStyle='rgba(245,197,24,0.3)';c.lineWidth=1;c.setLineDash([4,4]);
+    c.beginPath();c.moveTo(xB,floorY-hMax);c.lineTo(xB,floorY);c.stroke();
+    c.setLineDash([]);
+    c.fillStyle='rgba(245,197,24,0.15)';
+    c.fillRect(xB-W*0.06,floorY-hMax,W*0.12,hMax);
+    c.fillStyle='#f5c518';
+    c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
+    c.textAlign='center';
+    c.fillText('e='+e[i].toFixed(2),xB,floorY-hMax-8);
+  }
+  // Ballon animé
+  var phase=Math.floor(T/60)%5;
+  var frac=(T%60)/60;
+  var hMax2=H*0.7*e[Math.min(phase,4)];
+  var xBall=W*(0.12+phase*0.16);
+  var yBall=frac<0.5?floorY-hMax2*Math.sin(Math.PI*frac*2):floorY-hMax2*Math.sin(Math.PI*(frac)*2);
+  yBall=floorY-hMax2*(1-Math.pow(2*frac-1,2));
+  c.beginPath();c.arc(xBall,yBall,r,0,Math.PI*2);
+  c.fillStyle='#e87c2a';c.fill();
+  c.strokeStyle='rgba(0,0,0,0.4)';c.lineWidth=1.5;c.stroke();
+  // Sol
+  c.fillStyle='rgba(245,197,24,0.6)';c.fillRect(0,floorY,W,3);
+  var en=window._lang==='en';
+  var lbl=en?'Restitution coeff e = v_bounce/v_impact':'Coefficient e = v_rebond/v_impact';
+  c.fillStyle='rgba(255,255,255,0.7)';c.font='bold '+Math.round(W*0.035)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(lbl,W/2,H*0.97);
+}
+
+function drawNewton3(){
+  var c=initC('visu-newton3');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawNewton3._t)drawNewton3._t=0;
+  drawNewton3._t=(drawNewton3._t+0.5)%360;
+  var T=drawNewton3._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  // 3 zones
+  var zones=[
+    {x:0,w:W/3,lbl:en?'1st Law: Inertia':'1ère Loi: Inertie',sub:en?'Ball keeps rolling':'Le ballon roule seul'},
+    {x:W/3,w:W/3,lbl:en?'2nd Law: F=ma':'2ème Loi: F=ma',sub:en?'Push-off force':'Force push-off'},
+    {x:2*W/3,w:W/3,lbl:en?'3rd Law: Action=Reaction':'3ème Loi: Action=Réaction',sub:en?'Floor pushes back':'Le sol pousse en retour'},
+  ];
+  zones.forEach(function(z,i){
+    c.strokeStyle='rgba(245,197,24,0.2)';c.lineWidth=1;
+    c.strokeRect(z.x+4,4,z.w-8,H-8);
+    c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+    c.textAlign='center';c.fillText(z.lbl,z.x+z.w/2,H*0.12);
+    c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+    c.fillText(z.sub,z.x+z.w/2,H*0.22);
+    var cx=z.x+z.w/2, cy=H*0.55, r=W*0.06;
+    if(i===0){
+      var bx=cx-W*0.08+T*(W*0.002)%(W*0.2);
+      c.beginPath();c.arc(bx,cy,r,0,Math.PI*2);c.fillStyle='#e87c2a';c.fill();
+      c.fillStyle='rgba(245,197,24,0.3)';c.fillRect(cx-W*0.1,cy+r,W*0.2,4);
+    } else if(i===1){
+      var a=Math.sin(T*0.05)*0.3+0.5;
+      c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle='#e87c2a';c.fill();
+      c.strokeStyle='#f5c518';c.lineWidth=2;
+      c.beginPath();c.moveTo(cx,cy);c.lineTo(cx,cy-H*0.15*a);c.stroke();
+      c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
+      c.textAlign='center';c.fillText('F='+Math.round(a*500)+'N',cx,cy-H*0.18*a);
+    } else {
+      var push=Math.abs(Math.sin(T*0.04))*H*0.12;
+      c.beginPath();c.arc(cx,cy-push,r,0,Math.PI*2);c.fillStyle='#e87c2a';c.fill();
+      c.strokeStyle='#2dc653';c.lineWidth=2;
+      c.beginPath();c.moveTo(cx,cy-push+r);c.lineTo(cx,cy+H*0.08);c.stroke();
+      c.beginPath();c.moveTo(cx,cy-push-r);c.lineTo(cx,cy-push-H*0.08);c.stroke();
+      c.fillStyle='rgba(245,197,24,0.4)';c.fillRect(cx-W*0.1,cy+H*0.09,W*0.2,4);
+    }
+  });
+}
+
+function drawBalistique(){
+  var c=initC('visu-balistique');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawBalistique._t)drawBalistique._t=0;
+  drawBalistique._t=(drawBalistique._t+0.4)%200;
+  var T=drawBalistique._t, en=window._lang==='en';
+  var floorY=H*0.82, GOLD='#f5c518';
+  var angles=[35,45,52,65];
+  var colors=['#e63946','#2dc653','#f5c518','#4ecdc4'];
+  angles.forEach(function(ang,i){
+    var rad=ang*Math.PI/180;
+    var v0=W*0.012;
+    var pts=[];
+    for(var t2=0;t2<W/v0/Math.cos(rad)*1.2;t2+=0.5){
+      var x=v0*Math.cos(rad)*t2;
+      var y=v0*Math.sin(rad)*t2-0.5*9.81*0.001*t2*t2;
+      if(floorY-y*H*0.008<floorY)pts.push({x:x,y:floorY-y*H*0.008});
+      else{pts.push({x:x,y:floorY});break;}
+    }
+    c.strokeStyle=colors[i];c.lineWidth=i===2?2.5:1.2;c.setLineDash(i===2?[]:[3,3]);
+    c.beginPath();pts.forEach(function(p,j){j===0?c.moveTo(p.x+W*0.08,p.y):c.lineTo(p.x+W*0.08,p.y);});c.stroke();
+    c.setLineDash([]);
+    c.fillStyle=colors[i];c.font='bold '+Math.round(W*0.033)+'px Barlow Condensed';
+    c.textAlign='left';c.fillText(ang+'°',W*0.08+5,floorY-(ang-20)*H*0.004);
+  });
+  // Panier
+  c.strokeStyle='#e87c2a';c.lineWidth=2;
+  c.beginPath();c.moveTo(W*0.85,floorY-H*0.25);c.lineTo(W*0.85+W*0.06,floorY-H*0.25);c.stroke();
+  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.032)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Optimal angle ≈ 52°':'Angle optimal ≈ 52°',W/2,H*0.95);
+  c.fillStyle='rgba(245,197,24,0.4)';c.fillRect(0,floorY,W,2);
+}
+
+function drawDoppler(){
+  var c=initC('visu-doppler');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawDoppler._t)drawDoppler._t=0;
+  drawDoppler._t=(drawDoppler._t+0.8)%300;
+  var T=drawDoppler._t, en=window._lang==='en';
+  var srcX=W*0.2+T*(W*0.002), srcY=H*0.5;
+  if(srcX>W*0.8)srcX=W*0.2;
+  for(var i=1;i<=8;i++){
+    var age=T-(i*15);if(age<0)continue;
+    var rxLeft=age*0.6, rxRight=age*1.2;
+    var alpha=Math.max(0,1-age/120);
+    c.strokeStyle='rgba(245,197,24,'+alpha*0.6+')';
+    c.lineWidth=1;
+    c.beginPath();
+    c.ellipse(srcX-age*0.3,srcY,rxLeft,rxLeft*0.6,0,0,Math.PI*2);c.stroke();
+  }
+  // Joueur
+  c.fillStyle='#f5c518';c.beginPath();c.arc(srcX,srcY,W*0.04,0,Math.PI*2);c.fill();
+  // Labels
+  c.fillStyle='#2dc653';c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';c.textAlign='center';
+  c.fillText(en?'Higher pitch':'Son aigu',W*0.15,H*0.2);
+  c.fillStyle='#e63946';
+  c.fillText(en?'Lower pitch':'Son grave',W*0.85,H*0.2);
+  c.fillStyle='rgba(255,255,255,0.7)';c.font=Math.round(W*0.03)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText("f' = f·(v+v_obs)/(v+v_src)",W/2,H*0.92);
+}
+
+function drawPressionAtm(){
+  var c=initC('visu-pression-atm');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawPressionAtm._t)drawPressionAtm._t=0;
+  drawPressionAtm._t=(drawPressionAtm._t+0.3)%360;
+  var T=drawPressionAtm._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  // 3 températures
+  var temps=[-10,20,40];
+  var P_base=8;
+  temps.forEach(function(temp,i){
+    var P=P_base*(273+temp)/293;
+    var cx=W*(0.2+i*0.3), cy=H*0.55, r=W*0.09*(P/P_base);
+    var col=temp<0?'#4ecdc4':temp<25?'#2dc653':'#e63946';
+    c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);
+    c.fillStyle=col+'33';c.fill();
+    c.strokeStyle=col;c.lineWidth=2;c.stroke();
+    c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';c.textAlign='center';
+    c.fillText(temp+'°C',cx,cy-r-10);
+    c.fillStyle='rgba(255,255,255,0.8)';c.font=Math.round(W*0.033)+'px Barlow Condensed';
+    c.fillText(P.toFixed(1)+' PSI',cx,cy+5);
+  });
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('PV = nRT',W/2,H*0.92);
+}
+
+function drawBruit(){
+  var c=initC('visu-bruit');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawBruit._t){drawBruit._t=0;drawBruit._noise=[];for(var i=0;i<80;i++)drawBruit._noise.push((Math.random()-0.5)*0.8);}
+  drawBruit._t=(drawBruit._t+1)%200;
+  var T=drawBruit._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  var N=drawBruit._noise;
+  // Signal bruité (haut)
+  var midH=H*0.3;
+  c.strokeStyle='rgba(230,57,70,0.8)';c.lineWidth=1.2;c.beginPath();
+  for(var x=0;x<W;x++){
+    var idx=Math.floor(x*N.length/W);
+    var signal=Math.sin(x*0.08)*H*0.1;
+    var noise=N[idx]*H*0.08;
+    var y=midH+signal+noise;
+    x===0?c.moveTo(x,y):c.lineTo(x,y);
+  }c.stroke();
+  c.fillStyle='#e63946';c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';
+  c.textAlign='left';c.fillText(en?'Noisy signal':'Signal bruité',8,midH-H*0.12);
+  // Signal filtré (bas)
+  var midH2=H*0.72;
+  c.strokeStyle='rgba(45,198,83,0.9)';c.lineWidth=2;c.beginPath();
+  for(var x2=0;x2<W;x2++){
+    var signal2=Math.sin(x2*0.08)*H*0.1;
+    var y2=midH2+signal2;
+    x2===0?c.moveTo(x2,y2):c.lineTo(x2,y2);
+  }c.stroke();
+  c.fillStyle='#2dc653';c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';
+  c.textAlign='left';c.fillText(en?'Filtered signal':'Signal filtré',8,midH2-H*0.12);
+  c.strokeStyle='rgba(245,197,24,0.3)';c.lineWidth=1;c.setLineDash([4,4]);
+  c.beginPath();c.moveTo(0,H*0.5);c.lineTo(W,H*0.5);c.stroke();c.setLineDash([]);
+}
+
+function drawComplexes(){
+  var c=initC('visu-complexes');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawComplexes._t)drawComplexes._t=0;
+  drawComplexes._t=(drawComplexes._t+0.6)%360;
+  var T=drawComplexes._t, en=window._lang==='en';
+  var cx=W*0.5,cy=H*0.5,R=Math.min(W,H)*0.35;
+  // Cercle unité
+  c.strokeStyle='rgba(245,197,24,0.3)';c.lineWidth=1;
+  c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.stroke();
+  // Axes
+  c.strokeStyle='rgba(255,255,255,0.2)';
+  c.beginPath();c.moveTo(cx-R*1.1,cy);c.lineTo(cx+R*1.1,cy);c.stroke();
+  c.beginPath();c.moveTo(cx,cy-R*1.1);c.lineTo(cx,cy+R*1.1);c.stroke();
+  // Vecteur tournant
+  var theta=T*Math.PI/180;
+  var px=cx+R*Math.cos(theta), py=cy-R*Math.sin(theta);
+  c.strokeStyle='#f5c518';c.lineWidth=2.5;
+  c.beginPath();c.moveTo(cx,cy);c.lineTo(px,py);c.stroke();
+  c.beginPath();c.arc(px,py,R*0.06,0,Math.PI*2);c.fillStyle='#f5c518';c.fill();
+  // Trail
+  c.strokeStyle='rgba(245,197,24,0.2)';c.lineWidth=1;c.beginPath();
+  for(var a=0;a<360;a+=2){
+    var rad=a*Math.PI/180;
+    var px2=cx+R*Math.cos(rad),py2=cy-R*Math.sin(rad);
+    a===0?c.moveTo(px2,py2):c.lineTo(px2,py2);
+    if(a>T)break;
+  }c.stroke();
+  var ang=Math.round(T)%360;
+  c.fillStyle='#f5c518';c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('e^i·'+ang+'° = '+Math.cos(theta).toFixed(2)+'+'+Math.sin(theta).toFixed(2)+'i',W/2,H*0.94);
+}
+
+function drawSerieFourier(){
+  var c=initC('visu-serie-fourier');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawSerieFourier._t)drawSerieFourier._t=0;
+  drawSerieFourier._t=(drawSerieFourier._t+0.5)%360;
+  var T=drawSerieFourier._t, en=window._lang==='en';
+  var n=Math.floor(T/90)+1;
+  var midY=H*0.5, amp=H*0.3;
+  // Signal cible (carré)
+  c.strokeStyle='rgba(245,197,24,0.3)';c.lineWidth=1.5;c.setLineDash([4,4]);
+  c.beginPath();
+  for(var x=0;x<W;x++){
+    var t=x/W*4*Math.PI;
+    var y=midY-(Math.sign(Math.sin(t)))*amp*0.8;
+    x===0?c.moveTo(x,y):c.lineTo(x,y);
+  }c.stroke();c.setLineDash([]);
+  // Approximation Fourier
+  var colors=['#e63946','#f5c518','#2dc653','#4ecdc4'];
+  c.strokeStyle=colors[Math.min(n-1,3)];c.lineWidth=2;
+  c.beginPath();
+  for(var x2=0;x2<W;x2++){
+    var t2=x2/W*4*Math.PI;
+    var s=0;
+    for(var k=0;k<n;k++){var h2=2*k+1;s+=Math.sin(h2*t2)/h2;}
+    var y2=midY-(4/Math.PI)*s*amp*0.7;
+    x2===0?c.moveTo(x2,y2):c.lineTo(x2,y2);
+  }c.stroke();
+  c.fillStyle=colors[Math.min(n-1,3)];c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText((en?'Harmonics: ':'Harmoniques: ')+n,W/2,H*0.1);
+}
+
+function drawLoiPuissance(){
+  var c=initC('visu-loi-puissance');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawLoiPuissance._t)drawLoiPuissance._t=0;
+  drawLoiPuissance._t=(drawLoiPuissance._t+0.4)%200;
+  var T=drawLoiPuissance._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  var alpha=1.8, N=20;
+  var maxY=H*0.8,baseX=W*0.1,barW=(W*0.85)/N;
+  var maxVal=Math.pow(1,-alpha)*100;
+  for(var i=0;i<N;i++){
+    var rank=i+1;
+    var val=Math.pow(rank,-alpha)*100;
+    var h=val/Math.pow(1,-alpha)*maxY*0.9;
+    var highlight=(T/10)%N|0===i;
+    c.fillStyle=highlight?GOLD:(i<4?'#e63946':'rgba(245,197,24,0.4)');
+    c.fillRect(baseX+i*barW,H*0.85-h,barW*0.8,h);
+  }
+  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('P(x) ∝ x^-α   α≈1.8',W/2,H*0.1);
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.03)+'px Barlow Condensed';
+  c.fillText(en?'Top 20% players score 80% of points':'20% joueurs = 80% des points',W/2,H*0.95);
+}
+
+function drawVraisemblance(){
+  var c=initC('visu-vraisemblance');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawVraisemblance._t)drawVraisemblance._t=0;
+  drawVraisemblance._t=(drawVraisemblance._t+0.3)%300;
+  var T=drawVraisemblance._t, en=window._lang==='en';
+  var k=7,n=10; // 7 succès sur 10
+  var pHat=k/n;
+  var maxL=Math.pow(pHat,k)*Math.pow(1-pHat,n-k);
+  c.strokeStyle='#f5c518';c.lineWidth=2;c.beginPath();
+  for(var i=0;i<=W;i++){
+    var p=i/W;
+    var L=Math.pow(p,k)*Math.pow(1-p,n-k)/maxL;
+    var y=H*0.85-L*H*0.65;
+    i===0?c.moveTo(i,y):c.lineTo(i,y);
+  }c.stroke();
+  // MLE
+  var mleX=pHat*W;
+  c.strokeStyle='#2dc653';c.lineWidth=2;c.setLineDash([4,4]);
+  c.beginPath();c.moveTo(mleX,H*0.15);c.lineTo(mleX,H*0.85);c.stroke();c.setLineDash([]);
+  c.fillStyle='#2dc653';c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('p̂ = '+pHat.toFixed(2),mleX,H*0.12);
+  c.fillStyle='rgba(255,255,255,0.7)';c.font=Math.round(W*0.03)+'px Barlow Condensed';
+  c.fillText(en?'7/10 shots made — MLE estimates true FG%':'7/10 tirs réussis — MLE estime le vrai FG%',W/2,H*0.95);
+  c.fillStyle='rgba(245,197,24,0.3)';c.fillRect(0,H*0.85,W,2);
+}
+
+function drawConvolution(){
+  var c=initC('visu-convolution');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawConvolution._t)drawConvolution._t=0;
+  drawConvolution._t=(drawConvolution._t+0.6)%W;
+  var T=drawConvolution._t, en=window._lang==='en';
+  var N=W, kern=5;
+  // Signal
+  var sig=[];for(var i=0;i<N;i++)sig.push(Math.sin(i*0.12)*0.5+Math.sin(i*0.3)*(Math.random()*0.3+0.2));
+  // Convolution
+  var filtered=[];for(var i=0;i<N;i++){var s=0;for(var k=-kern;k<=kern;k++)s+=sig[Math.max(0,Math.min(N-1,i+k))];filtered.push(s/(2*kern+1));}
+  var mid1=H*0.28,mid2=H*0.72;
+  // Signal brut
+  c.strokeStyle='rgba(230,57,70,0.7)';c.lineWidth=1;c.beginPath();
+  sig.forEach(function(v,i){i===0?c.moveTo(i,mid1-v*H*0.18):c.lineTo(i,mid1-v*H*0.18);});c.stroke();
+  // Signal filtré
+  c.strokeStyle='rgba(45,198,83,0.9)';c.lineWidth=2;c.beginPath();
+  filtered.forEach(function(v,i){i===0?c.moveTo(i,mid2-v*H*0.18):c.lineTo(i,mid2-v*H*0.18);});c.stroke();
+  // Curseur
+  var cx=T;
+  c.strokeStyle='rgba(245,197,24,0.6)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(cx,0);c.lineTo(cx,H);c.stroke();
+  c.fillStyle='#e63946';c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';c.textAlign='left';c.fillText(en?'Raw':'Brut',4,mid1-H*0.2);
+  c.fillStyle='#2dc653';c.fillText(en?'Filtered':'Filtré',4,mid2-H*0.2);
+}
+
+function drawTopologie(){
+  var c=initC('visu-topologie');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawTopologie._t)drawTopologie._t=0;
+  drawTopologie._t=(drawTopologie._t+0.4)%360;
+  var T=drawTopologie._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  // Deux shapes topologiquement équivalentes — déformation continue
+  var morph=0.5+0.5*Math.sin(T*Math.PI/180);
+  var cx1=W*0.28,cy1=H*0.5,cx2=W*0.72,cy2=H*0.5;
+  // Forme 1: cercle → ellipse
+  c.strokeStyle=GOLD;c.lineWidth=2;c.beginPath();
+  var rx1=W*0.15,ry1=W*0.15*(0.5+0.5*morph);
+  c.ellipse(cx1,cy1,rx1,ry1,0,0,Math.PI*2);c.stroke();
+  // Forme 2: ellipse → cercle
+  c.strokeStyle='#2dc653';c.lineWidth=2;c.beginPath();
+  var rx2=W*0.15*(0.5+0.5*(1-morph)),ry2=W*0.15;
+  c.ellipse(cx2,cy2,rx2,ry2,0,0,Math.PI*2);c.stroke();
+  // Flèche de déformation
+  c.strokeStyle='rgba(255,255,255,0.4)';c.lineWidth=1.5;c.setLineDash([4,4]);
+  c.beginPath();c.moveTo(cx1+rx1,cy1);c.lineTo(cx2-rx2,cy2);c.stroke();c.setLineDash([]);
+  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.036)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Continuous deformation':'Déformation continue',W/2,H*0.92);
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.fillText(en?'Same topology — different shape':'Même topologie — forme différente',W/2,H*0.1);
+}
+
+function drawTheorieMesure(){
+  var c=initC('visu-theorie-mesure');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawTheorieMesure._t)drawTheorieMesure._t=0;
+  drawTheorieMesure._t=(drawTheorieMesure._t+0.5)%300;
+  var T=drawTheorieMesure._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  var sets=[
+    {x:W*0.15,y:H*0.3,w:W*0.3,h:H*0.2,lbl:'A',val:0.35,col:'#e63946'},
+    {x:W*0.25,y:H*0.5,w:W*0.3,h:H*0.2,lbl:'B',val:0.28,col:'#2dc653'},
+    {x:W*0.55,y:H*0.38,w:W*0.3,h:H*0.2,lbl:'C',val:0.18,col:'#4ecdc4'},
+  ];
+  sets.forEach(function(s){
+    c.fillStyle=s.col+'33';c.strokeStyle=s.col;c.lineWidth=1.5;
+    c.beginPath();c.roundRect(s.x,s.y,s.w,s.h,8);c.fill();c.stroke();
+    c.fillStyle=s.col;c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
+    c.textAlign='center';c.fillText('μ('+s.lbl+')='+s.val,s.x+s.w/2,s.y+s.h/2+5);
+  });
+  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('μ(A∪B∪C) = '+( 0.35+0.28+0.18).toFixed(2),W/2,H*0.85);
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.fillText(en?'σ-additivity: measure of performance spaces':'σ-additivité: mesure des espaces de perf.',W/2,H*0.95);
+}
+
+function drawRiemannien(){
+  var c=initC('visu-riemannien');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawRiemannien._t)drawRiemannien._t=0;
+  drawRiemannien._t=(drawRiemannien._t+0.4)%360;
+  var T=drawRiemannien._t, en=window._lang==='en';
+  // Surface courbée
+  var rows=10,cols=20;
+  for(var i=0;i<rows;i++){
+    c.strokeStyle='rgba(245,197,24,'+(0.1+i/rows*0.3)+')';c.lineWidth=1;c.beginPath();
+    for(var j=0;j<=cols;j++){
+      var u=j/cols,v=i/rows;
+      var x=u*W;
+      var curve=Math.sin(u*Math.PI)*H*0.15*Math.sin(T*Math.PI/180)*0.5;
+      var y=H*0.2+v*H*0.55+curve;
+      j===0?c.moveTo(x,y):c.lineTo(x,y);
+    }c.stroke();
+  }
+  // Géodésique
+  c.strokeStyle='#f5c518';c.lineWidth=2.5;c.beginPath();
+  for(var j2=0;j2<=cols;j2++){
+    var u2=j2/cols;
+    var curve2=Math.sin(u2*Math.PI)*H*0.15*Math.sin(T*Math.PI/180)*0.5;
+    var y2=H*0.2+H*0.275+curve2-H*0.08*Math.sin(u2*Math.PI);
+    j2===0?c.moveTo(u2*W,y2):c.lineTo(u2*W,y2);
+  }c.stroke();
+  c.fillStyle='#f5c518';c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Geodesic = shortest path on curved space':'Géodésique = chemin optimal courbé',W/2,H*0.92);
+}
+
+function drawTheoInfo(){
+  var c=initC('visu-theorie-info');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawTheoInfo._t)drawTheoInfo._t=0;
+  drawTheoInfo._t=(drawTheoInfo._t+0.4)%300;
+  var T=drawTheoInfo._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  var B=5000,SNR=Math.abs(Math.sin(T*Math.PI/150))*20+1;
+  var C=B*Math.log2(1+SNR);
+  var barH=Math.min(C/200000,1)*H*0.6;
+  c.fillStyle='rgba(45,198,83,0.8)';
+  c.fillRect(W*0.3,H*0.75-barH,W*0.4,barH);
+  c.strokeStyle='#2dc653';c.lineWidth=1.5;
+  c.strokeRect(W*0.3,H*0.15,W*0.4,H*0.6);
+  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.05)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(Math.round(C/1000)+' kbps',W/2,H*0.45);
+  c.fillStyle='rgba(255,255,255,0.7)';c.font='bold '+Math.round(W*0.033)+'px Barlow Condensed';
+  c.fillText('SNR = '+SNR.toFixed(1)+' dB',W/2,H*0.12);
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.fillText('C = B·log₂(1+SNR)',W/2,H*0.92);
+  c.fillText(en?'Brain channel capacity while dribbling':'Capacité cérébrale en dribblant',W/2,H*0.97);
+}
+
+function drawHRV(){
+  var c=initC('visu-hrv');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawHRV._t)drawHRV._t=0;
+  drawHRV._t=(drawHRV._t+0.6)%400;
+  var T=drawHRV._t, en=window._lang==='en';
+  var midY=H*0.5,GOLD='#f5c518';
+  // 2 signaux RR : haute HRV vs basse HRV
+  var labels=[en?'High HRV':'HRV élevée',en?'Low HRV':'HRV faible'];
+  var colors=['#2dc653','#e63946'];
+  var ampls=[0.15,0.04];
+  [H*0.3,H*0.7].forEach(function(my,row){
+    var beats=[];var x=0;
+    while(x<W){var rr=800+ampls[row]*800*Math.sin(x*0.02+T*0.05)+(Math.random()-0.5)*50*ampls[row]*10;beats.push({x:x,rr:rr});x+=rr*W/4000;}
+    c.strokeStyle=colors[row];c.lineWidth=1.5;c.beginPath();
+    beats.forEach(function(b,i){
+      if(i===0){c.moveTo(b.x,my);}else{
+        c.lineTo(b.x-3,my);c.lineTo(b.x,my-H*0.12);c.lineTo(b.x+3,my);
+      }
+    });c.stroke();
+    c.fillStyle=colors[row];c.font='bold '+Math.round(W*0.035)+'px Barlow Condensed';
+    c.textAlign='left';c.fillText(labels[row],5,my-H*0.15);
+  });
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText('RMSSD = √(Σ(RRₙ₊₁−RRₙ)²/N)',W/2,H*0.97);
+}
+
+function drawChronobio(){
+  var c=initC('visu-chronobio');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawChronobio._t)drawChronobio._t=0;
+  drawChronobio._t=(drawChronobio._t+0.3)%300;
+  var T=drawChronobio._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  var baseY=H*0.6,amp=H*0.3;
+  // Courbe température corporelle sur 24h
+  c.strokeStyle=GOLD;c.lineWidth=2;c.beginPath();
+  for(var h=0;h<=24;h+=0.1){
+    var x=h/24*W;
+    var temp=H*0.35+amp*0.5*(1-Math.cos(2*Math.PI*(h-6)/24));
+    h===0?c.moveTo(x,H-temp):c.lineTo(x,H-temp);
+  }c.stroke();
+  // Zone optimale (15h-19h)
+  var x1=15/24*W,x2=19/24*W;
+  c.fillStyle='rgba(45,198,83,0.2)';c.fillRect(x1,H*0.1,x2-x1,H*0.8);
+  c.strokeStyle='#2dc653';c.lineWidth=1;c.setLineDash([3,3]);
+  c.beginPath();c.moveTo(x1,0);c.lineTo(x1,H);c.stroke();
+  c.beginPath();c.moveTo(x2,0);c.lineTo(x2,H);c.stroke();c.setLineDash([]);
+  // Curseur animé
+  var hNow=(T/300*24)%24;
+  var xNow=hNow/24*W;
+  c.strokeStyle='rgba(245,197,24,0.8)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(xNow,0);c.lineTo(xNow,H);c.stroke();
+  // Labels heures
+  [0,6,12,15,19,24].forEach(function(h){
+    c.fillStyle='rgba(255,255,255,0.5)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+    c.textAlign='center';c.fillText(h+'h',h/24*W,H*0.97);
+  });
+  c.fillStyle='#2dc653';c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Peak: 3-7pm':'Pic: 15h-19h',W/2,H*0.08);
+}
+
+function drawProprioception(){
+  var c=initC('visu-proprioception');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawProprioception._t)drawProprioception._t=0;
+  drawProprioception._t=(drawProprioception._t+0.5)%300;
+  var T=drawProprioception._t, en=window._lang==='en';
+  var GOLD='#f5c518';
+  // Schéma simplifié: muscle → fuseau → moelle → contraction
+  var nodes=[
+    {x:W*0.15,y:H*0.5,lbl:en?'Muscle':'Muscle',col:'#e87c2a'},
+    {x:W*0.38,y:H*0.5,lbl:en?'Spindle':'Fuseau',col:'#f5c518'},
+    {x:W*0.62,y:H*0.5,lbl:en?'Spinal cord':'Moelle',col:'#4ecdc4'},
+    {x:W*0.85,y:H*0.5,lbl:en?'Contraction':'Contraction',col:'#2dc653'},
+  ];
+  // Signal qui voyage
+  var progress=(T%100)/100;
+  nodes.forEach(function(n,i){
+    c.beginPath();c.arc(n.x,n.y,W*0.055,0,Math.PI*2);
+    c.fillStyle=n.col+'44';c.fill();
+    c.strokeStyle=n.col;c.lineWidth=2;c.stroke();
+    c.fillStyle=n.col;c.font='bold '+Math.round(W*0.03)+'px Barlow Condensed';
+    c.textAlign='center';c.fillText(n.lbl,n.x,n.y+W*0.095);
+    if(i<nodes.length-1){
+      var next=nodes[i+1];
+      c.strokeStyle='rgba(255,255,255,0.3)';c.lineWidth=1.5;
+      c.beginPath();c.moveTo(n.x+W*0.055,n.y);c.lineTo(next.x-W*0.055,next.y);c.stroke();
+    }
+  });
+  // Pulse animé
+  var seg=Math.floor(progress*3);
+  var frac=(progress*3)%1;
+  if(seg<3){
+    var from=nodes[seg],to=nodes[seg+1];
+    var px=from.x+(to.x-from.x)*frac;
+    var py=from.y+(to.y-from.y)*frac;
+    c.beginPath();c.arc(px,py,W*0.02,0,Math.PI*2);
+    c.fillStyle='#fff';c.fill();
+  }
+  c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Reflex loop: ~30ms':'Boucle réflexe: ~30ms',W/2,H*0.12);
+}
+
+function drawAttention(){
+  var c=initC('visu-attention');if(!c)return;
+  var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
+  if(!drawAttention._t)drawAttention._t=0;
+  drawAttention._t=(drawAttention._t+0.5)%360;
+  var T=drawAttention._t, en=window._lang==='en';
+  // Terrain simplifié
+  c.fillStyle='rgba(30,40,60,0.8)';c.fillRect(W*0.05,H*0.1,W*0.9,H*0.8);
+  c.strokeStyle='rgba(255,255,255,0.15)';c.lineWidth=1;
+  c.beginPath();c.moveTo(W/2,H*0.1);c.lineTo(W/2,H*0.9);c.stroke();
+  // Focus spotlight qui se déplace
+  var fx=W*(0.3+0.4*Math.sin(T*Math.PI/180*0.7));
+  var fy=H*(0.4+0.25*Math.sin(T*Math.PI/180*0.5));
+  var gr=c.createRadialGradient(fx,fy,0,fx,fy,W*0.25);
+  gr.addColorStop(0,'rgba(245,197,24,0.35)');
+  gr.addColorStop(0.5,'rgba(245,197,24,0.1)');
+  gr.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=gr;c.fillRect(0,0,W,H);
+  // Joueurs (points)
+  var players=[{x:0.3,y:0.4},{x:0.5,y:0.6},{x:0.7,y:0.35},{x:0.4,y:0.7},{x:0.65,y:0.65}];
+  players.forEach(function(p,i){
+    var px=W*p.x,py=H*p.y;
+    var dist=Math.sqrt(Math.pow(px-fx,2)+Math.pow(py-fy,2));
+    var alpha=Math.max(0.2,1-dist/(W*0.3));
+    c.beginPath();c.arc(px,py,W*0.035,0,Math.PI*2);
+    c.fillStyle='rgba(45,198,83,'+alpha+')';c.fill();
+  });
+  c.fillStyle='#f5c518';c.font='bold '+Math.round(W*0.036)+'px Barlow Condensed';
+  c.textAlign='center';c.fillText(en?'Spotlight attention model':'Modèle Spotlight attention',W/2,H*0.06);
+}
+
 var _fns=[
   {id:'visu-a',fn:drawA},{id:'visu-angle',fn:drawAngle},{id:'visu-magnus',fn:drawMagnus},
   {id:'visu-buzzer',fn:drawBuzzer},{id:'visu-ligne',fn:drawLigne},
@@ -19594,7 +20365,26 @@ var _fns=[
   {id:'visu-fractions',fn:drawFractions},{id:'visu-lagrangien',fn:drawLagrangien},
   {id:'visu-transformers',fn:drawTransformers},{id:'visu-gan',fn:drawGAN},
   {id:'visu-controleoptimal',fn:drawControleOptimal},{id:'visu-pareto',fn:drawPareto},
-  {id:'visu-modelemixte',fn:drawModeleMixte}
+  {id:'visu-modelemixte',fn:drawModeleMixte},
+  {id:'visu-restitution',fn:drawRestitution},
+  {id:'visu-newton3',fn:drawNewton3},
+  {id:'visu-balistique',fn:drawBalistique},
+  {id:'visu-doppler',fn:drawDoppler},
+  {id:'visu-pression-atm',fn:drawPressionAtm},
+  {id:'visu-bruit',fn:drawBruit},
+  {id:'visu-complexes',fn:drawComplexes},
+  {id:'visu-serie-fourier',fn:drawSerieFourier},
+  {id:'visu-loi-puissance',fn:drawLoiPuissance},
+  {id:'visu-vraisemblance',fn:drawVraisemblance},
+  {id:'visu-convolution',fn:drawConvolution},
+  {id:'visu-topologie',fn:drawTopologie},
+  {id:'visu-theorie-mesure',fn:drawTheorieMesure},
+  {id:'visu-riemannien',fn:drawRiemannien},
+  {id:'visu-theorie-info',fn:drawTheoInfo},
+  {id:'visu-hrv',fn:drawHRV},
+  {id:'visu-chronobio',fn:drawChronobio},
+  {id:'visu-proprioception',fn:drawProprioception},
+  {id:'visu-attention',fn:drawAttention}
 ];
 /* ── VISU 17 : MARCHE ALÉATOIRE & VICTOIRE ── */
 function drawRandomWalk() {
@@ -22722,6 +23512,25 @@ function _tsym_drawFrame(poses) {
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
     _tsym_ctx.fillText(avg+'%', 0, 0);
     _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
+
+    // Timer session TSYM — discret haut-gauche
+    (function(){
+      var _s=Math.max(0,_tsym_sessDur-_tsym_sessSec);
+      var _m=Math.floor(_s/60),_ss=_s%60;
+      var _tStr=_m+':'+(_ss<10?'0':'')+_ss;
+      _tsym_ctx.save();
+      _tsym_ctx.translate(Math.round(W*0.06),Math.round(H*0.20));
+      _tsym_ctx.rotate(-Math.PI/2);
+      _tsym_ctx.fillStyle='rgba(0,0,0,0.45)';
+      _tsym_ctx.beginPath();_tsym_ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);_tsym_ctx.fill();
+      _tsym_ctx.fillStyle=_s<=10?'#e63946':'rgba(255,255,255,0.75)';
+      _tsym_ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+      _tsym_ctx.textAlign='center';_tsym_ctx.textBaseline='middle';
+      _tsym_ctx.shadowColor='rgba(0,0,0,0.8)';_tsym_ctx.shadowBlur=4;
+      _tsym_ctx.fillText(_tStr,0,0);
+      _tsym_ctx.shadowBlur=0;_tsym_ctx.restore();
+    })();
+
     // Mode — haut centre pivoté -90°
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
     _tsym_ctx.save();
@@ -23516,6 +24325,23 @@ function _tdr_drawFrame(poses) {
     ctx.fillText(String(_tdr_score), 0, 0);
     ctx.shadowBlur = 0; ctx.restore();
 
+    // Timer session — discret haut-gauche sous score
+
+    // Timer général — haut-gauche, petit, discret
+    var _tStr = (function(){var _s=Math.max(0,_tdr_sec);var _m=Math.floor(_s/60);var _ss=_s%60;return _m+':'+(_ss<10?'0':'')+_ss;})();
+    ctx.save();
+    ctx.translate(Math.round(W*0.06), Math.round(H*0.20));
+    ctx.rotate(-Math.PI/2);
+    // Fond discret
+    ctx.fillStyle='rgba(0,0,0,0.45)';
+    ctx.beginPath();ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);ctx.fill();
+    ctx.fillStyle=_tdr_sec<=10?"#e63946":"rgba(255,255,255,0.75)";
+    ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
+    ctx.fillText(_tStr,0,0);
+    ctx.shadowBlur=0;ctx.restore();
+
     // Chrono — haut gauche après score, pivoté -90°
     var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
     var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
@@ -23630,11 +24456,10 @@ function _tdr_spawnTarget() {
   var yMid    = landscape ? 0.55 : 0.50;
   var yBot    = landscape ? 0.80 : 0.72;
   var positions = [
-    {x: W*(cx - spread), y: H*yMid, color:'#2dc653'},  // gauche milieu
-    {x: W*(cx + spread), y: H*yMid, color:'#e63946'},  // droite milieu
-    {x: W*cx,            y: H*yTop, color:'#f5c518'},  // centre haut
-    {x: W*(cx - spread), y: H*yBot, color:'#4ecdc4'},  // gauche bas
-    {x: W*(cx + spread), y: H*yBot, color:'#7b2d8b'},  // droite bas
+    {x: W*(cx - spread), y: H*yTop, color:'#2dc653'},  // gauche haut
+    {x: W*(cx + spread), y: H*yTop, color:'#e63946'},  // droite haut
+    {x: W*(cx - spread), y: H*yMid, color:'#f5c518'},  // gauche milieu
+    {x: W*(cx + spread), y: H*yMid, color:'#4ecdc4'},  // droite milieu
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -24500,6 +25325,26 @@ function _dcog_drawFrame(poses) {
     ctx.fillText(sprintLbl, 0, 0);
     ctx.shadowBlur = 0; ctx.restore();
   }
+  // Timer session général DCOG — haut-gauche, discret, toutes features
+  if (_dcog_running) {
+    var _ds = _dcog_drill === 'math'
+      ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
+      : Math.max(0, _dcog_sessDur - _dcog_sessSec);
+    var _dm=Math.floor(_ds/60),_dss=_ds%60;
+    var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
+    ctx.save();
+    ctx.translate(Math.round(W*0.06),Math.round(H*0.20));
+    ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(0,0,0,0.45)';
+    ctx.beginPath();ctx.roundRect(-W*0.045,-H*0.025,W*0.09,H*0.05,4);ctx.fill();
+    ctx.fillStyle=_ds<=10?'#e63946':'rgba(255,255,255,0.75)';
+    ctx.font='bold '+Math.round(W*0.05)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
+    ctx.fillText(_dtStr,0,0);
+    ctx.shadowBlur=0;ctx.restore();
+  }
+
   // Score correct/incorrect — bas gauche canvas
   if (_dcog_drill === 'math' && _dcog_running) {
     ctx.save();
@@ -24590,16 +25435,19 @@ function _dcog_nextQuestion() {
   var H  = cv ? cv.height : 480;
   // 2 cibles style HomeCourt : positions aléatoires comme dans Dribble
   var r  = Math.round(W * (W > H ? 0.10 : 0.17));
-  var colors = ['#2dc653', '#e63946', '#e63946']; // vert = bonne, 2 rouges = mauvaises
+  // Couleurs aléatoires comme TDR — pas d'indice visuel sur la bonne réponse
+  var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
+  var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
+  var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
   var allZones = [
-    // Haut gauche, haut droite, haut centre
+    // Haut uniquement — loin des mains en dribble
     {x: W*0.22, y: H*0.20}, {x: W*0.78, y: H*0.20}, {x: W*0.50, y: H*0.18},
-    // Milieu gauche, milieu droite (côtés uniquement — pas le centre)
-    {x: W*0.18, y: H*0.50}, {x: W*0.82, y: H*0.50},
-    // Bas gauche, bas droite (côtés — pas le centre bas où est le corps)
-    {x: W*0.18, y: H*0.78}, {x: W*0.82, y: H*0.78},
+    // Milieu côtés uniquement
+    {x: W*0.15, y: H*0.50}, {x: W*0.85, y: H*0.50},
+    // Milieu-haut côtés
+    {x: W*0.15, y: H*0.35}, {x: W*0.85, y: H*0.35},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
