@@ -24116,7 +24116,8 @@ var _tdr_score      = 0;
 var _tdr_hits       = 0;
 var _tdr_total      = 0;
 var _tdr_reactionTimes = [];
-var _tdr_streak     = 0;          // hits consécutifs
+var _tdr_streak     = 0;
+var _tdr_lastSide   = 'right'; // alternance gauche/droite          // hits consécutifs
 var _tdr_lastSpawn  = 0;
 var _tdr_sec        = 0;
 var _tdr_duration   = 30;
@@ -24449,11 +24450,9 @@ function _tdr_spawnTarget() {
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
-  // Alterner gauche/droite — jamais 2x le même côté
-  var _tdr_lastSide = _tdr_lastSide || 'right';
-  var nextSide = _tdr_lastSide === 'left' ? 'right' : 'left';
-  _tdr_lastSide = nextSide;
-  var xPos = nextSide === 'left' ? W*0.20 : W*0.80;
+  // Alterner gauche/droite — variable globale
+  _tdr_lastSide = (_tdr_lastSide === 'left') ? 'right' : 'left';
+  var xPos = _tdr_lastSide === 'left' ? W*0.20 : W*0.80;
   // Y aléatoire dans le tiers supérieur strict
   var yOptions = [H*0.12, H*0.18, H*0.22];
   var yPos = yOptions[Math.floor(Math.random()*yOptions.length)];
@@ -25460,17 +25459,22 @@ function _dcog_nextQuestion() {
     {x: W*0.50, y: H*0.25},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
+  // Garantir répartition gauche/centre/droite
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-  var z1 = shuffledZ[0], z2 = shuffledZ[1], z3 = shuffledZ[2];
-  var attempts = 0;
+  // Trier par x pour avoir gauche, milieu, droite
+  var sorted3 = shuffledZ.slice(0,3).sort(function(a,b){return a.x-b.x;});
+  // Vérifier distances
   function _dist(a,b){return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2));}
+  var attempts = 0;
   while (attempts++ < 50 && (
-    _dist(z1,z2) < r*3 || _dist(z1,z3) < r*3 || _dist(z2,z3) < r*3
+    _dist(sorted3[0],sorted3[1]) < r*3 ||
+    _dist(sorted3[0],sorted3[2]) < r*3 ||
+    _dist(sorted3[1],sorted3[2]) < r*3
   )) {
     shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-    z1 = shuffledZ[0]; z2 = shuffledZ[1]; z3 = shuffledZ[2];
+    sorted3 = shuffledZ.slice(0,3).sort(function(a,b){return a.x-b.x;});
   }
-  var picked = [z1, z2, z3];
+  var picked = sorted3;
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
