@@ -24461,7 +24461,7 @@ function _tdr_spawnTarget() {
   var yOptions = [H*0.20, H*0.25, H*0.30];
   var yPos = yOptions[Math.floor(Math.random()*yOptions.length)];
   var tdrColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#e87c2a','#7b2d8b'];
-  var r_tdr = Math.round(W * 0.07);
+  var r_tdr = Math.round(Math.min(W,H) * 0.12); // taille fixe landscape
   var positions = [
     {x: xPos, y: yPos, r: r_tdr, color: tdrColors[Math.floor(Math.random()*tdrColors.length)]},
   ];
@@ -26838,8 +26838,9 @@ function senseiCamShow(mod,stream){
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    _scam.canvas.width  = window.innerWidth;
-    _scam.canvas.height = window.innerHeight;
+    // Forcer landscape : W=max, H=min
+    _scam.canvas.width  = Math.max(window.innerWidth, window.innerHeight);
+    _scam.canvas.height = Math.min(window.innerWidth, window.innerHeight);
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -26872,8 +26873,8 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
-  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
+  _scam.canvas.width  = Math.max(window.innerWidth, window.innerHeight);
+  _scam.canvas.height = Math.min(window.innerWidth, window.innerHeight);
 });
 </script>
 <script>
