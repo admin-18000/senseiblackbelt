@@ -24449,12 +24449,17 @@ function _tdr_spawnTarget() {
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
-  // Positions fixes — 4 coins haut uniquement, bien répartis gauche/droite
+  // Alterner gauche/droite — jamais 2x le même côté
+  var _tdr_lastSide = _tdr_lastSide || 'right';
+  var nextSide = _tdr_lastSide === 'left' ? 'right' : 'left';
+  _tdr_lastSide = nextSide;
+  var xPos = nextSide === 'left' ? W*0.20 : W*0.80;
+  // Y aléatoire dans le tiers supérieur strict
+  var yOptions = [H*0.12, H*0.18, H*0.22];
+  var yPos = yOptions[Math.floor(Math.random()*yOptions.length)];
+  var tdrColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#e87c2a','#7b2d8b'];
   var positions = [
-    {x: W*0.18, y: H*0.15, color:'#2dc653'},  // gauche haut
-    {x: W*0.82, y: H*0.15, color:'#e63946'},  // droite haut
-    {x: W*0.18, y: H*0.32, color:'#f5c518'},  // gauche milieu-haut
-    {x: W*0.82, y: H*0.32, color:'#4ecdc4'},  // droite milieu-haut
+    {x: xPos, y: yPos, color: tdrColors[Math.floor(Math.random()*tdrColors.length)]},
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
@@ -25439,13 +25444,13 @@ function _dcog_nextQuestion() {
   // Réduire le rayon pour éviter le chevauchement
   r = Math.round(W * 0.10);
   var allZones = [
-    // 6 zones bien espacées — tiers supérieur uniquement
-    {x: W*0.18, y: H*0.13},  // gauche haut
-    {x: W*0.82, y: H*0.13},  // droite haut
-    {x: W*0.50, y: H*0.10},  // centre haut
-    {x: W*0.18, y: H*0.30},  // gauche milieu-haut
-    {x: W*0.82, y: H*0.30},  // droite milieu-haut
-    {x: W*0.50, y: H*0.27},  // centre milieu-haut
+    // Tiers supérieur strict — 2 rangées bien espacées
+    {x: W*0.18, y: H*0.10},  // gauche haut
+    {x: W*0.82, y: H*0.10},  // droite haut
+    {x: W*0.50, y: H*0.08},  // centre haut
+    {x: W*0.15, y: H*0.28},  // gauche bas-haut
+    {x: W*0.85, y: H*0.28},  // droite bas-haut
+    {x: W*0.50, y: H*0.25},  // centre bas-haut
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
