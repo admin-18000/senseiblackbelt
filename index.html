@@ -25441,16 +25441,23 @@ function _dcog_nextQuestion() {
   var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
-  // Réduire le rayon pour éviter le chevauchement
-  r = Math.round(W * 0.10);
-  var allZones = [
-    // Tiers supérieur strict — 2 rangées bien espacées
-    {x: W*0.18, y: H*0.10},  // gauche haut
-    {x: W*0.82, y: H*0.10},  // droite haut
-    {x: W*0.50, y: H*0.08},  // centre haut
-    {x: W*0.15, y: H*0.28},  // gauche bas-haut
-    {x: W*0.85, y: H*0.28},  // droite bas-haut
-    {x: W*0.50, y: H*0.25},  // centre bas-haut
+  var landscape = W > H;
+  r = Math.round(W * (landscape ? 0.06 : 0.10));
+  var allZones = landscape ? [
+    // LANDSCAPE : 5 zones bien espacées, haut uniquement
+    {x: W*0.10, y: H*0.20},  // extrême gauche
+    {x: W*0.30, y: H*0.15},  // quart gauche
+    {x: W*0.50, y: H*0.20},  // centre
+    {x: W*0.70, y: H*0.15},  // quart droite
+    {x: W*0.90, y: H*0.20},  // extrême droite
+  ] : [
+    // PORTRAIT : tiers supérieur strict (y < H*0.30)
+    {x: W*0.18, y: H*0.10},
+    {x: W*0.82, y: H*0.10},
+    {x: W*0.50, y: H*0.08},
+    {x: W*0.15, y: H*0.28},
+    {x: W*0.85, y: H*0.28},
+    {x: W*0.50, y: H*0.25},
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
