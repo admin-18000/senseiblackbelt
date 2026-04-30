@@ -24450,11 +24450,10 @@ function _tdr_spawnTarget() {
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
-  // LANDSCAPE uniquement — alterner gauche/droite
+  // LANDSCAPE — alterner gauche/droite ÉCRAN
+  // Miroir caméra : x=W*0.82 code = gauche écran, x=W*0.18 code = droite écran
   _tdr_lastSide = (_tdr_lastSide === 'left') ? 'right' : 'left';
-  // En landscape W>H : gauche=W*0.18, droite=W*0.82
-  // Y dans le quart supérieur uniquement (haut de l'écran paysage)
-  var xPos = _tdr_lastSide === 'left' ? W*0.18 : W*0.82;
+  var xPos = _tdr_lastSide === 'left' ? W*0.82 : W*0.18; // inversé pour miroir
   var yOptions = [H*0.20, H*0.28, H*0.32];
   var yPos = yOptions[Math.floor(Math.random()*yOptions.length)];
   var tdrColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#e87c2a','#7b2d8b'];
@@ -25441,14 +25440,15 @@ function _dcog_nextQuestion() {
   var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
-  // LANDSCAPE uniquement — 5 zones bien espacées dans le haut
+  // LANDSCAPE — zones miroir (x inversé pour caméra frontale)
+  // W*0.90 code = gauche écran, W*0.10 code = droite écran
   r = Math.round(W * 0.07);
   var allZones = [
-    {x: W*0.10, y: H*0.25},  // extrême gauche
-    {x: W*0.28, y: H*0.20},  // quart gauche
-    {x: W*0.50, y: H*0.18},  // centre
-    {x: W*0.72, y: H*0.20},  // quart droite
-    {x: W*0.90, y: H*0.25},  // extrême droite
+    {x: W*0.90, y: H*0.25},  // gauche écran
+    {x: W*0.72, y: H*0.20},  // milieu-gauche écran
+    {x: W*0.50, y: H*0.18},  // centre écran
+    {x: W*0.28, y: H*0.20},  // milieu-droite écran
+    {x: W*0.10, y: H*0.25},  // droite écran
   ];
   // Choisir 3 zones non adjacentes aléatoirement
   // Garantir répartition gauche/centre/droite
