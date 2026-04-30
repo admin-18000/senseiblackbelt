@@ -24454,18 +24454,18 @@ function _tdr_spawnTarget() {
   // Si non calibré : centerX = 0.5 (fallback symétrique)
   // LANDSCAPE — strict: gauche puis droite puis gauche puis droite...
   // 4 zones couvrant toute la largeur gauche→droite
+  // Cycle strict 4 positions sur toute la largeur landscape
+  // W landscape ~844px : 12%=101, 35%=295, 65%=549, 88%=743
   var xZones = [W*0.12, W*0.35, W*0.65, W*0.88];
-  if (_tdr_posIndex === undefined) _tdr_posIndex = 0;
-  var xPos = xZones[_tdr_posIndex % xZones.length];
+  _tdr_posIndex = (_tdr_posIndex || 0);
+  var xPos = xZones[_tdr_posIndex % 4];
   _tdr_posIndex++;
-  var yOptions = [H*0.20, H*0.25, H*0.30];
-  var yPos = yOptions[Math.floor(Math.random()*yOptions.length)];
+  var yPos = H * (0.18 + Math.random() * 0.14); // entre H*0.18 et H*0.32
   var tdrColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#e87c2a','#7b2d8b'];
-  var r_tdr = Math.round(Math.min(W,H) * 0.12); // taille fixe landscape
   var positions = [
-    {x: xPos, y: yPos, r: r_tdr, color: tdrColors[Math.floor(Math.random()*tdrColors.length)]},
+    {x: xPos, y: yPos, color: tdrColors[Math.floor(Math.random()*tdrColors.length)]},
   ];
-  var count = 1; // toujours 1 cible à la fois — positions n'a qu'1 élément
+  var count = 1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
   for (var i=0; i<count && i<shuffled.length; i++) {
     var p = shuffled[i];
@@ -25445,16 +25445,16 @@ function _dcog_nextQuestion() {
   var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
-  // LANDSCAPE — 3 zones fixes : gauche / centre / droite
-  // Cibles plus grandes pour lisibilité
-  r = Math.round(W * 0.10);
+  // 3 zones fixes gauche/centre/droite — landscape W~844 H~390
+  // Rayon H*0.18 ~70px, dist min entre centres = 296px >> 2*70=140 ✓
+  r = Math.round(H * 0.18);
   var allZones = [
-    {x: W*0.15, y: H*0.28},  // GAUCHE
-    {x: W*0.50, y: H*0.22},  // CENTRE
-    {x: W*0.85, y: H*0.28},  // DROITE
+    {x: W*0.15, y: H*0.30},  // GAUCHE
+    {x: W*0.50, y: H*0.25},  // CENTRE
+    {x: W*0.85, y: H*0.30},  // DROITE
   ];
   // Choisir 3 zones non adjacentes aléatoirement
-  // 3 zones fixes gauche/centre/droite — toujours les 3
+  // Toujours les 3 zones — gauche, centre, droite
   var picked = allZones.slice(0, 3);
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
@@ -26839,8 +26839,8 @@ function senseiCamShow(mod,stream){
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
     // Forcer landscape : W=max, H=min
-    _scam.canvas.width  = Math.max(window.innerWidth, window.innerHeight);
-    _scam.canvas.height = Math.min(window.innerWidth, window.innerHeight);
+    _scam.canvas.width  = window.innerWidth;
+    _scam.canvas.height = window.innerHeight;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -26873,8 +26873,8 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  _scam.canvas.width  = Math.max(window.innerWidth, window.innerHeight);
-  _scam.canvas.height = Math.min(window.innerWidth, window.innerHeight);
+  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
+  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
 });
 </script>
 <script>
