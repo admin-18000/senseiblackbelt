@@ -24116,10 +24116,7 @@ var _tdr_score      = 0;
 var _tdr_hits       = 0;
 var _tdr_total      = 0;
 var _tdr_reactionTimes = [];
-var _tdr_streak     = 0;
-var _tdr_lastSide   = 'right'; // alternance gauche/droite
-var _tdr_posIndex   = 0;
-var _tdr_posOrder   = null;          // hits consécutifs
+var _tdr_streak     = 0;          // hits consécutifs
 var _tdr_lastSpawn  = 0;
 var _tdr_sec        = 0;
 var _tdr_duration   = 30;
@@ -24452,20 +24449,14 @@ function _tdr_spawnTarget() {
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
   // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
   // Si non calibré : centerX = 0.5 (fallback symétrique)
-  // LANDSCAPE — strict: gauche puis droite puis gauche puis droite...
-  // 4 zones couvrant toute la largeur gauche→droite
-  // Cycle strict 4 positions sur toute la largeur landscape
-  // W landscape ~844px : 12%=101, 35%=295, 65%=549, 88%=743
-  var xZones = [W*0.12, W*0.35, W*0.65, W*0.88];
-  _tdr_posIndex = (_tdr_posIndex || 0);
-  var xPos = xZones[_tdr_posIndex % 4];
-  _tdr_posIndex++;
-  var yPos = H * (0.18 + Math.random() * 0.14); // entre H*0.18 et H*0.32
-  var tdrColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#e87c2a','#7b2d8b'];
+  // Positions fixes — 4 coins haut uniquement, bien répartis gauche/droite
   var positions = [
-    {x: xPos, y: yPos, color: tdrColors[Math.floor(Math.random()*tdrColors.length)]},
+    {x: W*0.18, y: H*0.15, color:'#2dc653'},  // gauche haut
+    {x: W*0.82, y: H*0.15, color:'#e63946'},  // droite haut
+    {x: W*0.18, y: H*0.32, color:'#f5c518'},  // gauche milieu-haut
+    {x: W*0.82, y: H*0.32, color:'#4ecdc4'},  // droite milieu-haut
   ];
-  var count = 1;
+  var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   var shuffled = positions.sort(function(){return Math.random()-0.5;});
   for (var i=0; i<count && i<shuffled.length; i++) {
     var p = shuffled[i];
@@ -25445,17 +25436,29 @@ function _dcog_nextQuestion() {
   var colors = shuffledColors.slice(0,3);
   // Pool de positions aléatoires — éviter les bords et le chevauchement
   var margin = r + Math.round(W * 0.05);
-  // 3 zones fixes gauche/centre/droite — landscape W~844 H~390
-  // Rayon H*0.18 ~70px, dist min entre centres = 296px >> 2*70=140 ✓
-  r = Math.round(H * 0.18);
+  // Réduire le rayon pour éviter le chevauchement
+  r = Math.round(W * 0.10);
   var allZones = [
-    {x: W*0.15, y: H*0.30},  // GAUCHE
-    {x: W*0.50, y: H*0.25},  // CENTRE
-    {x: W*0.85, y: H*0.30},  // DROITE
+    // 6 zones bien espacées — tiers supérieur uniquement
+    {x: W*0.18, y: H*0.13},  // gauche haut
+    {x: W*0.82, y: H*0.13},  // droite haut
+    {x: W*0.50, y: H*0.10},  // centre haut
+    {x: W*0.18, y: H*0.30},  // gauche milieu-haut
+    {x: W*0.82, y: H*0.30},  // droite milieu-haut
+    {x: W*0.50, y: H*0.27},  // centre milieu-haut
   ];
   // Choisir 3 zones non adjacentes aléatoirement
-  // Toujours les 3 zones — gauche, centre, droite
-  var picked = allZones.slice(0, 3);
+  var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
+  var z1 = shuffledZ[0], z2 = shuffledZ[1], z3 = shuffledZ[2];
+  var attempts = 0;
+  function _dist(a,b){return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2));}
+  while (attempts++ < 50 && (
+    _dist(z1,z2) < r*3 || _dist(z1,z3) < r*3 || _dist(z2,z3) < r*3
+  )) {
+    shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
+    z1 = shuffledZ[0]; z2 = shuffledZ[1]; z3 = shuffledZ[2];
+  }
+  var picked = [z1, z2, z3];
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
@@ -26838,7 +26841,6 @@ function senseiCamShow(mod,stream){
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    // Forcer landscape : W=max, H=min
     _scam.canvas.width  = window.innerWidth;
     _scam.canvas.height = window.innerHeight;
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
