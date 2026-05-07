@@ -25420,7 +25420,15 @@ function _dcog_nextQuestion() {
   // Afficher aussi dans l'overlay plein écran
   var qOv = document.getElementById('sensei-cam-question');
   // PHASE 1 : afficher question seule, grande, centrée (style HomeCourt)
-  if (qOv) { qOv.textContent = q.text; qOv.style.display = 'block'; }
+  // En mode paysage natif, pas de rotation — l'écran est déjà horizontal
+  if (qOv) {
+    qOv.textContent = q.text;
+    var isLandscapeQ = window.innerWidth > window.innerHeight;
+    qOv.style.transform = isLandscapeQ
+      ? 'translate(-50%,-50%)'           // paysage : pas de rotation
+      : 'translate(-50%,-50%) rotate(-90deg)'; // portrait → rotation compensatoire
+    qOv.style.display = 'block';
+  }
   _dcog_mathChoices = _dcog_genChoices(q.answer);
   // Vider les cibles pendant la phase 1
   _dcog_mathTargets = [];
@@ -25428,37 +25436,35 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  // 2 cibles style HomeCourt : positions aléatoires comme dans Dribble
-  var r  = Math.round(W * (W > H ? 0.10 : 0.17));
+  // MODE PAYSAGE : 3 cibles étalées de GAUCHE à DROITE — main gauche, centre, main droite
+  // En paysage W > H, rayon adapté pour éviter tout chevauchement
+  var isLandscape = W > H;
+  var r = isLandscape
+    ? Math.round(Math.min(W * 0.08, H * 0.14))   // paysage : rayon contenu en hauteur
+    : Math.round(W * 0.13);                        // portrait : rayon classique
+
   // Couleurs aléatoires comme TDR — pas d'indice visuel sur la bonne réponse
   var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
   var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
   var colors = shuffledColors.slice(0,3);
-  // Pool de positions aléatoires — éviter les bords et le chevauchement
-  var margin = r + Math.round(W * 0.05);
-  // Réduire le rayon pour éviter le chevauchement
-  r = Math.round(W * 0.10);
-  var allZones = [
-    // 6 zones bien espacées — tiers supérieur uniquement
-    {x: W*0.18, y: H*0.13},  // gauche haut
-    {x: W*0.82, y: H*0.13},  // droite haut
-    {x: W*0.50, y: H*0.10},  // centre haut
-    {x: W*0.18, y: H*0.30},  // gauche milieu-haut
-    {x: W*0.82, y: H*0.30},  // droite milieu-haut
-    {x: W*0.50, y: H*0.27},  // centre milieu-haut
-  ];
-  // Choisir 3 zones non adjacentes aléatoirement
-  var shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-  var z1 = shuffledZ[0], z2 = shuffledZ[1], z3 = shuffledZ[2];
-  var attempts = 0;
-  function _dist(a,b){return Math.sqrt(Math.pow(a.x-b.x,2)+Math.pow(a.y-b.y,2));}
-  while (attempts++ < 50 && (
-    _dist(z1,z2) < r*3 || _dist(z1,z3) < r*3 || _dist(z2,z3) < r*3
-  )) {
-    shuffledZ = allZones.slice().sort(function(){ return Math.random()-0.5; });
-    z1 = shuffledZ[0]; z2 = shuffledZ[1]; z3 = shuffledZ[2];
-  }
-  var picked = [z1, z2, z3];
+
+  // ── Positionnement horizontal strict gauche → centre → droite ──────────────
+  // En paysage : les 3 cibles occupent toute la largeur utile du canvas.
+  // La caméra étant miroir, le côté gauche canvas = côté gauche joueur.
+  // Petite variation verticale aléatoire pour éviter la monotonie tout en gardant les cibles
+  // dans la moitié supérieure et sans jamais se superposer.
+  var yBase = isLandscape ? H * 0.30 : H * 0.18;   // ligne de base verticale
+  var yJitter = isLandscape ? H * 0.12 : H * 0.10; // amplitude variation verticale
+
+  // Espacement horizontal : x à 1/6, 3/6, 5/6 de la largeur → espacement = W/3
+  // Garantit une distance inter-cibles de W/3 ≫ 2r même sur petits écrans
+  var xPositions = [W * (1/6), W * (3/6), W * (5/6)];
+
+  var picked = xPositions.map(function(xBase) {
+    var yVariation = (Math.random() * 2 - 1) * yJitter; // [-yJitter, +yJitter]
+    var y = Math.round(Math.max(r + 8, Math.min(H * 0.55, yBase + yVariation)));
+    return { x: Math.round(xBase), y: y };
+  });
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
@@ -25583,20 +25589,43 @@ function _dcog_drawMathTargets(ctx, W, H) {
       ? (t.mathVal === _dcog_mathAnswer ? '#2dc653' : '#e63946')
       : t.color;
     ctx.fill();
-    // Chiffre au centre — au lieu de la croix
+    // Chiffre au centre — sans rotation en mode paysage (canvas natif horizontal)
+    var isLandscapeNow = (_dcog_canvas && _dcog_canvas.width > _dcog_canvas.height);
     ctx.globalAlpha  = 1;
     ctx.fillStyle    = '#fff';
     ctx.save();
     ctx.translate(t.x, t.y);
-    ctx.rotate(-Math.PI/2);
-    ctx.font         = 'bold ' + Math.round(t.r * 0.75) + 'px sans-serif';
+    // En paysage : pas de rotation — le canvas est déjà horizontal
+    if (!isLandscapeNow) ctx.rotate(-Math.PI/2);
+    ctx.font         = 'bold ' + Math.round(t.r * 0.78) + 'px sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor  = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur   = 4;
+    ctx.shadowColor  = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur   = 5;
     ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), 0, 0);
     ctx.shadowBlur   = 0;
     ctx.restore();
+    // Label directionnel sous la cible (paysage uniquement)
+    if (isLandscapeNow && !t.hit) {
+      var W_now = _dcog_canvas.width;
+      var labelText = t.x < W_now * 0.34 ? '← GAUCHE'
+                    : t.x > W_now * 0.66 ? 'DROITE →'
+                    : '· CENTRE ·';
+      var labelColor = t.x < W_now * 0.34 ? '#4ecdc4'
+                     : t.x > W_now * 0.66 ? '#e87c2a'
+                     : '#f5c518';
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.75;
+      ctx.font = 'bold ' + Math.round(t.r * 0.32) + 'px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = labelColor;
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 3;
+      ctx.fillText(labelText, t.x, t.y + t.r * 1.45);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
   });
 }
 function _dcog_drawMathZones() {}
