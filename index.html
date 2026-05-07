@@ -23382,13 +23382,10 @@ function _tsym_startDetection() {
       ctx.save();
       ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#f5c518';
-      ctx.save();
-      ctx.translate(W/2, H/2);
-      ctx.rotate(-Math.PI/2);
       ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
-      ctx.fillText(String(n), 0, 0);
+      ctx.fillText(String(n), W/2, H/2);
       ctx.shadowBlur=0; ctx.restore();
     }
     _td_beep(n===1?880:660, 0.08, 0.12);
@@ -23495,68 +23492,37 @@ function _tsym_drawFrame(poses) {
     var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
     _tsym_updateScoreDisplay(avg);
 
-    // Score overlay sur canvas (HomeCourt-style : lisible sans baisser les yeux)
-    var fs = Math.round(W * 0.052);
-    var barH = Math.round(W * 0.10);
+    // Score overlay paysage natif — barre supérieure horizontale
+    var fs = Math.round(H * 0.10);
+    var barH = Math.round(H * 0.16);
     _tsym_ctx.save();
     _tsym_ctx.fillStyle = 'rgba(0,0,0,0.52)';
     _tsym_ctx.fillRect(0, 0, W, barH);
-    // Score symétrie — haut gauche pivoté -90°
+
+    // Score symétrie — haut gauche, horizontal
     var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
-    _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.12));
-    _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = col;
-    _tsym_ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'left'; _tsym_ctx.textBaseline = 'top';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
-    _tsym_ctx.fillText(avg+'%', 0, 0);
-    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
+    _tsym_ctx.fillText(avg+'%', Math.round(W*0.03), Math.round(H*0.03));
 
-    // Timer session TSYM — discret haut-gauche
-    (function(){
-      var _s=Math.max(0,_tsym_sessDur-_tsym_sessSec);
-      var _m=Math.floor(_s/60),_ss=_s%60;
-      var _tStr=_m+':'+(_ss<10?'0':'')+_ss;
-      _tsym_ctx.save();
-      _tsym_ctx.translate(Math.round(W*0.12),Math.round(H*0.12));
-      _tsym_ctx.rotate(-Math.PI/2);
-      _tsym_ctx.fillStyle='rgba(0,0,0,0.6)';
-      _tsym_ctx.beginPath();_tsym_ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);_tsym_ctx.fill();
-      _tsym_ctx.fillStyle=_s<=10?'#e63946':'#fff';
-      _tsym_ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
-      _tsym_ctx.textAlign='center';_tsym_ctx.textBaseline='middle';
-      _tsym_ctx.shadowColor='rgba(0,0,0,0.8)';_tsym_ctx.shadowBlur=4;
-      _tsym_ctx.fillText(_tStr,0,0);
-      _tsym_ctx.shadowBlur=0;_tsym_ctx.restore();
-    })();
-
-    // Mode — haut centre pivoté -90°
+    // Mode — haut centre, horizontal
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
-    _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.45), Math.round(H*0.06));
-    _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = '#fff';
-    _tsym_ctx.font = 'bold '+Math.round(W*0.055)+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
-    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
-    _tsym_ctx.fillText(modeLabel, 0, 0);
-    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
-    // Timer session — haut droit, pivoté -90°, même style que TDR
+    _tsym_ctx.font = 'bold '+Math.round(H*0.07)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'top';
+    _tsym_ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.04));
+
+    // Timer session — haut droite, horizontal, encadré
     var remaining = Math.max(0, _tsym_sessDur - _tsym_sessSec);
     var mm = Math.floor(remaining/60);
     var ss = remaining % 60;
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
-    var timerFs2 = Math.round(H * 0.10);
-    _tsym_ctx.save();
-    _tsym_ctx.translate(Math.round(W*0.08), Math.round(H*0.25));
-    _tsym_ctx.rotate(-Math.PI/2);
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
-    _tsym_ctx.font = 'bold '+timerFs2+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
-    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
-    _tsym_ctx.fillText(timerStr, 0, 0);
-    _tsym_ctx.shadowBlur = 0; _tsym_ctx.restore();
+    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'right'; _tsym_ctx.textBaseline = 'top';
+    _tsym_ctx.fillText(timerStr, Math.round(W*0.97), Math.round(H*0.03));
 
     _tsym_ctx.shadowBlur = 0;
     _tsym_ctx.restore();
@@ -24307,65 +24273,37 @@ function _tdr_drawFrame(poses) {
   // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
-  // Score overlay — style HomeCourt
+  // Score overlay — paysage natif, tout horizontal
   if (_tdr_running) {
-    var fs = Math.round(W * 0.055); // taille font adaptative mobile
+    var fs = Math.round(H * 0.10); // taille adaptée à la hauteur paysage
     ctx.save();
 
-    var timerFs = Math.round(H * 0.10);
-
-    // Score — haut gauche, pivoté -90°
-    ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.12));
-    ctx.rotate(-Math.PI/2);
+    // Score — haut gauche
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold ' + fs + 'px Arial Narrow, Arial, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
-    ctx.fillText(String(_tdr_score), 0, 0);
-    ctx.shadowBlur = 0; ctx.restore();
+    ctx.fillText(String(_tdr_score), Math.round(W*0.03), Math.round(H*0.04));
 
-    // Timer session — discret haut-gauche sous score
-
-    // Timer général — haut-gauche, petit, discret
+    // Timer général — haut centre, fond discret
     var _tStr = (function(){var _s=Math.max(0,_tdr_sec);var _m=Math.floor(_s/60);var _ss=_s%60;return _m+':'+(_ss<10?'0':'')+_ss;})();
-    ctx.save();
-    ctx.translate(Math.round(W*0.12), Math.round(H*0.12));
-    ctx.rotate(-Math.PI/2);
-    // Fond discret
+    var tx = Math.round(W*0.50), ty = Math.round(H*0.06);
+    var tw = Math.round(W*0.10), th = Math.round(H*0.08);
     ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.beginPath();ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);ctx.fill();
-    ctx.fillStyle=_tdr_sec<=10?"#e63946":"#fff";
-    ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
+    ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 6);ctx.fill();
+    ctx.fillStyle=_tdr_sec<=10?'#e63946':'#fff';
+    ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
-    ctx.fillText(_tStr,0,0);
-    ctx.shadowBlur=0;ctx.restore();
+    ctx.fillText(_tStr, tx, ty);
 
-    // Chrono — haut gauche après score, pivoté -90°
-    var mm = Math.floor(_tdr_sec/60), ss = _tdr_sec%60;
-    var chronoStr = (mm>0?(mm+':'):'') + (ss<10?'0':'')+ss;
-    ctx.save();
-    ctx.translate(Math.round(W*0.18), Math.round(H*0.12));
-    ctx.rotate(-Math.PI/2);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold ' + timerFs + 'px Arial Narrow, Arial, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
-    ctx.fillText(chronoStr, 0, 0);
-    ctx.shadowBlur = 0; ctx.restore();
+    // Chrono — haut droite (mm:ss long) — redondant, on le retire car déjà au centre
 
-    // Streak au centre si >= 3
+    // Streak au centre haut si >= 3
     if (_tdr_streak >= 3) {
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       ctx.fillStyle = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
-      ctx.font = 'bold ' + Math.round(fs*0.85) + 'px Arial Narrow, Arial, sans-serif';
-      ctx.save();
-      ctx.translate(W*0.50, Math.round(H*0.06));
-      ctx.rotate(-Math.PI/2);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('🔥 ×' + _tdr_streak, 0, 0);
-      ctx.restore();
+      ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow, Arial, sans-serif';
+      ctx.fillText('🔥 ×' + _tdr_streak, Math.round(W*0.50), Math.round(H*0.18));
     }
 
     ctx.shadowBlur = 0;
@@ -24447,33 +24385,28 @@ function _tdr_drawTargets(ctx, W, H) {
 function _tdr_spawnTarget() {
   if (!_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  // ── MODE PAYSAGE : étalement horizontal complet, moitié supérieure uniquement ──
-  // Le joueur dribble : la main descend bas. Les cibles doivent rester DANS LE HAUT
-  // de l'image pour exiger un geste intentionnel vers le haut, et couvrir toute la
-  // largeur (gauche → centre → droite) pour solliciter les deux mains.
-  // 6 colonnes régulières × 2 hauteurs hautes = 12 positions étalées.
+  // ── PAYSAGE NATIF — étalement horizontal complet, tiers supérieur uniquement ──
+  // Le dribble se fait en bas (60-100% H). Les cibles restent en haut (8-32% H)
+  // pour exiger un geste intentionnel vers le haut. Étalement gauche → droite
+  // sur toute la largeur pour solliciter les deux mains.
+  var radius = Math.round(Math.min(W * 0.075, H * 0.13));
   var positions = [
-    // Ligne haute (Y = 12% de H) — gauche → droite
-    {x: W*0.12, y: H*0.12, color:'#2dc653'},  // extrême gauche
-    {x: W*0.30, y: H*0.12, color:'#4ecdc4'},  // gauche-centre
-    {x: W*0.50, y: H*0.10, color:'#f5c518'},  // centre haut
-    {x: W*0.70, y: H*0.12, color:'#e87c2a'},  // droite-centre
-    {x: W*0.88, y: H*0.12, color:'#e63946'},  // extrême droite
-    // Ligne médiane-haute (Y = 28% de H) — gauche → droite
-    {x: W*0.20, y: H*0.28, color:'#7b2d8b'},  // gauche
-    {x: W*0.40, y: H*0.26, color:'#2dc653'},  // gauche-centre
-    {x: W*0.60, y: H*0.26, color:'#f5c518'},  // droite-centre
-    {x: W*0.80, y: H*0.28, color:'#e63946'},  // droite
+    // Rangée haute (Y = 12% de H) — gauche → droite
+    {x: W*0.12, y: H*0.12, color:'#2dc653'},
+    {x: W*0.30, y: H*0.12, color:'#4ecdc4'},
+    {x: W*0.50, y: H*0.10, color:'#f5c518'},
+    {x: W*0.70, y: H*0.12, color:'#e87c2a'},
+    {x: W*0.88, y: H*0.12, color:'#e63946'},
+    // Rangée médiane-haute (Y = 28% de H) — gauche → droite
+    {x: W*0.20, y: H*0.28, color:'#7b2d8b'},
+    {x: W*0.40, y: H*0.26, color:'#2dc653'},
+    {x: W*0.60, y: H*0.26, color:'#f5c518'},
+    {x: W*0.80, y: H*0.28, color:'#e63946'},
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
-  // Rayon adapté au paysage : contraint par la hauteur pour ne pas déborder
-  var isLandscapeT = W > H;
-  var radius = isLandscapeT
-    ? Math.round(Math.min(W * 0.075, H * 0.13))
-    : Math.round(W * 0.12);
-  // Mélange + filtrage : éviter les chevauchements entre cibles spawnées simultanément
+  // Mélange + filtrage anti-chevauchement
   var shuffled = positions.slice().sort(function(){return Math.random()-0.5;});
-  var minDist = radius * 2.4; // distance minimale entre deux centres
+  var minDist = radius * 2.4;
   var picked = [];
   for (var k=0; k<shuffled.length && picked.length<count; k++) {
     var cand = shuffled[k];
@@ -24493,7 +24426,6 @@ function _tdr_spawnTarget() {
     });
     _tdr_total++;
   });
-  // Cibles expirées
   _tdr_targets = _tdr_targets.filter(function(t){
     if (!t.hit && Date.now()-t.born > t.ttl) { return false; }
     return true;
@@ -24624,28 +24556,17 @@ function _tdr_countdown(cb) {
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#f5c518';
-    // Rotation 90° — téléphone posé à l'horizontal
-    ctx.save();
-    ctx.translate(W/2, H/2);
-    ctx.rotate(-Math.PI/2);
+    // Paysage natif — pas de rotation
     ctx.font = 'bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 20;
-    ctx.fillText(String(num), 0, 0);
-    ctx.restore();
+    ctx.fillText(String(num), W/2, H/2);
     if (num === 1) {
-      ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
-      ctx.save();
-      ctx.translate(W/2, H/2 + Math.round(H*0.25));
-      ctx.rotate(-Math.PI/2);
       ctx.font = Math.round(H*0.10)+'px Arial Narrow,Arial,sans-serif';
       ctx.fillStyle = '#fff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-      ctx.fillText(en?'GET READY':'PRÊT ?', 0, 0);
-      ctx.shadowBlur = 0; ctx.restore();
+      ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.30));
     }
     ctx.shadowBlur = 0;
     ctx.restore();
@@ -25258,13 +25179,10 @@ function _dcog_launchDrill() {
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#f5c518';
-    ctx.save();
-    ctx.translate(W/2, H/2);
-    ctx.rotate(-Math.PI/2);
     ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
-    ctx.fillText(String(n), 0, 0);
+    ctx.fillText(String(n), W/2, H/2);
     ctx.shadowBlur=0; ctx.restore();
     _td_beep(n===1?880:660, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(n===1?30:15);
@@ -25303,18 +25221,16 @@ function _dcog_drawFrame(poses) {
   // Draw math targets + particules
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
-    // Timer question — affiché en haut à droite, pivoté -90°
+    // Timer question — haut centre, horizontal
     if (_dcog_qTimerSec > 0) {
       var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
       ctx.save();
-      ctx.translate(Math.round(W*0.25), Math.round(H*0.12));
-      ctx.rotate(-Math.PI/2);
       ctx.fillStyle = timerColor;
-      ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.font = 'bold ' + Math.round(H*0.10) + 'px Arial Narrow,Arial,sans-serif';
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.textBaseline = 'top';
       ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 12;
-      ctx.fillText(String(_dcog_qTimerSec), 0, 0);
+      ctx.fillText(String(_dcog_qTimerSec), Math.round(W*0.50), Math.round(H*0.42));
       ctx.shadowBlur = 0;
       ctx.restore();
     }
@@ -25330,74 +25246,49 @@ function _dcog_drawFrame(poses) {
   if (_dcog_drill === 'height' && _dcog_running) {
     _dcog_drawHeightLine(ctx, W, H);
   }
-  // Label sprint — centré en haut
+  // Label sprint — centré en haut, horizontal
   if (_dcog_drill === 'sprint' && _dcog_running) {
     var en_s = window._lang === 'en';
     var sprintLbl = en_s ? 'SPRINT' : 'SPRINT';
     ctx.save();
-    ctx.translate(Math.round(W*0.45), Math.round(H*0.06));
-    ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + Math.round(W*0.055) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(sprintLbl, 0, 0);
+    ctx.fillText(sprintLbl, Math.round(W*0.50), Math.round(H*0.04));
     ctx.shadowBlur = 0; ctx.restore();
   }
-  // Timer session général DCOG — haut-gauche, discret, toutes features
+  // Timer session général DCOG — haut centre, horizontal, pour TOUS les drills
   if (_dcog_running) {
     var _ds = _dcog_drill === 'math'
       ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
       : Math.max(0, _dcog_sessDur - _dcog_sessSec);
     var _dm=Math.floor(_ds/60),_dss=_ds%60;
     var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
+    var tx2 = Math.round(W*0.50), ty2 = Math.round(H*0.06);
+    var tw2 = Math.round(W*0.10), th2 = Math.round(H*0.08);
     ctx.save();
-    ctx.translate(Math.round(W*0.12),Math.round(H*0.12));
-    ctx.rotate(-Math.PI/2);
     ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.beginPath();ctx.roundRect(-W*0.05,-H*0.03,W*0.10,H*0.06,4);ctx.fill();
+    ctx.beginPath();ctx.roundRect(tx2-tw2/2, ty2-th2/2, tw2, th2, 6);ctx.fill();
     ctx.fillStyle=_ds<=10?'#e63946':'#fff';
-    ctx.font='bold '+Math.round(W*0.06)+'px Arial Narrow,Arial,sans-serif';
+    ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
-    ctx.fillText(_dtStr,0,0);
+    ctx.fillText(_dtStr, tx2, ty2);
     ctx.shadowBlur=0;ctx.restore();
   }
 
-  // Score correct/incorrect — bas gauche canvas
+  // Score correct/incorrect — haut gauche et haut droit, horizontal
   if (_dcog_drill === 'math' && _dcog_running) {
     ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.25));
-    ctx.rotate(-Math.PI/2);
-    ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
     ctx.fillStyle = '#2dc653';
-    ctx.fillText('✓ '+_dcog_correct, 0, 0);
-    ctx.shadowBlur = 0; ctx.restore();
-    ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.50));
-    ctx.rotate(-Math.PI/2);
-    ctx.font = 'bold '+Math.round(W*0.07)+'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+    ctx.fillText('✓ '+_dcog_correct, Math.round(W*0.03), Math.round(H*0.04));
+    ctx.textAlign = 'right';
     ctx.fillStyle = '#e63946';
-    ctx.fillText('✗ '+_dcog_wrong, 0, 0);
-    ctx.shadowBlur = 0; ctx.restore();
-  }
-  // Timer session — haut droit, pivoté -90° (sprint/height/twoball)
-  if (_dcog_drill !== 'math' && _dcog_running) {
-    var _sr = Math.max(0, _dcog_sessDur - _dcog_sessSec);
-    var _smm = Math.floor(_sr/60), _sss = _sr % 60;
-    var _st = _smm+':'+(_sss<10?'0':'')+_sss;
-    ctx.save();
-    ctx.translate(Math.round(W*0.08), Math.round(H*0.38));
-    ctx.rotate(-Math.PI/2);
-    ctx.fillStyle = _sr <= 10 ? '#e63946' : '#fff';
-    ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
-    ctx.fillText(_st, 0, 0);
+    ctx.fillText('✗ '+_dcog_wrong, Math.round(W*0.97), Math.round(H*0.04));
     ctx.shadowBlur = 0; ctx.restore();
   }
 }
@@ -25441,16 +25332,11 @@ function _dcog_nextQuestion() {
   _dcog_mathAnswer  = q.answer;
   var qEl = document.getElementById('dcog_mathQuestion');
   if (qEl) qEl.textContent = q.text;
-  // Afficher aussi dans l'overlay plein écran
+  // Afficher aussi dans l'overlay plein écran — paysage natif, horizontal
   var qOv = document.getElementById('sensei-cam-question');
-  // PHASE 1 : afficher question seule, grande, centrée (style HomeCourt)
-  // En mode paysage natif, pas de rotation — l'écran est déjà horizontal
   if (qOv) {
     qOv.textContent = q.text;
-    var isLandscapeQ = window.innerWidth > window.innerHeight;
-    qOv.style.transform = isLandscapeQ
-      ? 'translate(-50%,-50%)'           // paysage : pas de rotation
-      : 'translate(-50%,-50%) rotate(-90deg)'; // portrait → rotation compensatoire
+    qOv.style.transform = 'translate(-50%,-50%)';
     qOv.style.display = 'block';
   }
   _dcog_mathChoices = _dcog_genChoices(q.answer);
@@ -25460,35 +25346,25 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  // MODE PAYSAGE : 3 cibles étalées de GAUCHE à DROITE — main gauche, centre, main droite
-  // En paysage W > H, rayon adapté pour éviter tout chevauchement
-  var isLandscape = W > H;
-  var r = isLandscape
-    ? Math.round(Math.min(W * 0.08, H * 0.14))   // paysage : rayon contenu en hauteur
-    : Math.round(W * 0.13);                        // portrait : rayon classique
+  // ── PAYSAGE NATIF — étalement horizontal gauche → centre → droite ──
+  // Tiers supérieur uniquement (Y entre 12% et 32% de H) pour exiger un geste
+  // intentionnel vers le haut, hors trajectoire de dribble (60-100% H).
+  var r = Math.round(Math.min(W * 0.075, H * 0.13));
 
-  // Couleurs aléatoires comme TDR — pas d'indice visuel sur la bonne réponse
+  // Couleurs aléatoires — pas d'indice visuel sur la bonne réponse
   var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
   var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
   var colors = shuffledColors.slice(0,3);
 
-  // ── Positionnement horizontal strict gauche → centre → droite ──────────────
-  // En paysage : les 3 cibles occupent toute la largeur utile du canvas.
-  // La caméra étant miroir, le côté gauche canvas = côté gauche joueur.
-  // Les cibles restent dans le TIERS SUPÉRIEUR uniquement — le dribble se fait
-  // entre la taille et les genoux (zone 60-100% de H), donc tout ce qui est
-  // au-dessus de 40% de H ne peut être touché QUE par un geste intentionnel.
-  var yBase = isLandscape ? H * 0.20 : H * 0.15;   // ligne de base verticale (haut)
-  var yJitter = isLandscape ? H * 0.08 : H * 0.06; // amplitude variation verticale réduite
-  var yMaxAllowed = H * 0.36; // PLAFOND ABSOLU — jamais en dessous (zone dribble exclue)
-
-  // Espacement horizontal : x à 1/6, 3/6, 5/6 de la largeur → espacement = W/3
-  // Garantit une distance inter-cibles de W/3 ≫ 2r même sur petits écrans
+  // 3 cibles à 1/6, 3/6, 5/6 de W → espacement W/3 ≫ 2r = zéro chevauchement
   var xPositions = [W * (1/6), W * (3/6), W * (5/6)];
+  var yBase = H * 0.20;
+  var yJitter = H * 0.08;
+  var yMax = H * 0.32; // plafond strict — jamais dans la zone de dribble
 
   var picked = xPositions.map(function(xBase) {
-    var yVariation = (Math.random() * 2 - 1) * yJitter; // [-yJitter, +yJitter]
-    var y = Math.round(Math.max(r + 8, Math.min(yMaxAllowed, yBase + yVariation)));
+    var yVar = (Math.random() * 2 - 1) * yJitter;
+    var y = Math.round(Math.max(r + 8, Math.min(yMax, yBase + yVar)));
     return { x: Math.round(xBase), y: y };
   });
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
@@ -25615,28 +25491,24 @@ function _dcog_drawMathTargets(ctx, W, H) {
       ? (t.mathVal === _dcog_mathAnswer ? '#2dc653' : '#e63946')
       : t.color;
     ctx.fill();
-    // Chiffre au centre — sans rotation en mode paysage (canvas natif horizontal)
-    var isLandscapeNow = (_dcog_canvas && _dcog_canvas.width > _dcog_canvas.height);
+    // Chiffre au centre — paysage natif, pas de rotation
     ctx.globalAlpha  = 1;
     ctx.fillStyle    = '#fff';
     ctx.save();
-    ctx.translate(t.x, t.y);
-    // En paysage : pas de rotation — le canvas est déjà horizontal
-    if (!isLandscapeNow) ctx.rotate(-Math.PI/2);
     ctx.font         = 'bold ' + Math.round(t.r * 0.78) + 'px sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor  = 'rgba(0,0,0,0.9)';
     ctx.shadowBlur   = 5;
-    ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), 0, 0);
+    ctx.fillText(t.hit ? (t.mathVal===_dcog_mathAnswer?'✓':'✗') : String(t.mathVal), t.x, t.y);
     ctx.shadowBlur   = 0;
     ctx.restore();
-    // Label directionnel sous la cible (paysage uniquement)
-    if (isLandscapeNow && !t.hit) {
+    // Label directionnel sous la cible — paysage natif
+    if (!t.hit) {
       var W_now = _dcog_canvas.width;
-      var labelText = t.x < W_now * 0.34 ? '← GAUCHE'
-                    : t.x > W_now * 0.66 ? 'DROITE →'
-                    : '· CENTRE ·';
+      var labelText = t.x < W_now * 0.34 ? '← G'
+                    : t.x > W_now * 0.66 ? 'D →'
+                    : '· C ·';
       var labelColor = t.x < W_now * 0.34 ? '#4ecdc4'
                      : t.x > W_now * 0.66 ? '#e87c2a'
                      : '#f5c518';
@@ -26003,17 +25875,15 @@ function _dcog_drawHeightLine(ctx, W, H) {
   ctx.setLineDash([14, 6]);
   ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
   ctx.setLineDash([]);
-  // Label pivoté -90° — centré sur la ligne, loin des bords
+  // Label horizontal — centré sur la ligne
   var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
   ctx.save();
-  ctx.translate(Math.round(W*0.60), ly);
-  ctx.rotate(-Math.PI/2);
   ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
   ctx.font         = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
   ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textBaseline = 'bottom';
   ctx.shadowColor  = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-  ctx.fillText(lbl, 0, 0);
+  ctx.fillText(lbl, Math.round(W*0.50), ly - 8);
   ctx.shadowBlur = 0;
   ctx.restore();
   // Point poignet actif
@@ -26149,13 +26019,11 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.textBaseline = 'bottom';
     var en = window._lang === 'en';
     ctx.save();
-    ctx.translate(Math.round(W*0.60), ly);
-    ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#2dc653';
     ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', 0, 0);
+    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', Math.round(W*0.50), ly - 8);
     ctx.shadowBlur = 0; ctx.restore();
     // Indicateurs poignets
     if (_dcog_tbLWristY !== null) {
@@ -26184,26 +26052,16 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.strokeStyle = '#e63946';
     ctx.beginPath(); ctx.moveTo(W/2, lR); ctx.lineTo(W, lR); ctx.stroke();
     ctx.setLineDash([]);
-    // Labels
+    // Labels horizontaux — au-dessus de chaque ligne
     var en2 = window._lang === 'en';
-    ctx.font = 'bold 10px sans-serif'; ctx.textBaseline = 'bottom';
     ctx.save();
-    ctx.translate(Math.round(W*0.25), lL);
-    ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#4ecdc4';
     ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
     ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', 0, 0);
-    ctx.shadowBlur = 0; ctx.restore();
-    ctx.save();
-    ctx.translate(Math.round(W*0.60), lR);
-    ctx.rotate(-Math.PI/2);
+    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', Math.round(W*0.25), lL - 8);
     ctx.fillStyle = '#e63946';
-    ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', 0, 0);
+    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', Math.round(W*0.75), lR - 8);
     ctx.shadowBlur = 0; ctx.restore();
     // Indicateurs
     if (_dcog_tbLWristY !== null) {
@@ -26856,7 +26714,7 @@ if('serviceWorker' in navigator){
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
   <!-- Question math — affichée en phase 1 puis cachée -->
-  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none;white-space:nowrap;width:max-content"></div>
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none;white-space:nowrap;width:max-content"></div>
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
