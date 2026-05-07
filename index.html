@@ -635,6 +635,14 @@ body.unlocked .sensei-only{display:revert !important}
 #sensei-cam-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;background:#000;overflow:hidden;transform-origin:top left}
 #sensei-cam-overlay canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 #sensei-cam-overlay video{display:none}
+/* Forçage paysage natif quand iOS reste verrouillé portrait :
+   on rotate UNIQUEMENT l'overlay caméra de 90°, le reste du code JS
+   continue de raisonner en paysage natif (W > H). */
+#sensei-cam-overlay.force-landscape{
+  width:100vh;height:100vw;
+  transform:rotate(90deg) translateY(-100vw);
+  transform-origin:top left;
+}
 #sensei-cam-stop-btn{display:none;position:absolute;top:14px;right:14px;z-index:10002;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 20px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px}
 </style>
 </head>
@@ -1639,7 +1647,7 @@ body.unlocked .sensei-only{display:revert !important}
       <div id="dcog_mathOverlay"
         style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
         <div id="dcog_mathQuestion"
-          style="font-family:var(--font-display);font-size:clamp(26px,8vw,48px);color:#fff;letter-spacing:3px;text-shadow:0 2px 16px rgba(0,0,0,.9);margin-bottom:16px;text-align:center">
+          style="font-family:var(--font-display);font-size:clamp(56px,16vw,120px);color:#fff;letter-spacing:4px;text-shadow:0 4px 24px rgba(0,0,0,.95);margin-bottom:16px;text-align:center;font-weight:900">
           ? × ? = ?
         </div>
         <!-- zones dessinées dans le canvas — hint text seulement -->
@@ -23492,37 +23500,45 @@ function _tsym_drawFrame(poses) {
     var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
     _tsym_updateScoreDisplay(avg);
 
-    // Score overlay paysage natif — barre supérieure horizontale
-    var fs = Math.round(H * 0.10);
-    var barH = Math.round(H * 0.16);
+    // ═══════════════════ HUD GRID — paysage natif ═══════════════════
+    // Layout identique DCOG/TDR :
+    //   • Ligne 1 (Y 0-13%) : REC | Timer central | STOP
+    //   • Ligne 2 (Y 14-25%) : Score % gauche | Mode centre | --
+    // ────────────────────────────────────────────────────────────────
     _tsym_ctx.save();
-    _tsym_ctx.fillStyle = 'rgba(0,0,0,0.52)';
-    _tsym_ctx.fillRect(0, 0, W, barH);
 
-    // Score symétrie — haut gauche, horizontal
-    var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
-    _tsym_ctx.fillStyle = col;
-    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'left'; _tsym_ctx.textBaseline = 'top';
-    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 5;
-    _tsym_ctx.fillText(avg+'%', Math.round(W*0.03), Math.round(H*0.03));
-
-    // Mode — haut centre, horizontal
-    var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
-    _tsym_ctx.fillStyle = '#fff';
-    _tsym_ctx.font = 'bold '+Math.round(H*0.07)+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'top';
-    _tsym_ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.04));
-
-    // Timer session — haut droite, horizontal, encadré
+    // ── Ligne 1 : Timer principal au CENTRE (encadré) ──
     var remaining = Math.max(0, _tsym_sessDur - _tsym_sessSec);
     var mm = Math.floor(remaining/60);
     var ss = remaining % 60;
     var timerStr = mm+':'+(ss<10?'0':'')+ss;
+    var tx = Math.round(W*0.50), ty = Math.round(H*0.07);
+    var tw = Math.round(Math.max(110, W*0.10));
+    var th = Math.round(Math.max(50, H*0.09));
+    _tsym_ctx.fillStyle='rgba(0,0,0,0.7)';
+    _tsym_ctx.beginPath();_tsym_ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);_tsym_ctx.fill();
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
-    _tsym_ctx.font = 'bold '+fs+'px Arial Narrow,Arial,sans-serif';
-    _tsym_ctx.textAlign = 'right'; _tsym_ctx.textBaseline = 'top';
-    _tsym_ctx.fillText(timerStr, Math.round(W*0.97), Math.round(H*0.03));
+    _tsym_ctx.font = 'bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
+    _tsym_ctx.fillText(timerStr, tx, ty);
+    _tsym_ctx.shadowBlur = 0;
+
+    // ── Ligne 2 : Score % gauche (sous REC) | Mode centre ──
+    var scoreY = Math.round(H * 0.20);
+    var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
+    _tsym_ctx.fillStyle = col;
+    _tsym_ctx.font = 'bold '+Math.round(H*0.075)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'left'; _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.shadowColor = 'rgba(0,0,0,0.9)'; _tsym_ctx.shadowBlur = 6;
+    _tsym_ctx.fillText(avg+'%', Math.round(W*0.03), scoreY);
+
+    // Mode au centre, ligne 2
+    var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
+    _tsym_ctx.fillStyle = '#fff';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.055)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.fillText(modeLabel, Math.round(W*0.50), scoreY);
 
     _tsym_ctx.shadowBlur = 0;
     _tsym_ctx.restore();
@@ -24273,39 +24289,47 @@ function _tdr_drawFrame(poses) {
   // Pas de squelette dans Dribble Réaction — inutile et visuellement gênant
   // Cibles
   _tdr_drawTargets(ctx, W, H);
-  // Score overlay — paysage natif, tout horizontal
+  // ═══════════════════ HUD GRID — paysage natif ═══════════════════
+  // REC : top:14px left:14px | STOP : top:14px right:14px (boutons HTML)
+  // Zones canvas réservées :
+  //   • Y 0-13% : ligne 1 (REC | timer principal | STOP)
+  //   • Y 14-25% : ligne 2 (score gauche | streak centre | --)
+  //   • Y 26-55% : zone des cibles
+  //   • Y 56-100% : zone du joueur (dribble) — interdite aux UI
+  // ────────────────────────────────────────────────────────────────
   if (_tdr_running) {
-    var fs = Math.round(H * 0.10); // taille adaptée à la hauteur paysage
     ctx.save();
 
-    // Score — haut gauche
-    ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + fs + 'px Arial Narrow, Arial, sans-serif';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
-    ctx.fillText(String(_tdr_score), Math.round(W*0.03), Math.round(H*0.04));
-
-    // Timer général — haut centre, fond discret
+    // ── Ligne 1 : Timer principal au CENTRE ──
     var _tStr = (function(){var _s=Math.max(0,_tdr_sec);var _m=Math.floor(_s/60);var _ss=_s%60;return _m+':'+(_ss<10?'0':'')+_ss;})();
-    var tx = Math.round(W*0.50), ty = Math.round(H*0.06);
-    var tw = Math.round(W*0.10), th = Math.round(H*0.08);
-    ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 6);ctx.fill();
+    var tx = Math.round(W*0.50), ty = Math.round(H*0.07);
+    var tw = Math.round(Math.max(110, W*0.10));
+    var th = Math.round(Math.max(50, H*0.09));
+    ctx.fillStyle='rgba(0,0,0,0.7)';
+    ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
     ctx.fillStyle=_tdr_sec<=10?'#e63946':'#fff';
     ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
     ctx.fillText(_tStr, tx, ty);
+    ctx.shadowBlur=0;
 
-    // Chrono — haut droite (mm:ss long) — redondant, on le retire car déjà au centre
+    // ── Ligne 2 : Score gauche (sous REC) | Streak centre ──
+    var scoreY = Math.round(H * 0.20);
+    var scoreFs = Math.round(H * 0.075);
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold '+scoreFs+'px Arial Narrow, Arial, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
+    ctx.fillText(String(_tdr_score), Math.round(W*0.03), scoreY);
 
-    // Streak au centre haut si >= 3
+    // Streak au centre si >= 3
     if (_tdr_streak >= 3) {
-      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       ctx.fillStyle = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
-      ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow, Arial, sans-serif';
-      ctx.fillText('🔥 ×' + _tdr_streak, Math.round(W*0.50), Math.round(H*0.18));
+      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow, Arial, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🔥 ×' + _tdr_streak, Math.round(W*0.50), scoreY);
     }
-
     ctx.shadowBlur = 0;
     ctx.restore();
   }
@@ -24336,7 +24360,7 @@ function _tdr_drawTargets(ctx, W, H) {
       var prox = Math.max(0, 1 - dist/(t.r*3.5));
       if(prox > proximity) proximity = prox;
     });
-    var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
+    var spawnRamp = Math.min(1, (now - t.born) / 250); var pulse = 1 + (0.08 + proximity*0.15) * spawnRamp * Math.sin(now / (120 - proximity*60));
     ctx.save();
     ctx.globalAlpha = alpha;
     // Ring d'approche : s'intensifie quand poignet s'approche
@@ -24385,23 +24409,22 @@ function _tdr_drawTargets(ctx, W, H) {
 function _tdr_spawnTarget() {
   if (!_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  // ── PAYSAGE NATIF — étalement horizontal complet, tiers supérieur uniquement ──
-  // Le dribble se fait en bas (60-100% H). Les cibles restent en haut (8-32% H)
-  // pour exiger un geste intentionnel vers le haut. Étalement gauche → droite
-  // sur toute la largeur pour solliciter les deux mains.
+  // ── PAYSAGE NATIF — étalement horizontal, sous le HUD ──
+  // Y entre 32% et 50% : SOUS la grille HUD (timer + score) et AU-DESSUS
+  // de la zone de dribble naturel (60-100% H).
   var radius = Math.round(Math.min(W * 0.075, H * 0.13));
   var positions = [
-    // Rangée haute (Y = 12% de H) — gauche → droite
-    {x: W*0.12, y: H*0.12, color:'#2dc653'},
-    {x: W*0.30, y: H*0.12, color:'#4ecdc4'},
-    {x: W*0.50, y: H*0.10, color:'#f5c518'},
-    {x: W*0.70, y: H*0.12, color:'#e87c2a'},
-    {x: W*0.88, y: H*0.12, color:'#e63946'},
-    // Rangée médiane-haute (Y = 28% de H) — gauche → droite
-    {x: W*0.20, y: H*0.28, color:'#7b2d8b'},
-    {x: W*0.40, y: H*0.26, color:'#2dc653'},
-    {x: W*0.60, y: H*0.26, color:'#f5c518'},
-    {x: W*0.80, y: H*0.28, color:'#e63946'},
+    // Rangée haute (Y = 34% de H) — gauche → droite
+    {x: W*0.12, y: H*0.34, color:'#2dc653'},
+    {x: W*0.30, y: H*0.34, color:'#4ecdc4'},
+    {x: W*0.50, y: H*0.32, color:'#f5c518'},
+    {x: W*0.70, y: H*0.34, color:'#e87c2a'},
+    {x: W*0.88, y: H*0.34, color:'#e63946'},
+    // Rangée médiane (Y = 48% de H) — gauche → droite
+    {x: W*0.20, y: H*0.48, color:'#7b2d8b'},
+    {x: W*0.40, y: H*0.46, color:'#2dc653'},
+    {x: W*0.60, y: H*0.46, color:'#f5c518'},
+    {x: W*0.80, y: H*0.48, color:'#e63946'},
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   // Mélange + filtrage anti-chevauchement
@@ -25218,23 +25241,6 @@ function _dcog_drawFrame(poses) {
   // Dessiner la vidéo miroir sur le canvas (le <video> est display:none)
   _drawVideoMirror(ctx, _dcog_video, W, H);
   // Pas de squelette dans Cognitif — inutile et visuellement gênant
-  // Draw math targets + particules
-  if (_dcog_drill === 'math' && _dcog_running) {
-    _dcog_drawMathTargets(ctx, W, H);
-    // Timer question — haut centre, horizontal
-    if (_dcog_qTimerSec > 0) {
-      var timerColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
-      ctx.save();
-      ctx.fillStyle = timerColor;
-      ctx.font = 'bold ' + Math.round(H*0.10) + 'px Arial Narrow,Arial,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 12;
-      ctx.fillText(String(_dcog_qTimerSec), Math.round(W*0.50), Math.round(H*0.42));
-      ctx.shadowBlur = 0;
-      ctx.restore();
-    }
-  }
   // Particules explosion toujours dessinées (persistent après hit)
   if (_dcog_particles.length > 0) _dcog_drawParticles(ctx);
   // Draw two ball height lines on canvas
@@ -25246,50 +25252,81 @@ function _dcog_drawFrame(poses) {
   if (_dcog_drill === 'height' && _dcog_running) {
     _dcog_drawHeightLine(ctx, W, H);
   }
-  // Label sprint — centré en haut, horizontal
-  if (_dcog_drill === 'sprint' && _dcog_running) {
-    var en_s = window._lang === 'en';
-    var sprintLbl = en_s ? 'SPRINT' : 'SPRINT';
-    ctx.save();
-    ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(sprintLbl, Math.round(W*0.50), Math.round(H*0.04));
-    ctx.shadowBlur = 0; ctx.restore();
-  }
-  // Timer session général DCOG — haut centre, horizontal, pour TOUS les drills
+
+  // ═══════════════════ HUD GRID — paysage natif ═══════════════════
+  // REC : top:14px left:14px | STOP : top:14px right:14px (boutons HTML)
+  // Zones canvas réservées :
+  //   • Y 0-13% : ligne 1 (REC | timer principal | STOP)
+  //   • Y 14-25% : ligne 2 (✓ score | timer question | ✗ score)
+  //   • Y 26-55% : zone des cibles
+  //   • Y 56-100% : zone du joueur (dribble) — interdite aux UI
+  // ────────────────────────────────────────────────────────────────
   if (_dcog_running) {
+    ctx.save();
+
+    // ── Ligne 1 : Timer principal au CENTRE (entre REC et STOP) ──
     var _ds = _dcog_drill === 'math'
       ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
       : Math.max(0, _dcog_sessDur - _dcog_sessSec);
     var _dm=Math.floor(_ds/60),_dss=_ds%60;
     var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
-    var tx2 = Math.round(W*0.50), ty2 = Math.round(H*0.06);
-    var tw2 = Math.round(W*0.10), th2 = Math.round(H*0.08);
-    ctx.save();
-    ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.beginPath();ctx.roundRect(tx2-tw2/2, ty2-th2/2, tw2, th2, 6);ctx.fill();
+    var tx = Math.round(W*0.50), ty = Math.round(H*0.07);
+    var tw = Math.round(Math.max(110, W*0.10));
+    var th = Math.round(Math.max(50, H*0.09));
+    ctx.fillStyle='rgba(0,0,0,0.7)';
+    ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
     ctx.fillStyle=_ds<=10?'#e63946':'#fff';
     ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
-    ctx.fillText(_dtStr, tx2, ty2);
-    ctx.shadowBlur=0;ctx.restore();
+    ctx.fillText(_dtStr, tx, ty);
+    ctx.shadowBlur=0;
+
+    // ── Ligne 2 : scores math (✓ gauche, ✗ droite) — sous REC/STOP ──
+    if (_dcog_drill === 'math') {
+      var scoreY = Math.round(H * 0.20);
+      var scoreFs = Math.round(H * 0.075);
+      ctx.font = 'bold '+scoreFs+'px Arial Narrow, Arial, sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
+      // ✓ correct — gauche, sous REC
+      ctx.fillStyle = '#2dc653';
+      ctx.textAlign = 'left';
+      ctx.fillText('✓ '+_dcog_correct, Math.round(W*0.03), scoreY);
+      // ✗ wrong — droite, sous STOP
+      ctx.fillStyle = '#e63946';
+      ctx.textAlign = 'right';
+      ctx.fillText('✗ '+_dcog_wrong, Math.round(W*0.97), scoreY);
+      ctx.shadowBlur = 0;
+
+      // Timer question — centre, sous timer principal (ligne 2)
+      if (_dcog_qTimerSec > 0) {
+        var qColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
+        ctx.fillStyle = qColor;
+        ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+        ctx.fillText(String(_dcog_qTimerSec), Math.round(W*0.50), scoreY);
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // ── Label sprint — centre haut (ligne 2 si sprint) ──
+    if (_dcog_drill === 'sprint') {
+      ctx.fillStyle = '#f5c518';
+      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
+      ctx.fillText('SPRINT', Math.round(W*0.50), Math.round(H*0.20));
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.restore();
   }
 
-  // Score correct/incorrect — haut gauche et haut droit, horizontal
+  // Cibles math dessinées EN DERNIER (au-dessus du HUD pour qu'elles restent visibles)
   if (_dcog_drill === 'math' && _dcog_running) {
-    ctx.save();
-    ctx.font = 'bold '+Math.round(H*0.09)+'px Arial Narrow,Arial,sans-serif';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
-    ctx.fillStyle = '#2dc653';
-    ctx.fillText('✓ '+_dcog_correct, Math.round(W*0.03), Math.round(H*0.04));
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#e63946';
-    ctx.fillText('✗ '+_dcog_wrong, Math.round(W*0.97), Math.round(H*0.04));
-    ctx.shadowBlur = 0; ctx.restore();
+    _dcog_drawMathTargets(ctx, W, H);
   }
 }
 
@@ -25347,24 +25384,24 @@ function _dcog_nextQuestion() {
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
   // ── PAYSAGE NATIF — étalement horizontal gauche → centre → droite ──
-  // Tiers supérieur uniquement (Y entre 12% et 32% de H) pour exiger un geste
-  // intentionnel vers le haut, hors trajectoire de dribble (60-100% H).
+  // Y entre 32% et 50% : SOUS le HUD (timer + scores) et AU-DESSUS de la zone
+  // de dribble naturel (60-100% H). Geste vers le haut nécessaire.
   var r = Math.round(Math.min(W * 0.075, H * 0.13));
 
-  // Couleurs aléatoires — pas d'indice visuel sur la bonne réponse
   var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
   var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
   var colors = shuffledColors.slice(0,3);
 
-  // 3 cibles à 1/6, 3/6, 5/6 de W → espacement W/3 ≫ 2r = zéro chevauchement
+  // 3 cibles à 1/6, 3/6, 5/6 de W → espacement W/3 ≫ 2r
   var xPositions = [W * (1/6), W * (3/6), W * (5/6)];
-  var yBase = H * 0.20;
-  var yJitter = H * 0.08;
-  var yMax = H * 0.32; // plafond strict — jamais dans la zone de dribble
+  var yBase = H * 0.40;          // sous le HUD (HUD occupe 0-26% H)
+  var yJitter = H * 0.06;        // amplitude réduite
+  var yMin = H * 0.32;           // plancher : pas trop haut (chevauche pas les scores)
+  var yMax = H * 0.50;           // plafond : pas trop bas (zone dribble)
 
   var picked = xPositions.map(function(xBase) {
     var yVar = (Math.random() * 2 - 1) * yJitter;
-    var y = Math.round(Math.max(r + 8, Math.min(yMax, yBase + yVar)));
+    var y = Math.round(Math.max(yMin, Math.min(yMax, yBase + yVar)));
     return { x: Math.round(xBase), y: y };
   });
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
@@ -25467,7 +25504,7 @@ function _dcog_drawMathTargets(ctx, W, H) {
       var prox = Math.max(0, 1 - dist/(t.r*3.5));
       if(prox > proximity) proximity = prox;
     });
-    var pulse = 1 + (0.1 + proximity*0.2) * Math.sin(now / (120 - proximity*60));
+    var spawnRamp = Math.min(1, (now - t.born) / 250); var pulse = 1 + (0.08 + proximity*0.15) * spawnRamp * Math.sin(now / (120 - proximity*60));
     ctx.save();
     ctx.globalAlpha = alpha;
     if(!t.hit && proximity > 0.15) {
@@ -26714,7 +26751,7 @@ if('serviceWorker' in navigator){
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
   <!-- Question math — affichée en phase 1 puis cachée -->
-  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(48px,12vh,96px);font-weight:900;letter-spacing:4px;text-align:center;z-index:10;text-shadow:0 4px 24px rgba(0,0,0,.9);pointer-events:none;white-space:nowrap;width:max-content"></div>
+  <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(80px,18vh,160px);font-weight:900;letter-spacing:6px;text-align:center;z-index:10;text-shadow:0 6px 32px rgba(0,0,0,.95),0 0 20px rgba(0,0,0,.8);pointer-events:none;white-space:nowrap;width:max-content;background:rgba(0,0,0,0.45);padding:18px 42px;border-radius:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)"></div>
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
@@ -26754,8 +26791,20 @@ function senseiCamShow(mod,stream){
   _scam.video.muted=true;
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
-    _scam.canvas.width  = window.innerWidth;
-    _scam.canvas.height = window.innerHeight;
+    // ── Forçage paysage natif : si iOS est verrouillé portrait, on rotate l'overlay
+    //    en CSS pour que le canvas raisonne TOUJOURS en paysage (W > H).
+    var iw = window.innerWidth, ih = window.innerHeight;
+    var devicePortrait = iw < ih;
+    if (devicePortrait) {
+      ov.classList.add('force-landscape');
+      // Après rotation CSS l'overlay fait ih × iw → canvas en paysage
+      _scam.canvas.width  = ih;
+      _scam.canvas.height = iw;
+    } else {
+      ov.classList.remove('force-landscape');
+      _scam.canvas.width  = iw;
+      _scam.canvas.height = ih;
+    }
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
@@ -26764,7 +26813,7 @@ function senseiCamShow(mod,stream){
 function senseiCamStop(){
   var ov=document.getElementById('sensei-cam-overlay');
   var sb=document.getElementById('sensei-cam-stop-btn');
-  if(ov)ov.style.display='none';
+  if(ov){ov.style.display='none'; ov.classList.remove('force-landscape');}
   if(sb)sb.style.display='none';
   var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
   var qOv=document.getElementById('sensei-cam-question');
@@ -26788,8 +26837,17 @@ window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
   var ov=document.getElementById('sensei-cam-overlay');
   if(!ov||ov.style.display==='none')return;
-  _scam.canvas.width  = ov.offsetWidth  || window.innerWidth;
-  _scam.canvas.height = ov.offsetHeight || window.innerHeight;
+  var iw = window.innerWidth, ih = window.innerHeight;
+  var devicePortrait = iw < ih;
+  if (devicePortrait) {
+    ov.classList.add('force-landscape');
+    _scam.canvas.width  = ih;
+    _scam.canvas.height = iw;
+  } else {
+    ov.classList.remove('force-landscape');
+    _scam.canvas.width  = iw;
+    _scam.canvas.height = ih;
+  }
 });
 </script>
 <script>
