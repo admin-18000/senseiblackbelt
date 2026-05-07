@@ -24447,28 +24447,52 @@ function _tdr_drawTargets(ctx, W, H) {
 function _tdr_spawnTarget() {
   if (!_tdr_canvas) return;
   var W = _tdr_canvas.width, H = _tdr_canvas.height;
-  // Positions adaptées au corps — centrées sur _tdr_centerX (calibration)
-  // Si non calibré : centerX = 0.5 (fallback symétrique)
-  // Positions fixes — 4 coins haut uniquement, bien répartis gauche/droite
+  // ── MODE PAYSAGE : étalement horizontal complet, moitié supérieure uniquement ──
+  // Le joueur dribble : la main descend bas. Les cibles doivent rester DANS LE HAUT
+  // de l'image pour exiger un geste intentionnel vers le haut, et couvrir toute la
+  // largeur (gauche → centre → droite) pour solliciter les deux mains.
+  // 6 colonnes régulières × 2 hauteurs hautes = 12 positions étalées.
   var positions = [
-    {x: W*0.18, y: H*0.15, color:'#2dc653'},  // gauche haut
-    {x: W*0.82, y: H*0.15, color:'#e63946'},  // droite haut
-    {x: W*0.18, y: H*0.32, color:'#f5c518'},  // gauche milieu-haut
-    {x: W*0.82, y: H*0.32, color:'#4ecdc4'},  // droite milieu-haut
+    // Ligne haute (Y = 12% de H) — gauche → droite
+    {x: W*0.12, y: H*0.12, color:'#2dc653'},  // extrême gauche
+    {x: W*0.30, y: H*0.12, color:'#4ecdc4'},  // gauche-centre
+    {x: W*0.50, y: H*0.10, color:'#f5c518'},  // centre haut
+    {x: W*0.70, y: H*0.12, color:'#e87c2a'},  // droite-centre
+    {x: W*0.88, y: H*0.12, color:'#e63946'},  // extrême droite
+    // Ligne médiane-haute (Y = 28% de H) — gauche → droite
+    {x: W*0.20, y: H*0.28, color:'#7b2d8b'},  // gauche
+    {x: W*0.40, y: H*0.26, color:'#2dc653'},  // gauche-centre
+    {x: W*0.60, y: H*0.26, color:'#f5c518'},  // droite-centre
+    {x: W*0.80, y: H*0.28, color:'#e63946'},  // droite
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
-  var shuffled = positions.sort(function(){return Math.random()-0.5;});
-  for (var i=0; i<count && i<shuffled.length; i++) {
-    var p = shuffled[i];
+  // Rayon adapté au paysage : contraint par la hauteur pour ne pas déborder
+  var isLandscapeT = W > H;
+  var radius = isLandscapeT
+    ? Math.round(Math.min(W * 0.075, H * 0.13))
+    : Math.round(W * 0.12);
+  // Mélange + filtrage : éviter les chevauchements entre cibles spawnées simultanément
+  var shuffled = positions.slice().sort(function(){return Math.random()-0.5;});
+  var minDist = radius * 2.4; // distance minimale entre deux centres
+  var picked = [];
+  for (var k=0; k<shuffled.length && picked.length<count; k++) {
+    var cand = shuffled[k];
+    var ok = picked.every(function(p){
+      var dx=p.x-cand.x, dy=p.y-cand.y;
+      return Math.sqrt(dx*dx+dy*dy) >= minDist;
+    });
+    if (ok) picked.push(cand);
+  }
+  picked.forEach(function(p){
     _tdr_targets.push({
-      x: p.x + (Math.random()-0.5)*20,
-      y: p.y + (Math.random()-0.5)*20,
-      r: Math.round((_tdr_canvas ? _tdr_canvas.width : 640) * 0.12), color: p.color,
+      x: p.x + (Math.random()-0.5)*15,
+      y: p.y + (Math.random()-0.5)*15,
+      r: radius, color: p.color,
       born: Date.now(), ttl: 2000,
       hit: false, hitTime: 0
     });
     _tdr_total++;
-  }
+  });
   // Cibles expirées
   _tdr_targets = _tdr_targets.filter(function(t){
     if (!t.hit && Date.now()-t.born > t.ttl) { return false; }
@@ -25451,10 +25475,12 @@ function _dcog_nextQuestion() {
   // ── Positionnement horizontal strict gauche → centre → droite ──────────────
   // En paysage : les 3 cibles occupent toute la largeur utile du canvas.
   // La caméra étant miroir, le côté gauche canvas = côté gauche joueur.
-  // Petite variation verticale aléatoire pour éviter la monotonie tout en gardant les cibles
-  // dans la moitié supérieure et sans jamais se superposer.
-  var yBase = isLandscape ? H * 0.30 : H * 0.18;   // ligne de base verticale
-  var yJitter = isLandscape ? H * 0.12 : H * 0.10; // amplitude variation verticale
+  // Les cibles restent dans le TIERS SUPÉRIEUR uniquement — le dribble se fait
+  // entre la taille et les genoux (zone 60-100% de H), donc tout ce qui est
+  // au-dessus de 40% de H ne peut être touché QUE par un geste intentionnel.
+  var yBase = isLandscape ? H * 0.20 : H * 0.15;   // ligne de base verticale (haut)
+  var yJitter = isLandscape ? H * 0.08 : H * 0.06; // amplitude variation verticale réduite
+  var yMaxAllowed = H * 0.36; // PLAFOND ABSOLU — jamais en dessous (zone dribble exclue)
 
   // Espacement horizontal : x à 1/6, 3/6, 5/6 de la largeur → espacement = W/3
   // Garantit une distance inter-cibles de W/3 ≫ 2r même sur petits écrans
@@ -25462,7 +25488,7 @@ function _dcog_nextQuestion() {
 
   var picked = xPositions.map(function(xBase) {
     var yVariation = (Math.random() * 2 - 1) * yJitter; // [-yJitter, +yJitter]
-    var y = Math.round(Math.max(r + 8, Math.min(H * 0.55, yBase + yVariation)));
+    var y = Math.round(Math.max(r + 8, Math.min(yMaxAllowed, yBase + yVariation)));
     return { x: Math.round(xBase), y: y };
   });
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
