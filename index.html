@@ -1601,27 +1601,27 @@ body.unlocked .sensei-only{display:revert !important}
     <div id="dcog_optTwoball" style="display:none">
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('alternate')" data-tbmode="alternate"
         style="padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s">
-        🔄 <span id="dcog_lbl_alternate">ALTERNÉ</span><br><span style="font-size:9px;opacity:.7">G puis D</span>
+        🔄 <span id="dcog_lbl_alternate">ALTERNÉ</span><br><span id="dcog_sub_alternate" style="font-size:9px;opacity:.7">G puis D</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('sync')" data-tbmode="sync"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s">
-        ⚡ <span id="dcog_lbl_sync">SYNC</span><br><span style="font-size:9px;opacity:.7">ensemble</span>
+        ⚡ <span id="dcog_lbl_sync">SYNC</span><br><span id="dcog_sub_sync" style="font-size:9px;opacity:.7">ensemble</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('chaos')" data-tbmode="chaos"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s">
-        🌀 CHAOS<br><span style="font-size:9px;opacity:.7">aléatoire</span>
+        🌀 <span id="dcog_lbl_chaos">CHAOS</span><br><span id="dcog_sub_chaos" style="font-size:9px;opacity:.7">aléatoire</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('burnout')" data-tbmode="burnout"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s;margin-top:6px">
-        🔥 <span id="dcog_lbl_burnout">BURNOUT</span><br><span style="font-size:9px;opacity:.7">accélération</span>
+        🔥 <span id="dcog_lbl_burnout">BURNOUT</span><br><span id="dcog_sub_burnout" style="font-size:9px;opacity:.7">accélération</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('sameheight')" data-tbmode="sameheight"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);margin-right:6px;text-align:center;transition:all .2s;margin-top:6px">
-        ↔ <span id="dcog_lbl_sameheight">MÊME HAUTEUR</span><br><span style="font-size:9px;opacity:.7">ligne verte</span>
+        ↔ <span id="dcog_lbl_sameheight">MÊME HAUTEUR</span><br><span id="dcog_sub_sameheight" style="font-size:9px;opacity:.7">ligne verte</span>
       </button>
       <button class="dcog-tb-btn" onclick="_dcog_setTwoBallMode('diffheight')" data-tbmode="diffheight"
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;width:calc(33% - 6px);text-align:center;transition:all .2s;margin-top:6px">
-        ↕ <span id="dcog_lbl_diffheight">HAUTEUR DIFF.</span><br><span style="font-size:9px;opacity:.7">2 lignes</span>
+        ↕ <span id="dcog_lbl_diffheight">HAUTEUR DIFF.</span><br><span id="dcog_sub_diffheight" style="font-size:9px;opacity:.7">2 lignes</span>
       </button>
     </div>
   </div>
@@ -23394,6 +23394,7 @@ var _tsym_ctx = null;
 var _tsym_running = false;
 var _tsym_lowScoreSince = 0;  // timestamp début période score < 60%
 var _tsym_lastAsymAlert = 0;  // timestamp dernier bip alerte (anti-spam)
+var _tsym_currentAsymMode = null; // mode actuel si défaut détecté (pour son adapté)
 var _tsym_rafId = null;
 var _tsym_mode = 'dribble'; // dribble | shot | footwork | posture
 var _tsym_scores = []; // historique des scores
@@ -23592,7 +23593,6 @@ function _tsym_startDetection() {
       var W=_tsym_canvas.width, H=_tsym_canvas.height, ctx=_tsym_ctx;
       _drawVideoMirror(ctx, _tsym_video, W, H);
       ctx.save();
-      ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#f5c518';
       ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -23696,67 +23696,154 @@ function _tsym_drawFrame(poses) {
   // Dessiner le squelette
   _tsym_drawSkeleton(kps, scaleX, scaleY, W);
 
-  // ═══════ FEEDBACK ASYMÉTRIE — ligne médiane + flèche directionnelle ═══════
-  // Détecte le côté défaillant selon le mode courant et affiche une indication
-  // visuelle claire pour que le joueur puisse s'auto-corriger sans coach.
-  // Tout est encapsulé dans try/catch — si bug ou pose incomplète, le squelette
-  // et le score continuent de fonctionner normalement.
+  // ═══════ FEEDBACK ASYMÉTRIE ADAPTÉ AU MODE ═══════
+  // Chaque mode (dribble/shot/footwork/posture) a son propre visuel et son
+  // type de défaut détecté. Tout encapsulé dans try/catch : si bug ou pose
+  // incomplète, le squelette et le score continuent normalement.
   try {
-    // Helpers locaux pour récupérer les keypoints en coordonnées canvas (mirror)
     var _kp = function(name){
       var idx = _TSYM_KP[name]; if (idx === undefined) return null;
       var k = kps[idx]; if (!k || k.score < 0.35) return null;
       return { x: W - k.x * scaleX, y: k.y * scaleY };
     };
-    // Calcul axe médian théorique = milieu des épaules (référence verticale)
+    var en_a = window._lang === 'en';
     var lS = _kp('leftShoulder'), rS = _kp('rightShoulder');
-    if (lS && rS) {
-      var axisX = (lS.x + rS.x) / 2;
-      // Détecter le côté problématique selon le mode
-      var problemSide = null;     // 'L' ou 'R' ou null
-      var asymMag = 0;            // amplitude relative 0-1
-      if (_tsym_mode === 'dribble') {
-        var lW2 = _kp('leftWrist'), rW2 = _kp('rightWrist');
-        if (lW2 && rW2) {
-          var hL = lS.y - lW2.y, hR = rS.y - rW2.y; // hauteur poignet relative à épaule
-          var dh = hL - hR;
-          if (Math.abs(dh) > Math.max(20, H * 0.04)) {
-            problemSide = dh < 0 ? 'L' : 'R'; // côté plus bas = défaut
-            asymMag = Math.min(1, Math.abs(dh) / (H * 0.20));
-          }
-        }
-      } else if (_tsym_mode === 'shot') {
-        var lE = _kp('leftElbow'), rE = _kp('rightElbow');
-        var lW3 = _kp('leftWrist'), rW3 = _kp('rightWrist');
-        if (lE && rE && lW3 && rW3) {
-          var aL = _tsym_angle({x:lS.x,y:lS.y},{x:lE.x,y:lE.y},{x:lW3.x,y:lW3.y});
-          var aR = _tsym_angle({x:rS.x,y:rS.y},{x:rE.x,y:rE.y},{x:rW3.x,y:rW3.y});
-          var da = aL - aR;
-          if (Math.abs(da) > 25) {
-            problemSide = da < 0 ? 'L' : 'R';
-            asymMag = Math.min(1, Math.abs(da) / 90);
-          }
-        }
-      } else if (_tsym_mode === 'footwork') {
-        var lK = _kp('leftKnee'), rK = _kp('rightKnee');
-        if (lK && rK) {
-          var dk = lK.y - rK.y;
-          if (Math.abs(dk) > Math.max(15, H * 0.03)) {
-            problemSide = dk > 0 ? 'L' : 'R'; // genou plus bas = défaut
-            asymMag = Math.min(1, Math.abs(dk) / (H * 0.15));
-          }
-        }
-      } else if (_tsym_mode === 'posture') {
-        // Comparaison hauteur épaules
-        var ds = lS.y - rS.y;
-        if (Math.abs(ds) > Math.max(15, H * 0.025)) {
-          problemSide = ds > 0 ? 'L' : 'R'; // épaule plus basse = défaut
-          asymMag = Math.min(1, Math.abs(ds) / (H * 0.10));
+    var problemSide = null;     // 'L' / 'R' / null
+    var asymMag = 0;            // amplitude relative 0-1
+    var asymDetail = '';        // texte spécifique au mode
+    var asymDetailColor = '#ff3b30';
+
+    // ── MODE DRIBBLE : différence hauteur poignets ──
+    if (_tsym_mode === 'dribble' && lS && rS) {
+      var lW2 = _kp('leftWrist'), rW2 = _kp('rightWrist');
+      if (lW2 && rW2) {
+        var hL = lS.y - lW2.y, hR = rS.y - rW2.y;
+        var dh = hL - hR;
+        if (Math.abs(dh) > Math.max(20, H * 0.04)) {
+          problemSide = dh < 0 ? 'L' : 'R';
+          asymMag = Math.min(1, Math.abs(dh) / (H * 0.20));
+          asymDetail = problemSide === 'L'
+            ? (en_a ? 'L HAND TOO LOW' : 'MAIN G TROP BASSE')
+            : (en_a ? 'R HAND TOO LOW' : 'MAIN D TROP BASSE');
+          // Trait horizontal court à hauteur de chaque poignet pour visualiser l'écart
+          _tsym_ctx.save();
+          _tsym_ctx.lineWidth = 4;
+          _tsym_ctx.strokeStyle = problemSide === 'L' ? '#ff3b30' : '#4ecdc4';
+          _tsym_ctx.beginPath();
+          _tsym_ctx.moveTo(lW2.x - W*0.06, lW2.y);
+          _tsym_ctx.lineTo(lW2.x + W*0.06, lW2.y);
+          _tsym_ctx.stroke();
+          _tsym_ctx.strokeStyle = problemSide === 'R' ? '#ff3b30' : '#4ecdc4';
+          _tsym_ctx.beginPath();
+          _tsym_ctx.moveTo(rW2.x - W*0.06, rW2.y);
+          _tsym_ctx.lineTo(rW2.x + W*0.06, rW2.y);
+          _tsym_ctx.stroke();
+          _tsym_ctx.restore();
         }
       }
+    }
+    // ── MODE TIR (shot) : différence d'angle aux coudes ──
+    else if (_tsym_mode === 'shot' && lS && rS) {
+      var lE = _kp('leftElbow'), rE = _kp('rightElbow');
+      var lW3 = _kp('leftWrist'), rW3 = _kp('rightWrist');
+      if (lE && rE && lW3 && rW3) {
+        var aL = _tsym_angle({x:lS.x,y:lS.y},{x:lE.x,y:lE.y},{x:lW3.x,y:lW3.y});
+        var aR = _tsym_angle({x:rS.x,y:rS.y},{x:rE.x,y:rE.y},{x:rW3.x,y:rW3.y});
+        var da = aL - aR;
+        if (Math.abs(da) > 25) {
+          problemSide = da < 0 ? 'L' : 'R';
+          asymMag = Math.min(1, Math.abs(da) / 90);
+          asymDetail = problemSide === 'L'
+            ? (en_a ? 'L ELBOW TOO CLOSED' : 'COUDE G TROP FERMÉ')
+            : (en_a ? 'R ELBOW TOO CLOSED' : 'COUDE D TROP FERMÉ');
+          // Arc de cercle au coude défaillant pour visualiser l'angle
+          var defE = problemSide === 'L' ? lE : rE;
+          var defAngle = problemSide === 'L' ? aL : aR;
+          _tsym_ctx.save();
+          _tsym_ctx.strokeStyle = '#ff3b30';
+          _tsym_ctx.lineWidth = 3;
+          _tsym_ctx.beginPath();
+          _tsym_ctx.arc(defE.x, defE.y, Math.round(H*0.05), 0, Math.PI * (defAngle/180));
+          _tsym_ctx.stroke();
+          _tsym_ctx.restore();
+        }
+      }
+    }
+    // ── MODE FOOTWORK : différence hauteur genoux + écart appuis ──
+    else if (_tsym_mode === 'footwork') {
+      var lK = _kp('leftKnee'), rK = _kp('rightKnee');
+      var lA = _kp('leftAnkle'), rA = _kp('rightAnkle');
+      var lH = _kp('leftHip'), rH = _kp('rightHip');
+      // Différence hauteur genoux (un fléchit, pas l'autre)
+      if (lK && rK) {
+        var dk = lK.y - rK.y;
+        if (Math.abs(dk) > Math.max(15, H * 0.03)) {
+          problemSide = dk > 0 ? 'L' : 'R';
+          asymMag = Math.min(1, Math.abs(dk) / (H * 0.15));
+          asymDetail = problemSide === 'L'
+            ? (en_a ? 'BEND L KNEE MORE' : 'FLÉCHIR + LE GENOU G')
+            : (en_a ? 'BEND R KNEE MORE' : 'FLÉCHIR + LE GENOU D');
+        }
+      }
+      // Si pas de problème genou, vérifier écart pieds vs hanches
+      if (!problemSide && lA && rA && lH && rH) {
+        var stepW = Math.abs(lA.x - rA.x);
+        var hipW  = Math.abs(lH.x - rH.x) || 1;
+        var ratio = stepW / hipW;
+        if (ratio > 2.0 || ratio < 1.0) {
+          problemSide = 'C'; // central, pas latéral
+          asymMag = Math.min(1, Math.abs(ratio - 1.5) / 1.0);
+          asymDetail = ratio > 2.0
+            ? (en_a ? 'STANCE TOO WIDE' : 'ÉCART TROP LARGE')
+            : (en_a ? 'STANCE TOO NARROW' : 'ÉCART TROP ÉTROIT');
+          asymDetailColor = '#f5c518';
+        }
+      }
+      // Cercles aux chevilles : vert si OK, rouge sinon
+      if (lA && rA) {
+        _tsym_ctx.save();
+        _tsym_ctx.fillStyle = (!problemSide || problemSide === 'R') ? '#00e676' : '#ff3b30';
+        _tsym_ctx.beginPath(); _tsym_ctx.arc(lA.x, lA.y, 10, 0, Math.PI*2); _tsym_ctx.fill();
+        _tsym_ctx.fillStyle = (!problemSide || problemSide === 'L') ? '#00e676' : '#ff3b30';
+        _tsym_ctx.beginPath(); _tsym_ctx.arc(rA.x, rA.y, 10, 0, Math.PI*2); _tsym_ctx.fill();
+        _tsym_ctx.restore();
+      }
+    }
+    // ── MODE POSTURE : équilibre tronc/épaules + niveau à bulle ──
+    else if (_tsym_mode === 'posture' && lS && rS) {
+      var ds = lS.y - rS.y;
+      if (Math.abs(ds) > Math.max(15, H * 0.025)) {
+        problemSide = ds > 0 ? 'L' : 'R';
+        asymMag = Math.min(1, Math.abs(ds) / (H * 0.10));
+        asymDetail = problemSide === 'L'
+          ? (en_a ? 'LEANING LEFT' : 'INCLINAISON G')
+          : (en_a ? 'LEANING RIGHT' : 'INCLINAISON D');
+      }
+      // Niveau à bulle horizontal en haut représentant l'inclinaison
+      var bbCx = Math.round(W * 0.50);
+      var bbY  = Math.round(H * 0.30);
+      var bbW  = Math.round(W * 0.30);
+      _tsym_ctx.save();
+      _tsym_ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      _tsym_ctx.lineWidth = 2;
+      _tsym_ctx.beginPath();
+      _tsym_ctx.moveTo(bbCx - bbW/2, bbY);
+      _tsym_ctx.lineTo(bbCx + bbW/2, bbY);
+      _tsym_ctx.stroke();
+      // "Bulle" qui se déplace selon l'inclinaison
+      var bubbleOffset = problemSide
+        ? (problemSide === 'L' ? -1 : 1) * asymMag * (bbW/2 - 10)
+        : 0;
+      _tsym_ctx.fillStyle = problemSide ? '#ff3b30' : '#00e676';
+      _tsym_ctx.beginPath();
+      _tsym_ctx.arc(bbCx + bubbleOffset, bbY, 9, 0, Math.PI*2);
+      _tsym_ctx.fill();
+      _tsym_ctx.restore();
+    }
 
-      // ── A. Ligne médiane verticale ──
-      // Verte si symétrique, rouge graduel selon amplitude de l'asymétrie
+    // ── A. Ligne médiane verticale (tous modes sauf footwork central) ──
+    if (lS && rS && problemSide !== 'C') {
+      var axisX = (lS.x + rS.x) / 2;
       var lineColor = problemSide
         ? 'rgba(255,59,48,' + (0.4 + asymMag * 0.5).toFixed(2) + ')'
         : 'rgba(0,230,118,0.55)';
@@ -23770,50 +23857,51 @@ function _tsym_drawFrame(poses) {
       _tsym_ctx.stroke();
       _tsym_ctx.setLineDash([]);
       _tsym_ctx.restore();
+    }
 
-      // ── C. Flèche directionnelle "← CORRIGER" si problème détecté ──
-      if (problemSide) {
-        var en_a = window._lang === 'en';
-        var arrowText = problemSide === 'L'
-          ? (en_a ? '← FIX'   : '← CORRIGER')
-          : (en_a ? 'FIX →'   : 'CORRIGER →');
-        var arrowY = Math.round(H * 0.45);
-        var arrowX = problemSide === 'L' ? Math.round(W * 0.25) : Math.round(W * 0.75);
+    // ── Texte d'instruction spécifique au mode ──
+    if (problemSide && asymDetail) {
+      var lblY = Math.round(H * 0.45);
+      var lblX = problemSide === 'L' ? Math.round(W * 0.25)
+               : problemSide === 'R' ? Math.round(W * 0.75)
+               : Math.round(W * 0.50); // 'C' = central
+      _tsym_ctx.save();
+      // Fond pill noir semi-transparent
+      _tsym_ctx.font = 'bold ' + Math.round(H * 0.055) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      _tsym_ctx.textAlign = 'center';
+      _tsym_ctx.textBaseline = 'middle';
+      var tw = _tsym_ctx.measureText(asymDetail).width;
+      var pillW = Math.round(tw + 30), pillH = Math.round(H * 0.09);
+      _tsym_ctx.fillStyle = 'rgba(0,0,0,0.70)';
+      _tsym_ctx.beginPath();
+      _tsym_ctx.roundRect(lblX - pillW/2, lblY - pillH/2, pillW, pillH, 12);
+      _tsym_ctx.fill();
+      // Texte avec contour noir
+      _tsym_ctx.lineWidth = 4;
+      _tsym_ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      _tsym_ctx.strokeText(asymDetail, lblX, lblY);
+      _tsym_ctx.fillStyle = asymDetailColor;
+      _tsym_ctx.fillText(asymDetail, lblX, lblY);
+      _tsym_ctx.restore();
+    }
+
+    // ── Marqueur clignotant sur le côté problématique (sauf central) ──
+    if (problemSide && problemSide !== 'C' && lS && rS) {
+      var blinkOn = (Math.floor(Date.now() / 350) % 2) === 0;
+      if (blinkOn) {
+        var marker = problemSide === 'L' ? lS : rS;
         _tsym_ctx.save();
-        // Fond pill semi-transparent
-        var pillW = Math.round(W * 0.22), pillH = Math.round(H * 0.10);
-        _tsym_ctx.fillStyle = 'rgba(0,0,0,0.65)';
-        _tsym_ctx.beginPath();
-        _tsym_ctx.roundRect(arrowX - pillW/2, arrowY - pillH/2, pillW, pillH, 12);
-        _tsym_ctx.fill();
-        // Texte avec contour noir
-        _tsym_ctx.font = 'bold ' + Math.round(H * 0.06) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-        _tsym_ctx.textAlign = 'center';
-        _tsym_ctx.textBaseline = 'middle';
+        _tsym_ctx.strokeStyle = '#ff3b30';
         _tsym_ctx.lineWidth = 4;
-        _tsym_ctx.strokeStyle = 'rgba(0,0,0,0.95)';
-        _tsym_ctx.strokeText(arrowText, arrowX, arrowY);
-        _tsym_ctx.fillStyle = '#ff3b30';
-        _tsym_ctx.fillText(arrowText, arrowX, arrowY);
+        _tsym_ctx.beginPath();
+        _tsym_ctx.arc(marker.x, marker.y, Math.round(H * 0.04), 0, Math.PI * 2);
+        _tsym_ctx.stroke();
         _tsym_ctx.restore();
       }
-
-      // ── B. Marqueur clignotant sur le côté problématique ──
-      if (problemSide) {
-        var blinkOn = (Math.floor(Date.now() / 350) % 2) === 0;
-        if (blinkOn) {
-          var marker = problemSide === 'L' ? lS : rS;
-          // Cercle rouge pulsant autour de l'épaule défaillante
-          _tsym_ctx.save();
-          _tsym_ctx.strokeStyle = '#ff3b30';
-          _tsym_ctx.lineWidth = 4;
-          _tsym_ctx.beginPath();
-          _tsym_ctx.arc(marker.x, marker.y, Math.round(H * 0.04), 0, Math.PI * 2);
-          _tsym_ctx.stroke();
-          _tsym_ctx.restore();
-        }
-      }
     }
+
+    // ── Stocker le mode défaut courant pour le son adapté plus bas ──
+    _tsym_currentAsymMode = problemSide ? _tsym_mode : null;
   } catch(eAsym) { /* feedback désactivé silencieusement si erreur */ }
   // ═══════════════════════════════════════════════════════════════
 
@@ -23825,13 +23913,48 @@ function _tsym_drawFrame(poses) {
     var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
     _tsym_updateScoreDisplay(avg);
 
-    // ── D. Alerte sonore : score < 60% maintenu > 1 s ──
+    // ── D. Alerte sonore adaptée au mode (différent pour chaque type de défaut) ──
     try {
       var nowA = Date.now();
       if (avg < 60) {
         if (!_tsym_lowScoreSince) _tsym_lowScoreSince = nowA;
         else if (nowA - _tsym_lowScoreSince > 1000 && nowA - _tsym_lastAsymAlert > 2500) {
-          _td_soundFail();
+          // Son distinct selon le mode courant — chaque mode a sa signature
+          var m = _tsym_mode;
+          if (m === 'dribble') {
+            // Dribble : double bip aigu sec (rythme cassé)
+            _td_beep(880, 0.06, 0.18);
+            setTimeout(function(){ _td_beep(660, 0.06, 0.18); }, 100);
+          } else if (m === 'shot') {
+            // Shot : sweep descendant rapide (geste manqué)
+            _td_soundFail();
+          } else if (m === 'footwork') {
+            // Footwork : 3 bips graves rapides (appuis instables)
+            _td_beep(330, 0.05, 0.20);
+            setTimeout(function(){ _td_beep(330, 0.05, 0.20); }, 80);
+            setTimeout(function(){ _td_beep(330, 0.05, 0.20); }, 160);
+          } else if (m === 'posture') {
+            // Posture : note longue grave qui descend (déséquilibre)
+            try {
+              var ctx = _td_getAudioCtx();
+              if (ctx) {
+                var t0 = ctx.currentTime;
+                var o = ctx.createOscillator();
+                var g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(440, t0);
+                o.frequency.exponentialRampToValueAtTime(220, t0 + 0.40);
+                g.gain.setValueAtTime(0.18, t0);
+                g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.45);
+                o.connect(g); g.connect(ctx.destination);
+                var rec = (typeof _td_getRecDestination === 'function') ? _td_getRecDestination() : null;
+                if (rec) { try { g.connect(rec); } catch(e){} }
+                o.start(t0); o.stop(t0 + 0.48);
+              }
+            } catch(e){}
+          } else {
+            _td_soundFail();
+          }
           if (navigator.vibrate) navigator.vibrate([60,40,60]);
           _tsym_lastAsymAlert = nowA;
         }
@@ -24850,9 +24973,12 @@ function _tdr_checkHits(poses) {
         var streakBonus = _tdr_streak >= 5 ? 5 : 0;
         _tdr_score += 10 + bonus + streakBonus;
         _tdr_flashHit(t);
-        // Son cristallin sur hit + bip différencié rapide/lent en complément
+        // Son cristallin sur hit + bip différencié rapide/lent
         _td_soundOK();
-        if (_tdr_streak >= 5) { _td_beep(1100, 0.05, 0.1); _sensei_speak(window._lang==='en'?'On fire!':'En feu !', 4000); }
+        // Bip aigu si rapide (< 500ms), médium si moyen, grave si lent
+        var hitFreq = rt < 500 ? 1320 : rt < 1000 ? 880 : 660;
+        _td_beep(hitFreq, 0.05, 0.10);
+        if (_tdr_streak >= 5) { _td_beep(1760, 0.06, 0.12); _sensei_speak(window._lang==='en'?'On fire!':'En feu !', 4000); }
         if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
         _tdr_updateScoreDisplay();
       }
@@ -24925,8 +25051,6 @@ function _tdr_countdown(cb) {
   function drawN(num) {
     _drawVideoMirror(ctx, _tdr_video, W, H);
     ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#f5c518';
     // Paysage natif — pas de rotation
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -25195,6 +25319,14 @@ function _dcog_applyLang(en) {
     'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
     'dcog_lbl_burnout': en?'BURNOUT':'BURNOUT',
     'dcog_lbl_sync': 'SYNC',
+    'dcog_lbl_chaos': 'CHAOS',
+    // Sous-labels descriptifs des modes Two Ball
+    'dcog_sub_alternate':  en?'L then R':'G puis D',
+    'dcog_sub_sync':       en?'together':'ensemble',
+    'dcog_sub_chaos':      en?'random':'aléatoire',
+    'dcog_sub_burnout':    en?'speeding up':'accélération',
+    'dcog_sub_sameheight': en?'green line':'ligne verte',
+    'dcog_sub_diffheight': en?'2 lines':'2 lignes',
     'dcog_scoreTitle': en?'🎯 SCORE':'🎯 SCORE',
     'dcog_lbl_correct': en?'CORRECT':'CORRECTS',
     'dcog_lbl_wrong': en?'ERRORS':'ERREURS',
@@ -25557,7 +25689,6 @@ function _dcog_launchDrill() {
     // Vidéo en fond avant l'overlay (évite l'écran noir au démarrage)
     _drawVideoMirror(ctx, _dcog_video, W, H);
     ctx.save();
-    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#f5c518';
     ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
