@@ -23437,7 +23437,7 @@ function _tsym_startDetection() {
       ctx.save();
       ctx.fillStyle='rgba(0,0,0,0.52)'; ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#f5c518';
-      ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
+      ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
       ctx.fillText(String(n), W/2, H/2);
@@ -23565,7 +23565,7 @@ function _tsym_drawFrame(poses) {
     _tsym_ctx.fillStyle='rgba(0,0,0,0.7)';
     _tsym_ctx.beginPath();_tsym_ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);_tsym_ctx.fill();
     _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
-    _tsym_ctx.font = 'bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
     _tsym_ctx.fillText(timerStr, tx, ty);
@@ -23575,7 +23575,7 @@ function _tsym_drawFrame(poses) {
     var scoreY = Math.round(H * 0.20);
     var col = avg>=80 ? '#2dc653' : avg>=60 ? '#f5c518' : '#e63946';
     _tsym_ctx.fillStyle = col;
-    _tsym_ctx.font = 'bold '+Math.round(H*0.075)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.075)+'px "Bebas Neue","Arial Narrow",sans-serif';
     _tsym_ctx.textAlign = 'left'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.9)'; _tsym_ctx.shadowBlur = 6;
     _tsym_ctx.fillText(avg+'%', Math.round(W*0.03), scoreY);
@@ -23583,7 +23583,7 @@ function _tsym_drawFrame(poses) {
     // Mode au centre, ligne 2
     var modeLabel = {dribble:'DRIBBLE',shot:'SHOOT',footwork:'FOOTWORK',posture:'POSTURE'}[_tsym_mode]||_tsym_mode.toUpperCase();
     _tsym_ctx.fillStyle = '#fff';
-    _tsym_ctx.font = 'bold '+Math.round(H*0.055)+'px Arial Narrow,Arial,sans-serif';
+    _tsym_ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
     _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.fillText(modeLabel, Math.round(W*0.50), scoreY);
 
@@ -24355,7 +24355,7 @@ function _tdr_drawFrame(poses) {
     ctx.fillStyle='rgba(0,0,0,0.7)';
     ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
     ctx.fillStyle=_tdr_sec<=10?'#e63946':'#fff';
-    ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
+    ctx.font='bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
     ctx.fillText(_tStr, tx, ty);
@@ -24365,7 +24365,7 @@ function _tdr_drawFrame(poses) {
     var scoreY = Math.round(H * 0.20);
     var scoreFs = Math.round(H * 0.075);
     ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold '+scoreFs+'px Arial Narrow, Arial, sans-serif';
+    ctx.font = 'bold '+scoreFs+'px "Bebas Neue", "Arial Narrow", sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
     ctx.fillText(String(_tdr_score), Math.round(W*0.03), scoreY);
@@ -24373,7 +24373,7 @@ function _tdr_drawFrame(poses) {
     // Streak au centre si >= 3
     if (_tdr_streak >= 3) {
       ctx.fillStyle = _tdr_streak >= 5 ? '#e63946' : '#f5c518';
-      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow, Arial, sans-serif';
+      ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Bebas Neue", "Arial Narrow", sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('🔥 ×' + _tdr_streak, Math.round(W*0.50), scoreY);
     }
@@ -24630,13 +24630,13 @@ function _tdr_countdown(cb) {
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#f5c518';
     // Paysage natif — pas de rotation
-    ctx.font = 'bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 20;
     ctx.fillText(String(num), W/2, H/2);
     if (num === 1) {
-      ctx.font = Math.round(H*0.10)+'px Arial Narrow,Arial,sans-serif';
+      ctx.font = Math.round(H*0.10)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.fillStyle = '#fff';
       ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
       ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.30));
@@ -25256,7 +25256,7 @@ function _dcog_launchDrill() {
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#f5c518';
-    ctx.font='bold '+Math.round(H*0.55)+'px Arial Narrow,Arial,sans-serif';
+    ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
     ctx.fillText(String(n), W/2, H/2);
@@ -25330,7 +25330,7 @@ function _dcog_drawFrame(poses) {
     ctx.fillStyle='rgba(0,0,0,0.7)';
     ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
     ctx.fillStyle=_ds<=10?'#e63946':'#fff';
-    ctx.font='bold '+Math.round(H*0.06)+'px Arial Narrow,Arial,sans-serif';
+    ctx.font='bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
     ctx.fillText(_dtStr, tx, ty);
@@ -25340,7 +25340,7 @@ function _dcog_drawFrame(poses) {
     if (_dcog_drill === 'math') {
       var scoreY = Math.round(H * 0.20);
       var scoreFs = Math.round(H * 0.075);
-      ctx.font = 'bold '+scoreFs+'px Arial Narrow, Arial, sans-serif';
+      ctx.font = 'bold '+scoreFs+'px "Bebas Neue", "Arial Narrow", sans-serif';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
       // ✓ correct — gauche, sous REC
@@ -25357,7 +25357,7 @@ function _dcog_drawFrame(poses) {
       if (_dcog_qTimerSec > 0) {
         var qColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
         ctx.fillStyle = qColor;
-        ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.font = 'bold ' + Math.round(H*0.07) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center';
         ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
         ctx.fillText(String(_dcog_qTimerSec), Math.round(W*0.50), scoreY);
@@ -25372,32 +25372,35 @@ function _dcog_drawFrame(poses) {
       var spCount = _dcog_sprintCount || 0;
       var spGoal  = _dcog_sprintTarget || 300;
       var spPct   = Math.min(100, Math.round(spCount / spGoal * 100));
-      var spColor = spPct >= 100 ? '#2dc653' : spPct >= 50 ? '#f5c518' : '#fff';
+      var spColor = spPct >= 100 ? '#00e676' : '#fff';
 
-      // Compteur géant (jaune, très gros)
-      ctx.fillStyle = spColor;
-      ctx.font = 'bold ' + Math.round(H*0.22) + 'px Arial Narrow,Arial,sans-serif';
+      // Compteur géant — blanc avec contour noir épais (vert vif si goal atteint)
+      ctx.font = 'bold ' + Math.round(H*0.24) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 16;
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.strokeText(String(spCount), Math.round(W*0.50), spY);
+      ctx.fillStyle = spColor;
       ctx.fillText(String(spCount), Math.round(W*0.50), spY);
-      ctx.shadowBlur = 0;
 
-      // Objectif "/ 300" sous le compteur
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
+      // Objectif "/ 300" sous le compteur — jaune avec contour
+      ctx.font = 'bold ' + Math.round(H*0.07) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-      ctx.fillText('/ ' + spGoal, Math.round(W*0.50), spY + Math.round(H*0.13));
+      ctx.lineWidth = 5;
+      ctx.strokeText('/ ' + spGoal, Math.round(W*0.50), spY + Math.round(H*0.14));
+      ctx.fillStyle = '#f5c518';
+      ctx.fillText('/ ' + spGoal, Math.round(W*0.50), spY + Math.round(H*0.14));
 
-      // Chrono sous l'objectif
+      // Chrono sous l'objectif — blanc avec contour
       var spElapsed = _dcog_sprintStart > 0 ? Date.now() - _dcog_sprintStart : 0;
       var spMm = Math.floor(spElapsed/60000);
       var spSs = Math.floor((spElapsed%60000)/1000);
       var spClock = (spMm<10?'0':'')+spMm+':'+(spSs<10?'0':'')+spSs;
+      ctx.font = 'bold ' + Math.round(H*0.085) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.lineWidth = 5;
+      ctx.strokeText(spClock, Math.round(W*0.50), spY + Math.round(H*0.23));
       ctx.fillStyle = '#fff';
-      ctx.font = 'bold ' + Math.round(H*0.075) + 'px Arial Narrow,Arial,sans-serif';
-      ctx.fillText(spClock, Math.round(W*0.50), spY + Math.round(H*0.21));
-      ctx.shadowBlur = 0;
+      ctx.fillText(spClock, Math.round(W*0.50), spY + Math.round(H*0.23));
 
       // Barre progression — Y = 60% (sous le HUD, fine, ne gêne pas)
       var bx = Math.round(W*0.15), by = Math.round(H*0.60);
@@ -25426,13 +25429,16 @@ function _dcog_drawFrame(poses) {
         burnout: '#e63946', chaos: '#f5c518'
       }[_dcog_tbMode] || '#fff';
 
-      // Label mode — Ligne 2 centre (Y 20%)
-      ctx.fillStyle = modeColor;
-      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
+      // Label mode — Ligne 2 centre (Y 20%) — jaune unique avec contour noir
+      ctx.font = 'bold ' + Math.round(H*0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
+      // Contour noir épais pour lisibilité fond variable
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.strokeText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
+      // Texte jaune par-dessus
+      ctx.fillStyle = '#f5c518';
       ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
-      ctx.shadowBlur = 0;
 
       // ── BURNOUT : BPM central + cercle pulsant ──
       if (_dcog_tbMode === 'burnout') {
@@ -25451,16 +25457,20 @@ function _dcog_drawFrame(poses) {
         ctx.arc(bpmCx, bpmCy, pulseR, 0, Math.PI*2);
         ctx.fill();
         ctx.restore();
-        // BPM au centre
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.16) + 'px Arial Narrow,Arial,sans-serif';
+        // BPM au centre — blanc avec contour noir épais
+        ctx.font = 'bold ' + Math.round(H*0.22) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 12;
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(String(bpm), bpmCx, bpmCy);
+        ctx.fillStyle = '#fff';
         ctx.fillText(String(bpm), bpmCx, bpmCy);
-        ctx.fillStyle = bpmColor;
-        ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
-        ctx.fillText('BPM', bpmCx, bpmCy + Math.round(H*0.11));
-        ctx.shadowBlur = 0;
+        // Label "BPM" en jaune avec contour noir
+        ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+        ctx.lineWidth = 4;
+        ctx.strokeText('BPM', bpmCx, bpmCy + Math.round(H*0.13));
+        ctx.fillStyle = '#f5c518';
+        ctx.fillText('BPM', bpmCx, bpmCy + Math.round(H*0.13));
       }
 
       // ── SYNC / ALTERNATE : flèches G/D + % synchro central ──
@@ -25486,7 +25496,7 @@ function _dcog_drawFrame(poses) {
         // Flèche gauche
         ctx.save();
         ctx.fillStyle = arrColor;
-        ctx.font = 'bold ' + Math.round(H*0.14) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.font = 'bold ' + Math.round(H*0.14) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
         ctx.fillText(arrL > 0 ? '▼' : arrL < 0 ? '▲' : '·', Math.round(W*0.18), arrLY);
@@ -25494,22 +25504,26 @@ function _dcog_drawFrame(poses) {
         ctx.fillText(arrR > 0 ? '▼' : arrR < 0 ? '▲' : '·', Math.round(W*0.82), arrLY);
         // Labels G / D au-dessus
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.font = 'bold ' + Math.round(H*0.05) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
         ctx.fillText('G', Math.round(W*0.18), arrLY - Math.round(H*0.13));
         ctx.fillText('D', Math.round(W*0.82), arrLY - Math.round(H*0.13));
         ctx.restore();
 
-        // % synchro central
+        // % synchro central — blanc avec contour noir, vert/rouge si extrême
         ctx.save();
-        ctx.fillStyle = pctColor;
-        ctx.font = 'bold ' + Math.round(H*0.16) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.font = 'bold ' + Math.round(H*0.22) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 14;
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(pct + '%', Math.round(W*0.50), arrLY);
+        ctx.fillStyle = pct >= 70 ? '#00e676' : pct >= 30 ? '#fff' : '#ff3b30';
         ctx.fillText(pct + '%', Math.round(W*0.50), arrLY);
+        // Sous-label en blanc avec contour
+        ctx.font = 'bold ' + Math.round(H*0.05) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+        ctx.lineWidth = 4;
+        ctx.strokeText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.13));
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.04) + 'px Arial Narrow,Arial,sans-serif';
-        ctx.fillText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.10));
-        ctx.shadowBlur = 0;
+        ctx.fillText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.13));
         ctx.restore();
       }
 
@@ -25524,40 +25538,47 @@ function _dcog_drawFrame(poses) {
             : Math.max(0, 1 - (stimAge - 200) / (_dcog_chaosCurrentStim.ttl - 200)); // fade out
           ctx.save();
           ctx.globalAlpha = Math.min(1, stimAlpha);
-          // Fond pill semi-transparent
-          var stimW = Math.round(W * 0.40), stimH = Math.round(H * 0.16);
+          // Fond pill semi-transparent — agrandi pour contenir l'instruction plus grosse
+          var stimW = Math.round(W * 0.50), stimH = Math.round(H * 0.22);
           var stimX = Math.round(W * 0.50), stimY = Math.round(H * 0.42);
-          ctx.fillStyle = 'rgba(0,0,0,0.60)';
+          ctx.fillStyle = 'rgba(0,0,0,0.65)';
           ctx.beginPath();
-          ctx.roundRect(stimX - stimW/2, stimY - stimH/2, stimW, stimH, 16);
+          ctx.roundRect(stimX - stimW/2, stimY - stimH/2, stimW, stimH, 18);
           ctx.fill();
-          // Flèche "changement" au-dessus du texte
-          ctx.fillStyle = _dcog_chaosCurrentStim.color;
-          ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
+          // Flèche "↕ CHANGEMENT" au-dessus — jaune avec contour
+          ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Bebas Neue","Arial Narrow",sans-serif';
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
-          ctx.fillText('↕ CHANGEMENT', stimX, stimY - Math.round(H*0.05));
-          // Instruction principale — très grosse
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+          ctx.strokeText('↕ CHANGEMENT', stimX, stimY - Math.round(H*0.07));
+          ctx.fillStyle = '#f5c518';
+          ctx.fillText('↕ CHANGEMENT', stimX, stimY - Math.round(H*0.07));
+          // Instruction principale — TRÈS grosse, blanc avec contour épais
+          ctx.font = 'bold ' + Math.round(H*0.13) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+          ctx.lineWidth = 8;
+          ctx.strokeText(_dcog_chaosCurrentStim.text, stimX, stimY + Math.round(H*0.04));
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold ' + Math.round(H*0.09) + 'px Arial Narrow,Arial,sans-serif';
           ctx.fillText(_dcog_chaosCurrentStim.text, stimX, stimY + Math.round(H*0.04));
-          ctx.shadowBlur = 0;
           ctx.restore();
         }
-        // Stats bas — réussites / total + temps réaction
+        // Stats bas — réussites / total + temps réaction (avec contour)
         var chHits  = _dcog_chaosHits  || 0;
         var chTotal = _dcog_chaosTotal || 0;
         var chRT    = _dcog_chaosAvgRT || 0;
         ctx.save();
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.07) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.font = 'bold ' + Math.round(H*0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
-        ctx.fillText(chHits + ' / ' + chTotal, Math.round(W*0.50), Math.round(H*0.58));
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(chHits + ' / ' + chTotal, Math.round(W*0.50), Math.round(H*0.62));
+        ctx.fillStyle = '#fff';
+        ctx.fillText(chHits + ' / ' + chTotal, Math.round(W*0.50), Math.round(H*0.62));
         if (chRT > 0) {
+          ctx.font = 'bold ' + Math.round(H*0.055) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+          ctx.lineWidth = 4;
+          ctx.strokeText('⚡ ' + chRT + ' ms', Math.round(W*0.50), Math.round(H*0.69));
           ctx.fillStyle = '#f5c518';
-          ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
-          ctx.fillText('⚡ ' + chRT + ' ms', Math.round(W*0.50), Math.round(H*0.65));
+          ctx.fillText('⚡ ' + chRT + ' ms', Math.round(W*0.50), Math.round(H*0.69));
         }
         ctx.shadowBlur = 0;
         ctx.restore();
@@ -26168,16 +26189,18 @@ function _dcog_drawHeightLine(ctx, W, H) {
   ctx.setLineDash([14, 6]);
   ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
   ctx.setLineDash([]);
-  // Label horizontal — centré sur la ligne
+  // Label horizontal — centré sur la ligne, contour noir pour lisibilité
   var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
   ctx.save();
-  ctx.fillStyle    = inZ ? '#2dc653' : '#f5c518';
-  ctx.font         = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
+  ctx.font         = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'bottom';
-  ctx.shadowColor  = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-  ctx.fillText(lbl, Math.round(W*0.50), ly - 8);
-  ctx.shadowBlur = 0;
+  ctx.lineWidth    = 5;
+  ctx.strokeStyle  = 'rgba(0,0,0,0.95)';
+  ctx.strokeText(lbl, Math.round(W*0.50), ly - 10);
+  // Vert vif si dans la zone, jaune sinon
+  ctx.fillStyle    = inZ ? '#00e676' : '#f5c518';
+  ctx.fillText(lbl, Math.round(W*0.50), ly - 10);
   ctx.restore();
   // Point poignet actif
   if (_dcog_heightWristPx !== null) {
@@ -26326,12 +26349,14 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.textBaseline = 'bottom';
     var en = window._lang === 'en';
     ctx.save();
-    ctx.fillStyle = '#2dc653';
-    ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
+    ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', Math.round(W*0.50), ly - 8);
-    ctx.shadowBlur = 0; ctx.restore();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+    ctx.strokeText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', Math.round(W*0.50), ly - 10);
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText(en ? 'TARGET HEIGHT' : 'HAUTEUR CIBLE', Math.round(W*0.50), ly - 10);
+    ctx.restore();
     // Indicateurs poignets
     if (_dcog_tbLWristY !== null) {
       var okL = Math.abs(_dcog_tbLWristY - ly) < H * 0.08;
@@ -26359,17 +26384,19 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
     ctx.strokeStyle = '#e63946';
     ctx.beginPath(); ctx.moveTo(W/2, lR); ctx.lineTo(W, lR); ctx.stroke();
     ctx.setLineDash([]);
-    // Labels horizontaux — au-dessus de chaque ligne
+    // Labels horizontaux — au-dessus de chaque ligne, blanc avec contour noir
     var en2 = window._lang === 'en';
     ctx.save();
-    ctx.fillStyle = '#4ecdc4';
-    ctx.font = 'bold ' + Math.round(H*0.055) + 'px Arial Narrow,Arial,sans-serif';
+    ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', Math.round(W*0.25), lL - 8);
-    ctx.fillStyle = '#e63946';
-    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', Math.round(W*0.75), lR - 8);
-    ctx.shadowBlur = 0; ctx.restore();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+    ctx.strokeText(en2 ? 'LEFT HIGH' : 'G HAUT', Math.round(W*0.25), lL - 10);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en2 ? 'LEFT HIGH' : 'G HAUT', Math.round(W*0.25), lL - 10);
+    ctx.strokeText(en2 ? 'RIGHT LOW' : 'D BAS', Math.round(W*0.75), lR - 10);
+    ctx.fillText(en2 ? 'RIGHT LOW' : 'D BAS', Math.round(W*0.75), lR - 10);
+    ctx.restore();
     // Indicateurs
     if (_dcog_tbLWristY !== null) {
       var okL2 = Math.abs(_dcog_tbLWristY - lL) < H * 0.08;
