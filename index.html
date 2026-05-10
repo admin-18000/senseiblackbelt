@@ -2063,7 +2063,7 @@ body.unlocked .sensei-only{display:revert !important}
     <div style="display:flex;gap:10px;margin-bottom:8px">
       <button class="tr-btn-tap" id="td_btnTap" onclick="_td_tap()" ontouchstart="">🤜 TAP DRIBBLE</button>
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-        <button class="tr-btn-error" onclick="_td_addError()" ontouchstart="">⚠ ERREUR</button>
+        <button class="tr-btn-error" onclick="_td_addError()" ontouchstart="">⚠ <span id="td_lblError" data-i18n="td_lbl_error">ERREUR</span></button>
         <div id="td_errCount" style="font-size:28px;font-weight:bold;color:var(--red);line-height:1.2">0</div>
       </div>
     </div>
@@ -2106,7 +2106,7 @@ body.unlocked .sensei-only{display:revert !important}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
       <div class="tr-score-box"><div class="tr-score-val" id="td_sDur">0s</div><div class="tr-score-lbl">DURÉE</div></div>
       <div class="tr-score-box"><div class="tr-score-val" id="td_sDrib">0</div><div class="tr-score-lbl">DRIBBLES</div></div>
-      <div class="tr-score-box"><div class="tr-score-val" id="td_sErr">0</div><div class="tr-score-lbl">ERREURS</div></div>
+      <div class="tr-score-box"><div class="tr-score-val" id="td_sErr">0</div><div class="tr-score-lbl" id="td_lblErrors" data-i18n="td_lbl_errors">ERREURS</div></div>
       <div class="tr-score-box"><div class="tr-score-val" id="td_sCons" style="color:var(--muted)">--</div><div class="tr-score-lbl">CONSIST.</div></div>
     </div>
     <div style="margin-bottom:4px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between">
@@ -12139,6 +12139,7 @@ function applyLangTracker(lang) {
     home_app_action: "L'APP EN ACTION",
     home_join_btn: 'Rejoindre le programme',
     mj_pp_best: 'MEILLEUR (ms)', mj_pp_trials: 'ESSAIS', mj_pp_errors: 'ERREURS',
+    td_lbl_error: 'ERREUR', td_lbl_errors: 'ERREURS',
     mj_cla_tag: 'Issu du programme Sensei BlackBelt · Constraints-Led Approach',
     pr_belt_white_name: 'BLANCHE', testi_author1: 'Athlète SENSEI', res_select_label: 'Sélectionner',
   });
@@ -12155,6 +12156,7 @@ function applyLangTracker(lang) {
     home_app_action: 'THE APP IN ACTION',
     home_join_btn: 'Join the program',
     mj_pp_best: 'BEST (ms)', mj_pp_trials: 'TRIALS', mj_pp_errors: 'ERRORS',
+    td_lbl_error: 'ERROR', td_lbl_errors: 'ERRORS',
     mj_cla_tag: 'From the Sensei BlackBelt program · Constraints-Led Approach',
     pr_belt_white_name: 'WHITE', testi_author1: 'SENSEI Athlete', res_select_label: 'Select',
   });
@@ -22533,16 +22535,6 @@ function _td_getRecDestination() {
 /* Helper interne : connecter un noeud à la fois aux haut-parleurs ET
  * à la destination d'enregistrement. Si la destination n'est pas dispo,
  * fallback silencieux sur le haut-parleur seul. */
-function _td_routeAudio(node) {
-  try {
-    var ctx = _td_getAudioCtx();
-    if (!ctx) return;
-    node.connect(ctx.destination);
-    var rec = _td_getRecDestination();
-    if (rec) { try { node.connect(rec); } catch(e2) {} }
-  } catch(e) {}
-}
-
 /* ── Musique de fond rythmée HomeCourt-style ────────────────────
  * Boucle synthétique 16 pas à ~110 BPM (kick + hi-hat + basse).
  * Volume bas (15%) pour ne pas couvrir les sons de feedback.
@@ -23596,9 +23588,8 @@ function _tsym_startDetection() {
       ctx.fillStyle='#f5c518';
       ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
       ctx.fillText(String(n), W/2, H/2);
-      ctx.shadowBlur=0; ctx.restore();
+      ctx.restore();
     }
     _td_beep(n===1?880:660, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(n===1?30:15);
@@ -25056,15 +25047,12 @@ function _tdr_countdown(cb) {
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 20;
     ctx.fillText(String(num), W/2, H/2);
     if (num === 1) {
       ctx.font = Math.round(H*0.10)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.fillStyle = '#fff';
-      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
       ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.30));
     }
-    ctx.shadowBlur = 0;
     ctx.restore();
     _td_beep(num===1?880:660, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(num===1?30:15);
@@ -25692,9 +25680,8 @@ function _dcog_launchDrill() {
     ctx.fillStyle='#f5c518';
     ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=18;
     ctx.fillText(String(n), W/2, H/2);
-    ctx.shadowBlur=0; ctx.restore();
+    ctx.restore();
     _td_beep(n===1?880:660, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(n===1?30:15);
     setTimeout(function(){ dcogCountdown(n-1); }, 900);
@@ -26273,7 +26260,6 @@ function _dcog_drawMathTargets(ctx, W, H) {
     }
   });
 }
-function _dcog_drawMathZones() {}
 
 function _dcog_flashHit(t, ctx) {
   var n = 10;
