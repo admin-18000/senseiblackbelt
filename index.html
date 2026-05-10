@@ -25197,6 +25197,9 @@ function _dcog_launchDrill() {
   _dcog_tbInZoneFrames = 0; _dcog_tbTotalFrames2 = 0;
   _dcog_tbTargetLineY = null; _dcog_tbTargetLineL = null; _dcog_tbTargetLineR = null;
   _dcog_tbLWristY = null; _dcog_tbRWristY = null;
+  _dcog_tbDirL = 0; _dcog_tbDirR = 0;
+  _dcog_chaosTargets = []; _dcog_chaosHits = 0; _dcog_chaosTotal = 0; _dcog_chaosRTSum = 0; _dcog_chaosAvgRT = 0;
+  _dcog_burnoutLastTick = 0;
   _dcog_running = true;
   // Démarrer le timer si drill math
   if (_dcog_drill === 'math') _dcog_startTimer();
@@ -25361,14 +25364,207 @@ function _dcog_drawFrame(poses) {
       }
     }
 
-    // ── Label sprint — centre haut (ligne 2 si sprint) ──
+    // ═══════════ SPRINT 300/600 — HUD CENTRAL HOMECOURT-STYLE ═══════════
     if (_dcog_drill === 'sprint') {
-      ctx.fillStyle = '#f5c518';
+      // Compteur géant central
+      var spY = Math.round(H * 0.45);
+      var spCount = _dcog_sprintCount || 0;
+      var spGoal  = _dcog_sprintTarget || 300;
+      var spPct   = Math.min(100, Math.round(spCount / spGoal * 100));
+      var spColor = spPct >= 100 ? '#2dc653' : spPct >= 50 ? '#f5c518' : '#fff';
+
+      // Compteur géant (jaune, très gros)
+      ctx.fillStyle = spColor;
+      ctx.font = 'bold ' + Math.round(H*0.22) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 16;
+      ctx.fillText(String(spCount), Math.round(W*0.50), spY);
+      ctx.shadowBlur = 0;
+
+      // Objectif "/ 300" sous le compteur
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
+      ctx.fillText('/ ' + spGoal, Math.round(W*0.50), spY + Math.round(H*0.13));
+
+      // Chrono sous l'objectif
+      var spElapsed = _dcog_sprintStart > 0 ? Date.now() - _dcog_sprintStart : 0;
+      var spMm = Math.floor(spElapsed/60000);
+      var spSs = Math.floor((spElapsed%60000)/1000);
+      var spClock = (spMm<10?'0':'')+spMm+':'+(spSs<10?'0':'')+spSs;
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold ' + Math.round(H*0.075) + 'px Arial Narrow,Arial,sans-serif';
+      ctx.fillText(spClock, Math.round(W*0.50), spY + Math.round(H*0.21));
+      ctx.shadowBlur = 0;
+
+      // Barre progression — Y = 60% (sous le HUD, fine, ne gêne pas)
+      var bx = Math.round(W*0.15), by = Math.round(H*0.60);
+      var bw = Math.round(W*0.70), bh = Math.round(H*0.018);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, bh/2); ctx.fill();
+      ctx.fillStyle = spColor;
+      var bwFill = Math.round(bw * spPct / 100);
+      if (bwFill > 0) {
+        ctx.beginPath(); ctx.roundRect(bx, by, bwFill, bh, bh/2); ctx.fill();
+      }
+    }
+
+    // ═══════════ TWO BALL — HUD selon mode ═══════════
+    if (_dcog_drill === 'twoball') {
+      var modeLabel = {
+        sameheight: 'MÊME HAUTEUR',
+        diffheight: 'HAUTEUR DIFF.',
+        sync: 'SYNC',
+        alternate: 'ALTERNÉ',
+        burnout: 'BURNOUT',
+        chaos: 'CHAOS'
+      }[_dcog_tbMode] || _dcog_tbMode.toUpperCase();
+      var modeColor = {
+        sync: '#4ecdc4', alternate: '#7b2d8b',
+        burnout: '#e63946', chaos: '#f5c518'
+      }[_dcog_tbMode] || '#fff';
+
+      // Label mode — Ligne 2 centre (Y 20%)
+      ctx.fillStyle = modeColor;
       ctx.font = 'bold ' + Math.round(H*0.06) + 'px Arial Narrow,Arial,sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 4;
-      ctx.fillText('SPRINT', Math.round(W*0.50), Math.round(H*0.20));
+      ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
       ctx.shadowBlur = 0;
+
+      // ── BURNOUT : BPM central + cercle pulsant ──
+      if (_dcog_tbMode === 'burnout') {
+        var bpm = _dcog_burnoutBpm || 60;
+        var bpmColor = bpm > 140 ? '#e63946' : bpm > 100 ? '#f5c518' : '#2dc653';
+        var bpmCx = Math.round(W*0.50), bpmCy = Math.round(H*0.42);
+        // Cercle pulsant synchro avec le bip (basé sur le tick)
+        var beatInterval = 60000 / bpm;
+        var sinceBeat = _dcog_burnoutLastTick ? (Date.now() - _dcog_burnoutLastTick) % beatInterval : 0;
+        var pulsePhase = 1 - Math.min(1, sinceBeat / 200); // 0-200ms après le bip
+        var pulseR = Math.round(H*0.10) * (1 + pulsePhase * 0.4);
+        ctx.save();
+        ctx.globalAlpha = 0.3 + pulsePhase * 0.4;
+        ctx.fillStyle = bpmColor;
+        ctx.beginPath();
+        ctx.arc(bpmCx, bpmCy, pulseR, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+        // BPM au centre
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + Math.round(H*0.16) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 12;
+        ctx.fillText(String(bpm), bpmCx, bpmCy);
+        ctx.fillStyle = bpmColor;
+        ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.fillText('BPM', bpmCx, bpmCy + Math.round(H*0.11));
+        ctx.shadowBlur = 0;
+      }
+
+      // ── SYNC / ALTERNATE : flèches G/D + % synchro central ──
+      if (_dcog_tbMode === 'sync' || _dcog_tbMode === 'alternate') {
+        var pct = _dcog_tbFrames > 0
+          ? Math.round(_dcog_tbAntiphase / _dcog_tbFrames * 100) : 0;
+        var pctColor = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
+
+        // Flèches G/D — sens dépend du mouvement instantané du poignet
+        var arrL = _dcog_tbDirL || 0; // -1 monte, +1 descend
+        var arrR = _dcog_tbDirR || 0;
+        var arrLY = Math.round(H*0.40);
+        // Mode sync : G et D doivent être identiques
+        // Mode alternate : G et D doivent être opposés
+        var isOK;
+        if (_dcog_tbMode === 'sync') {
+          isOK = (arrL !== 0 && arrL === arrR);
+        } else {
+          isOK = (arrL !== 0 && arrR !== 0 && arrL === -arrR);
+        }
+        var arrColor = isOK ? '#2dc653' : '#e63946';
+
+        // Flèche gauche
+        ctx.save();
+        ctx.fillStyle = arrColor;
+        ctx.font = 'bold ' + Math.round(H*0.14) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
+        ctx.fillText(arrL > 0 ? '▼' : arrL < 0 ? '▲' : '·', Math.round(W*0.18), arrLY);
+        // Flèche droite
+        ctx.fillText(arrR > 0 ? '▼' : arrR < 0 ? '▲' : '·', Math.round(W*0.82), arrLY);
+        // Labels G / D au-dessus
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.fillText('G', Math.round(W*0.18), arrLY - Math.round(H*0.13));
+        ctx.fillText('D', Math.round(W*0.82), arrLY - Math.round(H*0.13));
+        ctx.restore();
+
+        // % synchro central
+        ctx.save();
+        ctx.fillStyle = pctColor;
+        ctx.font = 'bold ' + Math.round(H*0.16) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 14;
+        ctx.fillText(pct + '%', Math.round(W*0.50), arrLY);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + Math.round(H*0.04) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.fillText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.10));
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
+      // ── CHAOS : cibles aléatoires G/D ──
+      if (_dcog_tbMode === 'chaos') {
+        // Spawn cibles si vide ou expirées
+        if (!_dcog_chaosTargets) _dcog_chaosTargets = [];
+        var cnow = Date.now();
+        // Affichage des cibles actives (TTL géré dans schedule)
+        _dcog_chaosTargets.forEach(function(ct){
+          var age = (cnow - ct.born) / ct.ttl;
+          var alpha = ct.hit ? Math.max(0, 1 - (cnow - ct.hitTime)/300) : Math.max(0, 1 - age);
+          if (alpha <= 0) return;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          // Pulse stable depuis spawn
+          var spawnRamp = Math.min(1, (cnow - ct.born) / 250);
+          var pulse = 1 + 0.10 * spawnRamp * Math.sin(cnow / 110);
+          // Halo
+          ctx.beginPath();
+          ctx.arc(ct.x, ct.y, ct.r * pulse * 1.3, 0, Math.PI*2);
+          ctx.strokeStyle = ct.hit ? '#2dc653' : ct.color;
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          // Cercle plein
+          ctx.beginPath();
+          ctx.arc(ct.x, ct.y, ct.r, 0, Math.PI*2);
+          ctx.fillStyle = ct.hit ? '#2dc653' : ct.color;
+          ctx.fill();
+          // Lettre G/D au centre
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold ' + Math.round(ct.r * 0.7) + 'px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5;
+          ctx.fillText(ct.side === 'L' ? 'G' : 'D', ct.x, ct.y);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+        });
+        // Stats centre (sous les cibles)
+        var chHits  = _dcog_chaosHits  || 0;
+        var chTotal = _dcog_chaosTotal || 0;
+        var chRT    = _dcog_chaosAvgRT || 0;
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + Math.round(H*0.08) + 'px Arial Narrow,Arial,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
+        ctx.fillText(chHits + ' / ' + chTotal, Math.round(W*0.50), Math.round(H*0.50));
+        if (chRT > 0) {
+          ctx.fillStyle = '#f5c518';
+          ctx.font = 'bold ' + Math.round(H*0.05) + 'px Arial Narrow,Arial,sans-serif';
+          ctx.fillText('⚡ ' + chRT + ' ms', Math.round(W*0.50), Math.round(H*0.58));
+        }
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
     }
 
     ctx.restore();
@@ -26002,6 +26198,8 @@ function _dcog_drawHeightLine(ctx, W, H) {
    (quand poignet G descend, D monte et vice versa)
 ═══════════════════════════════════════════ */
 var _dcog_prevLW_y = null;
+var _dcog_tbDirL = 0; // direction instantanée poignet gauche : -1 monte, +1 descend, 0 immobile
+var _dcog_tbDirR = 0;
 var _dcog_prevRW_y = null;
 
 function _dcog_analyzeTwoBall(poses) {
@@ -26012,13 +26210,22 @@ function _dcog_analyzeTwoBall(poses) {
 
   var W  = _dcog_canvas ? _dcog_canvas.width  : 640;
   var H  = _dcog_canvas ? _dcog_canvas.height : 480;
+  var sx = W / (_dcog_video.videoWidth  || 640);
   var sy = H / (_dcog_video.videoHeight || 480);
+  // Coordonnées canvas (X miroir car _drawVideoMirror inverse l'image)
   var lY = lW.y * sy;
   var rY = rW.y * sy;
+  var lX = W - lW.x * sx;
+  var rX = W - rW.x * sx;
 
   // Stocker positions Y pour drawTwoBallLines
   _dcog_tbLWristY = lY;
   _dcog_tbRWristY = rY;
+
+  // CHAOS : détection hit cibles aléatoires
+  if (_dcog_tbMode === 'chaos') {
+    _dcog_chaosCheckHits(lY, rY, lX, rX);
+  }
 
   // Wrist indicators (overlay HTML)
   var wL = document.getElementById('dcog_tbWristL');
@@ -26060,6 +26267,9 @@ function _dcog_analyzeTwoBall(poses) {
   if (_dcog_prevLW_y !== null && _dcog_prevRW_y !== null) {
     var dL = lY - _dcog_prevLW_y;
     var dR = rY - _dcog_prevRW_y;
+    // Direction instantanée pour les flèches HUD : +1 descend, -1 monte, 0 immobile
+    _dcog_tbDirL = dL > 2 ? 1 : dL < -2 ? -1 : 0;
+    _dcog_tbDirR = dR > 2 ? 1 : dR < -2 ? -1 : 0;
     var moving = Math.abs(dL) > 1 || Math.abs(dR) > 1;
     if (moving) {
       _dcog_tbFrames++;
@@ -26178,20 +26388,82 @@ function _dcog_drawTwoBallLines(ctx, W, H) {
   ctx.restore();
 }
 
+/* ── Two Ball CHAOS : cibles aléatoires G/D, détection réaction ─── */
+var _dcog_chaosTargets    = [];
+var _dcog_chaosHits       = 0;
+var _dcog_chaosTotal      = 0;
+var _dcog_chaosRTSum      = 0;
+var _dcog_chaosAvgRT      = 0;
+var _dcog_chaosTimer      = null;
+
 function _dcog_tbScheduleChaos() {
-  if (!_dcog_running || _dcog_drill !== 'twoball') return;
-  var delay = 1500 + Math.random() * 2000;
+  if (!_dcog_running || _dcog_drill !== 'twoball' || _dcog_tbMode !== 'chaos') return;
+  var delay = 1500 + Math.random() * 1500; // 1.5-3 s entre cibles
   _dcog_tbChaosTimer = setTimeout(function() {
-    if (!_dcog_running) return;
-    _td_beep(660, 0.08, 0.2);
+    if (!_dcog_running || _dcog_tbMode !== 'chaos') return;
+    // Spawn une cible aléatoire G ou D
+    var cv = _dcog_canvas;
+    if (cv) {
+      var cW = cv.width, cH = cv.height;
+      var side = Math.random() < 0.5 ? 'L' : 'R';
+      var radius = Math.round(Math.min(cW * 0.075, cH * 0.13));
+      // Position : G côté gauche (x=18% W), D côté droit (x=82% W), Y zone HUD targets
+      var cx = side === 'L' ? Math.round(cW * 0.18) : Math.round(cW * 0.82);
+      var cy = Math.round(cH * 0.42);
+      var color = side === 'L' ? '#4ecdc4' : '#e87c2a';
+      _dcog_chaosTargets.push({
+        x: cx, y: cy, r: radius, side: side, color: color,
+        born: Date.now(), ttl: 1500,
+        hit: false, hitTime: 0
+      });
+      _dcog_chaosTotal++;
+      _td_beep(660, 0.06, 0.10);
+    }
+    // Nettoyage cibles expirées + miss tracking
+    var nowC = Date.now();
+    _dcog_chaosTargets = _dcog_chaosTargets.filter(function(t) {
+      // Cible touchée : garder 300 ms pour feedback puis virer
+      if (t.hit) return (nowC - t.hitTime) < 300;
+      // Cible expirée non touchée → miss
+      if (nowC - t.born > t.ttl) {
+        _td_soundFail();
+        if (navigator.vibrate) navigator.vibrate([40,10,40]);
+        return false;
+      }
+      return true;
+    });
     _dcog_tbScheduleChaos();
   }, delay);
+}
+
+/* Détection hit chaos — appelée depuis _dcog_analyzeTwoBall */
+function _dcog_chaosCheckHits(lY, rY, lX, rX) {
+  if (_dcog_tbMode !== 'chaos' || !_dcog_chaosTargets || _dcog_chaosTargets.length === 0) return;
+  var nowC = Date.now();
+  _dcog_chaosTargets.forEach(function(t) {
+    if (t.hit) return;
+    // Le poignet attendu selon le side de la cible
+    var wx = t.side === 'L' ? lX : rX;
+    var wy = t.side === 'L' ? lY : rY;
+    if (wx === undefined || wy === undefined) return;
+    var dist = Math.sqrt(Math.pow(wx - t.x, 2) + Math.pow(wy - t.y, 2));
+    if (dist < t.r * 1.5) {
+      t.hit = true; t.hitTime = nowC;
+      _dcog_chaosHits++;
+      var rt = nowC - t.born;
+      _dcog_chaosRTSum += rt;
+      _dcog_chaosAvgRT = Math.round(_dcog_chaosRTSum / _dcog_chaosHits);
+      _td_soundOK();
+      if (navigator.vibrate) navigator.vibrate(30);
+    }
+  });
 }
 
 /* ── Two Ball Burnout : métronome qui s'accélère ─────────────── */
 var _dcog_burnoutBpm    = 60;
 var _dcog_burnoutTimer  = null;
 var _dcog_burnoutTick   = 0;
+var _dcog_burnoutLastTick = 0; // timestamp dernier bip pour pulse visuelle
 
 function _dcog_startBurnout() {
   _dcog_burnoutBpm   = 60;
@@ -26205,6 +26477,7 @@ function _dcog_burnoutSchedule() {
   _dcog_burnoutTimer = setTimeout(function() {
     if (!_dcog_running || _dcog_tbMode !== 'burnout') return;
     _td_beep(880, 0.06, 0.08);
+    _dcog_burnoutLastTick = Date.now();
     _dcog_burnoutTick++;
     // Accélérer tous les 8 ticks (+5 BPM, max 180)
     if (_dcog_burnoutTick % 8 === 0 && _dcog_burnoutBpm < 180) {
