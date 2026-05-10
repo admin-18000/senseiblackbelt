@@ -22458,6 +22458,53 @@ function _td_beep(freq, dur, vol) {
   } catch(e) {}
 }
 
+/* ── Sons de feedback réutilisables (DCOG, TDR) ───────────────────
+ * _td_soundOK   : "ding" cristallin ascendant, sensation positive
+ * _td_soundFail : "buzz" sec descendant, sensation neutre-négative
+ * Pas de fichiers externes — synthèse Web Audio pure.
+ * ───────────────────────────────────────────────────────────── */
+function _td_soundOK() {
+  try {
+    var ctx = _td_getAudioCtx();
+    var t0 = ctx.currentTime;
+    // 1ère note : sinus 880 → 1320 Hz, court
+    var o1 = ctx.createOscillator();
+    var g1 = ctx.createGain();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(880, t0);
+    o1.frequency.exponentialRampToValueAtTime(1320, t0 + 0.10);
+    g1.gain.setValueAtTime(0.22, t0);
+    g1.gain.exponentialRampToValueAtTime(0.001, t0 + 0.18);
+    o1.connect(g1); g1.connect(ctx.destination);
+    o1.start(t0); o1.stop(t0 + 0.20);
+    // 2ème note décalée : harmonique aigue pour effet cristallin
+    var o2 = ctx.createOscillator();
+    var g2 = ctx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(1760, t0 + 0.05);
+    g2.gain.setValueAtTime(0.10, t0 + 0.05);
+    g2.gain.exponentialRampToValueAtTime(0.001, t0 + 0.20);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.start(t0 + 0.05); o2.stop(t0 + 0.22);
+  } catch(e) {}
+}
+function _td_soundFail() {
+  try {
+    var ctx = _td_getAudioCtx();
+    var t0 = ctx.currentTime;
+    // Sweep descendant carré 220 → 90 Hz, sensation "erreur" sèche
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(220, t0);
+    o.frequency.exponentialRampToValueAtTime(90, t0 + 0.18);
+    g.gain.setValueAtTime(0.18, t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t0); o.stop(t0 + 0.24);
+  } catch(e) {}
+}
+
 function _td_startMetronome() {
   if (_td_metroActive) return;
   _td_metroActive = true;
@@ -24402,7 +24449,12 @@ function _tdr_drawTargets(ctx, W, H) {
     if (!t.hit && Date.now()-t.born > t.ttl) { hadMiss = true; return false; }
     return !t.hit || (Date.now() - t.hitTime < 300);
   });
-  if (hadMiss) { _tdr_streak = 0; _tdr_updateScoreDisplay(); }
+  if (hadMiss) {
+    _tdr_streak = 0;
+    _td_soundFail();
+    if (navigator.vibrate) navigator.vibrate([40,10,40]);
+    _tdr_updateScoreDisplay();
+  }
 }
 
 /* ── Spawn cibles ─────────────────────────────────────────────── */
@@ -24499,10 +24551,8 @@ function _tdr_checkHits(poses) {
         var streakBonus = _tdr_streak >= 5 ? 5 : 0;
         _tdr_score += 10 + bonus + streakBonus;
         _tdr_flashHit(t);
-        // Son différencié : rapide=aigu, lent=grave
-        var freq = rt < 500 ? 880 : rt < 1000 ? 660 : 440;
-        var vol  = rt < 500 ? 0.15 : 0.08;
-        _td_beep(freq, 0.1, vol);
+        // Son cristallin sur hit + bip différencié rapide/lent en complément
+        _td_soundOK();
         if (_tdr_streak >= 5) { _td_beep(1100, 0.05, 0.1); _sensei_speak(window._lang==='en'?'On fire!':'En feu !', 4000); }
         if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
         _tdr_updateScoreDisplay();
@@ -25360,6 +25410,8 @@ function _dcog_nextQuestion() {
       // Temps écoulé → question suivante
       if (_dcog_running && _dcog_drill === 'math') {
         _dcog_wrong++;
+        _td_soundFail();
+        if (navigator.vibrate) navigator.vibrate([40,10,40]);
         _dcog_updateScores();
         setTimeout(_dcog_nextQuestion, 400);
       }
@@ -25653,11 +25705,11 @@ function _dcog_answerMath(val, idx) {
   var correct = (val === _dcog_mathAnswer);
   if (correct) {
     _dcog_correct++;
-    _td_beep(880, 0.1, 0.2);
+    _td_soundOK();
     if (navigator.vibrate) navigator.vibrate(30);
   } else {
     _dcog_wrong++;
-    _td_beep(220, 0.12, 0.2);
+    _td_soundFail();
     if (navigator.vibrate) navigator.vibrate([40,10,40]);
   }
   _dcog_updateScores();
@@ -25841,8 +25893,17 @@ function _dcog_analyzeHeight(poses) {
   // Normalize: 0=shoulder level, 1=ankle level
   var shoulderY = ((lS.y*sx + rS.y*sx) / 2) || (H * 0.3);
   var ankleY    = lA ? lA.y*sy : rA ? rA.y*sy : H;
-  var kneeY     = lK ? lK.y*sy : rK ? rK.y*sy : (shoulderY + ankleY)/2;
-  var hipY      = lH ? lH.y*sy : rH ? rH.y*sy : (shoulderY + ankleY)*0.55;
+  // Fallback anatomique correct : hip à 50% entre épaule et cheville,
+  // knee à 75% entre épaule et cheville (proportions humaines moyennes)
+  var hipY      = lH ? lH.y*sy : rH ? rH.y*sy : shoulderY + (ankleY - shoulderY) * 0.50;
+  var kneeY     = lK ? lK.y*sy : rK ? rK.y*sy : shoulderY + (ankleY - shoulderY) * 0.75;
+  // Sanity check : forcer l'ordre anatomique shoulderY < hipY < kneeY < ankleY.
+  // Si MoveNet renvoie des valeurs aberrantes (joueur en flexion, occlusion),
+  // on recalcule par interpolation propre entre épaule et cheville.
+  if (!(shoulderY < hipY && hipY < kneeY && kneeY < ankleY)) {
+    hipY  = shoulderY + (ankleY - shoulderY) * 0.50;
+    kneeY = shoulderY + (ankleY - shoulderY) * 0.75;
+  }
   var bodyH     = Math.abs(ankleY - shoulderY) || 200;
 
   var wristY    = activeWrist.y * sy;
@@ -25851,13 +25912,15 @@ function _dcog_analyzeHeight(poses) {
   // Target zone thresholds
   var zoneMin, zoneMax, zonePx;
   if (_dcog_heightZone === 'low') {
-    zoneMin = (kneeY - shoulderY) / bodyH;  // knee level
-    zoneMax = (ankleY - shoulderY) / bodyH; // ankle level
-    zonePx  = kneeY + (ankleY - kneeY) * 0.4;
+    // BAS : zone autour du genou (cible visuelle = ligne au genou)
+    zoneMin = (kneeY - shoulderY) / bodyH;
+    zoneMax = (ankleY - shoulderY) / bodyH;
+    zonePx  = kneeY;  // ligne au niveau anatomique du genou
   } else {
+    // HAUT : zone autour de la hanche (cible visuelle = ligne à la hanche)
     zoneMin = (hipY - shoulderY) / bodyH * 0.7;
     zoneMax = (hipY - shoulderY) / bodyH * 1.1;
-    zonePx  = hipY;
+    zonePx  = hipY;   // ligne au niveau anatomique de la hanche
   }
 
   var inZone = normY >= zoneMin && normY <= zoneMax;
@@ -26755,6 +26818,7 @@ if('serviceWorker' in navigator){
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
+  <img id="sensei-cam-logo" src="logo.png" alt="SENSEI" style="display:none;position:absolute;bottom:14px;right:14px;width:60px;height:60px;z-index:10000;opacity:.75;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">
 </div>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
@@ -26776,6 +26840,7 @@ function senseiCamShow(mod,stream){
   if(!ov||!_scam.video||!_scam.canvas)return;
   ov.style.display='block';
   if(sb)sb.style.display='block';
+  var lg=document.getElementById('sensei-cam-logo');if(lg)lg.style.display='block';
   window.scrollTo(0, 1); // force Safari à cacher sa barre d'adresse
   var rb=document.getElementById('sensei-cam-rec-btn');
   if(rb){rb.style.display='block';rb.textContent='\u25CF REC';rb.style.background='rgba(230,57,70,.92)';}
@@ -26815,6 +26880,7 @@ function senseiCamStop(){
   var sb=document.getElementById('sensei-cam-stop-btn');
   if(ov){ov.style.display='none'; ov.classList.remove('force-landscape');}
   if(sb)sb.style.display='none';
+  var lg=document.getElementById('sensei-cam-logo');if(lg)lg.style.display='none';
   var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
   var qOv=document.getElementById('sensei-cam-question');
   if(qOv){qOv.style.display='none';qOv.textContent='';}
