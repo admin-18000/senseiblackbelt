@@ -22450,6 +22450,11 @@ function _td_beep(freq, dur, vol) {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
+    // Aussi router vers la destination d'enregistrement si dispo
+    if (typeof _td_getRecDestination === 'function') {
+      var rec = _td_getRecDestination();
+      if (rec) { try { gain.connect(rec); } catch(e2){} }
+    }
     osc.frequency.value = freq || 880;
     gain.gain.setValueAtTime(vol || 0.3, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (dur || 0.1));
@@ -22467,6 +22472,7 @@ function _td_soundOK() {
   try {
     var ctx = _td_getAudioCtx();
     var t0 = ctx.currentTime;
+    var rec = (typeof _td_getRecDestination === 'function') ? _td_getRecDestination() : null;
     // 1ère note : sinus 880 → 1320 Hz, court
     var o1 = ctx.createOscillator();
     var g1 = ctx.createGain();
@@ -22476,6 +22482,7 @@ function _td_soundOK() {
     g1.gain.setValueAtTime(0.22, t0);
     g1.gain.exponentialRampToValueAtTime(0.001, t0 + 0.18);
     o1.connect(g1); g1.connect(ctx.destination);
+    if (rec) { try { g1.connect(rec); } catch(e2){} }
     o1.start(t0); o1.stop(t0 + 0.20);
     // 2ème note décalée : harmonique aigue pour effet cristallin
     var o2 = ctx.createOscillator();
@@ -22485,6 +22492,7 @@ function _td_soundOK() {
     g2.gain.setValueAtTime(0.10, t0 + 0.05);
     g2.gain.exponentialRampToValueAtTime(0.001, t0 + 0.20);
     o2.connect(g2); g2.connect(ctx.destination);
+    if (rec) { try { g2.connect(rec); } catch(e2){} }
     o2.start(t0 + 0.05); o2.stop(t0 + 0.22);
   } catch(e) {}
 }
@@ -22492,6 +22500,7 @@ function _td_soundFail() {
   try {
     var ctx = _td_getAudioCtx();
     var t0 = ctx.currentTime;
+    var rec = (typeof _td_getRecDestination === 'function') ? _td_getRecDestination() : null;
     // Sweep descendant carré 220 → 90 Hz, sensation "erreur" sèche
     var o = ctx.createOscillator();
     var g = ctx.createGain();
@@ -22501,8 +22510,150 @@ function _td_soundFail() {
     g.gain.setValueAtTime(0.18, t0);
     g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
     o.connect(g); g.connect(ctx.destination);
+    if (rec) { try { g.connect(rec); } catch(e2){} }
     o.start(t0); o.stop(t0 + 0.24);
   } catch(e) {}
+}
+
+/* ── Audio destination pour enregistrement vidéo ─────────────────
+ * Tous les sons (bips, OK/Fail, musique) sont aussi routés vers cette
+ * destination pour pouvoir être capturés par MediaRecorder.
+ * ───────────────────────────────────────────────────────────── */
+var _td_recDestination = null;
+function _td_getRecDestination() {
+  if (_td_recDestination) return _td_recDestination;
+  try {
+    var ctx = _td_getAudioCtx();
+    if (ctx && ctx.createMediaStreamDestination) {
+      _td_recDestination = ctx.createMediaStreamDestination();
+    }
+  } catch(e) {}
+  return _td_recDestination;
+}
+/* Helper interne : connecter un noeud à la fois aux haut-parleurs ET
+ * à la destination d'enregistrement. Si la destination n'est pas dispo,
+ * fallback silencieux sur le haut-parleur seul. */
+function _td_routeAudio(node) {
+  try {
+    var ctx = _td_getAudioCtx();
+    if (!ctx) return;
+    node.connect(ctx.destination);
+    var rec = _td_getRecDestination();
+    if (rec) { try { node.connect(rec); } catch(e2) {} }
+  } catch(e) {}
+}
+
+/* ── Musique de fond rythmée HomeCourt-style ────────────────────
+ * Boucle synthétique 16 pas à ~110 BPM (kick + hi-hat + basse).
+ * Volume bas (15%) pour ne pas couvrir les sons de feedback.
+ * Démarre/stop via _td_startMusic / _td_stopMusic.
+ * ───────────────────────────────────────────────────────────── */
+var _td_musicTimer  = null;
+var _td_musicStep   = 0;
+var _td_musicGain   = null;
+var _td_musicActive = false;
+
+function _td_startMusic() {
+  if (_td_musicActive) return;
+  try {
+    var ctx = _td_getAudioCtx();
+    if (!ctx) return;
+    _td_musicActive = true;
+    _td_musicStep = 0;
+    // Gain master de la musique — réglable, audible par speaker + recorder
+    _td_musicGain = ctx.createGain();
+    _td_musicGain.gain.value = 0.15;
+    _td_musicGain.connect(ctx.destination);
+    var rec = _td_getRecDestination();
+    if (rec) { try { _td_musicGain.connect(rec); } catch(e){} }
+    // Tempo : 110 BPM, 4 pas par temps → 16e de note = 60000/110/4 ≈ 136 ms
+    var stepMs = Math.round(60000 / 110 / 4);
+    function tick() {
+      if (!_td_musicActive) return;
+      var t0 = ctx.currentTime;
+      var step = _td_musicStep % 16;
+      // Kick sur les pas 0, 4, 8, 12 (chaque temps)
+      if (step % 4 === 0) {
+        var k = ctx.createOscillator();
+        var kg = ctx.createGain();
+        k.type = 'sine';
+        k.frequency.setValueAtTime(120, t0);
+        k.frequency.exponentialRampToValueAtTime(40, t0 + 0.10);
+        kg.gain.setValueAtTime(0.7, t0);
+        kg.gain.exponentialRampToValueAtTime(0.001, t0 + 0.12);
+        k.connect(kg); kg.connect(_td_musicGain);
+        k.start(t0); k.stop(t0 + 0.14);
+      }
+      // Hi-hat sur les pas impairs (4 = noire, on prend off-beats)
+      if (step % 2 === 1) {
+        var bufSize = 2048;
+        var noise = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        var data = noise.getChannelData(0);
+        for (var i=0;i<bufSize;i++) data[i] = Math.random()*2-1;
+        var src = ctx.createBufferSource();
+        src.buffer = noise;
+        var hpf = ctx.createBiquadFilter();
+        hpf.type = 'highpass'; hpf.frequency.value = 7000;
+        var hg = ctx.createGain();
+        hg.gain.setValueAtTime(0.20, t0);
+        hg.gain.exponentialRampToValueAtTime(0.001, t0 + 0.05);
+        src.connect(hpf); hpf.connect(hg); hg.connect(_td_musicGain);
+        src.start(t0); src.stop(t0 + 0.06);
+      }
+      // Basse — note longue sur les pas 0 et 8 (pattern simple)
+      if (step === 0 || step === 8) {
+        var b = ctx.createOscillator();
+        var bg = ctx.createGain();
+        b.type = 'sawtooth';
+        b.frequency.value = step === 0 ? 55 : 73; // A1 puis D2
+        var lpf = ctx.createBiquadFilter();
+        lpf.type = 'lowpass'; lpf.frequency.value = 400;
+        bg.gain.setValueAtTime(0.25, t0);
+        bg.gain.exponentialRampToValueAtTime(0.001, t0 + 0.40);
+        b.connect(lpf); lpf.connect(bg); bg.connect(_td_musicGain);
+        b.start(t0); b.stop(t0 + 0.42);
+      }
+      _td_musicStep++;
+    }
+    tick();
+    _td_musicTimer = setInterval(tick, stepMs);
+  } catch(e) { _td_musicActive = false; }
+}
+
+function _td_stopMusic() {
+  _td_musicActive = false;
+  if (_td_musicTimer) { clearInterval(_td_musicTimer); _td_musicTimer = null; }
+  if (_td_musicGain) {
+    try {
+      // Fade out doux pour éviter le clic
+      var ctx = _td_getAudioCtx();
+      if (ctx) {
+        _td_musicGain.gain.setValueAtTime(_td_musicGain.gain.value, ctx.currentTime);
+        _td_musicGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        setTimeout(function(){ try { _td_musicGain.disconnect(); } catch(e){} _td_musicGain = null; }, 250);
+      }
+    } catch(e) { _td_musicGain = null; }
+  }
+}
+
+/* ── Helper : combiner canvas stream + audio pour enregistrement ──
+ * Si l'audio destination est disponible, retourne un MediaStream
+ * combiné (vidéo canvas + audio synthétisé).
+ * Sinon, retourne le canvas stream tel quel (fallback silencieux).
+ * ───────────────────────────────────────────────────────────── */
+function _td_combineStreamWithAudio(canvasStream) {
+  try {
+    if (!canvasStream) return canvasStream;
+    var rec = _td_getRecDestination();
+    if (!rec || !rec.stream) return canvasStream;
+    var audioTracks = rec.stream.getAudioTracks();
+    if (!audioTracks.length) return canvasStream;
+    var videoTracks = canvasStream.getVideoTracks();
+    var combined = new MediaStream();
+    videoTracks.forEach(function(t){ combined.addTrack(t); });
+    audioTracks.forEach(function(t){ combined.addTrack(t); });
+    return combined;
+  } catch(e) { return canvasStream; }
 }
 
 function _td_startMetronome() {
@@ -23241,6 +23392,8 @@ var _tsym_video = null;
 var _tsym_canvas = null;
 var _tsym_ctx = null;
 var _tsym_running = false;
+var _tsym_lowScoreSince = 0;  // timestamp début période score < 60%
+var _tsym_lastAsymAlert = 0;  // timestamp dernier bip alerte (anti-spam)
 var _tsym_rafId = null;
 var _tsym_mode = 'dribble'; // dribble | shot | footwork | posture
 var _tsym_scores = []; // historique des scores
@@ -23364,6 +23517,7 @@ function _tsym_startCamera() {
 
 function _tsym_stopCamera() {
   _tsym_running = false;
+  if (typeof _td_stopMusic === "function") _td_stopMusic();
   if (_tsym_rafId) { cancelAnimationFrame(_tsym_rafId); _tsym_rafId = null; }
   if (_tsym_stream) { _tsym_stream.getTracks().forEach(function(t){t.stop();}); _tsym_stream = null; }
   var vid = document.getElementById('tsym_video');
@@ -23415,6 +23569,9 @@ function _tsym_startDetection() {
   var bRec=document.getElementById('tsym_btnRec');
   if(bRec)bRec.style.display='flex';
   _tsym_running = true;
+  _tsym_lowScoreSince = 0;
+  _tsym_lastAsymAlert = 0;
+  if (typeof _td_startMusic === 'function') _td_startMusic();
   _tsym_frameScores = [];
   _tsym_lastAudioScore = 0;
   var btnStart = document.getElementById('tsym_btnStart');
@@ -23539,6 +23696,127 @@ function _tsym_drawFrame(poses) {
   // Dessiner le squelette
   _tsym_drawSkeleton(kps, scaleX, scaleY, W);
 
+  // ═══════ FEEDBACK ASYMÉTRIE — ligne médiane + flèche directionnelle ═══════
+  // Détecte le côté défaillant selon le mode courant et affiche une indication
+  // visuelle claire pour que le joueur puisse s'auto-corriger sans coach.
+  // Tout est encapsulé dans try/catch — si bug ou pose incomplète, le squelette
+  // et le score continuent de fonctionner normalement.
+  try {
+    // Helpers locaux pour récupérer les keypoints en coordonnées canvas (mirror)
+    var _kp = function(name){
+      var idx = _TSYM_KP[name]; if (idx === undefined) return null;
+      var k = kps[idx]; if (!k || k.score < 0.35) return null;
+      return { x: W - k.x * scaleX, y: k.y * scaleY };
+    };
+    // Calcul axe médian théorique = milieu des épaules (référence verticale)
+    var lS = _kp('leftShoulder'), rS = _kp('rightShoulder');
+    if (lS && rS) {
+      var axisX = (lS.x + rS.x) / 2;
+      // Détecter le côté problématique selon le mode
+      var problemSide = null;     // 'L' ou 'R' ou null
+      var asymMag = 0;            // amplitude relative 0-1
+      if (_tsym_mode === 'dribble') {
+        var lW2 = _kp('leftWrist'), rW2 = _kp('rightWrist');
+        if (lW2 && rW2) {
+          var hL = lS.y - lW2.y, hR = rS.y - rW2.y; // hauteur poignet relative à épaule
+          var dh = hL - hR;
+          if (Math.abs(dh) > Math.max(20, H * 0.04)) {
+            problemSide = dh < 0 ? 'L' : 'R'; // côté plus bas = défaut
+            asymMag = Math.min(1, Math.abs(dh) / (H * 0.20));
+          }
+        }
+      } else if (_tsym_mode === 'shot') {
+        var lE = _kp('leftElbow'), rE = _kp('rightElbow');
+        var lW3 = _kp('leftWrist'), rW3 = _kp('rightWrist');
+        if (lE && rE && lW3 && rW3) {
+          var aL = _tsym_angle({x:lS.x,y:lS.y},{x:lE.x,y:lE.y},{x:lW3.x,y:lW3.y});
+          var aR = _tsym_angle({x:rS.x,y:rS.y},{x:rE.x,y:rE.y},{x:rW3.x,y:rW3.y});
+          var da = aL - aR;
+          if (Math.abs(da) > 25) {
+            problemSide = da < 0 ? 'L' : 'R';
+            asymMag = Math.min(1, Math.abs(da) / 90);
+          }
+        }
+      } else if (_tsym_mode === 'footwork') {
+        var lK = _kp('leftKnee'), rK = _kp('rightKnee');
+        if (lK && rK) {
+          var dk = lK.y - rK.y;
+          if (Math.abs(dk) > Math.max(15, H * 0.03)) {
+            problemSide = dk > 0 ? 'L' : 'R'; // genou plus bas = défaut
+            asymMag = Math.min(1, Math.abs(dk) / (H * 0.15));
+          }
+        }
+      } else if (_tsym_mode === 'posture') {
+        // Comparaison hauteur épaules
+        var ds = lS.y - rS.y;
+        if (Math.abs(ds) > Math.max(15, H * 0.025)) {
+          problemSide = ds > 0 ? 'L' : 'R'; // épaule plus basse = défaut
+          asymMag = Math.min(1, Math.abs(ds) / (H * 0.10));
+        }
+      }
+
+      // ── A. Ligne médiane verticale ──
+      // Verte si symétrique, rouge graduel selon amplitude de l'asymétrie
+      var lineColor = problemSide
+        ? 'rgba(255,59,48,' + (0.4 + asymMag * 0.5).toFixed(2) + ')'
+        : 'rgba(0,230,118,0.55)';
+      _tsym_ctx.save();
+      _tsym_ctx.strokeStyle = lineColor;
+      _tsym_ctx.lineWidth = 3;
+      _tsym_ctx.setLineDash([10, 8]);
+      _tsym_ctx.beginPath();
+      _tsym_ctx.moveTo(axisX, lS.y - H * 0.08);
+      _tsym_ctx.lineTo(axisX, H * 0.95);
+      _tsym_ctx.stroke();
+      _tsym_ctx.setLineDash([]);
+      _tsym_ctx.restore();
+
+      // ── C. Flèche directionnelle "← CORRIGER" si problème détecté ──
+      if (problemSide) {
+        var en_a = window._lang === 'en';
+        var arrowText = problemSide === 'L'
+          ? (en_a ? '← FIX'   : '← CORRIGER')
+          : (en_a ? 'FIX →'   : 'CORRIGER →');
+        var arrowY = Math.round(H * 0.45);
+        var arrowX = problemSide === 'L' ? Math.round(W * 0.25) : Math.round(W * 0.75);
+        _tsym_ctx.save();
+        // Fond pill semi-transparent
+        var pillW = Math.round(W * 0.22), pillH = Math.round(H * 0.10);
+        _tsym_ctx.fillStyle = 'rgba(0,0,0,0.65)';
+        _tsym_ctx.beginPath();
+        _tsym_ctx.roundRect(arrowX - pillW/2, arrowY - pillH/2, pillW, pillH, 12);
+        _tsym_ctx.fill();
+        // Texte avec contour noir
+        _tsym_ctx.font = 'bold ' + Math.round(H * 0.06) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        _tsym_ctx.textAlign = 'center';
+        _tsym_ctx.textBaseline = 'middle';
+        _tsym_ctx.lineWidth = 4;
+        _tsym_ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        _tsym_ctx.strokeText(arrowText, arrowX, arrowY);
+        _tsym_ctx.fillStyle = '#ff3b30';
+        _tsym_ctx.fillText(arrowText, arrowX, arrowY);
+        _tsym_ctx.restore();
+      }
+
+      // ── B. Marqueur clignotant sur le côté problématique ──
+      if (problemSide) {
+        var blinkOn = (Math.floor(Date.now() / 350) % 2) === 0;
+        if (blinkOn) {
+          var marker = problemSide === 'L' ? lS : rS;
+          // Cercle rouge pulsant autour de l'épaule défaillante
+          _tsym_ctx.save();
+          _tsym_ctx.strokeStyle = '#ff3b30';
+          _tsym_ctx.lineWidth = 4;
+          _tsym_ctx.beginPath();
+          _tsym_ctx.arc(marker.x, marker.y, Math.round(H * 0.04), 0, Math.PI * 2);
+          _tsym_ctx.stroke();
+          _tsym_ctx.restore();
+        }
+      }
+    }
+  } catch(eAsym) { /* feedback désactivé silencieusement si erreur */ }
+  // ═══════════════════════════════════════════════════════════════
+
   // Calculer score symétrie selon le mode
   var score = _tsym_computeSymmetry(poses, scaleX, scaleY, W);
   if (score >= 0) {
@@ -23546,6 +23824,21 @@ function _tsym_drawFrame(poses) {
     if (_tsym_frameScores.length > 60) _tsym_frameScores.shift();
     var avg = Math.round(_tsym_frameScores.reduce(function(a,b){return a+b;},0) / _tsym_frameScores.length);
     _tsym_updateScoreDisplay(avg);
+
+    // ── D. Alerte sonore : score < 60% maintenu > 1 s ──
+    try {
+      var nowA = Date.now();
+      if (avg < 60) {
+        if (!_tsym_lowScoreSince) _tsym_lowScoreSince = nowA;
+        else if (nowA - _tsym_lowScoreSince > 1000 && nowA - _tsym_lastAsymAlert > 2500) {
+          _td_soundFail();
+          if (navigator.vibrate) navigator.vibrate([60,40,60]);
+          _tsym_lastAsymAlert = nowA;
+        }
+      } else {
+        _tsym_lowScoreSince = 0;
+      }
+    } catch(eA){}
 
     // ═══════════════════ HUD GRID — paysage natif ═══════════════════
     // Layout identique DCOG/TDR :
@@ -23564,7 +23857,7 @@ function _tsym_drawFrame(poses) {
     var th = Math.round(Math.max(50, H*0.09));
     _tsym_ctx.fillStyle='rgba(0,0,0,0.7)';
     _tsym_ctx.beginPath();_tsym_ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);_tsym_ctx.fill();
-    _tsym_ctx.fillStyle = remaining <= 10 ? '#e63946' : '#fff';
+    _tsym_ctx.fillStyle = "#fff";
     _tsym_ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     _tsym_ctx.textAlign = 'center'; _tsym_ctx.textBaseline = 'middle';
     _tsym_ctx.shadowColor = 'rgba(0,0,0,0.8)'; _tsym_ctx.shadowBlur = 4;
@@ -23820,6 +24113,8 @@ function _tdr_startRec(){
   var stream=null;
   try{stream=cv.captureStream?cv.captureStream(25):cv.mozCaptureStream?cv.mozCaptureStream(25):null;}catch(e){}
   if(!stream){_tdr_recError(_t('Capture impossible','Capture failed'));return;}
+  // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime=_tsym_getBestMime();
   try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}):new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000});}
   catch(e){try{_tdr_recorder=new MediaRecorder(stream);}catch(e2){_tdr_recError('start failed');return;}}
@@ -23884,6 +24179,7 @@ function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
   _tsym_running = false;
+  if (typeof _td_stopMusic === "function") _td_stopMusic();
 }
 
 
@@ -23964,6 +24260,8 @@ function _tsym_startRec() {
       'Canvas capture not supported on this device'
     )); return;
   }
+  // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mimeType = _tsym_getBestMime();
   try {
     _tsym_recorder = mimeType
@@ -24226,6 +24524,7 @@ function _tdr_start() {
 
 function _tdr_stop() {
   _tdr_running = false;
+  if (typeof _td_stopMusic === "function") _td_stopMusic();
   _tdr_particles = []; // nettoyer particules résiduelles
   clearInterval(_tdr_timer);
   clearInterval(_tdr_metroSync);
@@ -24354,7 +24653,7 @@ function _tdr_drawFrame(poses) {
     var th = Math.round(Math.max(50, H*0.09));
     ctx.fillStyle='rgba(0,0,0,0.7)';
     ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
-    ctx.fillStyle=_tdr_sec<=10?'#e63946':'#fff';
+    ctx.fillStyle="#fff";
     ctx.font='bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
@@ -24659,6 +24958,7 @@ function _tdr_countdown(cb) {
 
 function _tdr_startDrill() {
   _tdr_running = true;
+  if (typeof _td_startMusic === 'function') _td_startMusic();
   _tdr_score   = 0;
   _tdr_hits    = 0;
   _tdr_streak  = 0;
@@ -24727,6 +25027,7 @@ function _tdr_updateScoreDisplay() {
 
 function _tdr_endDrill() {
   _tdr_running = false;
+  if (typeof _td_stopMusic === "function") _td_stopMusic();
   _tdr_targets = [];
   var avgRT = _tdr_reactionTimes.length > 0
     ? Math.round(_tdr_reactionTimes.reduce(function(a,b){return a+b;},0) / _tdr_reactionTimes.length)
@@ -25078,6 +25379,7 @@ function _dcog_start() {
 
 function _dcog_stop() {
   _dcog_running = false;
+  if (typeof _td_stopMusic === "function") _td_stopMusic();
   _dcog_particles = []; // nettoyer particules résiduelles
   clearInterval(_dcog_mathTimer); _dcog_mathTimer = null;
   var disp = document.getElementById('dcog_timerDisplay');
@@ -25173,7 +25475,7 @@ function _dcog_updateTimerDisplay() {
   var ss = _dcog_mathSec % 60;
   disp.textContent = (mm>0?(mm<10?'0'+mm:mm)+':':'') + (ss<10?'0'+ss:ss);
   // Rouge dans les 10 dernières secondes
-  disp.style.color = _dcog_mathSec <= 10 ? '#e63946' : '#f5c518';
+  disp.style.color = "#fff";
   if(_dcog_mathSec <= 10 && _dcog_mathSec > 0) {
     _td_beep(880, 0.04, 0.06); // tick sonore
     if(navigator.vibrate) navigator.vibrate(5);
@@ -25202,6 +25504,7 @@ function _dcog_launchDrill() {
   _dcog_chaosCurrentStim = null; _dcog_chaosCurrentMode = 'sync';
   _dcog_burnoutLastTick = 0;
   _dcog_running = true;
+  if (typeof _td_startMusic === 'function') _td_startMusic();
   // Démarrer le timer si drill math
   if (_dcog_drill === 'math') _dcog_startTimer();
   // Update score display
@@ -25329,7 +25632,7 @@ function _dcog_drawFrame(poses) {
     var th = Math.round(Math.max(50, H*0.09));
     ctx.fillStyle='rgba(0,0,0,0.7)';
     ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
-    ctx.fillStyle=_ds<=10?'#e63946':'#fff';
+    ctx.fillStyle="#fff";
     ctx.font='bold '+Math.round(H*0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
@@ -25355,7 +25658,7 @@ function _dcog_drawFrame(poses) {
 
       // Timer question — centre, sous timer principal (ligne 2)
       if (_dcog_qTimerSec > 0) {
-        var qColor = _dcog_qTimerSec <= 2 ? '#e63946' : _dcog_qTimerSec <= 3 ? '#f5c518' : '#fff';
+        var qColor = "#fff";
         ctx.fillStyle = qColor;
         ctx.font = 'bold ' + Math.round(H*0.07) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center';
@@ -25416,13 +25719,14 @@ function _dcog_drawFrame(poses) {
 
     // ═══════════ TWO BALL — HUD selon mode ═══════════
     if (_dcog_drill === 'twoball') {
+      var en_mode = window._lang === 'en';
       var modeLabel = {
-        sameheight: 'MÊME HAUTEUR',
-        diffheight: 'HAUTEUR DIFF.',
-        sync: 'SYNC',
-        alternate: 'ALTERNÉ',
-        burnout: 'BURNOUT',
-        chaos: 'CHAOS'
+        sameheight: en_mode ? 'SAME HEIGHT'  : 'MÊME HAUTEUR',
+        diffheight: en_mode ? 'DIFF. HEIGHT' : 'HAUTEUR DIFF.',
+        sync:       'SYNC',
+        alternate:  en_mode ? 'ALTERNATE'    : 'ALTERNÉ',
+        burnout:    'BURNOUT',
+        chaos:      'CHAOS'
       }[_dcog_tbMode] || _dcog_tbMode.toUpperCase();
       var modeColor = {
         sync: '#4ecdc4', alternate: '#e87c2a',
@@ -25502,11 +25806,18 @@ function _dcog_drawFrame(poses) {
         ctx.fillText(arrL > 0 ? '▼' : arrL < 0 ? '▲' : '·', Math.round(W*0.18), arrLY);
         // Flèche droite
         ctx.fillText(arrR > 0 ? '▼' : arrR < 0 ? '▲' : '·', Math.round(W*0.82), arrLY);
-        // Labels G / D au-dessus
+        // Labels G/D (ou L/R en EN) au-dessus — gros, blanc avec contour noir
+        var en_tb = window._lang === 'en';
+        var lblL = en_tb ? 'L' : 'G';
+        var lblR = en_tb ? 'R' : 'D';
+        ctx.font = 'bold ' + Math.round(H*0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(lblL, Math.round(W*0.18), arrLY - Math.round(H*0.14));
+        ctx.strokeText(lblR, Math.round(W*0.82), arrLY - Math.round(H*0.14));
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.05) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
-        ctx.fillText('G', Math.round(W*0.18), arrLY - Math.round(H*0.13));
-        ctx.fillText('D', Math.round(W*0.82), arrLY - Math.round(H*0.13));
+        ctx.fillText(lblL, Math.round(W*0.18), arrLY - Math.round(H*0.14));
+        ctx.fillText(lblR, Math.round(W*0.82), arrLY - Math.round(H*0.14));
         ctx.restore();
 
         // % synchro central — blanc avec contour noir, vert/rouge si extrême
@@ -25519,11 +25830,12 @@ function _dcog_drawFrame(poses) {
         ctx.fillStyle = pct >= 70 ? '#00e676' : pct >= 30 ? '#fff' : '#ff3b30';
         ctx.fillText(pct + '%', Math.round(W*0.50), arrLY);
         // Sous-label en blanc avec contour
+        var subLbl = _dcog_tbMode === 'sync' ? 'SYNC' : (window._lang === 'en' ? 'ALTERNATE' : 'ALTERNÉ');
         ctx.font = 'bold ' + Math.round(H*0.05) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
         ctx.lineWidth = 4;
-        ctx.strokeText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.13));
+        ctx.strokeText(subLbl, Math.round(W*0.50), arrLY + Math.round(H*0.13));
         ctx.fillStyle = '#fff';
-        ctx.fillText(_dcog_tbMode === 'sync' ? 'SYNC' : 'ALTERNÉ', Math.round(W*0.50), arrLY + Math.round(H*0.13));
+        ctx.fillText(subLbl, Math.round(W*0.50), arrLY + Math.round(H*0.13));
         ctx.restore();
       }
 
@@ -25545,14 +25857,15 @@ function _dcog_drawFrame(poses) {
           ctx.beginPath();
           ctx.roundRect(stimX - stimW/2, stimY - stimH/2, stimW, stimH, 18);
           ctx.fill();
-          // Flèche "↕ CHANGEMENT" au-dessus — jaune avec contour
+          // Flèche "↕ CHANGEMENT" / "↕ SWITCH" au-dessus — jaune avec contour
+          var changeLbl = window._lang === 'en' ? '↕ SWITCH' : '↕ CHANGEMENT';
           ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Bebas Neue","Arial Narrow",sans-serif';
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.lineWidth = 4;
           ctx.strokeStyle = 'rgba(0,0,0,0.95)';
-          ctx.strokeText('↕ CHANGEMENT', stimX, stimY - Math.round(H*0.07));
+          ctx.strokeText(changeLbl, stimX, stimY - Math.round(H*0.07));
           ctx.fillStyle = '#f5c518';
-          ctx.fillText('↕ CHANGEMENT', stimX, stimY - Math.round(H*0.07));
+          ctx.fillText(changeLbl, stimX, stimY - Math.round(H*0.07));
           // Instruction principale — TRÈS grosse, blanc avec contour épais
           ctx.font = 'bold ' + Math.round(H*0.13) + 'px "Bebas Neue","Arial Narrow",sans-serif';
           ctx.lineWidth = 8;
@@ -26428,11 +26741,12 @@ function _dcog_tbScheduleChaos() {
   _dcog_tbChaosTimer = setTimeout(function() {
     if (!_dcog_running || _dcog_tbMode !== 'chaos') return;
     // Choisir un stimulus aléatoire parmi 4 modes
+    var en_ch = window._lang === 'en';
     var stimuli = [
-      { text: 'SYNC',     color: '#4ecdc4', mode: 'sync'     },
-      { text: 'ALTERNÉ',  color: '#e87c2a', mode: 'alternate'},
-      { text: 'HAUT',     color: '#2dc653', mode: 'high'     },
-      { text: 'BAS',      color: '#f5c518', mode: 'low'      },
+      { text: 'SYNC',                                 color: '#4ecdc4', mode: 'sync'     },
+      { text: en_ch ? 'ALTERNATE' : 'ALTERNÉ',        color: '#e87c2a', mode: 'alternate'},
+      { text: en_ch ? 'HIGH'      : 'HAUT',           color: '#2dc653', mode: 'high'     },
+      { text: en_ch ? 'LOW'       : 'BAS',            color: '#f5c518', mode: 'low'      },
     ];
     var s = stimuli[Math.floor(Math.random() * stimuli.length)];
     _dcog_chaosCurrentMode = s.mode;
@@ -26638,6 +26952,8 @@ function _dcog_startRec() {
   var stream = null;
   try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
   if (!stream) { _dcog_recError(_t('Capture impossible','Capture failed')); return; }
+  // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime = _tsym_getBestMime();
   try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000}); }
   catch(e) { try { _dcog_recorder = new MediaRecorder(stream); } catch(e2) { _dcog_recError('start failed'); return; } }
