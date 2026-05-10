@@ -6962,6 +6962,93 @@ const IQ_ITEMS = [
 ];
 
 // ══ NAVIGATION ══════════════════════════════════════
+/* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
+function showOnboardingIfNeeded() {
+  try {
+    if (localStorage.getItem('sensei_onboarding_seen') === '1') return;
+    var m = document.getElementById('onboarding-modal');
+    if (!m) return;
+    m.style.display = 'flex';
+    // Lancer particules dorées flottantes
+    onboardingSpawnParticles();
+    // Lancer animation équation MATHS qui change toutes les 2s
+    onboardingCycleMath();
+  } catch(e) {}
+}
+function onboardingSpawnParticles() {
+  var container = document.getElementById('onb-particles');
+  if (!container) return;
+  container.innerHTML = '';
+  for (var i = 0; i < 16; i++) {
+    var p = document.createElement('div');
+    p.className = 'onb-particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.animationDuration = (6 + Math.random() * 6) + 's';
+    p.style.animationDelay = (Math.random() * 4) + 's';
+    p.style.opacity = (0.3 + Math.random() * 0.5).toFixed(2);
+    container.appendChild(p);
+  }
+}
+var _onbMathTimer = null;
+function onboardingCycleMath() {
+  if (_onbMathTimer) clearInterval(_onbMathTimer);
+  var equations = ['7 + 3 = ?', '12 − 5 = ?', '6 × 4 = ?', '18 + 9 = ?', '15 − 7 = ?', '8 × 3 = ?', '24 ÷ 4 = ?'];
+  var idx = 0;
+  _onbMathTimer = setInterval(function() {
+    var el = document.getElementById('onb-math-eq');
+    if (!el) { clearInterval(_onbMathTimer); _onbMathTimer = null; return; }
+    idx = (idx + 1) % equations.length;
+    el.style.opacity = '0';
+    setTimeout(function() {
+      if (el) { el.textContent = equations[idx]; el.style.opacity = '1'; }
+    }, 200);
+  }, 2200);
+}
+function onboardingClose() {
+  try { localStorage.setItem('sensei_onboarding_seen', '1'); } catch(e) {}
+  var m = document.getElementById('onboarding-modal');
+  if (m) {
+    m.style.opacity = '0';
+    m.style.transition = 'opacity .3s';
+    setTimeout(function() { m.style.display = 'none'; m.style.opacity = '1'; }, 300);
+  }
+  if (_onbMathTimer) { clearInterval(_onbMathTimer); _onbMathTimer = null; }
+}
+function onboardingSkip() {
+  onboardingClose();
+}
+function onboardingLaunch(which) {
+  onboardingClose();
+  // Petit délai pour laisser le modal se fermer avant de naviguer
+  setTimeout(function() {
+    try {
+      if (which === 'tdr') {
+        showSection('training');
+        // Scroll vers TDR + démarrer
+        setTimeout(function() {
+          var card = document.getElementById('tdr_btnStart');
+          if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        }, 200);
+      } else if (which === 'math') {
+        showSection('training');
+        setTimeout(function() {
+          if (typeof _dcog_selectDrill === 'function') _dcog_selectDrill('math');
+          var card = document.getElementById('dcog_btnStart');
+          if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        }, 200);
+      } else if (which === 'burnout') {
+        showSection('training');
+        setTimeout(function() {
+          if (typeof _dcog_selectDrill === 'function') _dcog_selectDrill('twoball');
+          if (typeof _dcog_setTwoBallMode === 'function') _dcog_setTwoBallMode('burnout');
+          var card = document.getElementById('dcog_btnStart');
+          if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        }, 300);
+      }
+    } catch(e) {}
+  }, 350);
+}
+
 /* ── Disclaimer santé Training Mode (mémorisé localStorage) ────── */
 function showHealthWarningIfNeeded() {
   try {
@@ -7541,6 +7628,10 @@ window.addEventListener('load', () => {
   buildIQ();
   buildCalendar();
   initEinstein();
+  // Onboarding première visite — affiché après que la page soit rendue
+  setTimeout(function() {
+    if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
+  }, 800);
   // initVisuSci est appelé à la première ouverture de la section, pas au load
 
   // ══ MOCKUPS : charger les vraies thumbnails YouTube ══
@@ -8510,6 +8601,95 @@ function initVisuSci() {
     </div>
   </div>
 </div>
+
+<!-- ═══════════ ONBOARDING ACCUEIL — 3 DRILLS DEMO ═══════════ -->
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:100001;align-items:center;justify-content:center;padding:18px;overflow-y:auto;background:radial-gradient(ellipse at top,rgba(15,20,35,0.95),rgba(0,0,0,0.98));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:onbFadeIn .5s ease-out">
+  <!-- Particules dorées flottantes -->
+  <div id="onb-particles" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+
+  <div style="position:relative;max-width:1100px;width:100%;text-align:center;padding:20px 0">
+    <!-- Logo -->
+    <div style="animation:onbSlideDown .6s ease-out;margin-bottom:18px">
+      <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;filter:drop-shadow(0 4px 24px rgba(245,197,24,.4));animation:onbPulse 2.5s ease-in-out infinite">
+    </div>
+
+    <!-- Titre -->
+    <div data-i18n="onb_title" style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:clamp(42px,8vw,72px);color:#fff;letter-spacing:4px;line-height:1;margin-bottom:8px;animation:onbSlideUp .7s .15s ease-out backwards">
+      BIENVENUE !
+    </div>
+    <div data-i18n="onb_subtitle" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(15px,2.5vw,20px);color:#cfd3e0;font-weight:600;letter-spacing:1.5px;margin-bottom:36px;animation:onbSlideUp .7s .3s ease-out backwards">
+      Essaie un drill maintenant — sans inscription
+    </div>
+
+    <!-- 3 cartes -->
+    <div id="onb-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:980px;margin:0 auto 28px;animation:onbSlideUp .8s .45s ease-out backwards">
+
+      <!-- TDR -->
+      <button class="onb-card" onclick="onboardingLaunch('tdr')" style="background:linear-gradient(160deg,rgba(245,197,24,.12),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.35);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🎯</div>
+        <div data-i18n="onb_tdr_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">RÉACTION</div>
+        <!-- Mini-animation cibles -->
+        <div style="height:60px;position:relative;margin:8px 0">
+          <span class="onb-target onb-t1" style="position:absolute;left:18%;top:20%;width:22px;height:22px;border-radius:50%;background:#2dc653;box-shadow:0 0 12px rgba(45,198,83,.6)"></span>
+          <span class="onb-target onb-t2" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#f5c518;box-shadow:0 0 14px rgba(245,197,24,.7)"></span>
+          <span class="onb-target onb-t3" style="position:absolute;right:18%;top:20%;width:22px;height:22px;border-radius:50%;background:#e63946;box-shadow:0 0 12px rgba(230,57,70,.6)"></span>
+        </div>
+        <div data-i18n="onb_tdr_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Touche les cibles le plus vite possible</div>
+      </button>
+
+      <!-- MATHS -->
+      <button class="onb-card" onclick="onboardingLaunch('math')" style="background:linear-gradient(160deg,rgba(78,205,196,.12),rgba(78,205,196,.02));border:2px solid rgba(78,205,196,.35);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🧠</div>
+        <div data-i18n="onb_math_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#4ecdc4;letter-spacing:3px;line-height:1">MATHS</div>
+        <!-- Mini-animation équation qui change -->
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;margin:8px 0">
+          <span id="onb-math-eq" style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#fff;letter-spacing:3px;background:rgba(0,0,0,.4);padding:6px 18px;border-radius:10px">7 + 3 = ?</span>
+        </div>
+        <div data-i18n="onb_math_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Calcule en dribblant — dissociation cognitive</div>
+      </button>
+
+      <!-- BURNOUT -->
+      <button class="onb-card" onclick="onboardingLaunch('burnout')" style="background:linear-gradient(160deg,rgba(230,57,70,.12),rgba(230,57,70,.02));border:2px solid rgba(230,57,70,.35);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🔥</div>
+        <div data-i18n="onb_burnout_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#e63946;letter-spacing:3px;line-height:1">BURNOUT</div>
+        <!-- Mini-animation pulse rouge -->
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;margin:8px 0">
+          <span style="display:inline-block;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#e63946,#7a1d22);box-shadow:0 0 24px rgba(230,57,70,.7);animation:onbBurnoutPulse 1.1s ease-in-out infinite"></span>
+        </div>
+        <div data-i18n="onb_burnout_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Métronome qui s'accélère — endurance pure</div>
+      </button>
+
+    </div>
+
+    <!-- Skip -->
+    <button onclick="onboardingSkip()" data-i18n="onb_skip" style="background:transparent;border:none;color:#7b82a0;font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;padding:10px 20px;animation:onbSlideUp .9s .6s ease-out backwards;transition:color .2s">
+      Plus tard →
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes onbFadeIn { from{opacity:0} to{opacity:1} }
+@keyframes onbSlideDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes onbSlideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes onbPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+@keyframes onbBurnoutPulse { 0%,100%{transform:scale(1);box-shadow:0 0 24px rgba(230,57,70,.7)} 50%{transform:scale(1.18);box-shadow:0 0 40px rgba(230,57,70,1)} }
+@keyframes onbTargetPulse1 { 0%,100%{transform:scale(1);opacity:.5} 33%{transform:scale(1.3);opacity:1} }
+@keyframes onbTargetPulse2 { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5} 66%{transform:translate(-50%,-50%) scale(1.3);opacity:1} }
+@keyframes onbTargetPulse3 { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.3);opacity:1} }
+.onb-t1{animation:onbTargetPulse1 1.5s ease-in-out infinite}
+.onb-t2{animation:onbTargetPulse2 1.5s ease-in-out infinite}
+.onb-t3{animation:onbTargetPulse3 1.5s ease-in-out infinite}
+.onb-card:hover{transform:translateY(-4px);border-color:rgba(245,197,24,.7) !important;box-shadow:0 12px 32px rgba(245,197,24,.25)}
+.onb-card:active{transform:translateY(-1px) scale(.99)}
+#onboarding-modal button[onclick="onboardingSkip()"]:hover{color:#f5c518}
+@media (max-width:520px){
+  #onb-cards{grid-template-columns:1fr !important;gap:12px !important}
+  .onb-card{min-height:160px !important;padding:18px !important}
+}
+@keyframes onbParticle { 0%{transform:translateY(100vh) translateX(0);opacity:0} 10%{opacity:.6} 90%{opacity:.6} 100%{transform:translateY(-20vh) translateX(40px);opacity:0} }
+.onb-particle{position:absolute;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,#f5c518,transparent);animation:onbParticle linear infinite}
+</style>
 
 <!-- ═══════════ DISCLAIMER SANTÉ TRAINING MODE ═══════════ -->
 <div id="health-warning-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
@@ -10832,6 +11012,16 @@ function applyLangTracker(lang) {
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
     footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
+    // Onboarding accueil
+    onb_title:'BIENVENUE !',
+    onb_subtitle:'Essaie un drill maintenant \u2014 sans inscription',
+    onb_tdr_title:'R\u00c9ACTION',
+    onb_tdr_desc:'Touche les cibles le plus vite possible',
+    onb_math_title:'MATHS',
+    onb_math_desc:'Calcule en dribblant \u2014 dissociation cognitive',
+    onb_burnout_title:'BURNOUT',
+    onb_burnout_desc:'M\u00e9tronome qui s\u2019acc\u00e9l\u00e8re \u2014 endurance pure',
+    onb_skip:'Plus tard \u2192',
     // Politique de confidentialité
     privacy_title_1:'POLITIQUE', privacy_title_2:'CONFIDENTIALIT\u00c9',
     privacy_intro:'Cette politique d\u00e9crit comment SENSEI Black Belt (\u00ab nous \u00bb, \u00ab l\u2019app \u00bb) traite vos donn\u00e9es personnelles. Nous accordons la plus grande importance \u00e0 votre vie priv\u00e9e et \u00e0 celle des mineurs utilisant nos services.',
@@ -10882,6 +11072,16 @@ function applyLangTracker(lang) {
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
     footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
+    // Onboarding
+    onb_title:'WELCOME!',
+    onb_subtitle:'Try a drill now \u2014 no sign-up needed',
+    onb_tdr_title:'REACTION',
+    onb_tdr_desc:'Hit the targets as fast as you can',
+    onb_math_title:'MATH',
+    onb_math_desc:'Compute while dribbling \u2014 cognitive dissociation',
+    onb_burnout_title:'BURNOUT',
+    onb_burnout_desc:'Metronome speeding up \u2014 pure endurance',
+    onb_skip:'Later \u2192',
     // Privacy Policy
     privacy_title_1:'PRIVACY', privacy_title_2:'POLICY',
     privacy_intro:'This policy describes how SENSEI Black Belt (\u201cwe\u201d, \u201cthe app\u201d) handles your personal data. We place the highest importance on your privacy and that of minors using our services.',
@@ -12727,6 +12927,11 @@ function applyLangTracker(lang) {
     puzzle_tpl_4: '🔄 Before / After',
     puzzle_tpl_5: '🎯 Drill of the Week',
     puzzle_tpl_6: '🎥 AI Training',
+    puzzle_tpl_7: '🏆 Belt Up',
+    puzzle_tpl_8: '🌍 Community',
+    puzzle_tpl_9: '📅 Weekly Recap',
+    puzzle_tpl_10: '🎬 Cinematic',
+    puzzle_tpl_11: '❓ Quiz IQ',
   });
   Object.assign(T.en, {
     pr_stats_globales: '📊 Global Stats',
@@ -12751,6 +12956,11 @@ function applyLangTracker(lang) {
     puzzle_tpl_4: '🔄 Before / After',
     puzzle_tpl_5: '🎯 Drill of the Week',
     puzzle_tpl_6: '🎥 AI Training',
+    puzzle_tpl_7: '🏆 Belt Up',
+    puzzle_tpl_8: '🌍 Community',
+    puzzle_tpl_9: '📅 Weekly Recap',
+    puzzle_tpl_10: '🎬 Cinematic',
+    puzzle_tpl_11: '❓ Quiz IQ',
   });
 })();
 </script>
@@ -12788,6 +12998,11 @@ function applyLangTracker(lang) {
       <button onclick="puzzleSelectTemplate(4,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_4">🔄 Before / After</button>
       <button onclick="puzzleSelectTemplate(5,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_5">🎯 Drill of the Week</button>
       <button onclick="puzzleSelectTemplate(6,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_6">🎥 AI Training</button>
+      <button onclick="puzzleSelectTemplate(7,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_7">🏆 Belt Up</button>
+      <button onclick="puzzleSelectTemplate(8,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_8">🌍 Community</button>
+      <button onclick="puzzleSelectTemplate(9,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_9">📅 Weekly Recap</button>
+      <button onclick="puzzleSelectTemplate(10,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_10">🎬 Cinematic</button>
+      <button onclick="puzzleSelectTemplate(11,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_11">❓ Quiz IQ</button>
     </div>
 
     <!-- Aperçu 3×3 + téléchargement -->
@@ -13684,9 +13899,306 @@ function puzzleDrawTemplate6(canvases, d) {
   pF(c9,'senseiblackbelt.com', S/2, S-60, 28, 'rgba(245,197,24,0.35)');
 }
 
+// ═══════════ TEMPLATE 7 — 🏆 BELT UP (célébration ceinture) ═══════════
+function puzzleDrawTemplate7(canvases, d) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  const prevIdx = Math.max(0, d.beltIdx - 1);
+  const prevColor = d.beltColors[prevIdx];
+  const prevName = en ? d.beltNamesEN[prevIdx] : d.beltNames[prevIdx];
+  // Toutes les cases : fond dégradé du précédent vers le nouveau
+  for (let i = 0; i < 9; i++) {
+    const c = canvases[i].getContext('2d');
+    // Dégradé diagonal
+    const grad = c.createLinearGradient(0, 0, S, S);
+    grad.addColorStop(0, prevColor); grad.addColorStop(1, d.beltColor);
+    c.fillStyle = grad; c.fillRect(0, 0, S, S);
+    c.fillStyle = 'rgba(0,0,0,0.45)'; c.fillRect(0, 0, S, S);
+  }
+  // Case 0 : "FROM" + ceinture précédente
+  const c0 = canvases[0].getContext('2d');
+  pF(c0, en?'FROM':'DE', S/2, 280, 60, 'rgba(255,255,255,0.7)', 'center', '900');
+  pRect(c0, S/2-180, 340, 360, 200, 30, prevColor, '#fff', 4);
+  pF(c0, prevName.toUpperCase(), S/2, 470, 80, '#fff', 'center', '900');
+  // Case 1 : flèche transition
+  const c1 = canvases[1].getContext('2d');
+  pF(c1, '🥋', S/2, S/2+50, 280, '#fff');
+  pF(c1, en?'LEVEL UP':'LEVEL UP', S/2, 770, 70, '#f5c518', 'center', '900');
+  // Case 2 : "TO" + nouvelle ceinture
+  const c2 = canvases[2].getContext('2d');
+  pF(c2, en?'TO':'\u00c0', S/2, 280, 60, 'rgba(255,255,255,0.7)', 'center', '900');
+  pRect(c2, S/2-180, 340, 360, 200, 30, d.beltColor, '#f5c518', 6);
+  pF(c2, (d.beltName||'').toUpperCase(), S/2, 470, 80, d.beltIdx===7?'#fff':'#000', 'center', '900');
+  pF(c2, '✨', S/2, 720, 180, '#f5c518');
+  // Cases 3-5 : 3 stats clés
+  const stats = [
+    {lbl: en?'SESSIONS':'S\u00c9ANCES', val: d.sessions.length, color:'#f5c518'},
+    {lbl: en?'AVG SCORE':'SCORE MOY', val: d.avg+(d.avg!=='—'?'/10':''), color:'#2dc653'},
+    {lbl: en?'JOURNAL':'JOURNAL', val: d.journal.length, color:'#4ecdc4'}
+  ];
+  for (let i = 0; i < 3; i++) {
+    const c = canvases[3+i].getContext('2d');
+    pF(c, stats[i].lbl, S/2, 240, 50, 'rgba(255,255,255,0.6)', 'center', '700');
+    pF(c, String(stats[i].val), S/2, 560, 220, stats[i].color, 'center', '900');
+    pLine(c, S/2-200, 700, S/2+200, 700, stats[i].color, 4);
+  }
+  // Case 6-7 : message célébration sur 2 cases
+  const c6 = canvases[6].getContext('2d');
+  pF(c6, en?'A NEW':'UN NOUVEAU', 80, 350, 80, '#fff', 'left', '900');
+  pF(c6, en?'CHAPTER':'CHAPITRE', 80, 470, 80, '#f5c518', 'left', '900');
+  pF(c6, en?'BEGINS':'COMMENCE', 80, 590, 80, '#fff', 'left', '900');
+  pF(c6, d.name.toUpperCase(), 80, 800, 56, d.beltColor, 'left', '900');
+  pF(c6, en?'on Sensei Black Belt':'sur Sensei Black Belt', 80, 870, 36, 'rgba(255,255,255,0.5)', 'left', '700');
+  // Case 7 : trophée
+  const c7 = canvases[7].getContext('2d');
+  pF(c7, '🏆', S/2, S/2+90, 480, '#f5c518');
+  // Case 8 : CTA
+  const c8 = canvases[8].getContext('2d');
+  pF(c8, '#'+(d.beltName||'').replace(/\s/g,'')+'Belt', S/2, 280, 50, '#f5c518');
+  pF(c8, '#BeltUp', S/2, 360, 50, 'rgba(245,197,24,0.6)');
+  pRect(c8, S/2-280, 540, 560, 130, 65, '#f5c518');
+  pF(c8, en?'JOIN THE WAY':'REJOINS LA VOIE', S/2, 622, 48, '#080a0f', 'center', '900');
+  pF(c8, 'senseiblackbelt.com', S/2, 840, 32, 'rgba(245,197,24,0.4)');
+}
+
+// ═══════════ TEMPLATE 8 — 🌍 COMMUNITY (leaderboard / top players) ═══════════
+function puzzleDrawTemplate8(canvases, d) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  // Fond commun : bleu nuit avec accents jaunes
+  for (let i = 0; i < 9; i++) {
+    const c = canvases[i].getContext('2d');
+    c.fillStyle = '#0a1428'; c.fillRect(0, 0, S, S);
+    // grille discrète
+    c.strokeStyle = 'rgba(245,197,24,0.04)'; c.lineWidth = 1;
+    for (let x = 0; x < S; x += 60) { c.beginPath(); c.moveTo(x,0); c.lineTo(x,S); c.stroke(); }
+    for (let y = 0; y < S; y += 60) { c.beginPath(); c.moveTo(0,y); c.lineTo(S,y); c.stroke(); }
+  }
+  // Case 0-1-2 : titre LEADERBOARD sur 3 cases
+  const c0 = canvases[0].getContext('2d');
+  pF(c0, '🌍', S-100, S-80, 130, '#f5c518', 'right');
+  pF(c0, en?'GLOBAL':'GLOBAL', 80, 480, 130, '#f5c518', 'left', '900');
+  pF(c0, en?'RANKING':'CLASSEMENT', 80, 620, 90, '#fff', 'left', '900');
+  const c1 = canvases[1].getContext('2d');
+  pF(c1, en?'TOP':'TOP', S/2, 380, 200, 'rgba(245,197,24,0.2)', 'center', '900');
+  pF(c1, '9', S/2, 720, 360, '#f5c518', 'center', '900');
+  const c2 = canvases[2].getContext('2d');
+  pF(c2, en?'PLAYERS':'JOUEURS', S/2, 350, 110, '#fff', 'center', '900');
+  pF(c2, en?'THIS WEEK':'CETTE SEMAINE', S/2, 480, 60, 'rgba(245,197,24,0.7)', 'center', '700');
+  pRect(c2, S/2-220, 640, 440, 180, 90, '#f5c518');
+  pF(c2, '#'+(d.beltIdx+1), S/2, 758, 110, '#080a0f', 'center', '900');
+  // Cases 3-8 : 6 entrées de leaderboard (top 6)
+  const samplePlayers = [
+    {n:'Marcus J.', s:9.4, c:'#ffd60a'},
+    {n:'Léa M.',    s:9.1, c:'#ff6d00'},
+    {n:'Kevin T.',  s:8.9, c:'#cd853f'},
+    {n:'Aïcha B.',  s:8.7, c:'#2dc653'},
+    {n:'Theo P.',   s:8.5, c:'#0077b6'},
+    {n:'Sara K.',   s:8.3, c:'#7b2d8b'}
+  ];
+  for (let i = 0; i < 6; i++) {
+    const c = canvases[3+i].getContext('2d');
+    const p = samplePlayers[i];
+    pF(c, '#'+(i+1), S/2, 180, 80, 'rgba(245,197,24,0.5)', 'center', '900');
+    // medaille
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'⭐';
+    pF(c, medal, S/2, 380, 160, '#fff');
+    // barre ceinture
+    pRect(c, S/2-180, 480, 360, 40, 20, p.c);
+    // nom
+    pF(c, p.n, S/2, 620, 70, '#fff', 'center', '900');
+    // score
+    pF(c, p.s.toFixed(1), S/2, 760, 140, p.c, 'center', '900');
+    pF(c, '/10', S/2+135, 760, 60, 'rgba(255,255,255,0.5)', 'center', '700');
+    pF(c, 'sensei-blackbelt.com', S/2, S-50, 24, 'rgba(245,197,24,0.3)');
+  }
+}
+
+// ═══════════ TEMPLATE 9 — 📅 WEEKLY RECAP ═══════════
+function puzzleDrawTemplate9(canvases, d) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  const days = en ? ['MON','TUE','WED','THU','FRI','SAT','SUN'] : ['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+  // Case 0 : titre
+  const c0 = canvases[0].getContext('2d');
+  c0.fillStyle = '#080a0f'; c0.fillRect(0,0,S,S);
+  pF(c0, en?'MY':'MA', 80, 350, 130, '#fff', 'left', '900');
+  pF(c0, en?'WEEK':'SEMAINE', 80, 500, 130, '#f5c518', 'left', '900');
+  pF(c0, '📅', S-150, 200, 200, '#f5c518', 'left');
+  pF(c0, d.name.toUpperCase(), 80, 760, 50, 'rgba(255,255,255,0.5)', 'left', '700');
+  pF(c0, en?'On Sensei Black Belt':'Sur Sensei Black Belt', 80, 830, 32, 'rgba(245,197,24,0.5)', 'left');
+  // Cases 1-7 : 7 jours de la semaine (3 sessions = vert, 0 = gris)
+  for (let i = 0; i < 7; i++) {
+    const c = canvases[1+i].getContext('2d');
+    // simulation sessions par jour à partir des données réelles
+    const dayHasSession = d.sessions.length > i;
+    c.fillStyle = '#0a1428'; c.fillRect(0, 0, S, S);
+    pF(c, days[i], S/2, 180, 90, 'rgba(245,197,24,0.7)', 'center', '900');
+    if (dayHasSession) {
+      pF(c, '✓', S/2, S/2+90, 380, '#2dc653');
+      pF(c, en?'DONE':'FAIT', S/2, 880, 70, '#2dc653', 'center', '900');
+    } else {
+      pF(c, '○', S/2, S/2+90, 380, 'rgba(255,255,255,0.15)');
+      pF(c, en?'REST':'REPOS', S/2, 880, 60, 'rgba(255,255,255,0.4)', 'center', '700');
+    }
+  }
+  // Case 8 : récap chiffré
+  const c8 = canvases[8].getContext('2d');
+  c8.fillStyle = '#080a0f'; c8.fillRect(0,0,S,S);
+  pF(c8, en?'TOTAL':'TOTAL', S/2, 200, 70, 'rgba(245,197,24,0.6)', 'center', '900');
+  pF(c8, String(d.sessions.length), S/2, 480, 280, '#f5c518', 'center', '900');
+  pF(c8, en?'SESSIONS':'S\u00c9ANCES', S/2, 600, 60, '#fff', 'center', '900');
+  pLine(c8, S/2-200, 660, S/2+200, 660, '#f5c518', 3);
+  pF(c8, en?'AVG SCORE':'SCORE MOY', S/2, 740, 50, 'rgba(255,255,255,0.5)', 'center', '700');
+  pF(c8, d.avg+(d.avg!=='—'?'/10':''), S/2, 850, 100, '#2dc653', 'center', '900');
+}
+
+// ═══════════ TEMPLATE 10 — 🎬 CINEMATIC (style magazine sport) ═══════════
+function puzzleDrawTemplate10(canvases, d) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  const quotes = en ? [
+    {t:'PRACTICE',s:'LIKE A PRO'},
+    {t:'PLAY',s:'LIKE A WARRIOR'},
+    {t:'THINK',s:'LIKE A SENSEI'}
+  ] : [
+    {t:'ENTRA\u00ceNE-TOI',s:'COMME UN PRO'},
+    {t:'JOUE',s:'COMME UN GUERRIER'},
+    {t:'PENSE',s:'COMME UN SENSEI'}
+  ];
+  // Case 0 : noir profond + photo coach grande
+  const c0 = canvases[0].getContext('2d');
+  c0.fillStyle = '#000'; c0.fillRect(0,0,S,S);
+  if (_puzzleCoachImg) { try { c0.globalAlpha = 0.85; c0.drawImage(_puzzleCoachImg, 0, 0, S, S); c0.globalAlpha = 1; } catch(e){} }
+  // overlay sombre bas
+  const grad0 = c0.createLinearGradient(0, S*0.5, 0, S);
+  grad0.addColorStop(0,'rgba(0,0,0,0)'); grad0.addColorStop(1,'rgba(0,0,0,0.85)');
+  c0.fillStyle = grad0; c0.fillRect(0,0,S,S);
+  pF(c0, 'SENSEI', 60, S-180, 70, '#f5c518', 'left', '900');
+  pF(c0, 'BLACK BELT', 60, S-110, 50, '#fff', 'left', '900');
+  // Case 1 : citation 1
+  const c1 = canvases[1].getContext('2d');
+  c1.fillStyle = '#0a0a0a'; c1.fillRect(0,0,S,S);
+  pF(c1, '"', S/2, 220, 220, 'rgba(245,197,24,0.3)', 'center', '900');
+  pF(c1, quotes[0].t, S/2, 480, 110, '#fff', 'center', '900');
+  pLine(c1, S/2-150, 540, S/2+150, 540, '#f5c518', 4);
+  pF(c1, quotes[0].s, S/2, 660, 70, '#f5c518', 'center', '900');
+  // Case 2 : action #
+  const c2 = canvases[2].getContext('2d');
+  c2.fillStyle = '#f5c518'; c2.fillRect(0,0,S,S);
+  c2.fillStyle = '#000'; c2.fillRect(0, S-220, S, 220);
+  pF(c2, '01', 80, 280, 280, '#080a0f', 'left', '900');
+  pF(c2, en?'MASTERY':'MA\u00ceTRISE', 80, 430, 80, '#080a0f', 'left', '900');
+  pF(c2, '#1', 80, S-120, 100, '#f5c518', 'left', '900');
+  // Case 3 : noir avec gros chiffre
+  const c3 = canvases[3].getContext('2d');
+  c3.fillStyle = '#0a0a0a'; c3.fillRect(0,0,S,S);
+  pF(c3, String(d.sessions.length), S/2, S/2+150, 480, '#f5c518', 'center', '900');
+  pF(c3, en?'SESSIONS':'S\u00c9ANCES', S/2, 880, 60, '#fff', 'center', '900');
+  // Case 4 : citation 2 sur fond ceinture
+  const c4 = canvases[4].getContext('2d');
+  c4.fillStyle = d.beltColor; c4.fillRect(0,0,S,S);
+  c4.fillStyle = 'rgba(0,0,0,0.55)'; c4.fillRect(0,0,S,S);
+  pF(c4, quotes[1].t, S/2, 460, 130, '#fff', 'center', '900');
+  pF(c4, quotes[1].s, S/2, 600, 70, '#f5c518', 'center', '900');
+  // Case 5 : action #
+  const c5 = canvases[5].getContext('2d');
+  c5.fillStyle = '#080a0f'; c5.fillRect(0,0,S,S);
+  c5.fillStyle = '#f5c518'; c5.fillRect(0, 0, S, 220);
+  pF(c5, '02', 80, 160, 180, '#080a0f', 'left', '900');
+  pF(c5, en?'SYMMETRY':'SYM\u00c9TRIE', S/2, S/2+50, 90, '#fff', 'center', '900');
+  pF(c5, '#2', S/2, 780, 100, '#f5c518', 'center', '900');
+  // Case 6 : noir gradient
+  const c6 = canvases[6].getContext('2d');
+  const grad6 = c6.createLinearGradient(0, 0, S, S);
+  grad6.addColorStop(0, '#1a1a1a'); grad6.addColorStop(1, '#0a0a0a');
+  c6.fillStyle = grad6; c6.fillRect(0,0,S,S);
+  pF(c6, '🏀', S/2, S/2+150, 480, 'rgba(245,197,24,0.6)');
+  pF(c6, 'BBALL', S/2, 880, 90, '#fff', 'center', '900');
+  // Case 7 : citation 3
+  const c7 = canvases[7].getContext('2d');
+  c7.fillStyle = '#0a0a0a'; c7.fillRect(0,0,S,S);
+  pF(c7, quotes[2].t, S/2, 460, 130, '#fff', 'center', '900');
+  pF(c7, quotes[2].s, S/2, 600, 70, '#f5c518', 'center', '900');
+  pF(c7, '— SENSEI', S/2, 800, 50, 'rgba(255,255,255,0.4)', 'center');
+  // Case 8 : CTA jaune
+  const c8 = canvases[8].getContext('2d');
+  c8.fillStyle = '#f5c518'; c8.fillRect(0,0,S,S);
+  pF(c8, 'BE', S/2, 360, 220, '#080a0f', 'center', '900');
+  pF(c8, en?'THE NEXT':'LE PROCHAIN', S/2, 560, 100, '#080a0f', 'center', '900');
+  pF(c8, 'SENSEI', S/2, 720, 140, '#080a0f', 'center', '900');
+  pF(c8, 'senseiblackbelt.com', S/2, S-80, 36, 'rgba(0,0,0,0.5)');
+}
+
+// ═══════════ TEMPLATE 11 — ❓ QUIZ IQ (devine la réponse) ═══════════
+function puzzleDrawTemplate11(canvases, d) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  // Fond jaune profond pour case 0 (question)
+  const c0 = canvases[0].getContext('2d');
+  c0.fillStyle = '#f5c518'; c0.fillRect(0,0,S,S);
+  c0.fillStyle = '#000'; c0.fillRect(40, 40, S-80, S-80);
+  pF(c0, '❓', S/2, 320, 200, '#f5c518', 'center');
+  pF(c0, 'BASKET', S/2, 540, 100, '#f5c518', 'center', '900');
+  pF(c0, 'IQ', S/2, 670, 180, '#fff', 'center', '900');
+  pF(c0, en?'TEST YOURSELF':'TESTE-TOI', S/2, 800, 50, 'rgba(255,255,255,0.6)', 'center', '700');
+  // Cases 1-7 : 7 questions
+  const questions = en ? [
+    {q:'How many pts is a 3?',a:'3'},
+    {q:'Shot clock seconds?',a:'24'},
+    {q:'Players on court?',a:'5'},
+    {q:'Free throw line ft?',a:'15'},
+    {q:'NBA quarter min?',a:'12'},
+    {q:'Rim height ft?',a:'10'},
+    {q:'Game players total?',a:'10'}
+  ] : [
+    {q:'Combien pour un 3 pts?',a:'3'},
+    {q:'Secondes au shot clock?',a:'24'},
+    {q:'Joueurs sur le terrain?',a:'5'},
+    {q:'Distance lancer franc?',a:'4.6m'},
+    {q:'Dur\u00e9e d\u2019un quart NBA?',a:'12min'},
+    {q:'Hauteur du panier?',a:'3.05m'},
+    {q:'Total joueurs en jeu?',a:'10'}
+  ];
+  for (let i = 0; i < 7; i++) {
+    const c = canvases[1+i].getContext('2d');
+    c.fillStyle = '#0a1428'; c.fillRect(0,0,S,S);
+    // Numéro question
+    pF(c, 'Q'+(i+1), 60, 130, 70, '#f5c518', 'left', '900');
+    // Question (wrap simple — 2 lignes max)
+    const q = questions[i].q;
+    c.font = '900 56px "Barlow Condensed",Arial Narrow,sans-serif';
+    c.fillStyle = '#fff'; c.textAlign = 'center';
+    const words = q.split(' ');
+    let line1 = '', line2 = '';
+    for (const w of words) {
+      if ((line1 + ' ' + w).length < 22) line1 += (line1?' ':'') + w;
+      else line2 += (line2?' ':'') + w;
+    }
+    c.fillText(line1, S/2, 380);
+    if (line2) c.fillText(line2, S/2, 450);
+    // Carré réponse caché
+    pRect(c, S/2-160, 580, 320, 240, 20, 'rgba(245,197,24,0.15)', '#f5c518', 3);
+    pF(c, '?', S/2, 760, 200, '#f5c518', 'center', '900');
+    pF(c, en?'swipe \u2192':'swipe \u2192', S/2, 900, 36, 'rgba(245,197,24,0.5)', 'center', '700');
+  }
+  // Case 8 : CTA réponses
+  const c8 = canvases[8].getContext('2d');
+  c8.fillStyle = '#0a1428'; c8.fillRect(0,0,S,S);
+  pF(c8, en?'ANSWERS':'R\u00c9PONSES', S/2, 200, 90, '#f5c518', 'center', '900');
+  pLine(c8, S/2-180, 240, S/2+180, 240, '#f5c518', 3);
+  for (let i = 0; i < 7; i++) {
+    const y = 320 + i * 70;
+    pF(c8, 'Q'+(i+1)+':', S/2-180, y, 44, 'rgba(245,197,24,0.7)', 'left', '900');
+    pF(c8, questions[i].a, S/2-80, y, 44, '#fff', 'left', '900');
+  }
+  pRect(c8, S/2-280, S-160, 560, 100, 50, '#f5c518');
+  pF(c8, en?'PLAY ON APP →':'JOUE SUR L\u2019APP \u2192', S/2, S-94, 42, '#080a0f', 'center', '900');
+}
+
 function puzzleRender() {
   const d = puzzleGetData();
-  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6];
+  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6, puzzleDrawTemplate7, puzzleDrawTemplate8, puzzleDrawTemplate9, puzzleDrawTemplate10, puzzleDrawTemplate11];
   fns[_puzzleTemplate](_puzzleCanvases, d);
   // mise à jour aperçu
   const grid = document.getElementById('puzzle-grid-preview');
