@@ -6962,7 +6962,25 @@ const IQ_ITEMS = [
 ];
 
 // ══ NAVIGATION ══════════════════════════════════════
+/* ── Disclaimer santé Training Mode (mémorisé localStorage) ────── */
+function showHealthWarningIfNeeded() {
+  try {
+    if (localStorage.getItem('sensei_health_accepted') === '1') return;
+    var m = document.getElementById('health-warning-modal');
+    if (m) m.style.display = 'flex';
+  } catch(e) {}
+}
+function acceptHealthWarning() {
+  try { localStorage.setItem('sensei_health_accepted', '1'); } catch(e) {}
+  var m = document.getElementById('health-warning-modal');
+  if (m) m.style.display = 'none';
+}
+
 function showSection(id, btn) {
+  // Disclaimer santé au premier accès Training Mode (mémorisé en localStorage)
+  if (id === 'training' && typeof showHealthWarningIfNeeded === 'function') {
+    showHealthWarningIfNeeded();
+  }
   // Si le bouton cliqué est un nav-drop-item, marquer aussi le nav-drop-btn parent
   if(btn && btn.classList && btn.classList.contains('nav-drop-item')){
     var dropParent = btn.closest('.nav-drop');
@@ -8397,8 +8415,126 @@ function initVisuSci() {
   </div>
 </div>
 
+<!-- ═══════════ POLITIQUE DE CONFIDENTIALITÉ ═══════════ -->
+<div id="s-privacy" class="section">
+  <div class="sec-pad" style="max-width:880px;margin:0 auto;padding:40px 20px 60px">
+    <div class="sec-title"><span data-i18n="privacy_title_1">POLITIQUE</span> <span style="color:var(--gold)" data-i18n="privacy_title_2">CONFIDENTIALITÉ</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#cfd3e0;line-height:1.7;font-size:15px;margin-top:30px">
+
+      <p data-i18n="privacy_intro" style="margin-bottom:20px;font-size:16px">
+        Cette politique décrit comment SENSEI Black Belt (« nous », « l'app ») traite vos données personnelles. Nous accordons la plus grande importance à votre vie privée et à celle des mineurs utilisant nos services.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_data">1. DONNÉES COLLECTÉES</h3>
+      <p data-i18n="privacy_data" style="margin-bottom:15px">
+        L'application collecte uniquement les données strictement nécessaires à son fonctionnement : score des drills, statistiques de progression, préférences (langue, mode), et identifiant utilisateur si vous créez un compte. Aucune donnée biométrique brute n'est conservée.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_camera">2. ACCÈS CAMÉRA & MICROPHONE</h3>
+      <p data-i18n="privacy_camera" style="margin-bottom:15px">
+        Lorsque vous utilisez le mode TRAINING, la caméra et le microphone de votre appareil sont activés <strong>localement</strong>. Les flux vidéo et audio sont traités <strong>en temps réel sur votre appareil uniquement</strong>. Aucune vidéo n'est envoyée à nos serveurs sauf si vous décidez explicitement de la sauvegarder ou de la partager.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_storage">3. STOCKAGE LOCAL</h3>
+      <p data-i18n="privacy_storage" style="margin-bottom:15px">
+        Vos statistiques et préférences sont stockées localement dans votre navigateur (localStorage). Vous pouvez les effacer à tout moment via les paramètres de votre navigateur ou en désinstallant l'application.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_minors">4. UTILISATEURS MINEURS</h3>
+      <p data-i18n="privacy_minors" style="margin-bottom:15px">
+        L'application est ouverte à toutes les tranches d'âge. Pour les utilisateurs de moins de 16 ans, nous recommandons une supervision parentale. Aucune donnée personnelle d'identification (nom, adresse, etc.) n'est requise pour utiliser les drills.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_rights">5. VOS DROITS (RGPD)</h3>
+      <p data-i18n="privacy_rights" style="margin-bottom:15px">
+        Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de portabilité et d'opposition concernant vos données personnelles. Pour exercer ces droits, contactez-nous à <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_cookies">6. COOKIES & TRACEURS</h3>
+      <p data-i18n="privacy_cookies" style="margin-bottom:15px">
+        L'application n'utilise pas de cookies publicitaires ni de traceurs tiers. Seuls les cookies techniques nécessaires au bon fonctionnement de la PWA (Service Worker, cache) sont utilisés.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="privacy_h_contact">7. CONTACT</h3>
+      <p data-i18n="privacy_contact" style="margin-bottom:15px">
+        Pour toute question concernant la confidentialité ou vos données, contactez : <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>
+      </p>
+
+      <p style="margin-top:40px;font-size:12px;color:#7b82a0;font-style:italic" data-i18n="privacy_updated">Dernière mise à jour : mai 2026</p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MENTIONS LÉGALES ═══════════ -->
+<div id="s-legal" class="section">
+  <div class="sec-pad" style="max-width:880px;margin:0 auto;padding:40px 20px 60px">
+    <div class="sec-title"><span data-i18n="legal_title_1">MENTIONS</span> <span style="color:var(--gold)" data-i18n="legal_title_2">LÉGALES</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#cfd3e0;line-height:1.7;font-size:15px;margin-top:30px">
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:20px;margin-bottom:10px" data-i18n="legal_h_editor">ÉDITEUR DU SITE</h3>
+      <p style="margin-bottom:15px">
+        <strong data-i18n="legal_editor_name">Thibault NJECKIL</strong><br>
+        <span data-i18n="legal_editor_status">Particulier</span><br>
+        <span data-i18n="legal_editor_address">Paris, France</span><br>
+        <span data-i18n="legal_editor_email">Email : <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a></span>
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="legal_h_director">DIRECTEUR DE LA PUBLICATION</h3>
+      <p style="margin-bottom:15px" data-i18n="legal_director">
+        Thibault NJECKIL
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="legal_h_hosting">HÉBERGEMENT</h3>
+      <p style="margin-bottom:15px" data-i18n="legal_hosting">
+        Hébergeur : GitHub Pages — GitHub, Inc., 88 Colin P Kelly Jr Street, San Francisco, CA 94107, États-Unis
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="legal_h_ip">PROPRIÉTÉ INTELLECTUELLE</h3>
+      <p style="margin-bottom:15px" data-i18n="legal_ip">
+        L'ensemble du site SENSEI Black Belt (concept, contenus, textes, marque, logo, design, code source) est protégé par les droits de propriété intellectuelle. La marque, le concept des « ceintures de compétences basketball » et l'ensemble des contenus pédagogiques font l'objet d'un dépôt INPI. Toute reproduction, représentation, modification ou exploitation, totale ou partielle, sans autorisation écrite préalable est strictement interdite et constitue une contrefaçon sanctionnée par les articles L.335-2 et suivants du Code de la propriété intellectuelle.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="legal_h_health">CLAUSE SANTÉ & SPORT</h3>
+      <p style="margin-bottom:15px" data-i18n="legal_health">
+        SENSEI Black Belt n'est ni un programme médical ni un programme de rééducation. Les exercices proposés sont des entraînements sportifs destinés à des personnes en bonne santé. Avant tout exercice physique intense, consultez un professionnel de santé. L'éditeur ne saurait être tenu responsable des blessures ou dommages résultant de l'utilisation de l'application sans suivi médical approprié.
+      </p>
+
+      <h3 style="color:var(--gold);font-family:var(--font-cond);letter-spacing:2px;margin-top:30px;margin-bottom:10px" data-i18n="legal_h_liability">LIMITATION DE RESPONSABILITÉ</h3>
+      <p style="margin-bottom:15px" data-i18n="legal_liability">
+        L'éditeur s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site, mais ne peut garantir l'absence d'erreurs ou d'omissions. L'utilisation des informations et contenus disponibles se fait sous l'entière responsabilité de l'utilisateur.
+      </p>
+
+      <p style="margin-top:40px;font-size:12px;color:#7b82a0;font-style:italic" data-i18n="legal_updated">Dernière mise à jour : mai 2026</p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DISCLAIMER SANTÉ TRAINING MODE ═══════════ -->
+<div id="health-warning-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+  <div style="max-width:480px;width:100%;background:linear-gradient(180deg,#1a1f2e,#0d1117);border:2px solid var(--gold);border-radius:18px;padding:30px;text-align:center;font-family:'Barlow',sans-serif">
+    <div id="health_warning_title" data-i18n="health_warning_title" style="font-family:var(--font-display);color:#ff9800;font-size:28px;letter-spacing:3px;margin-bottom:18px">⚠ AVERTISSEMENT SANTÉ</div>
+    <div id="health_warning_body" data-i18n="health_warning_body" style="color:#cfd3e0;font-size:15px;line-height:1.6;margin-bottom:24px">
+      Avant tout exercice physique intense, consultez un professionnel de santé. SENSEI Black Belt n'est pas un programme médical. Pratiquez à votre propre rythme et arrêtez en cas de douleur.
+    </div>
+    <button id="health_warning_ok" data-i18n="health_warning_ok" onclick="acceptHealthWarning()" style="background:var(--gold);color:#000;border:none;padding:14px 30px;border-radius:30px;font-family:var(--font-cond);font-size:14px;font-weight:900;letter-spacing:2px;cursor:pointer;text-transform:uppercase">
+      J'AI COMPRIS, J'ACCEPTE
+    </button>
+  </div>
+</div>
+
 <footer style="text-align:center;padding:18px 20px;font-size:11px;color:#7b82a0;border-top:1px solid #1e2235;background:#0d1117;letter-spacing:.3px;font-family:'Barlow Condensed',sans-serif">
-  <span data-i18n="footer_text"><span data-i18n="footer_text">© 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite</span></span>
+  <div style="margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;font-size:12px">
+    <a href="javascript:showSection('privacy')" style="color:#9aa3bf;text-decoration:none;cursor:pointer" data-i18n="footer_privacy">Confidentialité</a>
+    <span style="color:#3a4060">·</span>
+    <a href="javascript:showSection('legal')" style="color:#9aa3bf;text-decoration:none;cursor:pointer" data-i18n="footer_legal">Mentions légales</a>
+    <span style="color:#3a4060">·</span>
+    <a href="mailto:contact@senseiblackbelt.com" style="color:#9aa3bf;text-decoration:none" data-i18n="footer_contact">Contact</a>
+    <span style="color:#3a4060">·</span>
+    <span style="color:#7b82a0">v2026.05.10</span>
+  </div>
+  <span data-i18n="footer_text">© 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite</span>
 </footer>
 <script>
 let deferredPrompt;
@@ -9017,7 +9153,7 @@ function showNotif(msg, duration=3000) {
 // ═══════════════════════════════════════════════════════════
 (function initSwipe() {
   let tx=0, ty=0;
-  const SECTIONS_ORDER = ['home','belts','ballhandling','hec','sc','tutorials','programs','challenges','battle','profil','stats','minijeux','vulga','neuro','visusci','iq','shooting','defense','rebounding','coach','testi','reserver','inscription'];
+  const SECTIONS_ORDER = ['home','belts','ballhandling','hec','sc','tutorials','programs','challenges','battle','profil','stats','minijeux','vulga','neuro','visusci','iq','shooting','defense','rebounding','coach','testi','reserver','inscription','privacy','legal'];
   document.addEventListener('touchstart', e => {
     tx=e.touches[0].clientX; ty=e.touches[0].clientY;
   }, { passive:true });
@@ -10695,6 +10831,47 @@ function applyLangTracker(lang) {
     radar_save_btn:'\ud83d\udcbe Enregistrer cette session',
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
+    footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
+    // Politique de confidentialité
+    privacy_title_1:'POLITIQUE', privacy_title_2:'CONFIDENTIALIT\u00c9',
+    privacy_intro:'Cette politique d\u00e9crit comment SENSEI Black Belt (\u00ab nous \u00bb, \u00ab l\u2019app \u00bb) traite vos donn\u00e9es personnelles. Nous accordons la plus grande importance \u00e0 votre vie priv\u00e9e et \u00e0 celle des mineurs utilisant nos services.',
+    privacy_h_data:'1. DONN\u00c9ES COLLECT\u00c9ES',
+    privacy_data:'L\u2019application collecte uniquement les donn\u00e9es strictement n\u00e9cessaires \u00e0 son fonctionnement : score des drills, statistiques de progression, pr\u00e9f\u00e9rences (langue, mode), et identifiant utilisateur si vous cr\u00e9ez un compte. Aucune donn\u00e9e biom\u00e9trique brute n\u2019est conserv\u00e9e.',
+    privacy_h_camera:'2. ACC\u00c8S CAM\u00c9RA & MICROPHONE',
+    privacy_camera:'Lorsque vous utilisez le mode TRAINING, la cam\u00e9ra et le microphone de votre appareil sont activ\u00e9s <strong>localement</strong>. Les flux vid\u00e9o et audio sont trait\u00e9s <strong>en temps r\u00e9el sur votre appareil uniquement</strong>. Aucune vid\u00e9o n\u2019est envoy\u00e9e \u00e0 nos serveurs sauf si vous d\u00e9cidez explicitement de la sauvegarder ou de la partager.',
+    privacy_h_storage:'3. STOCKAGE LOCAL',
+    privacy_storage:'Vos statistiques et pr\u00e9f\u00e9rences sont stock\u00e9es localement dans votre navigateur (localStorage). Vous pouvez les effacer \u00e0 tout moment via les param\u00e8tres de votre navigateur ou en d\u00e9sinstallant l\u2019application.',
+    privacy_h_minors:'4. UTILISATEURS MINEURS',
+    privacy_minors:'L\u2019application est ouverte \u00e0 toutes les tranches d\u2019\u00e2ge. Pour les utilisateurs de moins de 16 ans, nous recommandons une supervision parentale. Aucune donn\u00e9e personnelle d\u2019identification (nom, adresse, etc.) n\u2019est requise pour utiliser les drills.',
+    privacy_h_rights:'5. VOS DROITS (RGPD)',
+    privacy_rights:'Conform\u00e9ment au RGPD, vous disposez d\u2019un droit d\u2019acc\u00e8s, de rectification, d\u2019effacement, de portabilit\u00e9 et d\u2019opposition concernant vos donn\u00e9es personnelles. Pour exercer ces droits, contactez-nous \u00e0 <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>.',
+    privacy_h_cookies:'6. COOKIES & TRACEURS',
+    privacy_cookies:'L\u2019application n\u2019utilise pas de cookies publicitaires ni de traceurs tiers. Seuls les cookies techniques n\u00e9cessaires au bon fonctionnement de la PWA (Service Worker, cache) sont utilis\u00e9s.',
+    privacy_h_contact:'7. CONTACT',
+    privacy_contact:'Pour toute question concernant la confidentialit\u00e9 ou vos donn\u00e9es, contactez : <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>',
+    privacy_updated:'Derni\u00e8re mise \u00e0 jour : mai 2026',
+    // Mentions légales
+    legal_title_1:'MENTIONS', legal_title_2:'L\u00c9GALES',
+    legal_h_editor:'\u00c9DITEUR DU SITE',
+    legal_editor_name:'Thibault NJECKIL',
+    legal_editor_status:'Particulier',
+    legal_editor_address:'Paris, France',
+    legal_editor_email:'Email : <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>',
+    legal_h_director:'DIRECTEUR DE LA PUBLICATION',
+    legal_director:'Thibault NJECKIL',
+    legal_h_hosting:'H\u00c9BERGEMENT',
+    legal_hosting:'H\u00e9bergeur : GitHub Pages \u2014 GitHub, Inc., 88 Colin P Kelly Jr Street, San Francisco, CA 94107, \u00c9tats-Unis',
+    legal_h_ip:'PROPRI\u00c9T\u00c9 INTELLECTUELLE',
+    legal_ip:'L\u2019ensemble du site SENSEI Black Belt (concept, contenus, textes, marque, logo, design, code source) est prot\u00e9g\u00e9 par les droits de propri\u00e9t\u00e9 intellectuelle. La marque, le concept des \u00ab ceintures de comp\u00e9tences basketball \u00bb et l\u2019ensemble des contenus p\u00e9dagogiques font l\u2019objet d\u2019un d\u00e9p\u00f4t INPI. Toute reproduction, repr\u00e9sentation, modification ou exploitation, totale ou partielle, sans autorisation \u00e9crite pr\u00e9alable est strictement interdite et constitue une contrefa\u00e7on sanctionn\u00e9e par les articles L.335-2 et suivants du Code de la propri\u00e9t\u00e9 intellectuelle.',
+    legal_h_health:'CLAUSE SANT\u00c9 & SPORT',
+    legal_health:'SENSEI Black Belt n\u2019est ni un programme m\u00e9dical ni un programme de r\u00e9\u00e9ducation. Les exercices propos\u00e9s sont des entra\u00eenements sportifs destin\u00e9s \u00e0 des personnes en bonne sant\u00e9. Avant tout exercice physique intense, consultez un professionnel de sant\u00e9. L\u2019\u00e9diteur ne saurait \u00eatre tenu responsable des blessures ou dommages r\u00e9sultant de l\u2019utilisation de l\u2019application sans suivi m\u00e9dical appropri\u00e9.',
+    legal_h_liability:'LIMITATION DE RESPONSABILIT\u00c9',
+    legal_liability:'L\u2019\u00e9diteur s\u2019efforce d\u2019assurer l\u2019exactitude et la mise \u00e0 jour des informations diffus\u00e9es sur ce site, mais ne peut garantir l\u2019absence d\u2019erreurs ou d\u2019omissions. L\u2019utilisation des informations et contenus disponibles se fait sous l\u2019enti\u00e8re responsabilit\u00e9 de l\u2019utilisateur.',
+    legal_updated:'Derni\u00e8re mise \u00e0 jour : mai 2026',
+    // Disclaimer santé Training Mode
+    health_warning_title:'\u26a0 AVERTISSEMENT SANT\u00c9',
+    health_warning_body:'Avant tout exercice physique intense, consultez un professionnel de sant\u00e9. SENSEI Black Belt n\u2019est pas un programme m\u00e9dical. Pratiquez \u00e0 votre propre rythme et arr\u00eatez en cas de douleur.',
+    health_warning_ok:'J\u2019ai compris, j\u2019accepte',
     res_solo:'S\u00e9ance individuelle',
     res_pack:'Forfait mensuel',
   });
@@ -10704,6 +10881,47 @@ function applyLangTracker(lang) {
     radar_save_btn:'Save this session',
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
+    footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
+    // Privacy Policy
+    privacy_title_1:'PRIVACY', privacy_title_2:'POLICY',
+    privacy_intro:'This policy describes how SENSEI Black Belt (\u201cwe\u201d, \u201cthe app\u201d) handles your personal data. We place the highest importance on your privacy and that of minors using our services.',
+    privacy_h_data:'1. DATA COLLECTED',
+    privacy_data:'The application only collects data strictly necessary for its operation: drill scores, progression statistics, preferences (language, mode), and user identifier if you create an account. No raw biometric data is retained.',
+    privacy_h_camera:'2. CAMERA & MICROPHONE ACCESS',
+    privacy_camera:'When using TRAINING mode, your device\u2019s camera and microphone are activated <strong>locally</strong>. Video and audio streams are processed <strong>in real time on your device only</strong>. No video is sent to our servers unless you explicitly decide to save or share it.',
+    privacy_h_storage:'3. LOCAL STORAGE',
+    privacy_storage:'Your statistics and preferences are stored locally in your browser (localStorage). You can erase them at any time via your browser settings or by uninstalling the application.',
+    privacy_h_minors:'4. MINOR USERS',
+    privacy_minors:'The application is open to all age groups. For users under 16, we recommend parental supervision. No personal identification data (name, address, etc.) is required to use the drills.',
+    privacy_h_rights:'5. YOUR RIGHTS (GDPR)',
+    privacy_rights:'In accordance with GDPR, you have the right of access, rectification, erasure, portability and objection regarding your personal data. To exercise these rights, contact us at <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>.',
+    privacy_h_cookies:'6. COOKIES & TRACKERS',
+    privacy_cookies:'The application does not use advertising cookies or third-party trackers. Only technical cookies necessary for the proper functioning of the PWA (Service Worker, cache) are used.',
+    privacy_h_contact:'7. CONTACT',
+    privacy_contact:'For any question regarding privacy or your data, contact: <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>',
+    privacy_updated:'Last updated: May 2026',
+    // Legal Notice
+    legal_title_1:'LEGAL', legal_title_2:'NOTICE',
+    legal_h_editor:'SITE EDITOR',
+    legal_editor_name:'Thibault NJECKIL',
+    legal_editor_status:'Individual',
+    legal_editor_address:'Paris, France',
+    legal_editor_email:'Email: <a href="mailto:contact@senseiblackbelt.com" style="color:var(--gold)">contact@senseiblackbelt.com</a>',
+    legal_h_director:'PUBLICATION DIRECTOR',
+    legal_director:'Thibault NJECKIL',
+    legal_h_hosting:'HOSTING',
+    legal_hosting:'Host: GitHub Pages \u2014 GitHub, Inc., 88 Colin P Kelly Jr Street, San Francisco, CA 94107, United States',
+    legal_h_ip:'INTELLECTUAL PROPERTY',
+    legal_ip:'The entire SENSEI Black Belt site (concept, content, texts, brand, logo, design, source code) is protected by intellectual property rights. The brand, the concept of \u201cbasketball skill belts\u201d and all educational content are subject to an INPI filing. Any reproduction, representation, modification or exploitation, in whole or in part, without prior written authorization is strictly prohibited and constitutes counterfeiting punishable by articles L.335-2 et seq. of the French Intellectual Property Code.',
+    legal_h_health:'HEALTH & SPORT CLAUSE',
+    legal_health:'SENSEI Black Belt is neither a medical program nor a rehabilitation program. The exercises offered are sports training intended for people in good health. Before any intense physical exercise, consult a healthcare professional. The publisher cannot be held responsible for injuries or damages resulting from the use of the application without appropriate medical supervision.',
+    legal_h_liability:'LIMITATION OF LIABILITY',
+    legal_liability:'The publisher strives to ensure the accuracy and updating of information disseminated on this site, but cannot guarantee the absence of errors or omissions. The use of the information and content available is entirely at the user\u2019s own responsibility.',
+    legal_updated:'Last updated: May 2026',
+    // Training Mode Health Disclaimer
+    health_warning_title:'\u26a0 HEALTH WARNING',
+    health_warning_body:'Before any intense physical exercise, consult a healthcare professional. SENSEI Black Belt is not a medical program. Practice at your own pace and stop if you feel pain.',
+    health_warning_ok:'I understand and accept',
     res_solo:'Individual session',
     res_pack:'Monthly package',
   });
