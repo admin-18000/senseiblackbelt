@@ -799,12 +799,17 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- ═══════════ ENCART ORIENTATION — VITRINE OPPORTUNITÉS ═══════════ -->
   <div id="hero-orientation" style="position:relative;padding:clamp(40px,7vw,90px) clamp(16px,4vw,40px);background:linear-gradient(135deg,#0a0d18 0%,#0d1424 50%,#0a0d18 100%);overflow:hidden;border-top:1px solid rgba(245,197,24,.12);border-bottom:1px solid rgba(245,197,24,.12)">
-    <!-- Fond décoratif : carte de France stylisée + halo doré -->
+    <!-- Fond décoratif : carte de France stylisée (desktop only) + halo doré -->
     <div aria-hidden="true" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(900px,90vw);background:radial-gradient(circle,rgba(245,197,24,.07) 0%,rgba(245,197,24,0) 60%);pointer-events:none"></div>
-    <svg aria-hidden="true" viewBox="0 0 200 200" style="position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:min(380px,40vw);height:auto;opacity:.07;pointer-events:none">
+    <svg aria-hidden="true" viewBox="0 0 200 200" class="orient-map-svg" style="position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:min(380px,30vw);height:auto;opacity:.04;pointer-events:none">
       <path d="M100 20 L130 30 L150 50 L160 80 L155 110 L140 140 L120 165 L100 175 L80 165 L60 145 L45 115 L40 85 L50 55 L70 30 Z" fill="#f5c518" stroke="#f5c518" stroke-width="0.5"/>
       <circle cx="100" cy="100" r="3" fill="#f5c518"/>
     </svg>
+    <style>
+      @media (max-width: 720px) {
+        .orient-map-svg { display: none !important; }
+      }
+    </style>
 
     <div style="position:relative;max-width:1100px;margin:0 auto;text-align:center">
       <!-- Badge intro -->
@@ -818,7 +823,7 @@ body.unlocked .sensei-only{display:revert !important}
 
       <!-- Sous-titre -->
       <p style="font-family:'Barlow',sans-serif;font-size:clamp(14px,1.8vw,18px);color:#cfd3e0;line-height:1.55;max-width:680px;margin:0 auto clamp(24px,3.5vw,38px)" data-i18n="orient_subtitle">
-        La seule app basket qui te guide dans tout l'écosystème français — du club de quartier à la Pro, des Brevets Fédéraux aux diplômes d'État.
+        La seule app basket qui te guide dans tout l'écosystème français — du club de quartier aux Pro, des Brevets Fédéraux aux diplômes d'État.
       </p>
 
       <!-- 3 mini-pictos -->
@@ -8197,7 +8202,7 @@ function initVisuSci() {
 
 <!-- ══ LE COACH ══ -->
 <div id="s-coach" class="section">
-  <div style="max-width:1080px;margin:0 auto;padding:0 16px">
+  <div style="max-width:1080px;margin:0 auto;padding:0 16px;overflow:hidden">
     <div class="sec-title" data-i18n="sec_coach_title">LE <span>COACH</span></div>
     <div class="sec-sub" data-i18n="sec_coach_sub">Sensei BlackBelt · L'homme derrière la méthode</div>
     <div class="sec-line"></div>
@@ -8223,7 +8228,13 @@ function initVisuSci() {
       </div>
     </div>
   </div>
-  <style>\n    @media (max-width: 720px) {\n      .coach-layout { grid-template-columns: 1fr !important; gap: 24px !important; }\n      .coach-layout > div:first-child { max-width: 280px; margin: 0 auto; }\n    }\n  </style>\n</div>
+  <style>
+    @media (max-width: 720px) {
+      .coach-layout { grid-template-columns: 1fr !important; gap: 24px !important; }
+      .coach-layout > div:first-child { max-width: 280px; margin: 0 auto; }
+    }
+  </style>
+</div>
 
 <!-- ══ TÉMOIGNAGES ══ -->
 <div id="s-testi" class="section">
@@ -11686,7 +11697,7 @@ function applyLangTracker(lang) {
     // Hero Orientation
     orient_badge:'\ud83e\udded SENSEI ORIENTATION',
     orient_title_1:'O\u00d9 JOUER ?', orient_title_2:'O\u00d9 TE FORMER ?',
-    orient_subtitle:'La seule app basket qui te guide dans tout l\u2019\u00e9cosyst\u00e8me fran\u00e7ais \u2014 du club de quartier \u00e0 la Pro, des Brevets F\u00e9d\u00e9raux aux dipl\u00f4mes d\u2019\u00c9tat.',
+    orient_subtitle:'La seule app basket qui te guide dans tout l\u2019\u00e9cosyst\u00e8me fran\u00e7ais \u2014 du club de quartier aux Pro, des Brevets F\u00e9d\u00e9raux aux dipl\u00f4mes d\u2019\u00c9tat.',
     orient_pic_1:'FORMATIONS FFBB', orient_pic_1_sub:'BF \u00b7 DETB \u00b7 BPJEPS \u00b7 DEPB',
     orient_pic_2:'PYRAMIDE CLUBS', orient_pic_2_sub:'D\u00e9partemental \u2192 Pro',
     orient_pic_3:'MATCHING IA', orient_pic_3_sub:'Recommandations sur mesure',
