@@ -130,7 +130,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 /* ── HERO ── */
 #s-home{padding:0;position:relative;overflow:hidden}
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;padding:80px 20px 60px}
-@media(min-width:769px){.hero{display:none!important}}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(245,197,24,.12) 0%,transparent 70%),radial-gradient(ellipse at 80% 80%,rgba(230,57,70,.08) 0%,transparent 50%)}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;opacity:.5}
 .hero-tag{font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,197,24,.3);padding:5px 16px;border-radius:20px;margin-bottom:24px;display:inline-block;animation:fadeUp .8s ease both;background:rgba(245,197,24,.06);backdrop-filter:blur(8px)}
@@ -799,17 +798,10 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- ═══════════ ENCART ORIENTATION — VITRINE OPPORTUNITÉS ═══════════ -->
   <div id="hero-orientation" style="position:relative;padding:clamp(40px,7vw,90px) clamp(16px,4vw,40px);background:linear-gradient(135deg,#0a0d18 0%,#0d1424 50%,#0a0d18 100%);overflow:hidden;border-top:1px solid rgba(245,197,24,.12);border-bottom:1px solid rgba(245,197,24,.12)">
-    <!-- Fond décoratif : carte de France stylisée (desktop only) + halo doré -->
-    <div aria-hidden="true" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(900px,90vw);background:radial-gradient(circle,rgba(245,197,24,.07) 0%,rgba(245,197,24,0) 60%);pointer-events:none"></div>
-    <svg aria-hidden="true" viewBox="0 0 200 200" class="orient-map-svg" style="position:absolute;right:-4%;top:50%;transform:translateY(-50%);width:min(380px,30vw);height:auto;opacity:.04;pointer-events:none">
-      <path d="M100 20 L130 30 L150 50 L160 80 L155 110 L140 140 L120 165 L100 175 L80 165 L60 145 L45 115 L40 85 L50 55 L70 30 Z" fill="#f5c518" stroke="#f5c518" stroke-width="0.5"/>
-      <circle cx="100" cy="100" r="3" fill="#f5c518"/>
-    </svg>
-    <style>
-      @media (max-width: 720px) {
-        .orient-map-svg { display: none !important; }
-      }
-    </style>
+    <!-- Décor : halo doré central uniquement (sobre, élégant) -->
+    <div aria-hidden="true" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(900px,90vw);background:radial-gradient(circle,rgba(245,197,24,.08) 0%,rgba(245,197,24,0) 55%);pointer-events:none"></div>
+    <!-- Grille discrète en fond pour profondeur -->
+    <div aria-hidden="true" style="position:absolute;inset:0;background-image:linear-gradient(rgba(245,197,24,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,197,24,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;opacity:.6"></div>
 
     <div style="position:relative;max-width:1100px;margin:0 auto;text-align:center">
       <!-- Badge intro -->
