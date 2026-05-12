@@ -7020,9 +7020,11 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
-    var ONBOARDING_VERSION = '2026.05.11';
+    var ONBOARDING_VERSION = '2026.05.12';
+    // Test bypass : ?onboarding=1 dans l'URL force l'affichage
+    var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
     var seenVersion = localStorage.getItem('sensei_onboarding_seen_v');
-    if (seenVersion === ONBOARDING_VERSION) return;
+    if (!forceShow && seenVersion === ONBOARDING_VERSION) return;
     var m = document.getElementById('onboarding-modal');
     if (!m) return;
     m.style.display = 'flex';
@@ -7071,7 +7073,7 @@ function onboardingCycleMath() {
   }, 2200);
 }
 function onboardingClose() {
-  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.05.11'); } catch(e) {}
+  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.05.12'); } catch(e) {}
   var m = document.getElementById('onboarding-modal');
   if (m) {
     m.style.opacity = '0';
