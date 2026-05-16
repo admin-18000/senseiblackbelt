@@ -4317,6 +4317,22 @@ window._camStartCooldown = function(){
   window._camCooldown = true;
   setTimeout(function(){ window._camCooldown = false; }, 800);
 };
+// ══ RAF économe : freeze automatique quand la page est cachée (onglet en arrière-plan, PWA en veille) ══
+// Évite que les canvas décoratifs (Einstein, neuro, visu, court) continuent à brûler la batterie en background.
+window._rafIfVisible = function(cb){
+  if (document.hidden) {
+    // Page cachée : on attend qu'elle redevienne visible avant de relancer
+    var onVis = function(){
+      if (!document.hidden) {
+        document.removeEventListener('visibilitychange', onVis);
+        requestAnimationFrame(cb);
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return 0;
+  }
+  return requestAnimationFrame(cb);
+};
 // ══ LOGO sur canvas (pour qu'il apparaisse dans les vidéos enregistrées) ══
 window._camLogoImg = null;
 window._camLogoReady = false;
@@ -7969,7 +7985,7 @@ function initEinstein() {
       ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w,0); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0,h); ctx.lineTo(w,h); ctx.stroke();
 
-      requestAnimationFrame(draw);
+      window._rafIfVisible(draw);
     }
     draw();
   })();
@@ -8091,7 +8107,7 @@ function initEinstein() {
       ctx.fillText(subTexts[subIdx], w/2, h*0.9);
       ctx.textAlign = 'left';
 
-      requestAnimationFrame(draw);
+      window._rafIfVisible(draw);
     }
     draw();
   })();
@@ -8146,7 +8162,7 @@ function initVisuSci() {
       if(phase===2){setTimeout(()=>{trail=[];drawT=0;angle=[30,45,60][Math.floor(Math.random()*3)];totalT=getTotalTime(angle,v0);phase=0;},800);phase=-1;}
       ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 12px Barlow Condensed';ctx.fillText('y = x·tan(θ) − gx²/2v₀²cos²(θ)',w*0.55,h*0.15);
       ctx.fillStyle='rgba(245,197,24,.25)';ctx.font='10px Barlow Condensed';ctx.fillText('v₀ = '+v0+' m/s   g = 9.81 m/s²',w*0.55,h*0.22);
-      requestAnimationFrame(draw);
+      window._rafIfVisible(draw);
     }
     draw();
   })();
@@ -8198,7 +8214,7 @@ function initVisuSci() {
       ctx.fillStyle='rgba(245,197,24,.08)';ctx.font='900 42px Bebas Neue';ctx.textAlign='center';ctx.fillText(labels[labelIdx],w/2,h/2+14);ctx.textAlign='left';
       ctx.fillStyle='rgba(245,197,24,.5)';ctx.font='700 11px Barlow Condensed';ctx.fillText(window._lang==='en'?'ΔW = η · δ · x    (Hebb\'s rule)':'ΔW = η · δ · x    (règle de Hebb)',w*.05,h*.92);
       ctx.fillStyle='rgba(245,197,24,.25)';ctx.font='10px Barlow Condensed';ctx.fillText(window._lang==='en'?'Repetition → Synaptic strengthening → Motor automatism':'Répétition → Renforcement synaptique → Automatisme moteur',w*.05,h*.97);
-      requestAnimationFrame(draw);
+      window._rafIfVisible(draw);
     }
     draw();
   })();
@@ -8238,7 +8254,7 @@ function initVisuSci() {
       equations.forEach(eq=>{eq.x+=eq.vx;eq.y+=eq.vy;eq.phase+=.02;if(eq.x<0||eq.x>w)eq.vx*=-1;if(eq.y<h*.05||eq.y>h*.88)eq.vy*=-1;const pulse=Math.sin(eq.phase)*.15+eq.opacity;ctx.fillStyle=`rgba(245,197,24,${pulse})`;ctx.font=`700 ${eq.size}px Barlow Condensed`;ctx.fillText(eq.text,eq.x,eq.y);});
       ctx.fillStyle='rgba(245,197,24,.6)';ctx.font='700 11px Barlow Condensed';ctx.fillText(window._lang==='en'?'Newton\'s 3rd Law · Action = Reaction':'3ème loi de Newton · Action = Réaction',w*.05,h*.92);
       ctx.fillStyle='rgba(245,197,24,.25)';ctx.font='10px Barlow Condensed';ctx.fillText(window._lang==='en'?'Each bounce = kinetic → potential → kinetic energy':'Chaque rebond = énergie cinétique → potentielle → cinétique',w*.05,h*.97);
-      requestAnimationFrame(draw);
+      window._rafIfVisible(draw);
     }
     draw();
   })();
@@ -23005,7 +23021,7 @@ function initTraining_sc2() {
   _tsc_updateGrid();
   _tsc_drawCourt();
   _tsc_updateInsight();
-  (function loop(){_tsc_drawCourt();requestAnimationFrame(loop);})();
+  (function loop(){_tsc_drawCourt();window._rafIfVisible(loop);})();
 }
 
 var _tsc_VIDEOS = [
