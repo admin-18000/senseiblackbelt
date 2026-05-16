@@ -4340,10 +4340,13 @@ window._camDrawLogo = function(ctx, W, H){
     var x = W - size - pad;
     var y = H - size - pad;
     ctx.save();
-    ctx.globalAlpha = 0.85;
+    // Smoothing HAUTE QUALITÉ pour le downscale 512→~96 (Lanczos-like)
+    ctx.imageSmoothingEnabled = true;
+    if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+    ctx.globalAlpha = 0.9;
     // Ombre portée légère pour visibilité sur fond clair
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(0,0,0,0.55)';
+    ctx.shadowBlur = 6;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 2;
     ctx.drawImage(window._camLogoImg, x, y, size, size);
@@ -24990,6 +24993,9 @@ function _drawVideoMirror(ctx, video, W, H) {
   if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw-sw)/2; sy = 0; }
   else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh-sh)/2; }
   ctx.save();
+  // Smoothing haute qualité pour le rendu vidéo (downscale/upscale du flux caméra)
+  ctx.imageSmoothingEnabled = true;
+  if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
   ctx.scale(-1, 1);
   ctx.drawImage(video, sx, sy, sw, sh, -W, 0, W, H);
   ctx.restore();
@@ -25558,7 +25564,7 @@ function _tdr_startRec(){
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime=_tsym_getBestMime();
-  try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}):new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000});}
+  try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}):new MediaRecorder(stream,{videoBitsPerSecond:3500000,audioBitsPerSecond:128000});}
   catch(e){try{_tdr_recorder=new MediaRecorder(stream);}catch(e2){_tdr_recError('start failed');return;}}
   _tdr_recChunks=[];_tdr_recSec=0;
   _tdr_recorder.ondataavailable=function(e){if(e.data&&e.data.size>0)_tdr_recChunks.push(e.data);};
@@ -25707,10 +25713,10 @@ function _tsym_startRec() {
   var mimeType = _tsym_getBestMime();
   try {
     _tsym_recorder = mimeType
-      ? new MediaRecorder(stream, {mimeType: mimeType, videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000})
-      : new MediaRecorder(stream, {videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000});
+      ? new MediaRecorder(stream, {mimeType: mimeType, videoBitsPerSecond: 3500000, audioBitsPerSecond: 128000})
+      : new MediaRecorder(stream, {videoBitsPerSecond: 3500000, audioBitsPerSecond: 128000});
   } catch(e) {
-    try { _tsym_recorder = new MediaRecorder(stream, {videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000}); }
+    try { _tsym_recorder = new MediaRecorder(stream, {videoBitsPerSecond: 3500000, audioBitsPerSecond: 128000}); }
     catch(e2) {
       _tsym_recError(_t(
         'Impossible de démarrer l\'enregistrement',
@@ -28435,7 +28441,7 @@ function _dcog_startRec() {
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime = _tsym_getBestMime();
-  try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream,{videoBitsPerSecond:2500000,audioBitsPerSecond:128000}); }
+  try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream,{videoBitsPerSecond:3500000,audioBitsPerSecond:128000}); }
   catch(e) { try { _dcog_recorder = new MediaRecorder(stream); } catch(e2) { _dcog_recError('start failed'); return; } }
   _dcog_recChunks = []; _dcog_recSec = 0;
   _dcog_recorder.ondataavailable = function(e) { if(e.data && e.data.size>0) _dcog_recChunks.push(e.data); };
