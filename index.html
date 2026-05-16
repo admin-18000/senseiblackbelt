@@ -4302,6 +4302,54 @@ body.unlocked .sensei-only{display:revert !important}
 </div>
 
 <script>
+// ══ CAMERA HELPERS (global, accessibles à toutes les balises script) ══
+window._camCooldown = false;
+window._camIsLocked = function(){
+  if(window._camCooldown){
+    if(typeof _sensei_speak==='function'){
+      try{_sensei_speak(window._lang==='en'?'Wait a moment':'Patiente une seconde',1500);}catch(e){}
+    }
+    return true;
+  }
+  return false;
+};
+window._camStartCooldown = function(){
+  window._camCooldown = true;
+  setTimeout(function(){ window._camCooldown = false; }, 800);
+};
+// ══ LOGO sur canvas (pour qu'il apparaisse dans les vidéos enregistrées) ══
+window._camLogoImg = null;
+window._camLogoReady = false;
+(function(){
+  try {
+    var img = new Image();
+    // Pas de crossOrigin : logo.png est servi depuis le même domaine que la page,
+    // donc le canvas ne sera pas "tainted" et drawImage fonctionne sans header CORS.
+    img.onload = function(){ window._camLogoReady = true; };
+    img.onerror = function(){ window._camLogoReady = false; };
+    img.src = 'logo.png';
+    window._camLogoImg = img;
+  } catch(e){}
+})();
+window._camDrawLogo = function(ctx, W, H){
+  if (!window._camLogoReady || !window._camLogoImg || !ctx) return;
+  try {
+    // Taille adaptative : ~10% de la hauteur, min 64, max 110 px
+    var size = Math.max(64, Math.min(110, Math.round(H * 0.10)));
+    var pad = Math.max(12, Math.round(H * 0.025));
+    var x = W - size - pad;
+    var y = H - size - pad;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    // Ombre portée légère pour visibilité sur fond clair
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
+    ctx.drawImage(window._camLogoImg, x, y, size, size);
+    ctx.restore();
+  } catch(e){}
+};
 // ══ TRAINING PROGRAMS — ONGLETS ══
 function openProgTab(id, btn) {
   document.querySelectorAll('.prog-panel').forEach(p => p.style.display = 'none');
@@ -24747,16 +24795,35 @@ function _tsym_startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     _tsym_onError(_t('Caméra non disponible','Camera not available')); return;
   }
+  if (_camIsLocked()) return;
+  // Nettoyage défensif du recorder précédent
+  if (typeof _tsym_recorder !== 'undefined' && _tsym_recorder) {
+    try { if (_tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e) {}
+    _tsym_recorder = null;
+  }
+  if (typeof _tsym_recChunks !== 'undefined') _tsym_recChunks = [];
+  if (typeof _tsym_recActive !== 'undefined') _tsym_recActive = false;
+
+  var btnStart = document.getElementById('tsym_btnStart');
+  var btnStop  = document.getElementById('tsym_btnStop');
+  if (btnStart) { btnStart.disabled = true; btnStart.style.opacity = '0.5'; btnStart.style.pointerEvents = 'none'; }
   var status = document.getElementById('tsym_status');
   if (status) status.textContent = _t('Accès caméra...','Accessing camera...');
 
   var _vConstraints=[{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'},{width:{ideal:640},height:{ideal:480},facingMode:'user'},{facingMode:'user'},true];
   var _tsym_loadTimeout = null; // fix : _lt annulable depuis stopCamera
   function tryCamera(ci){
-    if(ci>=_vConstraints.length){_tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));return;}
+    if(ci>=_vConstraints.length){
+      _tsym_onError(_t('Caméra inaccessible','Camera inaccessible'));
+      if (btnStart) { btnStart.disabled = false; btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto'; btnStart.style.display = 'flex'; }
+      if (btnStop) btnStop.style.display = 'none';
+      return;
+    }
     navigator.mediaDevices.getUserMedia({video:_vConstraints[ci]})
     .then(function(stream) {
       _tsym_stream = stream;
+      if (btnStart) { btnStart.disabled = false; btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto'; btnStart.style.display = 'none'; }
+      if (btnStop) btnStop.style.display = 'flex';
       senseiCamShow('tsym', stream);
     })
     .catch(function(){tryCamera(ci+1);});
@@ -24935,7 +25002,10 @@ function _tsym_drawFrame(poses) {
   // Miroir vidéo — géré en interne par _drawVideoMirror
   _drawVideoMirror(_tsym_ctx, _tsym_video, W, H);
 
-  if (!poses || !poses[0]) return;
+  if (!poses || !poses[0]) {
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_tsym_ctx, W, H);
+    return;
+  }
   var kps = poses[0].keypoints;
   var scaleX = W / (_tsym_video.videoWidth  || 640);
   var scaleY = H / (_tsym_video.videoHeight || 480);
@@ -25265,6 +25335,8 @@ function _tsym_drawFrame(poses) {
     }
     _tsym_lastAudioScore = avg;
   }
+  // Logo SENSEI sur le canvas (capturé par MediaRecorder)
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_tsym_ctx, W, H);
 }
 
 var _TSYM_PAIRS = [
@@ -25874,22 +25946,37 @@ function _tdr_start() {
   if (!navigator.mediaDevices) {
     _tdr_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
+  if (_camIsLocked()) return;
+  // Nettoyage défensif du recorder précédent
+  if (typeof _tdr_recorder !== 'undefined' && _tdr_recorder) {
+    try { if (_tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e) {}
+    _tdr_recorder = null;
+  }
+  if (typeof _tdr_recChunks !== 'undefined') _tdr_recChunks = [];
+  if (typeof _tdr_recActive !== 'undefined') _tdr_recActive = false;
+
+  var btnStart = document.getElementById('tdr_btnStart');
+  var btnStop  = document.getElementById('tdr_btnStop');
+  if (btnStart) { btnStart.disabled = true; btnStart.style.opacity = '0.5'; btnStart.style.pointerEvents = 'none'; }
   _tdr_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
   function tryC(i) {
-    if (i >= constraints.length) { _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return; }
+    if (i >= constraints.length) {
+      _tdr_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946');
+      if (btnStart) { btnStart.disabled = false; btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto'; btnStart.style.display = 'flex'; }
+      if (btnStop) btnStop.style.display = 'none';
+      return;
+    }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _tdr_stream = stream;
+      if (btnStart) { btnStart.disabled = false; btnStart.style.opacity = '1'; btnStart.style.pointerEvents = 'auto'; btnStart.style.display = 'none'; }
+      if (btnStop) btnStop.style.display = 'flex';
+      var bRec=document.getElementById('tdr_btnRec');
+      if(bRec)bRec.style.display='flex';
       senseiCamShow('tdr', stream);
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
-  var bRec=document.getElementById('tdr_btnRec');
-  if(bRec)bRec.style.display='flex';
-  var btnStart = document.getElementById('tdr_btnStart');
-  var btnStop  = document.getElementById('tdr_btnStop');
-  if (btnStart) btnStart.style.display = 'none';
-  if (btnStop)  btnStop.style.display  = 'flex';
 }
 
 function _tdr_stop() {
@@ -26049,6 +26136,8 @@ function _tdr_drawFrame(poses) {
     ctx.shadowBlur = 0;
     ctx.restore();
   }
+  // Logo SENSEI sur le canvas (capturé par MediaRecorder)
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
 }
 
 function _tdr_drawTargets(ctx, W, H) {
@@ -26729,6 +26818,19 @@ function _dcog_start() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     _dcog_setStatus(_t('Caméra non disponible','Camera not available'), '#e63946'); return;
   }
+  if (_camIsLocked()) return;
+  // Nettoyage défensif du recorder précédent (relance rapide)
+  if (typeof _dcog_recorder !== 'undefined' && _dcog_recorder) {
+    try { if (_dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e) {}
+    _dcog_recorder = null;
+  }
+  if (typeof _dcog_recChunks !== 'undefined') _dcog_recChunks = [];
+  if (typeof _dcog_recActive !== 'undefined') _dcog_recActive = false;
+
+  var btnS = document.getElementById('dcog_btnStart');
+  var btnT = document.getElementById('dcog_btnStop');
+  // Désactiver visuellement le bouton START sans le cacher (évite état zombie)
+  if (btnS) { btnS.disabled = true; btnS.style.opacity = '0.5'; btnS.style.pointerEvents = 'none'; }
   _dcog_setStatus(_t('Accès caméra...','Accessing camera...'), '#f5c518');
   var constraints = [
     {video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30},facingMode:'user'}},
@@ -26739,18 +26841,21 @@ function _dcog_start() {
   ];
   function tryC(i) {
     if (i >= constraints.length) {
-      _dcog_setStatus(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); return;
+      _dcog_setStatus(_t('Caméra inaccessible','Camera inaccessible'), '#e63946');
+      // Restaurer le bouton si échec total
+      if (btnS) { btnS.disabled = false; btnS.style.opacity = '1'; btnS.style.pointerEvents = 'auto'; btnS.style.display = 'flex'; }
+      if (btnT) btnT.style.display = 'none';
+      return;
     }
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream) {
       _dcog_stream = stream;
+      // SEULEMENT MAINTENANT on bascule les boutons (caméra acquise)
+      if (btnS) { btnS.disabled = false; btnS.style.opacity = '1'; btnS.style.pointerEvents = 'auto'; btnS.style.display = 'none'; }
+      if (btnT) btnT.style.display = 'flex';
       senseiCamShow('dcog', stream);
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
-  var btnS = document.getElementById('dcog_btnStart');
-  var btnT = document.getElementById('dcog_btnStop');
-  if (btnS) btnS.style.display = 'none';
-  if (btnT) btnT.style.display = 'flex';
 }
 
 function _dcog_stop() {
@@ -27279,6 +27384,8 @@ function _dcog_drawFrame(poses) {
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
   }
+  // Logo SENSEI sur le canvas (capturé par MediaRecorder)
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
 }
 
 /* ═══════════════════════════════════════════
@@ -28795,10 +28902,20 @@ if('serviceWorker' in navigator){
 
   <button id="sensei-cam-rec-btn" onclick="senseiCamToggleRec()" style="display:none;position:absolute;top:14px;left:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#9679; REC</button>
   <button id="sensei-cam-stop-btn" onclick="senseiCamStop()" style="display:none;position:absolute;top:14px;right:14px;z-index:10001;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:15px;padding:10px 22px;border-radius:30px;border:none;cursor:pointer;letter-spacing:1px">&#10005; STOP</button>
-  <img id="sensei-cam-logo" src="logo.png" alt="SENSEI" style="display:none;position:absolute;bottom:14px;right:14px;width:60px;height:60px;z-index:10000;opacity:.75;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">
+  <img id="sensei-cam-logo" src="logo.png" alt="SENSEI" style="display:none;position:absolute;bottom:14px;right:14px;width:60px;height:60px;z-index:10000;opacity:0;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))">
 </div>
 <script>
 var _scam={stream:null,video:null,canvas:null,ctx:null,module:null};
+// Détection de coupure caméra par iOS quand l'app passe en background
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible' && _scam.module && _scam.stream) {
+    var tracks = _scam.stream.getTracks();
+    var dead = tracks.some(function(t) { return t.readyState === 'ended'; });
+    if (dead && typeof senseiCamStop === 'function') {
+      senseiCamStop();
+    }
+  }
+});
 
 // Helper : fermer la caméra proprement après fin de session
 function _senseiEndSession(delay) {
@@ -28875,6 +28992,8 @@ function senseiCamStop(){
     p.style.visibility = '';
     p.removeAttribute('data-cam-hidden');
   });
+  // Démarrer le cooldown pour éviter relance trop rapide (iOS PWA)
+  if (typeof _camStartCooldown === 'function') _camStartCooldown();
 }
 window.addEventListener('resize',function(){
   if(!_scam.canvas)return;
