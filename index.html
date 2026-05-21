@@ -1704,6 +1704,9 @@ body.unlocked .sensei-only{display:revert !important}
       👤 <span id="dcog_guide2">Corps entier visible dans le cadre</span><br>
       💡 <span id="dcog_guide3">Bonne luminosité requise</span>
     </div>
+    <button class="sensei-tv-btn" onclick="_sensei_toggleTvMode()" ontouchstart=""
+      style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">📺 MODE TV : DÉSACTIVÉ</button>
+    <div class="sensei-tv-hint" style="margin-top:6px;font-size:9px;color:#5a6377;line-height:1.5;text-align:center"></div>
   </div>
 
   <!-- CAMERA CANVAS -->
@@ -1951,6 +1954,9 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="font-size:9px;color:#7a8299" id="tsym_guide2txt">Téléphone DE PROFIL · Bras + épaules visibles</div>
       </div>
     </div>
+    <button class="sensei-tv-btn" onclick="_sensei_toggleTvMode()" ontouchstart=""
+      style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">📺 MODE TV : DÉSACTIVÉ</button>
+    <div class="sensei-tv-hint" style="margin-top:6px;font-size:9px;color:#5a6377;line-height:1.5;text-align:center"></div>
   </div>
 
 
@@ -2089,6 +2095,11 @@ body.unlocked .sensei-only{display:revert !important}
       <canvas id="tdr_canvas" width="640" height="480"
         style="width:100%;height:auto;display:block;background:#0d1117;border-radius:10px"></canvas>
     </div>
+
+    <!-- Mode TV (affichage grand écran) -->
+    <button class="sensei-tv-btn" onclick="_sensei_toggleTvMode()" ontouchstart=""
+      style="width:100%;margin-bottom:8px;padding:9px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">📺 MODE TV : DÉSACTIVÉ</button>
+    <div class="sensei-tv-hint" style="margin-bottom:8px;font-size:9px;color:#5a6377;line-height:1.5;text-align:center"></div>
 
     <!-- Status + score live -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -22809,6 +22820,69 @@ function initTraining_d() {
 
 function _t(fr, en) { return window._lang === 'en' ? en : fr; }
 
+/* ════════════════════════════════════════════════════════════════
+   TV MODE — affichage optimisé grand écran (AirPlay / Cast / HDMI)
+   ────────────────────────────────────────────────────────────────
+   L'utilisateur lance son mirroring natif (AirPlay iOS / Cast Android).
+   Le TV Mode agrandit les éléments dessinés sur canvas (panneau, HUD,
+   textes) via le multiplicateur _sensei_tvScale, pour une lecture du
+   fond du gymnase. État global partagé par tous les drills caméra.
+   Choix persisté en localStorage.
+════════════════════════════════════════════════════════════════ */
+var _sensei_tvMode  = false;
+var _sensei_tvScale = 1.0;          // 1.0 normal · 1.35 en TV Mode
+
+/* Charger le choix sauvegardé au démarrage */
+try {
+  if (localStorage.getItem('sensei_tvmode') === '1') {
+    _sensei_tvMode  = true;
+    _sensei_tvScale = 1.35;
+  }
+} catch(e) {}
+
+/* Bascule TV Mode — appelée par les boutons des 3 modules */
+function _sensei_toggleTvMode() {
+  _sensei_tvMode  = !_sensei_tvMode;
+  _sensei_tvScale = _sensei_tvMode ? 1.35 : 1.0;
+  try { localStorage.setItem('sensei_tvmode', _sensei_tvMode ? '1' : '0'); } catch(e) {}
+  _sensei_refreshTvButtons();
+}
+
+/* Met à jour l'apparence de TOUS les boutons TV Mode (DCOG/TSYM/TDR) */
+function _sensei_refreshTvButtons() {
+  var en = window._lang === 'en';
+  var btns = document.querySelectorAll('.sensei-tv-btn');
+  for (var i=0;i<btns.length;i++) {
+    var b = btns[i];
+    if (_sensei_tvMode) {
+      b.style.background = 'rgba(245,197,24,.15)';
+      b.style.border     = '1px solid rgba(245,197,24,.5)';
+      b.style.color      = '#f5c518';
+      b.textContent      = '📺 ' + (en ? 'TV MODE: ON' : 'MODE TV : ACTIVÉ');
+    } else {
+      b.style.background = 'var(--dark3)';
+      b.style.border     = '1px solid #1e2535';
+      b.style.color      = '#7a8299';
+      b.textContent      = '📺 ' + (en ? 'TV MODE: OFF' : 'MODE TV : DÉSACTIVÉ');
+    }
+  }
+}
+
+/* Texte d'invite contextuel selon la plateforme */
+function _sensei_tvHintText() {
+  var en = window._lang === 'en';
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) {
+    return en ? 'Mirror via AirPlay, then place your phone as a fixed camera.'
+              : 'Diffuse via AirPlay, puis pose ton téléphone comme caméra fixe.';
+  }
+  return en ? 'Mirror via Cast / HDMI, then place your phone as a fixed camera.'
+            : 'Diffuse via Cast / HDMI, puis pose ton téléphone comme caméra fixe.';
+}
+
+
 var _td_VIDEOS = [
   {id:'ttwQywcjF6s',title:'Drill #1'},
   {id:'BkMXA0Z8bLc',title:'Drill #2'},
@@ -26829,6 +26903,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.btn-primary,.btn-secondary').forEach(function(btn) {
     btn.addEventListener('touchstart', function(){ _vibe(10); }, {passive:true});
   });
+  // TV Mode : haptique + init de l'état (boutons + texte d'invite)
+  document.querySelectorAll('.sensei-tv-btn').forEach(function(btn) {
+    btn.addEventListener('touchstart', function(){ _vibe(10); }, {passive:true});
+  });
+  document.querySelectorAll('.sensei-tv-hint').forEach(function(el) {
+    el.textContent = _sensei_tvHintText();
+  });
+  if (typeof _sensei_refreshTvButtons === 'function') _sensei_refreshTvButtons();
 });
 
 /* ── Sub-option setters ──────────────────────────────────────── */
@@ -28956,8 +29038,10 @@ function _dcog_tbd_draw(ctx, W, H) {
   }
 
   // Couche 1 — Le panneau LED
-  var panelW = W * 0.70;
-  var panelH = H * 0.155;
+  // TV Mode : panneau et texte agrandis pour lecture à distance.
+  var tvS = (typeof _sensei_tvScale === 'number') ? _sensei_tvScale : 1.0;
+  var panelW = Math.min(W * 0.94, W * 0.70 * tvS);
+  var panelH = H * 0.155 * (tvS > 1 ? 1.12 : 1);
   var panelX = (W - panelW) / 2;
   var panelY = H * 0.045;
   var flashing = now < _dcog_tbd_flashUntil;
@@ -28976,7 +29060,7 @@ function _dcog_tbd_draw(ctx, W, H) {
   if (instr) {
     var label = _dcog_tbd_label(instr);
     var col   = _dcog_tbd_instrColor(instr);
-    var fs = Math.max(46, Math.min(H*0.115, 110));
+    var fs = Math.max(46, Math.min(H*0.115, 110)) * tvS;
     ctx.font = 'bold ' + fs + 'px "Bebas Neue","Arial Narrow",sans-serif';
     var tw = ctx.measureText(label).width;
     if (tw > panelW*0.92) {
@@ -29056,7 +29140,7 @@ function _dcog_tbd_draw(ctx, W, H) {
 
   // HUD compact : streak (sous le panneau)
   if (_dcog_tbd_streak >= 2) {
-    ctx.font = 'bold ' + Math.round(H*0.055) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.font = 'bold ' + Math.round(H*0.055*tvS) + 'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.lineWidth = 4;
