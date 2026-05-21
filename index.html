@@ -28983,8 +28983,15 @@ function _dcog_tbd_draw(ctx, W, H) {
     var subLine = (instr.kind === 'trap') ? _t('NE FAIS PAS', 'DO NOT') : null;
     if (subLine) cy = panelY + panelH*0.62;
 
+    // Lisibilité à distance (joueur à 2-3m) : contour sombre net SOUS le texte,
+    // puis glow LED discret par-dessus. Lettres tranchantes, halo léger.
+    ctx.lineWidth   = Math.max(4, fs*0.085);
+    ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+    ctx.lineJoin    = 'round';
+    ctx.shadowBlur  = 0;
+    ctx.strokeText(label, cx, cy);
     ctx.shadowColor = col;
-    ctx.shadowBlur  = flashing ? 26 : 16;
+    ctx.shadowBlur  = flashing ? 12 : 7;
     ctx.fillStyle   = col;
     ctx.fillText(label, cx, cy);
     ctx.shadowBlur  = 0;
