@@ -2612,7 +2612,12 @@ body.unlocked .sensei-only{display:revert !important}
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🏃</span>
-            <div><div class="vis-card-title" data-i18n="vis_vitesse_title">VITESSE DU JOUEUR
+            <div><div class="vis-card-title" data-i18n="vis_vitesse_title">VITESSE DU JOUEUR</div><div class="vis-formula">v = d / t   |   v_max ≈ 10 m/s</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_vitesse_tag">⚡ CINÉMATIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_vitesse_desc">Un joueur NBA sprint à ~10 m/s. La simulation compare marche, trot et sprint — vitesse = distance ÷ temps.</div>
+          <div class="vis-wrap"><canvas id="visu-vitesse"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🏀</span>
@@ -2621,12 +2626,6 @@ body.unlocked .sensei-only{display:revert !important}
           </div>
           <div class="vis-desc" data-i18n="vis_restitution_desc">Un ballon NBA lâché de 1,80m rebondit à 1,35m — coefficient e=0,75. Animation de la perte d'énergie à chaque rebond.</div>
           <div class="vis-wrap"><canvas id="visu-restitution"></canvas></div>
-        </div>
-      </div><div class="vis-formula">v = d / t   |   v_max ≈ 10 m/s</div></div>
-            <span class="vis-tag vis-tag-gold" data-i18n="vis_vitesse_tag">⚡ CINÉMATIQUE</span>
-          </div>
-          <div class="vis-desc" data-i18n="vis_vitesse_desc">Un joueur NBA sprint à ~10 m/s. La simulation compare marche, trot et sprint — vitesse = distance ÷ temps.</div>
-          <div class="vis-wrap"><canvas id="visu-vitesse"></canvas></div>
         </div>
         <div class="vis-card">
           <div class="vis-card-hd">
@@ -2675,9 +2674,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-phys-lycee" style="display:block">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🏀</span>
-        <div><div class="vis-card-title" data-i18n="vis_card1_title">LA PARABOLE DU TIR
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🏀</span>
+            <div><div class="vis-card-title" data-i18n="vis_card1_title">LA PARABOLE DU TIR</div><div class="vis-formula">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_tag1">⚡ PHYSIQUE BALISTIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_card1_desc">Chaque tir suit une trajectoire parabolique. L'angle optimal est 45° — ni trop plat, ni trop vertical.</div>
+          <div class="vis-wrap"><canvas id="visu-a"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">⚡</span>
@@ -2705,12 +2709,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_doppler_desc">Le son du ballon change de fréquence quand le joueur court vers ou s'éloigne du panier — effet Doppler illustré.</div>
           <div class="vis-wrap"><canvas id="visu-doppler"></canvas></div>
         </div>
-      </div><div class="vis-formula">y = x·tan(θ) − gx²/2v₀²cos²(θ)</div></div>
-        <span class="vis-tag vis-tag-gold" data-i18n="vis_tag1">⚡ PHYSIQUE BALISTIQUE</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_card1_desc">Chaque tir suit une trajectoire parabolique. L'angle optimal est 45° — ni trop plat, ni trop vertical.</div>
-      <div class="vis-wrap"><canvas id="visu-a"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🎯</span>
@@ -2812,9 +2810,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-phys-licence" style="display:none">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🌊</span>
-        <div><div class="vis-card-title" data-i18n="vis_bernoulli_title">BERNOULLI — AÉRODYNAMIQUE
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🌊</span>
+            <div><div class="vis-card-title" data-i18n="vis_bernoulli_title">BERNOULLI — AÉRODYNAMIQUE</div><div class="vis-formula">P + ½ρv² + ρgh = cte</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_bernoulli_tag">⚡ AÉRODYNAMIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_bernoulli_desc">Flux rapide → pression basse → portance (backspin = Magnus).</div>
+          <div class="vis-wrap"><canvas id="visu-bernoulli"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">💨</span>
@@ -2824,12 +2827,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_pression_atm_desc">La loi des gaz parfaits explique pourquoi un ballon se dégonfle par temps froid. Simulation P, V, T interactifs.</div>
           <div class="vis-wrap"><canvas id="visu-pression-atm"></canvas></div>
         </div>
-      </div><div class="vis-formula">P + ½ρv² + ρgh = cte</div></div>
-        <span class="vis-tag vis-tag-gold" data-i18n="vis_bernoulli_tag">⚡ AÉRODYNAMIQUE</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_bernoulli_desc">Flux rapide → pression basse → portance (backspin = Magnus).</div>
-      <div class="vis-wrap"><canvas id="visu-bernoulli"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🔄</span>
@@ -2850,9 +2847,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-phys-master" style="display:none">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">〰️</span>
-        <div><div class="vis-card-title" data-i18n="vis_oscillation_title">OSCILLATIONS — RYTHME DE DRIBBLE
+          <div class="vis-card-hd">
+            <span style="font-size:22px">〰️</span>
+            <div><div class="vis-card-title" data-i18n="vis_oscillation_title">OSCILLATIONS — RYTHME DE DRIBBLE</div><div class="vis-formula">x(t) = A·cos(ωt+φ)   f = ω/2π</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_oscillation_tag">⚡ MÉCANIQUE VIBRATOIRE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_oscillation_desc">Dribble = oscillateur harmonique. Expert : 4-6 Hz. Débutant : 1-2 Hz.</div>
+          <div class="vis-wrap"><canvas id="visu-oscillation"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">📡</span>
@@ -2862,12 +2864,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_bruit_desc">MoveNet génère du bruit sur les keypoints. Filtrage passe-bas appliqué au signal de dribble — avant/après.</div>
           <div class="vis-wrap"><canvas id="visu-bruit"></canvas></div>
         </div>
-      </div><div class="vis-formula">x(t) = A·cos(ωt+φ)   f = ω/2π</div></div>
-        <span class="vis-tag vis-tag-gold" data-i18n="vis_oscillation_tag">⚡ MÉCANIQUE VIBRATOIRE</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_oscillation_desc">Dribble = oscillateur harmonique. Expert : 4-6 Hz. Débutant : 1-2 Hz.</div>
-      <div class="vis-wrap"><canvas id="visu-oscillation"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🌡️</span>
@@ -3045,9 +3041,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-maths-lycee" style="display:block">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">⏱️</span>
-        <div><div class="vis-card-title" data-i18n="vis_card6_title">LE TIR AU BUZZER
+          <div class="vis-card-hd">
+            <span style="font-size:22px">⏱️</span>
+            <div><div class="vis-card-title" data-i18n="vis_card6_title">LE TIR AU BUZZER</div><div class="vis-formula">t ∈ [tₙ, tₙ₊₁[ — discrétisation du temps</div></div>
+            <span class="vis-tag vis-tag-red" data-i18n="vis_tag6">📐 ANALYSE NUMÉRIQUE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_card6_desc">L'arbitre cherche dans quel intervalle discret le ballon a quitté la main.</div>
+          <div class="vis-wrap"><canvas id="visu-buzzer"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🔢</span>
@@ -3057,12 +3058,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_complexes_desc">Tourner son corps de θ° = multiplier par e^iθ dans le plan complexe. Animation du pivot et du fadeaway.</div>
           <div class="vis-wrap"><canvas id="visu-complexes"></canvas></div>
         </div>
-      </div><div class="vis-formula">t ∈ [tₙ, tₙ₊₁[ — discrétisation du temps</div></div>
-        <span class="vis-tag vis-tag-red" data-i18n="vis_tag6">📐 ANALYSE NUMÉRIQUE</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_card6_desc">L'arbitre cherche dans quel intervalle discret le ballon a quitté la main.</div>
-      <div class="vis-wrap"><canvas id="visu-buzzer"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">👟</span>
@@ -3119,9 +3114,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-maths-licence" style="display:none">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">📊</span>
-        <div><div class="vis-card-title" data-i18n="vis_correlation_title">CORRÉLATION DE PEARSON
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📊</span>
+            <div><div class="vis-card-title" data-i18n="vis_correlation_title">CORRÉLATION DE PEARSON</div><div class="vis-formula">r = Σ(x-x̄)(y-ȳ)/√[Σ(x-x̄)²·Σ(y-ȳ)²]</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_correlation_tag">📊 STATISTIQUES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_correlation_desc">r=0.78 entre volume d'entraînement et régularité du geste — forte corrélation.</div>
+          <div class="vis-wrap"><canvas id="visu-correlation"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🎵</span>
@@ -3131,12 +3131,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_serie_fourier_desc">Le rythme de dribble décomposé en harmoniques — séries de Fourier reconstruisent progressivement le signal périodique.</div>
           <div class="vis-wrap"><canvas id="visu-serie-fourier"></canvas></div>
         </div>
-      </div><div class="vis-formula">r = Σ(x-x̄)(y-ȳ)/√[Σ(x-x̄)²·Σ(y-ȳ)²]</div></div>
-        <span class="vis-tag vis-tag-blue" data-i18n="vis_correlation_tag">📊 STATISTIQUES</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_correlation_desc">r=0.78 entre volume d'entraînement et régularité du geste — forte corrélation.</div>
-      <div class="vis-wrap"><canvas id="visu-correlation"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">📐</span>
@@ -3256,9 +3250,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-maths-master" style="display:none">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">📉</span>
-        <div><div class="vis-card-title" data-i18n="vis_derivee_title">DÉRIVÉE — VITESSE INSTANTANÉE
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📉</span>
+            <div><div class="vis-card-title" data-i18n="vis_derivee_title">DÉRIVÉE — VITESSE INSTANTANÉE</div><div class="vis-formula">f'(t) = lim[f(t+h)-f(t)]/h   h→0</div></div>
+            <span class="vis-tag vis-tag-red" data-i18n="vis_derivee_tag">📐 ANALYSE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_derivee_desc">Tangente animée = vitesse instantanée du poignet. Expert : 8-12 m/s.</div>
+          <div class="vis-wrap"><canvas id="visu-derivee"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">📊</span>
@@ -3268,12 +3267,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_loi_puissance_desc">Les scores NBA suivent une loi puissance : 20% des joueurs font 80% des points. Distribution Zipf animée.</div>
           <div class="vis-wrap"><canvas id="visu-loi-puissance"></canvas></div>
         </div>
-      </div><div class="vis-formula">f'(t) = lim[f(t+h)-f(t)]/h   h→0</div></div>
-        <span class="vis-tag vis-tag-red" data-i18n="vis_derivee_tag">📐 ANALYSE</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_derivee_desc">Tangente animée = vitesse instantanée du poignet. Expert : 8-12 m/s.</div>
-      <div class="vis-wrap"><canvas id="visu-derivee"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">∫</span>
@@ -3296,9 +3289,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-neuro-master" style="display:block">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🧠</span>
-        <div><div class="vis-card-title" data-i18n="vis_neuro_title">PLASTICITÉ NEURONALE
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🧠</span>
+            <div><div class="vis-card-title" data-i18n="vis_neuro_title">PLASTICITÉ NEURONALE</div><div class="vis-formula">ΔW = η · δ · x (règle de Hebb)</div></div>
+            <span class="vis-tag vis-tag-purple" data-i18n="vis_tag2">🧬 NEUROSCIENCES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_card2_desc">La répétition renforce les connexions synaptiques. Le geste devient automatique. Base neurologique de la ceinture noire.</div>
+          <div class="vis-wrap"><canvas id="visu-b"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">❤️</span>
@@ -3308,12 +3306,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_hrv_desc">La variabilité cardiaque (HRV) mesure la récupération du joueur — haute HRV = système nerveux autonome équilibré = prêt à performer.</div>
           <div class="vis-wrap"><canvas id="visu-hrv"></canvas></div>
         </div>
-      </div><div class="vis-formula">ΔW = η · δ · x (règle de Hebb)</div></div>
-        <span class="vis-tag vis-tag-purple" data-i18n="vis_tag2">🧬 NEUROSCIENCES</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_card2_desc">La répétition renforce les connexions synaptiques. Le geste devient automatique. Base neurologique de la ceinture noire.</div>
-      <div class="vis-wrap"><canvas id="visu-b"></canvas></div>
-    </div>
       </div>
     </div>
     <div class="vis-acc" id="acc-neuro-master2" data-state="open">
@@ -3325,9 +3317,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-neuro-master2" style="display:block">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🧠</span>
-        <div><div class="vis-card-title" data-i18n="vis_connectome_title">CONNECTOME MOTEUR
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🧠</span>
+            <div><div class="vis-card-title" data-i18n="vis_connectome_title">CONNECTOME MOTEUR</div><div class="vis-formula">Cortex → Cervelet → Moelle → Muscle</div></div>
+            <span class="vis-tag vis-tag-purple" data-i18n="vis_connectome_tag">🧬 NEUROSCIENCES COMPUTATIONNELLES</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_connectome_desc">10 000 rép. myélinisent la boucle Cortex→Cervelet. Conduction 100× plus rapide.</div>
+          <div class="vis-wrap"><canvas id="visu-connectome"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🕐</span>
@@ -3364,12 +3361,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_attention_desc">Un joueur expert focalise son attention (spotlight) sur 2-3 zones clés — le reste du terrain est traité en vision périphérique.</div>
           <div class="vis-wrap"><canvas id="visu-attention"></canvas></div>
         </div>
-      </div><div class="vis-formula">Cortex → Cervelet → Moelle → Muscle</div></div>
-        <span class="vis-tag vis-tag-purple" data-i18n="vis_connectome_tag">🧬 NEUROSCIENCES COMPUTATIONNELLES</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_connectome_desc">10 000 rép. myélinisent la boucle Cortex→Cervelet. Conduction 100× plus rapide.</div>
-      <div class="vis-wrap"><canvas id="visu-connectome"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">📈</span>
@@ -3420,9 +3411,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-data-licence" style="display:block">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🎲</span>
-        <div><div class="vis-card-title" data-i18n="vis_card12_title">ESPÉRANCE — 2 PTS VS 3 PTS
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🎲</span>
+            <div><div class="vis-card-title" data-i18n="vis_card12_title">ESPÉRANCE — 2 PTS VS 3 PTS</div><div class="vis-formula">E = p × valeur</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_tag12">📊 PROBABILITÉS</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_card12_desc">E₂ = 0.80 pts/tir, E₃ = 0.99 pts/tir. Le 3pts est statistiquement supérieur.</div>
+          <div class="vis-wrap"><canvas id="visu-esperance"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🎲</span>
@@ -3432,12 +3428,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_vraisemblance_desc">Estimer le vrai FG% d'un joueur avec seulement 10 tirs observés — courbe de vraisemblance animée.</div>
           <div class="vis-wrap"><canvas id="visu-vraisemblance"></canvas></div>
         </div>
-      </div><div class="vis-formula">E = p × valeur</div></div>
-        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag12">📊 PROBABILITÉS</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_card12_desc">E₂ = 0.80 pts/tir, E₃ = 0.99 pts/tir. Le 3pts est statistiquement supérieur.</div>
-      <div class="vis-wrap"><canvas id="visu-esperance"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🧮</span>
@@ -3494,9 +3484,14 @@ body.unlocked .sensei-only{display:revert !important}
       </button>
       <div class="vis-acc-body" id="body-data-master" style="display:none">
         <div class="vis-card">
-      <div class="vis-card-hd">
-        <span style="font-size:22px">🥁</span>
-        <div><div class="vis-card-title" data-i18n="vis_card11_title">FOURIER & RYTHME DE DRIBBLE
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🥁</span>
+            <div><div class="vis-card-title" data-i18n="vis_card11_title">FOURIER & RYTHME DE DRIBBLE</div><div class="vis-formula">X(f) = ∫ x(t)·e⁻²πft dt</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_tag11">📡 TRAITEMENT DU SIGNAL</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_card11_desc">Le dribble est un signal périodique. Fourier révèle la régularité du rythme.</div>
+          <div class="vis-wrap"><canvas id="visu-fourier"></canvas></div>
+        </div>
         <div class="vis-card">
           <div class="vis-card-hd">
             <span style="font-size:22px">🔄</span>
@@ -3506,12 +3501,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div class="vis-desc" data-i18n="vis_convolution_desc">La convolution glisse un filtre sur le signal de dribble pour lisser le mouvement et détecter les patterns rythmiques.</div>
           <div class="vis-wrap"><canvas id="visu-convolution"></canvas></div>
         </div>
-      </div><div class="vis-formula">X(f) = ∫ x(t)·e⁻²πft dt</div></div>
-        <span class="vis-tag vis-tag-blue" data-i18n="vis_tag11">📡 TRAITEMENT DU SIGNAL</span>
-      </div>
-      <div class="vis-desc" data-i18n="vis_card11_desc">Le dribble est un signal périodique. Fourier révèle la régularité du rythme.</div>
-      <div class="vis-wrap"><canvas id="visu-fourier"></canvas></div>
-    </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">📉</span>
@@ -3658,45 +3647,7 @@ body.unlocked .sensei-only{display:revert !important}
         <div class="vis-card" id="vis-card-shannon">
       <div class="vis-card-hd">
         <span style="font-size:22px">🧮</span>
-        <div>
-          <div class="vis-card-title" data-i18n="vis_card19_title">THÉORÈME DU DRIBBLE À N BALLONS
-        <div class="vis-card">
-          <div class="vis-card-hd">
-            <span style="font-size:22px">🌐</span>
-            <div><div class="vis-card-title" data-i18n="vis_topologie_title">TOPOLOGIE — ESPACE DES TACTIQUES</div><div class="vis-formula">π₁(X) — groupe fondamental   |   déformation continue</div></div>
-            <span class="vis-tag vis-tag-blue" data-i18n="vis_topologie_tag">🔬 TOPOLOGIE</span>
-          </div>
-          <div class="vis-desc" data-i18n="vis_topologie_desc">L'espace des configurations tactiques est un espace topologique — deux tactiques sont équivalentes si on peut passer de l'une à l'autre continûment.</div>
-          <div class="vis-wrap"><canvas id="visu-topologie"></canvas></div>
-        </div>
-        <div class="vis-card">
-          <div class="vis-card-hd">
-            <span style="font-size:22px">📏</span>
-            <div><div class="vis-card-title" data-i18n="vis_theorie_mesure_title">THÉORIE DE LA MESURE — PERFORMANCE</div><div class="vis-formula">μ(A∪B) = μ(A)+μ(B)   |   σ-additivité</div></div>
-            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_mesure_tag">📐 MESURE</span>
-          </div>
-          <div class="vis-desc" data-i18n="vis_theorie_mesure_desc">Mesurer la performance d'un joueur rigoureusement — théorie de Lebesgue appliquée aux espaces de stats basketball.</div>
-          <div class="vis-wrap"><canvas id="visu-theorie-mesure"></canvas></div>
-        </div>
-        <div class="vis-card">
-          <div class="vis-card-hd">
-            <span style="font-size:22px">🌀</span>
-            <div><div class="vis-card-title" data-i18n="vis_riemannien_title">GÉOMÉTRIE RIEMANNIENNE — MOUVEMENTS SPORTIFS</div><div class="vis-formula">ds² = gᵢⱼdxⁱdxʲ   |   courbure K</div></div>
-            <span class="vis-tag vis-tag-blue" data-i18n="vis_riemannien_tag">🔬 GÉOMÉTRIE</span>
-          </div>
-          <div class="vis-desc" data-i18n="vis_riemannien_desc">L'espace des mouvements d'un joueur est courbé — la géodésique riemannienne donne le chemin optimal entre deux postures.</div>
-          <div class="vis-wrap"><canvas id="visu-riemannien"></canvas></div>
-        </div>
-        <div class="vis-card">
-          <div class="vis-card-hd">
-            <span style="font-size:22px">📶</span>
-            <div><div class="vis-card-title" data-i18n="vis_theorie_info_title">CAPACITÉ DU CANAL — CERVEAU DU JOUEUR</div><div class="vis-formula">C = B·log₂(1 + SNR)   |   Shannon 1948</div></div>
-            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_info_tag">📡 INFORMATION</span>
-          </div>
-          <div class="vis-desc" data-i18n="vis_theorie_info_desc">Combien d'informations le cerveau peut-il traiter en dribblant et lisant la défense ? Capacité du canal de Shannon.</div>
-          <div class="vis-wrap"><canvas id="visu-theorie-info"></canvas></div>
-        </div>
-      </div>
+        <div><div class="vis-card-title" data-i18n="vis_card19_title">THÉORÈME DU DRIBBLE À N BALLONS</div>
           <div class="vis-formula">(F + D) × H = (V + D) × N</div>
         </div>
         <span class="vis-tag vis-tag-green" data-i18n="vis_tag19">🧮 SHANNON 1980</span>
@@ -3750,6 +3701,42 @@ body.unlocked .sensei-only{display:revert !important}
         </style>
       </div>
     </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🌐</span>
+            <div><div class="vis-card-title" data-i18n="vis_topologie_title">TOPOLOGIE — ESPACE DES TACTIQUES</div><div class="vis-formula">π₁(X) — groupe fondamental   |   déformation continue</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_topologie_tag">🔬 TOPOLOGIE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_topologie_desc">L'espace des configurations tactiques est un espace topologique — deux tactiques sont équivalentes si on peut passer de l'une à l'autre continûment.</div>
+          <div class="vis-wrap"><canvas id="visu-topologie"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📏</span>
+            <div><div class="vis-card-title" data-i18n="vis_theorie_mesure_title">THÉORIE DE LA MESURE — PERFORMANCE</div><div class="vis-formula">μ(A∪B) = μ(A)+μ(B)   |   σ-additivité</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_mesure_tag">📐 MESURE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_theorie_mesure_desc">Mesurer la performance d'un joueur rigoureusement — théorie de Lebesgue appliquée aux espaces de stats basketball.</div>
+          <div class="vis-wrap"><canvas id="visu-theorie-mesure"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">🌀</span>
+            <div><div class="vis-card-title" data-i18n="vis_riemannien_title">GÉOMÉTRIE RIEMANNIENNE — MOUVEMENTS SPORTIFS</div><div class="vis-formula">ds² = gᵢⱼdxⁱdxʲ   |   courbure K</div></div>
+            <span class="vis-tag vis-tag-blue" data-i18n="vis_riemannien_tag">🔬 GÉOMÉTRIE</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_riemannien_desc">L'espace des mouvements d'un joueur est courbé — la géodésique riemannienne donne le chemin optimal entre deux postures.</div>
+          <div class="vis-wrap"><canvas id="visu-riemannien"></canvas></div>
+        </div>
+        <div class="vis-card">
+          <div class="vis-card-hd">
+            <span style="font-size:22px">📶</span>
+            <div><div class="vis-card-title" data-i18n="vis_theorie_info_title">CAPACITÉ DU CANAL — CERVEAU DU JOUEUR</div><div class="vis-formula">C = B·log₂(1 + SNR)   |   Shannon 1948</div></div>
+            <span class="vis-tag vis-tag-gold" data-i18n="vis_theorie_info_tag">📡 INFORMATION</span>
+          </div>
+          <div class="vis-desc" data-i18n="vis_theorie_info_desc">Combien d'informations le cerveau peut-il traiter en dribblant et lisant la défense ? Capacité du canal de Shannon.</div>
+          <div class="vis-wrap"><canvas id="visu-theorie-info"></canvas></div>
+        </div>
         <div class="vis-card">
       <div class="vis-card-hd">
         <span style="font-size:22px">🌀</span>
@@ -28785,52 +28772,43 @@ var _dcog_tbd_refShoulderGap2 = null;
    uni : libellé universel (FR=EN) ; sinon fr/en bilingues
 ─────────────────────────────────────────────────────────────── */
 var _dcog_tbd_poolOneSimple = [
-  { id:'cross',   uni:'CROSS',          kind:'dribble', validable:false },
-  { id:'tween',   uni:'TWEEN',          kind:'dribble', validable:false },
-  { id:'behind',  uni:'BEHIND',         kind:'dribble', validable:false },
-  { id:'front',   uni:'FRONT',          kind:'dribble', validable:false },
-  { id:'hesi',    uni:'HESITATION',     kind:'dribble', validable:false },
-  { id:'pounds',  uni:'POUNDS',         kind:'dribble', validable:false },
-  { id:'switch',  fr:'CHANGE DE MAIN',  en:'SWITCH HANDS', kind:'dribble', validable:false },
-  { id:'rhand',   fr:'MAIN DROITE',     en:'RIGHT HAND',   kind:'dribble', validable:false },
-  { id:'lhand',   fr:'MAIN GAUCHE',     en:'LEFT HAND',    kind:'dribble', validable:false },
-  { id:'low',     fr:'DRIBBLE BAS',     en:'LOW DRIBBLE',  kind:'dribble', validable:false },
-  { id:'high',    fr:'DRIBBLE HAUT',    en:'HIGH DRIBBLE', kind:'dribble', validable:false },
-  { id:'slow',    fr:'LENT',            en:'SLOW',         kind:'tempo',   validable:false },
-  { id:'fast',    fr:'RAPIDE',          en:'FAST',         kind:'tempo',   validable:false },
-  { id:'explode', fr:'EXPLOSE',         en:'EXPLODE',      kind:'tempo',   validable:false },
-  { id:'freeze',  fr:'FREEZE',          en:'FREEZE',       kind:'posture', validable:true, pose:'freeze' },
-  { id:'eyesup',  fr:'REGARDE EN HAUT', en:'EYES UP',      kind:'posture', validable:true, pose:'eyesup' },
-  { id:'getlow',  fr:'BAISSE-TOI',      en:'GET LOW',      kind:'posture', validable:true, pose:'getlow' },
-  { id:'spin',    fr:'TOURNE',          en:'SPIN',         kind:'posture', validable:true, pose:'spin' },
-  { id:'stepback',fr:'RECULE',          en:'STEP BACK',    kind:'posture', validable:true, pose:'stepback' },
-  { id:'stepup',  fr:'AVANCE',          en:'STEP UP',      kind:'posture', validable:true, pose:'stepup' }
+  { id:'front',  uni:'FRONT',         kind:'dribble', validable:false },
+  { id:'tween',  uni:'TWEEN',         kind:'dribble', validable:false },
+  { id:'behind', uni:'BEHIND',        kind:'dribble', validable:false },
+  { id:'cross',  uni:'CROSS',         kind:'dribble', validable:false },
+  { id:'rtween', uni:'REVERSE-TWEEN', kind:'dribble', validable:false },
+  { id:'bback',  uni:'BEHIND-BACK',   kind:'dribble', validable:false }
 ];
-/* Combos générés (naming universel) — débloqués quand la cadence accélère */
+/* Combos doubles générés — débloqués quand la cadence accélère */
 var _dcog_tbd_poolOneCombo = [
-  { id:'c_tt', uni:'TWEEN-TWEEN',  kind:'dribble', validable:false },
-  { id:'c_tb', uni:'TWEEN-BEHIND', kind:'dribble', validable:false },
-  { id:'c_tc', uni:'TWEEN-CROSS',  kind:'dribble', validable:false },
-  { id:'c_tf', uni:'TWEEN-FRONT',  kind:'dribble', validable:false },
-  { id:'c_cb', uni:'CROSS-BEHIND', kind:'dribble', validable:false },
-  { id:'c_cc', uni:'CROSS-CROSS',  kind:'dribble', validable:false },
-  { id:'c_bb', uni:'BEHIND-BEHIND',kind:'dribble', validable:false },
-  { id:'c_bf', uni:'BEHIND-FRONT', kind:'dribble', validable:false },
-  { id:'c_fc', uni:'FRONT-CROSS',  kind:'dribble', validable:false }
+  { id:'c_ft',  uni:'FRONT-TWEEN',          kind:'dribble', validable:false },
+  { id:'c_fb',  uni:'FRONT-BEHIND',         kind:'dribble', validable:false },
+  { id:'c_fc',  uni:'FRONT-CROSS',          kind:'dribble', validable:false },
+  { id:'c_tt',  uni:'TWEEN-TWEEN',          kind:'dribble', validable:false },
+  { id:'c_tb',  uni:'TWEEN-BEHIND',         kind:'dribble', validable:false },
+  { id:'c_tc',  uni:'TWEEN-CROSS',          kind:'dribble', validable:false },
+  { id:'c_trt', uni:'TWEEN-REVERSE-TWEEN',  kind:'dribble', validable:false },
+  { id:'c_bb',  uni:'BEHIND-BEHIND',        kind:'dribble', validable:false },
+  { id:'c_bc',  uni:'BEHIND-CROSS',         kind:'dribble', validable:false },
+  { id:'c_bbk', uni:'BEHIND-BEHIND-BACK',   kind:'dribble', validable:false },
+  { id:'c_cc',  uni:'CROSS-CROSS',          kind:'dribble', validable:false },
+  { id:'c_ct',  uni:'CROSS-TWEEN',          kind:'dribble', validable:false },
+  { id:'c_cb',  uni:'CROSS-BEHIND',         kind:'dribble', validable:false },
+  { id:'c_rtb', uni:'REVERSE-TWEEN-BEHIND', kind:'dribble', validable:false },
+  { id:'c_rtc', uni:'REVERSE-TWEEN-CROSS',  kind:'dribble', validable:false }
 ];
-/* Triple combos — palier minimum (1.5s) uniquement */
+/* Combos triples — palier de cadence rapide (1.5s) uniquement */
 var _dcog_tbd_poolOneTriple = [
-  { id:'t_ttc', uni:'TWEEN-TWEEN-CROSS',  kind:'dribble', validable:false },
-  { id:'t_tbc', uni:'TWEEN-BEHIND-CROSS', kind:'dribble', validable:false },
-  { id:'t_cbf', uni:'CROSS-BEHIND-FRONT', kind:'dribble', validable:false },
-  { id:'t_tbf', uni:'TWEEN-BEHIND-FRONT', kind:'dribble', validable:false }
+  { id:'t_ftc', uni:'FRONT-TWEEN-CROSS',     kind:'dribble', validable:false },
+  { id:'t_tbc', uni:'TWEEN-BEHIND-CROSS',    kind:'dribble', validable:false },
+  { id:'t_ttb', uni:'TWEEN-TWEEN-BEHIND',    kind:'dribble', validable:false },
+  { id:'t_cbf', uni:'CROSS-BEHIND-FRONT',    kind:'dribble', validable:false },
+  { id:'t_rtb', uni:'REVERSE-TWEEN-BEHIND-CROSS', kind:'dribble', validable:false },
+  { id:'t_bbc', uni:'BEHIND-BACK-CROSS',     kind:'dribble', validable:false }
 ];
-/* Pièges Stroop — le joueur doit NE PAS exécuter */
-var _dcog_tbd_poolOneTrap = [
-  { id:'trap_dd', uni:'DOUBLE DRIBBLE', kind:'trap', validable:false },
-  { id:'trap_tr', fr:'MARCHER', en:'TRAVEL', kind:'trap', validable:false }
-];
-/* POOL Mode 2 ballons */
+/* Plus de pièges Stroop — pool vide conservé pour compat */
+var _dcog_tbd_poolOneTrap = [];
+/* POOL Mode 2 ballons — combos de coordination bi-manuelle */
 var _dcog_tbd_poolTwo = [
   { id:'sync',    fr:'SYNCHRO',              en:'SYNC',         kind:'dribble', validable:false },
   { id:'alt',     fr:'ALTERNÉ',              en:'ALTERNATE',    kind:'dribble', validable:false },
@@ -28840,8 +28818,7 @@ var _dcog_tbd_poolTwo = [
   { id:'lfast',   fr:'GAUCHE PLUS RAPIDE',   en:'LEFT FASTER',  kind:'dribble', validable:false },
   { id:'highlow', fr:'HAUT / BAS',           en:'HIGH / LOW',   kind:'dribble', validable:false },
   { id:'pyramid', fr:'PYRAMIDE',             en:'PYRAMID',      kind:'dribble', validable:false },
-  { id:'stopgo',  fr:'STOP & GO',            en:'STOP & GO',    kind:'dribble', validable:false },
-  { id:'eyesup2', fr:'REGARDE EN HAUT',      en:'EYES UP',      kind:'posture', validable:true, pose:'eyesup' }
+  { id:'stopgo',  fr:'STOP & GO',            en:'STOP & GO',    kind:'dribble', validable:false }
 ];
 
 /* ── Setter mode (1 ballon / 2 ballons) ──────────────────────── */
@@ -28869,32 +28846,45 @@ function _dcog_tbd_label(instr) {
 function _dcog_tbd_speakText(instr) {
   if (!instr) return '';
   var en = window._lang === 'en';
-  if (instr.kind === 'trap') {
-    if (instr.id === 'trap_dd') return en ? 'Do not double dribble' : 'Ne fais pas de double dribble';
-    if (instr.id === 'trap_tr') return en ? 'Do not travel' : 'Ne marche pas';
-  }
-  var moveFR = { CROSS:'crossover', TWEEN:'entre les jambes', BEHIND:'dans le dos',
-                 FRONT:'devant', HESITATION:'hésitation', POUNDS:'pounds' };
-  var moveEN = { CROSS:'crossover', TWEEN:'between the legs', BEHIND:'behind the back',
-                 FRONT:'front change', HESITATION:'hesitation', POUNDS:'pounds' };
+  // Dictionnaire des 6 briques (clés = libellé universel exact)
+  var moveFR = {
+    'FRONT':'devant', 'TWEEN':'entre les jambes', 'BEHIND':'dans le dos',
+    'CROSS':'crossover', 'REVERSE-TWEEN':'reverse tween', 'BEHIND-BACK':'behind back'
+  };
+  var moveEN = {
+    'FRONT':'front change', 'TWEEN':'between the legs', 'BEHIND':'behind the back',
+    'CROSS':'crossover', 'REVERSE-TWEEN':'reverse tween', 'BEHIND-BACK':'behind the back'
+  };
   var dict = en ? moveEN : moveFR;
-  if (instr.uni && instr.uni.indexOf('-') > -1) {
-    var parts = instr.uni.split('-');
-    var sep = en ? ' then ' : ' puis ';
-    var out = [];
-    for (var i=0;i<parts.length;i++) out.push(dict[parts[i]] || parts[i].toLowerCase());
-    return out.join(sep);
+  if (instr.uni) {
+    // Découper le combo en briques connues (gère les briques à tiret comme REVERSE-TWEEN)
+    var bricks = ['REVERSE-TWEEN','BEHIND-BACK','FRONT','TWEEN','BEHIND','CROSS'];
+    var label = instr.uni, parts = [], guard = 0;
+    while (label.length > 0 && guard < 10) {
+      guard++;
+      var matched = false;
+      for (var b=0;b<bricks.length;b++) {
+        if (label.indexOf(bricks[b]) === 0) {
+          parts.push(bricks[b]);
+          label = label.slice(bricks[b].length).replace(/^-/, '');
+          matched = true; break;
+        }
+      }
+      if (!matched) break;
+    }
+    if (parts.length > 0) {
+      var sep = en ? ' then ' : ' puis ';
+      var out = [];
+      for (var i=0;i<parts.length;i++) out.push(dict[parts[i]] || parts[i].toLowerCase());
+      return out.join(sep);
+    }
+    return instr.uni.toLowerCase();
   }
-  if (instr.uni) return dict[instr.uni] || instr.uni.toLowerCase();
   return en ? (instr.en || instr.fr || '') : (instr.fr || instr.en || '');
 }
 
-/* ── Couleur d'une instruction selon son type ──────────────────── */
+/* ── Couleur d'une instruction ─────────────────────────────────── */
 function _dcog_tbd_instrColor(instr) {
-  if (!instr) return '#f5c518';
-  if (instr.kind === 'trap')    return '#e63946';
-  if (instr.kind === 'posture') return '#4ecdc4';
-  if (instr.kind === 'tempo')   return '#ff9f1c';
   return '#f5c518';
 }
 
@@ -28907,10 +28897,6 @@ function _dcog_tbd_pickInstruction() {
     pool = _dcog_tbd_poolOneSimple.slice();
     if (_dcog_tbd_interval <= 3.5) pool = pool.concat(_dcog_tbd_poolOneCombo);
     if (_dcog_tbd_interval <= 2.0) pool = pool.concat(_dcog_tbd_poolOneTriple);
-    if (Math.random() < 0.12 &&
-        (!_dcog_tbd_curInstr || _dcog_tbd_curInstr.kind !== 'trap')) {
-      pool = _dcog_tbd_poolOneTrap;
-    }
   }
   var pick, guard = 0;
   do {
@@ -28957,12 +28943,10 @@ function _dcog_tbd_nextInstruction() {
   if (_dcog_tbd_curInstr) {
     var prev = _dcog_tbd_curInstr;
     var ok;
-    if (prev.kind === 'trap') {
-      ok = true;  // piège : joueur seul juge — aucune sanction injuste
-    } else if (prev.validable) {
+    if (prev.validable) {
       ok = _dcog_tbd_lastValidated;
     } else {
-      ok = true;  // move ballon non détectable : compté au rythme
+      ok = true;  // combo de dribble : compté au rythme (non détectable sans tracking ballon)
     }
     if (ok) {
       _dcog_tbd_correct++;
@@ -29202,8 +29186,8 @@ function _dcog_tbd_draw(ctx, W, H) {
   // Couche 1 — Le panneau LED
   // TV Mode : panneau et texte agrandis pour lecture à distance.
   var tvS = (typeof _sensei_tvScale === 'number') ? _sensei_tvScale : 1.0;
-  var panelW = Math.min(W * 0.94, W * 0.70 * tvS);
-  var panelH = H * 0.155 * (tvS > 1 ? 1.12 : 1);
+  var panelW = Math.min(W * 0.96, W * 0.80 * tvS);
+  var panelH = H * 0.185 * (tvS > 1 ? 1.12 : 1);
   var panelX = (W - panelW) / 2;
   var panelY = H * 0.045;
   var flashing = now < _dcog_tbd_flashUntil;
@@ -29222,19 +29206,17 @@ function _dcog_tbd_draw(ctx, W, H) {
   if (instr) {
     var label = _dcog_tbd_label(instr);
     var col   = _dcog_tbd_instrColor(instr);
-    var fs = Math.max(46, Math.min(H*0.115, 110)) * tvS;
+    // Texte agrandi pour lisibilité terrain (joueur à distance)
+    var fs = Math.max(58, Math.min(H*0.140, 132)) * tvS;
     ctx.font = 'bold ' + fs + 'px "Bebas Neue","Arial Narrow",sans-serif';
     var tw = ctx.measureText(label).width;
-    if (tw > panelW*0.92) {
-      fs = fs * (panelW*0.92 / tw);
+    if (tw > panelW*0.94) {
+      fs = fs * (panelW*0.94 / tw);
       ctx.font = 'bold ' + fs + 'px "Bebas Neue","Arial Narrow",sans-serif';
     }
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     var cx = W*0.5, cy = panelY + panelH*0.50;
-
-    var subLine = (instr.kind === 'trap') ? _t('NE FAIS PAS', 'DO NOT') : null;
-    if (subLine) cy = panelY + panelH*0.62;
 
     // Lisibilité à distance (joueur à 2-3m) : contour sombre net SOUS le texte,
     // aucun halo/glow — lettres parfaitement tranchantes.
@@ -29245,15 +29227,6 @@ function _dcog_tbd_draw(ctx, W, H) {
     ctx.strokeText(label, cx, cy);
     ctx.fillStyle   = col;
     ctx.fillText(label, cx, cy);
-
-    if (subLine) {
-      ctx.font = 'bold ' + Math.round(fs*0.32) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
-      ctx.fillStyle = '#e63946';
-      ctx.shadowColor = 'rgba(0,0,0,0.9)';
-      ctx.shadowBlur = 4;
-      ctx.fillText(subLine, cx, panelY + panelH*0.26);
-      ctx.shadowBlur = 0;
-    }
   }
 
   // Chrono visuel : barre qui se vide sous le panneau
