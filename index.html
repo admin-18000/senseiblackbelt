@@ -23774,7 +23774,14 @@ function _sensei_speak(text, minInterval) {
   if (_sensei_speaking || now - _sensei_lastSpeak < gap) return;
   _sensei_speaking = true;
   _sensei_lastSpeak = now;
-  var utt = new SpeechSynthesisUtterance(text);
+  // Correction phonétique : en FR le TTS lit "Sensei" -> "san-sé".
+  // On envoie "Seine-sé" à la voix pour obtenir "saine-sé".
+  // En EN, "Sensei" -> "SEN-say" est déjà correct : on n'y touche pas.
+  var spoken = text;
+  if (window._lang !== 'en' && typeof spoken === 'string') {
+    spoken = spoken.replace(/Sensei/gi, 'Seine-sé');
+  }
+  var utt = new SpeechSynthesisUtterance(spoken);
   utt.lang = window._lang === 'en' ? 'en-US' : 'fr-FR';
   utt.rate  = 1.1;
   utt.pitch = 1.0;
