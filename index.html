@@ -19278,6 +19278,12 @@ function drawOndelettes(){
   c.setLineDash([]);
   c.fillStyle='rgba(230,57,70,.9)';c.font='700 9px Barlow Condensed';c.textAlign='center';
   c.fillText(t('Rupture de rythme','Rhythm break'),breakX,H*0.9);
+  // Tête de lecture animée qui balaie le scalogramme
+  var headX=(T/400)*W;
+  c.strokeStyle='rgba(245,197,24,.9)';c.lineWidth=2;
+  c.beginPath();c.moveTo(headX,H*0.08);c.lineTo(headX,H*0.87);c.stroke();
+  c.fillStyle='rgba(245,197,24,.9)';
+  c.beginPath();c.arc(headX,H*0.08,4,0,Math.PI*2);c.fill();
   c.fillStyle='rgba(245,197,24,.55)';c.font='700 10px Barlow Condensed';c.textAlign='left';
   c.fillText('ψ(t) = e^(−t²/2)·cos(2πf₀t)',W*0.05,H*0.94);
 }
@@ -21145,9 +21151,22 @@ function drawNewton3(){
   zones.forEach(function(z,i){
     c.strokeStyle='rgba(245,197,24,0.2)';c.lineWidth=1;
     c.strokeRect(z.x+4,4,z.w-8,H-8);
-    c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
+    // Titre : taille auto-réduite pour tenir dans la colonne (FR+EN)
+    var titleFs=Math.round(W*0.038);
+    c.font='bold '+titleFs+'px Barlow Condensed';
+    var maxW=z.w-14;
+    while(c.measureText(z.lbl).width>maxW && titleFs>9){
+      titleFs--; c.font='bold '+titleFs+'px Barlow Condensed';
+    }
+    c.fillStyle=GOLD;
     c.textAlign='center';c.fillText(z.lbl,z.x+z.w/2,H*0.12);
-    c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
+    // Sous-titre : même logique
+    var subFs=Math.round(W*0.028);
+    c.font=subFs+'px Barlow Condensed';
+    while(c.measureText(z.sub).width>maxW && subFs>8){
+      subFs--; c.font=subFs+'px Barlow Condensed';
+    }
+    c.fillStyle='rgba(255,255,255,0.6)';
     c.fillText(z.sub,z.x+z.w/2,H*0.22);
     var cx=z.x+z.w/2, cy=H*0.55, r=W*0.06;
     if(i===0){
@@ -21181,6 +21200,7 @@ function drawBalistique(){
   var floorY=H*0.82, GOLD='#f5c518';
   var angles=[35,45,52,65];
   var colors=['#e63946','#2dc653','#f5c518','#4ecdc4'];
+  var optimalPts=null;
   angles.forEach(function(ang,i){
     var rad=ang*Math.PI/180;
     var v0=W*0.012;
@@ -21191,12 +21211,22 @@ function drawBalistique(){
       if(floorY-y*H*0.008<floorY)pts.push({x:x,y:floorY-y*H*0.008});
       else{pts.push({x:x,y:floorY});break;}
     }
+    if(i===2)optimalPts=pts;
     c.strokeStyle=colors[i];c.lineWidth=i===2?2.5:1.2;c.setLineDash(i===2?[]:[3,3]);
     c.beginPath();pts.forEach(function(p,j){j===0?c.moveTo(p.x+W*0.08,p.y):c.lineTo(p.x+W*0.08,p.y);});c.stroke();
     c.setLineDash([]);
     c.fillStyle=colors[i];c.font='bold '+Math.round(W*0.033)+'px Barlow Condensed';
     c.textAlign='left';c.fillText(ang+'°',W*0.08+5,floorY-(ang-20)*H*0.004);
   });
+  // Ballon animé le long de la trajectoire optimale
+  if(optimalPts&&optimalPts.length>1){
+    var idx=Math.floor((T/200)*optimalPts.length)%optimalPts.length;
+    var bp=optimalPts[idx];
+    var grd=c.createRadialGradient(bp.x+W*0.08-4,bp.y-4,0,bp.x+W*0.08,bp.y,W*0.022);
+    grd.addColorStop(0,'#ffb866');grd.addColorStop(1,'#e87c2a');
+    c.fillStyle=grd;
+    c.beginPath();c.arc(bp.x+W*0.08,bp.y,W*0.022,0,Math.PI*2);c.fill();
+  }
   // Panier
   c.strokeStyle='#e87c2a';c.lineWidth=2;
   c.beginPath();c.moveTo(W*0.85,floorY-H*0.25);c.lineTo(W*0.85+W*0.06,floorY-H*0.25);c.stroke();
@@ -21383,7 +21413,9 @@ function drawPressionAtm(){
   var P_base=8;
   temps.forEach(function(temp,i){
     var P=P_base*(273+temp)/293;
-    var cx=W*(0.2+i*0.3), cy=H*0.55, r=W*0.09*(P/P_base);
+    // Pulsation thermique : plus il fait chaud, plus le ballon "respire" fort
+    var pulse=1+0.05*Math.sin(T*0.05+i)*(temp+15)/55;
+    var cx=W*(0.2+i*0.3), cy=H*0.55, r=W*0.09*(P/P_base)*pulse;
     var col=temp<0?'#4ecdc4':temp<25?'#2dc653':'#e63946';
     c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);
     c.fillStyle=col+'33';c.fill();
@@ -21405,13 +21437,13 @@ function drawBruit(){
   var T=drawBruit._t, en=window._lang==='en';
   var GOLD='#f5c518';
   var N=drawBruit._noise;
-  // Signal bruité (haut)
+  // Signal bruité (haut) — le bruit défile dans le temps
   var midH=H*0.3;
   c.strokeStyle='rgba(230,57,70,0.8)';c.lineWidth=1.2;c.beginPath();
   for(var x=0;x<W;x++){
     var idx=Math.floor(x*N.length/W);
-    var signal=Math.sin(x*0.08)*H*0.1;
-    var noise=N[idx]*H*0.08;
+    var signal=Math.sin(x*0.08+T*0.06)*H*0.1;
+    var noise=N[(idx+Math.floor(T))%N.length]*H*0.08;
     var y=midH+signal+noise;
     x===0?c.moveTo(x,y):c.lineTo(x,y);
   }c.stroke();
@@ -21421,7 +21453,7 @@ function drawBruit(){
   var midH2=H*0.72;
   c.strokeStyle='rgba(45,198,83,0.9)';c.lineWidth=2;c.beginPath();
   for(var x2=0;x2<W;x2++){
-    var signal2=Math.sin(x2*0.08)*H*0.1;
+    var signal2=Math.sin(x2*0.08+T*0.06)*H*0.1;
     var y2=midH2+signal2;
     x2===0?c.moveTo(x2,y2):c.lineTo(x2,y2);
   }c.stroke();
@@ -21505,11 +21537,13 @@ function drawLoiPuissance(){
   var alpha=1.8, N=20;
   var maxY=H*0.8,baseX=W*0.1,barW=(W*0.85)/N;
   var maxVal=Math.pow(1,-alpha)*100;
+  // Barre dorée qui se balade de gauche à droite (lecture animée)
+  var activeBar=Math.floor(T/10)%N;
   for(var i=0;i<N;i++){
     var rank=i+1;
     var val=Math.pow(rank,-alpha)*100;
     var h=val/Math.pow(1,-alpha)*maxY*0.9;
-    var highlight=(T/10)%N|0===i;
+    var highlight=(activeBar===i);
     c.fillStyle=highlight?GOLD:(i<4?'#e63946':'rgba(245,197,24,0.4)');
     c.fillRect(baseX+i*barW,H*0.85-h,barW*0.8,h);
   }
@@ -21541,6 +21575,15 @@ function drawVraisemblance(){
   c.beginPath();c.moveTo(mleX,H*0.15);c.lineTo(mleX,H*0.85);c.stroke();c.setLineDash([]);
   c.fillStyle='#2dc653';c.font='bold '+Math.round(W*0.038)+'px Barlow Condensed';
   c.textAlign='center';c.fillText('p̂ = '+pHat.toFixed(2),mleX,H*0.12);
+  // Point animé : balaie la courbe de vraisemblance et gravite autour du MLE
+  var px=( (Math.sin(T*0.04)*0.5+0.5)*0.5 + pHat*0.5 );
+  if(px>1)px=1;
+  var Lpx=Math.pow(px,k)*Math.pow(1-px,n-k)/maxL;
+  var pyx=H*0.85-Lpx*H*0.65;
+  var pxX=px*W;
+  c.fillStyle=GOLD;
+  c.beginPath();c.arc(pxX,pyx,W*0.014,0,Math.PI*2);c.fill();
+  c.strokeStyle='rgba(255,255,255,0.7)';c.lineWidth=1;c.stroke();
   c.fillStyle='rgba(255,255,255,0.7)';c.font=Math.round(W*0.03)+'px Barlow Condensed';
   c.fillText(en?'7/10 shots made — MLE estimates true FG%':'7/10 tirs réussis — MLE estime le vrai FG%',W/2,H*0.95);
   c.fillStyle='rgba(245,197,24,0.3)';c.fillRect(0,H*0.85,W,2);
@@ -21611,14 +21654,21 @@ function drawTheorieMesure(){
     {x:W*0.25,y:H*0.5,w:W*0.3,h:H*0.2,lbl:'B',val:0.28,col:'#2dc653'},
     {x:W*0.55,y:H*0.38,w:W*0.3,h:H*0.2,lbl:'C',val:0.18,col:'#4ecdc4'},
   ];
-  sets.forEach(function(s){
+  sets.forEach(function(s,si){
+    // Pulsation douce décalée par ensemble
+    var pulse=1+0.04*Math.sin(T*0.06+si*1.3);
+    var pw=s.w*pulse, ph=s.h*pulse;
+    var px=s.x-(pw-s.w)/2, py=s.y-(ph-s.h)/2;
     c.fillStyle=s.col+'33';c.strokeStyle=s.col;c.lineWidth=1.5;
-    c.beginPath();c.roundRect(s.x,s.y,s.w,s.h,8);c.fill();c.stroke();
+    c.beginPath();c.roundRect(px,py,pw,ph,8);c.fill();c.stroke();
     c.fillStyle=s.col;c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
-    c.textAlign='center';c.fillText('μ('+s.lbl+')='+s.val,s.x+s.w/2,s.y+s.h/2+5);
+    c.textAlign='center';c.fillText('μ('+s.lbl+')='+s.val,px+pw/2,py+ph/2+5);
   });
+  // Somme μ(A∪B∪C) qui se construit progressivement puis se maintient
+  var sumProg=Math.min(1,(T%300)/120);
+  var liveSum=(0.35+0.28+0.18)*sumProg;
   c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.034)+'px Barlow Condensed';
-  c.textAlign='center';c.fillText('μ(A∪B∪C) = '+( 0.35+0.28+0.18).toFixed(2),W/2,H*0.85);
+  c.textAlign='center';c.fillText('μ(A∪B∪C) = '+liveSum.toFixed(2),W/2,H*0.85);
   c.fillStyle='rgba(255,255,255,0.6)';c.font=Math.round(W*0.028)+'px Barlow Condensed';
   c.fillText(en?'σ-additivity: measure of performance spaces':'σ-additivité: mesure des espaces de perf.',W/2,H*0.95);
 }
