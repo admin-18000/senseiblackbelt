@@ -1990,7 +1990,7 @@ body.unlocked .sensei-only{display:revert !important}
 
 </div>
 <div id="tr-dribble" class="tr-panel" style="display:block;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card">
+  <div class="tr-card" id="td_chooseDrillCard">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
     <div class="vid-scroll" id="td_vidScroll"></div>
     <div id="td_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -26344,6 +26344,9 @@ function _tdr_setMode(m) {
   if (r)  r.style.display  = m === 'reaction' ? 'block' : 'none';
   if (rh) rh.style.display = m === 'rhythm'   ? 'block' : 'none';
   if (se) se.style.display = m === 'sensei'   ? 'block' : 'none';
+  // La vieille carte "Choisis ton drill" est redondante en mode Sensei
+  var chooseCard = document.getElementById('td_chooseDrillCard');
+  if (chooseCard) chooseCard.style.display = m === 'sensei' ? 'none' : 'block';
   document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
     b.style.background = b.dataset.mode === m ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
     b.style.color      = b.dataset.mode === m ? '#f5c518' : '#7a8299';
@@ -26609,7 +26612,27 @@ function _tdr_stop() {
 /* ── Calibration 3s ───────────────────────────────────────────── */
 function _tdr_onCamReady(video,canvas,ctx){
   _tdr_video=video; _tdr_canvas=canvas; _tdr_ctx=ctx;
+  // Mode Sensei : pas de calibration, pas de détection, pas de cibles.
+  // Juste le flux caméra en miroir (le joueur s'observe et reproduit).
+  if (_tdr_mode === 'sensei') {
+    _tdr_running = true;
+    _tdr_senseiMirrorLoop();
+    return;
+  }
   _tdr_calibrate();
+}
+
+/* ── Mode Sensei : boucle miroir simple (aucune analyse) ───────── */
+function _tdr_senseiMirrorLoop() {
+  if (!_tdr_running || _tdr_mode !== 'sensei') return;
+  var cv = _tdr_canvas, ctx = _tdr_ctx;
+  if (cv && ctx && _tdr_video) {
+    var W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+    _drawVideoMirror(ctx, _tdr_video, W, H);
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  }
+  _tdr_rafId = requestAnimationFrame(_tdr_senseiMirrorLoop);
 }
 function _tdr_calibrate() {
   // Attendre que le modèle IA soit prêt avant de démarrer la calibration
