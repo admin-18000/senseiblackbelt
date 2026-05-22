@@ -2019,6 +2019,13 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="font-size:18px;margin-bottom:3px">🎵</div>
         <div id="tdr_lblRhythm">RYTHME</div>
       </button>
+      <button class="tdr-mode-btn" data-mode="sensei" onclick="_tdr_setMode('sensei')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🥋</div>
+        <div id="tdr_lblSensei">SENSEI</div>
+      </button>
     </div>
 
     <!-- Panel Réaction : niveaux -->
@@ -2079,6 +2086,23 @@ body.unlocked .sensei-only{display:revert !important}
       <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:10px" id="tdr_rhythmDesc">
         Cibles sur chaque beat — reste en rythme !
       </div>
+    </div>
+
+    <!-- Panel Sensei : carrousel swipable de drills vidéo -->
+    <div id="tdr_panelSensei" style="display:none">
+      <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:8px" id="tdr_senseiHint">
+        Choisis un drill — observe le Sensei et reproduis
+      </div>
+      <div id="tdr_senseiCarousel"
+        style="position:relative;overflow:hidden;border-radius:10px;border:1px solid #1e2535;background:#0d1117;margin-bottom:8px;touch-action:pan-y">
+        <div id="tdr_senseiTrack"
+          style="display:flex;transition:transform .28s cubic-bezier(.22,.61,.36,1);will-change:transform"></div>
+        <button id="tdr_senseiPrev" onclick="_tdr_senseiSwipe(-1)" aria-label="Précédent"
+          style="position:absolute;left:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#f5c518;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+        <button id="tdr_senseiNext" onclick="_tdr_senseiSwipe(1)" aria-label="Suivant"
+          style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#f5c518;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+      <div id="tdr_senseiDots" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:10px"></div>
     </div>
 
     <!-- Guide placement -->
@@ -24975,6 +24999,9 @@ function _trApplyLang() {
   var tdrLbls = {
     'tdr_lblReaction': en?'REACTION':'RÉACTION',
     'tdr_lblRhythm':   en?'RHYTHM':'RYTHME',
+    'tdr_lblSensei':   'SENSEI',
+    'tdr_senseiHint':  en?'Pick a drill — watch the Sensei and copy'
+                         :'Choisis un drill — observe le Sensei et reproduis',
     'tdr_lblSimple':   'SIMPLE',
     'tdr_lblDouble':   'DOUBLE',
     'tdr_lblRandom':   'RANDOM',
@@ -26313,13 +26340,17 @@ function _tdr_setMode(m) {
   _tdr_mode = m;
   var r = document.getElementById('tdr_panelReaction');
   var rh = document.getElementById('tdr_panelRhythm');
+  var se = document.getElementById('tdr_panelSensei');
   if (r)  r.style.display  = m === 'reaction' ? 'block' : 'none';
   if (rh) rh.style.display = m === 'rhythm'   ? 'block' : 'none';
+  if (se) se.style.display = m === 'sensei'   ? 'block' : 'none';
   document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
     b.style.background = b.dataset.mode === m ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
     b.style.color      = b.dataset.mode === m ? '#f5c518' : '#7a8299';
     b.style.border     = b.dataset.mode === m ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
   });
+  // Mode Sensei : init du carrousel à la première sélection
+  if (m === 'sensei' && typeof _tdr_senseiInit === 'function') _tdr_senseiInit();
 }
 
 function _tdr_setLevel(lvl) {
@@ -26342,6 +26373,171 @@ function _tdr_setRMode(rm) {
     b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
   });
 }
+
+/* ════════════ TDR — MODE SENSEI (drill de mimétisme) ════════════ */
+/* ════════════════════════════════════════════════════════════════
+   TDR — MODE SENSEI  ·  drill de mimétisme
+   ────────────────────────────────────────────────────────────────
+   Split 60/40 : vidéo YouTube du Sensei (gauche) + caméra joueur
+   (droite). Le joueur observe et reproduit. Carrousel swipable
+   pour choisir le drill parmi SECTION_VIDEOS.ballhandling.
+   Enregistrement : caméra joueur seule (iframe YouTube non capturable).
+════════════════════════════════════════════════════════════════ */
+
+var _tdr_senseiIdx      = 0;        // index du drill sélectionné
+var _tdr_senseiInited   = false;    // carrousel construit ?
+var _tdr_senseiTouchX0  = null;     // début du geste tactile
+var _tdr_senseiTouchY0  = null;
+
+/* Liste des drills (réutilise les vidéos Ball Handling) */
+function _tdr_senseiList() {
+  if (typeof SECTION_VIDEOS !== 'undefined' && SECTION_VIDEOS.ballhandling) {
+    return SECTION_VIDEOS.ballhandling;
+  }
+  return [];
+}
+
+/* ── Construction du carrousel (une seule fois) ────────────────── */
+function _tdr_senseiInit() {
+  if (_tdr_senseiInited) return;
+  var track = document.getElementById('tdr_senseiTrack');
+  var dots  = document.getElementById('tdr_senseiDots');
+  var car   = document.getElementById('tdr_senseiCarousel');
+  if (!track || !dots || !car) return;
+  var list = _tdr_senseiList();
+  if (list.length === 0) return;
+
+  var en = window._lang === 'en';
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+
+  list.forEach(function(v, i) {
+    // Slide : vignette YouTube + titre
+    var slide = document.createElement('div');
+    slide.style.cssText = 'flex:0 0 100%;box-sizing:border-box;padding:10px;text-align:center';
+    var thumb = 'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg';
+    slide.innerHTML =
+      '<div style="position:relative;border-radius:8px;overflow:hidden;background:#000">' +
+        '<img src="' + thumb + '" alt="" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover">' +
+        '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">' +
+          '<div style="width:46px;height:46px;border-radius:50%;background:rgba(245,197,24,.92);' +
+                'display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d1117">▶</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:7px;font-family:var(--font-cond);font-size:12px;font-weight:700;color:#f5c518;letter-spacing:.5px">' +
+        (en ? 'DRILL #' : 'DRILL #') + (i + 1) +
+      '</div>';
+    slide.onclick = function(){ _tdr_senseiPick(i); };
+    track.appendChild(slide);
+
+    // Dot
+    var dot = document.createElement('div');
+    dot.className = 'tdr-sensei-dot';
+    dot.style.cssText = 'width:6px;height:6px;border-radius:50%;cursor:pointer;transition:all .2s;' +
+                        'background:' + (i === 0 ? '#f5c518' : '#2a3142');
+    dot.onclick = function(){ _tdr_senseiGoto(i); };
+    dots.appendChild(dot);
+  });
+
+  // Gestes tactiles : swipe horizontal
+  car.addEventListener('touchstart', function(e){
+    _tdr_senseiTouchX0 = e.touches[0].clientX;
+    _tdr_senseiTouchY0 = e.touches[0].clientY;
+  }, {passive:true});
+  car.addEventListener('touchend', function(e){
+    if (_tdr_senseiTouchX0 == null) return;
+    var dx = e.changedTouches[0].clientX - _tdr_senseiTouchX0;
+    var dy = e.changedTouches[0].clientY - _tdr_senseiTouchY0;
+    // Swipe horizontal franc (et pas un scroll vertical)
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      _tdr_senseiSwipe(dx < 0 ? 1 : -1);
+    }
+    _tdr_senseiTouchX0 = null;
+    _tdr_senseiTouchY0 = null;
+  }, {passive:true});
+
+  _tdr_senseiInited = true;
+  _tdr_senseiGoto(0);
+}
+
+/* ── Navigation carrousel ──────────────────────────────────────── */
+function _tdr_senseiGoto(i) {
+  var list = _tdr_senseiList();
+  if (list.length === 0) return;
+  if (i < 0) i = 0;
+  if (i > list.length - 1) i = list.length - 1;
+  _tdr_senseiIdx = i;
+  var track = document.getElementById('tdr_senseiTrack');
+  if (track) track.style.transform = 'translateX(' + (-i * 100) + '%)';
+  // Maj des dots
+  var dots = document.querySelectorAll('.tdr-sensei-dot');
+  for (var d = 0; d < dots.length; d++) {
+    dots[d].style.background = d === i ? '#f5c518' : '#2a3142';
+    dots[d].style.transform  = d === i ? 'scale(1.4)' : 'scale(1)';
+  }
+}
+
+function _tdr_senseiSwipe(dir) {
+  _tdr_senseiGoto(_tdr_senseiIdx + dir);
+}
+
+/* ── Sélection d'un drill : prépare le split ───────────────────── */
+function _tdr_senseiPick(i) {
+  _tdr_senseiGoto(i);
+  // Le drill sélectionné sera lancé par _tdr_start (qui lit _tdr_senseiIdx)
+  if (typeof _tdr_status === 'function') {
+    var en = window._lang === 'en';
+    _tdr_status(en ? ('Drill #' + (i+1) + ' selected — press START')
+                   : ('Drill #' + (i+1) + ' sélectionné — appuie sur DÉMARRER'), '#f5c518');
+  }
+}
+
+/* ── Charge la vidéo YouTube dans le split overlay ─────────────── */
+function _tdr_senseiLoadVideo() {
+  var list = _tdr_senseiList();
+  if (list.length === 0) return;
+  var v = list[_tdr_senseiIdx];
+  var fr = document.getElementById('sensei-cam-ytframe');
+  if (fr && v) {
+    fr.src = 'https://www.youtube.com/embed/' + v.id +
+             '?autoplay=1&mute=1&loop=1&playlist=' + v.id + '&controls=1&rel=0&playsinline=1';
+  }
+}
+
+/* ── Arrêt : coupe la vidéo ────────────────────────────────────── */
+function _tdr_senseiStopVideo() {
+  var fr = document.getElementById('sensei-cam-ytframe');
+  if (fr) fr.src = '';
+}
+
+/* ── Activation du split Sensei dans l'overlay caméra ──────────── */
+//    La vidéo occupe 60% gauche ; le canvas caméra est réduit à 40% droite.
+function _tdr_senseiActivate() {
+  var vid = document.getElementById('sensei-cam-senseivid');
+  var cv  = document.getElementById('sensei-cam-canvas');
+  if (vid) vid.style.display = 'block';
+  if (cv) {
+    // Le canvas caméra passe à droite, sur 40% de largeur
+    cv.style.left  = '60%';
+    cv.style.width = '40%';
+    cv.style.objectFit = 'cover';
+  }
+  _tdr_senseiLoadVideo();
+}
+
+/* ── Désactivation : restaure le canvas plein écran ────────────── */
+function _tdr_senseiDeactivate() {
+  _tdr_senseiStopVideo();
+  var vid = document.getElementById('sensei-cam-senseivid');
+  var cv  = document.getElementById('sensei-cam-canvas');
+  if (vid) vid.style.display = 'none';
+  if (cv) {
+    cv.style.left  = '';
+    cv.style.width = '';
+    cv.style.objectFit = '';
+  }
+}
+
 
 /* ── Caméra ───────────────────────────────────────────────────── */
 function _tdr_start() {
@@ -26376,6 +26572,10 @@ function _tdr_start() {
       var bRec=document.getElementById('tdr_btnRec');
       if(bRec)bRec.style.display='flex';
       senseiCamShow('tdr', stream);
+      // Mode Sensei : afficher le split + charger la vidéo YouTube
+      if (_tdr_mode === 'sensei' && typeof _tdr_senseiActivate === 'function') {
+        _tdr_senseiActivate();
+      }
     }).catch(function() { tryC(i+1); });
   }
   tryC(0);
@@ -26384,6 +26584,8 @@ function _tdr_start() {
 function _tdr_stop() {
   _tdr_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
+  // Mode Sensei : couper la vidéo + restaurer l'affichage normal
+  if (typeof _tdr_senseiDeactivate === 'function') _tdr_senseiDeactivate();
   _tdr_particles = []; // nettoyer particules résiduelles
   clearInterval(_tdr_timer);
   clearInterval(_tdr_metroSync);
@@ -29985,6 +30187,12 @@ if('serviceWorker' in navigator){
 <div id="sensei-cam-overlay">
   <video id="sensei-cam-video" playsinline muted></video>
   <canvas id="sensei-cam-canvas"></canvas>
+  <!-- Mode Sensei (TDR) : vidéo YouTube du Sensei à gauche (60%) -->
+  <div id="sensei-cam-senseivid" style="display:none;position:absolute;top:0;left:0;width:60%;height:100%;z-index:9;background:#000;border-right:2px solid #f5c518">
+    <div style="position:absolute;z-index:2;top:10px;left:10px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.55);color:#f5c518;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:1px">SENSEI</div>
+    <iframe id="sensei-cam-ytframe" width="100%" height="100%" style="border:none;display:block"
+      allow="autoplay;encrypted-media" allowfullscreen></iframe>
+  </div>
   <!-- Question math — affichée en phase 1 puis cachée -->
   <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(80px,18vh,160px);font-weight:900;letter-spacing:6px;text-align:center;z-index:10;text-shadow:0 6px 32px rgba(0,0,0,.95),0 0 20px rgba(0,0,0,.8);pointer-events:none;white-space:nowrap;width:max-content;background:rgba(0,0,0,0.45);padding:18px 42px;border-radius:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)"></div>
 
@@ -30066,6 +30274,13 @@ function senseiCamStop(){
   var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
   var qOv=document.getElementById('sensei-cam-question');
   if(qOv){qOv.style.display='none';qOv.textContent='';}
+  // Mode Sensei : couper la vidéo + masquer le split
+  var svid=document.getElementById('sensei-cam-senseivid');
+  if(svid)svid.style.display='none';
+  var syt=document.getElementById('sensei-cam-ytframe');
+  if(syt)syt.src='';
+  var scv=document.getElementById('sensei-cam-canvas');
+  if(scv){scv.style.left='';scv.style.width='';scv.style.objectFit='';}
   document.body.style.overflow='';
 
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
