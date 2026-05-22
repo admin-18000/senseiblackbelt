@@ -21195,44 +21195,129 @@ function drawBalistique(){
   var c=initC('visu-balistique');if(!c)return;
   var W=c.canvas.width,H=c.canvas.height;c.clearRect(0,0,W,H);
   if(!drawBalistique._t)drawBalistique._t=0;
-  drawBalistique._t=(drawBalistique._t+0.4)%200;
+  drawBalistique._t=(drawBalistique._t+1)%320;
   var T=drawBalistique._t, en=window._lang==='en';
-  var floorY=H*0.82, GOLD='#f5c518';
-  var angles=[35,45,52,65];
-  var colors=['#e63946','#2dc653','#f5c518','#4ecdc4'];
-  var optimalPts=null;
-  angles.forEach(function(ang,i){
-    var rad=ang*Math.PI/180;
-    var v0=W*0.012;
-    var pts=[];
-    for(var t2=0;t2<W/v0/Math.cos(rad)*1.2;t2+=0.5){
-      var x=v0*Math.cos(rad)*t2;
-      var y=v0*Math.sin(rad)*t2-0.5*9.81*0.001*t2*t2;
-      if(floorY-y*H*0.008<floorY)pts.push({x:x,y:floorY-y*H*0.008});
-      else{pts.push({x:x,y:floorY});break;}
+  var GOLD='#f5c518';
+
+  // Repère normalisé -> pixels
+  var floorY=H*0.86;
+  var shooterX=W*0.12;          // position du tireur
+  var releaseH=H*0.34;          // hauteur de lâcher du ballon
+  var releaseY=floorY-releaseH;
+  var rimR=W*0.045;             // demi-largeur de l'anneau
+  var hoopCx=W*0.80;            // CENTRE de l'anneau (le ballon vise ce point)
+  var rimH=H*0.52;              // hauteur de l'anneau
+  var rimY=floorY-rimH;
+
+  // Grille légère
+  c.strokeStyle='rgba(245,197,24,0.05)';c.lineWidth=1;
+  for(var gx=0;gx<W;gx+=W*0.1){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,floorY);c.stroke();}
+
+  // Sol
+  c.fillStyle='rgba(245,197,24,0.35)';c.fillRect(0,floorY,W,2);
+
+  // Distance horizontale tireur -> CENTRE de l'anneau
+  var dist=hoopCx-shooterX;
+  var dh=releaseY-rimY;         // dénivelé (positif si anneau plus haut)
+  var g=W*0.0016;               // gravité en unités pixel
+
+  // v0 calé pour que l'angle optimal (52°) passe exactement par l'anneau
+  function v0for(angDeg){
+    var a=angDeg*Math.PI/180;
+    var denom=2*Math.cos(a)*Math.cos(a)*(dist*Math.tan(a)-dh);
+    if(denom<=0)return null;
+    return Math.sqrt(g*dist*dist/denom);
+  }
+  var optAngle=52;
+  var v0opt=v0for(optAngle);
+
+  // Trajectoire y(x) pour un angle donné, avec la même v0 que l'optimal
+  function trajY(x,angDeg,v0){
+    var a=angDeg*Math.PI/180;
+    return releaseY - ( x*Math.tan(a) - g*x*x/(2*v0*v0*Math.cos(a)*Math.cos(a)) );
+  }
+
+  // Les 3 trajectoires : trop plat / OPTIMAL / trop haut
+  var shots=[
+    {ang:38,col:'#e63946',lbl:en?'Too flat':'Trop tendu'},
+    {ang:52,col:'#2dc653',lbl:en?'Optimal':'Optimal'},
+    {ang:66,col:'#4ecdc4',lbl:en?'Too high':'Trop haut'}
+  ];
+
+  var optPts=null;
+  shots.forEach(function(sh){
+    var isOpt=(sh.ang===optAngle);
+    c.strokeStyle=sh.col;c.lineWidth=isOpt?3:1.4;
+    c.setLineDash(isOpt?[]:[4,4]);
+    c.beginPath();
+    var pts=[],started=false;
+    for(var x=0;x<=dist;x+=dist/120){
+      var y=trajY(x,sh.ang,v0opt);
+      var px=shooterX+x, py=y;
+      if(py>floorY)py=floorY;
+      pts.push({x:px,y:py});
+      if(!started){c.moveTo(px,py);started=true;}else c.lineTo(px,py);
+      if(py>=floorY)break;
     }
-    if(i===2)optimalPts=pts;
-    c.strokeStyle=colors[i];c.lineWidth=i===2?2.5:1.2;c.setLineDash(i===2?[]:[3,3]);
-    c.beginPath();pts.forEach(function(p,j){j===0?c.moveTo(p.x+W*0.08,p.y):c.lineTo(p.x+W*0.08,p.y);});c.stroke();
+    c.stroke();
     c.setLineDash([]);
-    c.fillStyle=colors[i];c.font='bold '+Math.round(W*0.033)+'px Barlow Condensed';
-    c.textAlign='left';c.fillText(ang+'°',W*0.08+5,floorY-(ang-20)*H*0.004);
+    if(isOpt)optPts=pts;
+    // Label d'angle à l'apex de la courbe
+    var apex=pts[0];
+    for(var k=0;k<pts.length;k++) if(pts[k].y<apex.y)apex=pts[k];
+    c.fillStyle=sh.col;
+    c.font='bold '+Math.round(W*0.026)+'px Barlow Condensed';
+    c.textAlign='center';
+    c.fillText(sh.ang+'°  '+sh.lbl,apex.x,apex.y-H*0.04);
   });
-  // Ballon animé le long de la trajectoire optimale
-  if(optimalPts&&optimalPts.length>1){
-    var idx=Math.floor((T/200)*optimalPts.length)%optimalPts.length;
-    var bp=optimalPts[idx];
-    var grd=c.createRadialGradient(bp.x+W*0.08-4,bp.y-4,0,bp.x+W*0.08,bp.y,W*0.022);
+
+  // Tireur (silhouette simple)
+  c.strokeStyle='rgba(255,255,255,0.55)';c.lineWidth=2;
+  c.beginPath();c.arc(shooterX,releaseY+H*0.04,W*0.018,0,Math.PI*2);c.stroke();
+  c.beginPath();c.moveTo(shooterX,releaseY+H*0.06);c.lineTo(shooterX,floorY);c.stroke();
+
+  // Panier : potence (à droite de l'anneau) + anneau centré sur hoopCx
+  c.strokeStyle='#e87c2a';c.lineWidth=3;
+  c.beginPath();c.moveTo(hoopCx+rimR,rimY);c.lineTo(hoopCx+rimR,floorY);c.stroke();
+  c.lineWidth=3;
+  c.beginPath();c.moveTo(hoopCx-rimR,rimY);c.lineTo(hoopCx+rimR,rimY);c.stroke();
+  // Filet
+  c.strokeStyle='rgba(255,255,255,0.30)';c.lineWidth=1;
+  for(var nf=-2;nf<=2;nf++){
+    c.beginPath();
+    c.moveTo(hoopCx+nf*rimR*0.45,rimY);
+    c.lineTo(hoopCx+nf*rimR*0.22,rimY+rimR*1.0);
+    c.stroke();
+  }
+
+  // Ballon animé sur la trajectoire optimale, jusqu'au panier
+  if(optPts&&optPts.length>1){
+    var prog=(T%320)/280;            // 0->1 sur la trajectoire, pause en fin de cycle
+    if(prog>1)prog=1;
+    var fidx=prog*(optPts.length-1);
+    var i0=Math.floor(fidx), i1=Math.min(optPts.length-1,i0+1);
+    var fr=fidx-i0;
+    var bx=optPts[i0].x+(optPts[i1].x-optPts[i0].x)*fr;
+    var by=optPts[i0].y+(optPts[i1].y-optPts[i0].y)*fr;
+    var br=W*0.022;
+    var grd=c.createRadialGradient(bx-br*0.3,by-br*0.3,0,bx,by,br);
     grd.addColorStop(0,'#ffb866');grd.addColorStop(1,'#e87c2a');
     c.fillStyle=grd;
-    c.beginPath();c.arc(bp.x+W*0.08,bp.y,W*0.022,0,Math.PI*2);c.fill();
+    c.beginPath();c.arc(bx,by,br,0,Math.PI*2);c.fill();
+    // Flash "SWISH" quand le ballon atteint l'anneau
+    if(prog>=1){
+      c.fillStyle='#2dc653';
+      c.font='bold '+Math.round(W*0.04)+'px Barlow Condensed';
+      c.textAlign='center';
+      c.fillText(en?'SWISH':'PANIER',hoopCx,rimY-H*0.06);
+    }
   }
-  // Panier
-  c.strokeStyle='#e87c2a';c.lineWidth=2;
-  c.beginPath();c.moveTo(W*0.85,floorY-H*0.25);c.lineTo(W*0.85+W*0.06,floorY-H*0.25);c.stroke();
-  c.fillStyle=GOLD;c.font='bold '+Math.round(W*0.032)+'px Barlow Condensed';
-  c.textAlign='center';c.fillText(en?'Optimal angle ≈ 52°':'Angle optimal ≈ 52°',W/2,H*0.95);
-  c.fillStyle='rgba(245,197,24,0.4)';c.fillRect(0,floorY,W,2);
+
+  // Légende bas
+  c.fillStyle=GOLD;
+  c.font='bold '+Math.round(W*0.03)+'px Barlow Condensed';
+  c.textAlign='center';
+  c.fillText(en?'Optimal release angle ≈ 52°':'Angle de tir optimal ≈ 52°',W/2,H*0.97);
 }
 
 /* ── VISU : QUIET EYE — fixation du regard au lancer-franc ──────
