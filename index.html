@@ -28118,27 +28118,54 @@ function _dcog_nextQuestion() {
   var cv = _dcog_canvas;
   var W  = cv ? cv.width  : 640;
   var H  = cv ? cv.height : 480;
-  // ── PAYSAGE NATIF — étalement horizontal gauche → centre → droite ──
-  // Y entre 32% et 50% : SOUS le HUD (timer + scores) et AU-DESSUS de la zone
-  // de dribble naturel (60-100% H). Geste vers le haut nécessaire.
+  // ── PAYSAGE NATIF — disposition en L (perpendiculaire) ──
+  // Inspiré de HomeCourt : 2 cibles forment une "base" horizontale
+  // (en haut OU en bas), la 3e est perpendiculaire sur un côté.
+  // Aucune cible n'est jamais centrée en hauteur -> ne masque plus
+  // le visage du joueur. Config tirée au hasard à chaque série :
+  // le joueur doit re-scanner l'espace à chaque fois.
   var r = Math.round(Math.min(W * 0.075, H * 0.13));
 
   var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
   var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
   var colors = shuffledColors.slice(0,3);
 
-  // 3 cibles à 1/6, 3/6, 5/6 de W → espacement W/3 ≫ 2r
-  var xPositions = [W * (1/6), W * (3/6), W * (5/6)];
-  var yBase = H * 0.40;          // sous le HUD (HUD occupe 0-26% H)
-  var yJitter = H * 0.06;        // amplitude réduite
-  var yMin = H * 0.32;           // plancher : pas trop haut (chevauche pas les scores)
-  var yMax = H * 0.50;           // plafond : pas trop bas (zone dribble)
+  // Bandes verticales : on les place aux extrêmes de la fenêtre sûre
+  // pour MAXIMISER l'écart vertical du L — les 2 cibles de la barre
+  // verticale ne doivent jamais se toucher ni se confondre, sur PC
+  // comme sur mobile (le joueur dribble à distance).
+  var yHaut = Math.round(H * 0.30);    // juste sous le HUD
+  var yBas  = Math.round(H * 0.62);    // juste au-dessus de la zone dribble
+  // Garde-fou : si l'écart vertical est < 2.4 rayons (cas écran très plat),
+  // on resserre symétriquement le HUD pour garantir la séparation.
+  if ((yBas - yHaut) < r * 2.4) {
+    var mid = (yHaut + yBas) / 2;
+    yHaut = Math.round(mid - r * 1.2);
+    yBas  = Math.round(mid + r * 1.2);
+  }
+  var xG = Math.round(W * (1/6));   // colonne gauche
+  var xD = Math.round(W * (5/6));   // colonne droite
 
-  var picked = xPositions.map(function(xBase) {
-    var yVar = (Math.random() * 2 - 1) * yJitter;
-    var y = Math.round(Math.max(yMin, Math.min(yMax, yBase + yVar)));
-    return { x: Math.round(xBase), y: y };
-  });
+  // 4 configurations en L : {base: 'haut'|'bas', coude: 'gauche'|'droite'}
+  // base = les 2 cibles alignées horizontalement ; la 3e cible est sur le
+  // côté 'coude', à la hauteur opposée à la base.
+  var configs = [
+    {base:'bas',  coude:'gauche'},   // 2 en bas + 1 en haut à gauche
+    {base:'bas',  coude:'droite'},   // 2 en bas + 1 en haut à droite
+    {base:'haut', coude:'gauche'},   // 2 en haut + 1 en bas à gauche
+    {base:'haut', coude:'droite'}    // 2 en haut + 1 en bas à droite
+  ];
+  var cfg = configs[Math.floor(Math.random() * configs.length)];
+  var yBase  = (cfg.base === 'bas') ? yBas : yHaut;
+  var yCoude = (cfg.base === 'bas') ? yHaut : yBas;
+  var xCoude = (cfg.coude === 'gauche') ? xG : xD;
+
+  // 3 positions : 2 sur la base (gauche+droite), 1 sur le coude
+  var picked = [
+    { x: xG,     y: yBase  },   // base gauche
+    { x: xD,     y: yBase  },   // base droite
+    { x: xCoude, y: yCoude }    // coude (perpendiculaire)
+  ];
   // PHASE 2 : après 2s, cacher la question et afficher les cibles
   var _dcog_qOvRef = document.getElementById('sensei-cam-question');
   setTimeout(function(){
