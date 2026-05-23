@@ -24149,6 +24149,28 @@ function _td_getAudioCtx() {
 /* ── Voix coaching Sensei (speechSynthesis) ──────────────────── */
 var _sensei_speaking = false;
 var _sensei_lastSpeak = 0;
+
+/* La voix coach parle TOUJOURS anglais (la voix FR rend mal).
+   Ce dictionnaire traduit les phrases FR connues vers l'anglais,
+   pour que TOUTES les features vocales sortent en anglais sans
+   avoir à modifier chacun des ~20 appels. */
+var _sensei_voiceMap = {
+  'Patiente une seconde':'Wait a moment',
+  'Session terminée !':'Session done!',
+  'Excellente symétrie !':'Excellent symmetry!',
+  'Ajuste ta position':'Adjust your position',
+  'En feu !':'On fire!',
+  'Temps écoulé !':'Time up!',
+  'Rapide !':'Fast!',
+  'Bien':'Good',
+  'Mauvaise réponse':'Wrong answer',
+  'Objectif atteint ! Excellent travail !':'Goal reached! Amazing work!',
+  'Parfaite hauteur, continue !':'Perfect height, keep it up!',
+  'Round 1. Tableau du Sensei. Prépare-toi.':'Round 1. Sensei Board. Get ready.',
+  'INCROYABLE':'INCREDIBLE',
+  'Mode légendaire':'Legendary mode'
+};
+
 function _sensei_speak(text, minInterval) {
   if (!window.speechSynthesis) return;
   var now = Date.now();
@@ -24156,15 +24178,13 @@ function _sensei_speak(text, minInterval) {
   if (_sensei_speaking || now - _sensei_lastSpeak < gap) return;
   _sensei_speaking = true;
   _sensei_lastSpeak = now;
-  // Correction phonétique : en FR le TTS lit "Sensei" -> "san-sé".
-  // On envoie "Seine-sé" à la voix pour obtenir "saine-sé".
-  // En EN, "Sensei" -> "SEN-say" est déjà correct : on n'y touche pas.
+  // Voix toujours en anglais : si une phrase FR connue arrive, la traduire.
   var spoken = text;
-  if (window._lang !== 'en' && typeof spoken === 'string') {
-    spoken = spoken.replace(/Sensei/gi, 'Seine-sé');
+  if (typeof spoken === 'string' && _sensei_voiceMap[spoken]) {
+    spoken = _sensei_voiceMap[spoken];
   }
   var utt = new SpeechSynthesisUtterance(spoken);
-  utt.lang = window._lang === 'en' ? 'en-US' : 'fr-FR';
+  utt.lang = 'en-US';        // voix coach forcée en anglais (toutes features)
   utt.rate  = 1.1;
   utt.pitch = 1.0;
   utt.volume = 0.85;
@@ -27119,11 +27139,9 @@ function _tdr_endDrill() {
   // Afficher résultats
   _tdr_showResults(_tdr_score, _tdr_hits, _tdr_total, avgRT);
   _tdr_status(_t('Session terminée !','Session done!'), '#2dc653');
-  // Voix coaching : annonce le score final
+  // Voix coaching : annonce le score final (voix toujours en anglais)
   var pctEnd = _tdr_total > 0 ? Math.round(_tdr_hits/_tdr_total*100) : 0;
-  var msg = window._lang==='en'
-    ? 'Session done. Score '+_tdr_score+'. '+pctEnd+' percent accuracy.'
-    : 'Session terminée. Score '+_tdr_score+'. '+pctEnd+' pourcent de précision.';
+  var msg = 'Session done. Score '+_tdr_score+'. '+pctEnd+' percent accuracy.';
   setTimeout(function(){ _sensei_speak(msg, 0); }, 400);
   // Proposer sauvegarde
   var btnSave = document.getElementById('tdr_btnSave');
@@ -29203,20 +29221,15 @@ function _dcog_tbd_label(instr) {
   return en ? (instr.en || instr.fr || '') : (instr.fr || instr.en || '');
 }
 
-/* ── Texte parlé (voix coach localisée) ────────────────────────── */
+/* ── Texte parlé (voix coach — toujours en anglais) ────────────── */
 function _dcog_tbd_speakText(instr) {
   if (!instr) return '';
-  var en = window._lang === 'en';
-  // Dictionnaire des 6 briques (clés = libellé universel exact)
-  var moveFR = {
-    'FRONT':'devant', 'TWEEN':'entre les jambes', 'BEHIND':'dans le dos',
-    'CROSS':'crossover', 'REVERSE-TWEEN':'reverse tween', 'BEHIND-BACK':'behind back'
-  };
+  // La voix coach parle toujours anglais : dictionnaire EN uniquement.
   var moveEN = {
     'FRONT':'front change', 'TWEEN':'between the legs', 'BEHIND':'behind the back',
     'CROSS':'crossover', 'REVERSE-TWEEN':'reverse tween', 'BEHIND-BACK':'behind the back'
   };
-  var dict = en ? moveEN : moveFR;
+  var dict = moveEN;
   if (instr.uni) {
     // Découper le combo en briques connues (gère les briques à tiret comme REVERSE-TWEEN)
     var bricks = ['REVERSE-TWEEN','BEHIND-BACK','FRONT','TWEEN','BEHIND','CROSS'];
@@ -29234,14 +29247,14 @@ function _dcog_tbd_speakText(instr) {
       if (!matched) break;
     }
     if (parts.length > 0) {
-      var sep = en ? ' then ' : ' puis ';
+      var sep = ' then ';
       var out = [];
       for (var i=0;i<parts.length;i++) out.push(dict[parts[i]] || parts[i].toLowerCase());
       return out.join(sep);
     }
     return instr.uni.toLowerCase();
   }
-  return en ? (instr.en || instr.fr || '') : (instr.fr || instr.en || '');
+  return instr.en || instr.fr || '';
 }
 
 /* ── Couleur d'une instruction ─────────────────────────────────── */
