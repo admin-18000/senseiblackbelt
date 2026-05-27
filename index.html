@@ -7021,6 +7021,161 @@ function buildVideoSection(sectionKey) {
   items.forEach(v => grid.appendChild(makeCard(v)));
 }
 
+/* ════ CARROUSEL BALL HANDLING ════ */
+/* ════════════════════════════════════════════════════════════════
+   CARROUSEL BALL HANDLING — variante "drill central + voisins"
+   ────────────────────────────────────────────────────────────────
+   Transforme la grille Ball Handling en carrousel swipable :
+   le drill central est mis en avant, les voisins dépassent.
+   Pastilles de navigation + compteur N/total. Numéro de drill
+   bien visible (filigrane doré, non coupé). Réutilise makeCard
+   pour la lecture vidéo. N'affecte AUCUNE autre section.
+════════════════════════════════════════════════════════════════ */
+var _bhCar_idx   = 0;
+var _bhCar_built = false;
+var _bhCar_tx0   = null;
+var _bhCar_ty0   = null;
+
+function _bhCarousel_build() {
+  var grid = document.getElementById('grid-ballhandling');
+  if (!grid) return;
+  var items = (typeof SECTION_VIDEOS !== 'undefined' && SECTION_VIDEOS.ballhandling)
+              ? SECTION_VIDEOS.ballhandling : [];
+  if (items.length === 0) return;
+
+  // Vider la grille et reconstruire en carrousel
+  grid.innerHTML = '';
+  grid.style.cssText = 'margin-top:24px';
+
+  // Viewport (fenêtre qui masque le débordement)
+  var viewport = document.createElement('div');
+  viewport.style.cssText = 'position:relative;overflow:hidden;border-radius:12px;touch-action:pan-y';
+
+  // Piste (track) qui glisse
+  var track = document.createElement('div');
+  track.id = '_bhCar_track';
+  track.style.cssText = 'display:flex;transition:transform .3s cubic-bezier(.22,.61,.36,1);will-change:transform';
+
+  items.forEach(function(v, i) {
+    var slide = document.createElement('div');
+    // chaque slide = 80% de large -> les voisins dépassent de ~10% de chaque côté
+    slide.style.cssText = 'flex:0 0 80%;box-sizing:border-box;padding:6px';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'position:relative;background:var(--dark2);border-radius:12px;' +
+      'overflow:hidden;border:1px solid rgba(245,197,24,.4);cursor:pointer;' +
+      'box-shadow:0 6px 18px rgba(0,0,0,.5);transition:all .25s';
+
+    // Vignette YouTube
+    var thumbWrap = document.createElement('div');
+    thumbWrap.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;background:#000;overflow:hidden';
+    thumbWrap.innerHTML =
+      '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
+        'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" ' +
+        'loading="lazy" alt="" ' +
+        'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'">' +
+      // numéro de drill — filigrane doré, en HAUT À GAUCHE, à l'intérieur, non coupé
+      '<div style="position:absolute;top:6px;left:10px;font-family:var(--font-cond);' +
+        'font-size:46px;font-weight:700;line-height:1;color:rgba(245,197,24,.9);' +
+        'text-shadow:0 2px 8px rgba(0,0,0,.9);pointer-events:none;z-index:2">' +
+        (i + 1 < 10 ? '0' + (i + 1) : (i + 1)) + '</div>' +
+      // dégradé bas
+      '<div style="position:absolute;left:0;right:0;bottom:0;height:46%;' +
+        'background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none"></div>' +
+      // badge play
+      '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">' +
+        '<div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;' +
+          'display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5)">' +
+          '<svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px">' +
+          '<polygon points="6,4 20,12 6,20"/></svg></div></div>' +
+      // libellé bas
+      '<div style="position:absolute;bottom:7px;left:11px;font-family:var(--font-cond);' +
+        'font-size:14px;font-weight:700;letter-spacing:.5px;color:#fff;pointer-events:none;z-index:2">' +
+        'DRILL #' + (i + 1) + '</div>';
+    card.appendChild(thumbWrap);
+
+    // Clic -> lecture (réutilise la logique existante)
+    card.onclick = (function(vid){
+      return function(){
+        if (typeof isMobile === 'function' && !isMobile()) {
+          if (typeof openVideoModal === 'function') openVideoModal(vid.id, vid.title, vid.vertical);
+          return;
+        }
+        if (typeof launchPlayer === 'function') launchPlayer(card, vid);
+      };
+    })(v);
+
+    slide.appendChild(card);
+    track.appendChild(slide);
+  });
+
+  viewport.appendChild(track);
+  grid.appendChild(viewport);
+
+  // Pastilles de navigation
+  var dots = document.createElement('div');
+  dots.id = '_bhCar_dots';
+  dots.style.cssText = 'display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:12px';
+  items.forEach(function(v, i) {
+    var dot = document.createElement('div');
+    dot.className = '_bhCar_dot';
+    dot.style.cssText = 'width:6px;height:6px;border-radius:50%;cursor:pointer;transition:all .2s;background:#2a3142';
+    dot.onclick = (function(idx){ return function(){ _bhCarousel_goto(idx); }; })(i);
+    dots.appendChild(dot);
+  });
+  grid.appendChild(dots);
+
+  // Compteur N / total
+  var counter = document.createElement('div');
+  counter.id = '_bhCar_counter';
+  counter.style.cssText = 'text-align:center;font-size:10px;color:#7a8299;margin-top:6px;letter-spacing:1px;font-family:var(--font-cond)';
+  grid.appendChild(counter);
+
+  // Gestes tactiles : swipe horizontal
+  viewport.addEventListener('touchstart', function(e){
+    _bhCar_tx0 = e.touches[0].clientX;
+    _bhCar_ty0 = e.touches[0].clientY;
+  }, {passive:true});
+  viewport.addEventListener('touchend', function(e){
+    if (_bhCar_tx0 == null) return;
+    var dx = e.changedTouches[0].clientX - _bhCar_tx0;
+    var dy = e.changedTouches[0].clientY - _bhCar_ty0;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      _bhCarousel_goto(_bhCar_idx + (dx < 0 ? 1 : -1));
+    }
+    _bhCar_tx0 = null; _bhCar_ty0 = null;
+  }, {passive:true});
+
+  _bhCar_built = true;
+  _bhCarousel_goto(0);
+}
+
+/* Navigation : centre le slide d'index i */
+function _bhCarousel_goto(i) {
+  var items = (typeof SECTION_VIDEOS !== 'undefined' && SECTION_VIDEOS.ballhandling)
+              ? SECTION_VIDEOS.ballhandling : [];
+  var n = items.length;
+  if (n === 0) return;
+  if (i < 0) i = 0;
+  if (i > n - 1) i = n - 1;
+  _bhCar_idx = i;
+  var track = document.getElementById('_bhCar_track');
+  if (track) {
+    // slide = 80% ; pour centrer : décalage = i*80% - 10% (la moitié de l'espace voisin)
+    track.style.transform = 'translateX(calc(' + (-i * 80) + '% + 10%))';
+  }
+  var dots = document.querySelectorAll('._bhCar_dot');
+  for (var d = 0; d < dots.length; d++) {
+    var active = (d === i);
+    dots[d].style.background = active ? '#f5c518' : '#2a3142';
+    dots[d].style.width      = active ? '18px' : '6px';
+    dots[d].style.borderRadius = active ? '3px' : '50%';
+  }
+  var counter = document.getElementById('_bhCar_counter');
+  if (counter) counter.textContent = (i + 1) + ' / ' + n;
+}
+
+
 function launchPlayer(card, v) {
   const ratio = v.vertical ? '177.77%' : '56.25%';
   const uid   = 'yt-' + Math.random().toString(36).slice(2,9);
@@ -7800,6 +7955,8 @@ if(localStorage.getItem('sensei_unlocked')==='1') document.body.classList.add('u
 window.addEventListener('load', () => {
   buildBelts();
   Object.keys(SECTION_VIDEOS).forEach(key => buildVideoSection(key));
+  // Ball Handling : remplacer la grille par le carrousel swipable
+  if (typeof _bhCarousel_build === 'function') _bhCarousel_build();
   buildBtns('btns-maitrise', 3, 'maitrise');
   buildBtns('btns-symetrie', 3, 'symetrie');
   buildBtns('btns-creativite', 4, 'creativite');
