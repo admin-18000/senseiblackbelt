@@ -2026,6 +2026,20 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="font-size:18px;margin-bottom:3px">🥋</div>
         <div id="tdr_lblSensei">SENSEI</div>
       </button>
+      <button class="tdr-mode-btn" data-mode="dojo" onclick="_tdr_setMode('dojo')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🥷</div>
+        <div id="tdr_lblDojo">DOJO</div>
+      </button>
+      <button class="tdr-mode-btn" data-mode="studio" onclick="_tdr_setMode('studio')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <div style="font-size:18px;margin-bottom:3px">🎬</div>
+        <div id="tdr_lblStudio">STUDIO</div>
+      </button>
     </div>
 
     <!-- Panel Réaction : niveaux -->
@@ -2103,6 +2117,30 @@ body.unlocked .sensei-only{display:revert !important}
           style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#f5c518;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
       </div>
       <div id="tdr_senseiDots" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:10px"></div>
+    </div>
+
+    <!-- Panel Dojo : drill pilote unique avec ardoise blanche et consignes -->
+    <div id="tdr_panelDojo" style="display:none">
+      <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:8px">
+        Read the principles · Practice · Watch yourself in the mirror
+      </div>
+      <div style="background:#fff;border-radius:8px;padding:10px 12px;color:#1a2640;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;line-height:1.6">
+        <div style="border-bottom:1px solid #d8dde6;padding-bottom:5px;margin-bottom:6px;font-size:12px;color:#0a1428">DRILL · 4 MOVES</div>
+        1. FRONT<br>
+        2. BETWEEN-THE-LEGS<br>
+        3. REVERSE-TWEEN<br>
+        4. BEHIND-THE-BACK
+      </div>
+    </div>
+
+    <!-- Panel Studio : immersif spectacle (mini-star) -->
+    <div id="tdr_panelStudio" style="display:none">
+      <div style="font-size:9px;color:#7a8299;text-align:center;margin-bottom:8px">
+        Live in the spotlight — be the star of your training
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#1a1f2e,#0d1117);border:1px solid rgba(245,197,24,.3);border-radius:8px;padding:14px">
+        <div style="font-family:var(--font-cond);font-weight:700;font-size:13px;color:#f5c518;letter-spacing:2px">🎬 STUDIO MODE</div>
+      </div>
     </div>
 
     <!-- Guide placement -->
@@ -26592,15 +26630,19 @@ function initTraining_dr() {
 /* ── Sélection mode / niveau ──────────────────────────────────── */
 function _tdr_setMode(m) {
   _tdr_mode = m;
-  var r = document.getElementById('tdr_panelReaction');
+  var r  = document.getElementById('tdr_panelReaction');
   var rh = document.getElementById('tdr_panelRhythm');
   var se = document.getElementById('tdr_panelSensei');
+  var dj = document.getElementById('tdr_panelDojo');
+  var st = document.getElementById('tdr_panelStudio');
   if (r)  r.style.display  = m === 'reaction' ? 'block' : 'none';
   if (rh) rh.style.display = m === 'rhythm'   ? 'block' : 'none';
   if (se) se.style.display = m === 'sensei'   ? 'block' : 'none';
-  // La vieille carte "Choisis ton drill" est redondante en mode Sensei
+  if (dj) dj.style.display = m === 'dojo'     ? 'block' : 'none';
+  if (st) st.style.display = m === 'studio'   ? 'block' : 'none';
+  // La vieille carte "Choisis ton drill" est redondante pour les modes vidéo
   var chooseCard = document.getElementById('td_chooseDrillCard');
-  if (chooseCard) chooseCard.style.display = m === 'sensei' ? 'none' : 'block';
+  if (chooseCard) chooseCard.style.display = (m === 'sensei' || m === 'dojo' || m === 'studio') ? 'none' : 'block';
   document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
     b.style.background = b.dataset.mode === m ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
     b.style.color      = b.dataset.mode === m ? '#f5c518' : '#7a8299';
@@ -26795,6 +26837,178 @@ function _tdr_senseiDeactivate() {
   }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   TDR — MODE DOJO  ·  drill avec ardoise blanche + consignes
+   ────────────────────────────────────────────────────────────────
+   Drill pilote unique : vidéo YouTube + 4 consignes affichées
+   sur une ardoise blanche style Silent Ball. Le joueur lit les
+   principes et pratique en se voyant dans la caméra (40% droite).
+════════════════════════════════════════════════════════════════ */
+var _tdr_dojoVideoId = 'TnuT9lk7Fwk';        // drill pilote
+var _tdr_dojoDuration = 60;                  // 60 secondes par défaut
+var _tdr_dojoElapsed  = 0;
+var _tdr_dojoStartTs  = 0;
+
+function _tdr_dojoActivate() {
+  var panel = document.getElementById('sensei-cam-dojo');
+  var cv    = document.getElementById('sensei-cam-canvas');
+  var bar   = document.getElementById('sensei-cam-timebar');
+  if (panel) panel.style.display = 'block';
+  if (cv) {
+    cv.style.left      = '60%';
+    cv.style.width     = '40%';
+    cv.style.objectFit = 'cover';
+  }
+  if (bar) bar.style.display = 'block';
+  // Charger la vidéo coach
+  var fr = document.getElementById('sensei-cam-dojo-yt');
+  if (fr) {
+    fr.src = 'https://www.youtube.com/embed/' + _tdr_dojoVideoId +
+             '?autoplay=1&mute=1&loop=1&playlist=' + _tdr_dojoVideoId +
+             '&controls=0&rel=0&playsinline=1&modestbranding=1';
+  }
+  // Démarrer le timer
+  _tdr_dojoElapsed = 0;
+  _tdr_dojoStartTs = Date.now();
+  _tdr_timebarUpdate(_tdr_dojoDuration, _tdr_dojoStartTs);
+}
+
+function _tdr_dojoDeactivate() {
+  var panel = document.getElementById('sensei-cam-dojo');
+  var cv    = document.getElementById('sensei-cam-canvas');
+  var bar   = document.getElementById('sensei-cam-timebar');
+  var fr    = document.getElementById('sensei-cam-dojo-yt');
+  if (panel) panel.style.display = 'none';
+  if (bar)   bar.style.display   = 'none';
+  if (fr)    fr.src = '';
+  if (cv) {
+    cv.style.left      = '';
+    cv.style.width     = '';
+    cv.style.objectFit = '';
+  }
+}
+
+function _tdr_dojoMirrorLoop() {
+  if (!_tdr_running || _tdr_mode !== 'dojo') return;
+  var cv = _tdr_canvas, ctx = _tdr_ctx;
+  if (cv && ctx && _tdr_video) {
+    var W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+    _drawVideoMirror(ctx, _tdr_video, W, H);
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  }
+  _tdr_timebarUpdate(_tdr_dojoDuration, _tdr_dojoStartTs);
+  _tdr_rafId = requestAnimationFrame(_tdr_dojoMirrorLoop);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TDR — MODE STUDIO  ·  immersif spectacle "mini-star"
+   ────────────────────────────────────────────────────────────────
+   Coach vidéo plein cadre. Joueur en incrustation taille moyenne
+   coin haut-droit (~28% écran). Logo SENSEI géant en filigrane,
+   badge LIVE clignotant. Barre TIME LEFT en bas.
+════════════════════════════════════════════════════════════════ */
+var _tdr_studioVideoId = 'TnuT9lk7Fwk';     // même vidéo que DOJO pour le pilote
+var _tdr_studioDuration = 60;
+var _tdr_studioStartTs  = 0;
+var _tdr_studioLiveTimer = null;
+
+function _tdr_studioActivate() {
+  var panel = document.getElementById('sensei-cam-studio');
+  var cv    = document.getElementById('sensei-cam-canvas');
+  var bar   = document.getElementById('sensei-cam-timebar');
+  if (panel) panel.style.display = 'block';
+  if (cv) {
+    // Joueur en incrustation taille moyenne (~28%), coin haut-droit
+    cv.style.position   = 'absolute';
+    cv.style.top        = '10px';
+    cv.style.right      = '10px';
+    cv.style.left       = 'auto';
+    cv.style.bottom     = 'auto';
+    cv.style.width      = '28%';
+    cv.style.height     = 'auto';
+    cv.style.maxHeight  = '38%';
+    cv.style.borderRadius = '8px';
+    cv.style.border     = '2px solid rgba(231,124,42,.85)';
+    cv.style.boxShadow  = '0 6px 18px rgba(0,0,0,.55)';
+    cv.style.zIndex     = '11';
+    cv.style.objectFit  = 'cover';
+  }
+  if (bar) bar.style.display = 'block';
+  var fr = document.getElementById('sensei-cam-studio-yt');
+  if (fr) {
+    fr.src = 'https://www.youtube.com/embed/' + _tdr_studioVideoId +
+             '?autoplay=1&mute=1&loop=1&playlist=' + _tdr_studioVideoId +
+             '&controls=0&rel=0&playsinline=1&modestbranding=1';
+  }
+  _tdr_studioStartTs = Date.now();
+  _tdr_timebarUpdate(_tdr_studioDuration, _tdr_studioStartTs);
+  // Badge LIVE : pulsation du point
+  var dot = document.getElementById('sensei-cam-studio-live-dot');
+  if (dot && !_tdr_studioLiveTimer) {
+    var on = true;
+    _tdr_studioLiveTimer = setInterval(function(){
+      on = !on;
+      if (dot) dot.style.opacity = on ? '1' : '.25';
+    }, 600);
+  }
+}
+
+function _tdr_studioDeactivate() {
+  var panel = document.getElementById('sensei-cam-studio');
+  var cv    = document.getElementById('sensei-cam-canvas');
+  var bar   = document.getElementById('sensei-cam-timebar');
+  var fr    = document.getElementById('sensei-cam-studio-yt');
+  if (panel) panel.style.display = 'none';
+  if (bar)   bar.style.display   = 'none';
+  if (fr)    fr.src = '';
+  if (cv) {
+    cv.style.position   = '';
+    cv.style.top        = '';
+    cv.style.right      = '';
+    cv.style.left       = '';
+    cv.style.bottom     = '';
+    cv.style.width      = '';
+    cv.style.height     = '';
+    cv.style.maxHeight  = '';
+    cv.style.borderRadius = '';
+    cv.style.border     = '';
+    cv.style.boxShadow  = '';
+    cv.style.zIndex     = '';
+    cv.style.objectFit  = '';
+  }
+  if (_tdr_studioLiveTimer) {
+    clearInterval(_tdr_studioLiveTimer);
+    _tdr_studioLiveTimer = null;
+  }
+}
+
+function _tdr_studioMirrorLoop() {
+  if (!_tdr_running || _tdr_mode !== 'studio') return;
+  var cv = _tdr_canvas, ctx = _tdr_ctx;
+  if (cv && ctx && _tdr_video) {
+    var W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+    _drawVideoMirror(ctx, _tdr_video, W, H);
+  }
+  _tdr_timebarUpdate(_tdr_studioDuration, _tdr_studioStartTs);
+  _tdr_rafId = requestAnimationFrame(_tdr_studioMirrorLoop);
+}
+
+/* ── Time bar commune (DOJO + STUDIO) ───────────────────────────── */
+function _tdr_timebarUpdate(totalSec, startTs) {
+  var fill = document.getElementById('sensei-cam-timebar-fill');
+  var lbl  = document.getElementById('sensei-cam-timebar-label');
+  if (!fill || !lbl) return;
+  var elapsed = (Date.now() - startTs) / 1000;
+  var remaining = Math.max(0, totalSec - elapsed);
+  var pct = Math.max(0, Math.min(100, (remaining / totalSec) * 100));
+  fill.style.width = pct + '%';
+  var mm = Math.floor(remaining / 60);
+  var ss = Math.floor(remaining % 60);
+  lbl.textContent = (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+}
+
 
 /* ── Caméra ───────────────────────────────────────────────────── */
 function _tdr_start() {
@@ -26841,8 +27055,10 @@ function _tdr_start() {
 function _tdr_stop() {
   _tdr_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
-  // Mode Sensei : couper la vidéo + restaurer l'affichage normal
+  // Modes vidéo : couper la vidéo + restaurer l'affichage normal
   if (typeof _tdr_senseiDeactivate === 'function') _tdr_senseiDeactivate();
+  if (typeof _tdr_dojoDeactivate   === 'function') _tdr_dojoDeactivate();
+  if (typeof _tdr_studioDeactivate === 'function') _tdr_studioDeactivate();
   _tdr_particles = []; // nettoyer particules résiduelles
   clearInterval(_tdr_timer);
   clearInterval(_tdr_metroSync);
@@ -26866,11 +27082,23 @@ function _tdr_stop() {
 /* ── Calibration 3s ───────────────────────────────────────────── */
 function _tdr_onCamReady(video,canvas,ctx){
   _tdr_video=video; _tdr_canvas=canvas; _tdr_ctx=ctx;
-  // Mode Sensei : pas de calibration, pas de détection, pas de cibles.
+  // Modes vidéo (Sensei / Dojo / Studio) : pas de calibration, pas de cibles.
   // Juste le flux caméra en miroir (le joueur s'observe et reproduit).
   if (_tdr_mode === 'sensei') {
     _tdr_running = true;
     _tdr_senseiMirrorLoop();
+    return;
+  }
+  if (_tdr_mode === 'dojo') {
+    _tdr_running = true;
+    if (typeof _tdr_dojoActivate === 'function') _tdr_dojoActivate();
+    _tdr_dojoMirrorLoop();
+    return;
+  }
+  if (_tdr_mode === 'studio') {
+    _tdr_running = true;
+    if (typeof _tdr_studioActivate === 'function') _tdr_studioActivate();
+    _tdr_studioMirrorLoop();
     return;
   }
   _tdr_calibrate();
@@ -30491,6 +30719,43 @@ if('serviceWorker' in navigator){
     <iframe id="sensei-cam-ytframe" width="100%" height="100%" style="border:none;display:block"
       allow="autoplay;encrypted-media" allowfullscreen></iframe>
   </div>
+  <!-- Mode DOJO (TDR) : vidéo YouTube + ardoise blanche avec consignes -->
+  <div id="sensei-cam-dojo" style="display:none;position:absolute;top:0;left:0;width:60%;height:100%;z-index:9;background:#000;border-right:2px solid #f5c518">
+    <div style="position:absolute;z-index:3;top:10px;left:10px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.55);color:#f5c518;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:1px">DOJO</div>
+    <!-- Vidéo coach (moitié gauche du panneau) -->
+    <iframe id="sensei-cam-dojo-yt" width="50%" height="100%"
+      style="border:none;display:block;position:absolute;top:0;left:0"
+      allow="autoplay;encrypted-media" allowfullscreen></iframe>
+    <!-- Ardoise blanche (moitié droite du panneau, lecture franche) -->
+    <div id="sensei-cam-dojo-slate" style="position:absolute;top:0;right:0;width:50%;height:100%;background:#fff;color:#1a2640;padding:6% 5%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-family:'Bebas Neue','Barlow Condensed',Impact,sans-serif">
+      <div style="font-size:clamp(14px,2.4vw,28px);letter-spacing:1.5px;border-bottom:2px solid #d8dde6;padding-bottom:8px;margin-bottom:14px;color:#0a1428">DRILL · 4 MOVES</div>
+      <div style="font-size:clamp(13px,2.2vw,26px);line-height:1.55;letter-spacing:1px;font-weight:700">
+        <div>1. FRONT</div>
+        <div>2. BETWEEN-THE-LEGS</div>
+        <div>3. REVERSE-TWEEN</div>
+        <div>4. BEHIND-THE-BACK</div>
+      </div>
+    </div>
+  </div>
+  <!-- Mode STUDIO (TDR) : coach plein cadre + joueur en incrustation + logo géant -->
+  <div id="sensei-cam-studio" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:9;background:#000">
+    <iframe id="sensei-cam-studio-yt" width="100%" height="100%" style="border:none;display:block"
+      allow="autoplay;encrypted-media" allowfullscreen></iframe>
+    <!-- Logo SENSEI géant centré, façon panneau de stade -->
+    <div id="sensei-cam-studio-logo" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue','Barlow Condensed',Impact,sans-serif;font-size:clamp(48px,12vw,140px);font-weight:700;color:rgba(245,197,24,.18);letter-spacing:8px;pointer-events:none;text-shadow:0 0 30px rgba(245,197,24,.4);z-index:10">SENSEI</div>
+    <!-- Badge LIVE clignotant pour ambiance "spectacle" -->
+    <div style="position:absolute;top:14px;left:14px;z-index:12;background:rgba(230,57,70,.9);color:#fff;font-family:var(--font-cond);font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px;letter-spacing:1.5px;display:flex;align-items:center;gap:5px"><span id="sensei-cam-studio-live-dot" style="width:8px;height:8px;border-radius:50%;background:#fff;display:inline-block"></span>LIVE</div>
+  </div>
+  <!-- Barre TIME LEFT pour DOJO/STUDIO (commune) -->
+  <div id="sensei-cam-timebar" style="display:none;position:absolute;left:0;right:0;bottom:0;z-index:11;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.85));padding:8px 14px 10px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-family:var(--font-cond);font-size:11px;color:#f5c518;letter-spacing:1.5px;flex:0 0 auto;font-weight:700">TIME LEFT</div>
+      <div style="flex:1;height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.12)">
+        <div id="sensei-cam-timebar-fill" style="height:100%;width:100%;background:linear-gradient(90deg,#2dc653,#f5c518);transition:width .4s linear"></div>
+      </div>
+      <div id="sensei-cam-timebar-label" style="font-family:var(--font-cond);font-size:14px;color:#fff;letter-spacing:1px;flex:0 0 auto;font-weight:700">01:00</div>
+    </div>
+  </div>
   <!-- Question math — affichée en phase 1 puis cachée -->
   <div id="sensei-cam-question" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(80px,18vh,160px);font-weight:900;letter-spacing:6px;text-align:center;z-index:10;text-shadow:0 6px 32px rgba(0,0,0,.95),0 0 20px rgba(0,0,0,.8);pointer-events:none;white-space:nowrap;width:max-content;background:rgba(0,0,0,0.45);padding:18px 42px;border-radius:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)"></div>
 
@@ -30577,8 +30842,24 @@ function senseiCamStop(){
   if(svid)svid.style.display='none';
   var syt=document.getElementById('sensei-cam-ytframe');
   if(syt)syt.src='';
+  // Modes DOJO / STUDIO : nettoyage par sécurité
+  var dpan=document.getElementById('sensei-cam-dojo');
+  if(dpan)dpan.style.display='none';
+  var dyt=document.getElementById('sensei-cam-dojo-yt');
+  if(dyt)dyt.src='';
+  var span=document.getElementById('sensei-cam-studio');
+  if(span)span.style.display='none';
+  var styt=document.getElementById('sensei-cam-studio-yt');
+  if(styt)styt.src='';
+  var tbar=document.getElementById('sensei-cam-timebar');
+  if(tbar)tbar.style.display='none';
   var scv=document.getElementById('sensei-cam-canvas');
-  if(scv){scv.style.left='';scv.style.width='';scv.style.objectFit='';}
+  if(scv){
+    scv.style.left='';scv.style.width='';scv.style.objectFit='';
+    scv.style.position='';scv.style.top='';scv.style.right='';scv.style.bottom='';
+    scv.style.height='';scv.style.maxHeight='';scv.style.borderRadius='';
+    scv.style.border='';scv.style.boxShadow='';scv.style.zIndex='';
+  }
   document.body.style.overflow='';
 
   try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
