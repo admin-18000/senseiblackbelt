@@ -30888,15 +30888,15 @@ function shPlayVideo(){
 (function(){
   var STORAGE_KEY = 'sensei_progression_v1';
   var BELT_LEVELS = [
-    { id:'white',  name:'Blanche',  emoji:'⚪', color:'#ffffff', criteria:null },
-    { id:'yellow', name:'Jaune',    emoji:'🟡', color:'#f5c518', criteria:{ type:'sessions', count:3 } },
-    { id:'orange', name:'Orange',   emoji:'🟠', color:'#e87c2a', criteria:{ type:'drillScore', drill:'tboard',  threshold:60 } },
-    { id:'green',  name:'Verte',    emoji:'🟢', color:'#2dc653', criteria:{ type:'drillScore', drill:'math',    threshold:65 } },
-    { id:'blue',   name:'Bleue',    emoji:'🔵', color:'#0077b6', criteria:{ type:'drillScore', drill:'sym',     threshold:70 } },
-    { id:'purple', name:'Violette', emoji:'🟣', color:'#7b2d8b', criteria:{ type:'drillScore', drill:'tdr',     threshold:75 } },
-    { id:'brown',  name:'Marron',   emoji:'🟤', color:'#8b5a2b', criteria:{ type:'multiDrill', count:3, threshold:80 } },
-    { id:'black',  name:'Noire',    emoji:'⚫', color:'#1a1f2e', criteria:{ type:'allDrills', threshold:85 } },
-    { id:'red',    name:'Rouge',    emoji:'🔴', color:'#e63946', criteria:{ type:'legendary', threshold:90, sessions:50 } }
+    { id:'white',  name:'Blanche',  nameEN:'White',  emoji:'⚪', color:'#ffffff', criteria:null },
+    { id:'yellow', name:'Jaune',    nameEN:'Yellow', emoji:'🟡', color:'#f5c518', criteria:{ type:'sessions', count:3 } },
+    { id:'orange', name:'Orange',   nameEN:'Orange', emoji:'🟠', color:'#e87c2a', criteria:{ type:'drillScore', drill:'tboard',  threshold:60 } },
+    { id:'green',  name:'Verte',    nameEN:'Green',  emoji:'🟢', color:'#2dc653', criteria:{ type:'drillScore', drill:'math',    threshold:65 } },
+    { id:'blue',   name:'Bleue',    nameEN:'Blue',   emoji:'🔵', color:'#0077b6', criteria:{ type:'drillScore', drill:'sym',     threshold:70 } },
+    { id:'purple', name:'Violette', nameEN:'Purple', emoji:'🟣', color:'#7b2d8b', criteria:{ type:'drillScore', drill:'tdr',     threshold:75 } },
+    { id:'brown',  name:'Marron',   nameEN:'Brown',  emoji:'🟤', color:'#8b5a2b', criteria:{ type:'multiDrill', count:3, threshold:80 } },
+    { id:'black',  name:'Noire',    nameEN:'Black',  emoji:'⚫', color:'#1a1f2e', criteria:{ type:'allDrills', threshold:85 } },
+    { id:'red',    name:'Rouge',    nameEN:'Red',    emoji:'🔴', color:'#e63946', criteria:{ type:'legendary', threshold:90, sessions:50 } }
   ];
   function loadData() {
     try {
@@ -31005,12 +31005,18 @@ function shPlayVideo(){
     var prog    = progressToNext(data);
     var sessions = data.sessions.length;
     var en = (window._lang === 'en');
+    var nextBeltName = '';
+    if (prog.next) nextBeltName = en ? prog.next.nameEN : prog.next.name;
     var nextLabel = prog.next
-      ? (en ? prog.pct + '% to ' : prog.pct + '% vers ') + prog.next.name
+      ? (en ? prog.pct + '% to ' : prog.pct + '% vers ') + nextBeltName
       : (en ? 'Maximum belt reached' : 'Ceinture maximale atteinte');
     var sessionsLbl = en ? ' sessions completed' : ' séances complétées';
     var levelLbl    = en ? 'Level ' : 'Niveau ';
-    var beltLbl     = en ? 'BELT ' : 'CEINTURE ';
+    var beltDisplayName = (en ? belt.nameEN : belt.name);
+    // EN : "WHITE BELT" (adjectif avant nom) | FR : "CEINTURE BLANCHE"
+    var beltFullLabel = en
+      ? beltDisplayName.toUpperCase() + ' BELT'
+      : 'CEINTURE ' + beltDisplayName.toUpperCase();
     var idx = 1;
     for (var i = 0; i < BELT_LEVELS.length; i++) {
       if (BELT_LEVELS[i].id === belt.id) { idx = i + 1; break; }
@@ -31020,7 +31026,7 @@ function shPlayVideo(){
         '<div style="width:54px;height:54px;background:' + belt.color + ';border:2px solid rgba(245,197,24,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;box-shadow:0 4px 12px rgba(0,0,0,.4)">🥋</div>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-family:Bebas Neue,Barlow Condensed,sans-serif;font-size:16px;color:#fff;letter-spacing:1px;line-height:1.1">' +
-            beltLbl + belt.name.toUpperCase() +
+            beltFullLabel +
           '</div>' +
           '<div style="font-size:10px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px">' +
             levelLbl + idx + ' · ' + sessions + sessionsLbl +
@@ -31261,10 +31267,6 @@ function shPlayVideo(){
     var en = (window._lang === 'en');
     var title = en ? '🥋 BELT PATH' : '🥋 PARCOURS DES CEINTURES';
 
-    var beltNames = en
-      ? ['White','Yellow','Orange','Green','Blue','Purple','Brown','Black','Red']
-      : ['Blanche','Jaune','Orange','Verte','Bleue','Violette','Marron','Noire','Rouge'];
-
     function critLabel(belt) {
       var c = belt.criteria;
       if (!c) return en ? 'Default' : 'Par défaut';
@@ -31294,7 +31296,7 @@ function shPlayVideo(){
         '<div style="position:relative;background:' + bg + ';border:' + border + ';border-radius:10px;padding:10px 8px;text-align:center;opacity:' + opacity + ';transition:all .3s">' +
           currentMark + checkmark +
           '<div style="font-size:24px;margin-top:8px;margin-bottom:4px">' + b.emoji + '</div>' +
-          '<div style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#fff;letter-spacing:.5px;line-height:1.1">' + beltNames[k] + '</div>' +
+          '<div style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#fff;letter-spacing:.5px;line-height:1.1">' + (en ? b.nameEN : b.name) + '</div>' +
           '<div style="font-size:8px;color:#9aa3b3;margin-top:4px;line-height:1.3;min-height:22px">' + critLabel(b) + '</div>' +
         '</div>';
     }
@@ -31313,6 +31315,7 @@ function shPlayVideo(){
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
+    var en = (window._lang === 'en');
 
     // Récupérer les infos affichées dans le récap
     var get = function(id) { var e = document.getElementById(id); return e ? e.textContent : ''; };
@@ -31322,7 +31325,12 @@ function shPlayVideo(){
     var emoji    = get('sb-recap-emoji');
 
     // Belt info
-    var belt = (typeof _sb_currentBelt === 'function') ? _sb_currentBelt() : { name:'Blanche', color:'#fff' };
+    var belt = (typeof _sb_currentBelt === 'function') ? _sb_currentBelt() : { name:'Blanche', nameEN:'White', color:'#fff' };
+    var beltName = (en ? (belt.nameEN || belt.name) : belt.name);
+    // EN : "WHITE BELT" | FR : "CEINTURE BLANCHE"
+    var beltFullLabel = en
+      ? beltName.toUpperCase() + ' BELT'
+      : 'CEINTURE ' + beltName.toUpperCase();
 
     // Fond — dégradé sombre
     var g = ctx.createLinearGradient(0, 0, 0, H);
@@ -31344,7 +31352,7 @@ function shPlayVideo(){
 
     ctx.fillStyle = '#9aa3b3';
     ctx.font = '32px "Bebas Neue", "Barlow Condensed", Impact, sans-serif';
-    ctx.fillText('DRILL ' + drill + ' · CEINTURE ' + belt.name.toUpperCase(), W/2, 220);
+    ctx.fillText('DRILL ' + drill + ' · ' + beltFullLabel, W/2, 220);
 
     // Emoji géant
     ctx.font = '200px sans-serif';
@@ -31368,11 +31376,14 @@ function shPlayVideo(){
     canvas.toBlob(function(blob) {
       if (!blob) return;
       var file = new File([blob], 'sensei-score.png', { type:'image/png' });
+      var shareText = en
+        ? 'My score: ' + score + ' on drill ' + drill + ' 🥋'
+        : 'Mon score : ' + score + ' au drill ' + drill + ' 🥋';
       if (navigator.share && navigator.canShare && navigator.canShare({ files:[file] })) {
         navigator.share({
           files:[file],
           title: 'SENSEI BlackBelt',
-          text: 'Mon score : ' + score + ' au drill ' + drill + ' 🥋'
+          text: shareText
         }).catch(function(){});
       } else {
         // Fallback : téléchargement
