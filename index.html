@@ -31050,7 +31050,8 @@ function shPlayVideo(){
     if (typeof origSetLang === 'function' && !origSetLang.__sb_wrapped) {
       window.setLang = function() {
         var r = origSetLang.apply(this, arguments);
-        setTimeout(refreshBadge, 50);
+        // Rafraîchir IMMÉDIATEMENT (synchrone) pour éviter le flash FR/EN
+        refreshBadge();
         return r;
       };
       window.setLang.__sb_wrapped = true;
@@ -31211,7 +31212,7 @@ function shPlayVideo(){
     if (typeof origSetLang === 'function' && !origSetLang.__sb_w2) {
       window.setLang = function() {
         var r = origSetLang.apply(this, arguments);
-        setTimeout(refreshHistory, 60);
+        refreshHistory();
         return r;
       };
       window.setLang.__sb_w2 = true;
@@ -31235,13 +31236,6 @@ function shPlayVideo(){
     <div id="sb-help-content" style="color:#c8cdd6;font-size:13px;line-height:1.65"></div>
     <button onclick="_sb_helpClose()" ontouchstart="" style="width:100%;margin-top:16px;background:#f5c518;color:#0d1117;font-family:'Bebas Neue',sans-serif;font-size:13px;padding:11px;border-radius:8px;border:none;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-help-btn-close">COMPRIS, MERCI !</button>
   </div>
-</div>
-
-<!-- ═══════════ BULLE TUTORIAL — Vague 3 (#8) ═══════════ -->
-<div id="sb-tutorial-bubble" style="display:none;position:fixed;z-index:9997;max-width:300px;background:linear-gradient(135deg,#f5c518,#c89c14);color:#0d1117;border-radius:12px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,.7);font-family:inherit">
-  <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1px;margin-bottom:6px" id="sb-tutorial-title">👋 BIENVENUE !</div>
-  <div style="font-size:12px;line-height:1.5;margin-bottom:10px" id="sb-tutorial-text">Lance ton premier drill en 1 clic — choisis SENSEI, RÉACTION, MATHS ou SYMÉTRIE 👇</div>
-  <button onclick="_sb_tutorialDismiss()" ontouchstart="" style="background:#0d1117;color:#f5c518;border:none;padding:6px 14px;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;font-weight:700" id="sb-tutorial-btn">C'EST PARTI</button>
 </div>
 
 <!-- ═══════════ CANVAS POUR IMAGE PARTAGEABLE — Vague 3 (E) ═══════════ -->
@@ -31399,36 +31393,6 @@ function shPlayVideo(){
     }, 'image/png');
   };
 
-  /* ── #8 TUTORIAL 1er LANCEMENT ──────────────────────────── */
-  var TUTORIAL_KEY = 'sensei_tutorial_seen_v1';
-  function maybeShowTutorial() {
-    try {
-      if (localStorage.getItem(TUTORIAL_KEY)) return;
-    } catch(e) { return; }
-    var target = document.getElementById('sb-dojo-anchor');
-    var bubble = document.getElementById('sb-tutorial-bubble');
-    if (!bubble) return;
-    var en = (window._lang === 'en');
-    var ttl = document.getElementById('sb-tutorial-title');
-    var txt = document.getElementById('sb-tutorial-text');
-    var btn = document.getElementById('sb-tutorial-btn');
-    if (ttl) ttl.textContent = en ? '👋 WELCOME!' : '👋 BIENVENUE !';
-    if (txt) txt.textContent = en
-      ? 'Launch your first drill in 1 tap — pick SENSEI, REACTION, MATHS or SYMMETRY below 👇'
-      : 'Lance ton premier drill en 1 clic — choisis SENSEI, RÉACTION, MATHS ou SYMÉTRIE ci-dessous 👇';
-    if (btn) btn.textContent = en ? "LET'S GO" : "C'EST PARTI";
-    // Positionner en bas-centre
-    bubble.style.bottom = '20px';
-    bubble.style.left = '50%';
-    bubble.style.transform = 'translateX(-50%)';
-    bubble.style.display = 'block';
-  }
-  window._sb_tutorialDismiss = function() {
-    try { localStorage.setItem(TUTORIAL_KEY, '1'); } catch(e){}
-    var b = document.getElementById('sb-tutorial-bubble');
-    if (b) b.style.display = 'none';
-  };
-
   /* ── #9 PAGE AIDE ────────────────────────────────────────── */
   function buildHelpContent() {
     var en = (window._lang === 'en');
@@ -31493,7 +31457,6 @@ function shPlayVideo(){
   /* ── Init ───────────────────────────────────────────────── */
   function init() {
     refreshBelts();
-    setTimeout(maybeShowTutorial, 1500);
     // Bouton flottant aide — discret, accessible depuis n'importe où
     if (!document.getElementById('sb-help-fab')) {
       var fab = document.createElement('button');
@@ -31509,7 +31472,7 @@ function shPlayVideo(){
     if (typeof origSetLang === 'function' && !origSetLang.__sb_w3) {
       window.setLang = function() {
         var r = origSetLang.apply(this, arguments);
-        setTimeout(refreshBelts, 60);
+        refreshBelts();
         return r;
       };
       window.setLang.__sb_w3 = true;
