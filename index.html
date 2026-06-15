@@ -171,6 +171,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .scroll-hint svg{width:24px;height:24px;fill:var(--muted)}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sbUnlockIn{0%{opacity:0;transform:scale(.7);filter:brightness(2)}60%{opacity:1;transform:scale(1.05);filter:brightness(1.3)}100%{opacity:1;transform:scale(1);filter:brightness(1)}}
+@keyframes sbAlmostPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,.6),inset 0 0 0 1px rgba(245,197,24,.3)}50%{box-shadow:0 0 12px 4px rgba(245,197,24,.45),inset 0 0 0 1px rgba(245,197,24,.6)}}
+.sb-almost-pulse{animation:sbAlmostPulse 1.4s ease-in-out infinite}
 
 /* ── SECTION TITLE ── */
 .sec-title{font-family:var(--font-display);font-size:clamp(24px,6vw,64px);letter-spacing:4px;color:var(--text);margin-bottom:8px;line-height:1.05;text-align:center}
@@ -30859,6 +30862,12 @@ function shPlayVideo(){
 <!-- ═══════════ RÉCAP FIN DE SÉANCE — Vague 2 ═══════════ -->
 <div id="sb-recap-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
   <div id="sb-recap-card" style="background:linear-gradient(180deg,#11151f,#0a0d14);border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.5)">
+    <!-- Bandeau célébration ceinture débloquée (caché par défaut) -->
+    <div id="sb-recap-unlock" style="display:none;background:linear-gradient(135deg,rgba(245,197,24,.18),rgba(245,197,24,.05));border:1px solid rgba(245,197,24,.6);border-radius:10px;padding:12px 14px;margin-bottom:16px;animation:sbUnlockIn .6s cubic-bezier(.22,.61,.36,1) both">
+      <div style="font-size:30px;line-height:1;margin-bottom:4px" id="sb-recap-unlock-emoji">🥋</div>
+      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:12px;color:#f5c518;letter-spacing:2px;line-height:1.2" id="sb-recap-unlock-label">NOUVELLE CEINTURE</div>
+      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:18px;color:#fff;letter-spacing:1.5px;margin-top:3px;line-height:1.1" id="sb-recap-unlock-name">CEINTURE JAUNE</div>
+    </div>
     <div style="font-size:38px;margin-bottom:6px" id="sb-recap-emoji">🎯</div>
     <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:15px;color:#f5c518;letter-spacing:2px;margin-bottom:4px" id="sb-recap-title">SESSION DONE</div>
     <div style="font-size:11px;color:#7a8299;margin-bottom:16px;letter-spacing:.5px" id="sb-recap-drill"></div>
@@ -31021,8 +31030,16 @@ function shPlayVideo(){
     for (var i = 0; i < BELT_LEVELS.length; i++) {
       if (BELT_LEVELS[i].id === belt.id) { idx = i + 1; break; }
     }
+    // Pulsation à 80%+ : le joueur doit ressentir qu'il y est presque
+    var isAlmost = (prog.pct >= 80 && prog.next);
+    var pulseClass = isAlmost ? ' class="sb-almost-pulse"' : '';
+    var almostBadge = '';
+    if (isAlmost) {
+      var almostText = en ? '🔥 ALMOST !' : '🔥 PRESQUE !';
+      almostBadge = '<span style="display:inline-block;margin-left:6px;background:rgba(245,197,24,.18);border:1px solid rgba(245,197,24,.6);color:#f5c518;font-family:Bebas Neue,sans-serif;font-size:9px;letter-spacing:1px;padding:2px 6px;border-radius:4px;font-weight:700">' + almostText + '</span>';
+    }
     host.innerHTML =
-      '<div style="background:linear-gradient(135deg,rgba(245,197,24,.10),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.35)">' +
+      '<div style="background:linear-gradient(135deg,rgba(245,197,24,.10),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.35)"' + pulseClass + '>' +
         '<div style="width:54px;height:54px;background:' + belt.color + ';border:2px solid rgba(245,197,24,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;box-shadow:0 4px 12px rgba(0,0,0,.4)">🥋</div>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-family:Bebas Neue,Barlow Condensed,sans-serif;font-size:16px;color:#fff;letter-spacing:1px;line-height:1.1">' +
@@ -31034,7 +31051,7 @@ function shPlayVideo(){
           '<div style="margin-top:7px;height:5px;background:#1a1f2e;border-radius:3px;overflow:hidden">' +
             '<div style="height:100%;width:' + prog.pct + '%;background:linear-gradient(90deg,#f5c518,#ffd966);transition:width .4s"></div>' +
           '</div>' +
-          '<div style="font-size:9px;color:#7a8299;margin-top:3px;letter-spacing:.3px">' + nextLabel + '</div>' +
+          '<div style="font-size:9px;color:#7a8299;margin-top:3px;letter-spacing:.3px">' + nextLabel + almostBadge + '</div>' +
         '</div>' +
       '</div>';
   }
@@ -31118,7 +31135,7 @@ function shPlayVideo(){
   window._sb_refreshHistory = refreshHistory;
 
   /* ── D : RÉCAP FIN DE SÉANCE ────────────────────────────── */
-  function showRecap(drill, score) {
+  function showRecap(drill, score, unlocked) {
     _sb_lastDrill = drill;
     _sb_lastScore = score;
     var overlay = document.getElementById('sb-recap-overlay');
@@ -31137,24 +31154,18 @@ function shPlayVideo(){
     var avg = 0;
     if (drillSessions.length > 1) {
       var sum = 0;
-      // exclure la dernière (c'est celle qu'on vient d'enregistrer)
       for (var j = 0; j < drillSessions.length - 1; j++) sum += drillSessions[j];
       avg = Math.round(sum / (drillSessions.length - 1));
     }
     var best = data.bestByDrill[drill] || score;
 
-    // Diff vs moyenne
     var diff = (avg > 0) ? score - avg : 0;
     var diffText = diff > 0 ? '+' + diff : (diff === 0 ? '=' : '' + diff);
     var diffColor = diff > 0 ? '#2dc653' : (diff < 0 ? '#e63946' : '#f5c518');
 
-    // Emoji selon score
     var emoji = score >= 90 ? '🔥' : (score >= 75 ? '🎯' : (score >= 60 ? '💪' : '🏀'));
-
-    // Nom du drill
     var drillName = (en ? DRILL_NAMES_EN[drill] : DRILL_NAMES[drill]) || drill.toUpperCase();
 
-    // Remplir les éléments
     var el = function(id) { return document.getElementById(id); };
     var e;
     if ((e = el('sb-recap-emoji'))) e.textContent = emoji;
@@ -31166,8 +31177,29 @@ function shPlayVideo(){
     if ((e = el('sb-recap-best')))  e.textContent = best + '%';
     if ((e = el('sb-recap-btn-replay'))) e.textContent = en ? 'REPLAY' : 'REJOUER';
     if ((e = el('sb-recap-btn-close')))  e.textContent = en ? 'CLOSE' : 'FERMER';
+    if ((e = el('sb-recap-btn-share')))  e.textContent = en ? '📷 SHARE' : '📷 PARTAGER';
 
-    // Afficher l'overlay
+    // Bandeau célébration ceinture débloquée
+    var unlockHost = el('sb-recap-unlock');
+    if (unlockHost) {
+      if (unlocked) {
+        var unlockedName = (en ? (unlocked.nameEN || unlocked.name) : unlocked.name);
+        var unlockedFull = en ? unlockedName.toUpperCase() + ' BELT' : 'CEINTURE ' + unlockedName.toUpperCase();
+        var unlockedLabel = el('sb-recap-unlock-label');
+        var unlockedNameEl = el('sb-recap-unlock-name');
+        var unlockedEmojiEl = el('sb-recap-unlock-emoji');
+        if (unlockedLabel) unlockedLabel.textContent = en ? '🎉 NEW BELT UNLOCKED' : '🎉 NOUVELLE CEINTURE';
+        if (unlockedNameEl) unlockedNameEl.textContent = unlockedFull;
+        if (unlockedEmojiEl) unlockedEmojiEl.textContent = unlocked.emoji || '🥋';
+        // Re-déclencher l'animation : retirer + remettre le display
+        unlockHost.style.display = 'none';
+        void unlockHost.offsetWidth; // force reflow
+        unlockHost.style.display = 'block';
+      } else {
+        unlockHost.style.display = 'none';
+      }
+    }
+
     overlay.style.display = 'flex';
   }
   window._sb_showRecap = showRecap;
@@ -31190,16 +31222,21 @@ function shPlayVideo(){
     }
   };
 
-  /* ── Wrapper : enrichir _sb_recordSession pour déclencher historique + récap ── */
+  /* ── Wrapper : enrichir _sb_recordSession pour déclencher historique + récap + détection unlock ── */
   var _origRecord = window._sb_recordSession;
   if (typeof _origRecord === 'function') {
     window._sb_recordSession = function(drill, score) {
+      // Capturer la ceinture AVANT enregistrement
+      var beltBefore = (typeof _sb_currentBelt === 'function') ? _sb_currentBelt() : null;
       _origRecord(drill, score);
       // Rafraîchir l'historique
       refreshHistory();
-      // Afficher le récap (seulement si score > 0, pour ne pas pop sur les drills sans scoring)
+      // Capturer la ceinture APRÈS pour détecter un unlock
+      var beltAfter = (typeof _sb_currentBelt === 'function') ? _sb_currentBelt() : null;
+      var unlocked = (beltBefore && beltAfter && beltBefore.id !== beltAfter.id) ? beltAfter : null;
+      // Afficher le récap (seulement si score > 0)
       if (score > 0) {
-        setTimeout(function(){ showRecap(drill, score); }, 800);
+        setTimeout(function(){ showRecap(drill, score, unlocked); }, 800);
       }
     };
   }
@@ -31272,6 +31309,8 @@ function shPlayVideo(){
       return '';
     }
 
+    // Mapping critère drill → kind utilisé par _dojoLaunch
+    var DRILL_TO_KIND = { tboard:'math', math:'math', sym:'sym', tdr:'reaction' };
     var cards = '';
     for (var k = 0; k < _sb_BELT_LEVELS.length; k++) {
       var b = _sb_BELT_LEVELS[k];
@@ -31286,9 +31325,21 @@ function shPlayVideo(){
       var opacity = isUnlocked ? '1' : '.5';
       var checkmark = isUnlocked ? '<div style="position:absolute;top:5px;right:7px;color:#2dc653;font-size:12px">✓</div>' : '';
       var currentMark = isCurrent ? '<div style="position:absolute;top:5px;left:7px;background:#f5c518;color:#0d1117;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:.5px">' + (en ? 'NOW' : 'ICI') + '</div>' : '';
+      // Déterminer le drill cible pour cliquage
+      var kind = null;
+      if (b.criteria) {
+        if (b.criteria.type === 'drillScore' && DRILL_TO_KIND[b.criteria.drill]) {
+          kind = DRILL_TO_KIND[b.criteria.drill];
+        } else if (b.criteria.type === 'sessions' || b.criteria.type === 'multiDrill' || b.criteria.type === 'allDrills' || b.criteria.type === 'legendary') {
+          // Critères multi-drill : ouvrir le menu DOJO (scroll vers les boutons)
+          kind = 'menu';
+        }
+      }
+      var clickAttr = kind ? ' onclick="_sb_beltCardClick(\'' + kind + '\')" style="cursor:pointer;' : ' style="';
+      var hint = kind ? '<div style="position:absolute;bottom:4px;right:6px;font-size:8px;color:#f5c518;opacity:.7">▶</div>' : '';
       cards +=
-        '<div style="position:relative;background:' + bg + ';border:' + border + ';border-radius:10px;padding:10px 8px;text-align:center;opacity:' + opacity + ';transition:all .3s">' +
-          currentMark + checkmark +
+        '<div' + clickAttr + 'position:relative;background:' + bg + ';border:' + border + ';border-radius:10px;padding:10px 8px;text-align:center;opacity:' + opacity + ';transition:all .3s">' +
+          currentMark + checkmark + hint +
           '<div style="font-size:24px;margin-top:8px;margin-bottom:4px">' + b.emoji + '</div>' +
           '<div style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#fff;letter-spacing:.5px;line-height:1.1">' + (en ? b.nameEN : b.name) + '</div>' +
           '<div style="font-size:8px;color:#9aa3b3;margin-top:4px;line-height:1.3;min-height:22px">' + critLabel(b) + '</div>' +
@@ -31302,6 +31353,21 @@ function shPlayVideo(){
       '</div>';
   }
   window._sb_refreshBelts = refreshBelts;
+
+  /* ── Handler : clic sur une case ceinture ─────────────────── */
+  window._sb_beltCardClick = function(kind) {
+    if (kind === 'menu') {
+      // Critère multi-drill → scroll vers DOJO INTERACTIVE
+      var dojo = document.querySelector('button[onclick*="_dojoLaunch"]');
+      if (dojo && dojo.scrollIntoView) {
+        dojo.scrollIntoView({ behavior:'smooth', block:'center' });
+      }
+      return;
+    }
+    if (typeof _dojoLaunch === 'function') {
+      _dojoLaunch(kind);
+    }
+  };
 
   /* ── E : IMAGE PARTAGEABLE ──────────────────────────────── */
   window._sb_recapShare = function() {
