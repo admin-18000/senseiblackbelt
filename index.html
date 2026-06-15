@@ -796,6 +796,13 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
   </div>
 
+  <!-- ═══════════ BADGE PROGRESSION CEINTURE — Vague 1 ═══════════ -->
+  <div style="padding:clamp(20px,3vw,30px) clamp(16px,4vw,40px) 0;background:#0d1117">
+    <div id="sb-progress-badge" style="max-width:1100px;margin:0 auto"></div>
+    <!-- Historique 7 dernières séances — Vague 2 -->
+    <div id="sb-history-chart" style="max-width:1100px;margin:14px auto 0"></div>
+  </div>
+
   <!-- ═══════════ DOJO INTERACTIVE DRILLS — accès 1 clic aux drills caméra ═══════════ -->
   <div style="position:relative;padding:clamp(36px,6vw,72px) clamp(16px,4vw,40px);background:linear-gradient(180deg,#0d1117 0%,#0a0d14 100%);border-top:1px solid rgba(245,197,24,.18)">
     <div style="position:relative;max-width:1100px;margin:0 auto">
@@ -25649,6 +25656,13 @@ function _tsym_startSessTimer(){
       // Fin session symétrie
       _td_beep(440, 0.3, 0.25);
       _sensei_speak(window._lang==='en'?'Session done!':'Session terminée !', 0);
+      // Vague 1 — enregistrer dans la progression (moyenne des scores symétrie)
+      if (typeof _sb_recordSession === 'function' && _tsym_scores && _tsym_scores.length > 0) {
+        var sum = 0;
+        for (var si = 0; si < _tsym_scores.length; si++) sum += _tsym_scores[si];
+        var avgSym = Math.round(sum / _tsym_scores.length);
+        _sb_recordSession('sym', avgSym);
+      }
       _senseiEndSession(3000);
     }
   }, 1000);
@@ -27547,6 +27561,10 @@ function _tdr_endDrill() {
   var pctEnd = _tdr_total > 0 ? Math.round(_tdr_hits/_tdr_total*100) : 0;
   var msg = 'Session done. Score '+_tdr_score+'. '+pctEnd+' percent accuracy.';
   setTimeout(function(){ _sensei_speak(msg, 0); }, 400);
+  // Vague 1 — enregistrer dans la progression
+  if (typeof _sb_recordSession === 'function') {
+    _sb_recordSession('tdr', pctEnd);
+  }
   // Proposer sauvegarde
   var btnSave = document.getElementById('tdr_btnSave');
   if (btnSave) btnSave.style.display = 'flex';
@@ -27961,6 +27979,21 @@ function _dcog_stop() {
     btnSv.style.display = 'flex';
   _dcog_setStatus(_t('Session terminée','Session done'), '#2dc653');
   _dcog_showResults();
+  // Vague 1 — enregistrer dans la progression selon le sous-drill
+  if (typeof _sb_recordSession === 'function') {
+    var dcogPct = 0;
+    if (_dcog_drill === 'math') {
+      var totMath = _dcog_correct + _dcog_wrong;
+      dcogPct = totMath > 0 ? Math.round(_dcog_correct / totMath * 100) : 0;
+      _sb_recordSession('math', dcogPct);
+    } else if (_dcog_drill === 'tboard') {
+      var totTb = _dcog_tbd_correct + (typeof _dcog_tbd_wrong === 'number' ? _dcog_tbd_wrong : 0);
+      dcogPct = totTb > 0 ? Math.round(_dcog_tbd_correct / totTb * 100) : 0;
+      _sb_recordSession('tboard', dcogPct);
+    } else {
+      _sb_recordSession('dcog_' + _dcog_drill, 0);
+    }
+  }
 }
 
 /* ── Launch drill after camera + AI ready ────────────────────── */
@@ -30819,6 +30852,368 @@ function shPlayVideo(){
     : (window._lang==='en' ? '2-Ball Dribble Drill — SENSEI' : 'Drill 2 Ballons — SENSEI');
   openVideoModal(id, title, false);
 }
+</script>
+
+<!-- ═══════════ RÉCAP FIN DE SÉANCE — Vague 2 ═══════════ -->
+<div id="sb-recap-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div id="sb-recap-card" style="background:linear-gradient(180deg,#11151f,#0a0d14);border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.5)">
+    <div style="font-size:38px;margin-bottom:6px" id="sb-recap-emoji">🎯</div>
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:15px;color:#f5c518;letter-spacing:2px;margin-bottom:4px" id="sb-recap-title">SESSION DONE</div>
+    <div style="font-size:11px;color:#7a8299;margin-bottom:16px;letter-spacing:.5px" id="sb-recap-drill"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1" id="sb-recap-score">--</div>
+        <div style="font-size:9px;color:#9aa3b3;margin-top:3px;letter-spacing:.5px">SCORE</div>
+      </div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1" id="sb-recap-vs">--</div>
+        <div style="font-size:9px;color:#9aa3b3;margin-top:3px;letter-spacing:.5px" id="sb-recap-vs-lbl">VS MOY.</div>
+      </div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1" id="sb-recap-best">--</div>
+        <div style="font-size:9px;color:#9aa3b3;margin-top:3px;letter-spacing:.5px">BEST</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button onclick="_sb_recapReplay()" ontouchstart="" style="flex:1;background:#f5c518;color:#0d1117;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;border:none;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-replay">REJOUER</button>
+      <button onclick="_sb_recapClose()" ontouchstart="" style="flex:1;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.4);color:#f5c518;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-close">FERMER</button>
+    </div>
+  </div>
+</div>
+
+<script id="sb-progression-module">
+(function(){
+  var STORAGE_KEY = 'sensei_progression_v1';
+  var BELT_LEVELS = [
+    { id:'white',  name:'Blanche',  emoji:'⚪', color:'#ffffff', criteria:null },
+    { id:'yellow', name:'Jaune',    emoji:'🟡', color:'#f5c518', criteria:{ type:'sessions', count:3 } },
+    { id:'orange', name:'Orange',   emoji:'🟠', color:'#e87c2a', criteria:{ type:'drillScore', drill:'tboard',  threshold:60 } },
+    { id:'green',  name:'Verte',    emoji:'🟢', color:'#2dc653', criteria:{ type:'drillScore', drill:'math',    threshold:65 } },
+    { id:'blue',   name:'Bleue',    emoji:'🔵', color:'#0077b6', criteria:{ type:'drillScore', drill:'sym',     threshold:70 } },
+    { id:'purple', name:'Violette', emoji:'🟣', color:'#7b2d8b', criteria:{ type:'drillScore', drill:'tdr',     threshold:75 } },
+    { id:'brown',  name:'Marron',   emoji:'🟤', color:'#8b5a2b', criteria:{ type:'multiDrill', count:3, threshold:80 } },
+    { id:'black',  name:'Noire',    emoji:'⚫', color:'#1a1f2e', criteria:{ type:'allDrills', threshold:85 } },
+    { id:'red',    name:'Rouge',    emoji:'🔴', color:'#e63946', criteria:{ type:'legendary', threshold:90, sessions:50 } }
+  ];
+  function loadData() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { sessions: [], bestByDrill: {} };
+      var data = JSON.parse(raw);
+      if (!data.sessions)    data.sessions    = [];
+      if (!data.bestByDrill) data.bestByDrill = {};
+      return data;
+    } catch(e) { return { sessions: [], bestByDrill: {} }; }
+  }
+  function saveData(data) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch(e) {}
+  }
+  function recordSession(drill, score) {
+    if (typeof score !== 'number' || isNaN(score)) return;
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    var data = loadData();
+    data.sessions.push({ drill: drill, score: score, ts: Date.now() });
+    if (!(drill in data.bestByDrill) || score > data.bestByDrill[drill]) {
+      data.bestByDrill[drill] = score;
+    }
+    saveData(data);
+    refreshBadge();
+  }
+  function meetsCriteria(belt, data) {
+    var c = belt.criteria;
+    if (!c) return true;
+    if (c.type === 'sessions') return data.sessions.length >= c.count;
+    if (c.type === 'drillScore') return (data.bestByDrill[c.drill] || 0) >= c.threshold;
+    if (c.type === 'multiDrill') {
+      var ok = 0;
+      for (var k in data.bestByDrill) if (data.bestByDrill[k] >= c.threshold) ok++;
+      return ok >= c.count;
+    }
+    if (c.type === 'allDrills') {
+      var mainDrills = ['tboard', 'math', 'sym', 'tdr'];
+      for (var i = 0; i < mainDrills.length; i++) {
+        if ((data.bestByDrill[mainDrills[i]] || 0) < c.threshold) return false;
+      }
+      return true;
+    }
+    if (c.type === 'legendary') {
+      var allMains = ['tboard', 'math', 'sym', 'tdr'];
+      for (var i = 0; i < allMains.length; i++) {
+        if ((data.bestByDrill[allMains[i]] || 0) < c.threshold) return false;
+      }
+      return data.sessions.length >= c.sessions;
+    }
+    return false;
+  }
+  function currentBelt(data) {
+    data = data || loadData();
+    var lastReached = BELT_LEVELS[0];
+    for (var i = 1; i < BELT_LEVELS.length; i++) {
+      if (meetsCriteria(BELT_LEVELS[i], data)) lastReached = BELT_LEVELS[i];
+      else break;
+    }
+    return lastReached;
+  }
+  function progressToNext(data) {
+    data = data || loadData();
+    var current = currentBelt(data);
+    var idx = -1;
+    for (var i = 0; i < BELT_LEVELS.length; i++) {
+      if (BELT_LEVELS[i].id === current.id) { idx = i; break; }
+    }
+    if (idx < 0 || idx >= BELT_LEVELS.length - 1) return { pct: 100, next: null };
+    var next = BELT_LEVELS[idx + 1];
+    var c = next.criteria;
+    var pct = 0;
+    if (c.type === 'sessions') {
+      pct = Math.min(100, (data.sessions.length / c.count) * 100);
+    } else if (c.type === 'drillScore') {
+      var best = data.bestByDrill[c.drill] || 0;
+      pct = Math.min(100, (best / c.threshold) * 100);
+    } else if (c.type === 'multiDrill') {
+      var ok = 0;
+      for (var k in data.bestByDrill) if (data.bestByDrill[k] >= c.threshold) ok++;
+      pct = Math.min(100, (ok / c.count) * 100);
+    } else if (c.type === 'allDrills') {
+      var mains = ['tboard', 'math', 'sym', 'tdr'];
+      var total = 0;
+      for (var j = 0; j < mains.length; j++) {
+        total += Math.min(c.threshold, data.bestByDrill[mains[j]] || 0);
+      }
+      pct = Math.min(100, (total / (c.threshold * mains.length)) * 100);
+    } else if (c.type === 'legendary') {
+      var mainsL = ['tboard', 'math', 'sym', 'tdr'];
+      var totalL = 0;
+      for (var l = 0; l < mainsL.length; l++) {
+        totalL += Math.min(c.threshold, data.bestByDrill[mainsL[l]] || 0);
+      }
+      var scorePart   = (totalL / (c.threshold * mainsL.length)) * 50;
+      var sessionPart = Math.min(50, (data.sessions.length / c.sessions) * 50);
+      pct = Math.min(100, scorePart + sessionPart);
+    }
+    return { pct: Math.round(pct), next: next };
+  }
+  function refreshBadge() {
+    var host = document.getElementById('sb-progress-badge');
+    if (!host) return;
+    var data    = loadData();
+    var belt    = currentBelt(data);
+    var prog    = progressToNext(data);
+    var sessions = data.sessions.length;
+    var en = (window._lang === 'en');
+    var nextLabel = prog.next
+      ? (en ? prog.pct + '% to ' : prog.pct + '% vers ') + prog.next.name
+      : (en ? 'Maximum belt reached' : 'Ceinture maximale atteinte');
+    var sessionsLbl = en ? ' sessions completed' : ' séances complétées';
+    var levelLbl    = en ? 'Level ' : 'Niveau ';
+    var beltLbl     = en ? 'BELT ' : 'CEINTURE ';
+    var idx = 1;
+    for (var i = 0; i < BELT_LEVELS.length; i++) {
+      if (BELT_LEVELS[i].id === belt.id) { idx = i + 1; break; }
+    }
+    host.innerHTML =
+      '<div style="background:linear-gradient(135deg,rgba(245,197,24,.10),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.35)">' +
+        '<div style="width:54px;height:54px;background:' + belt.color + ';border:2px solid rgba(245,197,24,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;box-shadow:0 4px 12px rgba(0,0,0,.4)">🥋</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-family:Bebas Neue,Barlow Condensed,sans-serif;font-size:16px;color:#fff;letter-spacing:1px;line-height:1.1">' +
+            beltLbl + belt.name.toUpperCase() +
+          '</div>' +
+          '<div style="font-size:10px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px">' +
+            levelLbl + idx + ' · ' + sessions + sessionsLbl +
+          '</div>' +
+          '<div style="margin-top:7px;height:5px;background:#1a1f2e;border-radius:3px;overflow:hidden">' +
+            '<div style="height:100%;width:' + prog.pct + '%;background:linear-gradient(90deg,#f5c518,#ffd966);transition:width .4s"></div>' +
+          '</div>' +
+          '<div style="font-size:9px;color:#7a8299;margin-top:3px;letter-spacing:.3px">' + nextLabel + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  window._sb_recordSession  = recordSession;
+  window._sb_currentBelt    = function(){ return currentBelt(); };
+  window._sb_progressToNext = function(){ return progressToNext(); };
+  window._sb_refreshBadge   = refreshBadge;
+  window._sb_loadData       = loadData;
+  window._sb_BELT_LEVELS    = BELT_LEVELS;
+  function init() {
+    refreshBadge();
+    var origSetLang = window.setLang;
+    if (typeof origSetLang === 'function' && !origSetLang.__sb_wrapped) {
+      window.setLang = function() {
+        var r = origSetLang.apply(this, arguments);
+        setTimeout(refreshBadge, 50);
+        return r;
+      };
+      window.setLang.__sb_wrapped = true;
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+</script>
+<script id="sb-wave2-module">
+/* ════════════════════════════════════════════════════════════════
+   SENSEI BlackBelt — Vague 2 (historique + récap fin de séance)
+════════════════════════════════════════════════════════════════ */
+(function(){
+
+  var _sb_lastDrill = null;
+  var _sb_lastScore = null;
+
+  /* ── DRILL NAMES for display ──────────────────────────────── */
+  var DRILL_NAMES = {
+    tdr:'RÉACTION', math:'MATHS', tboard:'TBOARD', sym:'SYMÉTRIE',
+    sensei:'SENSEI', dcog_sprint:'SPRINT', dcog_height:'HEIGHT', dcog_twoball:'TWO BALL'
+  };
+  var DRILL_NAMES_EN = {
+    tdr:'REACTION', math:'MATHS', tboard:'TBOARD', sym:'SYMMETRY',
+    sensei:'SENSEI', dcog_sprint:'SPRINT', dcog_height:'HEIGHT', dcog_twoball:'TWO BALL'
+  };
+
+  /* ── B : HISTORIQUE 7 DERNIÈRES SÉANCES ──────────────────── */
+  function refreshHistory() {
+    var host = document.getElementById('sb-history-chart');
+    if (!host) return;
+    var data = (typeof _sb_loadData === 'function') ? _sb_loadData() : { sessions:[] };
+    var last7 = data.sessions.slice(-7);
+    if (last7.length === 0) { host.innerHTML = ''; return; }
+
+    var en = (window._lang === 'en');
+    var title = en ? 'YOUR LAST SESSIONS' : 'TES DERNIÈRES SÉANCES';
+
+    var bars = '';
+    for (var i = 0; i < last7.length; i++) {
+      var s = last7[i];
+      var h = Math.max(8, s.score);
+      var color = s.score >= 80 ? '#2dc653' : (s.score >= 60 ? '#f5c518' : '#e63946');
+      var name = (en ? DRILL_NAMES_EN[s.drill] : DRILL_NAMES[s.drill]) || s.drill.toUpperCase();
+      bars +=
+        '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">' +
+          '<div style="font-family:Bebas Neue,sans-serif;font-size:11px;color:#fff">' + s.score + '%</div>' +
+          '<div style="width:100%;max-width:36px;height:' + h + '%;background:' + color + ';border-radius:3px 3px 0 0;transition:height .3s"></div>' +
+          '<div style="font-size:8px;color:#7a8299;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48px">' + name + '</div>' +
+        '</div>';
+    }
+
+    host.innerHTML =
+      '<div style="background:linear-gradient(135deg,rgba(245,197,24,.06),rgba(13,17,23,.4));border:1px solid rgba(245,197,24,.25);border-radius:12px;padding:14px 16px">' +
+        '<div style="font-family:Bebas Neue,sans-serif;font-size:12px;color:#f5c518;letter-spacing:1.5px;margin-bottom:10px">📊 ' + title + '</div>' +
+        '<div style="display:flex;align-items:flex-end;gap:6px;height:80px">' + bars + '</div>' +
+      '</div>';
+  }
+  window._sb_refreshHistory = refreshHistory;
+
+  /* ── D : RÉCAP FIN DE SÉANCE ────────────────────────────── */
+  function showRecap(drill, score) {
+    _sb_lastDrill = drill;
+    _sb_lastScore = score;
+    var overlay = document.getElementById('sb-recap-overlay');
+    if (!overlay) return;
+
+    var en = (window._lang === 'en');
+    var data = (typeof _sb_loadData === 'function') ? _sb_loadData() : { sessions:[], bestByDrill:{} };
+
+    // Calcul de la moyenne perso pour ce drill
+    var drillSessions = [];
+    for (var i = 0; i < data.sessions.length; i++) {
+      if (data.sessions[i].drill === drill && data.sessions[i].score > 0) {
+        drillSessions.push(data.sessions[i].score);
+      }
+    }
+    var avg = 0;
+    if (drillSessions.length > 1) {
+      var sum = 0;
+      // exclure la dernière (c'est celle qu'on vient d'enregistrer)
+      for (var j = 0; j < drillSessions.length - 1; j++) sum += drillSessions[j];
+      avg = Math.round(sum / (drillSessions.length - 1));
+    }
+    var best = data.bestByDrill[drill] || score;
+
+    // Diff vs moyenne
+    var diff = (avg > 0) ? score - avg : 0;
+    var diffText = diff > 0 ? '+' + diff : (diff === 0 ? '=' : '' + diff);
+    var diffColor = diff > 0 ? '#2dc653' : (diff < 0 ? '#e63946' : '#f5c518');
+
+    // Emoji selon score
+    var emoji = score >= 90 ? '🔥' : (score >= 75 ? '🎯' : (score >= 60 ? '💪' : '🏀'));
+
+    // Nom du drill
+    var drillName = (en ? DRILL_NAMES_EN[drill] : DRILL_NAMES[drill]) || drill.toUpperCase();
+
+    // Remplir les éléments
+    var el = function(id) { return document.getElementById(id); };
+    var e;
+    if ((e = el('sb-recap-emoji'))) e.textContent = emoji;
+    if ((e = el('sb-recap-title'))) e.textContent = en ? 'SESSION DONE' : 'SÉANCE TERMINÉE';
+    if ((e = el('sb-recap-drill'))) e.textContent = drillName;
+    if ((e = el('sb-recap-score'))) e.textContent = score + '%';
+    if ((e = el('sb-recap-vs')))    { e.textContent = avg > 0 ? diffText : '--'; e.style.color = diffColor; }
+    if ((e = el('sb-recap-vs-lbl'))) e.textContent = en ? 'VS AVG.' : 'VS MOY.';
+    if ((e = el('sb-recap-best')))  e.textContent = best + '%';
+    if ((e = el('sb-recap-btn-replay'))) e.textContent = en ? 'REPLAY' : 'REJOUER';
+    if ((e = el('sb-recap-btn-close')))  e.textContent = en ? 'CLOSE' : 'FERMER';
+
+    // Afficher l'overlay
+    overlay.style.display = 'flex';
+  }
+  window._sb_showRecap = showRecap;
+
+  window._sb_recapClose = function() {
+    var overlay = document.getElementById('sb-recap-overlay');
+    if (overlay) overlay.style.display = 'none';
+  };
+
+  window._sb_recapReplay = function() {
+    var overlay = document.getElementById('sb-recap-overlay');
+    if (overlay) overlay.style.display = 'none';
+    if (_sb_lastDrill && typeof _dojoLaunch === 'function') {
+      // Mapper le drill enregistré vers le kind attendu par _dojoLaunch
+      var map = { tdr:'reaction', math:'math', tboard:'math', sym:'sym', sensei:'sensei' };
+      var kind = map[_sb_lastDrill] || null;
+      if (kind) {
+        setTimeout(function(){ _dojoLaunch(kind); }, 300);
+      }
+    }
+  };
+
+  /* ── Wrapper : enrichir _sb_recordSession pour déclencher historique + récap ── */
+  var _origRecord = window._sb_recordSession;
+  if (typeof _origRecord === 'function') {
+    window._sb_recordSession = function(drill, score) {
+      _origRecord(drill, score);
+      // Rafraîchir l'historique
+      refreshHistory();
+      // Afficher le récap (seulement si score > 0, pour ne pas pop sur les drills sans scoring)
+      if (score > 0) {
+        setTimeout(function(){ showRecap(drill, score); }, 800);
+      }
+    };
+  }
+
+  /* ── Init : afficher l'historique au chargement ──────────────── */
+  function init() {
+    refreshHistory();
+    // Observer changement de langue
+    var origSetLang = window.setLang;
+    if (typeof origSetLang === 'function' && !origSetLang.__sb_w2) {
+      window.setLang = function() {
+        var r = origSetLang.apply(this, arguments);
+        setTimeout(refreshHistory, 60);
+        return r;
+      };
+      window.setLang.__sb_w2 = true;
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>
