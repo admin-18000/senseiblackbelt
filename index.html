@@ -26955,6 +26955,18 @@ function _tdr_senseiActivate() {
 
 /* ── Désactivation : restaure le canvas plein écran ────────────── */
 function _tdr_senseiDeactivate() {
+  // Vague 1 — enregistrer la séance Sensei dans la progression
+  // Seulement si la séance a duré ≥ 50% de la durée prévue (sinon abandon)
+  if (typeof _sb_recordSession === 'function' && _tdr_senseiStartTs > 0) {
+    var elapsed = (Date.now() - _tdr_senseiStartTs) / 1000;
+    var ratio = elapsed / (_tdr_senseiDuration || 60);
+    if (ratio >= 0.5) {
+      // Score = ratio de complétion (100 si terminé, sinon proportionnel)
+      var senseiScore = Math.min(100, Math.round(ratio * 100));
+      _sb_recordSession('sensei', senseiScore);
+    }
+    _tdr_senseiStartTs = 0;
+  }
   _tdr_senseiStopVideo();
   var vid = document.getElementById('sensei-cam-senseivid');
   var cv  = document.getElementById('sensei-cam-canvas');
@@ -27984,20 +27996,27 @@ function _dcog_stop() {
     btnSv.style.display = 'flex';
   _dcog_setStatus(_t('Session terminée','Session done'), '#2dc653');
   _dcog_showResults();
-  // Vague 1 — enregistrer dans la progression selon le sous-drill
-  if (typeof _sb_recordSession === 'function') {
-    var dcogPct = 0;
-    if (_dcog_drill === 'math') {
-      var totMath = _dcog_correct + _dcog_wrong;
-      dcogPct = totMath > 0 ? Math.round(_dcog_correct / totMath * 100) : 0;
-      _sb_recordSession('math', dcogPct);
-    } else if (_dcog_drill === 'tboard') {
-      var totTb = _dcog_tbd_correct + (typeof _dcog_tbd_wrong === 'number' ? _dcog_tbd_wrong : 0);
-      dcogPct = totTb > 0 ? Math.round(_dcog_tbd_correct / totTb * 100) : 0;
-      _sb_recordSession('tboard', dcogPct);
-    } else {
-      _sb_recordSession('dcog_' + _dcog_drill, 0);
-    }
+  // Vague 1 — enregistrer dans la progression (factorisé)
+  _dcog_recordToProgression();
+}
+
+/* ── Enregistre la séance DCOG dans le module de progression ────
+   Appelée par les 3 chemins de fin de drill (manuel + 2 timers auto).
+   Couvre math / tboard / sprint / height / twoball. */
+function _dcog_recordToProgression() {
+  if (typeof _sb_recordSession !== 'function') return;
+  var dcogPct = 0;
+  if (_dcog_drill === 'math') {
+    var totMath = _dcog_correct + _dcog_wrong;
+    dcogPct = totMath > 0 ? Math.round(_dcog_correct / totMath * 100) : 0;
+    _sb_recordSession('math', dcogPct);
+  } else if (_dcog_drill === 'tboard') {
+    var totTb = _dcog_tbd_correct + (typeof _dcog_tbd_wrong === 'number' ? _dcog_tbd_wrong : 0);
+    dcogPct = totTb > 0 ? Math.round(_dcog_tbd_correct / totTb * 100) : 0;
+    _sb_recordSession('tboard', dcogPct);
+  } else {
+    // sprint / height / twoball : on enregistre la séance (compteur) sans score
+    _sb_recordSession('dcog_' + _dcog_drill, 0);
   }
 }
 
@@ -28052,6 +28071,7 @@ function _dcog_startTimer() {
       _dcog_mathTargets = [];
       _dcog_stop();
       _dcog_showResults();
+      _dcog_recordToProgression();
       var btnSv = document.getElementById('dcog_btnSave');
       if(btnSv) btnSv.style.display = 'flex';
       _senseiEndSession(4000);
@@ -28129,6 +28149,7 @@ function _dcog_launchDrill() {
         _sensei_speak(window._lang==='en'?'Session done!':'Session terminée !', 0);
         _dcog_stop();
         _dcog_showResults();
+        _dcog_recordToProgression();
         var btnSv2 = document.getElementById('dcog_btnSave');
         if(btnSv2) btnSv2.style.display = 'flex';
         _senseiEndSession(4000);
