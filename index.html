@@ -30951,7 +30951,19 @@ function shPlayVideo(){
       data.bestByDrill[drill] = score;
     }
     saveData(data);
+    // Synchroniser avec l'ancien système de ceintures (sensei_belt_idx)
+    syncBeltIdx(data);
     refreshBadge();
+  }
+  // Maintient sensei_belt_idx aligné avec le nouveau système automatique
+  function syncBeltIdx(data) {
+    data = data || loadData();
+    var belt = currentBelt(data);
+    var idx = 0;
+    for (var i = 0; i < BELT_LEVELS.length; i++) {
+      if (BELT_LEVELS[i].id === belt.id) { idx = i; break; }
+    }
+    try { localStorage.setItem('sensei_belt_idx', String(idx)); } catch(e) {}
   }
   function meetsCriteria(belt, data) {
     var c = belt.criteria;
@@ -31083,6 +31095,8 @@ function shPlayVideo(){
   window._sb_loadData       = loadData;
   window._sb_BELT_LEVELS    = BELT_LEVELS;
   function init() {
+    // Sync la ceinture avec l'ancien système dès le démarrage
+    syncBeltIdx();
     refreshBadge();
     var origSetLang = window.setLang;
     if (typeof origSetLang === 'function' && !origSetLang.__sb_wrapped) {
