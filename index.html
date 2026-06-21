@@ -21574,14 +21574,20 @@ function drawBalistique(){
   var T=drawBalistique._t, en=window._lang==='en';
   var GOLD='#f5c518';
 
-  // Repère normalisé -> pixels
+  // Sur écran large, limiter la zone utile pour garder les trajectoires dans le canvas
+  var aspect=W/H;
+  var maxAspect=2.0;
+  var usableW=Math.min(W, H*maxAspect);
+  var padX=(W-usableW)/2;
+
+  // Repère normalisé -> pixels (utilise usableW + padX pour l'horizontal)
   var floorY=H*0.86;
-  var shooterX=W*0.12;          // position du tireur
-  var releaseH=H*0.34;          // hauteur de lâcher du ballon
+  var shooterX=padX+usableW*0.12;
+  var releaseH=H*0.34;
   var releaseY=floorY-releaseH;
-  var rimR=W*0.045;             // demi-largeur de l'anneau
-  var hoopCx=W*0.80;            // CENTRE de l'anneau (le ballon vise ce point)
-  var rimH=H*0.52;              // hauteur de l'anneau
+  var rimR=usableW*0.045;
+  var hoopCx=padX+usableW*0.80;
+  var rimH=H*0.52;
   var rimY=floorY-rimH;
 
   // Grille légère
@@ -21594,7 +21600,7 @@ function drawBalistique(){
   // Distance horizontale tireur -> CENTRE de l'anneau
   var dist=hoopCx-shooterX;
   var dh=releaseY-rimY;         // dénivelé (positif si anneau plus haut)
-  var g=W*0.0016;               // gravité en unités pixel
+  var g=usableW*0.0016;         // gravité proportionnelle à la zone utile
 
   // v0 calé pour que l'angle optimal (52°) passe exactement par l'anneau
   function v0for(angDeg){
@@ -21620,6 +21626,8 @@ function drawBalistique(){
   ];
 
   var optPts=null;
+  // Clip : les trajectoires qui dépassent le canvas sont coupées proprement
+  c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
   shots.forEach(function(sh){
     var isOpt=(sh.ang===optAngle);
     c.strokeStyle=sh.col;c.lineWidth=isOpt?3:1.4;
@@ -21643,12 +21651,24 @@ function drawBalistique(){
     c.fillStyle=sh.col;
     c.font='bold '+Math.round(W*0.026)+'px Barlow Condensed';
     c.textAlign='center';
-    c.fillText(sh.ang+'°  '+sh.lbl,apex.x,apex.y-H*0.04);
+    // Label : positions fixes en haut, étagées horizontalement par angle pour éviter chevauchement
+    var lblX, lblY;
+    var apexClipped=(apex.y<H*0.08);
+    if(apexClipped){
+      // Légende fixe en haut : 66°=gauche, 52°=centre, 38°=droite
+      if(sh.ang===66)      { lblX=padX+usableW*0.22; lblY=H*0.08; }
+      else if(sh.ang===52) { lblX=padX+usableW*0.50; lblY=H*0.08; }
+      else                 { lblX=padX+usableW*0.74; lblY=H*0.08; }
+    } else {
+      lblX=apex.x; lblY=apex.y-H*0.04;
+    }
+    c.fillText(sh.ang+'°  '+sh.lbl,lblX,lblY);
   });
+  c.restore(); // fin du clip trajectoires
 
   // Tireur (silhouette simple)
   c.strokeStyle='rgba(255,255,255,0.55)';c.lineWidth=2;
-  c.beginPath();c.arc(shooterX,releaseY+H*0.04,W*0.018,0,Math.PI*2);c.stroke();
+  c.beginPath();c.arc(shooterX,releaseY+H*0.04,usableW*0.018,0,Math.PI*2);c.stroke();
   c.beginPath();c.moveTo(shooterX,releaseY+H*0.06);c.lineTo(shooterX,floorY);c.stroke();
 
   // Panier : potence (à droite de l'anneau) + anneau centré sur hoopCx
@@ -21674,7 +21694,7 @@ function drawBalistique(){
     var fr=fidx-i0;
     var bx=optPts[i0].x+(optPts[i1].x-optPts[i0].x)*fr;
     var by=optPts[i0].y+(optPts[i1].y-optPts[i0].y)*fr;
-    var br=W*0.022;
+    var br=usableW*0.022;
     var grd=c.createRadialGradient(bx-br*0.3,by-br*0.3,0,bx,by,br);
     grd.addColorStop(0,'#ffb866');grd.addColorStop(1,'#e87c2a');
     c.fillStyle=grd;
