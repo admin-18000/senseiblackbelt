@@ -21630,12 +21630,15 @@ function drawBalistique(){
   c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
   shots.forEach(function(sh){
     var isOpt=(sh.ang===optAngle);
+    // Le tir 66° a un v0 réduit pour rester dans le canvas
+    // (visuellement il reste plus haut que 52°, mais ne déborde plus)
+    var v0use=(sh.ang===66)?v0opt*0.70:v0opt;
     c.strokeStyle=sh.col;c.lineWidth=isOpt?3:1.4;
     c.setLineDash(isOpt?[]:[4,4]);
     c.beginPath();
     var pts=[],started=false;
     for(var x=0;x<=dist;x+=dist/120){
-      var y=trajY(x,sh.ang,v0opt);
+      var y=trajY(x,sh.ang,v0use);
       var px=shooterX+x, py=y;
       if(py>floorY)py=floorY;
       pts.push({x:px,y:py});
@@ -21651,18 +21654,10 @@ function drawBalistique(){
     c.fillStyle=sh.col;
     c.font='bold '+Math.round(W*0.026)+'px Barlow Condensed';
     c.textAlign='center';
-    // Label : positions fixes en haut, étagées horizontalement par angle pour éviter chevauchement
-    var lblX, lblY;
-    var apexClipped=(apex.y<H*0.08);
-    if(apexClipped){
-      // Légende fixe en haut : 66°=gauche, 52°=centre, 38°=droite
-      if(sh.ang===66)      { lblX=padX+usableW*0.22; lblY=H*0.08; }
-      else if(sh.ang===52) { lblX=padX+usableW*0.50; lblY=H*0.08; }
-      else                 { lblX=padX+usableW*0.74; lblY=H*0.08; }
-    } else {
-      lblX=apex.x; lblY=apex.y-H*0.04;
-    }
-    c.fillText(sh.ang+'°  '+sh.lbl,lblX,lblY);
+    // Label placé à l'apex avec une garde min pour rester lisible
+    var lblY=apex.y-H*0.04;
+    if(lblY<H*0.06) lblY=H*0.06;
+    c.fillText(sh.ang+'°  '+sh.lbl,apex.x,lblY);
   });
   c.restore(); // fin du clip trajectoires
 
