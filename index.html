@@ -778,6 +778,7 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
     <div class="hero-title" style="font-size:clamp(60px,12vw,140px)">SEN<span>SEI</span></div>
     <div class="hero-sub" style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);font-weight:700" data-i18n="hero_sub">BLACK BELT</div>
+    <div style="color:rgba(255,255,255,.75);font-family:var(--font-cond);font-size:clamp(12px,1.6vw,15px);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;margin-bottom:8px;animation:fadeUp .8s .25s ease both" data-i18n="hero_positioning">Pour les coachs qui accompagnent · Pour les athlètes déterminés</div>
     <div style="width:100%;max-width:420px;margin:0 auto 36px;border-radius:16px;overflow:hidden;border:2px solid rgba(245,197,24,.3);box-shadow:0 0 40px rgba(245,197,24,.2);animation:fadeUp .8s .35s ease both;position:relative">
       <video src="hero.mp4" autoplay muted loop playsinline style="width:100%;display:block;object-fit:cover;max-height:70vh"></video>
       <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(0,0,0,.7));text-align:center">
@@ -796,6 +797,26 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
     <div class="scroll-hint">
       <svg viewBox="0 0 24 24"><path d="M12 16l-6-6 1.4-1.4L12 13.2l4.6-4.6L18 10z"/></svg>
+    </div>
+  </div>
+
+  <!-- ═══════════ POSITIONNEMENT COACH/ATHLÈTE — Vague 5 ═══════════ -->
+  <div style="padding:clamp(20px,3vw,30px) clamp(16px,4vw,40px) 0;background:#0d1117">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.35);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:28px;line-height:1;flex-shrink:0">🥋</div>
+        <div>
+          <div style="font-family:var(--font-display,'Bebas Neue','Barlow Condensed',sans-serif);font-size:16px;color:var(--gold,#f5c518);letter-spacing:1.5px;line-height:1.1" data-i18n="pos_coach_title">POUR LES COACHS</div>
+          <div style="font-size:12px;color:#c8cdd6;margin-top:5px;line-height:1.45" data-i18n="pos_coach_desc">Un outil de séance individuelle qui mesure ce que l'œil ne voit pas et matérialise la progression.</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(45,198,83,.08),rgba(13,17,23,.55));border:1px solid rgba(45,198,83,.35);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:28px;line-height:1;flex-shrink:0">🏀</div>
+        <div>
+          <div style="font-family:var(--font-display,'Bebas Neue','Barlow Condensed',sans-serif);font-size:16px;color:#2dc653;letter-spacing:1.5px;line-height:1.1" data-i18n="pos_athlete_title">POUR LES ATHLÈTES DÉTERMINÉS</div>
+          <div style="font-size:12px;color:#c8cdd6;margin-top:5px;line-height:1.45" data-i18n="pos_athlete_desc">Un cadre scientifique pour aller au-delà du feeling et franchir les 9 ceintures.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -9709,8 +9730,12 @@ function oppDisplayResults(top, region, en, profile) {
     <div data-i18n="onb_title" style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:clamp(34px,8vw,72px);color:#fff;letter-spacing:4px;line-height:1;margin-bottom:6px;animation:onbSlideUp .7s .15s ease-out backwards">
       BIENVENUE !
     </div>
-    <div data-i18n="onb_subtitle" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(13px,2.5vw,20px);color:#cfd3e0;font-weight:600;letter-spacing:1.5px;margin-bottom:clamp(14px,3vw,36px);animation:onbSlideUp .7s .3s ease-out backwards">
+    <div data-i18n="onb_subtitle" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(13px,2.5vw,20px);color:#cfd3e0;font-weight:600;letter-spacing:1.5px;margin-bottom:clamp(10px,2vw,20px);animation:onbSlideUp .7s .3s ease-out backwards">
       Essaie un drill maintenant — sans inscription
+    </div>
+    <!-- Positionnement coach/athlète -->
+    <div data-i18n="onb_positioning" style="display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:clamp(11px,1.8vw,14px);color:#f5c518;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:clamp(14px,3vw,30px);padding:6px 16px;border:1px solid rgba(245,197,24,.35);border-radius:20px;background:rgba(245,197,24,.06);animation:onbSlideUp .7s .4s ease-out backwards">
+      🥋 Pour les coachs · 🏀 Pour les athlètes déterminés
     </div>
 
     <!-- 3 cartes -->
@@ -11995,6 +12020,11 @@ function applyLangTracker(lang) {
   Object.assign(T.fr,{
     hero_tag:'Ceintures de compétences · Basket',
     hero_sub:'BLACK BELT',
+    hero_positioning:'Pour les coachs qui accompagnent · Pour les athlètes déterminés',
+    pos_coach_title:'POUR LES COACHS',
+    pos_coach_desc:"Un outil de séance individuelle qui mesure ce que l'œil ne voit pas et matérialise la progression.",
+    pos_athlete_title:'POUR LES ATHLÈTES DÉTERMINÉS',
+    pos_athlete_desc:'Un cadre scientifique pour aller au-delà du feeling et franchir les 9 ceintures.',
     hero_desc:'La méthode basketball scientifique en 9 ceintures.<br><strong style="color:var(--text)" data-i18n="ins_sciences_strong">Neurosciences · Lean Six Sigma σ · Physique appliquée.</strong>',
     coach_tag:'Coach · Scientifique · Innovateur',
     coach_title:'Ingénieur de Recherche Opérationnelle<br>en Gestion des Risques &amp; Modélisation Mathématique<br>Expert en Coordination Visuomotrice',
@@ -12009,6 +12039,11 @@ function applyLangTracker(lang) {
   Object.assign(T.en,{
     hero_tag:'Basketball Mastery Belts',
     hero_sub:'BLACK BELT',
+    hero_positioning:'For coaches who guide · For determined athletes',
+    pos_coach_title:'FOR COACHES',
+    pos_coach_desc:"A one-on-one session tool that measures what the eye can't see and makes progress tangible.",
+    pos_athlete_title:'FOR DETERMINED ATHLETES',
+    pos_athlete_desc:'A scientific framework to go beyond feeling and climb the 9 belts.',
     hero_desc:'The scientific basketball method in 9 belts.<br><strong style="color:var(--text)">Neuroscience · Lean Six Sigma σ · Applied Physics.</strong>',
     coach_tag:'Coach · Scientist · Innovator',
     coach_title:'Operations Research Engineer<br>Risk Management &amp; Mathematical Modeling<br>Expert in Visuo-Motor Coordination',
@@ -12240,6 +12275,7 @@ function applyLangTracker(lang) {
     // Onboarding accueil
     onb_title:'BIENVENUE !',
     onb_subtitle:'Essaie un drill maintenant \u2014 sans inscription',
+    onb_positioning:'\ud83e\udd4b Pour les coachs \u00b7 \ud83c\udfc0 Pour les athl\u00e8tes d\u00e9termin\u00e9s',
     onb_tdr_title:'R\u00c9ACTION',
     onb_tdr_desc:'Touche les cibles le plus vite possible',
     onb_math_title:'MATHS',
@@ -12382,6 +12418,7 @@ function applyLangTracker(lang) {
     // Onboarding
     onb_title:'WELCOME!',
     onb_subtitle:'Try a drill now \u2014 no sign-up needed',
+    onb_positioning:'\ud83e\udd4b For coaches \u00b7 \ud83c\udfc0 For determined athletes',
     onb_tdr_title:'REACTION',
     onb_tdr_desc:'Hit the targets as fast as you can',
     onb_math_title:'MATH',
