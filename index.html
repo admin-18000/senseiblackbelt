@@ -11541,7 +11541,7 @@ fr: {
   dojo_sub_sensei:'Mimétisme · Sensei live',
   dojo_sub_reaction:'Cognitif · Cibles aléatoires',
   dojo_sub_math:'Validé scientifiquement',
-  dojo_sub_sym:'Bilatéral · Équilibre G/D',
+  dojo_sub_sym:'30s crossovers · Équilibre G/D',
 
   // ── ONGLETS ──
   prog_tab_bh:'🥋 Black Belt Ball-Handling', prog_tab_bp:'💪 Bench Press Program (PDF)',
@@ -11660,7 +11660,7 @@ en: {
   dojo_sub_sensei:'Mimicry · Sensei live',
   dojo_sub_reaction:'Cognitive · Random targets',
   dojo_sub_math:'Scientifically validated',
-  dojo_sub_sym:'Bilateral · L/R balance',
+  dojo_sub_sym:'30s crossovers · L/R balance',
 
   // ── TABS ──
   prog_tab_bh:'🥋 Black Belt Ball-Handling', prog_tab_bp:'💪 Bench Press Program (PDF)',
@@ -25705,9 +25705,26 @@ function _tsym_stopCamera() {
 /* ── Boucle de détection ────────────────────────────────────── */
 function _tsym_startSessTimer(){
   _tsym_sessSec = 0;
+  _tsym_sessDur = 30; // Refonte : drill 30 secondes crossovers
+  _tsym_crossCount = 0; // Compteur de changements de côté
+  _tsym_lastCrossSide = null; // 'L' ou 'R' selon la position dominante précédente
+  _tsym_lastCrossAt = 0; // timestamp du dernier changement (anti-spam)
+  _tsym_particles = []; // particules "+1" flottantes (reset à chaque session)
   if (_tsym_sessTimer) clearInterval(_tsym_sessTimer);
+  // Phrase d'ouverture (dès le démarrage)
+  setTimeout(function(){
+    _sensei_speak(window._lang==='en' ? 'Go, crossovers' : "C'est parti, crossovers", 0);
+  }, 200);
   _tsym_sessTimer = setInterval(function(){
     _tsym_sessSec++;
+    // Consigne à 15s (mi-drill) : rappel technique
+    if (_tsym_sessSec === 15) {
+      _sensei_speak(window._lang==='en' ? 'Stay low, hips balanced' : 'Reste bas, hanches équilibrées', 0);
+    }
+    // Alerte 5 secondes restantes
+    if (_tsym_sessSec === 25) {
+      _sensei_speak(window._lang==='en' ? '5 seconds' : '5 secondes', 0);
+    }
     if (_tsym_sessSec >= _tsym_sessDur) {
       clearInterval(_tsym_sessTimer); _tsym_sessTimer = null;
       // Fin session symétrie
@@ -25753,7 +25770,7 @@ function _tsym_startDetection() {
   if (btnStop)  btnStop.style.display  = 'flex';
   if (btnSave)  btnSave.style.display  = 'none';
   var status = document.getElementById('tsym_status');
-  // Countdown 3-2-1 sur canvas
+  // Countdown 10s sur canvas — laisse le temps de se mettre en place
   (function tsymCd(n){
     if (!_tsym_running) return;
     if (n <= 0) {
@@ -25768,13 +25785,18 @@ function _tsym_startDetection() {
       ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(String(n), W/2, H/2);
+      // Message "PRÊT" affiché pendant tout le countdown
+      var en = window._lang === 'en';
+      ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillStyle='#fff';
+      ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
       ctx.restore();
     }
-    _td_beep(n===1?880:660, 0.08, 0.12);
-    if(navigator.vibrate) navigator.vibrate(n===1?30:15);
+    _td_beep(n<=3?880:440, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(n<=3?30:15);
     if(status) status.textContent = String(n)+'...';
-    setTimeout(function(){ tsymCd(n-1); }, 900);
-  })(3);
+    setTimeout(function(){ tsymCd(n-1); }, 1000);
+  })(10);
 }
 
 function _tsym_detect() {
@@ -25868,6 +25890,45 @@ function _tsym_drawFrame(poses) {
   var kps = poses[0].keypoints;
   var scaleX = W / (_tsym_video.videoWidth  || 640);
   var scaleY = H / (_tsym_video.videoHeight || 480);
+
+  // ═══════ DÉTECTION CROSSOVERS (changement de côté du poignet actif) ═══════
+  // Approximation via MoveNet : on regarde le poignet le plus bas (position dribble),
+  // et on compte quand il change de côté du corps par rapport au centre.
+  try {
+    var _lw = kps[_TSYM_KP['leftWrist']];
+    var _rw = kps[_TSYM_KP['rightWrist']];
+    var _ls = kps[_TSYM_KP['leftShoulder']];
+    var _rs = kps[_TSYM_KP['rightShoulder']];
+    if (_lw && _rw && _ls && _rs &&
+        _lw.score > 0.35 && _rw.score > 0.35 &&
+        _ls.score > 0.35 && _rs.score > 0.35) {
+      // Centre du corps (milieu des épaules)
+      var _cx = (_ls.x + _rs.x) / 2;
+      // Poignet le plus bas = celui qui dribble
+      var _activeWrist = (_lw.y > _rw.y) ? _lw : _rw;
+      // Côté par rapport au centre du corps (rappel : coords vidéo non-miroir)
+      var _currentSide = (_activeWrist.x < _cx) ? 'L' : 'R';
+      // Détecter un changement de côté (avec anti-spam : min 200ms entre 2)
+      var _now = Date.now();
+      if (typeof _tsym_lastCrossSide !== 'undefined' && _tsym_lastCrossSide !== null &&
+          _currentSide !== _tsym_lastCrossSide &&
+          (_now - (_tsym_lastCrossAt || 0)) > 200) {
+        _tsym_crossCount = (_tsym_crossCount || 0) + 1;
+        _tsym_lastCrossAt = _now;
+        // Particule "+1" flottante au-dessus du poignet actif (miroir X pour rendu)
+        if (!_tsym_particles) _tsym_particles = [];
+        _tsym_particles.push({
+          x: W - _activeWrist.x * scaleX,  // miroir horizontal comme la vidéo
+          y: _activeWrist.y * scaleY - Math.round(H*0.03),
+          born: _now
+        });
+        // Nettoyer les vieilles particules (au-delà de 1s)
+        if (_tsym_particles.length > 40) _tsym_particles.shift();
+      }
+      _tsym_lastCrossSide = _currentSide;
+    }
+  } catch(eCross) { /* silencieux */ }
+  // ═══════════════════════════════════════════════════════════════
 
   // Dessiner le squelette
   _tsym_drawSkeleton(kps, scaleX, scaleY, W);
@@ -26194,6 +26255,100 @@ function _tsym_drawFrame(poses) {
     }
     _tsym_lastAudioScore = avg;
   }
+  // ═══════ HUD : chrono + compteur crossovers en overlay canvas (style pilule) ═══════
+  try {
+    var _en = window._lang === 'en';
+    var _remaining = Math.max(0, (_tsym_sessDur || 30) - (_tsym_sessSec || 0));
+    var _crossN = _tsym_crossCount || 0;
+
+    // Helper pour dessiner un rectangle à coins très arrondis (pilule)
+    var _drawPill = function(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    };
+
+    // ── Chrono (haut gauche) ──
+    var _padHUD = Math.round(H * 0.025);
+    var _hudW = Math.round(W * 0.19);
+    var _hudH = Math.round(H * 0.15);
+    var _hudR = Math.round(_hudH * 0.35); // coins très arrondis
+    _tsym_ctx.save();
+    // Fond noir semi-transparent
+    _tsym_ctx.fillStyle = 'rgba(13,17,23,0.82)';
+    _drawPill(_tsym_ctx, _padHUD, _padHUD, _hudW, _hudH, _hudR);
+    _tsym_ctx.fill();
+    // Chiffre chrono — blanc pur, gros
+    _tsym_ctx.fillStyle = '#ffffff';
+    _tsym_ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    _tsym_ctx.textAlign = 'center';
+    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.fillText('0:' + (_remaining < 10 ? '0' + _remaining : _remaining), _padHUD + _hudW/2, _padHUD + _hudH*0.42);
+    // Label "SECONDS LEFT" en petit, majuscules, doré
+    _tsym_ctx.fillStyle = '#f5c518';
+    _tsym_ctx.font = 'bold ' + Math.round(H*0.020) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    var _labChrono = _en ? 'SECONDS LEFT' : 'SEC. RESTANTES';
+    _tsym_ctx.fillText(_labChrono, _padHUD + _hudW/2, _padHUD + _hudH*0.78);
+    _tsym_ctx.restore();
+
+    // ── Compteur crossovers (haut droit) ──
+    var _hudW2 = Math.round(W * 0.19);
+    var _hudX2 = W - _padHUD - _hudW2;
+    _tsym_ctx.save();
+    _tsym_ctx.fillStyle = 'rgba(13,17,23,0.82)';
+    _drawPill(_tsym_ctx, _hudX2, _padHUD, _hudW2, _hudH, _hudR);
+    _tsym_ctx.fill();
+    // Chiffre — blanc pur
+    _tsym_ctx.fillStyle = '#ffffff';
+    _tsym_ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    _tsym_ctx.textAlign = 'center';
+    _tsym_ctx.textBaseline = 'middle';
+    _tsym_ctx.fillText(String(_crossN), _hudX2 + _hudW2/2, _padHUD + _hudH*0.42);
+    // Label — doré
+    _tsym_ctx.fillStyle = '#f5c518';
+    _tsym_ctx.font = 'bold ' + Math.round(H*0.020) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    _tsym_ctx.fillText('CROSSES', _hudX2 + _hudW2/2, _padHUD + _hudH*0.78);
+    _tsym_ctx.restore();
+  } catch(eHUD) { /* silencieux */ }
+  // ═══════ PARTICULES "+1" FLOTTANTES (style Ball AI : gros + contour noir) ═══════
+  try {
+    if (_tsym_particles && _tsym_particles.length > 0) {
+      var _pNow = Date.now();
+      var _pLife = 900; // 900ms de vie
+      var _pRise = Math.round(H * 0.11); // monte de 11% de H
+      _tsym_ctx.save();
+      _tsym_ctx.textAlign = 'center';
+      _tsym_ctx.textBaseline = 'middle';
+      // Grande taille pour lisibilité max
+      _tsym_ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      for (var _pi = _tsym_particles.length - 1; _pi >= 0; _pi--) {
+        var _p = _tsym_particles[_pi];
+        var _age = _pNow - _p.born;
+        if (_age > _pLife) { _tsym_particles.splice(_pi, 1); continue; }
+        var _t = _age / _pLife; // 0 → 1
+        var _yOff = -_t * _pRise; // monte
+        var _alpha = 1 - _t; // s'estompe
+        var _px = _p.x, _py = _p.y + _yOff;
+        // Contour noir épais (survit sur fond clair)
+        _tsym_ctx.strokeStyle = 'rgba(0,0,0,' + _alpha + ')';
+        _tsym_ctx.lineWidth = Math.max(3, Math.round(H*0.006));
+        _tsym_ctx.strokeText('+1', _px, _py);
+        // Texte blanc au-dessus (survit sur fond sombre)
+        _tsym_ctx.fillStyle = 'rgba(255,255,255,' + _alpha + ')';
+        _tsym_ctx.fillText('+1', _px, _py);
+      }
+      _tsym_ctx.restore();
+    }
+  } catch(ePart) { /* silencieux */ }
+  // ═══════════════════════════════════════════════════════════════
   // Logo SENSEI sur le canvas (capturé par MediaRecorder)
   if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_tsym_ctx, W, H);
 }
@@ -26547,7 +26702,9 @@ function _tsym_startRec() {
       'Recording not supported — please update your browser'
     )); return;
   }
-  var cv = document.getElementById('tsym_canvas');
+  // Utiliser le canvas actif (variable runtime mise à jour par _tsym_onCamReady)
+  // Cela couvre les 2 cas : caméra embarquée (tsym_canvas) OU overlay DOJO (sensei-cam-canvas)
+  var cv = (typeof _tsym_canvas !== 'undefined' && _tsym_canvas) ? _tsym_canvas : document.getElementById('tsym_canvas');
   if (!cv) return;
   // Capturer le canvas (vidéo + squelette fusionnés)
   var stream = null;
@@ -27511,11 +27668,11 @@ function _tdr_drawParticles(ctx) {
 /* ── Drill ────────────────────────────────────────────────────── */
 var _tdr_countdownActive = false; // flag dédié — ne touche pas _tdr_running
 function _tdr_countdown(cb) {
-  // Countdown 3-2-1 HomeCourt-style dessiné sur le canvas
+  // Countdown 10-9-...-1 avant démarrage — laisse le temps de se mettre en place
   var cv = _tdr_canvas, ctx = _tdr_ctx;
   if (!cv || !ctx) { cb(); return; }
   var W = cv.width, H = cv.height;
-  var n = 3;
+  var n = 10;
   var en = window._lang === 'en';
   _tdr_countdownActive = true; // bloque le dessin dans _tdr_drawFrame sans tuer le RAF
   function drawN(num) {
@@ -27527,14 +27684,14 @@ function _tdr_countdown(cb) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(String(num), W/2, H/2);
-    if (num === 1) {
-      ctx.font = Math.round(H*0.10)+'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.fillStyle = '#fff';
-      ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.30));
-    }
+    // Message "PRÊT" affiché pendant tout le countdown (pas seulement à 1)
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
     ctx.restore();
-    _td_beep(num===1?880:660, 0.08, 0.12);
-    if(navigator.vibrate) navigator.vibrate(num===1?30:15);
+    // Bip aigu sur les 3 derniers, grave avant
+    _td_beep(num<=3?880:440, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(num<=3?30:15);
   }
   function tick() {
     if (n <= 0) {
@@ -27542,7 +27699,7 @@ function _tdr_countdown(cb) {
       cb(); return;
     }
     drawN(n--);
-    setTimeout(tick, 900);
+    setTimeout(tick, 1000);
   }
   tick();
 }
@@ -28214,7 +28371,7 @@ function _dcog_launchDrill() {
   var bRec = document.getElementById('dcog_btnRec');
   if (bRec) bRec.style.display = 'flex';
   _dcog_setStatus(_t('GO !','GO!'), '#2dc653');
-  // Countdown 3-2-1 puis démarrage détection
+  // Countdown 10s puis démarrage détection — laisse le temps de se mettre en place
   (function dcogCountdown(n){
     if (!_dcog_running) return;
     var cv=_dcog_canvas, ctx=_dcog_ctx;
@@ -28227,11 +28384,16 @@ function _dcog_launchDrill() {
     ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(String(n), W/2, H/2);
+    // Message "PRÊT" affiché pendant tout le countdown
+    var en = window._lang === 'en';
+    ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle='#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
     ctx.restore();
-    _td_beep(n===1?880:660, 0.08, 0.12);
-    if(navigator.vibrate) navigator.vibrate(n===1?30:15);
-    setTimeout(function(){ dcogCountdown(n-1); }, 900);
-  })(3);
+    _td_beep(n<=3?880:440, 0.08, 0.12);
+    if(navigator.vibrate) navigator.vibrate(n<=3?30:15);
+    setTimeout(function(){ dcogCountdown(n-1); }, 1000);
+  })(10);
 }
 
 /* ── Detection loop (MoveNet) ────────────────────────────────── */
@@ -30944,6 +31106,12 @@ function shPlayVideo(){
     <div style="font-size:38px;margin-bottom:6px" id="sb-recap-emoji">🎯</div>
     <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:15px;color:#f5c518;letter-spacing:2px;margin-bottom:4px" id="sb-recap-title">SESSION DONE</div>
     <div style="font-size:11px;color:#7a8299;margin-bottom:16px;letter-spacing:.5px" id="sb-recap-drill"></div>
+    <!-- Verdict Handles (affiché uniquement pour le drill sym) -->
+    <div id="sb-recap-verdict" style="display:none;background:linear-gradient(135deg,rgba(245,197,24,.10),rgba(13,17,23,.5));border:1px solid rgba(245,197,24,.35);border-radius:10px;padding:10px 14px;margin-bottom:16px">
+      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:34px;color:#f5c518;letter-spacing:1.5px;line-height:1" id="sb-recap-verdict-note">--/10</div>
+      <div style="font-size:11px;color:#c8cdd6;margin-top:4px;letter-spacing:.5px;font-weight:600" id="sb-recap-verdict-label">Handles Score</div>
+      <div style="font-size:10px;color:#9aa3b3;margin-top:2px;letter-spacing:.3px" id="sb-recap-verdict-comment"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
       <div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1" id="sb-recap-score">--</div>
@@ -31264,6 +31432,43 @@ function shPlayVideo(){
     if ((e = el('sb-recap-best')))  e.textContent = best + '%';
     if ((e = el('sb-recap-btn-replay'))) e.textContent = en ? 'REPLAY' : 'REJOUER';
     if ((e = el('sb-recap-btn-close')))  e.textContent = en ? 'CLOSE' : 'FERMER';
+
+    // ═══════ VERDICT HANDLES (uniquement pour drill sym) ═══════
+    var verdictHost = el('sb-recap-verdict');
+    if (verdictHost) {
+      if (drill === 'sym') {
+        var note10 = (score / 10).toFixed(1); // ex: 72 → 7.2
+        var comment, verdictLabel;
+        if (en) {
+          verdictLabel = 'Handles Score';
+          if (score >= 90)      comment = 'Elite handles — flawless balance';
+          else if (score >= 80) comment = 'Sharp handles — very balanced';
+          else if (score >= 70) comment = 'Solid handles — keep going';
+          else if (score >= 60) comment = 'Decent — work on your weak hand';
+          else if (score >= 45) comment = 'Focus on your weak side';
+          else                  comment = 'Slow down, rebuild your base';
+        } else {
+          verdictLabel = 'Note Handles';
+          if (score >= 90)      comment = 'Handles d\'élite — équilibre parfait';
+          else if (score >= 80) comment = 'Handles solides — très équilibré';
+          else if (score >= 70) comment = 'Bons handles — continue comme ça';
+          else if (score >= 60) comment = 'Correct — travaille ta main faible';
+          else if (score >= 45) comment = 'Concentre-toi sur ton côté faible';
+          else                  comment = 'Ralentis, reprends les bases';
+        }
+        var vNote    = el('sb-recap-verdict-note');
+        var vLabel   = el('sb-recap-verdict-label');
+        var vComment = el('sb-recap-verdict-comment');
+        if (vNote)    vNote.textContent = note10 + '/10';
+        if (vLabel)   vLabel.textContent = verdictLabel;
+        if (vComment) vComment.textContent = comment;
+        // Couleur du chiffre selon niveau
+        if (vNote) vNote.style.color = score >= 80 ? '#2dc653' : (score >= 60 ? '#f5c518' : '#e63946');
+        verdictHost.style.display = 'block';
+      } else {
+        verdictHost.style.display = 'none';
+      }
+    }
     if ((e = el('sb-recap-btn-share')))  e.textContent = en ? '📷 SHARE' : '📷 PARTAGER';
 
     // Bandeau célébration ceinture débloquée
