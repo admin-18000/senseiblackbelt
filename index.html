@@ -837,7 +837,7 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="display:inline-block;font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(22px,3.2vw,36px);font-weight:700;letter-spacing:2.5px;color:#fff;line-height:1.1">🥋🏀 DOJO <span style="color:#f5c518">INTERACTIVE DRILLS</span></div>
         <div style="width:60px;height:3px;background:#f5c518;margin:10px auto 0;border-radius:2px"></div>
       </div>
-      <!-- Grille 4 boutons : 2×2 mobile / 1×4 desktop -->
+      <!-- Grille 3 boutons : responsive auto-fit -->
       <div style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
         <!-- SENSEI -->
         <button onclick="_dojoLaunch('sensei')" ontouchstart=""
@@ -859,13 +859,6 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🧠</div>
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1">MATHS</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#2dc653;margin-top:4px;letter-spacing:.5px;font-weight:700" data-i18n="dojo_sub_math">Validé scientifiquement</div>
-        </button>
-        <!-- SYMÉTRIE -->
-        <button onclick="_dojoLaunch('sym')" ontouchstart=""
-          style="cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
-          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">⚖️</div>
-          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_sym">SYMÉTRIE</div>
-          <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_sym">Bilatéral · Équilibre G/D</div>
         </button>
       </div>
     </div>
@@ -31142,8 +31135,8 @@ function shPlayVideo(){
     { id:'yellow', name:'Jaune',    nameEN:'Yellow', emoji:'🟡', color:'#f5c518', criteria:{ type:'sessions', count:3 } },
     { id:'orange', name:'Orange',   nameEN:'Orange', emoji:'🟠', color:'#e87c2a', criteria:{ type:'drillScore', drill:'tboard',  threshold:60 } },
     { id:'green',  name:'Verte',    nameEN:'Green',  emoji:'🟢', color:'#2dc653', criteria:{ type:'drillScore', drill:'math',    threshold:65 } },
-    { id:'blue',   name:'Bleue',    nameEN:'Blue',   emoji:'🔵', color:'#0077b6', criteria:{ type:'drillScore', drill:'sym',     threshold:70 } },
-    { id:'purple', name:'Violette', nameEN:'Purple', emoji:'🟣', color:'#7b2d8b', criteria:{ type:'drillScore', drill:'tdr',     threshold:75 } },
+    { id:'blue',   name:'Bleue',    nameEN:'Blue',   emoji:'🔵', color:'#0077b6', criteria:{ type:'drillScore', drill:'tdr',     threshold:70 } },
+    { id:'purple', name:'Violette', nameEN:'Purple', emoji:'🟣', color:'#7b2d8b', criteria:{ type:'drillScore', drill:'tdr',     threshold:80 } },
     { id:'brown',  name:'Marron',   nameEN:'Brown',  emoji:'🟤', color:'#8b5a2b', criteria:{ type:'multiDrill', count:3, threshold:80 } },
     { id:'black',  name:'Noire',    nameEN:'Black',  emoji:'⚫', color:'#1a1f2e', criteria:{ type:'allDrills', threshold:85 } },
     { id:'red',    name:'Rouge',    nameEN:'Red',    emoji:'🔴', color:'#e63946', criteria:{ type:'legendary', threshold:90, sessions:50 } }
@@ -31196,14 +31189,14 @@ function shPlayVideo(){
       return ok >= c.count;
     }
     if (c.type === 'allDrills') {
-      var mainDrills = ['tboard', 'math', 'sym', 'tdr'];
+      var mainDrills = ['tboard', 'math', 'tdr'];
       for (var i = 0; i < mainDrills.length; i++) {
         if ((data.bestByDrill[mainDrills[i]] || 0) < c.threshold) return false;
       }
       return true;
     }
     if (c.type === 'legendary') {
-      var allMains = ['tboard', 'math', 'sym', 'tdr'];
+      var allMains = ['tboard', 'math', 'tdr'];
       for (var i = 0; i < allMains.length; i++) {
         if ((data.bestByDrill[allMains[i]] || 0) < c.threshold) return false;
       }
@@ -31241,14 +31234,14 @@ function shPlayVideo(){
       for (var k in data.bestByDrill) if (data.bestByDrill[k] >= c.threshold) ok++;
       pct = Math.min(100, (ok / c.count) * 100);
     } else if (c.type === 'allDrills') {
-      var mains = ['tboard', 'math', 'sym', 'tdr'];
+      var mains = ['tboard', 'math', 'tdr'];
       var total = 0;
       for (var j = 0; j < mains.length; j++) {
         total += Math.min(c.threshold, data.bestByDrill[mains[j]] || 0);
       }
       pct = Math.min(100, (total / (c.threshold * mains.length)) * 100);
     } else if (c.type === 'legendary') {
-      var mainsL = ['tboard', 'math', 'sym', 'tdr'];
+      var mainsL = ['tboard', 'math', 'tdr'];
       var totalL = 0;
       for (var l = 0; l < mainsL.length; l++) {
         totalL += Math.min(c.threshold, data.bestByDrill[mainsL[l]] || 0);
