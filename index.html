@@ -25530,6 +25530,8 @@ var _tsym_video = null;
 var _tsym_canvas = null;
 var _tsym_ctx = null;
 var _tsym_running = false;
+var _tsym_countdownActive = false; // countdown 10s en cours
+var _tsym_recPending = false;      // REC demandé pendant countdown, à démarrer après
 var _tsym_lowScoreSince = 0;  // timestamp début période score < 60%
 var _tsym_lastAsymAlert = 0;  // timestamp dernier bip alerte (anti-spam)
 var _tsym_currentAsymMode = null; // mode actuel si défaut détecté (pour son adapté)
@@ -25764,10 +25766,19 @@ function _tsym_startDetection() {
   if (btnSave)  btnSave.style.display  = 'none';
   var status = document.getElementById('tsym_status');
   // Countdown 10s sur canvas — laisse le temps de se mettre en place
+  _tsym_countdownActive = true;
   (function tsymCd(n){
-    if (!_tsym_running) return;
+    if (!_tsym_running) { _tsym_countdownActive = false; return; }
     if (n <= 0) {
+      _tsym_countdownActive = false;
       if(status) status.textContent = _t('Analyse en cours...','Analysis running...');
+      // Si l'utilisateur avait appuyé REC pendant le countdown → démarrer maintenant
+      if (_tsym_recPending) {
+        _tsym_recPending = false;
+        var btnR = document.getElementById('tsym_btnRec');
+        if (btnR) { btnR.style.opacity = '1'; btnR.textContent = _t('⏺ REC','⏺ REC'); }
+        setTimeout(_tsym_startRec, 100);
+      }
       _tsym_detect(); return;
     }
     if(_tsym_canvas && _tsym_ctx) {
@@ -26557,6 +26568,15 @@ function _tsym_updateInsight() {
 var _tdr_recorder=null,_tdr_recChunks=[],_tdr_recActive=false,_tdr_recTimer=null,_tdr_recSec=0;
 function _tdr_toggleRec(){if(_tdr_recActive)_tdr_stopRec();else _tdr_startRec();}
 function _tdr_startRec(){
+  // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
+  // (évite un fichier vidéo corrompu / durée aberrante)
+  if (_tdr_countdownActive) {
+    _tdr_recPending = true;
+    // Signal visuel : bouton REC clignote pendant l'attente
+    var btn = document.getElementById('tdr_btnRec');
+    if (btn) { btn.style.opacity = '0.5'; btn.textContent = _t('⏺ Prêt à démarrer','⏺ Ready to start'); }
+    return;
+  }
   if(typeof MediaRecorder==='undefined'){_tdr_recError(_t('Non supporté','Not supported'));return;}
   var cv=document.getElementById('sensei-cam-canvas')||document.getElementById('tdr_canvas');if(!cv)return;
   var stream=null;
@@ -26688,6 +26708,14 @@ function _tsym_toggleRec() {
 }
 
 function _tsym_startRec() {
+  // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
+  // (évite un fichier vidéo corrompu / durée aberrante 1988:xx:xx)
+  if (_tsym_countdownActive) {
+    _tsym_recPending = true;
+    var btnP = document.getElementById('tsym_btnRec');
+    if (btnP) { btnP.style.opacity = '0.5'; btnP.textContent = _t('⏺ Prêt à démarrer','⏺ Ready to start'); }
+    return;
+  }
   // Vérifier support MediaRecorder
   if (typeof MediaRecorder === 'undefined') {
     _tsym_recError(_t(
@@ -27660,6 +27688,7 @@ function _tdr_drawParticles(ctx) {
 
 /* ── Drill ────────────────────────────────────────────────────── */
 var _tdr_countdownActive = false; // flag dédié — ne touche pas _tdr_running
+var _tdr_recPending = false;      // REC demandé pendant countdown, à démarrer après
 function _tdr_countdown(cb) {
   // Countdown 10-9-...-1 avant démarrage — laisse le temps de se mettre en place
   var cv = _tdr_canvas, ctx = _tdr_ctx;
@@ -27689,6 +27718,13 @@ function _tdr_countdown(cb) {
   function tick() {
     if (n <= 0) {
       _tdr_countdownActive = false;
+      // Si l'utilisateur avait appuyé REC pendant le countdown → démarrer maintenant
+      if (_tdr_recPending) {
+        _tdr_recPending = false;
+        var btn = document.getElementById('tdr_btnRec');
+        if (btn) { btn.style.opacity = '1'; btn.textContent = _t('⏺ REC','⏺ REC'); }
+        setTimeout(_tdr_startRec, 100);
+      }
       cb(); return;
     }
     drawN(n--);
@@ -27871,6 +27907,8 @@ var _dcog_canvas      = null;
 var _dcog_ctx         = null;
 var _dcog_rafId       = null;
 var _dcog_running     = false;
+var _dcog_countdownActive = false; // countdown 10s en cours
+var _dcog_recPending  = false;     // REC demandé pendant countdown, à démarrer après
 var _dcog_poses       = null;  // dernières poses MoveNet — pour proximity
 var _dcog_drill       = 'math';       // 'math' | 'sprint' | 'height' | 'twoball'
 var _dcog_mathLevel   = 'easy';       // 'easy' | 'medium' | 'hard'
@@ -28365,10 +28403,22 @@ function _dcog_launchDrill() {
   if (bRec) bRec.style.display = 'flex';
   _dcog_setStatus(_t('GO !','GO!'), '#2dc653');
   // Countdown 10s puis démarrage détection — laisse le temps de se mettre en place
+  _dcog_countdownActive = true;
   (function dcogCountdown(n){
-    if (!_dcog_running) return;
+    if (!_dcog_running) { _dcog_countdownActive = false; return; }
     var cv=_dcog_canvas, ctx=_dcog_ctx;
-    if (!cv || !ctx || n<=0) { setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50); return; }
+    if (!cv || !ctx || n<=0) {
+      _dcog_countdownActive = false;
+      // Si l'utilisateur avait appuyé REC pendant le countdown → démarrer maintenant
+      if (_dcog_recPending) {
+        _dcog_recPending = false;
+        var btnR = document.getElementById('dcog_btnRec');
+        if (btnR) { btnR.style.opacity = '1'; btnR.textContent = _t('⏺ REC','⏺ REC'); }
+        setTimeout(_dcog_startRec, 100);
+      }
+      setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50);
+      return;
+    }
     var W=cv.width, H=cv.height;
     // Vidéo en fond avant l'overlay (évite l'écran noir au démarrage)
     _drawVideoMirror(ctx, _dcog_video, W, H);
@@ -30446,6 +30496,14 @@ function _dcog_toggleRec() {
 }
 
 function _dcog_startRec() {
+  // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
+  // (évite un fichier vidéo corrompu / durée aberrante 1988:xx:xx)
+  if (_dcog_countdownActive) {
+    _dcog_recPending = true;
+    var btnP = document.getElementById('dcog_btnRec');
+    if (btnP) { btnP.style.opacity = '0.5'; btnP.textContent = _t('⏺ Prêt à démarrer','⏺ Ready to start'); }
+    return;
+  }
   if (typeof MediaRecorder === 'undefined') {
     _dcog_recError(_t('Non supporté','Not supported')); return;
   }
