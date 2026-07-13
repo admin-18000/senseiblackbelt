@@ -27924,7 +27924,8 @@ var _dcog_wrong      = 0;
 var _dcog_respTimes  = [];
 var _dcog_questionAt = 0;
 var _dcog_sprintCount= 0;
-var _dcog_sprintWristCount = 0;  // dribbles comptés via MoveNet
+var _dcog_sprintWristCount = 0;  // (legacy) compteur brut MoveNet — conservé pour compat
+var _dcog_sprintWristTimes = []; // timestamps des détections MoveNet (pour fusion micro)
 var _dcog_sprintBaseCount  = 0;
 var _dcog_sprintStart= 0;
 var _dcog_sprintInt  = null;
@@ -28343,7 +28344,7 @@ function _dcog_onCamReady(video,canvas,ctx){
 function _dcog_launchDrill() {
   // Reset counters
   _dcog_correct = 0; _dcog_wrong = 0; _dcog_respTimes = []; _dcog_questionAt = 0;
-  _dcog_sprintCount = 0; _dcog_sprintStart = Date.now(); _dcog_sprintWristCount = 0; _dcog_sprintPrevWristY = null; _dcog_sprintWristDir = 0;
+  _dcog_sprintCount = 0; _dcog_sprintStart = Date.now(); _dcog_sprintWristCount = 0; _dcog_sprintWristTimes = []; _dcog_sprintPrevWristY = null; _dcog_sprintWristDir = 0;
   _dcog_wristBpmTimes = []; _dcog_wristBpmLive = 0; _dcog_wristPrevY = null; _dcog_wristPrevDir = 0;
   _dcog_heightFrames = 0; _dcog_heightInZone = 0;
   _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
@@ -29241,6 +29242,7 @@ function _dcog_analyzeSprintWrist(poses) {
     // Un dribble = transition bas→haut (rebond)
     if (_dcog_sprintWristDir === 1 && newDir === -1) {
       _dcog_sprintWristCount++;
+      _dcog_sprintWristTimes.push(Date.now());
     }
     if (newDir !== 0) _dcog_sprintWristDir = newDir;
   }
@@ -29256,11 +29258,49 @@ function _dcog_startSprintTimer() {
   var bar = document.getElementById('dcog_sprintBar');
   if (bar) bar.style.width = '0%';
   var baseCount = _dcog_sprintBaseCount;
+  var baseMicroTimestamps = 0; // index de départ dans _td_dribbleTimes
+  if (typeof _td_dribbleTimes !== 'undefined') {
+    baseMicroTimestamps = _td_dribbleTimes.length;
+  }
   _dcog_sprintInt = setInterval(function() {
     if (!_dcog_running || _dcog_drill !== 'sprint') { clearInterval(_dcog_sprintInt); return; }
-    // Micro si actif, sinon MoveNet wrist count
-    var cur = typeof _td_dribbleTimes !== 'undefined' ? _td_dribbleTimes.length : 0;
-    _dcog_sprintCount = (cur - baseCount) + _dcog_sprintWristCount;
+
+    // ═══════════ FUSION INTELLIGENTE MICRO + MOVENET ═══════════
+    // Au lieu d'additionner bêtement les 2 sources (qui produisait des doubles comptages
+    // quand un dribble était vu ET entendu), on fusionne les timestamps :
+    //   - Un dribble détecté par les 2 sources dans une fenêtre de ±150ms = 1 seul dribble
+    //   - Un dribble détecté par une seule source = 1 dribble (fallback résilience)
+    // Résultat : compteur fiable même dans un environnement bruyant ou mal cadré.
+    var FUSION_WINDOW_MS = 150;
+    var micTimes = [];
+    if (typeof _td_dribbleTimes !== 'undefined') {
+      // Ne prendre que les timestamps micro survenus PENDANT cette session
+      for (var i = baseMicroTimestamps; i < _td_dribbleTimes.length; i++) {
+        micTimes.push(_td_dribbleTimes[i]);
+      }
+    }
+    var wrTimes = _dcog_sprintWristTimes.slice();
+    // Fusionner : parcourir les 2 tableaux triés en même temps
+    var i1 = 0, i2 = 0, fused = 0;
+    while (i1 < micTimes.length && i2 < wrTimes.length) {
+      var t1 = micTimes[i1], t2 = wrTimes[i2];
+      if (Math.abs(t1 - t2) <= FUSION_WINDOW_MS) {
+        // Match : 1 seul dribble compté, on avance sur les 2
+        fused++; i1++; i2++;
+      } else if (t1 < t2) {
+        // Micro seul (dribble entendu mais pas vu)
+        fused++; i1++;
+      } else {
+        // MoveNet seul (dribble vu mais pas entendu)
+        fused++; i2++;
+      }
+    }
+    // Restes non appariés
+    fused += (micTimes.length - i1);
+    fused += (wrTimes.length - i2);
+    _dcog_sprintCount = fused;
+    // ═══════════════════════════════════════════════════════════
+
     var countEl = document.getElementById('dcog_sprintCount');
     if (countEl) countEl.textContent = _dcog_sprintCount;
     // Clock
@@ -29468,6 +29508,21 @@ function _dcog_analyzeTwoBall(poses) {
 
   // ── Modes Same Height + Different Height ──────────────────────
   if (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight') {
+    // ═══ Garde de mouvement : n'incrémenter que si le joueur bouge vraiment
+    // (empêche 100% "immobile en bonne position" — cohérent avec sync/alternate/chaos)
+    var isMovingTB2 = false;
+    if (_dcog_prevLW_y !== null && _dcog_prevRW_y !== null) {
+      var dL_tb2 = lY - _dcog_prevLW_y;
+      var dR_tb2 = rY - _dcog_prevRW_y;
+      isMovingTB2 = Math.abs(dL_tb2) > 1 || Math.abs(dR_tb2) > 1;
+    }
+    // Toujours mémoriser la position précédente pour le prochain frame
+    _dcog_prevLW_y = lY;
+    _dcog_prevRW_y = rY;
+    if (!isMovingTB2) {
+      // Pas de mouvement → on ne compte rien (ni frame totale, ni frame en zone)
+      return;
+    }
     _dcog_tbTotalFrames2++;
     var tolerance = H * 0.12;  // ±12% de la hauteur canvas — plus confortable sans capteur
     var inZone = false;
