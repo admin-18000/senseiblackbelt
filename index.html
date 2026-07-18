@@ -1644,6 +1644,7 @@ body.unlocked .sensei-only{display:revert !important}
     <button onclick="openTrainingTab('agility',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">⚡ Agility</button>
     <button onclick="openTrainingTab('sc',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">💪 Strength</button>
     <button onclick="openTrainingTab('ch',this)"      class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap">🏆 Challenges</button>
+    <button onclick="if(typeof window._sb_journalOpenFull==='function')window._sb_journalOpenFull()" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:1px solid rgba(245,197,24,.3);border-radius:6px;cursor:pointer;transition:all .2s;background:rgba(245,197,24,.08);color:var(--gold);white-space:nowrap" data-i18n="tab_journal">📓 Journal</button>
   
     <button onclick="openTrainingTab('sym',this)" class="tr-tab" style="display:none;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap" data-i18n="tab_sym">⚖️ Symétrie</button>
     <button onclick="openTrainingTab('dcog',this)" class="tr-tab" style="font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;background:var(--dark3);color:var(--muted);white-space:nowrap" data-i18n="tab_dcog">🧠 Cognitif</button></div>
@@ -31235,6 +31236,7 @@ function shPlayVideo(){
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
       <button onclick="_sb_recapReplay()" ontouchstart="" style="flex:1;min-width:90px;background:#f5c518;color:#0d1117;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;border:none;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-replay">REJOUER</button>
       <button onclick="_sb_recapShare()" ontouchstart="" style="flex:1;min-width:90px;background:rgba(45,198,83,.15);border:1px solid rgba(45,198,83,.55);color:#2dc653;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-share">📷 PARTAGER</button>
+      <button onclick="_sb_recapClose();if(typeof window._sb_journalOpenFull==='function')setTimeout(window._sb_journalOpenFull,150)" ontouchstart="" style="flex:1;min-width:90px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.5);color:#f5c518;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-journal">📓 JOURNAL</button>
       <button onclick="_sb_recapClose()" ontouchstart="" style="flex:1;min-width:90px;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.4);color:#f5c518;font-family:'Bebas Neue',sans-serif;font-size:12px;padding:10px;border-radius:8px;letter-spacing:1px;font-weight:700;cursor:pointer" id="sb-recap-btn-close">FERMER</button>
     </div>
   </div>
@@ -31538,6 +31540,7 @@ function shPlayVideo(){
     if ((e = el('sb-recap-best')))  e.textContent = best + '%';
     if ((e = el('sb-recap-btn-replay'))) e.textContent = en ? 'REPLAY' : 'REJOUER';
     if ((e = el('sb-recap-btn-close')))  e.textContent = en ? 'CLOSE' : 'FERMER';
+    if ((e = el('sb-recap-btn-journal'))) e.textContent = en ? '📓 JOURNAL' : '📓 JOURNAL';
 
     // ═══════ VERDICT HANDLES (uniquement pour drill sym) ═══════
     var verdictHost = el('sb-recap-verdict');
@@ -31948,6 +31951,700 @@ function shPlayVideo(){
     init();
   }
 })();
+
+
+/* ════════════════════════════════════════════════════════════════
+   SENSEI BlackBelt — Vague 5 : MON JOURNAL (feed style Strava)
+   ------------------------------------------------------------------
+   - Lit les données de _sb_loadData() (déjà en localStorage)
+   - Affiche : streak, stats semaine, défi du jour, feed séances, records
+   - 100% local, aucun serveur, aucun compte
+   - Bilingue via _t() existant
+════════════════════════════════════════════════════════════════ */
+(function(){
+
+  // Noms lisibles des drills (aligné sur DRILL_NAMES existant)
+  var DRILL_LABELS_FR = {
+    math: 'MATHS',
+    tboard: 'TBOARD',
+    tdr:  'RÉACTION',
+    sensei: 'SENSEI',
+    sprint: '300 DRIBBLES',
+    height: 'HAUTEUR',
+    twoball: 'TWO BALL',
+    sym: 'SYMÉTRIE'
+  };
+  var DRILL_LABELS_EN = {
+    math: 'MATH',
+    tboard: 'TBOARD',
+    tdr:  'REACTION',
+    sensei: 'SENSEI',
+    sprint: '300 DRIBBLES',
+    height: 'HEIGHT',
+    twoball: 'TWO BALL',
+    sym: 'SYMMETRY'
+  };
+  function labelForDrill(d) {
+    var en = window._lang === 'en';
+    var t = en ? DRILL_LABELS_EN : DRILL_LABELS_FR;
+    return t[d] || d.toUpperCase();
+  }
+
+  // Format date relative (ex : "il y a 2 jours à 18:32")
+  function relativeDate(ts) {
+    var en = window._lang === 'en';
+    var d = new Date(ts);
+    var now = new Date();
+    var diffMs = now - d;
+    var diffDays = Math.floor(diffMs / 86400000);
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    var timeStr = hh + ':' + mm;
+    if (diffDays === 0) return (en ? 'Today at ' : "Aujourd'hui à ") + timeStr;
+    if (diffDays === 1) return (en ? 'Yesterday at ' : 'Hier à ') + timeStr;
+    if (diffDays < 7) return (en ? diffDays+' days ago' : 'Il y a '+diffDays+' jours');
+    return d.toLocaleDateString(en ? 'en-US' : 'fr-FR', { day:'numeric', month:'short' });
+  }
+
+  // Calculer le streak (jours consécutifs avec au moins 1 séance)
+  function computeStreak(sessions) {
+    if (!sessions || sessions.length === 0) return { current: 0, best: 0 };
+    // Regrouper par jour YYYY-MM-DD
+    var days = {};
+    for (var i = 0; i < sessions.length; i++) {
+      var d = new Date(sessions[i].date || sessions[i].ts || 0);
+      var key = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+      days[key] = true;
+    }
+    var dayList = Object.keys(days).map(function(k){
+      var p = k.split('-');
+      return new Date(+p[0], +p[1]-1, +p[2]).getTime();
+    }).sort(function(a,b){ return b - a; });
+    // Streak courant : jours consécutifs depuis aujourd'hui ou hier
+    var now = new Date();
+    var todayTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var currentStreak = 0;
+    var expectedTs = todayTs;
+    for (var j = 0; j < dayList.length; j++) {
+      if (dayList[j] === expectedTs) {
+        currentStreak++;
+        expectedTs -= 86400000;
+      } else if (dayList[j] === expectedTs + 86400000 && j === 0) {
+        // Rien aujourd'hui mais hier oui — streak part d'hier
+        currentStreak++;
+        expectedTs = dayList[j] - 86400000;
+      } else if (currentStreak > 0) {
+        break;
+      } else {
+        // Rien aujourd'hui ni hier — pas de streak actif
+        break;
+      }
+    }
+    // Meilleur streak historique
+    var best = 0, run = 1;
+    for (var k = 1; k < dayList.length; k++) {
+      if (dayList[k-1] - dayList[k] === 86400000) run++;
+      else { if (run > best) best = run; run = 1; }
+    }
+    if (run > best) best = run;
+    if (currentStreak > best) best = currentStreak;
+    return { current: currentStreak, best: best };
+  }
+
+  // Stats de la semaine (7 derniers jours)
+  function computeWeekStats(sessions) {
+    if (!sessions || sessions.length === 0) return { count: 0, avg: 0, records: 0 };
+    var weekAgo = Date.now() - 7 * 86400000;
+    var weekSess = sessions.filter(function(s){ return (s.date || s.ts || 0) > weekAgo; });
+    if (weekSess.length === 0) return { count: 0, avg: 0, records: 0 };
+    var sum = 0;
+    for (var i = 0; i < weekSess.length; i++) sum += (weekSess[i].score || 0);
+    // Compter les records (séances qui étaient le meilleur score de leur drill à ce moment)
+    var records = 0;
+    var bestSeen = {};
+    for (var j = 0; j < sessions.length; j++) {
+      var d = sessions[j].drill;
+      var s = sessions[j].score || 0;
+      var ts = sessions[j].date || sessions[j].ts || 0;
+      if (!bestSeen[d] || s > bestSeen[d]) {
+        bestSeen[d] = s;
+        if (ts > weekAgo) records++;
+      }
+    }
+    return { count: weekSess.length, avg: Math.round(sum / weekSess.length), records: records };
+  }
+
+  // Records personnels par drill
+  function computeRecords(sessions) {
+    if (!sessions || sessions.length === 0) return [];
+    var best = {};
+    for (var i = 0; i < sessions.length; i++) {
+      var s = sessions[i];
+      var d = s.drill;
+      var sc = s.score || 0;
+      var ts = s.date || s.ts || 0;
+      if (!best[d] || sc > best[d].score) best[d] = { score: sc, ts: ts };
+    }
+    var arr = [];
+    for (var k in best) arr.push({ drill: k, score: best[k].score, ts: best[k].ts });
+    return arr;
+  }
+
+  // Suggestion intelligente du drill à faire maintenant
+  // Basée sur : dernière fois joué, score moyen, drill le plus faible
+  function suggestDrill(sessions) {
+    var en = window._lang === 'en';
+    var drills = ['math', 'tboard', 'tdr'];
+    // Cas : aucune session encore
+    if (!sessions || sessions.length === 0) {
+      return {
+        drill: 'math',
+        reason: en ? 'Start with MATH — the SENSEI signature drill' : 'Commence par MATHS — le drill signature SENSEI',
+        priority: 'first'
+      };
+    }
+    // Calculer par drill : dernière date, score moyen
+    var stats = {};
+    for (var d = 0; d < drills.length; d++) {
+      stats[drills[d]] = { lastTs: 0, count: 0, sum: 0 };
+    }
+    for (var i = 0; i < sessions.length; i++) {
+      var s = sessions[i];
+      if (!stats[s.drill]) continue;
+      var ts = s.date || s.ts || 0;
+      if (ts > stats[s.drill].lastTs) stats[s.drill].lastTs = ts;
+      stats[s.drill].count++;
+      stats[s.drill].sum += (s.score || 0);
+    }
+    var now = Date.now();
+    // 1. Drill jamais joué → priorité absolue
+    for (var d1 = 0; d1 < drills.length; d1++) {
+      if (stats[drills[d1]].count === 0) {
+        return {
+          drill: drills[d1],
+          reason: en ? "You haven't tried this one yet!" : "Tu n'as pas encore essayé celui-ci !",
+          priority: 'never'
+        };
+      }
+    }
+    // 2. Drill le plus ancien (pas joué depuis 3+ jours) → priorité
+    var oldest = null;
+    for (var d2 = 0; d2 < drills.length; d2++) {
+      var daysSince = Math.floor((now - stats[drills[d2]].lastTs) / 86400000);
+      if (daysSince >= 3 && (!oldest || daysSince > oldest.days)) {
+        oldest = { drill: drills[d2], days: daysSince };
+      }
+    }
+    if (oldest) {
+      return {
+        drill: oldest.drill,
+        reason: en ? ("Not played for " + oldest.days + " days — stay balanced") : ("Pas joué depuis " + oldest.days + " jours — reste équilibré"),
+        priority: 'stale'
+      };
+    }
+    // 3. Drill le plus faible en moyenne → travailler ses lacunes
+    var weakest = null;
+    for (var d3 = 0; d3 < drills.length; d3++) {
+      var avg = stats[drills[d3]].sum / stats[drills[d3]].count;
+      if (!weakest || avg < weakest.avg) weakest = { drill: drills[d3], avg: avg };
+    }
+    if (weakest) {
+      return {
+        drill: weakest.drill,
+        reason: en ? "Your weakest drill — time to grind" : "Ton drill le plus faible — travaille-le",
+        priority: 'weak'
+      };
+    }
+    // Fallback : math
+    return {
+      drill: 'math',
+      reason: en ? 'Keep the momentum' : 'Maintiens la dynamique',
+      priority: 'default'
+    };
+  }
+
+  // Défi du jour (choisi selon jour de la semaine)
+  function todayChallenge() {
+    var en = window._lang === 'en';
+    var challenges = en ? [
+      { drill: 'math',   goal: 80, txt: 'MATH ≥ 80%' },
+      { drill: 'tboard', goal: 70, txt: 'TBOARD ≥ 70%' },
+      { drill: 'tdr',    goal: 75, txt: 'REACTION ≥ 75%' },
+      { drill: 'math',   goal: 85, txt: 'MATH ≥ 85%' },
+      { drill: 'tboard', goal: 75, txt: 'TBOARD ≥ 75%' },
+      { drill: 'tdr',    goal: 80, txt: 'REACTION ≥ 80%' },
+      { drill: 'math',   goal: 90, txt: 'MATH ≥ 90%' }
+    ] : [
+      { drill: 'math',   goal: 80, txt: 'MATHS ≥ 80%' },
+      { drill: 'tboard', goal: 70, txt: 'TBOARD ≥ 70%' },
+      { drill: 'tdr',    goal: 75, txt: 'RÉACTION ≥ 75%' },
+      { drill: 'math',   goal: 85, txt: 'MATHS ≥ 85%' },
+      { drill: 'tboard', goal: 75, txt: 'TBOARD ≥ 75%' },
+      { drill: 'tdr',    goal: 80, txt: 'RÉACTION ≥ 80%' },
+      { drill: 'math',   goal: 90, txt: 'MATHS ≥ 90%' }
+    ];
+    var day = new Date().getDay();
+    return challenges[day];
+  }
+
+  // Générer le mini graphique SVG orange (14 dernières séances du drill)
+  function chartSVG(sessionsForDrill) {
+    var pts = sessionsForDrill.slice(-14);
+    if (pts.length < 2) {
+      // Pas assez de données — afficher un placeholder simple
+      return '<div style="color:#7a8299;font-size:11px;text-align:center;padding:40px;font-family:var(--font-cond,sans-serif)">' +
+             _t("Pas assez de données pour le graphique", "Not enough data for chart") + '</div>';
+    }
+    var W = 500, H = 140;
+    var maxScore = 100;
+    var stepX = W / (pts.length - 1);
+    var coords = pts.map(function(p, i){
+      var x = i * stepX;
+      var y = H - (p.score / maxScore) * H;
+      return { x: x, y: y };
+    });
+    var pathLine = 'M ' + coords.map(function(c){ return c.x.toFixed(1) + ',' + c.y.toFixed(1); }).join(' L ');
+    var pathArea = pathLine + ' L ' + W + ',' + H + ' L 0,' + H + ' Z';
+    var last = coords[coords.length - 1];
+    var pointsSVG = coords.map(function(c){
+      return '<circle cx="' + c.x.toFixed(1) + '" cy="' + c.y.toFixed(1) + '" r="2.5" fill="#f5c518"/>';
+    }).join('');
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" style="width:100%;height:auto;max-height:140px;display:block">' +
+      '<defs><linearGradient id="jgrad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#f5c518" stop-opacity="0.45"/>' +
+      '<stop offset="100%" stop-color="#f5c518" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
+      '<line x1="0" y1="35" x2="' + W + '" y2="35" stroke="rgba(255,255,255,0.04)"/>' +
+      '<line x1="0" y1="70" x2="' + W + '" y2="70" stroke="rgba(255,255,255,0.04)"/>' +
+      '<line x1="0" y1="105" x2="' + W + '" y2="105" stroke="rgba(255,255,255,0.04)"/>' +
+      '<path d="' + pathArea + '" fill="url(#jgrad)"/>' +
+      '<path d="' + pathLine + '" stroke="#f5c518" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' +
+      pointsSVG +
+      '<circle cx="' + last.x.toFixed(1) + '" cy="' + last.y.toFixed(1) + '" r="5" fill="#f5c518" stroke="#0d1117" stroke-width="2"/>' +
+      '</svg>';
+  }
+
+  // Escape HTML
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Traduction rapide
+  function _t(fr, en) { return window._lang === 'en' ? en : fr; }
+
+  // Render principal du journal
+  function refreshJournal() {
+    var host = document.getElementById('sb-journal-block');
+    if (!host) return;
+    if (typeof _sb_loadData !== 'function') return;
+    var data = _sb_loadData();
+    var sessions = (data && data.sessions) ? data.sessions.slice() : [];
+    // Trier par date décroissante
+    sessions.sort(function(a,b){ return (b.date || b.ts || 0) - (a.date || a.ts || 0); });
+
+    // Cas où aucune séance
+    if (sessions.length === 0) {
+      host.innerHTML =
+        '<div style="background:linear-gradient(135deg,rgba(245,197,24,0.06),rgba(13,17,23,0.4));' +
+        'border:1px solid rgba(245,197,24,0.2);border-radius:14px;padding:24px;text-align:center">' +
+        '<div style="font-size:38px;line-height:1;margin-bottom:10px">📓</div>' +
+        '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:22px;letter-spacing:2px;margin-bottom:6px">' +
+        _t('MON JOURNAL', 'MY JOURNAL') + '</div>' +
+        '<div style="color:#c8cdd6;font-size:13px;line-height:1.5">' +
+        _t('Ton feed de séances apparaîtra ici dès ta première séance.', 'Your session feed will appear here after your first drill.') +
+        '</div></div>';
+      return;
+    }
+
+    // Calculer les données
+    var streak = computeStreak(sessions);
+    var week = computeWeekStats(sessions);
+    var challenge = todayChallenge();
+    var records = computeRecords(sessions);
+    var lastSessions = sessions.slice(0, 3); // 3 dernières pour version compacte
+
+    // Vérifier si le défi du jour est déjà réussi aujourd'hui
+    var todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    var challengeDone = false;
+    for (var i = 0; i < sessions.length; i++) {
+      var s = sessions[i];
+      if (s.drill === challenge.drill && (s.score || 0) >= challenge.goal && (s.date || s.ts || 0) >= todayStart.getTime()) {
+        challengeDone = true; break;
+      }
+    }
+
+    // Regrouper séances par jour pour marquer les records par rapport à la moyenne
+    var allByDrill = {};
+    for (var m = 0; m < sessions.length; m++) {
+      var sd = sessions[m].drill;
+      if (!allByDrill[sd]) allByDrill[sd] = [];
+      allByDrill[sd].push(sessions[m].score || 0);
+    }
+    var avgByDrill = {};
+    var bestByDrill = {};
+    for (var d in allByDrill) {
+      var arr = allByDrill[d];
+      var sum = 0;
+      var best = 0;
+      for (var n = 0; n < arr.length; n++) { sum += arr[n]; if (arr[n] > best) best = arr[n]; }
+      avgByDrill[d] = Math.round(sum / arr.length);
+      bestByDrill[d] = best;
+    }
+
+    // Construction du HTML
+    var html = '';
+
+    // Header rubrique
+    html += '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;padding:0 4px">' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:22px;letter-spacing:2.5px">📓 ' +
+      _t('MON JOURNAL', 'MY JOURNAL') + '</div>' +
+      '<button onclick="_sb_journalOpenFull()" style="background:transparent;border:1px solid rgba(245,197,24,0.35);color:#f5c518;font-family:var(--font-cond,sans-serif);font-size:11px;letter-spacing:1.5px;font-weight:700;padding:6px 12px;border-radius:16px;cursor:pointer;text-transform:uppercase">' +
+      _t('Voir tout', 'See all') + ' →</button>' +
+      '</div>';
+
+    // Streak + Records semaine
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:14px">';
+    // Streak
+    html += '<div style="background:linear-gradient(135deg,rgba(245,197,24,0.10),rgba(232,124,42,0.06));border:1px solid rgba(245,197,24,0.3);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px">' +
+      '<div style="font-size:34px;line-height:1">🔥</div>' +
+      '<div>' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:32px;line-height:1">' + streak.current + '</div>' +
+      '<div style="font-family:var(--font-cond,sans-serif);color:#c8cdd6;font-size:10px;letter-spacing:1.5px;font-weight:600;text-transform:uppercase;margin-top:3px">' + _t("Jours d'affilée", 'Day streak') + '</div>' +
+      '</div>' +
+      '<div style="margin-left:auto;text-align:right">' +
+      '<div style="font-family:var(--font-cond,sans-serif);color:#7a8299;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-weight:600">' + _t('Record', 'Best') + '</div>' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#c8cdd6;font-size:18px;margin-top:2px;line-height:1">' + streak.best + '</div>' +
+      '</div></div>';
+    // Semaine
+    html += '<div style="background:var(--dark2,#161b22);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 16px">' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:10px">' + _t('Cette semaine', 'This week') + '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">' +
+      '<div style="text-align:center"><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#fff;font-size:24px;line-height:1">' + week.count + '</div><div style="color:#7a8299;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:4px">' + _t('Séances', 'Sessions') + '</div></div>' +
+      '<div style="text-align:center"><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#fff;font-size:24px;line-height:1">' + (week.avg || 0) + '%</div><div style="color:#7a8299;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:4px">' + _t('Moyenne', 'Average') + '</div></div>' +
+      '<div style="text-align:center"><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:24px;line-height:1">' + week.records + '</div><div style="color:#7a8299;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:4px">' + _t('Records', 'Records') + '</div></div>' +
+      '</div></div>';
+    html += '</div>';
+
+    // Défi du jour
+    var challengeBg = challengeDone
+      ? 'linear-gradient(135deg,rgba(45,198,83,0.15),rgba(13,17,23,0.5))'
+      : 'linear-gradient(135deg,rgba(245,197,24,0.15),rgba(232,124,42,0.08))';
+    var challengeBorder = challengeDone ? 'rgba(45,198,83,0.4)' : 'rgba(245,197,24,0.35)';
+    var challengeAccent = challengeDone ? '#2dc653' : '#f5c518';
+    html += '<div style="background:' + challengeBg + ';border:1px solid ' + challengeBorder + ';border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px">' +
+      '<div style="font-size:30px;line-height:1">' + (challengeDone ? '✅' : '🎯') + '</div>' +
+      '<div style="flex:1">' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:' + challengeAccent + ';font-size:11px;letter-spacing:2px;font-weight:700">' + _t('Défi du jour', "Today's challenge") + '</div>' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#fff;font-size:22px;letter-spacing:1px;margin-top:2px">' + esc(challenge.txt) + '</div>' +
+      '<div style="color:#c8cdd6;font-size:11px;margin-top:3px">' + (challengeDone ? _t('Réussi ! Bravo 🥋', 'Completed! Great job 🥋') : _t("Vise cet objectif aujourd'hui", 'Aim for this goal today')) + '</div>' +
+      '</div></div>';
+
+    // Feed des 3 dernières séances (version compacte)
+    html += '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:var(--gold,#f5c518);font-size:13px;letter-spacing:2px;font-weight:700;margin:20px 4px 10px">' + _t('MES SÉANCES', 'MY SESSIONS') + '</div>';
+
+    for (var s = 0; s < lastSessions.length; s++) {
+      var sess = lastSessions[s];
+      var drillLbl = labelForDrill(sess.drill);
+      var score = sess.score || 0;
+      var ts = sess.date || sess.ts || 0;
+      var isRecord = (bestByDrill[sess.drill] === score);
+      var avg = avgByDrill[sess.drill] || 0;
+      var diff = score - avg;
+      var diffColor = diff > 3 ? '#2dc653' : (diff < -3 ? '#e63946' : '#7a8299');
+      var diffStr = diff > 0 ? '+' + diff + '%' : (diff < 0 ? diff + '%' : '=');
+      // Historique du drill (jusqu'à cette séance) pour le graphique de la carte
+      var drillHistory = sessions.filter(function(x){ return x.drill === sess.drill; })
+                                 .sort(function(a,b){ return (a.date||a.ts||0) - (b.date||b.ts||0); });
+
+      var cardBorder = isRecord ? 'rgba(245,197,24,0.4)' : 'rgba(255,255,255,0.06)';
+      var cardBg = isRecord ? 'linear-gradient(180deg,rgba(245,197,24,0.05),var(--dark2,#161b22))' : 'var(--dark2,#161b22)';
+
+      html += '<div style="background:' + cardBg + ';border:1px solid ' + cardBorder + ';border-radius:14px;margin-bottom:12px;overflow:hidden">';
+      // Header
+      html += '<div style="padding:12px 16px 6px;display:flex;align-items:center;gap:10px">' +
+        '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f5c518,#e0a800);display:flex;align-items:center;justify-content:center;color:#0d1117;font-weight:800;font-size:13px">🥋</div>' +
+        '<div>' +
+        '<div style="font-weight:700;font-size:13px;color:#f0f2f8">SENSEI</div>' +
+        '<div style="font-size:11px;color:#7a8299;margin-top:1px">' + esc(relativeDate(ts)) + '</div>' +
+        '</div></div>';
+      // Titre
+      html += '<div style="padding:0 16px 8px;font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:19px;letter-spacing:1px;color:#f0f2f8">' +
+        _t('SESSION', 'SESSION') + ' ' + esc(drillLbl);
+      if (isRecord) html += '<span style="display:inline-block;background:#f5c518;color:#0d1117;padding:3px 8px;border-radius:4px;font-family:Inter,system-ui,sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-left:8px;vertical-align:4px">🏆 ' + _t('Record', 'Record') + '</span>';
+      html += '</div>';
+      // Visual (graphique orange/doré)
+      html += '<div style="background:linear-gradient(135deg,#000,#0a0d12);padding:16px;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);min-height:150px;display:flex;align-items:center;justify-content:center">' +
+        chartSVG(drillHistory) + '</div>';
+      // Stats
+      html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);padding:12px 16px">' +
+        '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('Score', 'Score') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;color:#f0f2f8;letter-spacing:1px;line-height:1.1;margin-top:3px">' + score + '%</div></div>' +
+        '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('vs moy.', 'vs avg.') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;color:' + diffColor + ';letter-spacing:1px;line-height:1.1;margin-top:3px">' + diffStr + '</div></div>' +
+        '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('Record', 'Best') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;color:#f0f2f8;letter-spacing:1px;line-height:1.1;margin-top:3px">' + bestByDrill[sess.drill] + '%</div></div>' +
+        '</div>';
+      // Actions
+      html += '<div style="display:flex;padding:6px 12px;border-top:1px solid rgba(255,255,255,0.06)">' +
+        '<button onclick="_sb_journalShare(' + ts + ')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:transparent;border:none;color:#f5c518;font-weight:700;font-size:13px;cursor:pointer;border-radius:6px;font-family:Inter,system-ui,sans-serif;letter-spacing:0.3px">📤 ' + _t('Partager en story', 'Share to story') + '</button>' +
+        '</div>';
+      html += '</div>';
+    }
+
+    host.innerHTML = html;
+  }
+
+  // Ouvre la page complète du journal (feed déroulant + tous records + graphiques)
+  window._sb_journalOpenFull = function() {
+    if (typeof _sb_loadData !== 'function') return;
+    var data = _sb_loadData();
+    var sessions = (data && data.sessions) ? data.sessions.slice() : [];
+    sessions.sort(function(a,b){ return (b.date || b.ts || 0) - (a.date || a.ts || 0); });
+
+    // Overlay plein écran
+    var over = document.createElement('div');
+    over.id = 'sb-journal-full';
+    over.style.cssText = 'position:fixed;inset:0;background:#0d1117;z-index:100000;overflow-y:auto;color:#f0f2f8;font-family:Inter,system-ui,sans-serif';
+
+    // Header sticky
+    var header = '<div style="position:sticky;top:0;background:rgba(13,17,23,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.06);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10">' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#f5c518;font-size:22px;letter-spacing:2.5px">📓 ' + _t('MON JOURNAL', 'MY JOURNAL') + '</div>' +
+      '<button onclick="document.getElementById(\'sb-journal-full\').remove()" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#f0f2f8;font-family:Inter,sans-serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer">✕ ' + _t('Fermer', 'Close') + '</button>' +
+      '</div>';
+
+    var content = '<div style="max-width:700px;margin:0 auto;padding:24px 20px 40px">';
+
+    // Section suggestion du coach (avant les records)
+    var suggestion = suggestDrill(sessions);
+    var drillLabels = {
+      math: { fr: 'MATHS', en: 'MATH' },
+      tboard: { fr: 'TBOARD', en: 'TBOARD' },
+      tdr: { fr: 'RÉACTION', en: 'REACTION' }
+    };
+    var suggLbl = drillLabels[suggestion.drill] || { fr: suggestion.drill.toUpperCase(), en: suggestion.drill.toUpperCase() };
+    var suggLblTxt = (window._lang === 'en') ? suggLbl.en : suggLbl.fr;
+    var suggEmoji = { math: '🧮', tboard: '🎯', tdr: '⚡' }[suggestion.drill] || '🥋';
+    content += '<div style="background:linear-gradient(135deg,rgba(245,197,24,0.12),rgba(232,124,42,0.06));border:1px solid rgba(245,197,24,0.4);border-radius:14px;padding:18px 20px;margin-bottom:24px">' +
+      '<div style="display:flex;align-items:center;gap:14px">' +
+      '<div style="font-size:36px;line-height:1">' + suggEmoji + '</div>' +
+      '<div style="flex:1">' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#f5c518;font-size:11px;letter-spacing:2px;font-weight:700">' + _t('SUGGESTION DU COACH', "COACH'S PICK") + '</div>' +
+      '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#fff;font-size:22px;letter-spacing:1px;margin-top:3px">' + _t('Aujourd\'hui : ', 'Today: ') + suggLblTxt + '</div>' +
+      '<div style="color:#c8cdd6;font-size:12px;margin-top:4px">' + esc(suggestion.reason) + '</div>' +
+      '</div>' +
+      '<button onclick="_sb_journalLaunchDrill(\'' + suggestion.drill + '\')" style="background:#f5c518;color:#0d1117;border:none;padding:12px 20px;border-radius:10px;font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:14px;letter-spacing:1.5px;font-weight:700;cursor:pointer;white-space:nowrap">▶ ' + _t('LANCER', 'START') + '</button>' +
+      '</div></div>';
+
+    // Section records
+    var records = computeRecords(sessions).sort(function(a,b){ return b.score - a.score; });
+    content += '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#f5c518;font-size:14px;letter-spacing:2.5px;margin-bottom:12px">🏆 ' + _t('MES RECORDS', 'MY RECORDS') + '</div>';
+    if (records.length === 0) {
+      content += '<div style="color:#7a8299;font-size:13px;padding:16px;background:#161b22;border-radius:12px;text-align:center">' + _t('Fais ta première séance pour établir tes records.', 'Do your first session to set your records.') + '</div>';
+    } else {
+      content += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:28px">';
+      for (var r = 0; r < records.length; r++) {
+        var rec = records[r];
+        content += '<div style="background:#161b22;border:1px solid rgba(245,197,24,0.2);border-radius:10px;padding:12px 14px;position:relative">' +
+          '<div style="position:absolute;top:8px;right:10px;font-size:14px">🏆</div>' +
+          '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#f5c518;font-size:11px;letter-spacing:1.5px;font-weight:700">' + esc(labelForDrill(rec.drill)) + '</div>' +
+          '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#fff;font-size:28px;line-height:1;margin-top:6px">' + rec.score + '%</div>' +
+          '<div style="font-size:10px;color:#7a8299;margin-top:5px">' + esc(relativeDate(rec.ts)) + '</div>' +
+          '</div>';
+      }
+      content += '</div>';
+    }
+
+    // Feed complet (toutes les séances)
+    content += '<div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);color:#f5c518;font-size:14px;letter-spacing:2.5px;margin-bottom:12px">📓 ' + _t('TOUTES MES SÉANCES', 'ALL MY SESSIONS') + ' (' + sessions.length + ')</div>';
+
+    if (sessions.length === 0) {
+      content += '<div style="color:#7a8299;font-size:13px;padding:16px;background:#161b22;border-radius:12px;text-align:center">' + _t('Ton feed apparaîtra ici après ta première séance.', 'Your feed will appear here after your first session.') + '</div>';
+    } else {
+      var allByDrill2 = {};
+      for (var q = 0; q < sessions.length; q++) {
+        var qd = sessions[q].drill;
+        if (!allByDrill2[qd]) allByDrill2[qd] = [];
+        allByDrill2[qd].push(sessions[q].score || 0);
+      }
+      var avgByDrill2 = {}, bestByDrill2 = {};
+      for (var dd in allByDrill2) {
+        var aa = allByDrill2[dd], ss = 0, bb = 0;
+        for (var nn = 0; nn < aa.length; nn++) { ss += aa[nn]; if (aa[nn] > bb) bb = aa[nn]; }
+        avgByDrill2[dd] = Math.round(ss / aa.length);
+        bestByDrill2[dd] = bb;
+      }
+
+      for (var i2 = 0; i2 < sessions.length; i2++) {
+        var sess2 = sessions[i2];
+        var drillLbl2 = labelForDrill(sess2.drill);
+        var score2 = sess2.score || 0;
+        var ts2 = sess2.date || sess2.ts || 0;
+        var isRecord2 = (bestByDrill2[sess2.drill] === score2);
+        var avg2 = avgByDrill2[sess2.drill] || 0;
+        var diff2 = score2 - avg2;
+        var diffColor2 = diff2 > 3 ? '#2dc653' : (diff2 < -3 ? '#e63946' : '#7a8299');
+        var diffStr2 = diff2 > 0 ? '+' + diff2 + '%' : (diff2 < 0 ? diff2 + '%' : '=');
+        var drillHistory2 = sessions.filter(function(x){ return x.drill === sess2.drill; })
+                                    .sort(function(a,b){ return (a.date||a.ts||0) - (b.date||b.ts||0); });
+
+        content += '<div style="background:' + (isRecord2 ? 'linear-gradient(180deg,rgba(245,197,24,0.05),#161b22)' : '#161b22') + ';border:1px solid ' + (isRecord2 ? 'rgba(245,197,24,0.4)' : 'rgba(255,255,255,0.06)') + ';border-radius:14px;margin-bottom:12px;overflow:hidden">' +
+          '<div style="padding:12px 16px 6px;display:flex;align-items:center;gap:10px">' +
+          '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f5c518,#e0a800);display:flex;align-items:center;justify-content:center;color:#0d1117;font-weight:800;font-size:13px">🥋</div>' +
+          '<div><div style="font-weight:700;font-size:13px">SENSEI</div><div style="font-size:11px;color:#7a8299;margin-top:1px">' + esc(relativeDate(ts2)) + '</div></div>' +
+          '</div>' +
+          '<div style="padding:0 16px 8px;font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:19px;letter-spacing:1px">' + _t('SESSION', 'SESSION') + ' ' + esc(drillLbl2) +
+          (isRecord2 ? '<span style="display:inline-block;background:#f5c518;color:#0d1117;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-left:8px;vertical-align:4px">🏆 ' + _t('Record', 'Record') + '</span>' : '') +
+          '</div>' +
+          '<div style="background:linear-gradient(135deg,#000,#0a0d12);padding:16px;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);min-height:150px;display:flex;align-items:center;justify-content:center">' + chartSVG(drillHistory2) + '</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(3,1fr);padding:12px 16px">' +
+          '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('Score', 'Score') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;letter-spacing:1px;margin-top:3px">' + score2 + '%</div></div>' +
+          '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('vs moy.', 'vs avg.') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;color:' + diffColor2 + ';letter-spacing:1px;margin-top:3px">' + diffStr2 + '</div></div>' +
+          '<div style="text-align:center"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7a8299;font-weight:600">' + _t('Record', 'Best') + '</div><div style="font-family:var(--font-display,\'Bebas Neue\',sans-serif);font-size:22px;letter-spacing:1px;margin-top:3px">' + bestByDrill2[sess2.drill] + '%</div></div>' +
+          '</div>' +
+          '<div style="display:flex;padding:6px 12px;border-top:1px solid rgba(255,255,255,0.06)">' +
+          '<button onclick="_sb_journalShare(' + ts2 + ')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:transparent;border:none;color:#f5c518;font-weight:700;font-size:13px;cursor:pointer;border-radius:6px;letter-spacing:0.3px">📤 ' + _t('Partager en story', 'Share to story') + '</button>' +
+          '</div></div>';
+      }
+    }
+
+    content += '</div>';
+    over.innerHTML = header + content;
+    document.body.appendChild(over);
+  };
+
+  // Partage en story (image 1080×1920)
+  window._sb_journalShare = function(ts) {
+    if (typeof _sb_loadData !== 'function') return;
+    var data = _sb_loadData();
+    var sessions = (data && data.sessions) ? data.sessions : [];
+    var sess = null;
+    for (var i = 0; i < sessions.length; i++) {
+      if ((sessions[i].date || sessions[i].ts || 0) === ts) { sess = sessions[i]; break; }
+    }
+    if (!sess) return;
+    var W = 1080, H = 1920;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    var en = window._lang === 'en';
+
+    // Fond noir dégradé
+    var grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0d1117');
+    grad.addColorStop(1, '#1a1f2e');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Logo SENSEI en haut
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold 60px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('🥋 SENSEI BLACKBELT', W/2, 120);
+
+    ctx.fillStyle = '#7a8299';
+    ctx.font = '32px "Barlow Condensed", sans-serif';
+    ctx.fillText((en ? 'MY SESSION' : 'MA SÉANCE'), W/2, 200);
+
+    // Score énorme au centre
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 320px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillText((sess.score || 0) + '%', W/2, H/2 - 100);
+
+    // Drill sous le score
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold 80px "Bebas Neue", sans-serif';
+    ctx.fillText(labelForDrill(sess.drill), W/2, H/2 + 120);
+
+    // Date
+    ctx.fillStyle = '#c8cdd6';
+    ctx.font = '36px "Barlow Condensed", sans-serif';
+    var d = new Date(sess.date || sess.ts || Date.now());
+    var dateStr = d.toLocaleDateString(en ? 'en-US' : 'fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    ctx.fillText(dateStr, W/2, H/2 + 220);
+
+    // Ceinture actuelle en bas
+    var belt = (typeof _sb_currentBelt === 'function') ? _sb_currentBelt() : null;
+    if (belt) {
+      ctx.fillStyle = '#7a8299';
+      ctx.font = '38px "Barlow Condensed", sans-serif';
+      ctx.fillText((en ? 'CURRENT BELT' : 'CEINTURE ACTUELLE'), W/2, H - 340);
+      ctx.fillStyle = belt.color || '#fff';
+      ctx.font = 'bold 100px "Bebas Neue", sans-serif';
+      var beltName = en ? (belt.nameEN + ' BELT') : ('CEINTURE ' + belt.name.toUpperCase());
+      ctx.fillText(belt.emoji + ' ' + beltName, W/2, H - 250);
+    }
+
+    // Footer domaine
+    ctx.fillStyle = 'rgba(245,197,24,0.6)';
+    ctx.font = 'bold 32px "Barlow Condensed", sans-serif';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('senseiblackbelt.com', W/2, H - 80);
+
+    // Télécharger
+    cv.toBlob(function(blob){
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'sensei-story-' + (sess.drill || 'session') + '-' + Date.now() + '.png';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    }, 'image/png');
+  };
+
+  // Lancer un drill directement depuis le journal (ferme d'abord)
+  window._sb_journalLaunchDrill = function(drill) {
+    var over = document.getElementById('sb-journal-full');
+    if (over) over.remove();
+    // Petit délai pour laisser le DOM se nettoyer
+    setTimeout(function() {
+      if (typeof window._dojoLaunch === 'function') {
+        window._dojoLaunch(drill);
+      }
+    }, 100);
+  };
+
+  // Exposer + init
+  window._sb_refreshJournal = refreshJournal;
+
+  function init() {
+    refreshJournal();
+    // FAB flottant côté droit — au-dessus du cadenas SENSEI Lock (bottom 20px)
+    if (!document.getElementById('sb-journal-fab')) {
+      var fab = document.createElement('button');
+      fab.id = 'sb-journal-fab';
+      fab.setAttribute('aria-label', 'Journal');
+      fab.setAttribute('title', 'Journal');
+      fab.innerHTML = '📓';
+      fab.style.cssText = 'position:fixed;bottom:74px;right:20px;z-index:998;width:40px;height:40px;border-radius:50%;border:1px solid rgba(245,197,24,.5);background:rgba(13,17,23,.92);color:#f5c518;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:.9;padding:0';
+      fab.onclick = function(){ if (typeof window._sb_journalOpenFull === 'function') window._sb_journalOpenFull(); };
+      document.body.appendChild(fab);
+    }
+    // Hook sur recordSession pour rafraîchir après chaque nouvelle séance
+    var origRec = window._sb_recordSession;
+    if (typeof origRec === 'function' && !origRec.__journal_wrap) {
+      window._sb_recordSession = function() {
+        var r = origRec.apply(this, arguments);
+        try { refreshJournal(); } catch(e){}
+        return r;
+      };
+      window._sb_recordSession.__journal_wrap = true;
+    }
+    // Rafraîchir sur setLang
+    var origSetLang = window.setLang;
+    if (typeof origSetLang === 'function' && !origSetLang.__journal_wrap) {
+      window.setLang = function() {
+        var r = origSetLang.apply(this, arguments);
+        try { refreshJournal(); } catch(e){}
+        return r;
+      };
+      window.setLang.__journal_wrap = true;
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
 </script>
 </body>
 </html>
