@@ -26613,17 +26613,31 @@ function _tdr_startRec(){
     _tdr_dlBlob(blob,fn,st);
   };
   _tdr_recorder.onerror=function(e){clearInterval(_tdr_recTimer);_tdr_recError('error'+(e.error?': '+e.error.name:''));};
-  _tdr_recorder.start(1000);_tdr_recActive=true;
-  _tdr_recTimer=setInterval(function(){
-    _tdr_recSec++;var rem=180-_tdr_recSec;
-    var btn=document.getElementById('tdr_btnRec');
-    if(btn){var mm=Math.floor(_tdr_recSec/60),ss=_tdr_recSec%60;
-      btn.textContent='⏹ '+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+(rem<=30?' (⚠️ '+rem+'s)':'');}
-    if(_tdr_recSec>=180)_tdr_stopRec();
-  },1000);
-  _tdr_updateRecBtn();
-  var st2=document.getElementById('tdr_status');
-  if(st2)st2.textContent='🔴 '+_t('Enregistrement...','Recording...');
+  // ═══════ FIX durée corrompue (1988:xx:xx / 1755:xxx) ═══════
+  // Flush canvas + délai 200ms avant start() pour garantir une frame stable
+  // dans le pipeline captureStream avant l'écriture du header WebM.
+  try {
+    var _cvFixTdr = document.getElementById('sensei-cam-canvas') || document.getElementById('tdr_canvas');
+    if (_cvFixTdr) {
+      var _cxFixTdr = _cvFixTdr.getContext('2d');
+      if (_cxFixTdr) { _cxFixTdr.save(); _cxFixTdr.globalAlpha = 0; _cxFixTdr.fillRect(0,0,1,1); _cxFixTdr.restore(); }
+    }
+  } catch(eFixT) { /* silencieux */ }
+  setTimeout(function() {
+    if (!_tdr_recorder) return;
+    try { _tdr_recorder.start(1000); _tdr_recActive = true; }
+    catch(eStartT) { _tdr_recError('start failed'); return; }
+    _tdr_recTimer=setInterval(function(){
+      _tdr_recSec++;var rem=180-_tdr_recSec;
+      var btn=document.getElementById('tdr_btnRec');
+      if(btn){var mm=Math.floor(_tdr_recSec/60),ss=_tdr_recSec%60;
+        btn.textContent='⏹ '+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+(rem<=30?' (⚠️ '+rem+'s)':'');}
+      if(_tdr_recSec>=180)_tdr_stopRec();
+    },1000);
+    _tdr_updateRecBtn();
+    var st2=document.getElementById('tdr_status');
+    if(st2)st2.textContent='🔴 '+_t('Enregistrement...','Recording...');
+  }, 200);
 }
 function _tdr_stopRec(){if(_tdr_recorder&&_tdr_recActive){clearInterval(_tdr_recTimer);try{_tdr_recorder.stop();}catch(e){}}}
 function _tdr_updateRecBtn(){
@@ -26776,25 +26790,38 @@ function _tsym_startRec() {
     clearInterval(_tsym_recTimer);
     _tsym_recError(_t('Erreur enregistrement: ','Recording error: ') + (e.error ? e.error.name : ''));
   };
-  _tsym_recorder.start(1000);
-  _tsym_recActive = true;
-  // Timer + limite 3 min
-  _tsym_recTimer = setInterval(function() {
-    _tsym_recSec++;
-    var remaining = _tsym_REC_LIMIT - _tsym_recSec;
-    var btn = document.getElementById('tsym_btnRec');
-    if (btn) {
-      var mm = Math.floor(_tsym_recSec/60), ss = _tsym_recSec%60;
-      btn.textContent = '⏹ ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
-        (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+  // ═══════ FIX durée corrompue (1988:xx:xx / 1755:xxx) ═══════
+  // Flush canvas + délai 200ms avant start() pour garantir une frame stable
+  // dans le pipeline captureStream avant l'écriture du header WebM.
+  try {
+    var _cvFixS = document.getElementById('sensei-cam-canvas') || document.getElementById('tsym_canvas');
+    if (_cvFixS) {
+      var _cxFixS = _cvFixS.getContext('2d');
+      if (_cxFixS) { _cxFixS.save(); _cxFixS.globalAlpha = 0; _cxFixS.fillRect(0,0,1,1); _cxFixS.restore(); }
     }
-    if (_tsym_recSec >= _tsym_REC_LIMIT) {
-      _tsym_stopRec();
-    }
-  }, 1000);
-  _tsym_updateRecBtn();
-  var st = document.getElementById('tsym_status');
-  if (st) st.textContent = '🔴 ' + _t('Enregistrement en cours...', 'Recording...');
+  } catch(eFixS) { /* silencieux */ }
+  setTimeout(function() {
+    if (!_tsym_recorder) return;
+    try { _tsym_recorder.start(1000); _tsym_recActive = true; }
+    catch(eStartS) { _tsym_recError(_t('Erreur enregistrement','Recording error')); return; }
+    // Timer + limite 3 min
+    _tsym_recTimer = setInterval(function() {
+      _tsym_recSec++;
+      var remaining = _tsym_REC_LIMIT - _tsym_recSec;
+      var btn = document.getElementById('tsym_btnRec');
+      if (btn) {
+        var mm = Math.floor(_tsym_recSec/60), ss = _tsym_recSec%60;
+        btn.textContent = '⏹ ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
+          (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+      }
+      if (_tsym_recSec >= _tsym_REC_LIMIT) {
+        _tsym_stopRec();
+      }
+    }, 1000);
+    _tsym_updateRecBtn();
+    var st = document.getElementById('tsym_status');
+    if (st) st.textContent = '🔴 ' + _t('Enregistrement en cours...', 'Recording...');
+  }, 200);
 }
 
 function _tsym_stopRec() {
@@ -28546,53 +28573,37 @@ function _dcog_drawFrame(poses) {
       }
     }
 
-    // ═══════════ SPRINT 300/600 — HUD PILULES EN HAUT (hors du corps) ═══════════
+    // ═══════════ SPRINT 300/600 — HUD GROS EN HAUT (visible à distance, hors du corps) ═══════════
     if (_dcog_drill === 'sprint') {
       var spCount = _dcog_sprintCount || 0;
       var spGoal  = _dcog_sprintTarget || 300;
       var spPct   = Math.min(100, Math.round(spCount / spGoal * 100));
       var spColor = spPct >= 100 ? '#00e676' : '#fff';
 
-      // Helper pilule (utilisé aussi par TSYM)
-      var _sprintPill = function(x, y, w, h, r) {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-        ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-        ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.closePath();
-      };
-
-      // ── Pilule compteur + objectif (haut CENTRE, sous le timer principal ligne 1) ──
-      var _padSp = Math.round(H * 0.025);
-      var _spW = Math.round(W * 0.32);
-      var _spH = Math.round(H * 0.15);
-      var _spX = Math.round((W - _spW) / 2);
-      var _spY = Math.round(H * 0.16); // sous le timer principal (qui est à H*0.07)
-      var _spR = Math.round(_spH * 0.35);
-
+      // Compteur GÉANT centré en zone haute (Y ~ 18-25%) — au-dessus de la tête du joueur
+      // Le corps est cadré au centre-bas (Y 40-95%), donc zone Y 12-32% est libre.
+      var spY_num = Math.round(H * 0.22);
       ctx.save();
-      // Fond pilule
-      ctx.fillStyle = 'rgba(13,17,23,0.82)';
-      _sprintPill(_spX, _spY, _spW, _spH, _spR);
-      ctx.fill();
-      // Compteur (gros, blanc, contour noir léger pour lisibilité tous fonds)
-      ctx.fillStyle = spColor;
-      ctx.font = 'bold ' + Math.round(H*0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'rgba(0,0,0,0.9)';
-      ctx.strokeText(String(spCount), _spX + _spW/2, _spY + _spH*0.42);
-      ctx.fillText(String(spCount), _spX + _spW/2, _spY + _spH*0.42);
-      // Objectif "/ 300" en petit doré
+
+      // Compteur — TRÈS gros pour lisibilité à distance (18% de H)
+      ctx.font = 'bold ' + Math.round(H * 0.18) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.strokeText(String(spCount), Math.round(W * 0.50), spY_num);
+      ctx.fillStyle = spColor;
+      ctx.fillText(String(spCount), Math.round(W * 0.50), spY_num);
+
+      // Objectif "/ 300" — plus petit, doré, sous le compteur
+      ctx.font = 'bold ' + Math.round(H * 0.055) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.lineWidth = 5;
+      ctx.strokeText('/ ' + spGoal, Math.round(W * 0.50), spY_num + Math.round(H * 0.11));
       ctx.fillStyle = '#f5c518';
-      ctx.font = 'bold ' + Math.round(H*0.022) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.fillText('/ ' + spGoal, _spX + _spW/2, _spY + _spH*0.80);
+      ctx.fillText('/ ' + spGoal, Math.round(W * 0.50), spY_num + Math.round(H * 0.11));
       ctx.restore();
 
-      // ── Barre progression fine tout en bas (avant zone stats) ──
+      // Barre progression tout en bas (Y ~ 93%) — hors zone de dribble
       var bx = Math.round(W*0.15), by = Math.round(H*0.93);
       var bw = Math.round(W*0.70), bh = Math.round(H*0.012);
       ctx.fillStyle = 'rgba(255,255,255,0.18)';
@@ -28631,68 +28642,56 @@ function _dcog_drawFrame(poses) {
       ctx.fillStyle = '#f5c518';
       ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
 
-      // ── BURNOUT : BPM pilule en haut (hors du corps) + cercle pulsant discret ──
+      // ── BURNOUT : BPM GROS EN HAUT (visible à distance, hors du corps) + halo pulsant ──
       if (_dcog_tbMode === 'burnout') {
         var bpm = _dcog_burnoutBpm || 60;
         var bpmColor = bpm > 140 ? '#e63946' : bpm > 100 ? '#f5c518' : '#2dc653';
 
-        // Helper pilule
-        var _tbPill = function(x, y, w, h, r) {
-          ctx.beginPath();
-          ctx.moveTo(x + r, y);
-          ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-          ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-          ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-          ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-          ctx.closePath();
-        };
+        // Position en zone haute (Y ~ 22%) — au-dessus de la tête du joueur
+        var bpmCx = Math.round(W * 0.50);
+        var bpmCy = Math.round(H * 0.22);
 
-        // Pilule BPM centrée en haut sous le timer (ligne Y ~ 16%)
-        var _bpmW = Math.round(W * 0.30);
-        var _bpmH = Math.round(H * 0.14);
-        var _bpmX = Math.round((W - _bpmW) / 2);
-        var _bpmY = Math.round(H * 0.16);
-        var _bpmR = Math.round(_bpmH * 0.35);
-
-        // Cercle pulsant en fond de pilule (subtil)
+        // Halo pulsant synchronisé avec le bip (subtil, contourne le chiffre)
         var beatInterval = 60000 / bpm;
         var sinceBeat = _dcog_burnoutLastTick ? (Date.now() - _dcog_burnoutLastTick) % beatInterval : 0;
         var pulsePhase = 1 - Math.min(1, sinceBeat / 200);
+        var pulseR = Math.round(H * 0.11) * (1 + pulsePhase * 0.4);
         ctx.save();
-        ctx.globalAlpha = 0.15 + pulsePhase * 0.25;
+        ctx.globalAlpha = 0.25 + pulsePhase * 0.35;
         ctx.fillStyle = bpmColor;
-        _tbPill(_bpmX - 4, _bpmY - 4, _bpmW + 8, _bpmH + 8, _bpmR + 4);
+        ctx.beginPath();
+        ctx.arc(bpmCx, bpmCy, pulseR, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        // Pilule fond noir
+        // BPM géant (16% de H) — blanc avec contour noir épais
         ctx.save();
-        ctx.fillStyle = 'rgba(13,17,23,0.82)';
-        _tbPill(_bpmX, _bpmY, _bpmW, _bpmH, _bpmR);
-        ctx.fill();
-        // BPM en gros blanc
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(String(bpm), _bpmX + _bpmW/2, _bpmY + _bpmH*0.42);
-        // Label BPM en petit doré
+        ctx.font = 'bold ' + Math.round(H * 0.16) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(String(bpm), bpmCx, bpmCy);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(String(bpm), bpmCx, bpmCy);
+        // Label "BPM" doré sous le chiffre
+        ctx.font = 'bold ' + Math.round(H * 0.045) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+        ctx.lineWidth = 4;
+        ctx.strokeText('BPM', bpmCx, bpmCy + Math.round(H * 0.10));
         ctx.fillStyle = '#f5c518';
-        ctx.font = 'bold ' + Math.round(H*0.020) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-        ctx.fillText('BPM', _bpmX + _bpmW/2, _bpmY + _bpmH*0.80);
+        ctx.fillText('BPM', bpmCx, bpmCy + Math.round(H * 0.10));
         ctx.restore();
       }
 
-      // ── SYNC / ALTERNATE : flèches G/D sur les côtés + % pilule en haut ──
+      // ── SYNC / ALTERNATE : flèches G/D sur les côtés + % GROS EN HAUT ──
       if (_dcog_tbMode === 'sync' || _dcog_tbMode === 'alternate') {
         var pct = _dcog_tbFrames > 0
           ? Math.round(_dcog_tbAntiphase / _dcog_tbFrames * 100) : 0;
-        var pctColor = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
 
         // Flèches G/D — sens dépend du mouvement instantané du poignet
         var arrL = _dcog_tbDirL || 0;
         var arrR = _dcog_tbDirR || 0;
-        var arrLY = Math.round(H*0.50); // milieu vertical mais sur les CÔTÉS
+        var arrLY = Math.round(H * 0.50); // milieu vertical mais sur les CÔTÉS
         var isOK;
         if (_dcog_tbMode === 'sync') {
           isOK = (arrL !== 0 && arrL === arrR);
@@ -28701,61 +28700,48 @@ function _dcog_drawFrame(poses) {
         }
         var arrColor = isOK ? '#2dc653' : '#e63946';
 
-        // Flèche gauche (côté, pas centre)
+        // Flèche gauche (bord extrême)
         ctx.save();
         ctx.fillStyle = arrColor;
-        ctx.font = 'bold ' + _sf(H,0.14) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.font = 'bold ' + _sf(H, 0.14) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8;
-        ctx.fillText(arrL > 0 ? '▼' : arrL < 0 ? '▲' : '·', Math.round(W*0.10), arrLY);
-        ctx.fillText(arrR > 0 ? '▼' : arrR < 0 ? '▲' : '·', Math.round(W*0.90), arrLY);
-        // Labels L/R au-dessus (bord extrême)
+        ctx.fillText(arrL > 0 ? '▼' : arrL < 0 ? '▲' : '·', Math.round(W * 0.10), arrLY);
+        ctx.fillText(arrR > 0 ? '▼' : arrR < 0 ? '▲' : '·', Math.round(W * 0.90), arrLY);
+        // Labels L/R
         var en_tb = window._lang === 'en';
         var lblL = en_tb ? 'L' : 'G';
         var lblR = en_tb ? 'R' : 'D';
-        ctx.font = 'bold ' + _sf(H,0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.font = 'bold ' + _sf(H, 0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.lineWidth = 5;
         ctx.strokeStyle = 'rgba(0,0,0,0.95)';
-        ctx.strokeText(lblL, Math.round(W*0.10), arrLY - Math.round(H*0.14));
-        ctx.strokeText(lblR, Math.round(W*0.90), arrLY - Math.round(H*0.14));
+        ctx.strokeText(lblL, Math.round(W * 0.10), arrLY - Math.round(H * 0.14));
+        ctx.strokeText(lblR, Math.round(W * 0.90), arrLY - Math.round(H * 0.14));
         ctx.fillStyle = '#fff';
-        ctx.fillText(lblL, Math.round(W*0.10), arrLY - Math.round(H*0.14));
-        ctx.fillText(lblR, Math.round(W*0.90), arrLY - Math.round(H*0.14));
+        ctx.fillText(lblL, Math.round(W * 0.10), arrLY - Math.round(H * 0.14));
+        ctx.fillText(lblR, Math.round(W * 0.90), arrLY - Math.round(H * 0.14));
         ctx.restore();
 
-        // Helper pilule
-        var _syPill = function(x, y, w, h, r) {
-          ctx.beginPath();
-          ctx.moveTo(x + r, y);
-          ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-          ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-          ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-          ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-          ctx.closePath();
-        };
-
-        // % en pilule haut centre (au lieu du centre du corps)
-        var _syW = Math.round(W * 0.30);
-        var _syH = Math.round(H * 0.14);
-        var _syX = Math.round((W - _syW) / 2);
-        var _syY = Math.round(H * 0.16);
-        var _syR = Math.round(_syH * 0.35);
+        // % GÉANT en zone haute (Y ~ 22%) — au-dessus de la tête du joueur
+        var syCx = Math.round(W * 0.50);
+        var syCy = Math.round(H * 0.22);
         ctx.save();
-        ctx.fillStyle = 'rgba(13,17,23,0.82)';
-        _syPill(_syX, _syY, _syW, _syH, _syR);
-        ctx.fill();
-        // Valeur % en gros
-        var syTextColor = pct >= 70 ? '#00e676' : (pct >= 30 ? '#fff' : '#ff3b30');
-        ctx.fillStyle = syTextColor;
-        ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(pct + '%', _syX + _syW/2, _syY + _syH*0.42);
-        // Label mode en petit doré
+        // % en 16% de H
+        ctx.font = 'bold ' + Math.round(H * 0.16) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(pct + '%', syCx, syCy);
+        ctx.fillStyle = pct >= 70 ? '#00e676' : (pct >= 30 ? '#fff' : '#ff3b30');
+        ctx.fillText(pct + '%', syCx, syCy);
+        // Label mode doré sous le %
         var subLbl = _dcog_tbMode === 'sync' ? 'SYNC' : (window._lang === 'en' ? 'ALTERNATE' : 'ALTERNÉ');
+        ctx.font = 'bold ' + Math.round(H * 0.045) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+        ctx.lineWidth = 4;
+        ctx.strokeText(subLbl, syCx, syCy + Math.round(H * 0.10));
         ctx.fillStyle = '#f5c518';
-        ctx.font = 'bold ' + Math.round(H*0.020) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-        ctx.fillText(subLbl, _syX + _syW/2, _syY + _syH*0.80);
+        ctx.fillText(subLbl, syCx, syCy + Math.round(H * 0.10));
         ctx.restore();
       }
 
@@ -28794,43 +28780,30 @@ function _dcog_drawFrame(poses) {
           ctx.fillText(_dcog_chaosCurrentStim.text, stimX, stimY + Math.round(H*0.04));
           ctx.restore();
         }
-        // Stats haut — réussites / total + temps réaction en pilule (hors du corps)
+        // Stats haut — réussites / total GROS en haut (hors du corps, visible à distance)
         var chHits  = _dcog_chaosHits  || 0;
         var chTotal = _dcog_chaosTotal || 0;
         var chRT    = _dcog_chaosAvgRT || 0;
 
-        // Helper pilule
-        var _chPill = function(x, y, w, h, r) {
-          ctx.beginPath();
-          ctx.moveTo(x + r, y);
-          ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-          ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-          ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-          ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-          ctx.closePath();
-        };
-
-        // Pilule stats en haut centre (Y ~ 16%)
-        var _chW = Math.round(W * 0.32);
-        var _chH = Math.round(H * 0.14);
-        var _chX = Math.round((W - _chW) / 2);
-        var _chY = Math.round(H * 0.16);
-        var _chR = Math.round(_chH * 0.35);
+        var chCx = Math.round(W * 0.50);
+        var chCy = Math.round(H * 0.22);
         ctx.save();
-        ctx.fillStyle = 'rgba(13,17,23,0.82)';
-        _chPill(_chX, _chY, _chW, _chH, _chR);
-        ctx.fill();
-        // Hits/total en gros blanc
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold ' + Math.round(H*0.065) + 'px "Bebas Neue","Arial Narrow",sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(chHits + ' / ' + chTotal, _chX + _chW/2, _chY + _chH*0.40);
-        // Temps réaction en petit doré
+        // Hits/total GÉANT (14% de H, un peu plus petit car format X/Y prend plus de largeur)
+        ctx.font = 'bold ' + Math.round(H * 0.14) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.lineWidth = 9;
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+        ctx.strokeText(chHits + ' / ' + chTotal, chCx, chCy);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(chHits + ' / ' + chTotal, chCx, chCy);
+        // Temps réaction en petit doré sous
         if (chRT > 0) {
+          ctx.font = 'bold ' + Math.round(H * 0.045) + 'px "Barlow Condensed","Arial Narrow",sans-serif';
+          ctx.lineWidth = 4;
+          ctx.strokeText('⚡ ' + chRT + ' ms', chCx, chCy + Math.round(H * 0.10));
           ctx.fillStyle = '#f5c518';
-          ctx.font = 'bold ' + Math.round(H*0.022) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-          ctx.fillText('⚡ ' + chRT + ' ms', _chX + _chW/2, _chY + _chH*0.78);
+          ctx.fillText('⚡ ' + chRT + ' ms', chCx, chCy + Math.round(H * 0.10));
         }
         ctx.restore();
       }
