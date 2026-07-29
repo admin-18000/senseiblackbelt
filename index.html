@@ -28580,9 +28580,9 @@ function _dcog_drawFrame(poses) {
       var spPct   = Math.min(100, Math.round(spCount / spGoal * 100));
       var spColor = spPct >= 100 ? '#00e676' : '#fff';
 
-      // Compteur GÉANT centré en zone haute (Y ~ 18-25%) — au-dessus de la tête du joueur
-      // Le corps est cadré au centre-bas (Y 40-95%), donc zone Y 12-32% est libre.
-      var spY_num = Math.round(H * 0.22);
+      // Compteur GÉANT centré en zone haute (Y ~ 30%) — sous le chrono principal, au-dessus du corps
+      // Le corps est cadré au centre-bas, donc zone Y 25-40% est libre.
+      var spY_num = Math.round(H * 0.30);
       ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -28631,16 +28631,7 @@ function _dcog_drawFrame(poses) {
         burnout: '#e63946', chaos: '#f5c518'
       }[_dcog_tbMode] || '#fff';
 
-      // Label mode — Ligne 2 centre (Y 20%) — jaune unique avec contour noir
-      ctx.font = 'bold ' + _sf(H,0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      // Contour noir épais pour lisibilité fond variable
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
-      ctx.strokeText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
-      // Texte jaune par-dessus
-      ctx.fillStyle = '#f5c518';
-      ctx.fillText(modeLabel, Math.round(W*0.50), Math.round(H*0.20));
+      // (Le label mode est maintenant intégré sous chaque HUD spécifique, plus besoin de le doubler ici)
 
       // ── BURNOUT : BPM GROS EN HAUT (visible à distance, hors du corps) + halo pulsant ──
       if (_dcog_tbMode === 'burnout') {
@@ -28649,7 +28640,7 @@ function _dcog_drawFrame(poses) {
 
         // Position en zone haute (Y ~ 22%) — au-dessus de la tête du joueur
         var bpmCx = Math.round(W * 0.50);
-        var bpmCy = Math.round(H * 0.22);
+        var bpmCy = Math.round(H * 0.30);
 
         // Halo pulsant synchronisé avec le bip (subtil, contourne le chiffre)
         var beatInterval = 60000 / bpm;
@@ -28724,7 +28715,7 @@ function _dcog_drawFrame(poses) {
 
         // % GÉANT en zone haute (Y ~ 22%) — au-dessus de la tête du joueur
         var syCx = Math.round(W * 0.50);
-        var syCy = Math.round(H * 0.22);
+        var syCy = Math.round(H * 0.30);
         ctx.save();
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -28786,7 +28777,7 @@ function _dcog_drawFrame(poses) {
         var chRT    = _dcog_chaosAvgRT || 0;
 
         var chCx = Math.round(W * 0.50);
-        var chCy = Math.round(H * 0.22);
+        var chCy = Math.round(H * 0.30);
         ctx.save();
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
