@@ -26594,7 +26594,9 @@ function _tdr_startRec(){
     clearInterval(_tdr_recTimer);
     var blob=new Blob(_tdr_recChunks,{type:_tdr_recorder.mimeType||'video/webm'});
     _tdr_recActive=false;_tdr_recChunks=[];_tdr_updateRecBtn();
-    var ext='mp4';
+    // Choisir la bonne extension selon le type réel du blob
+    // (évite qu'iOS affiche 1988:xx:xx sur un fichier .mp4 qui contient du webm)
+    var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn='SENSEI_dribble_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st=document.getElementById('tdr_status');
     if(_tsym_isIOS()&&navigator.share&&typeof File!=='undefined'){
@@ -26845,7 +26847,7 @@ function _tsym_updateRecBtn() {
 
 function _tsym_saveBlob(blob) {
   var st = document.getElementById('tsym_status');
-  var ext = 'mp4';
+  var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
   var filename = 'SENSEI_symetrie_' + new Date().toISOString().slice(0,10) + '.' + ext;
   // iOS → navigator.share() avec File
   if (_tsym_isIOS() && navigator.share && typeof File !== 'undefined') {
@@ -30046,25 +30048,42 @@ var _dcog_tbd_poolOneSimple = [
 ];
 /* Combos doubles générés — débloqués quand la cadence accélère */
 var _dcog_tbd_poolOneCombo = [
-  { id:'c_ft',  uni:'FRONT-BETWEEN-THE-LEGS',              kind:'dribble', validable:false },
-  { id:'c_fb',  uni:'FRONT-BEHIND-THE-BACK',               kind:'dribble', validable:false },
-  { id:'c_fc',  uni:'FRONT-CROSSOVER',                     kind:'dribble', validable:false },
-  { id:'c_tt',  uni:'BETWEEN-THE-LEGS-BETWEEN-THE-LEGS',   kind:'dribble', validable:false },
-  { id:'c_tb',  uni:'BETWEEN-THE-LEGS-BEHIND-THE-BACK',    kind:'dribble', validable:false },
-  { id:'c_tc',  uni:'BETWEEN-THE-LEGS-CROSSOVER',          kind:'dribble', validable:false },
-  { id:'c_trt', uni:'BETWEEN-THE-LEGS-REVERSE-TWEEN',      kind:'dribble', validable:false },
-  { id:'c_bc',  uni:'BEHIND-THE-BACK-CROSSOVER',           kind:'dribble', validable:false },
-  { id:'c_cc',  uni:'CROSSOVER-CROSSOVER',                 kind:'dribble', validable:false },
-  { id:'c_ct',  uni:'CROSSOVER-BETWEEN-THE-LEGS',          kind:'dribble', validable:false },
-  { id:'c_cb',  uni:'CROSSOVER-BEHIND-THE-BACK',           kind:'dribble', validable:false },
-  { id:'c_rtb', uni:'REVERSE-TWEEN-BEHIND-THE-BACK',       kind:'dribble', validable:false },
-  { id:'c_rtc', uni:'REVERSE-TWEEN-CROSSOVER',             kind:'dribble', validable:false }
+  // Combinatoire exhaustive 5×5 = 25 combos doubles
+  { id:'c_ff',  uni:'FRONT-FRONT',                     kind:'dribble', validable:false },
+  { id:'c_ft',  uni:'FRONT-BETWEEN-THE-LEGS',          kind:'dribble', validable:false },
+  { id:'c_fc',  uni:'FRONT-CROSSOVER',                 kind:'dribble', validable:false },
+  { id:'c_fr',  uni:'FRONT-REVERSE-TWEEN',             kind:'dribble', validable:false },
+  { id:'c_fb',  uni:'FRONT-BEHIND-THE-BACK',           kind:'dribble', validable:false },
+
+  { id:'c_tf',  uni:'BETWEEN-THE-LEGS-FRONT',          kind:'dribble', validable:false },
+  { id:'c_tt',  uni:'TWEEN-TWEEN',                     kind:'dribble', validable:false },
+  { id:'c_tc',  uni:'BETWEEN-THE-LEGS-CROSSOVER',      kind:'dribble', validable:false },
+  { id:'c_tr',  uni:'BETWEEN-THE-LEGS-REVERSE-TWEEN',  kind:'dribble', validable:false },
+  { id:'c_tb',  uni:'BETWEEN-THE-LEGS-BEHIND-THE-BACK',kind:'dribble', validable:false },
+
+  { id:'c_cf',  uni:'CROSSOVER-FRONT',                 kind:'dribble', validable:false },
+  { id:'c_ct',  uni:'CROSSOVER-BETWEEN-THE-LEGS',      kind:'dribble', validable:false },
+  { id:'c_cc',  uni:'CROSSOVER-CROSSOVER',             kind:'dribble', validable:false },
+  { id:'c_cr',  uni:'CROSSOVER-REVERSE-TWEEN',         kind:'dribble', validable:false },
+  { id:'c_cb',  uni:'CROSSOVER-BEHIND-THE-BACK',       kind:'dribble', validable:false },
+
+  { id:'c_rf',  uni:'REVERSE-TWEEN-FRONT',             kind:'dribble', validable:false },
+  { id:'c_rt',  uni:'REVERSE-TWEEN-BETWEEN-THE-LEGS',  kind:'dribble', validable:false },
+  { id:'c_rc',  uni:'REVERSE-TWEEN-CROSSOVER',         kind:'dribble', validable:false },
+  { id:'c_rr',  uni:'REVERSE-TWEEN-REVERSE-TWEEN',     kind:'dribble', validable:false },
+  { id:'c_rb',  uni:'REVERSE-TWEEN-BEHIND-THE-BACK',   kind:'dribble', validable:false },
+
+  { id:'c_bf',  uni:'BEHIND-THE-BACK-FRONT',           kind:'dribble', validable:false },
+  { id:'c_bt',  uni:'BEHIND-THE-BACK-BETWEEN-THE-LEGS',kind:'dribble', validable:false },
+  { id:'c_bc',  uni:'BEHIND-THE-BACK-CROSSOVER',       kind:'dribble', validable:false },
+  { id:'c_br',  uni:'BEHIND-THE-BACK-REVERSE-TWEEN',   kind:'dribble', validable:false },
+  { id:'c_bb',  uni:'BEHIND-THE-BACK-BEHIND-THE-BACK', kind:'dribble', validable:false }
 ];
 /* Combos triples — palier de cadence rapide (1.5s) uniquement */
 var _dcog_tbd_poolOneTriple = [
   { id:'t_ftc', uni:'FRONT-BETWEEN-THE-LEGS-CROSSOVER',                    kind:'dribble', validable:false },
   { id:'t_tbc', uni:'BETWEEN-THE-LEGS-BEHIND-THE-BACK-CROSSOVER',          kind:'dribble', validable:false },
-  { id:'t_ttb', uni:'BETWEEN-THE-LEGS-BETWEEN-THE-LEGS-BEHIND-THE-BACK',   kind:'dribble', validable:false },
+  { id:'t_ttb', uni:'TWEEN-TWEEN-BEHIND-THE-BACK',                         kind:'dribble', validable:false },
   { id:'t_cbf', uni:'CROSSOVER-BEHIND-THE-BACK-FRONT',                    kind:'dribble', validable:false },
   { id:'t_rtb', uni:'REVERSE-TWEEN-BEHIND-THE-BACK-CROSSOVER',            kind:'dribble', validable:false },
   { id:'t_bbc', uni:'BEHIND-THE-BACK-CROSSOVER',                          kind:'dribble', validable:false }
@@ -30112,13 +30131,14 @@ function _dcog_tbd_speakText(instr) {
   // La voix coach parle toujours anglais : dictionnaire EN uniquement.
   var moveEN = {
     'FRONT':'front change', 'BETWEEN-THE-LEGS':'between the legs',
-    'CROSSOVER':'crossover', 'REVERSE-TWEEN':'reverse between the legs', 'BEHIND-THE-BACK':'behind the back'
+    'CROSSOVER':'crossover', 'REVERSE-TWEEN':'reverse between the legs', 'BEHIND-THE-BACK':'behind the back',
+    'TWEEN-TWEEN':'between the legs, between the legs'
   };
   var dict = moveEN;
   if (instr.uni) {
     // Découper le combo en briques connues — l'ordre est CRUCIAL : les briques longues d'abord
-    // pour que 'BETWEEN-THE-LEGS' ne soit pas matché comme 'FRONT' partiel, etc.
-    var bricks = ['BETWEEN-THE-LEGS','BEHIND-THE-BACK','REVERSE-TWEEN','CROSSOVER','FRONT'];
+    // TWEEN-TWEEN avant BETWEEN-THE-LEGS pour matcher le doublon compact avant les briques simples
+    var bricks = ['TWEEN-TWEEN','BETWEEN-THE-LEGS','BEHIND-THE-BACK','REVERSE-TWEEN','CROSSOVER','FRONT'];
     var label = instr.uni, parts = [], guard = 0;
     while (label.length > 0 && guard < 10) {
       guard++;
@@ -30680,7 +30700,9 @@ function _dcog_startRec() {
     clearInterval(_dcog_recTimer);
     var blob = new Blob(_dcog_recChunks, {type: _dcog_recorder.mimeType||'video/webm'});
     _dcog_recActive = false; _dcog_recChunks = []; _dcog_updateRecBtn();
-    var ext = 'mp4';
+    // Choisir la bonne extension selon le type réel du blob
+    // (évite qu'iOS affiche 1988:xx:xx sur un fichier .mp4 qui contient du webm)
+    var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn  = 'SENSEI_cognitive_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st  = document.getElementById('dcog_status');
     if (_tsym_isIOS() && navigator.share && typeof File!=='undefined') {
