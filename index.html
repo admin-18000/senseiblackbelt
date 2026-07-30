@@ -27958,6 +27958,7 @@ var _dcog_sprintBaseCount  = 0;
 var _dcog_sprintStart= 0;
 var _dcog_sprintInt  = null;
 var _dcog_heightFrames = 0;
+var _dcog_heightPrevWY = null; // Y du poignet actif à la frame précédente (pour garde mouvement)
 var _dcog_heightInZone = 0;
 var _dcog_tbFrames   = 0;
 var _dcog_tbAntiphase= 0;
@@ -28375,6 +28376,7 @@ function _dcog_launchDrill() {
   _dcog_sprintCount = 0; _dcog_sprintStart = Date.now(); _dcog_sprintWristCount = 0; _dcog_sprintWristTimes = []; _dcog_sprintPrevWristY = null; _dcog_sprintWristDir = 0;
   _dcog_wristBpmTimes = []; _dcog_wristBpmLive = 0; _dcog_wristPrevY = null; _dcog_wristPrevDir = 0;
   _dcog_heightFrames = 0; _dcog_heightInZone = 0;
+  _dcog_heightPrevWY = null; // reset garde mouvement
   _dcog_tbFrames = 0; _dcog_tbAntiphase = 0;
   _dcog_tbInZoneFrames = 0; _dcog_tbTotalFrames2 = 0;
   _dcog_tbTargetLineY = null; _dcog_tbTargetLineL = null; _dcog_tbTargetLineR = null;
@@ -29426,6 +29428,20 @@ function _dcog_analyzeHeight(poses) {
   }
 
   var inZone = normY >= zoneMin && normY <= zoneMax;
+  // ═══ Garde de mouvement : ne compter QUE si le poignet bouge vraiment ═══
+  // (empêche un score parasite quand le joueur est immobile en bonne position)
+  // Seuil 8 pixels : filtre le bruit MoveNet (3-5 px), garde les vrais dribbles
+  var heightIsMoving = false;
+  if (_dcog_heightPrevWY !== null) {
+    heightIsMoving = Math.abs(wristY - _dcog_heightPrevWY) > 8;
+  }
+  _dcog_heightPrevWY = wristY;
+  if (!heightIsMoving) {
+    // Pas de mouvement → on ne compte pas cette frame
+    // Mais on met à jour zonePx pour l'affichage de la ligne cible
+    _dcog_heightZonePx  = zonePx;
+    return;
+  }
   _dcog_heightFrames++;
   if (inZone) _dcog_heightInZone++;
   // Audio feedback : bip court à l'entrée dans la zone
