@@ -28430,8 +28430,8 @@ function _dcog_launchDrill() {
       }
     }, 1000);
   }
-  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos')   _dcog_tbScheduleChaos();
-  if (_dcog_drill === 'twoball' && _dcog_tbMode === 'burnout') _dcog_startBurnout();
+  // Burnout et Chaos démarrent APRÈS le countdown (voir dcogCountdown branche n<=0)
+  // (évite que le métronome burnout tourne pendant "PRÊT ?" et se retrouve à 65 BPM au GO)
   // Show REC button
   var bRec = document.getElementById('dcog_btnRec');
   if (bRec) bRec.style.display = 'flex';
@@ -28454,6 +28454,17 @@ function _dcog_launchDrill() {
       // (évite qu'une opération soit visible pendant le "PRÊT ?")
       if (_dcog_drill === 'math' && typeof _dcog_nextQuestion === 'function') {
         _dcog_nextQuestion();
+      }
+      // Two Ball Burnout : démarrer le métronome à 60 BPM SEULEMENT ici
+      // (sinon il tourne pendant le countdown et arrive à 65 BPM au GO)
+      if (_dcog_drill === 'twoball' && _dcog_tbMode === 'burnout' &&
+          typeof _dcog_startBurnout === 'function') {
+        _dcog_startBurnout();
+      }
+      // Two Ball Chaos : démarrer les stimuli aléatoires SEULEMENT ici
+      if (_dcog_drill === 'twoball' && _dcog_tbMode === 'chaos' &&
+          typeof _dcog_tbScheduleChaos === 'function') {
+        _dcog_tbScheduleChaos();
       }
       setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50);
       return;
