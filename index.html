@@ -29627,13 +29627,24 @@ function _dcog_analyzeTwoBall(poses) {
   _dcog_prevLW_y = lY;
   _dcog_prevRW_y = rY;
 
-  // Score — burnout affiche déjà BPM via son propre setter, ne pas écraser
+  // Score — chaque mode affiche sa métrique dans dcog_tbScoreBig
   var pct = _dcog_tbFrames > 0
     ? Math.round(_dcog_tbAntiphase / _dcog_tbFrames * 100) : 0;
   var scoreBig = document.getElementById('dcog_tbScoreBig');
-  if (scoreBig && _dcog_tbMode !== 'burnout') {
-    scoreBig.textContent = pct + '%';
-    scoreBig.style.color = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
+  var scoreLbl = document.getElementById('dcog_tbScoreLbl');
+  if (scoreBig) {
+    if (_dcog_tbMode === 'burnout') {
+      // burnout gère son affichage via _dcog_burnoutSchedule, ne pas écraser
+    } else if (_dcog_tbMode === 'chaos') {
+      scoreBig.textContent = (_dcog_chaosHits || 0) + '/' + (_dcog_chaosTotal || 0);
+      scoreBig.style.color = '#fff';
+      if (scoreLbl) scoreLbl.textContent = window._lang === 'en' ? 'HITS' : 'RÉUSSIS';
+    } else {
+      // sync, alternate, sameheight, diffheight → %
+      scoreBig.textContent = pct + '%';
+      scoreBig.style.color = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
+      if (scoreLbl) scoreLbl.textContent = window._lang === 'en' ? 'DISSOCIATION' : 'DISSOCIATION';
+    }
   }
   var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = pct+'%';
   var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_tbFrames;
@@ -29748,6 +29759,12 @@ var _dcog_chaosCurrentMode = 'sync'; // mode courant demandé
 
 function _dcog_tbScheduleChaos() {
   if (!_dcog_running || _dcog_drill !== 'twoball' || _dcog_tbMode !== 'chaos') return;
+  // Afficher immédiatement 0/0 au démarrage (avant la 1ère détection MoveNet)
+  // pour ne pas laisser un ancien BPM ou % traîner à l'écran
+  var scInit = document.getElementById('dcog_tbScoreBig');
+  var lblInit = document.getElementById('dcog_tbScoreLbl');
+  if (scInit) { scInit.textContent = '0/0'; scInit.style.color = '#fff'; }
+  if (lblInit) lblInit.textContent = window._lang === 'en' ? 'HITS' : 'RÉUSSIS';
   var delay = 2000 + Math.random() * 2000; // 2-4 s entre stimuli
   _dcog_tbChaosTimer = setTimeout(function() {
     if (!_dcog_running || _dcog_tbMode !== 'chaos') return;
@@ -29994,6 +30011,7 @@ var _dcog_tbd_flashUntil  = 0;       // fin du flash de fond panneau
 var _dcog_tbd_panelParts  = [];      // particules dorées de matérialisation
 var _dcog_tbd_intensity   = 0;       // 0 (dojo zen) → 1 (arena adrénaline)
 var _dcog_tbd_lastValidated = false; // dernière instruction pose-validée ?
+var _dcog_tbd_wristMoved = false;    // Option B : main a-t-elle bougé pendant l'instruction actuelle ?
 var _dcog_tbd_poseHoldFrames = 0;    // frames consécutives pose tenue
 var _dcog_tbd_legendUntil = 0;       // mode légendaire (20 streak)
 var _dcog_tbd_freezeFrameUntil = 0;  // freeze-frame artistique (10 streak)
@@ -30153,6 +30171,7 @@ function _dcog_tbd_launch() {
   _dcog_tbd_legendUntil   = 0;
   _dcog_tbd_freezeFrameUntil = 0;
   _dcog_tbd_lastValidated = false;
+  _dcog_tbd_wristMoved    = false;
   _dcog_tbd_poseHoldFrames = 0;
   _dcog_tbd_prevLWr = null;
   _dcog_tbd_prevRWr = null;
@@ -30177,7 +30196,10 @@ function _dcog_tbd_nextInstruction() {
     if (prev.validable) {
       ok = _dcog_tbd_lastValidated;
     } else {
-      ok = true;  // combo de dribble : compté au rythme (non détectable sans tracking ballon)
+      // Option B : compté OK uniquement si un poignet a bougé pendant l'instruction
+      // (pas de tracking ballon donc pas de mesure de qualité, mais on filtre
+      // au moins le joueur totalement immobile devant sa caméra)
+      ok = _dcog_tbd_wristMoved;
     }
     if (ok) {
       _dcog_tbd_correct++;
@@ -30204,6 +30226,7 @@ function _dcog_tbd_nextInstruction() {
   _dcog_tbd_count++;
   _dcog_tbd_instrStart     = Date.now();
   _dcog_tbd_lastValidated  = false;
+  _dcog_tbd_wristMoved     = false; // Option B : reset garde mouvement à chaque nouvelle instruction
   _dcog_tbd_poseHoldFrames = 0;
   _dcog_tbd_flashUntil     = Date.now() + 200;
   _dcog_tbd_spawnPanelParticles();
@@ -30342,6 +30365,20 @@ function _dcog_tbd_analyzePose(poses) {
 
   _dcog_tbd_prevLWr = lWr ? {x:lWr.x, y:lWr.y} : null;
   _dcog_tbd_prevRWr = rWr ? {x:rWr.x, y:rWr.y} : null;
+
+  // Option B — Garde de mouvement globale : si un poignet a bougé pendant l'instruction,
+  // on considère que le joueur EST en action (au moins ne reste pas statique).
+  // Seuil 14 px (comme freeze) : filtre le bruit MoveNet naturel de 3-5 px.
+  if (!_dcog_tbd_wristMoved) {
+    if (lWr && _dcog_tbd_prevLWr &&
+        Math.hypot(lWr.x - _dcog_tbd_prevLWr.x, lWr.y - _dcog_tbd_prevLWr.y) > 14) {
+      _dcog_tbd_wristMoved = true;
+    }
+    if (rWr && _dcog_tbd_prevRWr &&
+        Math.hypot(rWr.x - _dcog_tbd_prevRWr.x, rWr.y - _dcog_tbd_prevRWr.y) > 14) {
+      _dcog_tbd_wristMoved = true;
+    }
+  }
 
   if (pass) {
     _dcog_tbd_poseHoldFrames++;
