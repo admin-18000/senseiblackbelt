@@ -1717,12 +1717,12 @@ body.unlocked .sensei-only{display:revert !important}
     <!-- Height zone -->
     <div id="dcog_optHeight" style="display:none">
       <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
-        style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;text-align:center;transition:all .2s">
-        ⬇ <span id="dcog_lbl_low">BAS</span><br><span style="font-size:9px;opacity:.7">sous le genou</span>
+        style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;text-align:center;transition:all .2s">
+        ⬇ <span id="dcog_lbl_low" style="font-size:16px;font-weight:800;letter-spacing:1px">BAS</span><br><span id="dcog_sub_low" style="font-size:12px;opacity:.85;font-weight:600">sous le genou</span>
       </button>
       <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('high')" data-zone="high"
-        style="flex:1;padding:12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:700;cursor:pointer;width:calc(50% - 4px);text-align:center;transition:all .2s">
-        ⬆ <span id="dcog_lbl_high">HAUT</span><br><span style="font-size:9px;opacity:.7">hauteur hanches</span>
+        style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;width:calc(50% - 4px);text-align:center;transition:all .2s">
+        ⬆ <span id="dcog_lbl_high" style="font-size:16px;font-weight:800;letter-spacing:1px">HAUT</span><br><span id="dcog_sub_high" style="font-size:12px;opacity:.85;font-weight:600">hauteur hanches</span>
       </button>
     </div>
     <!-- Two ball mode -->
@@ -28011,6 +28011,8 @@ function _dcog_applyLang(en) {
     'dcog_lbl_hard': en?'HARD':'DIFFICILE',
     'dcog_lbl_low': en?'LOW':'BAS',
     'dcog_lbl_high': en?'HIGH':'HAUT',
+    'dcog_sub_low': en?'below the knee':'sous le genou',
+    'dcog_sub_high': en?'hip height':'hauteur hanches',
     'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
     'dcog_lbl_sameheight': en?'SAME HEIGHT':'MÊME HAUTEUR',
     'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
@@ -29625,11 +29627,11 @@ function _dcog_analyzeTwoBall(poses) {
   _dcog_prevLW_y = lY;
   _dcog_prevRW_y = rY;
 
-  // Score
+  // Score — burnout affiche déjà BPM via son propre setter, ne pas écraser
   var pct = _dcog_tbFrames > 0
     ? Math.round(_dcog_tbAntiphase / _dcog_tbFrames * 100) : 0;
   var scoreBig = document.getElementById('dcog_tbScoreBig');
-  if (scoreBig) {
+  if (scoreBig && _dcog_tbMode !== 'burnout') {
     scoreBig.textContent = pct + '%';
     scoreBig.style.color = pct >= 70 ? '#2dc653' : pct >= 40 ? '#f5c518' : '#e63946';
   }
@@ -29806,6 +29808,9 @@ var _dcog_burnoutLastTick = 0; // timestamp dernier bip pour pulse visuelle
 function _dcog_startBurnout() {
   _dcog_burnoutBpm   = 60;
   _dcog_burnoutTick  = 0;
+  // Afficher immédiatement "60 BPM" au démarrage (avant le 1er tick)
+  var scInit = document.getElementById('dcog_tbScoreBig');
+  if (scInit) { scInit.textContent = '60 BPM'; scInit.style.color = '#2dc653'; }
   _dcog_burnoutSchedule();
 }
 
@@ -30004,39 +30009,36 @@ var _dcog_tbd_refShoulderGap2 = null;
    uni : libellé universel (FR=EN) ; sinon fr/en bilingues
 ─────────────────────────────────────────────────────────────── */
 var _dcog_tbd_poolOneSimple = [
-  { id:'front',  uni:'FRONT',         kind:'dribble', validable:false },
-  { id:'tween',  uni:'TWEEN',         kind:'dribble', validable:false },
-  { id:'behind', uni:'BEHIND',        kind:'dribble', validable:false },
-  { id:'cross',  uni:'CROSS',         kind:'dribble', validable:false },
-  { id:'rtween', uni:'REVERSE-TWEEN', kind:'dribble', validable:false },
-  { id:'bback',  uni:'BEHIND-BACK',   kind:'dribble', validable:false }
+  { id:'front',  uni:'FRONT',             kind:'dribble', validable:false },
+  { id:'tween',  uni:'BETWEEN-THE-LEGS',  kind:'dribble', validable:false },
+  { id:'cross',  uni:'CROSSOVER',         kind:'dribble', validable:false },
+  { id:'rtween', uni:'REVERSE-TWEEN',     kind:'dribble', validable:false },
+  { id:'bback',  uni:'BEHIND-THE-BACK',   kind:'dribble', validable:false }
 ];
 /* Combos doubles générés — débloqués quand la cadence accélère */
 var _dcog_tbd_poolOneCombo = [
-  { id:'c_ft',  uni:'FRONT-TWEEN',          kind:'dribble', validable:false },
-  { id:'c_fb',  uni:'FRONT-BEHIND',         kind:'dribble', validable:false },
-  { id:'c_fc',  uni:'FRONT-CROSS',          kind:'dribble', validable:false },
-  { id:'c_tt',  uni:'TWEEN-TWEEN',          kind:'dribble', validable:false },
-  { id:'c_tb',  uni:'TWEEN-BEHIND',         kind:'dribble', validable:false },
-  { id:'c_tc',  uni:'TWEEN-CROSS',          kind:'dribble', validable:false },
-  { id:'c_trt', uni:'TWEEN-REVERSE-TWEEN',  kind:'dribble', validable:false },
-  { id:'c_bb',  uni:'BEHIND-BEHIND',        kind:'dribble', validable:false },
-  { id:'c_bc',  uni:'BEHIND-CROSS',         kind:'dribble', validable:false },
-  { id:'c_bbk', uni:'BEHIND-BEHIND-BACK',   kind:'dribble', validable:false },
-  { id:'c_cc',  uni:'CROSS-CROSS',          kind:'dribble', validable:false },
-  { id:'c_ct',  uni:'CROSS-TWEEN',          kind:'dribble', validable:false },
-  { id:'c_cb',  uni:'CROSS-BEHIND',         kind:'dribble', validable:false },
-  { id:'c_rtb', uni:'REVERSE-TWEEN-BEHIND', kind:'dribble', validable:false },
-  { id:'c_rtc', uni:'REVERSE-TWEEN-CROSS',  kind:'dribble', validable:false }
+  { id:'c_ft',  uni:'FRONT-BETWEEN-THE-LEGS',              kind:'dribble', validable:false },
+  { id:'c_fb',  uni:'FRONT-BEHIND-THE-BACK',               kind:'dribble', validable:false },
+  { id:'c_fc',  uni:'FRONT-CROSSOVER',                     kind:'dribble', validable:false },
+  { id:'c_tt',  uni:'BETWEEN-THE-LEGS-BETWEEN-THE-LEGS',   kind:'dribble', validable:false },
+  { id:'c_tb',  uni:'BETWEEN-THE-LEGS-BEHIND-THE-BACK',    kind:'dribble', validable:false },
+  { id:'c_tc',  uni:'BETWEEN-THE-LEGS-CROSSOVER',          kind:'dribble', validable:false },
+  { id:'c_trt', uni:'BETWEEN-THE-LEGS-REVERSE-TWEEN',      kind:'dribble', validable:false },
+  { id:'c_bc',  uni:'BEHIND-THE-BACK-CROSSOVER',           kind:'dribble', validable:false },
+  { id:'c_cc',  uni:'CROSSOVER-CROSSOVER',                 kind:'dribble', validable:false },
+  { id:'c_ct',  uni:'CROSSOVER-BETWEEN-THE-LEGS',          kind:'dribble', validable:false },
+  { id:'c_cb',  uni:'CROSSOVER-BEHIND-THE-BACK',           kind:'dribble', validable:false },
+  { id:'c_rtb', uni:'REVERSE-TWEEN-BEHIND-THE-BACK',       kind:'dribble', validable:false },
+  { id:'c_rtc', uni:'REVERSE-TWEEN-CROSSOVER',             kind:'dribble', validable:false }
 ];
 /* Combos triples — palier de cadence rapide (1.5s) uniquement */
 var _dcog_tbd_poolOneTriple = [
-  { id:'t_ftc', uni:'FRONT-TWEEN-CROSS',     kind:'dribble', validable:false },
-  { id:'t_tbc', uni:'TWEEN-BEHIND-CROSS',    kind:'dribble', validable:false },
-  { id:'t_ttb', uni:'TWEEN-TWEEN-BEHIND',    kind:'dribble', validable:false },
-  { id:'t_cbf', uni:'CROSS-BEHIND-FRONT',    kind:'dribble', validable:false },
-  { id:'t_rtb', uni:'REVERSE-TWEEN-BEHIND-CROSS', kind:'dribble', validable:false },
-  { id:'t_bbc', uni:'BEHIND-BACK-CROSS',     kind:'dribble', validable:false }
+  { id:'t_ftc', uni:'FRONT-BETWEEN-THE-LEGS-CROSSOVER',                    kind:'dribble', validable:false },
+  { id:'t_tbc', uni:'BETWEEN-THE-LEGS-BEHIND-THE-BACK-CROSSOVER',          kind:'dribble', validable:false },
+  { id:'t_ttb', uni:'BETWEEN-THE-LEGS-BETWEEN-THE-LEGS-BEHIND-THE-BACK',   kind:'dribble', validable:false },
+  { id:'t_cbf', uni:'CROSSOVER-BEHIND-THE-BACK-FRONT',                    kind:'dribble', validable:false },
+  { id:'t_rtb', uni:'REVERSE-TWEEN-BEHIND-THE-BACK-CROSSOVER',            kind:'dribble', validable:false },
+  { id:'t_bbc', uni:'BEHIND-THE-BACK-CROSSOVER',                          kind:'dribble', validable:false }
 ];
 /* Plus de pièges Stroop — pool vide conservé pour compat */
 var _dcog_tbd_poolOneTrap = [];
@@ -30080,13 +30082,14 @@ function _dcog_tbd_speakText(instr) {
   if (!instr) return '';
   // La voix coach parle toujours anglais : dictionnaire EN uniquement.
   var moveEN = {
-    'FRONT':'front change', 'TWEEN':'between the legs', 'BEHIND':'behind the back',
-    'CROSS':'crossover', 'REVERSE-TWEEN':'reverse tween', 'BEHIND-BACK':'behind the back'
+    'FRONT':'front change', 'BETWEEN-THE-LEGS':'between the legs',
+    'CROSSOVER':'crossover', 'REVERSE-TWEEN':'reverse between the legs', 'BEHIND-THE-BACK':'behind the back'
   };
   var dict = moveEN;
   if (instr.uni) {
-    // Découper le combo en briques connues (gère les briques à tiret comme REVERSE-TWEEN)
-    var bricks = ['REVERSE-TWEEN','BEHIND-BACK','FRONT','TWEEN','BEHIND','CROSS'];
+    // Découper le combo en briques connues — l'ordre est CRUCIAL : les briques longues d'abord
+    // pour que 'BETWEEN-THE-LEGS' ne soit pas matché comme 'FRONT' partiel, etc.
+    var bricks = ['BETWEEN-THE-LEGS','BEHIND-THE-BACK','REVERSE-TWEEN','CROSSOVER','FRONT'];
     var label = instr.uni, parts = [], guard = 0;
     while (label.length > 0 && guard < 10) {
       guard++;
