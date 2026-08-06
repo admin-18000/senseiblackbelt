@@ -860,6 +860,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1">MATHS</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#2dc653;margin-top:4px;letter-spacing:.5px;font-weight:700" data-i18n="dojo_sub_math">Validé scientifiquement</div>
         </button>
+        <!-- TON ENTRAÎNEMENT (fiche perso) -->
+        <button onclick="_fiche_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.12),rgba(13,17,23,.6));border:1px solid rgba(245,197,24,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">📋</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_fiche">TON ENTRAÎNEMENT</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_fiche">Fiche perso adaptée à ton poste</div>
+        </button>
       </div>
     </div>
   </div>
@@ -7467,7 +7475,7 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
-    var ONBOARDING_VERSION = '2026.05.12';
+    var ONBOARDING_VERSION = '2026.08.06';
     // Test bypass : ?onboarding=1 dans l'URL force l'affichage
     var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
     var seenVersion = localStorage.getItem('sensei_onboarding_seen_v');
@@ -7520,7 +7528,7 @@ function onboardingCycleMath() {
   }, 2200);
 }
 function onboardingClose() {
-  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.05.12'); } catch(e) {}
+  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.06'); } catch(e) {}
   var m = document.getElementById('onboarding-modal');
   if (m) {
     m.style.opacity = '0';
@@ -7559,6 +7567,8 @@ function onboardingLaunch(which) {
           var card = document.getElementById('dcog_btnStart');
           if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
         }, 300);
+      } else if (which === 'fiche') {
+        if (typeof _fiche_open === 'function') _fiche_open();
       }
     } catch(e) {}
   }, 350);
@@ -9768,6 +9778,25 @@ function oppDisplayResults(top, region, en, profile) {
           <span style="display:inline-block;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#e63946,#7a1d22);box-shadow:0 0 24px rgba(230,57,70,.7);animation:onbBurnoutPulse 1.1s ease-in-out infinite"></span>
         </div>
         <div data-i18n="onb_burnout_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Métronome qui s'accélère — endurance pure</div>
+      </button>
+
+      <!-- TON ENTRAÎNEMENT -->
+      <button class="onb-card" onclick="onboardingLaunch('fiche')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.7px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">📋</div>
+        <div data-i18n="onb_fiche_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">TON ENTRAÎNEMENT</div>
+        <!-- Mini-animation blocs cochés -->
+        <div style="height:60px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;margin:8px 0">
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);padding:3px 10px;border-radius:6px">
+            <span style="width:12px;height:12px;background:#2dc653;border-radius:3px;display:inline-block"></span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:1px">HANDLING · 10 MIN</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);padding:3px 10px;border-radius:6px">
+            <span style="width:12px;height:12px;background:#2dc653;border-radius:3px;display:inline-block;animation:onbBurnoutPulse 1.3s ease-in-out infinite"></span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:1px">3 PTS · 12 MIN</span>
+          </div>
+        </div>
+        <div data-i18n="onb_fiche_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Fiche perso adaptée à ton poste</div>
       </button>
 
     </div>
@@ -32789,5 +32818,1323 @@ function shPlayVideo(){
 })();
 
 </script>
+
+<script>
+window._FICHES_DATA = {
+  // ══════════════════════════════ MENEUR (PG) ══════════════════════════════
+  "PG_DEB": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Corde à sauter 2 min, puis dribbles alternés main forte / main faible sur le terrain, aller-retour.", contentEN:"Skip rope 2 min, then alternate strong/weak hand dribbles up and down the court." },
+      { emoji:"🏀", titleFR:"CONTRÔLE DE BALLE", titleEN:"BALL CONTROL", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Dribbles bas main droite 1 min, dribbles bas main gauche 1 min, en place. Répète 2 fois.", contentEN:"Low dribbles right hand 1 min, low dribbles left hand 1 min, in place. Repeat twice." },
+      { emoji:"🔄", titleFR:"CROSSOVER SIMPLE", titleEN:"SIMPLE CROSSOVER", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"En place, crossover devant toi lentement puis accélère. 3 séries de 90 sec.", contentEN:"Standing in place, slow crossovers in front of you then speed up. 3 sets of 90 sec." },
+      { emoji:"🎯", titleFR:"LAYUP LIGNE DROITE", titleEN:"STRAIGHT LINE LAYUP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 layups main droite, 20 layups main gauche, en ligne droite depuis la ligne médiane.", contentEN:"20 layups right hand, 20 layups left hand, straight line from midcourt." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"20 lancers francs à ton rythme, prends le temps de te placer.", contentEN:"20 free throws at your own pace, take your time to set up." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course lente autour du terrain 3 tours, puis 20 jumping jacks.", contentEN:"Slow jog around the court 3 laps, then 20 jumping jacks." },
+      { emoji:"🏀", titleFR:"BALL HANDLING STATIONNAIRE", titleEN:"STATIONARY BALL HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Ballon autour de la taille 30 sec, autour de la tête 30 sec, autour des jambes 30 sec. Répète 4 fois.", contentEN:"Ball around waist 30 sec, around head 30 sec, around legs 30 sec. Repeat 4 times." },
+      { emoji:"🔄", titleFR:"BETWEEN-THE-LEGS", titleEN:"BETWEEN-THE-LEGS", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Passage entre les jambes en place, lentement. 20 passages puis accélère. 3 séries.", contentEN:"Between-the-legs standing still, slowly. 20 reps then speed up. 3 sets." },
+      { emoji:"🎯", titleFR:"TIR DE PRÈS", titleEN:"CLOSE-RANGE SHOT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 tirs depuis 2 mètres, différents angles autour du panier.", contentEN:"30 shots from 2 meters, various angles around the basket." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 lancers francs, garde le même rituel avant chaque tir.", contentEN:"15 free throws, keep the same routine before each shot." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"Étirements dynamiques : rotations épaules, hanches, chevilles.", contentEN:"Dynamic stretching: shoulder, hip, ankle rotations." },
+      { emoji:"🏀", titleFR:"POUND DRIBBLE", titleEN:"POUND DRIBBLE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble puissant main droite 45 sec, main gauche 45 sec. Répète 4 fois.", contentEN:"Powerful pound dribble right hand 45 sec, left hand 45 sec. Repeat 4 times." },
+      { emoji:"👀", titleFR:"DRIBBLE TÊTE HAUTE", titleEN:"HEAD-UP DRIBBLE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Regarde en face de toi (pas le ballon) et dribble en marchant sur tout le terrain. 4 aller-retour.", contentEN:"Look ahead (not the ball) and dribble while walking full court. 4 round trips." },
+      { emoji:"🎯", titleFR:"LAYUP AVEC 1 DRIBBLE", titleEN:"1-DRIBBLE LAYUP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Depuis la ligne des lancers francs, 1 dribble puis layup. 15 main droite, 15 main gauche.", contentEN:"From the free throw line, 1 dribble then layup. 15 right hand, 15 left hand." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"20 lancers francs. Concentre-toi sur ton geste, pas sur le résultat.", contentEN:"20 free throws. Focus on your form, not the result." }
+    ]
+  },
+  "PG_INT": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Corde à sauter 2 min, dribbles main forte / main faible aller-retour, finish par 10 layups.", contentEN:"Skip rope 2 min, strong/weak hand dribbles up and down, finish with 10 layups." },
+      { emoji:"🏀", titleFR:"HANDLING RYTHMÉ", titleEN:"RHYTHMIC HANDLING", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"3 séries de 90 sec : crossover, between-the-legs, behind-the-back. 30 sec récup entre chaque.", contentEN:"3 sets of 90 sec: crossover, between-the-legs, behind-the-back. 30 sec rest between each." },
+      { emoji:"🎯", titleFR:"TIR SUR DRIBBLE MID-RANGE", titleEN:"MID-RANGE OFF DRIBBLE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"5 spots (aile G, coin G, top, coin D, aile D). Crossover puis tir. 5 tirs par spot.", contentEN:"5 spots (left wing, left corner, top, right corner, right wing). Crossover then shot. 5 shots per spot." },
+      { emoji:"🏹", titleFR:"3 PTS CATCH AND SHOOT", titleEN:"3 PT CATCH AND SHOOT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"5 spots à 3 pts, 5 tirs par spot. Objectif : 15/25.", contentEN:"5 spots at 3 pts line, 5 shots per spot. Target: 15/25." },
+      { emoji:"🎯", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"10 lancers francs réussis d'affilée. Si tu rates, tu recommences.", contentEN:"10 free throws in a row. If you miss, restart." },
+      { emoji:"💪", titleFR:"FINISH SOUS FATIGUE", titleEN:"FINISH UNDER FATIGUE", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"5 sprints terrain complet. Après chaque, 1 layup + 1 mid-range.", contentEN:"5 full-court sprints. After each: 1 layup + 1 mid-range." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec changements de direction, puis 30 dribbles bas main droite, 30 main gauche.", contentEN:"Running with direction changes, then 30 low dribbles right hand, 30 left hand." },
+      { emoji:"🏀", titleFR:"TWO-BALL SIMULTANÉ", titleEN:"TWO-BALL SIMULTANEOUS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"2 ballons, dribbles simultanés en place 1 min, en marchant 1 min. Répète 4 fois.", contentEN:"2 balls, simultaneous dribbles in place 1 min, walking 1 min. Repeat 4 times." },
+      { emoji:"🔄", titleFR:"COMBOS HANDLING", titleEN:"HANDLING COMBOS", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Enchaînements crossover + between-the-legs + behind-the-back en avançant. 5 aller-retour.", contentEN:"Combo crossover + between-the-legs + behind-the-back moving forward. 5 round trips." },
+      { emoji:"🎯", titleFR:"PULL-UP JUMPER", titleEN:"PULL-UP JUMPER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"2 dribbles + pull-up mid-range depuis 5 spots. 5 tirs par spot.", contentEN:"2 dribbles + pull-up mid-range from 5 spots. 5 shots per spot." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 lancers francs, série de 10 puis pause 1 min, série de 10.", contentEN:"20 free throws, set of 10 then 1 min break, set of 10." },
+      { emoji:"💪", titleFR:"SPRINT + TIR", titleEN:"SPRINT + SHOT", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"Sprint aller-retour, arrivé en zone à 3 pts, tir immédiat. 8 répétitions.", contentEN:"Sprint up and down, arriving in the 3-pt zone, immediate shot. 8 reps." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, dribble en zigzag entre plots imaginaires 3 min.", contentEN:"Skip rope 2 min, zigzag dribble between imaginary cones 3 min." },
+      { emoji:"🏀", titleFR:"HANDLING EN MARCHE", titleEN:"WALKING HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble en marchant sur tout le terrain, alternance de mouvements (cross, between, behind) tous les 3 pas.", contentEN:"Dribble while walking full court, alternating moves (cross, between, behind) every 3 steps." },
+      { emoji:"⚡", titleFR:"CHANGE DE VITESSE", titleEN:"SPEED CHANGE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble lent 3 sec puis accélération 3 sec, sur toute la longueur. 6 aller-retour.", contentEN:"Slow dribble 3 sec then acceleration 3 sec, full length. 6 round trips." },
+      { emoji:"🎯", titleFR:"HESITATION MOVE", titleEN:"HESITATION MOVE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Hesitation + drive vers le panier. 20 finish main droite, 20 main gauche.", contentEN:"Hesitation + drive to the basket. 20 finish right hand, 20 left hand." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 lancers francs, série de 5 puis 1 sprint, série de 5 puis 1 sprint, série de 5.", contentEN:"15 free throws, set of 5 then 1 sprint, set of 5 then 1 sprint, set of 5." },
+      { emoji:"💪", titleFR:"FATIGUE + DÉCISION", titleEN:"FATIGUE + DECISION", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"3 sprints puis à ton choix : layup, mid-range ou 3 pts. 5 fois.", contentEN:"3 sprints then your choice: layup, mid-range or 3 pts. 5 reps." }
+    ]
+  },
+  "PG_CON": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Corde à sauter 2 min, mobilité articulaire, 15 layups main forte / main faible.", contentEN:"Skip rope 2 min, joint mobility, 15 layups strong/weak hand." },
+      { emoji:"🏀", titleFR:"TWO-BALL AVANCÉ", titleEN:"ADVANCED TWO-BALL", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Dribbles simultanés, alternés, en X en avançant. 3 aller-retour par pattern.", contentEN:"Simultaneous, alternate, X-pattern dribbles moving forward. 3 round trips per pattern." },
+      { emoji:"🔄", titleFR:"COMBOS COMPLEXES", titleEN:"COMPLEX COMBOS", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Enchaînements 3 mouvements : between + cross + behind. En vitesse contrôlée. 5 aller-retour.", contentEN:"3-move combos: between + cross + behind. Controlled speed. 5 round trips." },
+      { emoji:"🎯", titleFR:"PULL-UP 3 PTS", titleEN:"PULL-UP 3 PT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"2 dribbles + pull-up derrière l'arc, 5 spots, 5 tirs par spot. Objectif : 12/25.", contentEN:"2 dribbles + pull-up beyond the arc, 5 spots, 5 shots per spot. Target: 12/25." },
+      { emoji:"🎯", titleFR:"STEP-BACK JUMPER", titleEN:"STEP-BACK JUMPER", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Step-back après drive, 4 spots, 5 tirs par spot.", contentEN:"Step-back after drive, 4 spots, 5 shots per spot." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 lancers francs réussis d'affilée. Recommence à zéro si tu rates.", contentEN:"15 free throws in a row. Restart if you miss." },
+      { emoji:"💪", titleFR:"FATIGUE + TIR", titleEN:"FATIGUE + SHOT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"5 sprints terrain, à chaque retour série de 3 tirs (layup + mid + 3 pts).", contentEN:"5 full-court sprints, on each return: 3-shot series (layup + mid + 3 pts)." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec crossovers, 30 sec sec, entre chaque tour.", contentEN:"Running with crossovers, 30 sec breaks between each lap." },
+      { emoji:"🏀", titleFR:"HANDLING SOUS PRESSION", titleEN:"HANDLING UNDER PRESSURE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble avec obstacle (chaise, plot), 5 patterns différents, 90 sec chacun.", contentEN:"Dribble with obstacle (chair, cone), 5 different patterns, 90 sec each." },
+      { emoji:"⚡", titleFR:"CHANGE DE RYTHME", titleEN:"RHYTHM CHANGE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Attaque du panier avec pause + relance. 15 fois côté droit, 15 côté gauche.", contentEN:"Basket attack with pause + restart. 15 right side, 15 left side." },
+      { emoji:"🎯", titleFR:"ISO — MID-RANGE", titleEN:"ISO — MID-RANGE", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Iso simulé : jab-step, crossover, pull-up mid-range. 20 répétitions.", contentEN:"Simulated iso: jab-step, crossover, pull-up mid-range. 20 reps." },
+      { emoji:"🎯", titleFR:"ISO — 3 PTS", titleEN:"ISO — 3 PT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Iso avec step-back 3 pts. 20 répétitions, alterne les côtés.", contentEN:"Iso with step-back 3 pts. 20 reps, alternate sides." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"20 LF, série de 5 avec pause active (dribbles) entre chaque série.", contentEN:"20 FTs, set of 5 with active break (dribbles) between each set." },
+      { emoji:"💪", titleFR:"MATCH SIMULÉ", titleEN:"SIMULATED GAME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Enchaîne 3 possessions imaginaires : drive, iso, catch and shoot. 6 séquences.", contentEN:"Simulate 3 imaginary possessions: drive, iso, catch and shoot. 6 sequences." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 3 min, dribble avancé (killer crossover, snatch back) 2 min.", contentEN:"Skip rope 3 min, advanced dribble (killer crossover, snatch back) 2 min." },
+      { emoji:"🏀", titleFR:"CONTRÔLE DE BALLE AVANCÉ", titleEN:"ADVANCED BALL CONTROL", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Dribble derrière le dos en marchant, changement de main sans regarder. 4 aller-retour.", contentEN:"Behind-the-back dribble walking, change hands without looking. 4 round trips." },
+      { emoji:"🔄", titleFR:"ATTACK MOVES", titleEN:"ATTACK MOVES", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Combo drive + spin + finish. 15 côté droit, 15 côté gauche.", contentEN:"Drive + spin + finish combo. 15 right side, 15 left side." },
+      { emoji:"🎯", titleFR:"FLOATER", titleEN:"FLOATER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Depuis la raquette étendue, floater par-dessus défenseur imaginaire. 30 tentatives.", contentEN:"From the extended paint, floater over imaginary defender. 30 attempts." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT 3 PTS", titleEN:"CATCH AND SHOOT 3 PT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Sortie d'écran simulée + tir. 6 spots, 5 tirs par spot.", contentEN:"Simulated off-screen + shot. 6 spots, 5 shots per spot." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"10 LF réussis d'affilée. Reset si tu rates.", contentEN:"10 FTs in a row. Reset if you miss." },
+      { emoji:"💪", titleFR:"CARDIO + PRÉCISION", titleEN:"CARDIO + PRECISION", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"3 tours de terrain rapides, série de 5 tirs, répète 4 fois.", contentEN:"3 fast court laps, 5-shot set, repeat 4 times." }
+    ]
+  },
+  "PG_COM": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 2 min, mobilité complète, activation neuro (10 sprints courts + réactions).", contentEN:"Skip rope 2 min, full mobility, neuro activation (10 short sprints + reactions)." },
+      { emoji:"🏀", titleFR:"WARMUP HANDLING", titleEN:"WARMUP HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Two-ball en X, killer crossover, snatch back, behind-the-back rapide. 90 sec chacun.", contentEN:"Two-ball X pattern, killer crossover, snatch back, fast behind-the-back. 90 sec each." },
+      { emoji:"🔄", titleFR:"COMBOS COMPÉTITION", titleEN:"COMPETITION COMBOS", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Signature move perso : crossover killer + step-back. 30 répétitions.", contentEN:"Personal signature move: killer crossover + step-back. 30 reps." },
+      { emoji:"🎯", titleFR:"3 PTS VOLUME", titleEN:"3 PT VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"50 tirs à 3 pts depuis 5 spots. Compte tes réussites, objectif : 30/50.", contentEN:"50 3-pt shots from 5 spots. Count makes, target: 30/50." },
+      { emoji:"🎯", titleFR:"PULL-UP + STEP-BACK COMBO", titleEN:"PULL-UP + STEP-BACK COMBO", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Enchaînement pull-up mid + step-back 3 pts. 20 séquences.", contentEN:"Pull-up mid + step-back 3 pts combo. 20 sequences." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF réussis d'affilée. Impossible sans concentration.", contentEN:"20 FTs in a row. Impossible without focus." },
+      { emoji:"💪", titleFR:"MATCH INTENSITY", titleEN:"MATCH INTENSITY", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"10 possessions complètes simulées, décision libre à chaque possession.", contentEN:"10 full simulated possessions, free decision each possession." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"5 min étirements, 3 min visualisation match.", contentEN:"5 min stretching, 3 min game visualization." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Corde à sauter 3 min, dribble compétition (double crossover, hesitation snap).", contentEN:"Skip rope 3 min, competition dribble (double crossover, hesitation snap)." },
+      { emoji:"🏀", titleFR:"HANDLING EXTRÊME", titleEN:"EXTREME HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Two-ball toutes combinaisons, obstacles multiples, 90 sec par pattern.", contentEN:"Two-ball all combinations, multiple obstacles, 90 sec per pattern." },
+      { emoji:"⚡", titleFR:"VITESSE PURE", titleEN:"PURE SPEED", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Sprint dribble main forte + main faible, 10 aller-retour terrain complet.", contentEN:"Sprint dribble strong + weak hand, 10 full-court round trips." },
+      { emoji:"🎯", titleFR:"SHOOTING VOLUME 3 PTS", titleEN:"SHOOTING VOLUME 3 PT", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"75 tirs à 3 pts depuis mouvement (catch and shoot ou pull-up). Objectif : 40/75.", contentEN:"75 3-pt shots from movement (catch and shoot or pull-up). Target: 40/75." },
+      { emoji:"🎯", titleFR:"ISO GAME", titleEN:"ISO GAME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 possessions iso : jab + move + finish. Alterne les moves.", contentEN:"15 iso possessions: jab + move + finish. Alternate moves." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 LF réussis d'affilée. Ne baisse jamais la garde.", contentEN:"25 FTs in a row. Never let your guard down." },
+      { emoji:"💪", titleFR:"SIMULATION MATCH", titleEN:"MATCH SIMULATION", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"4 quart-temps de 3 min. À chaque quart, exigence différente : vitesse, précision, fatigue, décision.", contentEN:"4 quarters of 3 min. Each quarter, different demand: speed, precision, fatigue, decision." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + respiration profonde.", contentEN:"Stretching + deep breathing." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 2 min, activation dynamique, 20 layups mixtes.", contentEN:"Skip rope 2 min, dynamic activation, 20 mixed layups." },
+      { emoji:"🏀", titleFR:"SIGNATURE MOVES", titleEN:"SIGNATURE MOVES", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Développe ton signature move (crossover killer, hesitation, etc.). 40 répétitions.", contentEN:"Develop your signature move (killer crossover, hesitation, etc.). 40 reps." },
+      { emoji:"🎯", titleFR:"PULL-UP MID VOLUME", titleEN:"PULL-UP MID VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"60 pull-up mid-range, 5 spots. Objectif : 35/60.", contentEN:"60 pull-up mid-range, 5 spots. Target: 35/60." },
+      { emoji:"🎯", titleFR:"3 PTS STEP-BACK", titleEN:"3 PT STEP-BACK", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Step-back 3 pts après drive. 30 répétitions, alterne les côtés.", contentEN:"Step-back 3 pts after drive. 30 reps, alternate sides." },
+      { emoji:"🎯", titleFR:"FINISH CONTACT", titleEN:"CONTACT FINISH", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Layup avec contact simulé (ballon lesté ou obstacle). 20 côté droit, 20 côté gauche.", contentEN:"Layup with simulated contact (weighted ball or obstacle). 20 right, 20 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF sous fatigue : 5 sprints puis 5 LF, répète 4 fois.", contentEN:"20 FTs under fatigue: 5 sprints then 5 FTs, repeat 4 times." },
+      { emoji:"💪", titleFR:"MATCH PRESSURE", titleEN:"MATCH PRESSURE", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Scénarios de fin de match : dernier tir, dernière possession. 10 situations.", contentEN:"End-game scenarios: last shot, last possession. 10 situations." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements profonds, visualisation du prochain match.", contentEN:"Deep stretching, next-game visualization." }
+    ]
+  }
+};
+</script>
+<script>
+Object.assign(window._FICHES_DATA, {
+  // ══════════════════════════════ ARRIÈRE (SG) ══════════════════════════════
+  "SG_DEB": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course lente, rotations épaules, 20 jumping jacks.", contentEN:"Slow jog, shoulder rotations, 20 jumping jacks." },
+      { emoji:"🎯", titleFR:"FORM SHOOTING", titleEN:"FORM SHOOTING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 tirs depuis 1 mètre, focus sur la mécanique (coude aligné, poignet cassé).", contentEN:"30 shots from 1 meter, focus on mechanics (elbow aligned, wrist snap)." },
+      { emoji:"🏹", titleFR:"TIR MI-DISTANCE", titleEN:"MID-RANGE SHOT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs depuis la ligne des lancers francs, position stationnaire.", contentEN:"20 shots from the free throw line, stationary." },
+      { emoji:"🎯", titleFR:"LAYUP", titleEN:"LAYUP", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"15 layups main droite, 15 layups main gauche, depuis la ligne médiane.", contentEN:"15 layups right hand, 15 layups left hand, from midcourt." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, focus sur le rituel avant chaque tir.", contentEN:"15 FTs, focus on routine before each shot." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Corde à sauter 2 min, 20 dribbles main droite, 20 main gauche.", contentEN:"Skip rope 2 min, 20 dribbles right hand, 20 left hand." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT MI-DISTANCE", titleEN:"CATCH AND SHOOT MID-RANGE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Auto-passe contre le mur ou panneau, catch and shoot. 30 tirs depuis 3-4 mètres.", contentEN:"Self-pass off wall or backboard, catch and shoot. 30 shots from 3-4 meters." },
+      { emoji:"🎯", titleFR:"LAYUP 1 DRIBBLE", titleEN:"1-DRIBBLE LAYUP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"1 dribble puis layup depuis la ligne des lancers francs. 15 main droite, 15 main gauche.", contentEN:"1 dribble then layup from the free throw line. 15 right hand, 15 left hand." },
+      { emoji:"🏹", titleFR:"MID-RANGE SPOTS", titleEN:"MID-RANGE SPOTS", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"5 tirs depuis 4 spots différents autour de la ligne des lancers francs.", contentEN:"5 shots from 4 different spots around the free throw line." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, prends le temps entre chaque tir.", contentEN:"15 FTs, take your time between each shot." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Étirements dynamiques, course avec pas chassés latéraux.", contentEN:"Dynamic stretching, running with lateral shuffle." },
+      { emoji:"🎯", titleFR:"TIR SANS DRIBBLE", titleEN:"SHOOT NO DRIBBLE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs mi-distance sans dribble, 5 spots.", contentEN:"30 mid-range shots no dribble, 5 spots." },
+      { emoji:"🎯", titleFR:"SET SHOT 3 PTS", titleEN:"SET SHOT 3 PT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs depuis le coin gauche 3 pts (position stationnaire, prends ton temps).", contentEN:"20 shots from left corner 3 pts (stationary, take your time)." },
+      { emoji:"🎯", titleFR:"MOUVEMENT SANS BALLON", titleEN:"OFF-BALL MOVEMENT", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"Course en L, en V, en S sur le terrain. Simule une sortie d'écran.", contentEN:"L-cut, V-cut, S-cut runs on the court. Simulate off-screen movement." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, garde ton rituel constant.", contentEN:"15 FTs, keep your routine constant." }
+    ]
+  },
+  "SG_INT": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Corde à sauter 2 min, dribbles + 10 layups d'échauffement.", contentEN:"Skip rope 2 min, dribbles + 10 warmup layups." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT 3 PTS", titleEN:"CATCH AND SHOOT 3 PT", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"5 spots (coin G, aile G, top, aile D, coin D). 6 tirs par spot.", contentEN:"5 spots (left corner, left wing, top, right wing, right corner). 6 shots per spot." },
+      { emoji:"🏃", titleFR:"OFF-SCREEN SHOOTING", titleEN:"OFF-SCREEN SHOOTING", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Course en V puis catch and shoot mi-distance. 20 répétitions.", contentEN:"V-cut then catch and shoot mid-range. 20 reps." },
+      { emoji:"🎯", titleFR:"PULL-UP 1 DRIBBLE", titleEN:"PULL-UP 1 DRIBBLE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"1 dribble + pull-up mid-range. 5 spots, 4 tirs par spot.", contentEN:"1 dribble + pull-up mid-range. 5 spots, 4 shots per spot." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"10 LF réussis d'affilée. Reset si tu rates.", contentEN:"10 FTs in a row. Reset if you miss." },
+      { emoji:"💪", titleFR:"SPRINT + TIR", titleEN:"SPRINT + SHOT", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"5 sprints, à chaque retour 1 catch and shoot 3 pts.", contentEN:"5 sprints, on each return 1 catch and shoot 3 pts." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec accélérations, mobilité articulaire.", contentEN:"Running with accelerations, joint mobility." },
+      { emoji:"🎯", titleFR:"SHOOTING VOLUME MID", titleEN:"SHOOTING VOLUME MID", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 tirs mi-distance, 5 spots. Compte tes réussites.", contentEN:"40 mid-range shots, 5 spots. Count makes." },
+      { emoji:"🏃", titleFR:"SORTIE D'ÉCRAN", titleEN:"OFF-SCREEN", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Course avec pause + tir immédiat. 4 spots, 6 répétitions par spot.", contentEN:"Movement with pause + immediate shot. 4 spots, 6 reps per spot." },
+      { emoji:"🎯", titleFR:"CORNER 3", titleEN:"CORNER 3", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs depuis chaque coin (10 gauche, 10 droit).", contentEN:"20 shots from each corner (10 left, 10 right)." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 LF, série de 5 avec pause dribble entre chaque.", contentEN:"15 FTs, set of 5 with dribble break between each." },
+      { emoji:"💪", titleFR:"FATIGUE + TIR", titleEN:"FATIGUE + SHOT", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"3 sprints, série de 3 tirs mid-range, répète 4 fois.", contentEN:"3 sprints, 3-shot mid-range set, repeat 4 times." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, footwork basique (pas chassés, changes de direction).", contentEN:"Skip rope 2 min, basic footwork (shuffle, direction changes)." },
+      { emoji:"🎯", titleFR:"PULL-UP MID APRÈS DRIBBLE", titleEN:"PULL-UP MID AFTER DRIBBLE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"2 dribbles + pull-up. 5 spots, 5 tirs par spot.", contentEN:"2 dribbles + pull-up. 5 spots, 5 shots per spot." },
+      { emoji:"🏃", titleFR:"MOVEMENT SANS BALLON", titleEN:"OFF-BALL MOVEMENT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 sorties d'écran simulées : V-cut, L-cut, back-cut.", contentEN:"15 simulated off-screen movements: V-cut, L-cut, back-cut." },
+      { emoji:"🎯", titleFR:"3 PTS AU TOP", titleEN:"TOP 3 PT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs depuis le top of the key. Concentre-toi sur la constance.", contentEN:"20 shots from top of the key. Focus on consistency." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF, prends 15 sec entre chaque tir.", contentEN:"20 FTs, take 15 sec between each shot." },
+      { emoji:"💪", titleFR:"ENCHAÎNEMENT", titleEN:"CHAIN", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"5 séquences : catch mi-distance → drive → layup. Alterne les côtés.", contentEN:"5 sequences: mid-range catch → drive → layup. Alternate sides." }
+    ]
+  },
+  "SG_CON": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité, 15 layups mixtes.", contentEN:"Skip rope 2 min, mobility, 15 mixed layups." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT 3 PTS VOLUME", titleEN:"CATCH AND SHOOT 3 PT VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"50 tirs à 3 pts, 5 spots. Objectif : 25/50.", contentEN:"50 3-pt shots, 5 spots. Target: 25/50." },
+      { emoji:"🏃", titleFR:"OFF-SCREEN ADVANCED", titleEN:"OFF-SCREEN ADVANCED", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Sortie d'écran + relocalisation + tir. 20 séquences.", contentEN:"Off-screen + relocation + shot. 20 sequences." },
+      { emoji:"🎯", titleFR:"PULL-UP 3 PTS", titleEN:"PULL-UP 3 PT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"2 dribbles + pull-up derrière l'arc. 4 spots, 6 tirs par spot.", contentEN:"2 dribbles + pull-up beyond arc. 4 spots, 6 shots per spot." },
+      { emoji:"🎯", titleFR:"STEP-BACK", titleEN:"STEP-BACK", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Step-back 3 pts, 20 répétitions, alterne les côtés.", contentEN:"Step-back 3 pts, 20 reps, alternate sides." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 LF réussis d'affilée.", contentEN:"15 FTs in a row." },
+      { emoji:"💪", titleFR:"MATCH PRESSURE", titleEN:"MATCH PRESSURE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"5 scénarios : catch and shoot 3 pts + drive + finish. Fatigue simulée.", contentEN:"5 scenarios: catch and shoot 3 pts + drive + finish. Simulated fatigue." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec direction changes, mobilité.", contentEN:"Running with direction changes, mobility." },
+      { emoji:"🎯", titleFR:"SHOOTING FROM MOVEMENT", titleEN:"SHOOTING FROM MOVEMENT", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"40 tirs depuis mouvement (catch and shoot ou pull-up). 5 spots.", contentEN:"40 shots from movement (catch and shoot or pull-up). 5 spots." },
+      { emoji:"🏃", titleFR:"SORTIE D'ÉCRAN AVANCÉE", titleEN:"ADVANCED OFF-SCREEN", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Simule 3 types d'écrans : back, down, flare. 15 répétitions.", contentEN:"Simulate 3 screen types: back, down, flare. 15 reps." },
+      { emoji:"🎯", titleFR:"ISO MID", titleEN:"ISO MID", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Iso simulé : jab + drive + pull-up. 20 répétitions.", contentEN:"Simulated iso: jab + drive + pull-up. 20 reps." },
+      { emoji:"🎯", titleFR:"FINISH + CONTACT", titleEN:"FINISH + CONTACT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Layup avec obstacle. 15 côté droit, 15 côté gauche.", contentEN:"Layup with obstacle. 15 right, 15 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"20 LF, série de 5 avec sprint entre chaque.", contentEN:"20 FTs, set of 5 with sprint between each." },
+      { emoji:"💪", titleFR:"CARDIO + PRÉCISION", titleEN:"CARDIO + PRECISION", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"4 sprints, série de 3 tirs 3 pts, répète 4 fois.", contentEN:"4 sprints, 3-shot 3-pt set, repeat 4 times." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 3 min, activation dynamique.", contentEN:"Skip rope 3 min, dynamic activation." },
+      { emoji:"🎯", titleFR:"CORNER 3 VOLUME", titleEN:"CORNER 3 VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 tirs depuis les coins (20 gauche, 20 droit). Objectif : 22/40.", contentEN:"40 shots from corners (20 left, 20 right). Target: 22/40." },
+      { emoji:"🏃", titleFR:"MOVEMENT COMBOS", titleEN:"MOVEMENT COMBOS", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Enchaîne V-cut + back-cut + curl. 15 séquences avec tir.", contentEN:"Chain V-cut + back-cut + curl. 15 sequences with shot." },
+      { emoji:"🎯", titleFR:"PULL-UP MID VOLUME", titleEN:"PULL-UP MID VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 pull-up mid-range, 5 spots.", contentEN:"30 mid pull-up, 5 spots." },
+      { emoji:"🎯", titleFR:"3 PTS UNDER FATIGUE", titleEN:"3 PT UNDER FATIGUE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"3 sprints puis 5 tirs à 3 pts, répète 4 fois.", contentEN:"3 sprints then 5 3-pt shots, repeat 4 times." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"12 LF réussis d'affilée.", contentEN:"12 FTs in a row." },
+      { emoji:"💪", titleFR:"SCÉNARIOS DE FIN DE MATCH", titleEN:"END-GAME SCENARIOS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dernières secondes, 10 tirs décisifs.", contentEN:"Last seconds, 10 clutch shots." }
+    ]
+  },
+  "SG_COM": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité complète, activation neuro.", contentEN:"Skip rope 3 min, full mobility, neuro activation." },
+      { emoji:"🎯", titleFR:"3 PTS VOLUME COMPÉTITION", titleEN:"3 PT VOLUME COMPETITION", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"75 tirs à 3 pts, mix catch and shoot + pull-up. Objectif : 40/75.", contentEN:"75 3-pt shots, mix catch and shoot + pull-up. Target: 40/75." },
+      { emoji:"🏃", titleFR:"MOVEMENT MASTER", titleEN:"MOVEMENT MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Off-screen tous types + finish. 25 répétitions.", contentEN:"All types of off-screen + finish. 25 reps." },
+      { emoji:"🎯", titleFR:"MID-RANGE PULL-UP VOLUME", titleEN:"MID-RANGE PULL-UP VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 pull-up mid, alterne les côtés.", contentEN:"40 mid pull-up, alternate sides." },
+      { emoji:"🎯", titleFR:"STEP-BACK 3 PTS", titleEN:"STEP-BACK 3 PT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 step-back derrière l'arc.", contentEN:"25 step-back beyond arc." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF réussis d'affilée.", contentEN:"20 FTs in a row." },
+      { emoji:"💪", titleFR:"GAME INTENSITY", titleEN:"GAME INTENSITY", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"4 quart-temps de 2.5 min, exigences différentes.", contentEN:"4 quarters of 2.5 min, different demands." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Corde à sauter 3 min, activation, 15 layups.", contentEN:"Skip rope 3 min, activation, 15 layups." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT RECORD", titleEN:"CATCH AND SHOOT RECORD", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"Cherche ta série record 3 pts. Compte, note ton meilleur.", contentEN:"Chase your 3-pt streak record. Count, note your best." },
+      { emoji:"🏃", titleFR:"SORTIE D'ÉCRAN + RELOCATION", titleEN:"OFF-SCREEN + RELOCATION", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 séquences complètes avec décision.", contentEN:"20 full sequences with decision." },
+      { emoji:"🎯", titleFR:"ISO GAME", titleEN:"ISO GAME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 possessions iso : jab, drive, pull-up ou step-back.", contentEN:"20 iso possessions: jab, drive, pull-up or step-back." },
+      { emoji:"🎯", titleFR:"FINISH CONTACT", titleEN:"FINISH CONTACT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 finish avec contact simulé.", contentEN:"25 finishes with simulated contact." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 LF sous fatigue : 5 sprints + 5 LF, répète 5 fois.", contentEN:"25 FTs under fatigue: 5 sprints + 5 FTs, repeat 5 times." },
+      { emoji:"💪", titleFR:"CLUTCH TIME", titleEN:"CLUTCH TIME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"10 scénarios : dernier tir, dernière possession, dernier LF.", contentEN:"10 scenarios: last shot, last possession, last FT." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements profonds + respiration.", contentEN:"Deep stretching + breathing." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 2 min, mobilité, 20 layups mixtes.", contentEN:"Skip rope 2 min, mobility, 20 mixed layups." },
+      { emoji:"🎯", titleFR:"SHOOTING VOLUME TOTAL", titleEN:"TOTAL SHOOTING VOLUME", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"100 tirs mixtes (mid + 3 pts). Objectif global : 55/100.", contentEN:"100 mixed shots (mid + 3 pts). Overall target: 55/100." },
+      { emoji:"🏃", titleFR:"MOVEMENT MASTER", titleEN:"MOVEMENT MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Toutes les sorties d'écran + relocalisations. 30 répétitions.", contentEN:"All screens + relocations. 30 reps." },
+      { emoji:"🎯", titleFR:"PULL-UP COMPLETS", titleEN:"FULL PULL-UPS", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Pull-up mid + step-back 3 pts en enchaînement. 15 séquences.", contentEN:"Mid pull-up + step-back 3 pts chained. 15 sequences." },
+      { emoji:"🎯", titleFR:"FINISH VARIÉS", titleEN:"VARIED FINISHES", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Layup, floater, euro-step. 8 de chaque.", contentEN:"Layup, floater, euro-step. 8 each." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 LF, série de 10 sous fatigue.", contentEN:"30 FTs, sets of 10 under fatigue." },
+      { emoji:"💪", titleFR:"MATCH COMPLET", titleEN:"FULL MATCH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"4 quart-temps 2 min : offense, défense (shadow), transition, clutch.", contentEN:"4 quarters 2 min: offense, defense (shadow), transition, clutch." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation prochain match.", contentEN:"Stretching + next-game visualization." }
+    ]
+  }
+});
+</script>
+<script>
+Object.assign(window._FICHES_DATA, {
+  // ══════════════════════════════ AILIER (SF) ══════════════════════════════
+  "SF_DEB": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course lente, rotations, 20 jumping jacks.", contentEN:"Slow jog, rotations, 20 jumping jacks." },
+      { emoji:"🏀", titleFR:"BALL HANDLING BASIQUE", titleEN:"BASIC BALL HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble main forte 90 sec, main faible 90 sec. Répète 2 fois.", contentEN:"Strong hand dribble 90 sec, weak hand 90 sec. Repeat twice." },
+      { emoji:"🎯", titleFR:"TIR MI-DISTANCE", titleEN:"MID-RANGE SHOT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 tirs depuis la ligne des lancers francs.", contentEN:"30 shots from free throw line." },
+      { emoji:"🎯", titleFR:"LAYUP DEUX CÔTÉS", titleEN:"BOTH SIDES LAYUP", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"15 layups main droite, 15 layups main gauche.", contentEN:"15 layups right hand, 15 layups left hand." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF avec rituel constant.", contentEN:"15 FTs with constant routine." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité épaules.", contentEN:"Skip rope 2 min, shoulder mobility." },
+      { emoji:"🏀", titleFR:"CONTRÔLE BALLE", titleEN:"BALL CONTROL", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble en marchant sur tout le terrain, main droite puis main gauche.", contentEN:"Walking dribble full court, right then left hand." },
+      { emoji:"🎯", titleFR:"CORNER 3 STATIONNAIRE", titleEN:"STATIONARY CORNER 3", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 tirs depuis chaque coin (30 total). Prends ton temps.", contentEN:"15 shots from each corner (30 total). Take your time." },
+      { emoji:"🎯", titleFR:"FACE-UP JUMPER", titleEN:"FACE-UP JUMPER", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Depuis 3-4 mètres, tir en face du panier. 20 tirs.", contentEN:"From 3-4 meters, face-up shot. 20 shots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, respiration entre chaque.", contentEN:"15 FTs, breathing between each." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Étirements dynamiques, course avec direction changes.", contentEN:"Dynamic stretching, running with direction changes." },
+      { emoji:"🏀", titleFR:"POUND DRIBBLE", titleEN:"POUND DRIBBLE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble puissant main droite / main gauche 1 min chacune. Répète 3 fois.", contentEN:"Powerful pound dribble right/left 1 min each. Repeat 3 times." },
+      { emoji:"🎯", titleFR:"POST-UP BASIQUE", titleEN:"BASIC POST-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Dos au panier, mini drop-step puis layup. 15 côté droit, 15 côté gauche.", contentEN:"Back to the basket, mini drop-step then layup. 15 right, 15 left." },
+      { emoji:"🎯", titleFR:"MID-RANGE", titleEN:"MID-RANGE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"20 tirs mi-distance depuis 4 spots.", contentEN:"20 mid-range shots from 4 spots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, focus mécanique.", contentEN:"15 FTs, focus on form." }
+    ]
+  },
+  "SF_INT": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, 10 layups d'échauffement.", contentEN:"Skip rope 2 min, 10 warmup layups." },
+      { emoji:"🏀", titleFR:"HANDLING EN MARCHE", titleEN:"WALKING HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribbles avec mouvements (cross, between, behind) sur toute la longueur.", contentEN:"Dribbles with moves (cross, between, behind) full length." },
+      { emoji:"🎯", titleFR:"CORNER 3", titleEN:"CORNER 3", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 tirs par coin (30 total). Objectif : 15/30.", contentEN:"15 shots per corner (30 total). Target: 15/30." },
+      { emoji:"🎯", titleFR:"POST-UP MOVE", titleEN:"POST-UP MOVE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Drop-step + finish. 15 côté droit, 15 côté gauche.", contentEN:"Drop-step + finish. 15 right, 15 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"10 LF réussis d'affilée. Reset si tu rates.", contentEN:"10 FTs in a row. Reset if you miss." },
+      { emoji:"💪", titleFR:"TRANSITION", titleEN:"TRANSITION", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Sprint aller-retour, finish par layup ou mid-range.", contentEN:"Sprint up and down, finish layup or mid-range." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec pas chassés, mobilité.", contentEN:"Running with shuffle, mobility." },
+      { emoji:"🏀", titleFR:"TWO-BALL", titleEN:"TWO-BALL", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribbles simultanés en place puis en marchant. 3 séries.", contentEN:"Simultaneous dribbles in place then walking. 3 sets." },
+      { emoji:"🎯", titleFR:"CATCH AND SHOOT 3 PTS", titleEN:"CATCH AND SHOOT 3 PT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"5 spots, 5 tirs par spot.", contentEN:"5 spots, 5 shots per spot." },
+      { emoji:"🎯", titleFR:"FACE-UP + DRIVE", titleEN:"FACE-UP + DRIVE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Depuis mi-distance : face-up + jab + drive + finish. 15 séquences.", contentEN:"From mid-range: face-up + jab + drive + finish. 15 sequences." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 LF, série de 5 avec pause active.", contentEN:"15 FTs, set of 5 with active break." },
+      { emoji:"💪", titleFR:"POST-UP + KICK", titleEN:"POST-UP + KICK", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Simule post-up + passe imaginaire + relocalisation + tir. 10 séquences.", contentEN:"Simulate post-up + imaginary pass + relocation + shot. 10 sequences." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, dribble en zigzag.", contentEN:"Skip rope 2 min, zigzag dribble." },
+      { emoji:"🏀", titleFR:"HANDLING COMBOS", titleEN:"HANDLING COMBOS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Combos crossover + between + behind. 3 séries de 90 sec.", contentEN:"Crossover + between + behind combos. 3 sets of 90 sec." },
+      { emoji:"🎯", titleFR:"MID-RANGE PULL-UP", titleEN:"MID-RANGE PULL-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"2 dribbles + pull-up. 5 spots, 5 tirs par spot.", contentEN:"2 dribbles + pull-up. 5 spots, 5 shots per spot." },
+      { emoji:"🎯", titleFR:"POST-UP AVANCÉ", titleEN:"ADVANCED POST-UP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Drop-step + jump hook. 10 côté droit, 10 côté gauche.", contentEN:"Drop-step + jump hook. 10 right, 10 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF, série de 10 avec sprint entre.", contentEN:"20 FTs, set of 10 with sprint between." },
+      { emoji:"💪", titleFR:"SPRINT + TIR", titleEN:"SPRINT + SHOT", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"5 sprints, à chaque retour tir mid ou 3 pts.", contentEN:"5 sprints, on each return mid or 3-pt shot." }
+    ]
+  },
+  "SF_CON": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité, 15 layups.", contentEN:"Skip rope 2 min, mobility, 15 layups." },
+      { emoji:"🏀", titleFR:"HANDLING AVANCÉ", titleEN:"ADVANCED HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Two-ball + combos complexes.", contentEN:"Two-ball + complex combos." },
+      { emoji:"🎯", titleFR:"CORNER 3 RECORD", titleEN:"CORNER 3 RECORD", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Cherche ta série record depuis les coins.", contentEN:"Chase your corner streak record." },
+      { emoji:"🎯", titleFR:"POST-UP MOVES", titleEN:"POST-UP MOVES", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Drop-step, jump hook, up-and-under. 10 de chaque, alterne côtés.", contentEN:"Drop-step, jump hook, up-and-under. 10 each, alternate sides." },
+      { emoji:"🎯", titleFR:"FACE-UP + MID PULL-UP", titleEN:"FACE-UP + MID PULL-UP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Face-up depuis poste bas + pull-up mid. 20 répétitions.", contentEN:"Face-up from low post + mid pull-up. 20 reps." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 LF réussis d'affilée.", contentEN:"15 FTs in a row." },
+      { emoji:"💪", titleFR:"TRANSITION", titleEN:"TRANSITION", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"8 séquences transition complètes : sprint + finish contact.", contentEN:"8 full transition sequences: sprint + contact finish." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec accélérations, mobilité.", contentEN:"Running with accelerations, mobility." },
+      { emoji:"🏀", titleFR:"TWO-BALL AVANCÉ", titleEN:"ADVANCED TWO-BALL", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Toutes patterns en avançant.", contentEN:"All patterns moving forward." },
+      { emoji:"🎯", titleFR:"3 PTS VOLUME", titleEN:"3 PT VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"40 tirs 3 pts depuis 5 spots. Objectif : 20/40.", contentEN:"40 3-pt shots from 5 spots. Target: 20/40." },
+      { emoji:"🎯", titleFR:"POST-UP MASTER", titleEN:"POST-UP MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Combo drop-step + spin + jump hook. 20 répétitions.", contentEN:"Drop-step + spin + jump hook combo. 20 reps." },
+      { emoji:"🎯", titleFR:"MID PULL-UP", titleEN:"MID PULL-UP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 pull-up mid depuis mouvement.", contentEN:"30 mid pull-up from movement." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"20 LF, série de 5 avec 3 sprints entre chaque.", contentEN:"20 FTs, set of 5 with 3 sprints between each." },
+      { emoji:"💪", titleFR:"ISO + DÉCISION", titleEN:"ISO + DECISION", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Iso simulé, tir libre selon situation. 15 répétitions.", contentEN:"Simulated iso, free shot by situation. 15 reps." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 3 min, activation dynamique.", contentEN:"Skip rope 3 min, dynamic activation." },
+      { emoji:"🏀", titleFR:"HANDLING SOUS PRESSION", titleEN:"HANDLING UNDER PRESSURE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble avec obstacles. 4 patterns × 90 sec.", contentEN:"Dribble with obstacles. 4 patterns × 90 sec." },
+      { emoji:"🎯", titleFR:"3 PTS + MID COMBO", titleEN:"3 PT + MID COMBO", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Alterne 3 pts et mid, 40 tirs total.", contentEN:"Alternate 3 pts and mid, 40 shots total." },
+      { emoji:"🎯", titleFR:"FACE-UP + FINISH", titleEN:"FACE-UP + FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up + drive + finish. Alterne les côtés. 20 répétitions.", contentEN:"Face-up + drive + finish. Alternate sides. 20 reps." },
+      { emoji:"🎯", titleFR:"POST-UP COMBOS", titleEN:"POST-UP COMBOS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 possessions poste bas : chaque coup différent.", contentEN:"15 low-post possessions: each move different." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"12 LF réussis d'affilée.", contentEN:"12 FTs in a row." },
+      { emoji:"💪", titleFR:"DÉCISION LIBRE", titleEN:"FREE DECISION", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"12 situations simulées : le joueur décide (tir, drive, post-up).", contentEN:"12 simulated situations: player decides (shot, drive, post-up)." }
+    ]
+  },
+  "SF_COM": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité complète.", contentEN:"Skip rope 3 min, full mobility." },
+      { emoji:"🏀", titleFR:"HANDLING MASTER", titleEN:"HANDLING MASTER", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Two-ball + combos + obstacles.", contentEN:"Two-ball + combos + obstacles." },
+      { emoji:"🎯", titleFR:"3 PTS VOLUME", titleEN:"3 PT VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"60 tirs 3 pts. Objectif : 32/60.", contentEN:"60 3-pt shots. Target: 32/60." },
+      { emoji:"🎯", titleFR:"POST-UP GAME", titleEN:"POST-UP GAME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"25 possessions poste bas avec décisions variées.", contentEN:"25 low-post possessions with varied decisions." },
+      { emoji:"🎯", titleFR:"MID PULL-UP + STEP-BACK", titleEN:"MID PULL-UP + STEP-BACK", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs enchaînés.", contentEN:"30 chained shots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF réussis d'affilée.", contentEN:"20 FTs in a row." },
+      { emoji:"💪", titleFR:"TRANSITION INTENSITY", titleEN:"TRANSITION INTENSITY", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"10 séquences transition complètes.", contentEN:"10 full transition sequences." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Corde à sauter 2 min, activation.", contentEN:"Skip rope 2 min, activation." },
+      { emoji:"🏀", titleFR:"HANDLING RECORD", titleEN:"HANDLING RECORD", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Toutes combinaisons two-ball + une main.", contentEN:"All combinations two-ball + one hand." },
+      { emoji:"🎯", titleFR:"CORNER 3 RECORD", titleEN:"CORNER 3 RECORD", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs depuis chaque coin. Ta série record.", contentEN:"30 shots from each corner. Your streak record." },
+      { emoji:"🎯", titleFR:"FACE-UP MASTER", titleEN:"FACE-UP MASTER", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Face-up + toutes options. 25 séquences.", contentEN:"Face-up + all options. 25 sequences." },
+      { emoji:"🎯", titleFR:"POST-UP VARIÉ", titleEN:"VARIED POST-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Signature move perso poste bas + variations.", contentEN:"Personal low-post signature move + variations." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 LF sous fatigue.", contentEN:"25 FTs under fatigue." },
+      { emoji:"💪", titleFR:"MATCH SIMULÉ", titleEN:"SIMULATED MATCH", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"4 quart-temps 3 min.", contentEN:"4 quarters 3 min." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements profonds + respiration.", contentEN:"Deep stretching + breathing." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, activation neuro.", contentEN:"Skip rope 3 min, neuro activation." },
+      { emoji:"🏀", titleFR:"HANDLING COMPLET", titleEN:"FULL HANDLING", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Toutes techniques enchaînées.", contentEN:"All techniques chained." },
+      { emoji:"🎯", titleFR:"SHOOTING VOLUME", titleEN:"SHOOTING VOLUME", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"80 tirs mixtes (mid + 3 pts + LF). Objectif : 45/80.", contentEN:"80 mixed shots (mid + 3 pts + FT). Target: 45/80." },
+      { emoji:"🎯", titleFR:"POST-UP + FACE-UP COMBO", titleEN:"POST-UP + FACE-UP COMBO", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Alterne post-up et face-up. 20 séquences.", contentEN:"Alternate post-up and face-up. 20 sequences." },
+      { emoji:"🎯", titleFR:"FINISH CONTACT", titleEN:"CONTACT FINISH", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 finish avec obstacle ou ballon lourd.", contentEN:"25 finishes with obstacle or weighted ball." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 LF, sets de 10 sous fatigue.", contentEN:"30 FTs, sets of 10 under fatigue." },
+      { emoji:"💪", titleFR:"CLUTCH TIME", titleEN:"CLUTCH TIME", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"10 scénarios de fin de match.", contentEN:"10 end-game scenarios." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ]
+  }
+});
+</script>
+<script>
+Object.assign(window._FICHES_DATA, {
+  // ══════════════════════════════ AILIER FORT (PF) ══════════════════════════════
+  "PF_DEB": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course lente, rotations, mobilité hanches.", contentEN:"Slow jog, rotations, hip mobility." },
+      { emoji:"🏀", titleFR:"CONTRÔLE BALLE BAS", titleEN:"LOW BALL CONTROL", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble bas main droite 90 sec, main gauche 90 sec.", contentEN:"Low dribble right hand 90 sec, left hand 90 sec." },
+      { emoji:"🎯", titleFR:"POST-UP BASIQUE", titleEN:"BASIC POST-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Drop-step vers la ligne de fond, layup. 15 côté droit, 15 côté gauche.", contentEN:"Baseline drop-step, layup. 15 right, 15 left." },
+      { emoji:"🎯", titleFR:"REBOND AUTO", titleEN:"SELF REBOUND", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Lance contre le panneau, saute et récupère, 20 fois.", contentEN:"Toss off backboard, jump and grab, 20 reps." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, rituel constant.", contentEN:"15 FTs, constant routine." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Étirements dynamiques, mobilité épaules.", contentEN:"Dynamic stretching, shoulder mobility." },
+      { emoji:"🏀", titleFR:"BALL HANDLING PROCHE DU CORPS", titleEN:"CLOSE-BODY BALL HANDLING", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble bas, ballon près des jambes.", contentEN:"Low dribble, ball close to legs." },
+      { emoji:"🎯", titleFR:"JUMP HOOK", titleEN:"JUMP HOOK", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Depuis raquette, jump hook simple. 15 côté droit, 15 côté gauche.", contentEN:"From paint, simple jump hook. 15 right, 15 left." },
+      { emoji:"🎯", titleFR:"FACE-UP MI-DISTANCE", titleEN:"FACE-UP MID-RANGE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Face-up + tir depuis raquette étendue. 20 tirs.", contentEN:"Face-up + shot from extended paint. 20 shots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, mécanique.", contentEN:"15 FTs, form." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité hanches.", contentEN:"Skip rope 2 min, hip mobility." },
+      { emoji:"🏀", titleFR:"POUND DRIBBLE PUISSANT", titleEN:"POWERFUL POUND DRIBBLE", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble puissant, ballon au genou. Main droite 90 sec, main gauche 90 sec.", contentEN:"Powerful pound dribble, knee-high. Right 90 sec, left 90 sec." },
+      { emoji:"🎯", titleFR:"POST MOVES BASIQUES", titleEN:"BASIC POST MOVES", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Alterne drop-step et jump hook. 20 total.", contentEN:"Alternate drop-step and jump hook. 20 total." },
+      { emoji:"🎯", titleFR:"PUTBACK", titleEN:"PUTBACK", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Auto-passe, tape le ballon dans le panneau, putback. 15 fois.", contentEN:"Self-pass, tap ball off backboard, putback. 15 reps." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF.", contentEN:"15 FTs." }
+    ]
+  },
+  "PF_INT": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité, 10 layups.", contentEN:"Skip rope 2 min, mobility, 10 layups." },
+      { emoji:"🏀", titleFR:"TWO-BALL SIMULTANÉ", titleEN:"TWO-BALL SIMULTANEOUS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"2 ballons dribbles simultanés bas, en place puis en marchant.", contentEN:"2 balls low simultaneous dribbles, in place then walking." },
+      { emoji:"🎯", titleFR:"POST MOVES", titleEN:"POST MOVES", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Drop-step + jump hook + up-and-under. 5 de chaque, alterne côtés.", contentEN:"Drop-step + jump hook + up-and-under. 5 each, alternate sides." },
+      { emoji:"🎯", titleFR:"MID-RANGE FACE-UP", titleEN:"MID-RANGE FACE-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"25 tirs mi-distance en face-up. 5 spots.", contentEN:"25 mid-range face-up shots. 5 spots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"10 LF réussis d'affilée.", contentEN:"10 FTs in a row." },
+      { emoji:"💪", titleFR:"REBOND + PUTBACK", titleEN:"REBOUND + PUTBACK", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"15 rebonds offensifs simulés + putback.", contentEN:"15 simulated offensive rebounds + putback." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec direction changes.", contentEN:"Running with direction changes." },
+      { emoji:"🏀", titleFR:"HANDLING PROCHE", titleEN:"CLOSE HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble bas + between-the-legs court. 3 séries.", contentEN:"Low dribble + short between-the-legs. 3 sets." },
+      { emoji:"🎯", titleFR:"CORNER 3 (STRETCH FOUR)", titleEN:"CORNER 3 (STRETCH FOUR)", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs depuis les coins. Objectif : 15/30.", contentEN:"30 shots from corners. Target: 15/30." },
+      { emoji:"🎯", titleFR:"POST-UP MIX", titleEN:"POST-UP MIX", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 possessions poste bas variées.", contentEN:"20 varied low-post possessions." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 LF, série de 5 avec pause.", contentEN:"15 FTs, set of 5 with break." },
+      { emoji:"💪", titleFR:"SPRINT + FINISH", titleEN:"SPRINT + FINISH", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"5 sprints + finish contact.", contentEN:"5 sprints + contact finish." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité hanches.", contentEN:"Skip rope 2 min, hip mobility." },
+      { emoji:"🏀", titleFR:"TWO-BALL ALTERNATE", titleEN:"TWO-BALL ALTERNATE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Alternate dribble bas. 3 séries.", contentEN:"Alternate low dribble. 3 sets." },
+      { emoji:"🎯", titleFR:"FACE-UP + DRIVE", titleEN:"FACE-UP + DRIVE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up + jab + drive + finish. 15 séquences.", contentEN:"Face-up + jab + drive + finish. 15 sequences." },
+      { emoji:"🎯", titleFR:"POST-UP AVANCÉ", titleEN:"ADVANCED POST-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Spin move + finish. 10 côté droit, 10 côté gauche.", contentEN:"Spin move + finish. 10 right, 10 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF, série de 10.", contentEN:"20 FTs, sets of 10." },
+      { emoji:"💪", titleFR:"REBOND AGGRESSIF", titleEN:"AGGRESSIVE REBOUND", timeFR:"4 MIN", timeEN:"4 MIN", contentFR:"20 rebonds avec sortie + tir.", contentEN:"20 rebounds with outlet + shot." }
+    ]
+  },
+  "PF_CON": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité complète.", contentEN:"Skip rope 2 min, full mobility." },
+      { emoji:"🏀", titleFR:"TWO-BALL AVANCÉ", titleEN:"ADVANCED TWO-BALL", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Toutes patterns bas.", contentEN:"All low patterns." },
+      { emoji:"🎯", titleFR:"POST MOVES COMPLETS", titleEN:"FULL POST MOVES", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Drop-step, jump hook, up-and-under, face-up jump shot. 5 de chaque.", contentEN:"Drop-step, jump hook, up-and-under, face-up jump shot. 5 each." },
+      { emoji:"🎯", titleFR:"MID-RANGE VOLUME", titleEN:"MID-RANGE VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs mid en face-up. Objectif : 17/30.", contentEN:"30 mid face-up shots. Target: 17/30." },
+      { emoji:"🎯", titleFR:"CORNER 3", titleEN:"CORNER 3", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs corner 3 (stretch four).", contentEN:"20 corner 3 (stretch four)." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 LF réussis d'affilée.", contentEN:"15 FTs in a row." },
+      { emoji:"💪", titleFR:"REBOND + PUTBACK + KICK", titleEN:"REBOUND + PUTBACK + KICK", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Rebond simulé + décision : putback ou kick out.", contentEN:"Simulated rebound + decision: putback or kick out." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec accélérations, mobilité.", contentEN:"Running with accelerations, mobility." },
+      { emoji:"🏀", titleFR:"HANDLING PF MODERNE", titleEN:"MODERN PF HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Between-the-legs + behind-the-back court + drive.", contentEN:"Between-the-legs + short behind-the-back + drive." },
+      { emoji:"🎯", titleFR:"POST-UP MASTER", titleEN:"POST-UP MASTER", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Signature move perso + 2 variations.", contentEN:"Personal signature move + 2 variations." },
+      { emoji:"🎯", titleFR:"FACE-UP + PULL-UP", titleEN:"FACE-UP + PULL-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up + jab + pull-up mid. 20 répétitions.", contentEN:"Face-up + jab + pull-up mid. 20 reps." },
+      { emoji:"🎯", titleFR:"3 PTS STRETCH", titleEN:"STRETCH 3 PT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 tirs 3 pts depuis 4 spots.", contentEN:"20 3-pt shots from 4 spots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"20 LF sous fatigue.", contentEN:"20 FTs under fatigue." },
+      { emoji:"💪", titleFR:"TRANSITION + FINISH", titleEN:"TRANSITION + FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"8 transitions avec finish contact.", contentEN:"8 transitions with contact finish." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 3 min, activation.", contentEN:"Skip rope 3 min, activation." },
+      { emoji:"🏀", titleFR:"HANDLING CONTRÔLÉ", titleEN:"CONTROLLED HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble bas + change de main + drive.", contentEN:"Low dribble + hand change + drive." },
+      { emoji:"🎯", titleFR:"POST-UP + FACE-UP COMBO", titleEN:"POST-UP + FACE-UP COMBO", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Alterne post-up et face-up. 20 séquences.", contentEN:"Alternate post-up and face-up. 20 sequences." },
+      { emoji:"🎯", titleFR:"MID + 3 PTS MIX", titleEN:"MID + 3 PT MIX", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs mixtes.", contentEN:"30 mixed shots." },
+      { emoji:"🎯", titleFR:"FINISH CONTACT", titleEN:"FINISH CONTACT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Layup avec obstacle. 20 côté droit, 20 côté gauche.", contentEN:"Layup with obstacle. 20 right, 20 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"12 LF réussis d'affilée.", contentEN:"12 FTs in a row." },
+      { emoji:"💪", titleFR:"REBOND MASTER", titleEN:"REBOUND MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 rebonds offensifs + finish.", contentEN:"15 offensive rebounds + finish." }
+    ]
+  },
+  "PF_COM": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité complète, activation.", contentEN:"Skip rope 3 min, full mobility, activation." },
+      { emoji:"🏀", titleFR:"HANDLING PF COMPLET", titleEN:"FULL PF HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Toutes techniques.", contentEN:"All techniques." },
+      { emoji:"🎯", titleFR:"POST-UP GAME", titleEN:"POST-UP GAME", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"30 possessions poste bas variées.", contentEN:"30 varied low-post possessions." },
+      { emoji:"🎯", titleFR:"FACE-UP MASTER", titleEN:"FACE-UP MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up + toutes options. 20 séquences.", contentEN:"Face-up + all options. 20 sequences." },
+      { emoji:"🎯", titleFR:"3 PTS STRETCH", titleEN:"STRETCH 3 PT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 tirs 3 pts. Objectif : 20/40.", contentEN:"40 3-pt shots. Target: 20/40." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF réussis d'affilée.", contentEN:"20 FTs in a row." },
+      { emoji:"💪", titleFR:"REBOND + FINISH CONTACT", titleEN:"REBOUND + CONTACT FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 rebonds + putback en contact.", contentEN:"20 rebounds + contact putback." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Corde à sauter 2 min, mobilité.", contentEN:"Skip rope 2 min, mobility." },
+      { emoji:"🏀", titleFR:"HANDLING AVANCÉ", titleEN:"ADVANCED HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Combos + obstacles.", contentEN:"Combos + obstacles." },
+      { emoji:"🎯", titleFR:"POST-UP SIGNATURE", titleEN:"POST-UP SIGNATURE", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Développe ton signature move poste bas.", contentEN:"Develop your low-post signature move." },
+      { emoji:"🎯", titleFR:"MID PULL-UP", titleEN:"MID PULL-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 pull-up mid après drive.", contentEN:"30 mid pull-up after drive." },
+      { emoji:"🎯", titleFR:"3 PTS + FACE-UP", titleEN:"3 PT + FACE-UP", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Alterne les deux. 40 tirs.", contentEN:"Alternate both. 40 shots." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 LF sous fatigue.", contentEN:"25 FTs under fatigue." },
+      { emoji:"💪", titleFR:"MATCH INTENSITY", titleEN:"MATCH INTENSITY", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"4 quart-temps 2.5 min.", contentEN:"4 quarters 2.5 min." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements + respiration.", contentEN:"Stretching + breathing." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité hanches.", contentEN:"Skip rope 3 min, hip mobility." },
+      { emoji:"🏀", titleFR:"HANDLING PF COMPLET", titleEN:"FULL PF HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Two-ball + une main + obstacles.", contentEN:"Two-ball + one hand + obstacles." },
+      { emoji:"🎯", titleFR:"POST-UP TOTAL", titleEN:"TOTAL POST-UP", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"30 possessions avec toutes options.", contentEN:"30 possessions with all options." },
+      { emoji:"🎯", titleFR:"FACE-UP + DRIVE", titleEN:"FACE-UP + DRIVE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"25 séquences complètes.", contentEN:"25 full sequences." },
+      { emoji:"🎯", titleFR:"CORNER 3 RECORD", titleEN:"CORNER 3 RECORD", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Ta série record depuis les coins.", contentEN:"Your streak record from corners." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 LF, sets de 10.", contentEN:"30 FTs, sets of 10." },
+      { emoji:"💪", titleFR:"REBOND + PUTBACK + CLUTCH", titleEN:"REBOUND + PUTBACK + CLUTCH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 scénarios de fin de possession.", contentEN:"15 end-of-possession scenarios." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ]
+  }
+});
+</script>
+<script>
+Object.assign(window._FICHES_DATA, {
+  // ══════════════════════════════ PIVOT (C) ══════════════════════════════
+  "C_DEB": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course lente, rotations épaules, mobilité hanches.", contentEN:"Slow jog, shoulder rotations, hip mobility." },
+      { emoji:"🏀", titleFR:"CATCH-AND-HOLD", titleEN:"CATCH-AND-HOLD", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Auto-passe contre panneau, catch fort à deux mains, hold 1 sec. 30 répétitions.", contentEN:"Self-pass off backboard, strong two-hand catch, 1-sec hold. 30 reps." },
+      { emoji:"🎯", titleFR:"LAYUP DEUX MAINS", titleEN:"TWO-HAND LAYUP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 layups main droite, 20 layups main gauche depuis la raquette.", contentEN:"20 layups right hand, 20 left hand from the paint." },
+      { emoji:"🎯", titleFR:"DROP-STEP BASIQUE", titleEN:"BASIC DROP-STEP", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dos au panier, drop-step vers la ligne de fond, layup. 15 côté droit, 15 côté gauche.", contentEN:"Back to basket, baseline drop-step, layup. 15 right, 15 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF, rituel constant.", contentEN:"15 FTs, constant routine." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Étirements dynamiques, mobilité épaules.", contentEN:"Dynamic stretching, shoulder mobility." },
+      { emoji:"🏀", titleFR:"CONTRÔLE BALLE PROCHE", titleEN:"CLOSE BALL CONTROL", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dribble bas, ballon proche du corps. Main droite 90 sec, main gauche 90 sec.", contentEN:"Low dribble, ball close to body. Right 90 sec, left 90 sec." },
+      { emoji:"🎯", titleFR:"MIKAN DRILL", titleEN:"MIKAN DRILL", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Alterne layups main droite/main gauche sans sortir de la raquette. 40 total.", contentEN:"Alternate layups right/left without leaving the paint. 40 total." },
+      { emoji:"🎯", titleFR:"JUMP HOOK BASIQUE", titleEN:"BASIC JUMP HOOK", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Depuis la raquette, jump hook simple. 15 côté droit, 15 côté gauche.", contentEN:"From the paint, simple jump hook. 15 right, 15 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF.", contentEN:"15 FTs." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité hanches.", contentEN:"Skip rope 2 min, hip mobility." },
+      { emoji:"🏀", titleFR:"POSITION POSTE BAS", titleEN:"LOW POST POSITION", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Travail de position : jambes fléchies, coudes hauts, dos droit. 3 séries × 90 sec.", contentEN:"Position work: bent legs, high elbows, straight back. 3 sets × 90 sec." },
+      { emoji:"🎯", titleFR:"PUTBACK", titleEN:"PUTBACK", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Auto-passe, tape ballon dans panneau, putback. 25 répétitions.", contentEN:"Self-pass, tap ball off backboard, putback. 25 reps." },
+      { emoji:"🎯", titleFR:"UP-AND-UNDER", titleEN:"UP-AND-UNDER", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Feinte de tir + drive + layup. 15 côté droit, 15 côté gauche.", contentEN:"Shot fake + drive + layup. 15 right, 15 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"3 MIN", timeEN:"3 MIN", contentFR:"15 LF.", contentEN:"15 FTs." }
+    ]
+  },
+  "C_INT": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité, 10 layups.", contentEN:"Skip rope 2 min, mobility, 10 layups." },
+      { emoji:"🏀", titleFR:"CATCH & FINISH", titleEN:"CATCH & FINISH", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Auto-passe puis finish immédiat. 30 répétitions varies (layup, hook, putback).", contentEN:"Self-pass then immediate finish. 30 varied reps (layup, hook, putback)." },
+      { emoji:"🎯", titleFR:"POST-UP MOVES", titleEN:"POST-UP MOVES", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Drop-step + jump hook + up-and-under. 5 de chaque, alterne côtés.", contentEN:"Drop-step + jump hook + up-and-under. 5 each, alternate sides." },
+      { emoji:"🎯", titleFR:"MIKAN AVANCÉ", titleEN:"ADVANCED MIKAN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Alternance rapide layup droite/gauche + petit reverse. 40 total.", contentEN:"Rapid alternation right/left layup + small reverse. 40 total." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"10 LF réussis d'affilée. Reset si tu rates.", contentEN:"10 FTs in a row. Reset if you miss." },
+      { emoji:"💪", titleFR:"REBOND + PUTBACK", titleEN:"REBOUND + PUTBACK", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"20 rebonds offensifs + putback immédiat.", contentEN:"20 offensive rebounds + immediate putback." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec direction changes, mobilité.", contentEN:"Running with direction changes, mobility." },
+      { emoji:"🏀", titleFR:"CONTRÔLE DE POSTE", titleEN:"POST CONTROL", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Dos au panier, sceller sa position, catch, finish. 20 séquences.", contentEN:"Back to basket, seal position, catch, finish. 20 sequences." },
+      { emoji:"🎯", titleFR:"JUMP HOOK MASTER", titleEN:"JUMP HOOK MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"25 jump hooks côté droit, 25 côté gauche.", contentEN:"25 jump hooks right, 25 left." },
+      { emoji:"🎯", titleFR:"DROP-STEP + FINISH", titleEN:"DROP-STEP + FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Drop-step ligne de fond + choix : layup ou dunk. 20 côté droit, 20 côté gauche.", contentEN:"Baseline drop-step + choice: layup or dunk. 20 right, 20 left." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"15 LF, série de 5 avec pause active.", contentEN:"15 FTs, set of 5 with active break." },
+      { emoji:"💪", titleFR:"BOXING OUT + REBOND", titleEN:"BOX OUT + REBOUND", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"Position boxing out simulée + rebond + outlet. 15 répétitions.", contentEN:"Simulated box-out + rebound + outlet. 15 reps." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité hanches.", contentEN:"Skip rope 2 min, hip mobility." },
+      { emoji:"🏀", titleFR:"MAIN FAIBLE POSTE BAS", titleEN:"WEAK HAND LOW POST", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 minutes concentrées main gauche uniquement : jump hook, layup, drop-step.", contentEN:"20 min focused weak hand only: jump hook, layup, drop-step." },
+      { emoji:"🎯", titleFR:"FACE-UP POSTE HAUT", titleEN:"HIGH-POST FACE-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Depuis coude de la raquette, face-up + shoot ou drive. 20 séquences.", contentEN:"From elbow, face-up + shoot or drive. 20 sequences." },
+      { emoji:"🎯", titleFR:"POST-UP + KICK OUT", titleEN:"POST-UP + KICK OUT", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Post-up + passe imaginaire vers extérieur + relocalisation. 15 séquences.", contentEN:"Post-up + imaginary pass outside + relocation. 15 sequences." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF, série de 10 avec sprint entre.", contentEN:"20 FTs, sets of 10 with sprint between." },
+      { emoji:"💪", titleFR:"SPRINT + CATCH + FINISH", titleEN:"SPRINT + CATCH + FINISH", timeFR:"6 MIN", timeEN:"6 MIN", contentFR:"5 sprints, à chaque retour catch + finish immédiat.", contentEN:"5 sprints, on each return catch + immediate finish." }
+    ]
+  },
+  "C_CON": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 2 min, mobilité complète, 15 layups mixtes.", contentEN:"Skip rope 2 min, full mobility, 15 mixed layups." },
+      { emoji:"🏀", titleFR:"CATCH SOUS PRESSION", titleEN:"CATCH UNDER PRESSURE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Catch depuis positions difficiles + finish immédiat. 25 séquences.", contentEN:"Catch from difficult positions + immediate finish. 25 sequences." },
+      { emoji:"🎯", titleFR:"POST MOVES COMPLETS", titleEN:"FULL POST MOVES", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Drop-step, jump hook, up-and-under, spin. 5 de chaque, alterne côtés.", contentEN:"Drop-step, jump hook, up-and-under, spin. 5 each, alternate sides." },
+      { emoji:"🎯", titleFR:"HOOK MASTER", titleEN:"HOOK MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 hooks côté droit, 30 côté gauche.", contentEN:"30 hooks right, 30 left." },
+      { emoji:"🎯", titleFR:"REBOND OFFENSIF", titleEN:"OFFENSIVE REBOUND", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 putbacks après tir manqué simulé.", contentEN:"25 putbacks after simulated missed shot." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"15 LF réussis d'affilée.", contentEN:"15 FTs in a row." },
+      { emoji:"💪", titleFR:"FINISH CONTACT", titleEN:"CONTACT FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 finish avec obstacle ou ballon lourd, alterne côtés.", contentEN:"20 finishes with obstacle or weighted ball, alternate sides." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec accélérations, mobilité complète.", contentEN:"Running with accelerations, full mobility." },
+      { emoji:"🏀", titleFR:"HANDLING PIVOT MODERNE", titleEN:"MODERN CENTER HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble bas + protection ballon + drive court.", contentEN:"Low dribble + ball protection + short drive." },
+      { emoji:"🎯", titleFR:"FACE-UP + SPIN MOVE", titleEN:"FACE-UP + SPIN MOVE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up jump shot + spin move. 15 côté droit, 15 côté gauche.", contentEN:"Face-up jump shot + spin move. 15 right, 15 left." },
+      { emoji:"🎯", titleFR:"POST-UP + FACE-UP", titleEN:"POST-UP + FACE-UP", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Alterne post-up et face-up. 20 séquences.", contentEN:"Alternate post-up and face-up. 20 sequences." },
+      { emoji:"🎯", titleFR:"FLOATER", titleEN:"FLOATER", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 floaters depuis raquette étendue.", contentEN:"20 floaters from extended paint." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"20 LF sous fatigue.", contentEN:"20 FTs under fatigue." },
+      { emoji:"💪", titleFR:"TRANSITION + FINISH", titleEN:"TRANSITION + FINISH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"8 transitions complètes avec finish contact.", contentEN:"8 full transitions with contact finish." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Skip rope 3 min, activation neuro.", contentEN:"Skip rope 3 min, neuro activation." },
+      { emoji:"🏀", titleFR:"CONTRÔLE POSTE HAUT + BAS", titleEN:"HIGH + LOW POST CONTROL", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Alterne travail poste haut et poste bas.", contentEN:"Alternate high and low post work." },
+      { emoji:"🎯", titleFR:"POST MOVES SIGNATURE", titleEN:"SIGNATURE POST MOVES", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Développe ton signature move poste bas + 2 variations.", contentEN:"Develop your low-post signature move + 2 variations." },
+      { emoji:"🎯", titleFR:"MID-RANGE POSTE HAUT", titleEN:"HIGH-POST MID-RANGE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 tirs depuis coudes de la raquette.", contentEN:"30 shots from elbows." },
+      { emoji:"🎯", titleFR:"REBOND + KICK", titleEN:"REBOUND + KICK", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Rebond + décision : putback ou outlet imaginaire. 20 séquences.", contentEN:"Rebound + decision: putback or imaginary outlet. 20 sequences." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"12 LF réussis d'affilée.", contentEN:"12 FTs in a row." },
+      { emoji:"💪", titleFR:"ENDURANCE POSTE", titleEN:"POST ENDURANCE", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"15 possessions poste bas enchaînées sans repos.", contentEN:"15 chained low-post possessions without rest." }
+    ]
+  },
+  "C_COM": {
+    "A": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité complète, activation.", contentEN:"Skip rope 3 min, full mobility, activation." },
+      { emoji:"🏀", titleFR:"CATCH & FINISH VOLUME", titleEN:"CATCH & FINISH VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 séquences catch varies + finish contact.", contentEN:"40 varied catch sequences + contact finish." },
+      { emoji:"🎯", titleFR:"POST MOVES AVANCÉS", titleEN:"ADVANCED POST MOVES", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Face-up jump shot, spin move, up-and-under. 15 répétitions.", contentEN:"Face-up jump shot, spin move, up-and-under. 15 reps." },
+      { emoji:"🎯", titleFR:"HOOK VOLUME", titleEN:"HOOK VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 hooks côté droit, 40 côté gauche.", contentEN:"40 hooks right, 40 left." },
+      { emoji:"🎯", titleFR:"REBOND MASTER", titleEN:"REBOUND MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"30 rebonds offensifs + putback.", contentEN:"30 offensive rebounds + putback." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"20 LF réussis d'affilée.", contentEN:"20 FTs in a row." },
+      { emoji:"💪", titleFR:"FINISH CONTACT INTENSITÉ", titleEN:"CONTACT FINISH INTENSITY", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"25 finish contact contre obstacle.", contentEN:"25 contact finishes against obstacle." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ],
+    "B": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Corde à sauter 2 min, activation.", contentEN:"Skip rope 2 min, activation." },
+      { emoji:"🏀", titleFR:"HANDLING PIVOT COMPLET", titleEN:"FULL CENTER HANDLING", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble bas + between-the-legs court + spin protection ballon.", contentEN:"Low dribble + short between-the-legs + spin with ball protection." },
+      { emoji:"🎯", titleFR:"POST-UP SIGNATURE VOLUME", titleEN:"SIGNATURE POST-UP VOLUME", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"25 possessions signature move.", contentEN:"25 signature move possessions." },
+      { emoji:"🎯", titleFR:"FACE-UP MASTER", titleEN:"FACE-UP MASTER", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Face-up + toutes options : shoot, drive, pass. 20 séquences.", contentEN:"Face-up + all options: shoot, drive, pass. 20 sequences." },
+      { emoji:"🎯", titleFR:"MID POSTE HAUT VOLUME", titleEN:"HIGH-POST MID VOLUME", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"40 tirs depuis les coudes.", contentEN:"40 shots from elbows." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"25 LF sous fatigue.", contentEN:"25 FTs under fatigue." },
+      { emoji:"💪", titleFR:"MATCH INTENSITY", titleEN:"MATCH INTENSITY", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"4 quart-temps 2.5 min.", contentEN:"4 quarters 2.5 min." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Étirements profonds + respiration.", contentEN:"Deep stretching + breathing." }
+    ],
+    "C": [
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Skip rope 3 min, mobilité complète.", contentEN:"Skip rope 3 min, full mobility." },
+      { emoji:"🏀", titleFR:"CATCH & DECISION", titleEN:"CATCH & DECISION", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Catch + décision immédiate (finish, kick, drive). 30 séquences.", contentEN:"Catch + immediate decision (finish, kick, drive). 30 sequences." },
+      { emoji:"🎯", titleFR:"POST-UP TOTAL", titleEN:"TOTAL POST-UP", timeFR:"15 MIN", timeEN:"15 MIN", contentFR:"30 possessions avec toutes options mixtes.", contentEN:"30 possessions with all mixed options." },
+      { emoji:"🎯", titleFR:"FACE-UP + PULL-UP", titleEN:"FACE-UP + PULL-UP", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"20 face-up + pull-up mid depuis coudes.", contentEN:"20 face-up + mid pull-up from elbows." },
+      { emoji:"🎯", titleFR:"REBOND OFFENSIF RECORD", titleEN:"OFFENSIVE REBOUND RECORD", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"Ta série record de putbacks consécutifs.", contentEN:"Your putback streak record." },
+      { emoji:"🏹", titleFR:"LANCERS FRANCS", titleEN:"FREE THROWS", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"30 LF, sets de 10 sous fatigue.", contentEN:"30 FTs, sets of 10 under fatigue." },
+      { emoji:"💪", titleFR:"CLUTCH POSTE", titleEN:"POST CLUTCH", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"10 scénarios de fin de possession poste bas.", contentEN:"10 end-of-possession low-post scenarios." },
+      { emoji:"🧘", titleFR:"COOL DOWN", titleEN:"COOL DOWN", timeFR:"7 MIN", timeEN:"7 MIN", contentFR:"Étirements + visualisation.", contentEN:"Stretching + visualization." }
+    ]
+  }
+});
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     TON ENTRAÎNEMENT PERSONNALISÉ — animation intro + sélecteur + fiches
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ─── Animation intro 10 sec ─── */
+#fiche-intro-overlay {
+  position: fixed; inset: 0; z-index: 100000;
+  background: radial-gradient(ellipse at center, #0d1424 0%, #050810 100%);
+  display: none; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#fiche-intro-overlay.on { display: flex; }
+.fiche-intro-skip {
+  position: absolute; top: 20px; right: 20px; z-index: 10;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+  color: #cfd3e0; padding: 8px 14px; border-radius: 10px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: 1.5px; cursor: pointer;
+}
+.fiche-intro-phone {
+  position: relative;
+  width: min(280px, 78vw); height: min(560px, 78vh); max-height: 88vh;
+  background: #0a0d14; border: 3px solid #f5c518; border-radius: 32px;
+  padding: 18px; overflow: hidden;
+  box-shadow: 0 0 60px rgba(245,197,24,0.4), 0 0 120px rgba(245,197,24,0.15);
+  animation: fiche-intro-phone-pulse 10s ease-in-out infinite;
+}
+@keyframes fiche-intro-phone-pulse {
+  0%,100% { transform: scale(1); box-shadow: 0 0 60px rgba(245,197,24,0.4); }
+  50%     { transform: scale(1.015); box-shadow: 0 0 90px rgba(245,197,24,0.55); }
+}
+.fiche-intro-scene {
+  position: absolute; inset: 18px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 20px 16px; text-align: center; gap: 14px;
+  opacity: 0; animation-fill-mode: forwards;
+}
+.fiche-intro-scene-emoji { font-size: 68px; line-height: 1; }
+.fiche-intro-scene-title {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  color: #f5c518; font-size: 22px; letter-spacing: 2px; line-height: 1.1;
+}
+.fiche-intro-scene-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  color: #cfd3e0; font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; font-weight: 600;
+}
+/* 5 scènes × 2 sec = 10 sec total */
+.fiche-intro-scene:nth-child(1) { animation: fiche-intro-scene 10s 0s; }
+.fiche-intro-scene:nth-child(2) { animation: fiche-intro-scene 10s 2s; }
+.fiche-intro-scene:nth-child(3) { animation: fiche-intro-scene 10s 4s; }
+.fiche-intro-scene:nth-child(4) { animation: fiche-intro-scene 10s 6s; }
+.fiche-intro-scene:nth-child(5) { animation: fiche-intro-scene 10s 8s; }
+@keyframes fiche-intro-scene {
+  0%,3% { opacity: 0; transform: translateY(20px); }
+  6%,18% { opacity: 1; transform: translateY(0); }
+  20%,100% { opacity: 0; transform: translateY(-20px); }
+}
+.fiche-intro-progress {
+  position: absolute; bottom: 0; left: 0; height: 3px;
+  background: #f5c518;
+  animation: fiche-intro-progress 10s linear forwards;
+}
+@keyframes fiche-intro-progress { from { width: 0; } to { width: 100%; } }
+.fiche-intro-brand {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  font-family: 'Bebas Neue', sans-serif;
+  color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 3px;
+  white-space: nowrap;
+}
+
+/* ─── Overlay principal (sélecteur + fiche) ─── */
+#fiche-main-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0d1117; display: none;
+  overflow-y: auto;
+}
+#fiche-main-overlay.on { display: block; }
+.fiche-container { max-width: 700px; margin: 0 auto; padding: 20px 16px 40px; }
+
+/* Topbar */
+.fiche-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; gap: 12px;
+}
+.fiche-btn-back {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: #cfd3e0; padding: 8px 14px; border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1px; cursor: pointer;
+}
+.fiche-profile {
+  font-size: 11px; color: #f5c518;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+/* Sélecteur */
+.fiche-selector-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: clamp(24px, 5vw, 32px); letter-spacing: 3px;
+  text-align: center; margin-bottom: 6px; line-height: 1;
+}
+.fiche-selector-sub {
+  font-size: 12px; color: #9aa3b3; text-align: center; margin-bottom: 24px;
+}
+.fiche-group-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: 18px; letter-spacing: 2px; margin: 24px 0 12px;
+}
+
+.fiche-poste-btn, .fiche-niveau-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: #161b22; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; margin-bottom: 8px; cursor: pointer;
+  transition: all 0.2s; width: 100%; text-align: left;
+  color: #f0f2f8; font-family: inherit;
+}
+.fiche-poste-btn:hover, .fiche-niveau-btn:hover {
+  border-color: rgba(245,197,24,0.4);
+}
+.fiche-poste-btn.on, .fiche-niveau-btn.on {
+  border-color: #f5c518;
+  background: linear-gradient(135deg, rgba(245,197,24,0.15), #161b22);
+}
+.fiche-poste-abbr {
+  width: 48px; height: 48px;
+  background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.4);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518; font-size: 20px;
+  flex-shrink: 0;
+}
+.fiche-poste-info { flex: 1; min-width: 0; }
+.fiche-poste-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+  letter-spacing: 1.3px; color: #f0f2f8;
+}
+.fiche-poste-hint {
+  font-size: 11px; color: #9aa3b3; margin-top: 2px; line-height: 1.3;
+}
+.fiche-niveau-bar {
+  width: 5px; height: 38px; border-radius: 3px; flex-shrink: 0;
+}
+.fiche-niveau-bar.n1 { background: #90caf9; }
+.fiche-niveau-bar.n2 { background: #64b5f6; }
+.fiche-niveau-bar.n3 { background: #f5c518; }
+.fiche-niveau-bar.n4 { background: linear-gradient(180deg, #f5c518, #e63946); }
+.fiche-niveau-content { flex: 1; }
+.fiche-niveau-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1.2px;
+}
+.fiche-niveau-hint {
+  font-size: 11px; color: #9aa3b3; margin-top: 2px;
+}
+
+.fiche-btn-generate {
+  display: block; width: 100%; padding: 16px;
+  background: #f5c518; color: #0d1117; border: none; border-radius: 12px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+  letter-spacing: 2.5px; font-weight: 700; cursor: pointer; margin-top: 20px;
+}
+.fiche-btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Fiche affichée */
+.fiche-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f0f2f8;
+  font-size: clamp(24px, 5vw, 32px); letter-spacing: 2px; line-height: 1;
+}
+.fiche-subtitle {
+  color: #f5c518; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; letter-spacing: 2px; font-weight: 700;
+  text-transform: uppercase; margin-top: 6px;
+}
+.fiche-total {
+  display: inline-block; margin-top: 10px;
+  background: rgba(245,197,24,0.15); color: #f5c518;
+  padding: 5px 14px; border-radius: 14px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: 1px;
+}
+.fiche-mention {
+  background: linear-gradient(135deg, rgba(245,197,24,0.08), #161b22);
+  border: 1px solid rgba(245,197,24,0.3); border-radius: 12px;
+  padding: 14px 16px; margin: 18px 0;
+  font-size: 12.5px; line-height: 1.5; color: #cfd3e0;
+  display: flex; gap: 10px;
+}
+.fiche-mention-icon { color: #f5c518; flex-shrink: 0; font-size: 16px; }
+
+.fiche-bloc {
+  background: #161b22; border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 14px; margin-bottom: 8px;
+  display: flex; gap: 12px; cursor: pointer; transition: all 0.2s;
+}
+.fiche-bloc.done {
+  background: rgba(45,198,83,0.06);
+  border-color: rgba(45,198,83,0.3);
+}
+.fiche-bloc.done .fiche-bloc-title,
+.fiche-bloc.done .fiche-bloc-content {
+  text-decoration: line-through; opacity: 0.55;
+}
+.fiche-bloc-check {
+  width: 22px; height: 22px;
+  border: 2px solid rgba(245,197,24,0.4); border-radius: 6px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 13px; margin-top: 2px;
+}
+.fiche-bloc.done .fiche-bloc-check {
+  background: #2dc653; border-color: #2dc653;
+}
+.fiche-bloc-emoji { font-size: 24px; flex-shrink: 0; }
+.fiche-bloc-body { flex: 1; min-width: 0; }
+.fiche-bloc-titrerow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 10px; margin-bottom: 4px; flex-wrap: wrap;
+}
+.fiche-bloc-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f0f2f8;
+  font-size: 15px; letter-spacing: 1.3px; line-height: 1;
+}
+.fiche-bloc-time {
+  color: #f5c518; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+  white-space: nowrap; padding: 3px 9px;
+  border: 1px solid rgba(245,197,24,0.4); border-radius: 8px;
+  cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.fiche-bloc-time:hover { background: rgba(245,197,24,0.1); }
+.fiche-bloc-time.running { background: #f5c518; color: #0d1117; }
+.fiche-bloc-content { font-size: 12.5px; color: #cfd3e0; line-height: 1.5; }
+
+.fiche-end {
+  text-align: center; padding: 22px;
+  background: linear-gradient(135deg, rgba(45,198,83,0.1), rgba(245,197,24,0.05));
+  border: 1px solid rgba(45,198,83,0.3); border-radius: 14px;
+  margin-top: 14px; display: none;
+}
+.fiche-end.show { display: block; }
+.fiche-end-icon { font-size: 40px; margin-bottom: 4px; }
+.fiche-end-title {
+  font-family: 'Bebas Neue', sans-serif; color: #2dc653;
+  font-size: 24px; letter-spacing: 2.5px;
+}
+
+.fiche-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-top: 18px; margin-bottom: 20px;
+}
+.fiche-btn-action {
+  padding: 12px 8px; background: transparent;
+  border: 1px solid rgba(245,197,24,0.4); color: #f5c518;
+  border-radius: 10px; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer;
+}
+.fiche-btn-action:hover { background: rgba(245,197,24,0.08); }
+.fiche-btn-action.wide { grid-column: span 2; }
+</style>
+
+<!-- Overlay Animation Intro 10 sec -->
+<div id="fiche-intro-overlay" role="dialog" aria-label="Intro SENSEI">
+  <button class="fiche-intro-skip" onclick="_fiche_introSkip()" data-i18n="fiche_intro_skip">PASSER →</button>
+  <div class="fiche-intro-phone">
+    <div class="fiche-intro-scene">
+      <div class="fiche-intro-scene-emoji">🥋</div>
+      <div class="fiche-intro-scene-title">SENSEI</div>
+      <div class="fiche-intro-scene-sub" data-i18n="fiche_intro_1">Ton dojo basketball</div>
+    </div>
+    <div class="fiche-intro-scene">
+      <div class="fiche-intro-scene-emoji">🥋</div>
+      <div class="fiche-intro-scene-title">TBOARD</div>
+      <div class="fiche-intro-scene-sub" data-i18n="fiche_intro_2">Handling en rythme</div>
+    </div>
+    <div class="fiche-intro-scene">
+      <div class="fiche-intro-scene-emoji">🎯</div>
+      <div class="fiche-intro-scene-title" data-i18n="fiche_intro_3_title">RÉACTION</div>
+      <div class="fiche-intro-scene-sub" data-i18n="fiche_intro_3">Vitesse main-œil</div>
+    </div>
+    <div class="fiche-intro-scene">
+      <div class="fiche-intro-scene-emoji">🧠</div>
+      <div class="fiche-intro-scene-title">MATHS</div>
+      <div class="fiche-intro-scene-sub" data-i18n="fiche_intro_4">Cognition sous dribble</div>
+    </div>
+    <div class="fiche-intro-scene">
+      <div class="fiche-intro-scene-emoji">📋</div>
+      <div class="fiche-intro-scene-title" data-i18n="fiche_intro_5_title">TON ENTRAÎNEMENT</div>
+      <div class="fiche-intro-scene-sub" data-i18n="fiche_intro_5">Fiche perso à ton poste</div>
+    </div>
+    <div class="fiche-intro-progress"></div>
+    <div class="fiche-intro-brand">SENSEI BLACKBELT</div>
+  </div>
+</div>
+
+<!-- Overlay principal (sélecteur ou fiche) -->
+<div id="fiche-main-overlay" role="dialog" aria-label="Ton entraînement personnalisé">
+  <div class="fiche-container" id="fiche-main-container">
+    <!-- rempli dynamiquement par JS -->
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TON ENTRAÎNEMENT PERSONNALISÉ — LOGIQUE
+═══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  // ─── Détection langue ───
+  function _flang() {
+    try {
+      if (window._lang) return window._lang;
+      var b = document.body || document.documentElement;
+      var d = b.getAttribute('data-lang');
+      if (d) return d;
+    } catch(e) {}
+    return 'fr';
+  }
+  var _T = function(fr, en) { return _flang()==='en' ? en : fr; };
+
+  // ─── LES 60 FICHES ───
+  // Structure : POSTE_NIVEAU_VARIANTE = [ {emoji,titleFR,titleEN,timeFR,timeEN,contentFR,contentEN}, ... ]
+  // FICHES est référencé dynamiquement via window._FICHES_DATA (injecté avant ce script)
+
+  // ─── Poste + niveau (données statiques) ───
+  var POSTES = [
+    { key:'PG', nameFR:'MENEUR',      nameEN:'POINT GUARD',    hintFR:'Tu crées le jeu, tu portes la balle',        hintEN:'You create the play, you handle the ball' },
+    { key:'SG', nameFR:'ARRIÈRE',     nameEN:'SHOOTING GUARD', hintFR:'Tu shootes, tu joues sans ballon',           hintEN:'You shoot, you play off-ball' },
+    { key:'SF', nameFR:'AILIER',      nameEN:'SMALL FORWARD',  hintFR:'Polyvalent, entre extérieur et intérieur',   hintEN:'Versatile, between perimeter and post' },
+    { key:'PF', nameFR:'AILIER FORT', nameEN:'POWER FORWARD',  hintFR:'Physique, poste bas, rebond',                hintEN:'Physical, low post, rebounding' },
+    { key:'C',  nameFR:'PIVOT',       nameEN:'CENTER',         hintFR:'Intérieur pur, protection du cercle',        hintEN:'Pure interior, rim protection' }
+  ];
+  var NIVEAUX = [
+    { key:'DEB', nameFR:'DÉBUTANT',      nameEN:'BEGINNER',    hintFR:'Moins de 2 ans de basket',        hintEN:'Less than 2 years of basketball' },
+    { key:'INT', nameFR:'INTERMÉDIAIRE', nameEN:'INTERMEDIATE',hintFR:'Je joue en club, gestes de base OK', hintEN:'I play in a club, basics OK' },
+    { key:'CON', nameFR:'CONFIRMÉ',      nameEN:'ADVANCED',    hintFR:'Championnat structuré, poste défini', hintEN:'Structured league, defined role' },
+    { key:'COM', nameFR:'COMPÉTITION',   nameEN:'COMPETITION', hintFR:'Régional / national / sélection', hintEN:'Regional / national / selection' }
+  ];
+
+  // ─── State ───
+  var STATE = {
+    poste: null,      // 'PG'..'C'
+    niveau: null,     // 'DEB'..'COM'
+    lastVariant: null,
+    curFicheKey: null,
+    curVariant: null,
+    checked: {},      // idx -> true
+    timers: {}        // idx -> { endAt, tickId }
+  };
+
+  // ─── Storage ───
+  var STORE_KEY = 'sensei_fiche_profile_v1';
+  function _load() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        STATE.poste = d.poste || null;
+        STATE.niveau = d.niveau || null;
+      }
+    } catch(e) {}
+  }
+  function _save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ poste:STATE.poste, niveau:STATE.niveau }));
+    } catch(e) {}
+  }
+
+  // ─── Ouverture / fermeture overlay ───
+  window._fiche_open = function() {
+    _load();
+    var ov = document.getElementById('fiche-main-overlay');
+    if (!ov) return;
+    ov.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    _render();
+  };
+  window._fiche_close = function() {
+    var ov = document.getElementById('fiche-main-overlay');
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
+    _stopAllTimers();
+  };
+  window._fiche_editProfile = function() {
+    STATE.curFicheKey = null;
+    _render(true); // force selector
+  };
+
+  // ─── Rendu principal ───
+  function _render(forceSelector) {
+    var c = document.getElementById('fiche-main-container');
+    if (!c) return;
+    if (!STATE.poste || !STATE.niveau || forceSelector) {
+      _renderSelector(c);
+    } else {
+      _renderFiche(c);
+    }
+  }
+
+  // ─── Sélecteur ───
+  function _renderSelector(c) {
+    var en = _flang()==='en';
+    var html = '';
+    html += '<div class="fiche-topbar">';
+    html += '  <button class="fiche-btn-back" onclick="_fiche_close()">'+ (en?'← BACK':'← RETOUR') +'</button>';
+    html += '  <div class="fiche-profile">'+ (en?'YOUR PROFILE':'TON PROFIL') +'</div>';
+    html += '</div>';
+    html += '<div class="fiche-selector-title">'+ (en?"WHAT'S YOUR POSITION?":"QUEL EST TON POSTE ?") +'</div>';
+    html += '<div class="fiche-selector-sub">'+ (en?"We build a sheet tailored to you":"On te construit une fiche adaptée") +'</div>';
+    POSTES.forEach(function(p){
+      var sel = STATE.poste===p.key ? 'on' : '';
+      html += '<button class="fiche-poste-btn '+sel+'" data-poste="'+p.key+'">';
+      html += '  <div class="fiche-poste-abbr">'+p.key+'</div>';
+      html += '  <div class="fiche-poste-info">';
+      html += '    <div class="fiche-poste-name">'+ (en?p.nameEN:p.nameFR) +'</div>';
+      html += '    <div class="fiche-poste-hint">'+ (en?p.hintEN:p.hintFR) +'</div>';
+      html += '  </div>';
+      html += '</button>';
+    });
+    html += '<div class="fiche-group-title">'+ (en?'YOUR LEVEL?':'TON NIVEAU ?') +'</div>';
+    NIVEAUX.forEach(function(n,i){
+      var sel = STATE.niveau===n.key ? 'on' : '';
+      html += '<button class="fiche-niveau-btn '+sel+'" data-niveau="'+n.key+'">';
+      html += '  <div class="fiche-niveau-bar n'+(i+1)+'"></div>';
+      html += '  <div class="fiche-niveau-content">';
+      html += '    <div class="fiche-niveau-name">'+ (en?n.nameEN:n.nameFR) +'</div>';
+      html += '    <div class="fiche-niveau-hint">'+ (en?n.hintEN:n.hintFR) +'</div>';
+      html += '  </div>';
+      html += '</button>';
+    });
+    var canGo = STATE.poste && STATE.niveau;
+    html += '<button class="fiche-btn-generate" id="fiche-btn-gen" '+(canGo?'':'disabled')+'>'+ (en?'GENERATE MY SHEET →':'GÉNÉRER MA FICHE →') +'</button>';
+    c.innerHTML = html;
+    // bind
+    c.querySelectorAll('.fiche-poste-btn').forEach(function(b){
+      b.addEventListener('click', function(){
+        STATE.poste = b.getAttribute('data-poste');
+        _save();
+        _renderSelector(c);
+      });
+    });
+    c.querySelectorAll('.fiche-niveau-btn').forEach(function(b){
+      b.addEventListener('click', function(){
+        STATE.niveau = b.getAttribute('data-niveau');
+        _save();
+        _renderSelector(c);
+      });
+    });
+    var bg = document.getElementById('fiche-btn-gen');
+    if (bg) bg.addEventListener('click', function(){
+      if (!STATE.poste || !STATE.niveau) return;
+      STATE.checked = {};
+      _stopAllTimers();
+      _pickVariant();
+      _renderFiche(c);
+    });
+  }
+
+  // ─── Choix variante aléatoire (pas 2× la même consécutive) ───
+  function _pickVariant() {
+    var key = STATE.poste + '_' + STATE.niveau;
+    var variants = ['A','B','C'];
+    var last = STATE.lastVariant;
+    var available = variants.filter(function(v){ return v !== last; });
+    var pick = available[Math.floor(Math.random()*available.length)];
+    STATE.curFicheKey = key;
+    STATE.curVariant = pick;
+    STATE.lastVariant = pick;
+  }
+  window._fiche_reroll = function() {
+    STATE.checked = {};
+    _stopAllTimers();
+    _pickVariant();
+    var c = document.getElementById('fiche-main-container');
+    if (c) _renderFiche(c);
+  };
+
+  // ─── Rendu fiche ───
+  function _renderFiche(c) {
+    var en = _flang()==='en';
+    var key = STATE.curFicheKey || (STATE.poste+'_'+STATE.niveau);
+    var variant = STATE.curVariant || 'A';
+    if (!window._FICHES_DATA || !window._FICHES_DATA[key] || !window._FICHES_DATA[key][variant]) {
+      // fallback : re-pick
+      _pickVariant();
+      key = STATE.curFicheKey; variant = STATE.curVariant;
+      if (!window._FICHES_DATA || !window._FICHES_DATA[key] || !window._FICHES_DATA[key][variant]) {
+        c.innerHTML = '<div style="color:#e63946;text-align:center;padding:40px">Fiche introuvable</div>';
+        return;
+      }
+    }
+    var blocs = window._FICHES_DATA[key][variant];
+    var poste = POSTES.filter(function(p){return p.key===STATE.poste;})[0];
+    var niv = NIVEAUX.filter(function(n){return n.key===STATE.niveau;})[0];
+    var posteName = en ? poste.nameEN : poste.nameFR;
+    var nivName = en ? niv.nameEN : niv.nameFR;
+    // Somme des durées
+    var totalMin = 0;
+    blocs.forEach(function(b){
+      var t = (en ? b.timeEN : b.timeFR) || '';
+      var m = t.match(/(\d+)/);
+      if (m) totalMin += parseInt(m[1],10);
+    });
+    var mention = en
+      ? "This training sheet is your foundation. Adapt it to the role your club coach has given you, so that your work transfers to competition."
+      : "Cette fiche d'entraînement est ta base. Adapte-la au rôle que t'a confié ton coach en club, pour que ton travail soit transférable en situation de compétition.";
+    var html = '';
+    html += '<div class="fiche-topbar">';
+    html += '  <button class="fiche-btn-back" onclick="_fiche_close()">'+ (en?'← BACK':'← RETOUR') +'</button>';
+    html += '  <div class="fiche-profile">'+ posteName +' · '+ nivName +'</div>';
+    html += '</div>';
+    html += '<div class="fiche-title">'+ _fictitle(en, STATE.poste, STATE.niveau) +'</div>';
+    html += '<div class="fiche-subtitle">'+ (en?'Variant ':'Variante ')+variant+' · '+ (en?"Today's sheet":"Fiche du jour") +'</div>';
+    html += '<div class="fiche-total">⏱ ~'+ totalMin +' MIN · '+ blocs.length +' '+ (en?'BLOCKS':'BLOCS') +'</div>';
+    html += '<div class="fiche-mention"><div class="fiche-mention-icon">💡</div><div>'+ mention +'</div></div>';
+    blocs.forEach(function(b, i){
+      var done = STATE.checked[i] ? 'done' : '';
+      var title = en ? b.titleEN : b.titleFR;
+      var time = en ? b.timeEN : b.timeFR;
+      var content = en ? b.contentEN : b.contentFR;
+      html += '<div class="fiche-bloc '+done+'" data-idx="'+i+'">';
+      html += '  <div class="fiche-bloc-check">'+(STATE.checked[i]?'✓':'')+'</div>';
+      html += '  <div class="fiche-bloc-emoji">'+b.emoji+'</div>';
+      html += '  <div class="fiche-bloc-body">';
+      html += '    <div class="fiche-bloc-titrerow">';
+      html += '      <div class="fiche-bloc-title">'+title+'</div>';
+      html += '      <div class="fiche-bloc-time" data-timer-idx="'+i+'">'+time+'</div>';
+      html += '    </div>';
+      html += '    <div class="fiche-bloc-content">'+content+'</div>';
+      html += '  </div>';
+      html += '</div>';
+    });
+    html += '<div class="fiche-end" id="fiche-end"><div class="fiche-end-icon">✅</div><div class="fiche-end-title">'+(en?'WELL DONE':'BIEN JOUÉ')+'</div></div>';
+    html += '<div class="fiche-actions">';
+    html += '  <button class="fiche-btn-action" onclick="_fiche_reroll()">🔄 '+(en?'ANOTHER SHEET':'AUTRE FICHE')+'</button>';
+    html += '  <button class="fiche-btn-action" onclick="_fiche_editProfile()">✏️ '+(en?'EDIT PROFILE':'MODIFIER')+'</button>';
+    html += '  <button class="fiche-btn-action wide" onclick="_fiche_sharePNG()">📤 '+(en?'SHARE (PNG)':'PARTAGER (PNG)')+'</button>';
+    html += '</div>';
+    c.innerHTML = html;
+    // bind blocs cochables
+    c.querySelectorAll('.fiche-bloc').forEach(function(el){
+      el.addEventListener('click', function(e){
+        if (e.target.classList.contains('fiche-bloc-time')) return;
+        var idx = parseInt(el.getAttribute('data-idx'),10);
+        STATE.checked[idx] = !STATE.checked[idx];
+        el.classList.toggle('done', !!STATE.checked[idx]);
+        el.querySelector('.fiche-bloc-check').textContent = STATE.checked[idx] ? '✓' : '';
+        _updateEnd(blocs.length);
+      });
+    });
+    // bind timers
+    c.querySelectorAll('.fiche-bloc-time').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        var idx = parseInt(el.getAttribute('data-timer-idx'),10);
+        _toggleTimer(idx, blocs[idx], el);
+      });
+    });
+    _updateEnd(blocs.length);
+    // scroll top
+    document.getElementById('fiche-main-overlay').scrollTop = 0;
+  }
+
+  function _fictitle(en, poste, niveau) {
+    var titles = {
+      'PG': { 'DEB': en?'HANDLING & LAYUPS':'HANDLING & LAYUPS',       'INT': en?'HANDLING & SHOOTING':'HANDLING & TIR',       'CON': en?'ADVANCED CREATOR':'CRÉATEUR AVANCÉ',        'COM': en?'COMPETITION PG':'MENEUR COMPÉTITION' },
+      'SG': { 'DEB': en?'SHOOTING BASICS':'BASES DU TIR',              'INT': en?'SHOOTING SPECIAL':'TIR SPÉCIAL',             'CON': en?'MOVEMENT SHOOTER':'TIREUR EN MOUVEMENT',   'COM': en?'COMPETITION SHOOTER':'TIREUR COMPÉTITION' },
+      'SF': { 'DEB': en?'VERSATILE BASICS':'BASES POLYVALENCE',        'INT': en?'VERSATILITY':'POLYVALENCE',                  'CON': en?'ADVANCED WING':'AILIER AVANCÉ',            'COM': en?'COMPETITION WING':'AILIER COMPÉTITION' },
+      'PF': { 'DEB': en?'LOW POST BASICS':'BASES POSTE BAS',           'INT': en?'LOW POST & CONTACT':'POSTE BAS & CONTACT',   'CON': en?'MODERN POWER':'POWER MODERNE',             'COM': en?'COMPETITION PF':'AILIER FORT COMPÉTITION' },
+      'C':  { 'DEB': en?'INSIDE BASICS':'BASES INTÉRIEUR',             'INT': en?'PURE INTERIOR':'INTÉRIEUR PUR',              'CON': en?'ADVANCED CENTER':'PIVOT AVANCÉ',           'COM': en?'COMPETITION CENTER':'PIVOT COMPÉTITION' }
+    };
+    return (titles[poste] && titles[poste][niveau]) || 'SÉANCE';
+  }
+
+  function _updateEnd(total) {
+    var done = Object.keys(STATE.checked).filter(function(k){ return STATE.checked[k]; }).length;
+    var e = document.getElementById('fiche-end');
+    if (e) e.classList.toggle('show', done === total && total > 0);
+  }
+
+  // ─── Timers par bloc ───
+  function _toggleTimer(idx, bloc, el) {
+    var t = STATE.timers[idx];
+    if (t && t.tickId) {
+      clearInterval(t.tickId);
+      STATE.timers[idx] = null;
+      el.classList.remove('running');
+      var origFR = bloc.timeFR, origEN = bloc.timeEN;
+      el.textContent = _flang()==='en' ? origEN : origFR;
+      return;
+    }
+    var timeStr = _flang()==='en' ? bloc.timeEN : bloc.timeFR;
+    var m = timeStr.match(/(\d+)/);
+    if (!m) return;
+    var mins = parseInt(m[1],10);
+    var endAt = Date.now() + mins*60000;
+    el.classList.add('running');
+    var tick = function(){
+      var rem = endAt - Date.now();
+      if (rem <= 0) {
+        clearInterval(STATE.timers[idx].tickId);
+        STATE.timers[idx] = null;
+        el.classList.remove('running');
+        el.textContent = '⏰ ' + (_flang()==='en'?'DONE':'FINI');
+        try { if (navigator.vibrate) navigator.vibrate([100,50,100]); } catch(e){}
+        return;
+      }
+      var s = Math.floor(rem/1000);
+      var mm = Math.floor(s/60), ss = s%60;
+      el.textContent = mm+':'+(ss<10?'0':'')+ss;
+    };
+    tick();
+    STATE.timers[idx] = { endAt: endAt, tickId: setInterval(tick, 500) };
+  }
+  function _stopAllTimers() {
+    Object.keys(STATE.timers).forEach(function(k){
+      var t = STATE.timers[k];
+      if (t && t.tickId) clearInterval(t.tickId);
+    });
+    STATE.timers = {};
+  }
+
+  // ─── Partage PNG ───
+  window._fiche_sharePNG = function() {
+    var en = _flang()==='en';
+    var key = STATE.curFicheKey; var variant = STATE.curVariant;
+    if (!window._FICHES_DATA || !window._FICHES_DATA[key] || !window._FICHES_DATA[key][variant]) return;
+    var blocs = window._FICHES_DATA[key][variant];
+    var poste = POSTES.filter(function(p){return p.key===STATE.poste;})[0];
+    var niv = NIVEAUX.filter(function(n){return n.key===STATE.niveau;})[0];
+    var W=1080, H=1920;
+    var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    var ctx=cv.getContext('2d');
+    // fond
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0d1424'); g.addColorStop(1,'#050810');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // header
+    ctx.fillStyle='#f5c518';
+    ctx.font='bold 56px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('SENSEI BLACKBELT', W/2, 130);
+    ctx.fillStyle='#cfd3e0';
+    ctx.font='bold 32px "Barlow Condensed", "Arial", sans-serif';
+    ctx.fillText((en?'TRAINING SHEET':'FICHE D\'ENTRAÎNEMENT'), W/2, 190);
+    // title
+    ctx.fillStyle='#fff';
+    ctx.font='bold 84px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.fillText((en?poste.nameEN:poste.nameFR), W/2, 340);
+    ctx.fillStyle='#f5c518';
+    ctx.font='bold 48px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.fillText((en?niv.nameEN:niv.nameFR)+' · '+(en?'VARIANT ':'VARIANTE ')+variant, W/2, 410);
+    // Ligne
+    ctx.fillStyle='#f5c518'; ctx.fillRect(W/2-120,450,240,4);
+    // Blocs
+    var y=560;
+    blocs.forEach(function(b,i){
+      ctx.fillStyle='rgba(245,197,24,0.08)';
+      ctx.fillRect(80,y,W-160,150);
+      ctx.strokeStyle='rgba(245,197,24,0.3)'; ctx.lineWidth=2;
+      ctx.strokeRect(80,y,W-160,150);
+      ctx.textAlign='left';
+      ctx.font='60px sans-serif';
+      ctx.fillStyle='#fff';
+      ctx.fillText(b.emoji, 110, y+70);
+      ctx.font='bold 34px "Bebas Neue", "Arial Narrow", sans-serif';
+      ctx.fillStyle='#f5c518';
+      ctx.fillText((en?b.titleEN:b.titleFR), 210, y+55);
+      ctx.font='bold 24px "Barlow Condensed", "Arial", sans-serif';
+      ctx.fillStyle='#f5c518';
+      ctx.textAlign='right';
+      ctx.fillText((en?b.timeEN:b.timeFR), W-110, y+55);
+      ctx.textAlign='left';
+      ctx.font='22px "Barlow", "Arial", sans-serif';
+      ctx.fillStyle='#cfd3e0';
+      var content = (en?b.contentEN:b.contentFR);
+      _wrap(ctx, content, 210, y+95, W-320, 30);
+      y+=170;
+    });
+    // Footer
+    ctx.fillStyle='rgba(245,197,24,0.5)';
+    ctx.font='bold 22px "Barlow Condensed", "Arial", sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('SENSEIBLACKBELT.COM', W/2, H-80);
+    // Download
+    try {
+      var url = cv.toDataURL('image/png');
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'SENSEI_fiche_'+STATE.poste+'_'+STATE.niveau+'_'+variant+'.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } catch(e) {
+      alert(en?'Cannot export PNG on this device':'Impossible d\'exporter le PNG sur cet appareil');
+    }
+  };
+  function _wrap(ctx, text, x, y, maxW, lh) {
+    var words = text.split(' ');
+    var line = '';
+    for (var n=0; n<words.length; n++) {
+      var test = line + words[n] + ' ';
+      var m = ctx.measureText(test);
+      if (m.width > maxW && n>0) {
+        ctx.fillText(line, x, y);
+        line = words[n] + ' '; y += lh;
+      } else line = test;
+    }
+    ctx.fillText(line, x, y);
+  }
+
+  // ─── Intro 10 sec au premier lancement ───
+  var INTRO_KEY = 'sensei_fiche_intro_seen_v1';
+  window._fiche_introSkip = function() {
+    var ov = document.getElementById('fiche-intro-overlay');
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
+    try { localStorage.setItem(INTRO_KEY, '1'); } catch(e){}
+  };
+  window._fiche_maybeShowIntro = function() {
+    try {
+      if (localStorage.getItem(INTRO_KEY)) return;
+    } catch(e){}
+    var ov = document.getElementById('fiche-intro-overlay');
+    if (!ov) return;
+    ov.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ _fiche_introSkip(); }, 10500);
+  };
+  // Auto-play l'intro au chargement (une seule fois)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){
+      setTimeout(function(){ _fiche_maybeShowIntro(); }, 400);
+    });
+  } else {
+    setTimeout(function(){ _fiche_maybeShowIntro(); }, 400);
+  }
+})();
+</script>
+
 </body>
 </html>
