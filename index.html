@@ -35749,23 +35749,107 @@ window._QI_DATA['pnr_05'] = {
     _stopTimer();
   };
 
+  // ─── Modifier profil (accessible depuis le menu) ───
+  window._qi_editProfile = function() {
+    _renderProfileSelector(false);
+  };
+  window._qi_saveProfile = function() {
+    // Sauvegarde dans le même localStorage que la fiche (partagé)
+    try {
+      var raw = localStorage.getItem('sensei_fiche_profile_v1');
+      var d = raw ? JSON.parse(raw) : {};
+      d.poste = STATE.poste;
+      d.niveau = STATE.niveau;
+      localStorage.setItem('sensei_fiche_profile_v1', JSON.stringify(d));
+    } catch(e){}
+    _renderMenu();
+  };
+
+  // ─── Sélecteur poste + niveau intégré ───
+  function _renderProfileSelector(isFirstTime) {
+    var en = _flang()==='en';
+    var c = document.getElementById('qi-container');
+    if (!c) return;
+    var POSTES_LOCAL = [
+      { key:'PG', nameFR:'MENEUR',      nameEN:'POINT GUARD',    hintFR:'Tu crées le jeu, tu portes la balle',        hintEN:'You create the play, you handle the ball' },
+      { key:'SG', nameFR:'ARRIÈRE',     nameEN:'SHOOTING GUARD', hintFR:'Tu shootes, tu joues sans ballon',           hintEN:'You shoot, you play off-ball' },
+      { key:'SF', nameFR:'AILIER',      nameEN:'SMALL FORWARD',  hintFR:'Polyvalent, entre extérieur et intérieur',   hintEN:'Versatile, between perimeter and post' },
+      { key:'PF', nameFR:'AILIER FORT', nameEN:'POWER FORWARD',  hintFR:'Physique, poste bas, rebond',                hintEN:'Physical, low post, rebounding' },
+      { key:'C',  nameFR:'PIVOT',       nameEN:'CENTER',         hintFR:'Intérieur pur, protection du cercle',        hintEN:'Pure interior, rim protection' }
+    ];
+    var NIVEAUX_LOCAL = [
+      { key:'DEB', nameFR:'DÉBUTANT',      nameEN:'BEGINNER',    hintFR:'Moins de 2 ans de basket',        hintEN:'Less than 2 years of basketball' },
+      { key:'INT', nameFR:'INTERMÉDIAIRE', nameEN:'INTERMEDIATE',hintFR:'Je joue en club, gestes de base OK', hintEN:'I play in a club, basics OK' },
+      { key:'CON', nameFR:'CONFIRMÉ',      nameEN:'ADVANCED',    hintFR:'Championnat structuré, poste défini', hintEN:'Structured league, defined role' },
+      { key:'COM', nameFR:'COMPÉTITION',   nameEN:'COMPETITION', hintFR:'Régional / national / sélection', hintEN:'Regional / national / selection' }
+    ];
+    var html = '';
+    html += '<div class="qi-topbar">';
+    if (isFirstTime) {
+      html += '  <button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    } else {
+      html += '  <button class="qi-btn-back" onclick="_qi_open()">'+(en?'← CANCEL':'← ANNULER')+'</button>';
+    }
+    html += '  <div class="qi-profile">'+(en?'YOUR PROFILE':'TON PROFIL')+'</div>';
+    html += '</div>';
+    html += '<div class="qi-title">'+(en?"WHAT'S YOUR POSITION?":"QUEL EST TON POSTE ?")+'</div>';
+    html += '<div class="qi-subtitle">'+(en?'We adapt situations to your game':'On adapte les situations à ton jeu')+'</div>';
+
+    POSTES_LOCAL.forEach(function(p){
+      var sel = STATE.poste===p.key ? 'on' : '';
+      html += '<button class="fiche-poste-btn '+sel+'" data-qiposte="'+p.key+'" style="margin-bottom:8px">';
+      html += '  <div class="fiche-poste-abbr" style="border-color:rgba(78,205,196,0.4);background:rgba(78,205,196,0.15);color:#4ecdc4">'+p.key+'</div>';
+      html += '  <div class="fiche-poste-info">';
+      html += '    <div class="fiche-poste-name">'+(en?p.nameEN:p.nameFR)+'</div>';
+      html += '    <div class="fiche-poste-hint">'+(en?p.hintEN:p.hintFR)+'</div>';
+      html += '  </div>';
+      html += '</button>';
+    });
+
+    html += '<div class="qi-cat-title">'+(en?'YOUR LEVEL?':'TON NIVEAU ?')+'</div>';
+    NIVEAUX_LOCAL.forEach(function(n,i){
+      var sel = STATE.niveau===n.key ? 'on' : '';
+      html += '<button class="fiche-niveau-btn '+sel+'" data-qiniveau="'+n.key+'" style="margin-bottom:8px">';
+      html += '  <div class="fiche-niveau-bar n'+(i+1)+'"></div>';
+      html += '  <div class="fiche-niveau-content">';
+      html += '    <div class="fiche-niveau-name">'+(en?n.nameEN:n.nameFR)+'</div>';
+      html += '    <div class="fiche-niveau-hint">'+(en?n.hintEN:n.hintFR)+'</div>';
+      html += '  </div>';
+      html += '</button>';
+    });
+
+    var canGo = STATE.poste && STATE.niveau;
+    html += '<button class="qi-next-btn on" id="qi-save-btn" '+(canGo?'':'disabled')+'>'+(en?'CONTINUE →':'CONTINUER →')+'</button>';
+    c.innerHTML = html;
+
+    // Bind sélection
+    c.querySelectorAll('[data-qiposte]').forEach(function(b){
+      b.addEventListener('click', function(){
+        STATE.poste = b.getAttribute('data-qiposte');
+        _renderProfileSelector(isFirstTime);
+      });
+    });
+    c.querySelectorAll('[data-qiniveau]').forEach(function(b){
+      b.addEventListener('click', function(){
+        STATE.niveau = b.getAttribute('data-qiniveau');
+        _renderProfileSelector(isFirstTime);
+      });
+    });
+    var sb = document.getElementById('qi-save-btn');
+    if (sb) sb.addEventListener('click', function(){
+      if (STATE.poste && STATE.niveau) window._qi_saveProfile();
+    });
+    document.getElementById('qi-overlay').scrollTop = 0;
+  }
+
   // ─── Menu principal ───
   function _renderMenu() {
     var en = _flang()==='en';
     var c = document.getElementById('qi-container');
     if (!c) return;
+    // Si pas de profil défini, ouvrir directement le sélecteur intégré
     if (!STATE.poste || !STATE.niveau) {
-      // Doit d'abord définir un profil : ouvrir la fiche pour choisir
-      c.innerHTML = '<div class="qi-topbar">'
-        +'<button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>'
-        +'</div>'
-        +'<div class="qi-title">'+(en?'BASKETBALL IQ':'QI BASKET')+'</div>'
-        +'<div class="qi-subtitle">'+(en?'Read the game — decision making':'Lecture de jeu — prise de décision')+'</div>'
-        +'<div class="qi-context" style="text-align:center">'
-        +(en?'To adapt situations to your level, please first choose your position and level in TON ENTRAÎNEMENT.'
-             :'Pour adapter les situations à ton niveau, choisis d\'abord ton poste et ton niveau dans TON ENTRAÎNEMENT.')
-        +'</div>'
-        +'<button class="qi-mode-btn" onclick="_qi_close();setTimeout(function(){if(typeof _fiche_open===\'function\')_fiche_open();},50)"><div class="qi-mode-title">📋 '+(en?'OPEN TRAINING SHEET':'OUVRIR TON ENTRAÎNEMENT')+'</div><div class="qi-mode-desc">'+(en?'Set your position and level once, applied here too':'Choisis ton poste et niveau une fois, appliqué ici aussi')+'</div></button>';
+      _renderProfileSelector(true);
       return;
     }
     var posteName = _posteName(STATE.poste, en);
@@ -35773,7 +35857,7 @@ window._QI_DATA['pnr_05'] = {
     var html = '';
     html += '<div class="qi-topbar">';
     html += '  <button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
-    html += '  <div class="qi-profile">'+posteName+' · '+nivName+'</div>';
+    html += '  <button class="qi-btn-back" onclick="_qi_editProfile()" style="cursor:pointer">'+posteName+' · '+nivName+' ✎</button>';
     html += '</div>';
     html += '<div class="qi-title">'+(en?'BASKETBALL IQ':'QI BASKET')+'</div>';
     html += '<div class="qi-subtitle">'+(en?'5 situations — decide fast':'5 situations — décide vite')+'</div>';
