@@ -868,6 +868,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_fiche">TON ENTRAÎNEMENT</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_fiche">Fiche perso adaptée à ton poste</div>
         </button>
+        <!-- QI BASKET (lecture de jeu) -->
+        <button onclick="_qi_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(78,205,196,.12),rgba(13,17,23,.6));border:1px solid rgba(78,205,196,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🧠</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#4ecdc4;line-height:1" data-i18n="dojo_lbl_qi">QI BASKET</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_qi">Lecture de jeu · Prise de décision</div>
+        </button>
       </div>
     </div>
   </div>
@@ -7475,7 +7483,7 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
-    var ONBOARDING_VERSION = '2026.08.06';
+    var ONBOARDING_VERSION = '2026.08.07';
     // Test bypass : ?onboarding=1 dans l'URL force l'affichage
     var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
     var seenVersion = localStorage.getItem('sensei_onboarding_seen_v');
@@ -7528,7 +7536,7 @@ function onboardingCycleMath() {
   }, 2200);
 }
 function onboardingClose() {
-  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.06'); } catch(e) {}
+  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.07'); } catch(e) {}
   var m = document.getElementById('onboarding-modal');
   if (m) {
     m.style.opacity = '0';
@@ -7569,6 +7577,8 @@ function onboardingLaunch(which) {
         }, 300);
       } else if (which === 'fiche') {
         if (typeof _fiche_open === 'function') _fiche_open();
+      } else if (which === 'qi') {
+        if (typeof _qi_open === 'function') _qi_open();
       }
     } catch(e) {}
   }, 350);
@@ -9797,6 +9807,21 @@ function oppDisplayResults(top, region, en, profile) {
           </div>
         </div>
         <div data-i18n="onb_fiche_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Fiche perso adaptée à ton poste</div>
+      </button>
+
+      <!-- QI BASKET -->
+      <button class="onb-card" onclick="onboardingLaunch('qi')" style="background:linear-gradient(160deg,rgba(78,205,196,.14),rgba(78,205,196,.02));border:2px solid rgba(78,205,196,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.7px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🧠</div>
+        <div data-i18n="onb_qi_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#4ecdc4;letter-spacing:3px;line-height:1">QI BASKET</div>
+        <!-- Mini-animation schéma tactique -->
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 0">
+          <div style="width:16px;height:16px;background:#f5c518;border-radius:50%;box-shadow:0 0 10px rgba(245,197,24,.7);animation:onbBurnoutPulse 1.5s ease-in-out infinite"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ecdc4;letter-spacing:1px">→</div>
+          <div style="width:16px;height:16px;background:#666;border-radius:50%"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ecdc4;letter-spacing:1px">?</div>
+        </div>
+        <div data-i18n="onb_qi_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Lecture de jeu — prise de décision</div>
       </button>
 
     </div>
@@ -34132,6 +34157,2014 @@ Object.assign(window._FICHES_DATA, {
     });
   } else {
     setTimeout(function(){ _fiche_maybeShowIntro(); }, 400);
+  }
+})();
+</script>
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   QI BASKET — DATA 120 situations
+   Structure : id → { cat, perspective, levels, contextFR, contextEN, positions{initial,preAction,result_A,result_B,result_C}, overlays{}, answers[3] }
+   Positions : {label, x, y, def?, ball?, you?}
+   Overlays : { arrows: [{x1,y1,x2,y2,color,dashed,curve,cx,cy}], screens: [{x1,y1,x2,y2}], label: {x,y,text} }
+   Perspective : 'off' (offensive) ou 'def' (défensive)
+   Coordonnées : 800×600, panier en bas au centre (x=400, y=560), demi-terrain
+═══════════════════════════════════════════════════════════════════════════════ */
+window._QI_DATA = {};
+
+// Helpers de positionnement rapides
+function _qp(label, x, y, opts) {
+  var p = { label: label, x: x, y: y };
+  if (opts) Object.keys(opts).forEach(function(k){ p[k] = opts[k]; });
+  return p;
+}
+
+// ════════════════════ CATÉGORIE 1 : PICK & ROLL (20 situations) ════════════════════
+
+// Positions type PnR : PG dribble au top, C monte poser un écran, défense choisit une couverture
+window._QI_DATA['pnr_01'] = {
+  cat: 'pnr', perspective: 'off', levels: ['DEB','INT','CON','COM'],
+  contextFR: "Tu es le meneur (1). Ton pivot (5) monte poser un écran sur ton défenseur (X1). Le défenseur du pivot (X5) est en DROP (recule vers la raquette). Ton défenseur PASSE SOUS l'écran.",
+  contextEN: "You are the PG (1). Your center (5) comes up to set a screen on your defender (X1). The C's defender (X5) is in DROP coverage. Your defender goes UNDER the screen.",
+  positions: {
+    initial: [
+      _qp('1', 400, 200, {ball:true, you:true}),
+      _qp('X1', 400, 240, {def:true}),
+      _qp('5', 400, 340), _qp('X5', 400, 380, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    preAction: [
+      _qp('1', 400, 220, {ball:true, you:true}),
+      _qp('X1', 400, 340, {def:true}),
+      _qp('5', 400, 260), _qp('X5', 400, 440, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_A: [
+      _qp('1', 400, 220, {ball:true, you:true}),
+      _qp('X1', 400, 340, {def:true}),
+      _qp('5', 400, 260), _qp('X5', 400, 440, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_B: [
+      _qp('1', 400, 400, {ball:true, you:true}),
+      _qp('X1', 400, 340, {def:true}),
+      _qp('5', 400, 260), _qp('X5', 400, 440, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_C: [
+      _qp('1', 400, 220, {you:true}),
+      _qp('X1', 400, 340, {def:true}),
+      _qp('5', 400, 260), _qp('X5', 400, 440, {def:true}),
+      _qp('2', 130, 480, {ball:true}), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ]
+  },
+  overlays: {
+    preAction: { screens: [{x1:380,y1:290,x2:420,y2:290}] },
+    result_A: { arrows: [{x1:400,y1:180,x2:400,y2:140,color:'#2dc653'}], label: {x:400,y:110,text:'PULL-UP 3PT'} },
+    result_B: { arrows: [{x1:400,y1:240,x2:400,y2:380,color:'#f5c518'}], label: {x:400,y:490,text:'DRIVE CONTESTÉ'} },
+    result_C: { arrows: [{x1:400,y1:200,x2:150,y2:460,color:'#e63946',curve:true,cx:250,cy:250}], label: {x:150,y:470,text:'BALLE PERDUE'} }
+  },
+  answers: [
+    { fr:"Tu pull-up à 3 pts (le défenseur est en retard, le pivot est en drop loin, tu es libre)", en:"You pull up for the 3 (defender is behind, C is in deep drop, you're open)", score:'opt', explainFR:"Le défenseur qui passe sous t'a laissé la fenêtre de shoot. Le pivot en drop ne peut pas contester à temps. C'est LA lecture standard du pull-up 3.", explainEN:"The defender going under gave you the shooting window. The C in drop can't contest in time. This is THE standard pull-up 3 read." },
+    { fr:"Tu drives vers la raquette", en:"You drive toward the paint", score:'acc', explainFR:"Ça marche mais tu fonces droit vers le pivot en drop qui va te contester le layup. Choix plus dur que nécessaire.", explainEN:"Works but you drive straight at the C in drop who will contest the layup. Harder choice than needed." },
+    { fr:"Tu ressors la passe à l'aile (2)", en:"You kick out the pass to the wing (2)", score:'weak', explainFR:"Tu gâches une lecture ouverte. Le défenseur en dessous t'a offert le shoot, tu dois attaquer immédiatement.", explainEN:"You waste an open read. Defender going under gave you the shot — you must attack immediately." }
+  ]
+};
+
+window._QI_DATA['pnr_02'] = {
+  cat: 'pnr', perspective: 'off', levels: ['INT','CON','COM'],
+  contextFR: "Tu es le meneur (1). Écran de ton pivot (5). Cette fois, la défense change (SWITCH) : X1 prend ton pivot, X5 vient sur toi. X5 est un grand lent.",
+  contextEN: "You are the PG (1). Screen from your C (5). This time defense SWITCHES: X1 takes your C, X5 comes on you. X5 is a slow big man.",
+  positions: {
+    initial: [
+      _qp('1', 400, 200, {ball:true, you:true}), _qp('X1', 400, 240, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 360, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    preAction: [
+      _qp('1', 400, 220, {ball:true, you:true}), _qp('X1', 400, 280, {def:true}),
+      _qp('5', 400, 270), _qp('X5', 400, 200, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_A: [
+      _qp('1', 550, 380, {ball:true, you:true}), _qp('X1', 400, 280, {def:true}),
+      _qp('5', 400, 270), _qp('X5', 450, 260, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_B: [
+      _qp('1', 400, 220, {you:true}), _qp('X1', 500, 400, {def:true}),
+      _qp('5', 400, 500, {ball:true}), _qp('X5', 400, 220, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_C: [
+      _qp('1', 400, 220, {ball:true, you:true}), _qp('X1', 400, 280, {def:true}),
+      _qp('5', 400, 270), _qp('X5', 400, 220, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ]
+  },
+  overlays: {
+    preAction: { screens: [{x1:380,y1:270,x2:420,y2:270}] },
+    result_A: { arrows: [{x1:400,y1:220,x2:550,y2:370,color:'#2dc653'}], label: {x:600,y:400,text:'ATTAQUE X5 SLOW'} },
+    result_B: { arrows: [{x1:400,y1:220,x2:400,y2:500,color:'#2dc653',curve:true,cx:100,cy:400}], label: {x:400,y:540,text:'PASSE MISMATCH POST'} },
+    result_C: { arrows: [{x1:380,y1:220,x2:380,y2:220,color:'#e63946',dashed:true}], label: {x:400,y:180,text:'HÉSITATION'} }
+  },
+  answers: [
+    { fr:"Tu attaques X5 en 1v1 (mismatch : tu es rapide, il est grand et lent)", en:"You attack X5 in 1v1 (mismatch: you're quick, he's big and slow)", score:'opt', explainFR:"Le switch t'a mis en 1v1 avec un grand lent. C'est la meilleure exploitation du mismatch : attaque avant qu'il n'y ait un help.", explainEN:"The switch gave you a 1v1 with a slow big. Best mismatch exploitation: attack before help arrives." },
+    { fr:"Tu passes le ballon à ton pivot (5) qui a X1 (petit) sur le dos près du panier", en:"You pass to your C (5) who has X1 (small) posting up near the basket", score:'acc', explainFR:"Le mismatch poste bas est réel mais demande à ton pivot de sceller correctement et à toi de faire une passe précise. Plus lent à exécuter que ton 1v1 direct.", explainEN:"Post mismatch is real but requires your C to seal properly and you to make a precise pass. Slower to execute than your direct 1v1." },
+    { fr:"Tu attends 3 secondes pour lire la situation", en:"You wait 3 seconds to read the situation", score:'weak', explainFR:"L'hésitation efface le mismatch. La défense va réajuster (help), et ta fenêtre disparaît. Décide vite.", explainEN:"Hesitation kills the mismatch. Defense will readjust (help), your window closes. Decide fast." }
+  ]
+};
+
+window._QI_DATA['pnr_03'] = {
+  cat: 'pnr', perspective: 'off', levels: ['INT','CON','COM'],
+  contextFR: "Meneur (1). Ton pivot (5) pose l'écran. Défense en HEDGE : X5 sort en aggressif sur toi pour te retarder, X1 revient. Ton pivot glisse (roll) vers le cercle libre.",
+  contextEN: "PG (1). Your C (5) sets the screen. Defense HEDGES: X5 comes out aggressively on you, X1 recovers. Your C rolls free to the rim.",
+  positions: {
+    initial: [
+      _qp('1', 400, 200, {ball:true, you:true}), _qp('X1', 400, 240, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 360, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    preAction: [
+      _qp('1', 400, 220, {ball:true, you:true}), _qp('X1', 400, 320, {def:true}),
+      _qp('5', 380, 380), _qp('X5', 380, 240, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_A: [
+      _qp('1', 400, 240, {you:true}), _qp('X1', 400, 320, {def:true}),
+      _qp('5', 400, 500, {ball:true}), _qp('X5', 380, 240, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_B: [
+      _qp('1', 400, 180, {ball:true, you:true}), _qp('X1', 400, 320, {def:true}),
+      _qp('5', 380, 380), _qp('X5', 380, 240, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_C: [
+      _qp('1', 480, 320, {ball:true, you:true}), _qp('X1', 400, 320, {def:true}),
+      _qp('5', 380, 380), _qp('X5', 500, 300, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ]
+  },
+  overlays: {
+    preAction: { screens: [{x1:360,y1:340,x2:400,y2:340}] },
+    result_A: { arrows: [{x1:400,y1:230,x2:400,y2:490,color:'#2dc653',curve:true,cx:600,cy:350}], label: {x:400,y:540,text:'POCKET PASS ROLLEUR'} },
+    result_B: { arrows: [{x1:400,y1:180,x2:400,y2:140,color:'#f5c518'}], label: {x:400,y:110,text:'PULL-UP LOIN'} },
+    result_C: { arrows: [{x1:400,y1:220,x2:480,y2:310,color:'#e63946'}], label: {x:530,y:340,text:'PIÉGÉ HEDGE'} }
+  },
+  answers: [
+    { fr:"Pocket pass à ton pivot (5) qui roule libre vers le cercle", en:"Pocket pass to your C (5) rolling free to the rim", score:'opt', explainFR:"Le hedge crée un 4v3 derrière. Ton pivot est libre sur le roll — c'est LA lecture prioritaire du hedge, à condition d'exécuter la pocket pass proprement.", explainEN:"The hedge creates a 4v3 behind. Your C is free on the roll — this is THE priority read against hedge, if you execute a clean pocket pass." },
+    { fr:"Tu reculs et prends un pull-up 3 pts très loin", en:"You step back for a deep pull-up 3", score:'acc', explainFR:"Ça peut rentrer mais c'est un tir difficile. Le vrai avantage du hedge est derrière (4v3), pas devant.", explainEN:"Can go in but tough shot. The real hedge advantage is behind you (4v3), not in front." },
+    { fr:"Tu attaques directement le hedgeur (X5) sur son côté", en:"You drive straight at the hedger (X5) on his side", score:'weak', explainFR:"X5 est venu pour te ralentir — attaquer son corps c'est jouer son jeu. Tu vas te faire prendre entre lui et X1 qui revient.", explainEN:"X5 came out to slow you — attacking him plays into his hands. You get sandwiched between him and returning X1." }
+  ]
+};
+
+window._QI_DATA['pnr_04'] = {
+  cat: 'pnr', perspective: 'off', levels: ['CON','COM'],
+  contextFR: "Meneur (1). Écran du pivot (5). Défense en TRAP : X1 et X5 te doublent tous les deux sur toi. Ton pivot roule libre. Ton ailier (3) reste dans le corner.",
+  contextEN: "PG (1). C (5) screen. Defense TRAPS: X1 and X5 both double you. Your C rolls free. Wing (3) stays in corner.",
+  positions: {
+    initial: [
+      _qp('1', 400, 200, {ball:true, you:true}), _qp('X1', 400, 240, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 360, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    preAction: [
+      _qp('1', 400, 240, {ball:true, you:true}), _qp('X1', 380, 280, {def:true}),
+      _qp('5', 400, 400), _qp('X5', 420, 280, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_A: [
+      _qp('1', 400, 240, {you:true}), _qp('X1', 380, 280, {def:true}),
+      _qp('5', 400, 500, {ball:true}), _qp('X5', 420, 280, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_B: [
+      _qp('1', 400, 240, {you:true}), _qp('X1', 380, 280, {def:true}),
+      _qp('5', 400, 400), _qp('X5', 420, 280, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480, {ball:true}), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_C: [
+      _qp('1', 400, 300, {ball:true, you:true}), _qp('X1', 380, 320, {def:true}),
+      _qp('5', 400, 400), _qp('X5', 420, 320, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ]
+  },
+  overlays: {
+    preAction: { screens: [{x1:380,y1:340,x2:420,y2:340}], label:{x:400,y:180,text:'TRAP !'} },
+    result_A: { arrows: [{x1:400,y1:250,x2:400,y2:490,color:'#2dc653',curve:true,cx:200,cy:400}], label: {x:400,y:540,text:'PASSE AU ROLLEUR'} },
+    result_B: { arrows: [{x1:400,y1:250,x2:670,y2:470,color:'#f5c518',curve:true,cx:550,cy:280}], label: {x:670,y:440,text:'SKIP PASS CORNER'} },
+    result_C: { arrows: [{x1:400,y1:250,x2:400,y2:300,color:'#e63946'}], label: {x:400,y:340,text:'PIÉGÉ - TURNOVER'} }
+  },
+  answers: [
+    { fr:"Passe rapide au pivot (5) qui roule libre — la vraie fenêtre courte", en:"Quick pass to C (5) rolling free — the real short window", score:'opt', explainFR:"Le trap laisse 4v3 derrière. Le rolleur est le plus proche et le plus dangereux. Passe rapide et courte, il finit ou décide.", explainEN:"The trap creates 4v3 behind. The roller is closest and most dangerous. Quick short pass, he finishes or decides." },
+    { fr:"Skip pass longue vers l'ailier (3) au corner opposé", en:"Skip pass to wing (3) in opposite corner", score:'acc', explainFR:"C'est jouable mais une skip pass longue est risquée sous double contest — un défenseur peut l'intercepter. Le rolleur est plus sûr.", explainEN:"Playable but a long skip pass under double pressure is risky — a defender can intercept. Roller is safer." },
+    { fr:"Tu drives entre les deux défenseurs", en:"You drive between the two defenders", score:'weak', explainFR:"C'est le pire choix contre un trap. Tu vas perdre le ballon quasi certainement. Le trap est justement conçu pour te forcer à driver.", explainEN:"Worst choice against a trap. You'll almost certainly lose the ball. Trap is designed to make you drive." }
+  ]
+};
+
+window._QI_DATA['pnr_05'] = {
+  cat: 'pnr', perspective: 'off', levels: ['DEB','INT'],
+  contextFR: "Meneur débutant (1). Ton pivot (5) monte poser un écran. Ton défenseur (X1) navigue AU-DESSUS de l'écran. Le pivot défenseur (X5) est en drop très bas.",
+  contextEN: "Beginner PG (1). Your C (5) sets a screen. Your defender (X1) navigates OVER the screen. C's defender (X5) is in very deep drop.",
+  positions: {
+    initial: [
+      _qp('1', 400, 200, {ball:true, you:true}), _qp('X1', 400, 240, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 460, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    preAction: [
+      _qp('1', 400, 260, {ball:true, you:true}), _qp('X1', 400, 260, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 460, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_A: [
+      _qp('1', 400, 380, {ball:true, you:true}), _qp('X1', 400, 260, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 460, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_B: [
+      _qp('1', 400, 180, {ball:true, you:true}), _qp('X1', 400, 260, {def:true}),
+      _qp('5', 400, 320), _qp('X5', 400, 460, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ],
+    result_C: [
+      _qp('1', 400, 260, {you:true}), _qp('X1', 400, 260, {def:true}),
+      _qp('5', 400, 320, {ball:true}), _qp('X5', 400, 460, {def:true}),
+      _qp('2', 130, 480), _qp('X2', 130, 520, {def:true}),
+      _qp('3', 670, 480), _qp('X3', 670, 520, {def:true}),
+      _qp('4', 250, 400), _qp('X4', 250, 440, {def:true})
+    ]
+  },
+  overlays: {
+    preAction: { screens: [{x1:380,y1:300,x2:420,y2:300}] },
+    result_A: { arrows: [{x1:400,y1:280,x2:400,y2:370,color:'#2dc653'}], label: {x:400,y:420,text:'FLOATER MI-DISTANCE'} },
+    result_B: { arrows: [{x1:400,y1:260,x2:400,y2:150,color:'#f5c518'}], label: {x:400,y:120,text:'RECUL 3PT (LONG)'} },
+    result_C: { arrows: [{x1:400,y1:270,x2:400,y2:310,color:'#e63946'}], label: {x:400,y:340,text:'PASSE MAL TIMÉE'} }
+  },
+  answers: [
+    { fr:"Tu attaques dans la fenêtre mi-distance et prends un floater par-dessus X5", en:"You attack the mid-range gap and take a floater over X5", score:'opt', explainFR:"X1 est au-dessus (tu es débarrassé), X5 est très bas (tu as l'espace mi-distance). Le floater est la lecture propre — c'est l'espace créé par cette couverture.", explainEN:"X1 is over (you got past), X5 is deep (mid-range space). Floater is the clean read — this is the space created by this coverage." },
+    { fr:"Tu recules pour prendre un 3 pts", en:"You step back for a 3", score:'acc', explainFR:"Tu peux prendre le 3 pts mais tu n'exploites pas l'espace principal créé. Le mi-distance était plus facile.", explainEN:"You can take the 3 but you don't exploit the main space created. Mid-range was easier." },
+    { fr:"Tu passes le ballon au pivot (5) tout de suite après l'écran", en:"You pass to C (5) right after the screen", score:'weak', explainFR:"Le pivot est encore en position d'écran, pas roleur. La passe arrive trop tôt — X1 récupère et intercepte facilement.", explainEN:"C is still setting the screen, not rolling. Pass comes too early — X1 recovers and intercepts easily." }
+  ]
+};
+
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   QI BASKET DATA — Partie 2 : template compact avec positions canoniques
+   Suite des situations (pnr 6-20, iso 1-20, off 1-20, def 1-20, trs 1-20, clt 1-20)
+═══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  // Helper quickPosition
+  function _p(l,x,y,o){ var r={label:l,x:x,y:y}; if(o) for(var k in o) r[k]=o[k]; return r; }
+
+  // ─── POSITIONS CANONIQUES RÉUTILISABLES ───
+  // PnR top classique
+  var POS_PNR_INIT = [
+    _p('1',400,200,{ball:true,you:true}), _p('X1',400,240,{def:true}),
+    _p('5',400,340), _p('X5',400,380,{def:true}),
+    _p('2',130,480), _p('X2',130,520,{def:true}),
+    _p('3',670,480), _p('X3',670,520,{def:true}),
+    _p('4',250,400), _p('X4',250,440,{def:true})
+  ];
+  // ISO top (1v1 au top)
+  var POS_ISO_TOP = [
+    _p('1',400,220,{ball:true,you:true}), _p('X1',400,290,{def:true}),
+    _p('2',120,300), _p('X2',150,320,{def:true}),
+    _p('3',680,300), _p('X3',650,320,{def:true}),
+    _p('4',180,480), _p('X4',180,510,{def:true}),
+    _p('5',620,480), _p('X5',620,510,{def:true})
+  ];
+  // ISO wing (1v1 sur l'aile)
+  var POS_ISO_WING = [
+    _p('2',200,320,{ball:true,you:true}), _p('X2',270,340,{def:true}),
+    _p('1',450,220), _p('X1',450,250,{def:true}),
+    _p('3',680,300), _p('X3',650,330,{def:true}),
+    _p('4',180,500), _p('X4',180,530,{def:true}),
+    _p('5',620,500), _p('X5',620,530,{def:true})
+  ];
+  // OFF-BALL cutter (tu es le cutter, PG a le ballon)
+  var POS_OFF_CUT = [
+    _p('1',400,220,{ball:true}), _p('X1',400,260,{def:true}),
+    _p('2',180,340,{you:true}), _p('X2',180,380,{def:true}),
+    _p('3',680,340), _p('X3',680,380,{def:true}),
+    _p('4',200,490), _p('X4',200,520,{def:true}),
+    _p('5',600,490), _p('X5',600,520,{def:true})
+  ];
+  // DEF help-side (tu es un défenseur en help)
+  var POS_DEF_HELP = [
+    _p('1',400,230), _p('X1',400,270,{def:true}),
+    _p('2',150,340,{ball:true}), _p('X2',180,370,{def:true}),
+    _p('3',650,340), _p('X3',620,370,{def:true,you:true}),
+    _p('4',280,490), _p('X4',300,520,{def:true}),
+    _p('5',550,470), _p('X5',530,500,{def:true})
+  ];
+  // DEF pnr (tu défends sur le porteur du pnr)
+  var POS_DEF_PNR = [
+    _p('1',400,220,{ball:true}), _p('X1',400,250,{def:true,you:true}),
+    _p('5',400,320), _p('X5',400,360,{def:true}),
+    _p('2',130,480), _p('X2',130,520,{def:true}),
+    _p('3',670,480), _p('X3',670,520,{def:true}),
+    _p('4',250,400), _p('X4',250,440,{def:true})
+  ];
+  // TRANSITION 2v1
+  var POS_TR_2v1 = [
+    _p('1',300,280,{ball:true,you:true}),
+    _p('2',500,280),
+    _p('X1',400,420,{def:true})
+  ];
+  // TRANSITION 3v2
+  var POS_TR_3v2 = [
+    _p('1',400,240,{ball:true,you:true}),
+    _p('2',150,320), _p('3',650,320),
+    _p('X1',300,420,{def:true}), _p('X2',500,420,{def:true})
+  ];
+  // CLUTCH last shot
+  var POS_CLUTCH = [
+    _p('1',400,240,{ball:true,you:true}), _p('X1',400,290,{def:true}),
+    _p('2',150,420), _p('X2',180,450,{def:true}),
+    _p('3',650,420), _p('X3',620,450,{def:true}),
+    _p('4',280,500), _p('X4',280,530,{def:true}),
+    _p('5',520,500), _p('X5',520,530,{def:true})
+  ];
+
+  // Helper : clone une position et modifie certaines
+  function _clone(arr) { return arr.map(function(p){ var r={}; for(var k in p) r[k]=p[k]; return r; }); }
+  function _modify(arr, changes) {
+    var out = _clone(arr);
+    changes.forEach(function(ch){
+      for (var i=0; i<out.length; i++) {
+        if (out[i].label === ch.label) {
+          if (ch.x !== undefined) out[i].x = ch.x;
+          if (ch.y !== undefined) out[i].y = ch.y;
+          if (ch.ball !== undefined) out[i].ball = ch.ball;
+          if (ch.you !== undefined) out[i].you = ch.you;
+        }
+      }
+    });
+    return out;
+  }
+
+  // Factory qui crée une situation avec structure minimale
+  // s = { id, cat, perspective, levels, contextFR, contextEN, basePositions,
+  //       preActionChanges, resultAChanges, resultBChanges, resultCChanges,
+  //       overlays, answers }
+  function _make(s) {
+    var initial = s.basePositions;
+    var preAction = s.preActionChanges ? _modify(initial, s.preActionChanges) : initial;
+    var result_A = s.resultAChanges ? _modify(preAction, s.resultAChanges) : preAction;
+    var result_B = s.resultBChanges ? _modify(preAction, s.resultBChanges) : preAction;
+    var result_C = s.resultCChanges ? _modify(preAction, s.resultCChanges) : preAction;
+    window._QI_DATA[s.id] = {
+      cat: s.cat, perspective: s.perspective, levels: s.levels,
+      contextFR: s.contextFR, contextEN: s.contextEN,
+      positions: { initial: initial, preAction: preAction, result_A: result_A, result_B: result_B, result_C: result_C },
+      overlays: s.overlays || {},
+      answers: s.answers
+    };
+  }
+
+  // ═════════════════════════ PNR (suite : 6 à 20) ═════════════════════════
+
+  _make({
+    id:'pnr_06', cat:'pnr', perspective:'off', levels:['CON','COM'],
+    contextFR:"Meneur (1). Écran du pivot (5). Cette fois c'est une couverture ICE : X1 pousse le ballon vers la ligne de touche, X5 monte le corner opposé. Le pivot (5) roule dans la raquette.",
+    contextEN:"PG (1). C (5) screen. This time ICE coverage: X1 pushes ball to sideline, X5 slides up. C rolls to paint.",
+    basePositions: POS_PNR_INIT,
+    preActionChanges: [{label:'X1',x:340,y:290},{label:'X5',x:400,y:280},{label:'5',x:400,y:440}],
+    overlays: {
+      preAction: { screens:[{x1:380,y1:300,x2:420,y2:300}], label:{x:400,y:170,text:'ICE'} },
+      result_A: { arrows:[{x1:400,y1:240,x2:400,y2:440,color:'#2dc653',curve:true,cx:600,cy:340}], label:{x:400,y:490,text:'PASSE HORS TEMPO AU ROLLEUR'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:200,y2:360,color:'#f5c518'}], label:{x:180,y:390,text:'REJET VERS LE HAUT'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:100,y2:400,color:'#e63946'}], label:{x:130,y:430,text:'DRIBBLE LIGNE — PIÉGÉ'} }
+    },
+    answers: [
+      { fr:"Tu joues la lecture hors tempo : passe au rolleur (5) qui est libre dans la raquette", en:"You play the off-timing read: pass to roller (5) free in the paint", score:'opt',
+        explainFR:"L'ICE cherche à te limiter côté ballon. Ton pivot exploite l'écart créé côté opposé, il est libre — c'est la bonne réponse à l'ICE.",
+        explainEN:"ICE tries to limit you on ball side. Your C exploits the gap created on the opposite side, he's free — that's the ICE answer." },
+      { fr:"Tu rejettes la balle vers un joueur au top", en:"You reject the ball to a top-side player", score:'acc',
+        explainFR:"Le reset est propre mais tu perds l'avantage numérique créé par l'ICE. Tu recommences l'attaque.",
+        explainEN:"Reset is clean but you waste the numeric edge from ICE. You restart the offense." },
+      { fr:"Tu drives fort vers la ligne de fond", en:"You drive hard to the baseline", score:'weak',
+        explainFR:"C'est exactement ce que veut l'ICE : te pousser vers la ligne pour te piéger. Tu vas perdre le ballon ou forcer un tir difficile.",
+        explainEN:"That's exactly what ICE wants: push you to sideline to trap. You'll turn it over or force a bad shot." }
+    ]
+  });
+
+  _make({
+    id:'pnr_07', cat:'pnr', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Meneur (1). Écran latéral du pivot (5) sur l'aile. Ton pivot POP (ressort au périmètre au lieu de rouler). X5 hésite.",
+    contextEN:"PG (1). C (5) side screen on the wing. Your C POPS (rolls out to perimeter instead of to the rim). X5 hesitates.",
+    basePositions: POS_PNR_INIT,
+    preActionChanges: [{label:'1',x:200,y:300},{label:'X1',x:280,y:340},{label:'5',x:150,y:230},{label:'X5',x:280,y:280}],
+    overlays: {
+      preAction: { screens:[{x1:230,y1:290,x2:270,y2:290}] },
+      result_A: { arrows:[{x1:200,y1:310,x2:150,y2:220,color:'#2dc653'}], label:{x:150,y:190,text:'PASSE POP 3PT'} },
+      result_B: { arrows:[{x1:200,y1:310,x2:400,y2:500,color:'#f5c518',curve:true,cx:400,cy:300}], label:{x:400,y:540,text:'DRIVE VERS RAQUETTE'} },
+      result_C: { arrows:[{x1:200,y1:310,x2:200,y2:310,color:'#e63946',dashed:true}], label:{x:220,y:270,text:'DRIBBLE INUTILE'} }
+    },
+    answers: [
+      { fr:"Passe immédiate au pivot qui POP à 3 pts, il shoote", en:"Quick pass to popping C at 3 pt line, he shoots", score:'opt',
+        explainFR:"Le POP est fait pour ça. X5 hésite entre te contester et récupérer sur le pivot — il ne peut pas les deux. Passe immédiate = tir ouvert.",
+        explainEN:"POP is designed for this. X5 hesitates between contest on you and recover on C — can't do both. Quick pass = open shot." },
+      { fr:"Tu attaques la raquette maintenant que X5 est sorti", en:"You attack the paint now that X5 is out", score:'acc',
+        explainFR:"C'est jouable — X5 est loin du cercle. Mais tu laisses passer un shoot ouvert pour un drive plus contesté.",
+        explainEN:"Playable — X5 is far from rim. But you pass on an open shot for a more contested drive." },
+      { fr:"Tu dribble sur place pour lire", en:"You dribble in place to read", score:'weak',
+        explainFR:"L'hésitation permet à X5 de récupérer sur le pivot ET de te contester. La fenêtre POP se ferme en 1 seconde.",
+        explainEN:"Hesitation lets X5 recover on C AND contest you. POP window closes in 1 second." }
+    ]
+  });
+
+  _make({
+    id:'pnr_08', cat:'pnr', perspective:'off', levels:['DEB','INT'],
+    contextFR:"Meneur (1). Écran du pivot (5). La défense joue une couverture simple : X5 hedge légèrement, X1 revient. Ton pivot roule.",
+    contextEN:"PG (1). C (5) screen. Simple coverage: X5 soft hedge, X1 recovers. C rolls.",
+    basePositions: POS_PNR_INIT,
+    preActionChanges: [{label:'X1',y:300},{label:'X5',y:270},{label:'5',y:400}],
+    overlays: {
+      preAction: { screens:[{x1:380,y1:290,x2:420,y2:290}] },
+      result_A: { arrows:[{x1:400,y1:240,x2:400,y2:400,color:'#2dc653',curve:true,cx:200,cy:320}], label:{x:400,y:440,text:'PASSE PIVOT ROULEUR'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:180,color:'#f5c518'}], label:{x:400,y:150,text:'PULL-UP 3PT'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:280,y2:400,color:'#e63946'}], label:{x:260,y:430,text:'PASSE FORCÉE'} }
+    },
+    answers: [
+      { fr:"Tu passes au pivot (5) qui roule libre vers le cercle", en:"You pass to C (5) rolling free to the rim", score:'opt',
+        explainFR:"Contre un hedge, le rolleur est TOUJOURS la priorité. Il est libre et proche du cercle — passe simple et efficace.",
+        explainEN:"Against hedge, the roller is ALWAYS priority. He's free and close to rim — simple efficient pass." },
+      { fr:"Tu prends un pull-up 3 pts par-dessus X5 qui hedge doucement", en:"You pull up 3 over softly hedging X5", score:'acc',
+        explainFR:"Ça peut rentrer mais X5 est encore près, il peut contester. La lecture prioritaire reste le rolleur libre.",
+        explainEN:"Can go in but X5 still close, can contest. Priority read stays the free roller." },
+      { fr:"Tu passes à l'ailier fort (4) qui n'est pas démarqué", en:"You pass to PF (4) who isn't open", score:'weak',
+        explainFR:"Tu ignores le pivot libre pour une passe forcée vers un joueur couvert. Turnover ou mauvaise possession assurés.",
+        explainEN:"You ignore the free C for a forced pass to a covered player. Turnover or bad possession guaranteed." }
+    ]
+  });
+
+  _make({
+    id:'pnr_09', cat:'pnr', perspective:'off', levels:['CON','COM'],
+    contextFR:"Meneur (1). Le pivot (5) va poser l'écran mais AVANT contact, tu vois X1 s'aventurer par-dessus. Tu peux REJETER l'écran (reject).",
+    contextEN:"PG (1). C (5) coming to set screen but BEFORE contact you see X1 leaning over. You can REJECT the screen.",
+    basePositions: POS_PNR_INIT,
+    preActionChanges: [{label:'X1',x:400,y:200},{label:'5',x:400,y:330}],
+    overlays: {
+      preAction: { label:{x:400,y:170,text:'X1 LEANING OVER'} },
+      result_A: { arrows:[{x1:400,y1:220,x2:200,y2:450,color:'#2dc653',curve:true,cx:300,cy:300}], label:{x:180,y:490,text:'DRIVE CÔTÉ FAIBLE'} },
+      result_B: { arrows:[{x1:400,y1:220,x2:400,y2:330,color:'#f5c518'}], label:{x:400,y:400,text:'ÉCRAN NORMAL'} },
+      result_C: { arrows:[{x1:400,y1:220,x2:400,y2:100,color:'#e63946'}], label:{x:400,y:80,text:'RECUL SANS BUT'} }
+    },
+    answers: [
+      { fr:"Tu REJETTES l'écran et drives côté opposé — X1 est déjà positionné pour au-dessus", en:"You REJECT the screen and drive the opposite side — X1 already positioned for over", score:'opt',
+        explainFR:"Superbe lecture avancée. X1 est déjà en train de tourner pour passer au-dessus — tu le laisses sur place en rejetant. Fenêtre libre côté opposé.",
+        explainEN:"Excellent advanced read. X1 is already turning to go over — you leave him behind by rejecting. Free lane opposite side." },
+      { fr:"Tu utilises l'écran normalement", en:"You use the screen normally", score:'acc',
+        explainFR:"Ça reste jouable mais tu perds une lecture avancée. X1 était surengagé, l'écran ne t'était plus nécessaire.",
+        explainEN:"Still playable but you miss an advanced read. X1 was over-committed, screen wasn't needed anymore." },
+      { fr:"Tu recules pour reset l'attaque", en:"You back up to reset the offense", score:'weak',
+        explainFR:"Tu gâches l'avantage. Le mismatch de positionnement de X1 était une opportunité rare — il fallait l'exploiter immédiatement.",
+        explainEN:"You waste the edge. X1's positioning mismatch was rare — should have exploited immediately." }
+    ]
+  });
+
+  _make({
+    id:'pnr_10', cat:'pnr', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Meneur (1). Ton ailier (3) monte poser un GHOST SCREEN (fait semblant, ne fait pas contact et sort au 3 pts). X3 hésite.",
+    contextEN:"PG (1). Wing (3) sets a GHOST SCREEN (fakes contact, slips out to 3-pt line). X3 hesitates.",
+    basePositions: POS_PNR_INIT,
+    preActionChanges: [{label:'5',x:670,y:480},{label:'X5',x:670,y:510},{label:'3',x:400,y:280},{label:'X3',x:400,y:250}],
+    overlays: {
+      preAction: { label:{x:400,y:170,text:'GHOST'} },
+      result_A: { arrows:[{x1:400,y1:220,x2:400,y2:150,color:'#2dc653'}], label:{x:400,y:120,text:'PULL-UP RAPIDE'} },
+      result_B: { arrows:[{x1:400,y1:220,x2:520,y2:280,color:'#f5c518'}], label:{x:560,y:310,text:'PASSE GHOST'} },
+      result_C: { arrows:[{x1:400,y1:220,x2:400,y2:300,color:'#e63946'}], label:{x:400,y:340,text:'ATTAQUE DIRECTE'} }
+    },
+    answers: [
+      { fr:"Tu prends immédiatement le pull-up 3 pts, X1 hésite avec le ghost", en:"You immediately pull up 3, X1 hesitates on the ghost", score:'opt',
+        explainFR:"Le ghost crée exactement cette fenêtre : X1 se dit qu'il y a un écran, marque un temps. Tu shootes dans cette fenêtre — c'est le but du ghost.",
+        explainEN:"Ghost creates exactly this window: X1 anticipates a screen, hesitates. You shoot in that window — that's the ghost's purpose." },
+      { fr:"Tu passes à l'ailier (3) qui sort du ghost à 3 pts", en:"You pass to wing (3) slipping ghost at 3 pt", score:'acc',
+        explainFR:"C'est cohérent mais X3 revient vite sur le ghosteur. La fenêtre la plus large est ton propre shoot immédiat.",
+        explainEN:"Consistent but X3 recovers fast on the ghost man. Your immediate shot is the widest window." },
+      { fr:"Tu attaques directement le panier sans utiliser le ghost", en:"You drive directly to the basket ignoring ghost", score:'weak',
+        explainFR:"Tu ignores l'action tactique. X1 est encore présent, X5 en drop — le drive est plus contesté que ton pull-up ouvert.",
+        explainEN:"You ignore the play. X1 still present, X5 in drop — drive is more contested than your open pull-up." }
+    ]
+  });
+
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+
+  // Ré-utilise les positions et helpers depuis le script précédent via _make
+  function _p(l,x,y,o){ var r={label:l,x:x,y:y}; if(o) for(var k in o) r[k]=o[k]; return r; }
+  function _clone(arr) { return arr.map(function(p){ var r={}; for(var k in p) r[k]=p[k]; return r; }); }
+  function _modify(arr, changes) {
+    var out = _clone(arr);
+    changes.forEach(function(ch){
+      for (var i=0; i<out.length; i++) if (out[i].label === ch.label) {
+        if (ch.x !== undefined) out[i].x = ch.x;
+        if (ch.y !== undefined) out[i].y = ch.y;
+        if (ch.ball !== undefined) out[i].ball = ch.ball;
+        if (ch.you !== undefined) out[i].you = ch.you;
+      }
+    });
+    return out;
+  }
+  function _make(s) {
+    var initial = s.basePositions;
+    var preAction = s.preActionChanges ? _modify(initial, s.preActionChanges) : initial;
+    window._QI_DATA[s.id] = {
+      cat: s.cat, perspective: s.perspective, levels: s.levels,
+      contextFR: s.contextFR, contextEN: s.contextEN,
+      positions: {
+        initial: initial, preAction: preAction,
+        result_A: s.resultAChanges ? _modify(preAction, s.resultAChanges) : preAction,
+        result_B: s.resultBChanges ? _modify(preAction, s.resultBChanges) : preAction,
+        result_C: s.resultCChanges ? _modify(preAction, s.resultCChanges) : preAction
+      },
+      overlays: s.overlays || {},
+      answers: s.answers
+    };
+  }
+
+  // Positions canoniques réutilisables
+  var POS_ISO_TOP = [
+    _p('1',400,220,{ball:true,you:true}), _p('X1',400,290,{def:true}),
+    _p('2',120,300), _p('X2',150,320,{def:true}),
+    _p('3',680,300), _p('X3',650,320,{def:true}),
+    _p('4',180,480), _p('X4',180,510,{def:true}),
+    _p('5',620,480), _p('X5',620,510,{def:true})
+  ];
+  var POS_ISO_WING = [
+    _p('2',200,320,{ball:true,you:true}), _p('X2',270,340,{def:true}),
+    _p('1',450,220), _p('X1',450,250,{def:true}),
+    _p('3',680,300), _p('X3',650,330,{def:true}),
+    _p('4',180,500), _p('X4',180,530,{def:true}),
+    _p('5',620,500), _p('X5',620,530,{def:true})
+  ];
+  var POS_OFF_CUT = [
+    _p('1',400,220,{ball:true}), _p('X1',400,260,{def:true}),
+    _p('2',180,340,{you:true}), _p('X2',180,380,{def:true}),
+    _p('3',680,340), _p('X3',680,380,{def:true}),
+    _p('4',200,490), _p('X4',200,520,{def:true}),
+    _p('5',600,490), _p('X5',600,520,{def:true})
+  ];
+  var POS_DEF_HELP = [
+    _p('1',400,230), _p('X1',400,270,{def:true}),
+    _p('2',150,340,{ball:true}), _p('X2',180,370,{def:true}),
+    _p('3',650,340), _p('X3',620,370,{def:true,you:true}),
+    _p('4',280,490), _p('X4',300,520,{def:true}),
+    _p('5',550,470), _p('X5',530,500,{def:true})
+  ];
+  var POS_DEF_PNR = [
+    _p('1',400,220,{ball:true}), _p('X1',400,250,{def:true,you:true}),
+    _p('5',400,320), _p('X5',400,360,{def:true}),
+    _p('2',130,480), _p('X2',130,520,{def:true}),
+    _p('3',670,480), _p('X3',670,520,{def:true}),
+    _p('4',250,400), _p('X4',250,440,{def:true})
+  ];
+  var POS_TR_2v1 = [
+    _p('1',300,280,{ball:true,you:true}),
+    _p('2',500,280),
+    _p('X1',400,420,{def:true})
+  ];
+  var POS_TR_3v2 = [
+    _p('1',400,240,{ball:true,you:true}),
+    _p('2',150,320), _p('3',650,320),
+    _p('X1',300,420,{def:true}), _p('X2',500,420,{def:true})
+  ];
+  var POS_CLUTCH = [
+    _p('1',400,240,{ball:true,you:true}), _p('X1',400,290,{def:true}),
+    _p('2',150,420), _p('X2',180,450,{def:true}),
+    _p('3',650,420), _p('X3',620,450,{def:true}),
+    _p('4',280,500), _p('X4',280,530,{def:true}),
+    _p('5',520,500), _p('X5',520,530,{def:true})
+  ];
+
+  // ═══════════════════════ ISO / 1v1 (10 situations) ═══════════════════════
+
+  _make({
+    id:'iso_01', cat:'iso', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Tu es le meneur (1) en 1v1 au top. X1 est en défense fermée (talons collés à toi). Il ne t'a pas laissé d'espace pour shooter.",
+    contextEN:"You are PG (1) in 1v1 at top. X1 is playing tight defense (heels on you). No shooting space.",
+    basePositions: POS_ISO_TOP,
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:220,x2:400,y2:450,color:'#2dc653'}], label:{x:400,y:500,text:'DRIVE'} },
+      result_B: { arrows:[{x1:400,y1:220,x2:400,y2:150,color:'#f5c518'}], label:{x:400,y:120,text:'PULL-UP FORCÉ'} },
+      result_C: { arrows:[{x1:400,y1:220,x2:400,y2:220,color:'#e63946',dashed:true}], label:{x:400,y:180,text:'STATIQUE'} }
+    },
+    answers: [
+      { fr:"Tu attaques immédiatement par le drive (il est trop près, tu as la vitesse)", en:"You drive immediately (he's too close, you have speed)", score:'opt',
+        explainFR:"Défense collée = pas d'espace pour shoot, mais avantage pour attaquer. Tu prends l'espace derrière lui avec ton premier pas.",
+        explainEN:"Tight defense = no shooting space, but attacking edge. Take the space behind him with your first step." },
+      { fr:"Tu forces un pull-up par-dessus lui", en:"You force a pull-up over him", score:'weak',
+        explainFR:"Il est trop près, ton shoot sera contesté. C'est le pire choix quand le défenseur est collé.",
+        explainEN:"Too close, shot will be contested. Worst choice against tight defense." },
+      { fr:"Tu attends pour lire s'il change de position", en:"You wait to see if he shifts", score:'acc',
+        explainFR:"Tu peux attendre mais X1 est déjà bien positionné — il ne va pas se démasquer. Attaque maintenant est plus efficace.",
+        explainEN:"You can wait but X1 is already set — he won't shift. Attacking now is more efficient." }
+    ]
+  });
+
+  _make({
+    id:'iso_02', cat:'iso', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Tu es sur l'aile (2) en 1v1. X2 laisse un large espace (2 mètres) parce qu'il craint ta vitesse. La raquette est vide.",
+    contextEN:"You are on wing (2) in 1v1. X2 gives space (2 meters) fearing your speed. Paint is empty.",
+    basePositions: POS_ISO_WING,
+    preActionChanges: [{label:'X2',x:320,y:380}],
+    overlays: {
+      result_A: { arrows:[{x1:200,y1:320,x2:200,y2:250,color:'#2dc653'}], label:{x:200,y:220,text:'PULL-UP OUVERT'} },
+      result_B: { arrows:[{x1:200,y1:320,x2:400,y2:500,color:'#f5c518'}], label:{x:400,y:540,text:'DRIVE FORT'} },
+      result_C: { arrows:[{x1:200,y1:320,x2:100,y2:340,color:'#e63946',dashed:true}], label:{x:100,y:310,text:'DRIBBLE INUTILE'} }
+    },
+    answers: [
+      { fr:"Tu prends immédiatement le pull-up 3 pts", en:"You immediately pull up 3", score:'opt',
+        explainFR:"L'espace donné est une invitation au shoot. Cette lecture est celle des shooters d'élite : tu punis directement le retrait.",
+        explainEN:"Given space is a shot invitation. Elite shooter read: you punish the sag immediately." },
+      { fr:"Tu drives fort vers la raquette (elle est vide)", en:"You drive hard to empty paint", score:'acc',
+        explainFR:"Le drive marche mais tu laisses passer un shoot ouvert. Ton pull-up était plus efficace.",
+        explainEN:"Drive works but you pass on an open shot. Pull-up was more efficient." },
+      { fr:"Tu dribbles latéralement pour tester la défense", en:"You dribble sideways to test defense", score:'weak',
+        explainFR:"Perte de temps qui laisse le help arriver. L'espace ouvert se referme en 2 secondes.",
+        explainEN:"Wasted time lets help come. Open space closes in 2 seconds." }
+    ]
+  });
+
+  _make({
+    id:'iso_03', cat:'iso', perspective:'off', levels:['CON','COM'],
+    contextFR:"Meneur (1) en iso. X1 est bien positionné mais tu vois X5 (le grand) prêt à help au premier drive. La raquette est chargée.",
+    contextEN:"PG (1) in iso. X1 well positioned but X5 (big) ready to help on drive. Paint is loaded.",
+    basePositions: POS_ISO_TOP,
+    preActionChanges: [{label:'X5',x:500,y:420}],
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:220,x2:120,y2:290,color:'#2dc653'}], label:{x:100,y:260,text:'PASSE SHOOTER LIBRE'} },
+      result_B: { arrows:[{x1:400,y1:220,x2:400,y2:450,color:'#e63946'}], label:{x:400,y:500,text:'DRIVE BLOCKED'} },
+      result_C: { arrows:[{x1:400,y1:220,x2:400,y2:150,color:'#f5c518'}], label:{x:400,y:120,text:'PULL-UP CONTESTÉ'} }
+    },
+    answers: [
+      { fr:"Tu simules le drive puis rejoues à ton shooter (2) que X5 a laissé pour help", en:"You fake drive then kick to shooter (2) X5 left to help", score:'opt',
+        explainFR:"C'est la lecture pro : tu utilises la sur-préparation du help pour créer le shoot ouvert de ton shooter. Manipulation défensive.",
+        explainEN:"Pro read: you use the loaded help to create your shooter's open shot. Defensive manipulation." },
+      { fr:"Tu drives quand même vers la raquette", en:"You drive anyway toward the paint", score:'weak',
+        explainFR:"Le help est en position, tu vas te faire bloquer ou forcer un tir tordu. Vraie mauvaise lecture.",
+        explainEN:"Help is set, you'll get blocked or forced ugly shot. True bad read." },
+      { fr:"Tu prends un pull-up contesté par X1", en:"You take a contested pull-up over X1", score:'acc',
+        explainFR:"Peut rentrer mais c'est un shot contesté quand tu pouvais créer un shot ouvert pour ton coéquipier. Choix égoïste.",
+        explainEN:"Can go in but contested when you could create an open shot for teammate. Selfish choice." }
+    ]
+  });
+
+  _make({
+    id:'iso_04', cat:'iso', perspective:'off', levels:['DEB','INT'],
+    contextFR:"Tu es sur l'aile (2) en 1v1 avec X2. Tu es plus fort physiquement que lui. La raquette est peu chargée.",
+    contextEN:"You are on wing (2) in 1v1 with X2. You're physically stronger. Paint is uncrowded.",
+    basePositions: POS_ISO_WING,
+    overlays: {
+      result_A: { arrows:[{x1:200,y1:320,x2:380,y2:490,color:'#2dc653'}], label:{x:400,y:530,text:'DRIVE FORCE'} },
+      result_B: { arrows:[{x1:200,y1:320,x2:200,y2:250,color:'#f5c518'}], label:{x:200,y:220,text:'PULL-UP'} },
+      result_C: { arrows:[{x1:200,y1:320,x2:450,y2:220,color:'#e63946'}], label:{x:470,y:190,text:'PASSE INUTILE'} }
+    },
+    answers: [
+      { fr:"Tu attaques par le drive en utilisant ton physique — la raquette est vide", en:"You drive using your physicality — paint is empty", score:'opt',
+        explainFR:"Mismatch physique + raquette vide = drive absolue. Utilise ton avantage principal.",
+        explainEN:"Physical mismatch + empty paint = drive priority. Use your main edge." },
+      { fr:"Tu prends un pull-up mi-distance", en:"You take a mid-range pull-up", score:'acc',
+        explainFR:"Ça peut rentrer mais tu n'exploites pas ton avantage physique. Le drive était plus rentable.",
+        explainEN:"Can go in but doesn't exploit your physical edge. Drive was more rewarding." },
+      { fr:"Tu passes au meneur (1) qui redémarre l'attaque", en:"You pass to PG (1) to restart", score:'weak',
+        explainFR:"Tu gâches un mismatch clair. Ce genre d'avantage ne se retrouve pas systématiquement.",
+        explainEN:"You waste a clear mismatch. This edge doesn't come back every possession." }
+    ]
+  });
+
+  _make({
+    id:'iso_05', cat:'iso', perspective:'off', levels:['COM'],
+    contextFR:"Fin de match. Meneur (1) en iso. Il reste 8 secondes. X1 est en défense passive, X5 ready à help. Ton équipe mène de 2.",
+    contextEN:"End of game. PG (1) in iso. 8 seconds left. X1 in passive defense, X5 ready to help. Your team leads by 2.",
+    basePositions: POS_ISO_TOP,
+    preActionChanges: [{label:'X1',y:320},{label:'X5',x:520,y:420}],
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:220,x2:400,y2:220,color:'#2dc653',dashed:true}], label:{x:400,y:180,text:'GESTION HORLOGE'} },
+      result_B: { arrows:[{x1:400,y1:220,x2:400,y2:150,color:'#f5c518'}], label:{x:400,y:120,text:'3PT PRÉCIPITÉ'} },
+      result_C: { arrows:[{x1:400,y1:220,x2:400,y2:450,color:'#e63946'}], label:{x:400,y:490,text:'DRIVE PIÉGÉ'} }
+    },
+    answers: [
+      { fr:"Tu dribbles proprement pour user l'horloge, tu joues le shot au dernier moment", en:"You dribble to burn clock, take shot at last moment", score:'opt',
+        explainFR:"Tu mènes de 2 avec 8 sec, il faut user l'horloge. Un shot à 2 sec = pas de rebond adverse. Gestion du temps > prise de risque.",
+        explainEN:"Up 2 with 8 sec, burn the clock. Shot at 2 sec = no defensive rebound. Clock management > risk-taking." },
+      { fr:"Tu prends un 3 pts rapide pour clore le match", en:"You take a quick 3 to end the game", score:'weak',
+        explainFR:"Trop tôt, trop risqué. Si tu rates, la défense a 6 secondes pour égaliser. Tu ne devais pas prendre ce risque.",
+        explainEN:"Too early, too risky. If you miss, defense has 6 seconds to tie. Shouldn't take this risk." },
+      { fr:"Tu drives sur X1 et forces un contact pour LF", en:"You drive on X1 to force contact for FTs", score:'acc',
+        explainFR:"Idée valable mais X5 est en help — le drive peut se terminer en turnover. Plus risqué que de gérer l'horloge.",
+        explainEN:"Valid idea but X5 in help — drive can end in turnover. Riskier than clock management." }
+    ]
+  });
+
+  // ═══════════════════════ OFF-BALL (10 situations) ═══════════════════════
+
+  _make({
+    id:'off_01', cat:'off', perspective:'off', levels:['DEB','INT','CON','COM'],
+    contextFR:"Tu es sur l'aile (2). Ton défenseur X2 regarde le ballon (au meneur). Il t'a oublié une seconde. La ligne de fond est libre.",
+    contextEN:"You are wing (2). Your defender X2 watches the ball (at PG). Forgot you 1 sec. Baseline is open.",
+    basePositions: POS_OFF_CUT,
+    preActionChanges: [{label:'X2',x:240,y:390}],
+    overlays: {
+      result_A: { arrows:[{x1:180,y1:340,x2:380,y2:530,color:'#2dc653',curve:true,cx:200,cy:490}], label:{x:400,y:560,text:'BACK-CUT'} },
+      result_B: { arrows:[{x1:180,y1:340,x2:180,y2:290,color:'#f5c518'}], label:{x:180,y:260,text:'RESTE VISIBLE'} },
+      result_C: { arrows:[{x1:180,y1:340,x2:180,y2:340,color:'#e63946',dashed:true}], label:{x:200,y:300,text:'STATIQUE'} }
+    },
+    answers: [
+      { fr:"Tu fais un BACK-CUT rapide vers la ligne de fond, le meneur te sert", en:"You BACK-CUT fast to baseline, PG feeds you", score:'opt',
+        explainFR:"Défenseur qui regarde le ballon = punition immédiate. Le back-cut est LE geste sans ballon prioritaire dans cette lecture.",
+        explainEN:"Ball-watching defender = immediate punishment. Back-cut is THE priority off-ball move here." },
+      { fr:"Tu remontes pour rester visible au meneur", en:"You move up to stay visible to PG", score:'acc',
+        explainFR:"Bon mouvement mais tu perds l'opportunité du back-cut. Un mouvement pour être vu, pas pour attaquer.",
+        explainEN:"Good move but you miss the back-cut opportunity. A move to be seen, not to attack." },
+      { fr:"Tu restes immobile et attends", en:"You stay still and wait", score:'weak',
+        explainFR:"Aucun mouvement = aucune menace. X2 va revenir sur toi, la fenêtre disparaît. En basket moderne, l'immobilité est fatale.",
+        explainEN:"No movement = no threat. X2 will recover, window closes. In modern basketball, stillness is fatal." }
+    ]
+  });
+
+  _make({
+    id:'off_02', cat:'off', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Tu es sur l'aile (2). Ton coéquipier (4) va poser un écran DOWN pour toi (viens du poste bas). X2 doit choisir sa route.",
+    contextEN:"You're on wing (2). Teammate (4) coming to set DOWN screen for you (from low post). X2 must pick route.",
+    basePositions: POS_OFF_CUT,
+    preActionChanges: [{label:'4',x:180,y:430}],
+    overlays: {
+      preAction: { screens:[{x1:170,y1:410,x2:190,y2:410}] },
+      result_A: { arrows:[{x1:180,y1:340,x2:400,y2:240,color:'#2dc653',curve:true,cx:290,cy:270}], label:{x:400,y:210,text:'CURL AU TOP'} },
+      result_B: { arrows:[{x1:180,y1:340,x2:120,y2:250,color:'#f5c518'}], label:{x:100,y:220,text:'FADE 3PT COIN'} },
+      result_C: { arrows:[{x1:180,y1:340,x2:180,y2:340,color:'#e63946',dashed:true}], label:{x:200,y:300,text:'STATIQUE'} }
+    },
+    answers: [
+      { fr:"Tu CURL au-dessus de l'écran (X2 essaie de suivre par en-dessous)", en:"You CURL over the screen (X2 tries to trail underneath)", score:'opt',
+        explainFR:"Si X2 suit par le bas, curl au-dessus te met dans une zone libre pour recevoir + finish rapide. Lecture standard du down screen.",
+        explainEN:"If X2 trails below, curl over puts you in a free zone to receive + quick finish. Standard down screen read." },
+      { fr:"Tu FADE vers le corner (X2 essaie de suivre par au-dessus)", en:"You FADE to corner (X2 tries to trail above)", score:'acc',
+        explainFR:"Bonne lecture MAIS uniquement si X2 monte au-dessus. Dans le doute, curl est plus universel comme premier réflexe.",
+        explainEN:"Good read BUT only if X2 goes over. When unsure, curl is more universal as first reflex." },
+      { fr:"Tu ne bouges pas et laisses l'écran passer", en:"You don't move and let screen expire", score:'weak',
+        explainFR:"L'écran offert et non utilisé = ton équipier a fait 5 pas pour rien. C'est aussi mal vu par le coach que par tes équipiers.",
+        explainEN:"Screen offered and unused = your teammate ran 5 steps for nothing. Coaches and teammates hate this." }
+    ]
+  });
+
+  _make({
+    id:'off_03', cat:'off', perspective:'off', levels:['DEB','INT'],
+    contextFR:"Tu es dans le coin (2). Le meneur drive vers la raquette. X2 est en train d'aller aider dans la raquette.",
+    contextEN:"You're in corner (2). PG drives to paint. X2 rotating to help in paint.",
+    basePositions: POS_OFF_CUT,
+    preActionChanges: [{label:'2',x:120,y:490},{label:'X2',x:200,y:490},{label:'1',x:340,y:400}],
+    overlays: {
+      result_A: { arrows:[{x1:120,y1:490,x2:120,y2:490,color:'#2dc653',dashed:true}], label:{x:150,y:450,text:'RESTE CORNER'} },
+      result_B: { arrows:[{x1:120,y1:490,x2:250,y2:400,color:'#f5c518'}], label:{x:280,y:370,text:'REMONTE LATÉRAL'} },
+      result_C: { arrows:[{x1:120,y1:490,x2:340,y2:400,color:'#e63946'}], label:{x:370,y:370,text:'CHERCHE LE BALLON'} }
+    },
+    answers: [
+      { fr:"Tu restes fixe dans le coin — X2 t'a laissé, tu vas recevoir la kick out et shooter", en:"You stay in corner — X2 left you, you'll receive kick-out and shoot", score:'opt',
+        explainFR:"L'immobilité stratégique dans le corner = shot ouvert quasi garanti. C'est le SPACING moderne : ton corner est ta ligne d'or.",
+        explainEN:"Strategic stillness in corner = near-guaranteed open shot. Modern SPACING: your corner is your money line." },
+      { fr:"Tu remontes vers la ligne des 3 pts sur ton côté", en:"You move up along your 3-pt line", score:'acc',
+        explainFR:"Mouvement OK mais moins efficace que rester fixe. Un déplacement latéral crée du travail pour le passeur.",
+        explainEN:"OK move but less efficient than staying. Lateral movement makes it harder for passer." },
+      { fr:"Tu remontes au top pour être plus visible", en:"You move up to top to be more visible", score:'weak',
+        explainFR:"Tu casses le spacing et tu réintègres la zone défensive. Tu vas te faire recouvrir et tu prives ton meneur d'une kick out corner.",
+        explainEN:"You break spacing and re-enter defensive zone. You get covered and deny PG a corner kick-out." }
+    ]
+  });
+
+  _make({
+    id:'off_04', cat:'off', perspective:'off', levels:['CON','COM'],
+    contextFR:"Tu es sur l'aile (3). Ton pivot (5) monte poser un écran FLARE pour toi (tu sors vers le coin). X3 doit choisir.",
+    contextEN:"You're on wing (3). Your C (5) coming to set FLARE screen (you fade to corner). X3 must choose.",
+    basePositions: POS_OFF_CUT,
+    preActionChanges: [{label:'3',x:600,y:340,you:true},{label:'X3',x:600,y:380},{label:'5',x:600,y:280},{label:'2',x:180,y:340,you:false},{label:'X2',x:180,y:380}],
+    overlays: {
+      preAction: { screens:[{x1:580,y1:290,x2:620,y2:290}] },
+      result_A: { arrows:[{x1:600,y1:340,x2:680,y2:450,color:'#2dc653'}], label:{x:700,y:490,text:'FADE 3PT COIN'} },
+      result_B: { arrows:[{x1:600,y1:340,x2:500,y2:300,color:'#f5c518'}], label:{x:470,y:270,text:'CURL AU TOP'} },
+      result_C: { arrows:[{x1:600,y1:340,x2:600,y2:340,color:'#e63946',dashed:true}], label:{x:620,y:300,text:'ATTENTE'} }
+    },
+    answers: [
+      { fr:"Tu FADE vers le coin (l'écran flare t'ouvre ce chemin, X3 est bloqué)", en:"You FADE to corner (flare opens this path, X3 is blocked)", score:'opt',
+        explainFR:"C'est exactement le but du flare screen : créer un shoot ouvert de coin. Ton pivot bloque X3, tu es libre au 3pt corner.",
+        explainEN:"Exactly the flare screen's purpose: create open corner shot. Your C blocks X3, you're open at corner 3." },
+      { fr:"Tu CURL vers le top au lieu de fade", en:"You CURL to top instead of fade", score:'acc',
+        explainFR:"Le curl marche mais tu casses le play prévu. Ton coéquipier a posé l'écran pour un fade — tu réduis son efficacité.",
+        explainEN:"Curl works but you break the play. Your teammate set the screen for a fade — you reduce its efficiency." },
+      { fr:"Tu attends que X3 se démasque avant de bouger", en:"You wait for X3 to unmask before moving", score:'weak',
+        explainFR:"L'immobilité efface tout l'effet de l'écran. X3 reste collé, l'écran devient inutile.",
+        explainEN:"Stillness erases the screen's effect. X3 stays glued, screen useless." }
+    ]
+  });
+
+  _make({
+    id:'off_05', cat:'off', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Tu es un shooter sur l'aile (3). Un pivot (5) va poser un ÉCRAN AVEUGLE (X3 ne le voit pas venir). Tu vas te retrouver libre.",
+    contextEN:"You're a shooter on wing (3). A C (5) sets BLIND SCREEN (X3 doesn't see it). You end up free.",
+    basePositions: POS_OFF_CUT,
+    preActionChanges: [{label:'3',x:600,y:340,you:true},{label:'X3',x:640,y:340},{label:'5',x:600,y:290}],
+    overlays: {
+      preAction: { screens:[{x1:590,y1:290,x2:610,y2:290}], label:{x:400,y:170,text:'ÉCRAN AVEUGLE'} },
+      result_A: { arrows:[{x1:600,y1:340,x2:600,y2:240,color:'#2dc653'}], label:{x:600,y:210,text:'SPRINT VERS BALLON'} },
+      result_B: { arrows:[{x1:600,y1:340,x2:700,y2:400,color:'#f5c518'}], label:{x:720,y:430,text:'FADE CORNER'} },
+      result_C: { arrows:[{x1:600,y1:340,x2:600,y2:340,color:'#e63946',dashed:true}], label:{x:620,y:300,text:'PASSIF'} }
+    },
+    answers: [
+      { fr:"Tu sprintes vers le ballon (le pivot va bloquer X3, tu es libre au 3pt)", en:"You sprint toward ball (C will block X3, you're free at 3pt)", score:'opt',
+        explainFR:"L'écran aveugle donne le maximum d'effet si tu sprintes vers le ballon. Tu maximises la distance entre toi et X3.",
+        explainEN:"Blind screen gives maximum effect if you sprint toward ball. You maximize distance between you and X3." },
+      { fr:"Tu fade vers le coin", en:"You fade to corner", score:'acc',
+        explainFR:"Le fade peut marcher mais X3 aura le temps de récupérer sur ta trajectoire. Sprint vers ballon = passe plus rapide.",
+        explainEN:"Fade can work but X3 has time to recover on your path. Sprint toward ball = faster pass." },
+      { fr:"Tu marches doucement pour lire la défense", en:"You walk slowly to read defense", score:'weak',
+        explainFR:"La vitesse est la clé de l'écran aveugle. Marcher = X3 récupère, l'écran devient un obstacle inutile.",
+        explainEN:"Speed is key to blind screen. Walking = X3 recovers, screen becomes useless." }
+    ]
+  });
+
+  // ═══════════════════════ DÉFENSE (10 situations) ═══════════════════════
+
+  _make({
+    id:'def_01', cat:'def', perspective:'def', levels:['DEB','INT','CON','COM'],
+    contextFR:"Tu défends sur X3 côté opposé du ballon. Le porteur (2) drive vers la raquette et personne ne bloque. Il va scorer facilement.",
+    contextEN:"You defend X3 opposite side. Ball handler (2) drives to paint, nobody blocks. He'll score easily.",
+    basePositions: POS_DEF_HELP,
+    preActionChanges: [{label:'2',x:200,y:400},{label:'X2',x:250,y:430}],
+    overlays: {
+      result_A: { arrows:[{x1:620,y1:370,x2:400,y2:480,color:'#2dc653'}], label:{x:400,y:520,text:'HELP + STUNT'} },
+      result_B: { arrows:[{x1:620,y1:370,x2:620,y2:370,color:'#f5c518',dashed:true}], label:{x:640,y:340,text:'RESTE COLLÉ'} },
+      result_C: { arrows:[{x1:620,y1:370,x2:400,y2:250,color:'#e63946'}], label:{x:400,y:220,text:'FONCE VERS BALLON'} }
+    },
+    answers: [
+      { fr:"Tu fais un HELP : tu quittes X3 une seconde pour couper la ligne de drive", en:"You HELP: leave X3 briefly to cut off drive line", score:'opt',
+        explainFR:"C'est la règle du help-side : quand un équipier est battu, le côté opposé doit help même en laissant son homme. C'est un principe fondamental.",
+        explainEN:"Help-side rule: when teammate beaten, opposite side must help even leaving own man. Fundamental principle." },
+      { fr:"Tu restes collé à X3 pour ne pas te faire punir en kick-out", en:"You stay on X3 to avoid getting punished on kick-out", score:'weak',
+        explainFR:"Tu laisses ton équipier se faire battre + un layup facile. Le principe de help-side est violé. Le coach va râler.",
+        explainEN:"You let teammate get beaten + easy layup. Help-side principle violated. Coach will yell." },
+      { fr:"Tu fonces contester le porteur du ballon (2)", en:"You charge to contest ball handler (2)", score:'acc',
+        explainFR:"Bon esprit mais tu vas laisser X3 complètement seul, très visible en kick-out. Le stunt (help + retour) est plus intelligent.",
+        explainEN:"Good spirit but you leave X3 completely open, very visible on kick-out. Stunt (help + recover) is smarter." }
+    ]
+  });
+
+  _make({
+    id:'def_02', cat:'def', perspective:'def', levels:['INT','CON','COM'],
+    contextFR:"Tu défends sur le porteur (1) en top of the key. Il attaque en pnr avec le pivot (5). Tu es X1. Le pivot défenseur (X5) est en drop.",
+    contextEN:"You defend on ball handler (1) at top. He attacks pnr with C (5). You are X1. C defender (X5) in drop.",
+    basePositions: POS_DEF_PNR,
+    preActionChanges: [{label:'1',y:250},{label:'X1',y:270}],
+    overlays: {
+      preAction: { screens:[{x1:380,y1:320,x2:420,y2:320}] },
+      result_A: { arrows:[{x1:400,y1:270,x2:400,y2:180,color:'#2dc653'}], label:{x:400,y:150,text:'CHASE AU-DESSUS'} },
+      result_B: { arrows:[{x1:400,y1:270,x2:400,y2:400,color:'#f5c518'}], label:{x:400,y:430,text:'PASSE SOUS'} },
+      result_C: { arrows:[{x1:400,y1:270,x2:400,y2:320,color:'#e63946'}], label:{x:400,y:350,text:'BLOQUÉ ÉCRAN'} }
+    },
+    answers: [
+      { fr:"Tu CHASSES au-dessus de l'écran (le porteur est un bon shooter)", en:"You CHASE over the screen (handler is good shooter)", score:'opt',
+        explainFR:"Bon shooter = tu ne peux pas laisser le pull-up 3pt. Chase au-dessus = tu contests le shoot même si X5 va prendre le drive.",
+        explainEN:"Good shooter = can't allow pull-up 3. Chase over = you contest shot even if X5 takes the drive." },
+      { fr:"Tu PASSES SOUS (le porteur n'est pas shooter)", en:"You go UNDER (handler isn't a shooter)", score:'acc',
+        explainFR:"Bonne lecture SI le porteur n'est pas shooter. Économise l'énergie et coupe l'angle. Mais tu concèdes le shot si c'est un shooter.",
+        explainEN:"Good read IF handler isn't a shooter. Saves energy, cuts angle. But you concede shot if shooter." },
+      { fr:"Tu te fais bloquer par l'écran et attends que ton pivot défende à ta place", en:"You get screened and let your C defend for you", score:'weak',
+        explainFR:"Manque d'anticipation. Un écran doit être ANTICIPÉ, pas subi. Tu laisses ton équipier dans une situation impossible.",
+        explainEN:"Lack of anticipation. A screen should be ANTICIPATED, not endured. You leave teammate in impossible situation." }
+    ]
+  });
+
+  _make({
+    id:'def_03', cat:'def', perspective:'def', levels:['CON','COM'],
+    contextFR:"Tu défends sur l'aile X3 au corner opposé du ballon. Le porteur post up sur le meneur. Le meneur adverse est petit face à un grand.",
+    contextEN:"You defend X3 opposite side. Ball handler posts up on PG. Adversary PG small vs your big.",
+    basePositions: POS_DEF_HELP,
+    preActionChanges: [{label:'1',x:520,y:450},{label:'X1',x:550,y:400}],
+    overlays: {
+      result_A: { arrows:[{x1:620,y1:370,x2:530,y2:430,color:'#2dc653'}], label:{x:500,y:460,text:'DIG (COUP DE MAIN)'} },
+      result_B: { arrows:[{x1:620,y1:370,x2:620,y2:370,color:'#f5c518',dashed:true}], label:{x:660,y:340,text:'RESTE COLLÉ'} },
+      result_C: { arrows:[{x1:620,y1:370,x2:520,y2:450,color:'#e63946'}], label:{x:500,y:490,text:'DOUBLE ENTIÈRE'} }
+    },
+    answers: [
+      { fr:"Tu vas 'DIG' (coup de main rapide sur le porteur puis retour à X3)", en:"You 'DIG' (quick hand on ball then back to X3)", score:'opt',
+        explainFR:"Le dig déstabilise le post up sans abandonner ton homme. Tu perturbes juste assez, puis tu récupères. Défense collective moderne.",
+        explainEN:"Dig disrupts the post up without abandoning your man. Just enough disruption, then recover. Modern team defense." },
+      { fr:"Tu restes collé à X3 pour couvrir le kick-out potentiel", en:"You stay on X3 to cover potential kick-out", score:'acc',
+        explainFR:"Tu es discipliné mais ton équipier est en difficulté sur le mismatch. Un dig aurait aidé sans risque.",
+        explainEN:"Disciplined but teammate struggles on mismatch. A dig would help without risk." },
+      { fr:"Tu fais un double vrai (tu ne reviens pas), le shooter X3 est libre", en:"Full double (no return), X3 is free", score:'weak',
+        explainFR:"Le double sur un post up d'un petit ne se justifie pas. Tu offres un 3pt ouvert à X3. Mauvaise gestion.",
+        explainEN:"Doubling a post-up by a small isn't justified. You offer an open 3 to X3. Bad management." }
+    ]
+  });
+
+  _make({
+    id:'def_04', cat:'def', perspective:'def', levels:['DEB','INT'],
+    contextFR:"Tu es X1 en défense sur le porteur (1). Il t'attaque en drive côté droit. La défense help-side est en place.",
+    contextEN:"You're X1 defending ball handler (1). He drives right side. Help-side is set.",
+    basePositions: POS_DEF_PNR,
+    preActionChanges: [{label:'X1',y:240,you:true}],
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:240,x2:450,y2:400,color:'#2dc653'}], label:{x:480,y:430,text:'GUIDE VERS HELP'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:150,color:'#f5c518'}], label:{x:400,y:120,text:'RECULE VITE'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:400,y2:400,color:'#e63946'}], label:{x:400,y:430,text:'ATTAQUE FRONTALE'} }
+    },
+    answers: [
+      { fr:"Tu 'guides' le drive vers la zone où ton help est présent", en:"You 'funnel' the drive toward where your help is set", score:'opt',
+        explainFR:"C'est la défense d'équipe : tu ne peux pas tout couvrir seul, mais tu peux orienter l'attaquant vers là où tes équipiers sont prêts.",
+        explainEN:"Team defense: you can't cover everything alone, but you can guide attacker to where teammates are ready." },
+      { fr:"Tu recules vite pour rester en face de lui", en:"You back up fast to stay in front", score:'acc',
+        explainFR:"Bon esprit mais tu vas céder du terrain sans le guider. Il choisit sa route, tu la subis. Contrôle passif au lieu d'actif.",
+        explainEN:"Good spirit but you cede ground without guiding. He picks the route, you follow. Passive control instead of active." },
+      { fr:"Tu vas à l'attaque frontale pour arrêter le drive", en:"You attack head-on to stop the drive", score:'weak',
+        explainFR:"Contact frontal = faute presque garantie ou premier pas battu. Tu es en défense, tu ne peux pas 'attaquer' l'attaquant.",
+        explainEN:"Head-on contact = foul or beaten. You're on defense, you can't 'attack' the attacker." }
+    ]
+  });
+
+  _make({
+    id:'def_05', cat:'def', perspective:'def', levels:['INT','CON','COM'],
+    contextFR:"Tu défends sur X2 sur l'aile. Il reçoit le ballon. Tu es un peu en retard sur le closeout — il commence son shot.",
+    contextEN:"You defend X2 on wing. He receives the ball. You're a bit late on closeout — he starts his shot.",
+    basePositions: POS_DEF_HELP,
+    preActionChanges: [{label:'2',x:150,y:340,ball:true},{label:'X2',x:200,y:380,you:true}],
+    overlays: {
+      result_A: { arrows:[{x1:200,y1:380,x2:150,y2:340,color:'#2dc653'}], label:{x:100,y:310,text:'HIGH HAND — NO FOUL'} },
+      result_B: { arrows:[{x1:200,y1:380,x2:150,y2:340,color:'#f5c518'}], label:{x:100,y:310,text:'CONTEST BAS'} },
+      result_C: { arrows:[{x1:200,y1:380,x2:120,y2:320,color:'#e63946'}], label:{x:100,y:290,text:'SAUT FRONTAL - FAUTE'} }
+    },
+    answers: [
+      { fr:"Tu closeout main haute, pieds courts (contest sans faute)", en:"Closeout hand up, short steps (contest no foul)", score:'opt',
+        explainFR:"Le closeout parfait : main haute pour contester la vision, pieds courts pour ne pas sauter dans lui = faute évitée + shoot contesté.",
+        explainEN:"Perfect closeout: hand high to contest vision, short steps to avoid jumping into him = no foul + contested shot." },
+      { fr:"Tu closeout main basse pour couper le drive", en:"Closeout hand low to cut drive", score:'acc',
+        explainFR:"Bonne idée si le porteur allait driver mais il commence son shoot — tu laisses la fenêtre libre. Main haute était prioritaire.",
+        explainEN:"Good idea if he was driving but he's starting his shot — you leave shooting window. Hand high was priority." },
+      { fr:"Tu sautes frontalement vers lui pour bloquer", en:"You jump into him head-on to block", score:'weak',
+        explainFR:"Faute quasi garantie. En basket moderne, la faute sur shooter à 3pt = 3 LF donnés. Erreur défensive coûteuse.",
+        explainEN:"Foul almost guaranteed. In modern basketball, foul on 3-pt shooter = 3 FTs given. Costly defensive error." }
+    ]
+  });
+
+  // ═══════════════════════ TRANSITION (10 situations) ═══════════════════════
+
+  _make({
+    id:'trs_01', cat:'trs', perspective:'off', levels:['DEB','INT','CON','COM'],
+    contextFR:"Tu es le meneur (1) en contre-attaque 2v1 avec ton coéquipier (2) sur ton côté droit. X1 est le seul défenseur.",
+    contextEN:"You're PG (1) in 2v1 fast break with teammate (2) on right side. X1 is sole defender.",
+    basePositions: POS_TR_2v1,
+    preActionChanges: [{label:'X1',y:380}],
+    overlays: {
+      result_A: { arrows:[{x1:300,y1:280,x2:500,y2:280,color:'#2dc653'}], label:{x:400,y:250,text:'PASSE + LAYUP'} },
+      result_B: { arrows:[{x1:300,y1:280,x2:400,y2:500,color:'#f5c518'}], label:{x:400,y:540,text:'DRIVE FORCÉ'} },
+      result_C: { arrows:[{x1:300,y1:280,x2:300,y2:500,color:'#e63946'}], label:{x:300,y:540,text:'DRIVE SEUL'} }
+    },
+    answers: [
+      { fr:"Tu attaques X1, quand il s'engage sur toi tu passes à (2) qui finit libre", en:"You attack X1, when he commits you pass to (2) who finishes free", score:'opt',
+        explainFR:"La règle du 2v1 : engage le défenseur pour l'obliger à choisir. Passe au bon moment = finish garanti pour ton coéquipier.",
+        explainEN:"2v1 rule: engage defender to force his choice. Pass at right moment = teammate finishes." },
+      { fr:"Tu drives fort vers le panier sans regarder ton coéquipier", en:"You drive hard to basket without looking at teammate", score:'acc',
+        explainFR:"Ça peut marcher mais tu prends un finish contesté quand tu pouvais offrir un finish libre. Choix moyen.",
+        explainEN:"Can work but you take contested finish when you could offer a free one. Medium choice." },
+      { fr:"Tu drives seul et écartes ton coéquipier de la ligne", en:"You drive alone and cut off teammate", score:'weak',
+        explainFR:"Tu gâches un 2v1 en 1v1. Le contre-attaque était fait pour être exploité — c'est la meilleure situation de tir en basket.",
+        explainEN:"You waste a 2v1 into 1v1. Fast break was to be exploited — best shooting situation in basketball." }
+    ]
+  });
+
+  _make({
+    id:'trs_02', cat:'trs', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Tu es le meneur en 3v2. Deux défenseurs sont alignés (le premier joue le porteur, le second protège le cercle).",
+    contextEN:"PG in 3v2. Two defenders aligned (first plays handler, second protects rim).",
+    basePositions: POS_TR_3v2,
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:240,x2:150,y2:320,color:'#2dc653'}], label:{x:120,y:290,text:'PASSE AILE OUVERTE'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:500,color:'#f5c518'}], label:{x:400,y:540,text:'DRIVE MILIEU'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:400,y2:180,color:'#e63946'}], label:{x:400,y:150,text:'PULL-UP LOIN'} }
+    },
+    answers: [
+      { fr:"Tu engages le premier défenseur puis passes à l'aile libre (2 ou 3)", en:"You engage first defender then pass to open wing (2 or 3)", score:'opt',
+        explainFR:"Le 3v2 se joue par les côtés. Tu attires le premier défenseur, le second doit choisir — l'aile est toujours libre.",
+        explainEN:"3v2 plays through the sides. Draw first defender, second must choose — wing is always free." },
+      { fr:"Tu drives au milieu et forces le finish", en:"You drive middle and force finish", score:'acc',
+        explainFR:"Le drive milieu peut marcher mais tu vas trouver les deux défenseurs sur toi. Ton finish sera contesté au max.",
+        explainEN:"Middle drive can work but you find both defenders on you. Contested finish max." },
+      { fr:"Tu prends un pull-up mid-range depuis le milieu", en:"You take a mid-range pull-up from middle", score:'weak',
+        explainFR:"Tu gâches le 3v2 pour un shot difficile. Le contre-attaque est fait pour finir près du cercle, pas mid-range contesté.",
+        explainEN:"You waste 3v2 for a hard shot. Fast break is for close finishes, not contested mid-range." }
+    ]
+  });
+
+  _make({
+    id:'trs_03', cat:'trs', perspective:'off', levels:['CON','COM'],
+    contextFR:"Contre-attaque 1v1. Tu es le meneur seul face au défenseur X1. Ton coéquipier trailer arrive derrière — il sera prêt dans 2 secondes.",
+    contextEN:"1v1 fast break. You're PG alone vs X1. Trailer teammate arrives — ready in 2 seconds.",
+    basePositions: POS_TR_2v1,
+    preActionChanges: [{label:'2',x:200,y:180}],
+    overlays: {
+      result_A: { arrows:[{x1:300,y1:280,x2:400,y2:280,color:'#2dc653',dashed:true}], label:{x:400,y:250,text:'DÉCÉLÈRE ATTEND TRAILER'} },
+      result_B: { arrows:[{x1:300,y1:280,x2:400,y2:500,color:'#f5c518'}], label:{x:400,y:540,text:'DRIVE + FINISH'} },
+      result_C: { arrows:[{x1:300,y1:280,x2:300,y2:180,color:'#e63946'}], label:{x:300,y:150,text:'PULL-UP LOIN'} }
+    },
+    answers: [
+      { fr:"Tu ralentis pour attendre le trailer et créer un 2v1", en:"You slow down to wait for trailer and create 2v1", score:'opt',
+        explainFR:"Une décélération intelligente convertit une situation moyenne (1v1) en excellente (2v1). Bonne lecture avancée.",
+        explainEN:"Smart deceleration turns average situation (1v1) into excellent (2v1). Good advanced read." },
+      { fr:"Tu drives directement et prends le finish 1v1", en:"You drive and take 1v1 finish", score:'acc',
+        explainFR:"Ça marche mais tu prends un finish contesté quand tu pouvais avoir un 2v1. Manque de patience.",
+        explainEN:"Works but you take contested finish when 2v1 was possible. Lack of patience." },
+      { fr:"Tu prends un pull-up 3 pts loin en transition", en:"You take a deep pull-up 3 in transition", score:'weak',
+        explainFR:"Shot très difficile pour une action qui offrait un finish facile en attendant. Choix impatient et coûteux.",
+        explainEN:"Very hard shot for an action that offered easy finish by waiting. Impatient costly choice." }
+    ]
+  });
+
+  _make({
+    id:'trs_04', cat:'trs', perspective:'def', levels:['INT','CON','COM'],
+    contextFR:"Tu es le dernier défenseur (X1) face à un 2v1 adverse. Les deux attaquants foncent vers toi.",
+    contextEN:"You're last defender (X1) facing opponent 2v1. Two attackers charge at you.",
+    basePositions: POS_TR_2v1,
+    preActionChanges: [{label:'X1',y:400,you:true},{label:'1',x:300,y:280},{label:'2',x:500,y:280}],
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:400,x2:400,y2:400,color:'#2dc653',dashed:true}], label:{x:400,y:360,text:'MILIEU ATTENDRE'} },
+      result_B: { arrows:[{x1:400,y1:400,x2:300,y2:290,color:'#f5c518'}], label:{x:270,y:260,text:'ATTAQUE PORTEUR'} },
+      result_C: { arrows:[{x1:400,y1:400,x2:500,y2:290,color:'#e63946'}], label:{x:530,y:260,text:'ATTAQUE RECEVEUR'} }
+    },
+    answers: [
+      { fr:"Tu restes au milieu et attends de voir le porteur s'engager", en:"You stay middle and wait to see handler commit", score:'opt',
+        explainFR:"En 2v1 défensif, tu ne peux pas gagner mais tu peux forcer une erreur. Rester au milieu = tu retardes leur choix.",
+        explainEN:"In 2v1 defense, you can't win but you can force a mistake. Stay middle = you delay their choice." },
+      { fr:"Tu attaques le porteur pour couper le layup", en:"You attack the handler to cut layup", score:'acc',
+        explainFR:"Peut fonctionner si le porteur est mauvais passeur. Sinon, il passe et tu offres un layup facile au receveur.",
+        explainEN:"Works if handler is bad passer. Otherwise, he passes and you offer easy layup to receiver." },
+      { fr:"Tu prends le receveur pour couper la passe", en:"You take the receiver to cut pass", score:'weak',
+        explainFR:"Erreur classique du débutant : tu offres un layup direct au porteur. Le principe est de forcer une décision, pas de céder immédiatement.",
+        explainEN:"Classic beginner error: you offer direct layup to handler. Principle is to force a decision, not concede immediately." }
+    ]
+  });
+
+  _make({
+    id:'trs_05', cat:'trs', perspective:'off', levels:['DEB','INT'],
+    contextFR:"Contre-attaque 3v2 basique. Tu es en flèche latérale (2). Le meneur (1) attaque le milieu. Le second défenseur pivote vers toi.",
+    contextEN:"Basic 3v2. You're side lane (2). PG attacks middle. Second defender pivots toward you.",
+    basePositions: POS_TR_3v2,
+    preActionChanges: [{label:'2',x:150,y:320,you:true,ball:false},{label:'1',ball:true},{label:'X2',x:400,y:400}],
+    overlays: {
+      result_A: { arrows:[{x1:150,y1:320,x2:150,y2:500,color:'#2dc653'}], label:{x:150,y:540,text:'REMPLIS LE COIN'} },
+      result_B: { arrows:[{x1:150,y1:320,x2:400,y2:400,color:'#f5c518'}], label:{x:420,y:430,text:'PASSE PIVOT'} },
+      result_C: { arrows:[{x1:150,y1:320,x2:250,y2:250,color:'#e63946'}], label:{x:270,y:220,text:'RALENTIT'} }
+    },
+    answers: [
+      { fr:"Tu remplis la lane et vas au coin pour créer un espacement 3v2", en:"You fill the lane and go to corner for 3v2 spacing", score:'opt',
+        explainFR:"Ton job en flèche latérale = ouvrir le terrain. Rempli le coin, le meneur peut te passer libre pour un shoot ou un layup.",
+        explainEN:"Your job on side lane = open the floor. Fill corner, PG can pass free for shoot or layup." },
+      { fr:"Tu montes vers ton pivot au milieu pour poser un écran", en:"You move toward C to set a screen", score:'acc',
+        explainFR:"Bonne intention mais tu casses la structure 3v2. En contre-attaque, l'espacement est plus important que les écrans.",
+        explainEN:"Good intention but you break the 3v2 structure. In fast break, spacing > screens." },
+      { fr:"Tu ralentis pour ne pas déborder le meneur", en:"You slow down to not overtake PG", score:'weak',
+        explainFR:"Sans vitesse en contre-attaque tu ne sers à rien. Le jeu se joue rapide — un ralentissement casse toute la transition.",
+        explainEN:"Without speed in fast break you're useless. Game is fast — slowing kills the whole transition." }
+    ]
+  });
+
+  // ═══════════════════════ CLUTCH (10 situations) ═══════════════════════
+
+  _make({
+    id:'clt_01', cat:'clt', perspective:'off', levels:['CON','COM'],
+    contextFR:"Il reste 6 secondes. Ton équipe mène de 1. Tu as le ballon au top. La défense adverse va faire faute pour arrêter l'horloge.",
+    contextEN:"6 seconds left. Team up by 1. Ball at top. Defense will foul to stop clock.",
+    basePositions: POS_CLUTCH,
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:240,x2:400,y2:240,color:'#2dc653',dashed:true}], label:{x:400,y:200,text:'JEU DE JAMBES'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:420,color:'#f5c518'}], label:{x:400,y:450,text:'DRIVE + LF'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:400,y2:150,color:'#e63946'}], label:{x:400,y:120,text:'PULL-UP RISQUÉ'} }
+    },
+    answers: [
+      { fr:"Tu joues les jambes pour éviter le contact et user l'horloge", en:"You use footwork to avoid contact and burn clock", score:'opt',
+        explainFR:"Le meilleur LF-shooter n'est pas plus utile que le temps qui s'écoule. Tu gardes le ballon en vie sans donner LF.",
+        explainEN:"Best FT shooter isn't more useful than time burning. Keep ball alive without giving FTs." },
+      { fr:"Tu drives fort pour forcer la faute et gagner 2 LF", en:"You drive hard to draw foul and get 2 FTs", score:'acc',
+        explainFR:"Valide si tu es un très bon LF-shooter. Sinon, un LF raté relance le match. Plus risqué que la gestion horloge.",
+        explainEN:"Valid if you're a very good FT shooter. Otherwise, missed FT restarts the game. Riskier than clock management." },
+      { fr:"Tu prends un pull-up 3 pts pour tuer le match", en:"You take a pull-up 3 to end the game", score:'weak',
+        explainFR:"Tu ne dois pas prendre ce risque en menant. Un shot raté à 6 sec = fast break adverse = défaite. Terrible décision.",
+        explainEN:"Shouldn't take this risk while leading. Missed shot at 6 sec = opponent fast break = loss. Terrible decision." }
+    ]
+  });
+
+  _make({
+    id:'clt_02', cat:'clt', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"Dernier tir. 4 secondes restantes. Tu es à égalité. Tu as le ballon, sur l'aile (2). X2 défend proche mais pas collé.",
+    contextEN:"Last shot. 4 seconds. Tied game. Ball on wing (2). X2 defends close but not glued.",
+    basePositions: POS_ISO_WING,
+    overlays: {
+      result_A: { arrows:[{x1:200,y1:320,x2:200,y2:500,color:'#2dc653'}], label:{x:200,y:540,text:'ATTAQUE 2 → PANIER'} },
+      result_B: { arrows:[{x1:200,y1:320,x2:200,y2:220,color:'#f5c518'}], label:{x:200,y:190,text:'STEP-BACK 3PT'} },
+      result_C: { arrows:[{x1:200,y1:320,x2:450,y2:220,color:'#e63946'}], label:{x:470,y:190,text:'PASSE + PRÉCIPITATION'} }
+    },
+    answers: [
+      { fr:"Tu attaques directement pour un layup / faute (2 points ou 2 LF)", en:"You drive directly for layup / foul (2 pts or 2 FTs)", score:'opt',
+        explainFR:"Match à égalité = un 2 points suffit pour gagner. Le plus haut pourcentage possible = drive/layup. Ne prends pas un 3pt si le 2pt te fait gagner.",
+        explainEN:"Tied game = 2 pts wins. Highest percentage possible = drive/layup. Don't take 3 when 2 wins." },
+      { fr:"Tu prends un step-back 3 pts pour gagner directement", en:"You take a step-back 3 to win directly", score:'acc',
+        explainFR:"Ça peut gagner mais c'est un shot à 30-35%. Ton drive/layup est à 50-60%. Statistiquement moins rentable.",
+        explainEN:"Can win but 30-35% shot. Your drive/layup is 50-60%. Statistically less rentable." },
+      { fr:"Tu passes le ballon à un coéquipier au dernier moment", en:"You pass ball to teammate at last moment", score:'weak',
+        explainFR:"À 4 secondes, la passe précipitée peut mener à un turnover ou à un shot forcé de ton coéquipier. Ton shot est plus fiable.",
+        explainEN:"At 4 sec, rushed pass can lead to turnover or forced shot from teammate. Your shot is more reliable." }
+    ]
+  });
+
+  _make({
+    id:'clt_03', cat:'clt', perspective:'off', levels:['COM'],
+    contextFR:"Dernier tir. 3 secondes. Tu as le ballon. Tu es mené de 3. Un 3 pts te fait égaliser.",
+    contextEN:"Last shot. 3 seconds. Ball in hand. Down 3. A 3 ties.",
+    basePositions: POS_CLUTCH,
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:240,x2:400,y2:150,color:'#2dc653'}], label:{x:400,y:120,text:'3PT ÉGALISATION'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:420,color:'#f5c518'}], label:{x:400,y:450,text:'2PT + FAUTE'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:150,y2:420,color:'#e63946'}], label:{x:120,y:450,text:'PASSE + SHOT AILE'} }
+    },
+    answers: [
+      { fr:"Tu prends un 3 pts direct pour égaliser", en:"You take a direct 3 to tie", score:'opt',
+        explainFR:"Mené de 3 = le 3 pts est la seule solution logique. Un 2 pts te fait perdre. La probabilité doit être calculée sur le résultat.",
+        explainEN:"Down 3 = 3 pt is the only logical solution. A 2 makes you lose. Probability is calculated on the result." },
+      { fr:"Tu drives pour un 2 pts + faute (3 LF potentiels)", en:"You drive for 2 + foul (potential 3 FTs)", score:'acc',
+        explainFR:"Idée créative mais tu comptes sur une faute. Si le défenseur ne fauche pas, tu perds le match. Trop conditionnel.",
+        explainEN:"Creative but you depend on a foul. If defender doesn't foul, you lose. Too conditional." },
+      { fr:"Tu passes le ballon à un coéquipier pour un 3 pts d'aile", en:"You pass to teammate for wing 3", score:'weak',
+        explainFR:"À 3 secondes, la passe précipitée est risquée. Ton coéquipier n'a pas le temps de se préparer. Ton propre shoot est plus fiable.",
+        explainEN:"At 3 sec, rushed pass is risky. Teammate has no time to prepare. Your own shot is more reliable." }
+    ]
+  });
+
+  _make({
+    id:'clt_04', cat:'clt', perspective:'def', levels:['CON','COM'],
+    contextFR:"Il reste 5 secondes. L'adversaire est mené de 3. Ils lancent une action à 3pt. Ton coach t'ordonne de faire faute AVANT le shot.",
+    contextEN:"5 seconds left. Opponent down 3. They call 3-pt play. Coach orders foul BEFORE the shot.",
+    basePositions: POS_CLUTCH,
+    preActionChanges: [{label:'X1',y:280,you:true}],
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:280,x2:400,y2:250,color:'#2dc653'}], label:{x:400,y:220,text:'FAUTE HANDLER TÔT'} },
+      result_B: { arrows:[{x1:400,y1:280,x2:400,y2:280,color:'#f5c518',dashed:true}], label:{x:400,y:250,text:'ATTENDRE LE SHOT'} },
+      result_C: { arrows:[{x1:400,y1:280,x2:400,y2:150,color:'#e63946'}], label:{x:400,y:120,text:'FAUTE PENDANT LE SHOT'} }
+    },
+    answers: [
+      { fr:"Tu fais faute sur le porteur AVANT qu'il n'entame son shot (2 LF au lieu de 3)", en:"You foul handler BEFORE he starts his shot (2 FTs instead of 3)", score:'opt',
+        explainFR:"C'est exactement la stratégie : couper le potentiel 3pt en donnant 2 LF max. Le timing est CRUCIAL — avant le mouvement de tir.",
+        explainEN:"Exactly the strategy: kill the potential 3pt by giving max 2 FTs. Timing is CRUCIAL — before shooting motion." },
+      { fr:"Tu attends de voir s'il shoote avant de faire faute", en:"You wait to see if he shoots before fouling", score:'weak',
+        explainFR:"Hésitation = tu fauches pendant le shot = 3 LF donnés = tu peux perdre le match. La consigne du coach était claire.",
+        explainEN:"Hesitation = you foul during shot = 3 FTs = you may lose. Coach's order was clear." },
+      { fr:"Tu contest sans fauter pour éviter le risque LF", en:"You contest without fouling to avoid FT risk", score:'acc',
+        explainFR:"Compréhensible mais tu vas contre la consigne. Un 3pt réussi = prolongation. La faute stratégique était plus sûre.",
+        explainEN:"Understandable but you go against orders. A made 3 = OT. Strategic foul was safer." }
+    ]
+  });
+
+  _make({
+    id:'clt_05', cat:'clt', perspective:'off', levels:['INT','CON','COM'],
+    contextFR:"3 secondes restantes. Tu es mené d'un point et tu as le ballon. Tu peux prendre un 2 pts pour gagner ou un 3 pts par excès de zèle.",
+    contextEN:"3 seconds left. Down 1 with ball. You can take a 2 to win or a 3 by overkill.",
+    basePositions: POS_CLUTCH,
+    overlays: {
+      result_A: { arrows:[{x1:400,y1:240,x2:400,y2:450,color:'#2dc653'}], label:{x:400,y:490,text:'DRIVE / MID-RANGE'} },
+      result_B: { arrows:[{x1:400,y1:240,x2:400,y2:150,color:'#f5c518'}], label:{x:400,y:120,text:'3PT INUTILE'} },
+      result_C: { arrows:[{x1:400,y1:240,x2:400,y2:240,color:'#e63946',dashed:true}], label:{x:400,y:200,text:'HÉSITATION'} }
+    },
+    answers: [
+      { fr:"Tu drives ou prends un mid-range (2 points suffisent pour gagner)", en:"You drive or take mid-range (2 pts enough to win)", score:'opt',
+        explainFR:"Mené d'un point, un 2 pts te fait gagner. Prends le shot LE PLUS FIABLE, pas le plus spectaculaire. Efficacité > style.",
+        explainEN:"Down 1, a 2 wins. Take the MOST RELIABLE shot, not the flashy one. Efficiency > style." },
+      { fr:"Tu prends un 3 pts pour la victoire avec panache", en:"You take a 3 for a stylish win", score:'weak',
+        explainFR:"Absurde stratégiquement. Le 3 pts a un taux de réussite plus bas que le 2 pts. Tu prends un shot plus difficile pour un gain identique.",
+        explainEN:"Strategically absurd. 3pt has lower % than 2pt. You take a harder shot for identical gain." },
+      { fr:"Tu prends 2 secondes pour lire la défense", en:"You take 2 sec to read defense", score:'acc',
+        explainFR:"OK mais tu réduis ton temps de décision. À 3 secondes, la décision doit être rapide et exécutée immédiatement.",
+        explainEN:"OK but you reduce decision time. At 3 sec, decision must be fast and executed immediately." }
+    ]
+  });
+
+})();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     QI BASKET / BASKETBALL IQ — Prise de décision tactique
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+#qi-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0d1117; display: none; overflow-y: auto;
+}
+#qi-overlay.on { display: block; }
+.qi-container { max-width: 780px; margin: 0 auto; padding: 20px 16px 40px; }
+
+.qi-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; gap: 12px;
+}
+.qi-btn-back {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: #cfd3e0; padding: 8px 14px; border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1px; cursor: pointer;
+}
+.qi-profile {
+  font-size: 11px; color: #4ecdc4;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+/* ─── Sélecteur de mode ─── */
+.qi-title {
+  font-family: 'Bebas Neue', sans-serif; color: #4ecdc4;
+  font-size: clamp(28px, 6vw, 40px); letter-spacing: 3px;
+  text-align: center; margin-bottom: 6px; line-height: 1;
+}
+.qi-subtitle {
+  font-size: 13px; color: #9aa3b3; text-align: center; margin-bottom: 22px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+.qi-mode-btn {
+  display: block; width: 100%;
+  padding: 20px 18px; margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(78,205,196,0.08), #161b22);
+  border: 2px solid rgba(78,205,196,0.4); border-radius: 14px;
+  color: #f0f2f8; cursor: pointer; transition: all 0.2s;
+  font-family: inherit; text-align: left;
+}
+.qi-mode-btn:hover {
+  border-color: #4ecdc4; background: linear-gradient(135deg, rgba(78,205,196,0.15), #161b22);
+}
+.qi-mode-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #4ecdc4; font-size: 20px; letter-spacing: 2px;
+}
+.qi-mode-desc {
+  color: #cfd3e0; font-size: 12.5px; margin-top: 6px; line-height: 1.4;
+}
+
+.qi-cat-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #4ecdc4; font-size: 18px; letter-spacing: 2px; margin: 24px 0 10px;
+}
+.qi-cat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.qi-cat-btn {
+  background: #161b22; border: 1px solid rgba(78,205,196,0.25);
+  border-radius: 12px; padding: 14px 12px;
+  cursor: pointer; transition: all 0.2s;
+  color: #f0f2f8; font-family: inherit; text-align: center;
+}
+.qi-cat-btn:hover { border-color: #4ecdc4; }
+.qi-cat-icon { font-size: 26px; line-height: 1; margin-bottom: 6px; }
+.qi-cat-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+  letter-spacing: 1.2px; color: #4ecdc4;
+}
+.qi-cat-hint {
+  font-size: 10px; color: #9aa3b3; margin-top: 3px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.8px;
+}
+
+/* ─── Zone de jeu ─── */
+.qi-play-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.qi-progress {
+  font-family: 'Bebas Neue', sans-serif; color: #cfd3e0;
+  font-size: 13px; letter-spacing: 1.5px;
+}
+.qi-cat-badge {
+  background: rgba(78,205,196,0.15); color: #4ecdc4;
+  padding: 4px 10px; border-radius: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+}
+
+.qi-court {
+  position: relative; width: 100%; aspect-ratio: 4/3;
+  background: linear-gradient(180deg, #0a1220 0%, #050810 100%);
+  border: 1px solid rgba(78,205,196,0.2); border-radius: 12px;
+  overflow: hidden; margin-bottom: 12px;
+}
+.qi-court svg { width: 100%; height: 100%; display: block; }
+
+.qi-context {
+  background: #161b22; border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+  font-size: 13px; color: #cfd3e0; line-height: 1.5;
+}
+.qi-context-perspective {
+  display: inline-block; margin-right: 8px;
+  padding: 2px 8px; border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+.qi-context-perspective.off { background: rgba(245,197,24,0.2); color: #f5c518; }
+.qi-context-perspective.def { background: rgba(230,57,70,0.2); color: #e63946; }
+
+/* ─── Timer et QCM ─── */
+.qi-timer-wrap {
+  display: none; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.qi-timer-wrap.on { display: flex; }
+.qi-timer-label {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #4ecdc4; font-size: 12px; letter-spacing: 1.5px;
+}
+.qi-timer-bar {
+  flex: 1; height: 8px; background: rgba(78,205,196,0.15); border-radius: 4px; overflow: hidden;
+}
+.qi-timer-fill {
+  height: 100%; background: linear-gradient(90deg, #4ecdc4, #f5c518, #e63946);
+  transform-origin: left; transition: transform linear;
+}
+.qi-timer-sec {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #cfd3e0; font-size: 14px; letter-spacing: 1px; min-width: 30px; text-align: right;
+}
+
+.qi-qcm { display: none; }
+.qi-qcm.on { display: block; }
+.qi-question {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #4ecdc4; font-size: 16px; letter-spacing: 1.5px;
+  text-align: center; margin-bottom: 10px;
+}
+.qi-answer {
+  display: block; width: 100%;
+  background: #161b22; border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  color: #f0f2f8; cursor: pointer; transition: all 0.15s;
+  font-family: inherit; font-size: 13px; text-align: left; line-height: 1.4;
+}
+.qi-answer:hover { border-color: #4ecdc4; background: rgba(78,205,196,0.05); }
+.qi-answer:disabled { cursor: default; }
+.qi-answer.reveal-opt   { border-color: #2dc653; background: rgba(45,198,83,0.1); }
+.qi-answer.reveal-acc   { border-color: #f5c518; background: rgba(245,197,24,0.1); }
+.qi-answer.reveal-weak  { border-color: #e63946; background: rgba(230,57,70,0.1); }
+.qi-answer .qi-answer-tag {
+  display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+}
+.qi-answer.reveal-opt  .qi-answer-tag { background: #2dc653; color: #fff; }
+.qi-answer.reveal-acc  .qi-answer-tag { background: #f5c518; color: #0d1117; }
+.qi-answer.reveal-weak .qi-answer-tag { background: #e63946; color: #fff; }
+
+.qi-feedback {
+  display: none;
+  border-radius: 12px; padding: 14px; margin-top: 12px;
+  font-size: 13px; line-height: 1.5;
+}
+.qi-feedback.on { display: block; }
+.qi-feedback.opt   { background: rgba(45,198,83,0.1);  border: 1px solid rgba(45,198,83,0.4); color: #a8e6b5; }
+.qi-feedback.acc   { background: rgba(245,197,24,0.1); border: 1px solid rgba(245,197,24,0.4); color: #f5da8f; }
+.qi-feedback.weak  { background: rgba(230,57,70,0.1);  border: 1px solid rgba(230,57,70,0.4); color: #f4a3aa; }
+.qi-feedback-verdict {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 2px; margin-bottom: 6px;
+}
+.qi-feedback-explain { color: #cfd3e0; font-size: 12.5px; }
+
+.qi-next-btn {
+  display: none; width: 100%; margin-top: 12px;
+  padding: 14px; background: #4ecdc4; color: #0d1117;
+  border: none; border-radius: 12px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+  letter-spacing: 2px; font-weight: 700; cursor: pointer;
+}
+.qi-next-btn.on { display: block; }
+.qi-optimal-btn {
+  display: none; width: 100%; margin-top: 8px;
+  padding: 10px; background: transparent; color: #4ecdc4;
+  border: 1px solid rgba(78,205,196,0.4); border-radius: 10px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+  letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; cursor: pointer;
+}
+.qi-optimal-btn.on { display: block; }
+
+/* ─── Récap fin session ─── */
+.qi-recap-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #4ecdc4; font-size: clamp(28px, 6vw, 40px);
+  letter-spacing: 3px; text-align: center; margin: 20px 0 6px; line-height: 1;
+}
+.qi-recap-sub {
+  font-size: 12px; color: #9aa3b3; text-align: center; margin-bottom: 20px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+.qi-recap-scores {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;
+}
+.qi-recap-score {
+  padding: 16px 8px; border-radius: 12px; text-align: center;
+}
+.qi-recap-score.opt  { background: rgba(45,198,83,0.1);  border: 1px solid rgba(45,198,83,0.4); }
+.qi-recap-score.acc  { background: rgba(245,197,24,0.1); border: 1px solid rgba(245,197,24,0.4); }
+.qi-recap-score.weak { background: rgba(230,57,70,0.1);  border: 1px solid rgba(230,57,70,0.4); }
+.qi-recap-num {
+  font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 1;
+}
+.qi-recap-score.opt  .qi-recap-num { color: #2dc653; }
+.qi-recap-score.acc  .qi-recap-num { color: #f5c518; }
+.qi-recap-score.weak .qi-recap-num { color: #e63946; }
+.qi-recap-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; letter-spacing: 1px; color: #cfd3e0;
+  margin-top: 3px; text-transform: uppercase; font-weight: 700;
+}
+.qi-recap-coach {
+  background: linear-gradient(135deg, rgba(78,205,196,0.08), #161b22);
+  border: 1px solid rgba(78,205,196,0.3); border-radius: 12px;
+  padding: 14px 16px; margin: 12px 0;
+  font-size: 13px; line-height: 1.5; color: #cfd3e0;
+  display: flex; gap: 10px;
+}
+.qi-recap-coach-icon { color: #4ecdc4; flex-shrink: 0; font-size: 16px; }
+.qi-recap-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px;
+}
+.qi-btn-action {
+  padding: 12px 8px; background: transparent;
+  border: 1px solid rgba(78,205,196,0.4); color: #4ecdc4;
+  border-radius: 10px; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer;
+}
+.qi-btn-action:hover { background: rgba(78,205,196,0.08); }
+.qi-btn-action.wide { grid-column: span 2; }
+
+@keyframes qi-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.15); } }
+.qi-highlight { animation: qi-pulse 1s ease-in-out infinite; }
+</style>
+
+<div id="qi-overlay" role="dialog" aria-label="QI Basket">
+  <div class="qi-container" id="qi-container"><!-- dynamique --></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   QI BASKET / BASKETBALL IQ — LOGIQUE
+═══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  function _flang() {
+    try { if (window._lang) return window._lang;
+      var d = (document.body || document.documentElement).getAttribute('data-lang');
+      if (d) return d;
+    } catch(e){}
+    return 'fr';
+  }
+  var _T = function(fr, en) { return _flang()==='en' ? en : fr; };
+
+  // ─── 6 catégories ───
+  var CATS = [
+    { key:'pnr',  icon:'🔀', nameFR:'PICK & ROLL',   nameEN:'PICK & ROLL',   hintFR:'Attaque en écran',  hintEN:'Screen offense' },
+    { key:'iso',  icon:'🥊', nameFR:'ISO / 1v1',     nameEN:'ISO / 1v1',     hintFR:'Duel individuel',   hintEN:'One-on-one' },
+    { key:'off',  icon:'🏃', nameFR:'SANS BALLON',   nameEN:'OFF-BALL',      hintFR:'Cuts, écrans, mouvement', hintEN:'Cuts, screens, movement' },
+    { key:'def',  icon:'🛡️', nameFR:'DÉFENSE',       nameEN:'DEFENSE',       hintFR:'Rotations, help',   hintEN:'Rotations, help' },
+    { key:'trs',  icon:'⚡', nameFR:'TRANSITION',    nameEN:'TRANSITION',    hintFR:'Contre-attaque',    hintEN:'Fast break' },
+    { key:'clt',  icon:'⏱️', nameFR:'CLUTCH',        nameEN:'CLUTCH',        hintFR:'Fin de match',      hintEN:'End of game' }
+  ];
+
+  // Timer par niveau (secondes)
+  var TIMERS = { DEB: 15, INT: 10, CON: 7, COM: 5 };
+
+  // ─── State ───
+  var STATE = {
+    poste: null, niveau: null,
+    mode: null,          // 'mixed' | 'category'
+    category: null,      // clé de CATS si mode==='category'
+    session: [],         // array de {sit, choice, score}
+    curIdx: 0,
+    curSit: null,
+    seenIds: {},         // pool tracking par catégorie
+    tickId: null, tEndAt: null
+  };
+
+  var STORE_KEY = 'sensei_qi_seen_v1';
+  function _loadSeen() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) STATE.seenIds = JSON.parse(raw) || {};
+    } catch(e){}
+  }
+  function _saveSeen() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(STATE.seenIds)); } catch(e){}
+  }
+
+  // Récupérer profil de la fiche (partagé)
+  function _loadProfile() {
+    try {
+      var raw = localStorage.getItem('sensei_fiche_profile_v1');
+      if (raw) {
+        var d = JSON.parse(raw);
+        STATE.poste = d.poste || null;
+        STATE.niveau = d.niveau || null;
+      }
+    } catch(e){}
+  }
+
+  window._qi_open = function() {
+    _loadProfile();
+    _loadSeen();
+    var ov = document.getElementById('qi-overlay');
+    if (!ov) return;
+    ov.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    STATE.mode = null; STATE.category = null;
+    STATE.session = []; STATE.curIdx = 0;
+    _renderMenu();
+  };
+  window._qi_close = function() {
+    var ov = document.getElementById('qi-overlay');
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
+    _stopTimer();
+  };
+
+  // ─── Menu principal ───
+  function _renderMenu() {
+    var en = _flang()==='en';
+    var c = document.getElementById('qi-container');
+    if (!c) return;
+    if (!STATE.poste || !STATE.niveau) {
+      // Doit d'abord définir un profil : ouvrir la fiche pour choisir
+      c.innerHTML = '<div class="qi-topbar">'
+        +'<button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>'
+        +'</div>'
+        +'<div class="qi-title">'+(en?'BASKETBALL IQ':'QI BASKET')+'</div>'
+        +'<div class="qi-subtitle">'+(en?'Read the game — decision making':'Lecture de jeu — prise de décision')+'</div>'
+        +'<div class="qi-context" style="text-align:center">'
+        +(en?'To adapt situations to your level, please first choose your position and level in TON ENTRAÎNEMENT.'
+             :'Pour adapter les situations à ton niveau, choisis d\'abord ton poste et ton niveau dans TON ENTRAÎNEMENT.')
+        +'</div>'
+        +'<button class="qi-mode-btn" onclick="_qi_close();setTimeout(function(){if(typeof _fiche_open===\'function\')_fiche_open();},50)"><div class="qi-mode-title">📋 '+(en?'OPEN TRAINING SHEET':'OUVRIR TON ENTRAÎNEMENT')+'</div><div class="qi-mode-desc">'+(en?'Set your position and level once, applied here too':'Choisis ton poste et niveau une fois, appliqué ici aussi')+'</div></button>';
+      return;
+    }
+    var posteName = _posteName(STATE.poste, en);
+    var nivName = _nivName(STATE.niveau, en);
+    var html = '';
+    html += '<div class="qi-topbar">';
+    html += '  <button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    html += '  <div class="qi-profile">'+posteName+' · '+nivName+'</div>';
+    html += '</div>';
+    html += '<div class="qi-title">'+(en?'BASKETBALL IQ':'QI BASKET')+'</div>';
+    html += '<div class="qi-subtitle">'+(en?'5 situations — decide fast':'5 situations — décide vite')+'</div>';
+
+    // Mode mixte
+    html += '<button class="qi-mode-btn" onclick="_qi_startSession(null)">';
+    html += '  <div class="qi-mode-title">🎲 '+(en?'MIXED SESSION':'SESSION MIXTE')+'</div>';
+    html += '  <div class="qi-mode-desc">'+(en?'5 situations from all 6 categories, random':'5 situations tirées des 6 catégories, au hasard')+'</div>';
+    html += '</button>';
+
+    html += '<div class="qi-cat-title">'+(en?'OR CHOOSE A CATEGORY':'OU CHOISIS UNE CATÉGORIE')+'</div>';
+    html += '<div class="qi-cat-grid">';
+    CATS.forEach(function(cat){
+      html += '<button class="qi-cat-btn" onclick="_qi_startSession(\''+cat.key+'\')">';
+      html += '  <div class="qi-cat-icon">'+cat.icon+'</div>';
+      html += '  <div class="qi-cat-name">'+(en?cat.nameEN:cat.nameFR)+'</div>';
+      html += '  <div class="qi-cat-hint">'+(en?cat.hintEN:cat.hintFR)+'</div>';
+      html += '</button>';
+    });
+    html += '</div>';
+    c.innerHTML = html;
+  }
+
+  function _posteName(k, en) {
+    var m = { PG:['MENEUR','POINT GUARD'], SG:['ARRIÈRE','SHOOTING GUARD'],
+              SF:['AILIER','SMALL FORWARD'], PF:['AILIER FORT','POWER FORWARD'],
+              C:['PIVOT','CENTER'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+  function _nivName(k, en) {
+    var m = { DEB:['DÉBUTANT','BEGINNER'], INT:['INTERMÉDIAIRE','INTERMEDIATE'],
+              CON:['CONFIRMÉ','ADVANCED'], COM:['COMPÉTITION','COMPETITION'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+
+  // ─── Choisir 5 situations ───
+  window._qi_startSession = function(categoryKey) {
+    if (!window._QI_DATA) { alert(_T('Données non chargées','Data not loaded')); return; }
+    STATE.mode = categoryKey ? 'category' : 'mixed';
+    STATE.category = categoryKey;
+    STATE.session = [];
+    STATE.curIdx = 0;
+
+    // Pool = situations correspondant au niveau (toutes catégories ou une seule)
+    var pool = _buildPool(categoryKey);
+    if (!pool.length) { alert(_T('Aucune situation disponible','No situation available')); return; }
+
+    // 5 situations non déjà vues récemment
+    var picked = _pickFive(pool);
+    STATE.session = picked.map(function(sit){ return { sit: sit, choice: null, score: null }; });
+
+    // Marquer comme vues
+    picked.forEach(function(s){
+      var poolKey = categoryKey || 'MIXED';
+      if (!STATE.seenIds[poolKey]) STATE.seenIds[poolKey] = [];
+      STATE.seenIds[poolKey].push(s.id);
+      // trim: garder les 15 dernières
+      if (STATE.seenIds[poolKey].length > 15) STATE.seenIds[poolKey].shift();
+    });
+    _saveSeen();
+
+    _renderPlay();
+  };
+
+  function _buildPool(categoryKey) {
+    var out = [];
+    var all = window._QI_DATA;
+    Object.keys(all).forEach(function(id){
+      var s = all[id];
+      if (categoryKey && s.cat !== categoryKey) return;
+      // Adapter au niveau : chaque situation a des levels: ['DEB','INT']. Prendre celles qui incluent le niveau du joueur.
+      if (!s.levels || s.levels.indexOf(STATE.niveau) === -1) return;
+      out.push(s);
+    });
+    return out;
+  }
+
+  function _pickFive(pool) {
+    var poolKey = STATE.category || 'MIXED';
+    var seen = STATE.seenIds[poolKey] || [];
+    var unseen = pool.filter(function(s){ return seen.indexOf(s.id) === -1; });
+    var work = unseen.length >= 5 ? unseen : pool.slice();
+    // shuffle
+    for (var i = work.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i+1));
+      var t = work[i]; work[i] = work[j]; work[j] = t;
+    }
+    return work.slice(0, 5);
+  }
+
+  // ─── Rendu jeu (1 situation à la fois) ───
+  function _renderPlay() {
+    var en = _flang()==='en';
+    var c = document.getElementById('qi-container');
+    if (!c) return;
+    var slot = STATE.session[STATE.curIdx];
+    if (!slot) { _renderRecap(); return; }
+    STATE.curSit = slot.sit;
+    var sit = slot.sit;
+    var cat = CATS.filter(function(x){return x.key===sit.cat;})[0] || {icon:'?', nameFR:sit.cat, nameEN:sit.cat};
+    var pers = sit.perspective==='def' ? (en?'DEFENSE':'DÉFENSE') : (en?'OFFENSE':'ATTAQUE');
+    var persCls = sit.perspective==='def' ? 'def' : 'off';
+
+    var html = '';
+    html += '<div class="qi-topbar">';
+    html += '  <button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    html += '  <div class="qi-profile">'+_posteName(STATE.poste,en)+' · '+_nivName(STATE.niveau,en)+'</div>';
+    html += '</div>';
+    html += '<div class="qi-play-header">';
+    html += '  <div class="qi-progress">'+ (STATE.curIdx+1) +' / 5</div>';
+    html += '  <div class="qi-cat-badge">'+cat.icon+' '+(en?cat.nameEN:cat.nameFR)+'</div>';
+    html += '</div>';
+    html += '<div class="qi-court" id="qi-court"></div>';
+    html += '<div class="qi-context">';
+    html += '  <span class="qi-context-perspective '+persCls+'">'+pers+'</span>';
+    html += '  <span>'+ (en?sit.contextEN:sit.contextFR) +'</span>';
+    html += '</div>';
+    html += '<div class="qi-timer-wrap" id="qi-timer-wrap">';
+    html += '  <div class="qi-timer-label">'+(en?'DECIDE':'DÉCIDE')+'</div>';
+    html += '  <div class="qi-timer-bar"><div class="qi-timer-fill" id="qi-timer-fill"></div></div>';
+    html += '  <div class="qi-timer-sec" id="qi-timer-sec">-</div>';
+    html += '</div>';
+    html += '<div class="qi-qcm" id="qi-qcm">';
+    html += '  <div class="qi-question">'+(en?'What do you do?':'Que fais-tu ?')+'</div>';
+    ['A','B','C'].forEach(function(letter, i){
+      html += '<button class="qi-answer" data-letter="'+letter+'">';
+      html += '  <strong>'+letter+'.</strong> '+ (en?sit.answers[i].en:sit.answers[i].fr);
+      html += '  <span class="qi-answer-tag" style="display:none"></span>';
+      html += '</button>';
+    });
+    html += '</div>';
+    html += '<div class="qi-feedback" id="qi-feedback"></div>';
+    html += '<button class="qi-optimal-btn" id="qi-optimal-btn" onclick="_qi_replayOptimal()">'+(en?'▶ SEE THE OPTIMAL PLAY':'▶ VOIR LA DÉCISION OPTIMALE')+'</button>';
+    html += '<button class="qi-next-btn" id="qi-next-btn" onclick="_qi_next()">'+(en?'NEXT SITUATION →':'SITUATION SUIVANTE →')+'</button>';
+    c.innerHTML = html;
+
+    // Rendre le schéma SVG
+    _renderSVG(document.getElementById('qi-court'), sit, 'initial');
+    // Bind réponses
+    document.querySelectorAll('.qi-answer').forEach(function(b){
+      b.addEventListener('click', function(){ _qi_answer(b.getAttribute('data-letter')); });
+    });
+
+    // Séquence : 4.5s d'affichage schéma statique + animation → puis QCM
+    setTimeout(function(){
+      _renderSVG(document.getElementById('qi-court'), sit, 'preAction');
+      setTimeout(function(){
+        // Freeze et affichage QCM + timer
+        document.getElementById('qi-qcm').classList.add('on');
+        _startTimer(TIMERS[STATE.niveau] || 10);
+        document.getElementById('qi-timer-wrap').classList.add('on');
+      }, 1800);
+    }, 2700);
+
+    document.getElementById('qi-overlay').scrollTop = 0;
+  }
+
+  // ─── Timer ───
+  function _startTimer(sec) {
+    _stopTimer();
+    var fill = document.getElementById('qi-timer-fill');
+    var lbl = document.getElementById('qi-timer-sec');
+    if (fill) { fill.style.transition = 'none'; fill.style.transform = 'scaleX(1)'; }
+    STATE.tEndAt = Date.now() + sec*1000;
+    var startAt = Date.now();
+    setTimeout(function(){
+      if (fill) { fill.style.transition = 'transform '+sec+'s linear'; fill.style.transform = 'scaleX(0)'; }
+    }, 30);
+    STATE.tickId = setInterval(function(){
+      var rem = STATE.tEndAt - Date.now();
+      if (rem <= 0) {
+        _stopTimer();
+        if (lbl) lbl.textContent = '0';
+        _qi_answer(null); // timeout = weak
+        return;
+      }
+      if (lbl) lbl.textContent = Math.ceil(rem/1000);
+    }, 100);
+  }
+  function _stopTimer() {
+    if (STATE.tickId) { clearInterval(STATE.tickId); STATE.tickId = null; }
+  }
+
+  // ─── Réponse joueur ───
+  window._qi_answer = function(letter) {
+    _stopTimer();
+    var sit = STATE.curSit;
+    if (!sit) return;
+    var slot = STATE.session[STATE.curIdx];
+    var score;
+    if (letter === null) {
+      // Timeout = weak
+      score = 'weak';
+    } else {
+      var idx = { A:0, B:1, C:2 }[letter];
+      score = sit.answers[idx].score; // 'opt', 'acc', 'weak'
+    }
+    slot.choice = letter;
+    slot.score = score;
+    // Désactiver boutons + révéler tags
+    var en = _flang()==='en';
+    document.querySelectorAll('.qi-answer').forEach(function(b, i){
+      b.disabled = true;
+      var s = sit.answers[i].score;
+      b.classList.add('reveal-'+s);
+      var tag = b.querySelector('.qi-answer-tag');
+      if (tag) {
+        tag.style.display = 'inline-block';
+        tag.textContent = s==='opt' ? (en?'OPTIMAL':'OPTIMALE')
+                       : s==='acc' ? (en?'ACCEPTABLE':'ACCEPTABLE')
+                       : (en?'WEAK':'FAIBLE');
+      }
+    });
+    // Animation résultat sur schéma (conséquence du choix)
+    var animKey = letter ? ('result_'+letter) : 'timeout';
+    _renderSVG(document.getElementById('qi-court'), sit, animKey);
+    // Feedback + explication
+    var fb = document.getElementById('qi-feedback');
+    if (fb) {
+      var verdictKey = { opt:'opt', acc:'acc', weak:'weak' }[score];
+      var verdictLbl = score==='opt' ? (en?'OPTIMAL READ':'LECTURE OPTIMALE')
+                    : score==='acc' ? (en?'ACCEPTABLE READ':'LECTURE ACCEPTABLE')
+                    : (letter===null ? (en?'TIME OUT — WEAK':'TEMPS ÉCOULÉ — FAIBLE') : (en?'WEAK READ':'LECTURE FAIBLE'));
+      var explain;
+      if (letter===null) {
+        explain = en ? 'Time ran out. In a real game, hesitation is a lost possession.' : 'Le temps est écoulé. En match, hésiter c\'est une possession perdue.';
+      } else {
+        var idx2 = { A:0, B:1, C:2 }[letter];
+        explain = en ? sit.answers[idx2].explainEN : sit.answers[idx2].explainFR;
+      }
+      fb.className = 'qi-feedback on '+verdictKey;
+      fb.innerHTML = '<div class="qi-feedback-verdict">'+verdictLbl+'</div><div class="qi-feedback-explain">'+explain+'</div>';
+    }
+    // Boutons voir optimal + next
+    if (score !== 'opt' && letter !== null) {
+      var ob = document.getElementById('qi-optimal-btn');
+      if (ob) ob.classList.add('on');
+    }
+    document.getElementById('qi-next-btn').classList.add('on');
+  };
+
+  window._qi_replayOptimal = function() {
+    var sit = STATE.curSit;
+    if (!sit) return;
+    // Trouver l'index de la bonne réponse
+    var optIdx = -1;
+    for (var i=0; i<sit.answers.length; i++) if (sit.answers[i].score==='opt') { optIdx = i; break; }
+    if (optIdx < 0) return;
+    var animKey = 'result_' + ['A','B','C'][optIdx];
+    _renderSVG(document.getElementById('qi-court'), sit, animKey);
+  };
+
+  window._qi_next = function() {
+    STATE.curIdx++;
+    if (STATE.curIdx >= 5) { _renderRecap(); return; }
+    _renderPlay();
+  };
+
+  // ─── Récap ───
+  function _renderRecap() {
+    var en = _flang()==='en';
+    var c = document.getElementById('qi-container');
+    if (!c) return;
+    var opt=0, acc=0, weak=0;
+    STATE.session.forEach(function(s){
+      if (s.score==='opt') opt++;
+      else if (s.score==='acc') acc++;
+      else weak++;
+    });
+    // Mot du coach
+    var coach;
+    if (opt >= 4) coach = en ? 'Excellent reading. Your decisions are sharp — keep this level in real games.' : 'Excellente lecture. Tes décisions sont nettes — garde ce niveau en vrai match.';
+    else if (opt >= 2) coach = en ? 'Solid overall. A few adjustments on end-of-possession choices and you\'ll be sharper.' : 'Solide dans l\'ensemble. Quelques ajustements sur les fins de possession et tu seras plus tranchant.';
+    else if (acc >= 3) coach = en ? 'Reads are workable but not optimal. Rewatch and internalize the priority read on each type of situation.' : 'Les lectures fonctionnent mais ne sont pas optimales. Revisualise et intègre la lecture prioritaire sur chaque type de situation.';
+    else coach = en ? 'Many weak reads. Take time to observe the defender\'s position before deciding — that\'s the key.' : 'Beaucoup de lectures faibles. Prends le temps d\'observer la position du défenseur avant de décider — c\'est la clé.';
+    var html = '';
+    html += '<div class="qi-topbar">';
+    html += '  <button class="qi-btn-back" onclick="_qi_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    html += '  <div class="qi-profile">'+_posteName(STATE.poste,en)+' · '+_nivName(STATE.niveau,en)+'</div>';
+    html += '</div>';
+    html += '<div class="qi-recap-title">'+(en?'SESSION DONE':'SESSION TERMINÉE')+'</div>';
+    html += '<div class="qi-recap-sub">'+(en?'Your decisions today':'Tes décisions aujourd\'hui')+'</div>';
+    html += '<div class="qi-recap-scores">';
+    html += '  <div class="qi-recap-score opt"><div class="qi-recap-num">'+opt+'</div><div class="qi-recap-lbl">'+(en?'OPTIMAL':'OPTIMALES')+'</div></div>';
+    html += '  <div class="qi-recap-score acc"><div class="qi-recap-num">'+acc+'</div><div class="qi-recap-lbl">'+(en?'ACCEPTABLE':'ACCEPTABLES')+'</div></div>';
+    html += '  <div class="qi-recap-score weak"><div class="qi-recap-num">'+weak+'</div><div class="qi-recap-lbl">'+(en?'WEAK':'FAIBLES')+'</div></div>';
+    html += '</div>';
+    html += '<div class="qi-recap-coach"><div class="qi-recap-coach-icon">💬</div><div>'+coach+'</div></div>';
+    html += '<div class="qi-recap-actions">';
+    html += '  <button class="qi-btn-action" onclick="_qi_startSession(STATE_CAT_PLACEHOLDER)">🔄 '+(en?'SAME AGAIN':'REJOUER PAREIL')+'</button>';
+    html += '  <button class="qi-btn-action" onclick="_qi_open()">🎲 '+(en?'CHANGE MODE':'CHANGER MODE')+'</button>';
+    html += '  <button class="qi-btn-action wide" onclick="_qi_close()">'+(en?'← RETURN TO HOME':'← RETOUR ACCUEIL')+'</button>';
+    html += '</div>';
+    var lastCat = STATE.category ? "'"+STATE.category+"'" : "null";
+    c.innerHTML = html.replace('STATE_CAT_PLACEHOLDER', lastCat);
+  }
+
+  // ─── Rendu SVG du schéma tactique ───
+  // Le SVG est construit à partir de la description de la situation (positions, mouvements)
+  function _renderSVG(container, sit, phase) {
+    if (!container) return;
+    var W = 800, H = 600; // ratio 4:3
+    // Terrain : demi-terrain vu de dessus (raquette en bas, ligne 3pts arc, milieu en haut)
+    var courtBg = ''
+      + '<defs>'
+      + '<marker id="qi-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+      + '<path d="M 0 0 L 10 5 L 0 10 z" fill="#4ecdc4"/>'
+      + '</marker>'
+      + '<marker id="qi-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+      + '<path d="M 0 0 L 10 5 L 0 10 z" fill="#e63946"/>'
+      + '</marker>'
+      + '<marker id="qi-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+      + '<path d="M 0 0 L 10 5 L 0 10 z" fill="#2dc653"/>'
+      + '</marker>'
+      + '</defs>';
+    // Lignes terrain
+    courtBg += '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
+    // Ligne milieu (haut du SVG)
+    courtBg += '<line x1="0" y1="20" x2="'+W+'" y2="20" stroke="#2a3548" stroke-width="2"/>';
+    // Cercle central partiel
+    courtBg += '<path d="M '+(W/2-60)+' 20 A 60 60 0 0 0 '+(W/2+60)+' 20" fill="none" stroke="#2a3548" stroke-width="2"/>';
+    // Arc 3pts
+    courtBg += '<path d="M 80 '+(H-40)+' L 80 '+(H-180)+' A 320 320 0 0 0 '+(W-80)+' '+(H-180)+' L '+(W-80)+' '+(H-40)+'" fill="none" stroke="#2a3548" stroke-width="2"/>';
+    // Raquette
+    courtBg += '<rect x="'+(W/2-90)+'" y="'+(H-190)+'" width="180" height="150" fill="none" stroke="#2a3548" stroke-width="2"/>';
+    // Cercle lancer franc
+    courtBg += '<circle cx="'+(W/2)+'" cy="'+(H-190)+'" r="60" fill="none" stroke="#2a3548" stroke-width="2"/>';
+    // Panier
+    courtBg += '<line x1="'+(W/2-30)+'" y1="'+(H-40)+'" x2="'+(W/2+30)+'" y2="'+(H-40)+'" stroke="#4ecdc4" stroke-width="4"/>';
+    courtBg += '<circle cx="'+(W/2)+'" cy="'+(H-52)+'" r="10" fill="none" stroke="#e07d3f" stroke-width="2.5"/>';
+
+    // Positions et couches selon la phase
+    var players = _computePositions(sit, phase);
+    var overlays = _computeOverlays(sit, phase);
+
+    // Dessin joueurs
+    var out = courtBg;
+    // Écrans (avant les joueurs)
+    if (overlays.screens) {
+      overlays.screens.forEach(function(s){
+        out += '<line x1="'+s.x1+'" y1="'+s.y1+'" x2="'+s.x2+'" y2="'+s.y2+'" stroke="#f5c518" stroke-width="4" stroke-linecap="round"/>';
+      });
+    }
+    // Flèches (avant les joueurs)
+    if (overlays.arrows) {
+      overlays.arrows.forEach(function(a){
+        var col = a.color || '#4ecdc4';
+        var marker = col==='#e63946' ? 'qi-arrow-red' : col==='#2dc653' ? 'qi-arrow-green' : 'qi-arrow';
+        var dash = a.dashed ? 'stroke-dasharray="6 6"' : '';
+        if (a.curve) {
+          out += '<path d="M '+a.x1+' '+a.y1+' Q '+a.cx+' '+a.cy+' '+a.x2+' '+a.y2+'" fill="none" stroke="'+col+'" stroke-width="3" marker-end="url(#'+marker+')" '+dash+'/>';
+        } else {
+          out += '<line x1="'+a.x1+'" y1="'+a.y1+'" x2="'+a.x2+'" y2="'+a.y2+'" stroke="'+col+'" stroke-width="3" marker-end="url(#'+marker+')" '+dash+'/>';
+        }
+      });
+    }
+    // Joueurs
+    players.forEach(function(p){
+      var fill = p.def ? '#4a5568' : '#f5c518';
+      var stroke = p.def ? '#2d3748' : '#c19a12';
+      var textCol = p.def ? '#e2e8f0' : '#0d1117';
+      // Halo TOI
+      if (p.you) {
+        out += '<circle cx="'+p.x+'" cy="'+p.y+'" r="34" fill="none" stroke="#4ecdc4" stroke-width="3" opacity="0.85">'
+             + '<animate attributeName="r" values="30;38;30" dur="1.5s" repeatCount="indefinite"/>'
+             + '<animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>'
+             + '</circle>';
+      }
+      out += '<circle cx="'+p.x+'" cy="'+p.y+'" r="22" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2"/>';
+      out += '<text x="'+p.x+'" y="'+(p.y+6)+'" font-family="Bebas Neue, sans-serif" font-size="18" fill="'+textCol+'" text-anchor="middle" font-weight="700">'+p.label+'</text>';
+      // Ballon
+      if (p.ball) {
+        out += '<circle cx="'+(p.x+22)+'" cy="'+(p.y-16)+'" r="10" fill="#e07d3f" stroke="#8b4a1f" stroke-width="1.5"/>';
+      }
+    });
+    // Texte d'annotation
+    if (overlays.label) {
+      out += '<text x="'+overlays.label.x+'" y="'+overlays.label.y+'" font-family="Bebas Neue, sans-serif" font-size="18" fill="#4ecdc4" text-anchor="middle" font-weight="700">'+overlays.label.text+'</text>';
+    }
+    container.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+out+'</svg>';
+  }
+
+  function _computePositions(sit, phase) {
+    // sit.positions = { initial: [...], preAction: [...], result_A: [...], result_B: [...], result_C: [...] }
+    // Si phase demandée n'existe pas, fallback sur initial
+    var p = sit.positions[phase] || sit.positions.preAction || sit.positions.initial;
+    return p || [];
+  }
+  function _computeOverlays(sit, phase) {
+    if (!sit.overlays) return {};
+    return sit.overlays[phase] || {};
   }
 })();
 </script>
