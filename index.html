@@ -876,6 +876,13 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#4ecdc4;line-height:1" data-i18n="dojo_lbl_qi">QI BASKET</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_qi">Lecture de jeu · Prise de décision</div>
         </button>
+        <!-- BALL HANDLING DRILLS (bibliothèque vidéo) -->
+        <button onclick="showSection('ballhandling',null)" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(224,125,63,.12),rgba(13,17,23,.6));border:1px solid rgba(224,125,63,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🏀</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#e07d3f;line-height:1" data-i18n="dojo_lbl_bh">BALL HANDLING</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_bh">Drills classés par ceinture</div>
+        </button>
       </div>
     </div>
   </div>
@@ -7483,7 +7490,7 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
-    var ONBOARDING_VERSION = '2026.08.07';
+    var ONBOARDING_VERSION = '2026.08.08';
     // Test bypass : ?onboarding=1 dans l'URL force l'affichage
     var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
     var seenVersion = localStorage.getItem('sensei_onboarding_seen_v');
@@ -7536,7 +7543,7 @@ function onboardingCycleMath() {
   }, 2200);
 }
 function onboardingClose() {
-  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.07'); } catch(e) {}
+  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.08'); } catch(e) {}
   var m = document.getElementById('onboarding-modal');
   if (m) {
     m.style.opacity = '0';
@@ -7579,6 +7586,8 @@ function onboardingLaunch(which) {
         if (typeof _fiche_open === 'function') _fiche_open();
       } else if (which === 'qi') {
         if (typeof _qi_open === 'function') _qi_open();
+      } else if (which === 'bh') {
+        showSection('ballhandling', null);
       }
     } catch(e) {}
   }, 350);
@@ -9822,6 +9831,20 @@ function oppDisplayResults(top, region, en, profile) {
           <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4ecdc4;letter-spacing:1px">?</div>
         </div>
         <div data-i18n="onb_qi_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Lecture de jeu — prise de décision</div>
+      </button>
+
+      <!-- BALL HANDLING DRILLS -->
+      <button class="onb-card" onclick="onboardingLaunch('bh')" style="background:linear-gradient(160deg,rgba(224,125,63,.14),rgba(224,125,63,.02));border:2px solid rgba(224,125,63,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🏀</div>
+        <div data-i18n="onb_bh_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#e07d3f;letter-spacing:3px;line-height:1">BALL HANDLING</div>
+        <!-- Mini-animation ceintures -->
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0">
+          <div style="width:24px;height:8px;background:#fff;border-radius:2px"></div>
+          <div style="width:24px;height:8px;background:#e07d3f;border-radius:2px"></div>
+          <div style="width:24px;height:8px;background:#4a90e2;border-radius:2px"></div>
+          <div style="width:24px;height:8px;background:#e63946;border-radius:2px;animation:onbBurnoutPulse 1.5s ease-in-out infinite"></div>
+        </div>
+        <div data-i18n="onb_bh_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">400+ drills classés par ceinture</div>
       </button>
 
     </div>
@@ -32907,7 +32930,7 @@ window._FICHES_DATA = {
       { emoji:"💪", titleFR:"FATIGUE + TIR", titleEN:"FATIGUE + SHOT", timeFR:"10 MIN", timeEN:"10 MIN", contentFR:"5 sprints terrain, à chaque retour série de 3 tirs (layup + mid + 3 pts).", contentEN:"5 full-court sprints, on each return: 3-shot series (layup + mid + 3 pts)." }
     ],
     "B": [
-      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec crossovers, 30 sec sec, entre chaque tour.", contentEN:"Running with crossovers, 30 sec breaks between each lap." },
+      { emoji:"🔥", titleFR:"ÉCHAUFFEMENT", titleEN:"WARMUP", timeFR:"5 MIN", timeEN:"5 MIN", contentFR:"Course avec crossovers, 30 sec de pause entre chaque tour.", contentEN:"Running with crossovers, 30 sec breaks between each lap." },
       { emoji:"🏀", titleFR:"HANDLING SOUS PRESSION", titleEN:"HANDLING UNDER PRESSURE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Dribble avec obstacle (chaise, plot), 5 patterns différents, 90 sec chacun.", contentEN:"Dribble with obstacle (chair, cone), 5 different patterns, 90 sec each." },
       { emoji:"⚡", titleFR:"CHANGE DE RYTHME", titleEN:"RHYTHM CHANGE", timeFR:"8 MIN", timeEN:"8 MIN", contentFR:"Attaque du panier avec pause + relance. 15 fois côté droit, 15 côté gauche.", contentEN:"Basket attack with pause + restart. 15 right side, 15 left side." },
       { emoji:"🎯", titleFR:"ISO — MID-RANGE", titleEN:"ISO — MID-RANGE", timeFR:"12 MIN", timeEN:"12 MIN", contentFR:"Iso simulé : jab-step, crossover, pull-up mid-range. 20 répétitions.", contentEN:"Simulated iso: jab-step, crossover, pull-up mid-range. 20 reps." },
@@ -34298,7 +34321,7 @@ window._QI_DATA['pnr_02'] = {
 
 window._QI_DATA['pnr_03'] = {
   cat: 'pnr', perspective: 'off', levels: ['INT','CON','COM'],
-  contextFR: "Meneur (1). Ton pivot (5) pose l'écran. Défense en HEDGE : X5 sort en aggressif sur toi pour te retarder, X1 revient. Ton pivot glisse (roll) vers le cercle libre.",
+  contextFR: "Meneur (1). Ton pivot (5) pose l'écran. Défense en HEDGE : X5 sort en agressif sur toi pour te retarder, X1 revient. Ton pivot glisse (roll) vers le cercle libre.",
   contextEN: "PG (1). Your C (5) sets the screen. Defense HEDGES: X5 comes out aggressively on you, X1 recovers. Your C rolls free to the rim.",
   positions: {
     initial: [
@@ -35185,7 +35208,7 @@ window._QI_DATA['pnr_05'] = {
         explainFR:"Ça peut marcher mais tu prends un finish contesté quand tu pouvais offrir un finish libre. Choix moyen.",
         explainEN:"Can work but you take contested finish when you could offer a free one. Medium choice." },
       { fr:"Tu drives seul et écartes ton coéquipier de la ligne", en:"You drive alone and cut off teammate", score:'weak',
-        explainFR:"Tu gâches un 2v1 en 1v1. Le contre-attaque était fait pour être exploité — c'est la meilleure situation de tir en basket.",
+        explainFR:"Tu gâches un 2v1 en 1v1. La contre-attaque était faite pour être exploitée — c'est la meilleure situation de tir en basket.",
         explainEN:"You waste a 2v1 into 1v1. Fast break was to be exploited — best shooting situation in basketball." }
     ]
   });
@@ -35208,7 +35231,7 @@ window._QI_DATA['pnr_05'] = {
         explainFR:"Le drive milieu peut marcher mais tu vas trouver les deux défenseurs sur toi. Ton finish sera contesté au max.",
         explainEN:"Middle drive can work but you find both defenders on you. Contested finish max." },
       { fr:"Tu prends un pull-up mid-range depuis le milieu", en:"You take a mid-range pull-up from middle", score:'weak',
-        explainFR:"Tu gâches le 3v2 pour un shot difficile. Le contre-attaque est fait pour finir près du cercle, pas mid-range contesté.",
+        explainFR:"Tu gâches le 3v2 pour un shot difficile. La contre-attaque est faite pour finir près du cercle, pas mid-range contesté.",
         explainEN:"You waste 3v2 for a hard shot. Fast break is for close finishes, not contested mid-range." }
     ]
   });
