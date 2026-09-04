@@ -835,6 +835,14 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
       <!-- Grille 3 boutons : responsive auto-fit -->
       <div style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
+        <!-- SENSEI IA (1ère tuile - générateur de séance) -->
+        <button onclick="_senseiAI_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">✨</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_ai">SENSEI IA</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_ai">Génère ta séance personnalisée avec l'IA</div>
+        </button>
         <!-- SENSEI -->
         <button onclick="_dojoLaunch('sensei')" ontouchstart=""
           style="cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1px solid rgba(245,197,24,.45);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
@@ -36268,6 +36276,644 @@ window._QI_DATA['pnr_05'] = {
   function _computeOverlays(sit, phase) {
     if (!sit.overlays) return {};
     return sit.overlays[phase] || {};
+  }
+})();
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     SENSEI IA — Générateur de séance personnalisée
+     Moteur de recombinaison intelligente du contenu SENSEI (100% frontend)
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+#senseiai-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0d1117; display: none; overflow-y: auto;
+}
+#senseiai-overlay.on { display: block; }
+.ai-container { max-width: 780px; margin: 0 auto; padding: 20px 16px 60px; }
+
+.ai-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; gap: 12px;
+}
+.ai-btn-back {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: #cfd3e0; padding: 8px 14px; border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1px; cursor: pointer;
+}
+.ai-btn-back:hover { border-color: #f5c518; color: #f5c518; }
+
+/* ─── Titre principal ─── */
+.ai-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: clamp(32px, 7vw, 46px); letter-spacing: 3px;
+  text-align: center; margin-bottom: 4px; line-height: 1;
+  text-shadow: 0 0 20px rgba(245,197,24,0.3);
+}
+.ai-sparkle {
+  display: inline-block; font-size: 0.8em;
+  animation: ai-sparkle-pulse 2s ease-in-out infinite;
+}
+@keyframes ai-sparkle-pulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+.ai-subtitle {
+  font-size: 13px; color: #9aa3b3; text-align: center; margin-bottom: 24px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+
+/* ─── Formulaire de génération ─── */
+.ai-question-block {
+  background: linear-gradient(135deg, rgba(245,197,24,0.05), #161b22);
+  border: 1px solid rgba(245,197,24,0.2); border-radius: 14px;
+  padding: 18px; margin-bottom: 14px;
+}
+.ai-question-label {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 14px; letter-spacing: 2px;
+  margin-bottom: 12px; text-transform: uppercase;
+}
+.ai-choices-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+.ai-choice-btn {
+  background: rgba(13,17,23,0.6); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 12px 10px; color: #f0f2f8;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+  font-weight: 600; letter-spacing: 0.5px; cursor: pointer;
+  transition: all 0.15s;
+}
+.ai-choice-btn:hover { border-color: #f5c518; background: rgba(245,197,24,0.08); }
+.ai-choice-btn.on {
+  border-color: #f5c518; background: rgba(245,197,24,0.20); color: #f5c518;
+  box-shadow: 0 0 12px rgba(245,197,24,0.3);
+}
+.ai-choice-icon { display: block; font-size: 20px; margin-bottom: 4px; }
+
+/* ─── Bouton génération ─── */
+.ai-generate-btn {
+  display: block; width: 100%; margin-top: 20px;
+  padding: 18px; background: linear-gradient(135deg, #f5c518, #e0a800);
+  color: #0d1117; border: none; border-radius: 14px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+  letter-spacing: 3px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(245,197,24,0.4);
+  transition: all 0.2s;
+}
+.ai-generate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(245,197,24,0.55); }
+.ai-generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ─── Écran de génération en cours ─── */
+.ai-loading {
+  text-align: center; padding: 60px 20px;
+}
+.ai-loading-icon {
+  font-size: 60px; animation: ai-loading-spin 2s linear infinite;
+  display: inline-block;
+}
+@keyframes ai-loading-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.ai-loading-text {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 18px; letter-spacing: 2px;
+  margin-top: 16px;
+}
+.ai-loading-hint {
+  font-size: 12px; color: #9aa3b3;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+/* ─── Séance générée ─── */
+.ai-session-header {
+  background: linear-gradient(135deg, rgba(245,197,24,0.12), #161b22);
+  border: 1.5px solid rgba(245,197,24,0.4); border-radius: 14px;
+  padding: 18px; margin-bottom: 16px;
+}
+.ai-session-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 22px; letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.ai-session-meta {
+  font-size: 12px; color: #cfd3e0;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.8px;
+}
+.ai-session-meta span {
+  display: inline-block; margin-right: 12px;
+  padding: 2px 8px; background: rgba(245,197,24,0.15); border-radius: 4px;
+  color: #f5c518;
+}
+.ai-block {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #161b22; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 14px; margin-bottom: 10px;
+  cursor: pointer; transition: all 0.15s;
+}
+.ai-block:hover {
+  border-color: rgba(245,197,24,0.5);
+  background: linear-gradient(135deg, rgba(245,197,24,0.05), #161b22);
+}
+.ai-block-num {
+  flex-shrink: 0; width: 36px; height: 36px;
+  background: rgba(245,197,24,0.15); color: #f5c518;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px; font-weight: 700;
+}
+.ai-block-content { flex: 1; min-width: 0; }
+.ai-block-cat {
+  font-family: 'Barlow Condensed', sans-serif;
+  color: #9aa3b3; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.ai-block-title {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f0f2f8; font-size: 16px; letter-spacing: 1px;
+  margin: 2px 0;
+}
+.ai-block-desc {
+  font-size: 12.5px; color: #cfd3e0; line-height: 1.4;
+}
+.ai-block-duration {
+  flex-shrink: 0; text-align: right;
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 14px; letter-spacing: 1px;
+}
+.ai-block-launch {
+  display: inline-block; margin-top: 8px;
+  font-size: 11px; color: #f5c518; font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+
+/* ─── Actions bas de séance ─── */
+.ai-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px;
+}
+.ai-btn-action {
+  padding: 14px 10px; background: transparent;
+  border: 1px solid rgba(245,197,24,0.45); color: #f5c518;
+  border-radius: 10px; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer;
+}
+.ai-btn-action:hover { background: rgba(245,197,24,0.1); }
+.ai-btn-action.wide { grid-column: span 2; }
+.ai-btn-action.primary {
+  background: rgba(245,197,24,0.15); border-color: #f5c518;
+}
+
+/* ─── Message profil manquant ─── */
+.ai-need-profile {
+  background: #161b22; border: 1px solid rgba(245,197,24,0.3);
+  border-radius: 12px; padding: 20px; text-align: center;
+  margin: 20px 0;
+}
+</style>
+
+<div id="senseiai-overlay" role="dialog" aria-label="SENSEI IA">
+  <div class="ai-container" id="senseiai-container"><!-- dynamique --></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SENSEI IA — Moteur de génération de séance personnalisée
+   Puise dans le contenu existant de l'app (fiches, drills, QI, sections vidéo)
+═══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  function _flang() {
+    try { if (window._lang) return window._lang;
+      var d = (document.body || document.documentElement).getAttribute('data-lang');
+      if (d) return d;
+    } catch(e){}
+    return 'fr';
+  }
+  var _T = function(fr, en) { return _flang()==='en' ? en : fr; };
+
+  // État de la session
+  var STATE = {
+    poste: null, niveau: null,
+    duree: null, focus: null, etat: null, lieu: null,
+    session: null
+  };
+
+  // ─── Base de connaissance SENSEI (référence les briques existantes) ───
+  // Chaque brique a : {id, cat, titleFR, titleEN, descFR, descEN, duration, action, matchFocus, matchLieu, intensity}
+  var BRIQUES = [
+    // ── DRILLS CAMÉRA (DOJO INTERACTIVE) ──
+    { id:'tboard', cat:'drill_camera', catFR:'DRILL CAMÉRA', catEN:'CAMERA DRILL',
+      titleFR:'TBOARD / SENSEI', titleEN:'TBOARD / SENSEI',
+      descFR:'Handling en rythme avec musique et pose detection', descEN:'Rhythm handling with music and pose detection',
+      duration:10, action:function(){ if(typeof _dojoLaunch==='function')_dojoLaunch('sensei'); },
+      matchFocus:['handling','mixte','surprise'], matchLieu:['chez','dehors','gymnase'], intensity:'medium' },
+    { id:'tdr', cat:'drill_camera', catFR:'DRILL CAMÉRA', catEN:'CAMERA DRILL',
+      titleFR:'RÉACTION (TDR)', titleEN:'REACTION (TDR)',
+      descFR:'Cibles aléatoires, vitesse main-œil', descEN:'Random targets, hand-eye speed',
+      duration:5, action:function(){ if(typeof _dojoLaunch==='function')_dojoLaunch('reaction'); },
+      matchFocus:['physique','tactique','mixte','surprise'], matchLieu:['chez','dehors','gymnase'], intensity:'high' },
+    { id:'math', cat:'drill_camera', catFR:'DRILL CAMÉRA', catEN:'CAMERA DRILL',
+      titleFR:'MATHS', titleEN:'MATHS',
+      descFR:'Cognition sous dribble, charge mentale', descEN:'Cognition under dribble, mental load',
+      duration:8, action:function(){ if(typeof _dojoLaunch==='function')_dojoLaunch('math'); },
+      matchFocus:['tactique','mixte','surprise'], matchLieu:['chez','dehors','gymnase'], intensity:'medium' },
+    // ── SECTIONS VIDÉO (TRAINING) ──
+    { id:'ballhandling', cat:'video', catFR:'HANDLING', catEN:'HANDLING',
+      titleFR:'Ball Handling', titleEN:'Ball Handling',
+      descFR:'Bibliothèque de drills de dribble classés par ceinture', descEN:'Dribble drills library classified by belt',
+      duration:15, action:function(){ if(typeof showSection==='function')showSection('ballhandling',null); },
+      matchFocus:['handling','mixte','surprise'], matchLieu:['chez','dehors','gymnase'], intensity:'medium' },
+    { id:'shooting', cat:'video', catFR:'TIR', catEN:'SHOOTING',
+      titleFR:'Shooting', titleEN:'Shooting',
+      descFR:'Techniques de tir, catch and shoot, mécanique', descEN:'Shooting techniques, catch and shoot, mechanics',
+      duration:15, action:function(){ if(typeof showSection==='function')showSection('shooting',null); },
+      matchFocus:['tir','mixte','surprise'], matchLieu:['gymnase','dehors'], intensity:'medium' },
+    { id:'defense', cat:'video', catFR:'DÉFENSE', catEN:'DEFENSE',
+      titleFR:'Defense', titleEN:'Defense',
+      descFR:'Footwork défensif, closeout, positionnement', descEN:'Defensive footwork, closeout, positioning',
+      duration:12, action:function(){ if(typeof showSection==='function')showSection('defense',null); },
+      matchFocus:['defense','tactique','mixte','surprise'], matchLieu:['gymnase','dehors','chez'], intensity:'high' },
+    { id:'rebounding', cat:'video', catFR:'REBOND', catEN:'REBOUNDING',
+      titleFR:'Rebounding', titleEN:'Rebounding',
+      descFR:'Technique de rebond, timing, positionnement', descEN:'Rebounding technique, timing, positioning',
+      duration:10, action:function(){ if(typeof showSection==='function')showSection('rebounding',null); },
+      matchFocus:['physique','tactique','mixte','surprise'], matchLieu:['gymnase'], intensity:'high' },
+    { id:'hec', cat:'video', catFR:'COORDINATION', catEN:'COORDINATION',
+      titleFR:'Hand-Eye Coordination', titleEN:'Hand-Eye Coordination',
+      descFR:'Coordination œil-main, réactivité', descEN:'Hand-eye coordination, reactivity',
+      duration:10, action:function(){ if(typeof showSection==='function')showSection('hec',null); },
+      matchFocus:['physique','tactique','mixte','surprise'], matchLieu:['chez','gymnase'], intensity:'medium' },
+    { id:'strength', cat:'video', catFR:'MUSCULATION', catEN:'STRENGTH',
+      titleFR:'Strength & Conditioning', titleEN:'Strength & Conditioning',
+      descFR:'Renforcement, préparation physique basket', descEN:'Strengthening, basketball physical prep',
+      duration:20, action:function(){ if(typeof showSection==='function')showSection('sc',null); },
+      matchFocus:['physique','mixte','surprise'], matchLieu:['chez','gymnase'], intensity:'high' },
+    { id:'tutorials', cat:'video', catFR:'TUTORIELS', catEN:'TUTORIALS',
+      titleFR:'Tutorials', titleEN:'Tutorials',
+      descFR:'Vidéos pédagogiques progression', descEN:'Educational progression videos',
+      duration:10, action:function(){ if(typeof showSection==='function')showSection('tutorials',null); },
+      matchFocus:['handling','tir','defense','mixte','surprise'], matchLieu:['chez','gymnase','dehors'], intensity:'low' },
+    // ── FICHE PERSO ──
+    { id:'fiche', cat:'fiche', catFR:'FICHE PERSO', catEN:'PERSONAL SHEET',
+      titleFR:'TON ENTRAÎNEMENT', titleEN:'YOUR TRAINING',
+      descFR:'Fiche complète adaptée à ton poste et niveau', descEN:'Full sheet adapted to your position and level',
+      duration:30, action:function(){ if(typeof _fiche_open==='function')_fiche_open(); },
+      matchFocus:['handling','tir','defense','physique','tactique','mixte','surprise'], matchLieu:['chez','gymnase','dehors'], intensity:'medium' },
+    // ── QI BASKET ──
+    { id:'qi', cat:'qi', catFR:'CULTURE TACTIQUE', catEN:'TACTICAL CULTURE',
+      titleFR:'QI BASKET', titleEN:'BASKETBALL IQ',
+      descFR:'Situation tactique · Lecture de jeu · Décision', descEN:'Tactical situation · Game reading · Decision',
+      duration:5, action:function(){ if(typeof _qi_open==='function')_qi_open(); },
+      matchFocus:['tactique','mixte','surprise'], matchLieu:['chez','gymnase','dehors'], intensity:'low' }
+  ];
+
+  // ─── Ouverture publique ───
+  window._senseiAI_open = function() {
+    _loadProfile();
+    var ov = document.getElementById('senseiai-overlay');
+    if (!ov) return;
+    ov.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    STATE.duree = null; STATE.focus = null; STATE.etat = null; STATE.lieu = null;
+    STATE.session = null;
+    _renderForm();
+  };
+  window._senseiAI_close = function() {
+    var ov = document.getElementById('senseiai-overlay');
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
+  };
+
+  function _loadProfile() {
+    try {
+      var raw = localStorage.getItem('sensei_fiche_profile_v1');
+      if (raw) {
+        var d = JSON.parse(raw);
+        STATE.poste = d.poste || null;
+        STATE.niveau = d.niveau || null;
+      }
+    } catch(e){}
+  }
+
+  // ─── Rendu formulaire de génération ───
+  function _renderForm() {
+    var en = _flang()==='en';
+    var c = document.getElementById('senseiai-container');
+    if (!c) return;
+    var html = '';
+    html += '<div class="ai-topbar">';
+    html += '  <button class="ai-btn-back" onclick="_senseiAI_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    if (STATE.poste && STATE.niveau) {
+      html += '  <div style="font-family:\'Barlow Condensed\',sans-serif;color:#f5c518;font-size:11px;letter-spacing:1.5px;font-weight:700">'+_posteName(STATE.poste,en)+' · '+_nivName(STATE.niveau,en)+'</div>';
+    }
+    html += '</div>';
+    html += '<div class="ai-title"><span class="ai-sparkle">✨</span> SENSEI '+(en?'AI':'IA')+' <span class="ai-sparkle">✨</span></div>';
+    html += '<div class="ai-subtitle">'+(en?'Answer 4 questions, I generate your custom session':'Réponds à 4 questions, je génère ta séance sur mesure')+'</div>';
+
+    if (!STATE.poste || !STATE.niveau) {
+      html += '<div class="ai-need-profile">';
+      html += '  <div style="font-family:\'Bebas Neue\',sans-serif;color:#f5c518;font-size:18px;letter-spacing:2px;margin-bottom:8px">'+(en?'DEFINE YOUR PROFILE FIRST':'DÉFINIS D\'ABORD TON PROFIL')+'</div>';
+      html += '  <div style="font-size:13px;color:#cfd3e0;margin-bottom:14px">'+(en?'To generate a truly personalized session, please set your position and level in TON ENTRAÎNEMENT.':'Pour générer une séance vraiment personnalisée, choisis ton poste et ton niveau dans TON ENTRAÎNEMENT.')+'</div>';
+      html += '  <button class="ai-btn-action primary wide" onclick="_senseiAI_close();setTimeout(function(){if(typeof _fiche_open===\'function\')_fiche_open();},50)">📋 '+(en?'OPEN TRAINING SHEET':'OUVRIR TON ENTRAÎNEMENT')+'</button>';
+      html += '</div>';
+      c.innerHTML = html;
+      return;
+    }
+
+    // Question 1 : Durée
+    html += '<div class="ai-question-block">';
+    html += '  <div class="ai-question-label">⏱ '+(en?'HOW LONG DO YOU HAVE?':'COMBIEN DE TEMPS AS-TU ?')+'</div>';
+    html += '  <div class="ai-choices-grid">';
+    [['15','15 min'],['30','30 min'],['45','45 min'],['60','60 min']].forEach(function(o){
+      var sel = STATE.duree===o[0] ? 'on' : '';
+      html += '<button class="ai-choice-btn '+sel+'" onclick="_senseiAI_setDuree(\''+o[0]+'\')">'+o[1]+'</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    // Question 2 : Focus
+    html += '<div class="ai-question-block">';
+    html += '  <div class="ai-question-label">🎯 '+(en?'YOUR FOCUS TODAY?':'TON FOCUS DU JOUR ?')+'</div>';
+    html += '  <div class="ai-choices-grid">';
+    var focus = en ? [
+      ['surprise','🎲','Surprise me'],['handling','🏀','Handling'],['tir','🎯','Shooting'],
+      ['defense','🛡️','Defense'],['physique','💪','Physical'],['tactique','🧠','Tactical'],['mixte','🔀','Mix']
+    ] : [
+      ['surprise','🎲','Surprise'],['handling','🏀','Handling'],['tir','🎯','Tir'],
+      ['defense','🛡️','Défense'],['physique','💪','Physique'],['tactique','🧠','Tactique'],['mixte','🔀','Mixte']
+    ];
+    focus.forEach(function(o){
+      var sel = STATE.focus===o[0] ? 'on' : '';
+      html += '<button class="ai-choice-btn '+sel+'" onclick="_senseiAI_setFocus(\''+o[0]+'\')"><span class="ai-choice-icon">'+o[1]+'</span>'+o[2]+'</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    // Question 3 : État
+    html += '<div class="ai-question-block">';
+    html += '  <div class="ai-question-label">⚡ '+(en?'HOW ARE YOU FEELING?':'TON ÉTAT ?')+'</div>';
+    html += '  <div class="ai-choices-grid">';
+    var etats = en ? [['forme','💪','Fresh'],['fatigue','😴','Tired'],['stresse','🎯','Pre-game']] : [['forme','💪','En forme'],['fatigue','😴','Fatigué'],['stresse','🎯','Avant match']];
+    etats.forEach(function(o){
+      var sel = STATE.etat===o[0] ? 'on' : '';
+      html += '<button class="ai-choice-btn '+sel+'" onclick="_senseiAI_setEtat(\''+o[0]+'\')"><span class="ai-choice-icon">'+o[1]+'</span>'+o[2]+'</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    // Question 4 : Lieu
+    html += '<div class="ai-question-block">';
+    html += '  <div class="ai-question-label">📍 '+(en?'WHERE ARE YOU?':'OÙ ES-TU ?')+'</div>';
+    html += '  <div class="ai-choices-grid">';
+    var lieux = en ? [['chez','🏠','Home'],['gymnase','🏟','Gym'],['dehors','🌳','Outdoor']] : [['chez','🏠','Chez toi'],['gymnase','🏟','Gymnase'],['dehors','🌳','Dehors']];
+    lieux.forEach(function(o){
+      var sel = STATE.lieu===o[0] ? 'on' : '';
+      html += '<button class="ai-choice-btn '+sel+'" onclick="_senseiAI_setLieu(\''+o[0]+'\')"><span class="ai-choice-icon">'+o[1]+'</span>'+o[2]+'</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    var ready = STATE.duree && STATE.focus && STATE.etat && STATE.lieu;
+    html += '<button class="ai-generate-btn" onclick="_senseiAI_generate()" '+(ready?'':'disabled')+'>✨ '+(en?'GENERATE MY SESSION':'GÉNÈRE MA SÉANCE')+' ✨</button>';
+
+    c.innerHTML = html;
+  }
+
+  window._senseiAI_setDuree = function(v){ STATE.duree=v; _renderForm(); };
+  window._senseiAI_setFocus = function(v){ STATE.focus=v; _renderForm(); };
+  window._senseiAI_setEtat = function(v){ STATE.etat=v; _renderForm(); };
+  window._senseiAI_setLieu = function(v){ STATE.lieu=v; _renderForm(); };
+
+  function _posteName(k, en) {
+    var m = { PG:['MENEUR','POINT GUARD'], SG:['ARRIÈRE','SHOOTING GUARD'],
+              SF:['AILIER','SMALL FORWARD'], PF:['AILIER FORT','POWER FORWARD'],
+              C:['PIVOT','CENTER'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+  function _nivName(k, en) {
+    var m = { DEB:['DÉBUTANT','BEGINNER'], INT:['INTERMÉDIAIRE','INTERMEDIATE'],
+              CON:['CONFIRMÉ','ADVANCED'], COM:['COMPÉTITION','COMPETITION'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+
+  // ─── GÉNÉRATION ───
+  window._senseiAI_generate = function() {
+    // Écran loading
+    var en = _flang()==='en';
+    var c = document.getElementById('senseiai-container');
+    if (c) {
+      c.innerHTML = '<div class="ai-loading">'
+        + '<div class="ai-loading-icon">✨</div>'
+        + '<div class="ai-loading-text">'+(en?'GENERATING YOUR SESSION':'GÉNÉRATION DE TA SÉANCE')+'</div>'
+        + '<div class="ai-loading-hint">'+(en?'Selecting the best exercises for you...':'Sélection des meilleurs exercices pour toi...')+'</div>'
+        + '</div>';
+    }
+    setTimeout(function(){
+      STATE.session = _buildSession();
+      _renderSession();
+    }, 1800);
+  };
+
+  // ─── MOTEUR de composition de séance ───
+  function _buildSession() {
+    var duree = parseInt(STATE.duree, 10);
+    var focus = STATE.focus;
+    var etat = STATE.etat;
+    var lieu = STATE.lieu;
+
+    // Résoudre 'surprise' : choisir un focus aléatoire pertinent
+    var effectiveFocus = focus;
+    if (focus === 'surprise') {
+      var options = ['handling','tir','defense','physique','tactique','mixte'];
+      effectiveFocus = options[Math.floor(Math.random()*options.length)];
+    }
+
+    // Filtrer les briques compatibles avec focus + lieu
+    var pool = BRIQUES.filter(function(b){
+      var okFocus = b.matchFocus.indexOf(effectiveFocus) !== -1;
+      var okLieu = b.matchLieu.indexOf(lieu) !== -1;
+      return okFocus && okLieu;
+    });
+
+    // Réduire l'intensité si état fatigué
+    if (etat === 'fatigue') {
+      pool = pool.filter(function(b){ return b.intensity !== 'high'; });
+    }
+
+    // Structure de séance selon la durée
+    var blocks = [];
+    var totalMin = 0;
+
+    // Bloc 1 : ÉCHAUFFEMENT (toujours la fiche perso — début de séance)
+    var ficheBrique = BRIQUES.filter(function(b){return b.id==='fiche';})[0];
+    if (ficheBrique) {
+      blocks.push(_makeBlock(ficheBrique, Math.min(5, duree*0.15), 'echauffement'));
+      totalMin += Math.min(5, duree*0.15);
+    }
+
+    // Bloc 2 : TRAVAIL TECHNIQUE (section vidéo prioritaire selon focus)
+    var videos = pool.filter(function(b){return b.cat==='video';});
+    if (videos.length && (duree - totalMin) > 8) {
+      var chosen = _pickPreferring(videos, effectiveFocus);
+      var dur = Math.min(chosen.duration, Math.max(10, duree*0.3));
+      blocks.push(_makeBlock(chosen, dur, 'technique'));
+      totalMin += dur;
+    }
+
+    // Bloc 3 : DRILL CAMÉRA (position 3 comme demandé)
+    var drills = pool.filter(function(b){return b.cat==='drill_camera';});
+    if (drills.length && (duree - totalMin) > 5) {
+      var chosenDrill = drills[Math.floor(Math.random()*drills.length)];
+      var durDrill = Math.min(chosenDrill.duration, Math.max(5, duree*0.25));
+      blocks.push(_makeBlock(chosenDrill, durDrill, 'drill_camera'));
+      totalMin += durDrill;
+    }
+
+    // Bloc 4 : SECOND TRAVAIL TECHNIQUE si durée longue
+    if (duree >= 45 && videos.length > 1 && (duree - totalMin) > 8) {
+      var used = blocks.map(function(b){return b.id;});
+      var remaining = videos.filter(function(b){ return used.indexOf(b.id)===-1; });
+      if (remaining.length) {
+        var second = remaining[Math.floor(Math.random()*remaining.length)];
+        var dur2 = Math.min(second.duration, duree - totalMin - 8);
+        blocks.push(_makeBlock(second, dur2, 'technique2'));
+        totalMin += dur2;
+      }
+    }
+
+    // Bloc 5 : CULTURE TACTIQUE (QI BASKET — toujours)
+    var qi = BRIQUES.filter(function(b){return b.id==='qi';})[0];
+    if (qi && (duree - totalMin) >= 5) {
+      blocks.push(_makeBlock(qi, 5, 'tactique'));
+      totalMin += 5;
+    }
+
+    return {
+      poste: STATE.poste, niveau: STATE.niveau,
+      duree: duree, focus: focus, effectiveFocus: effectiveFocus,
+      etat: etat, lieu: lieu,
+      blocks: blocks, totalMin: Math.round(totalMin)
+    };
+  }
+
+  function _makeBlock(brique, duration, phase) {
+    return {
+      id: brique.id, cat: brique.cat,
+      catFR: brique.catFR, catEN: brique.catEN,
+      titleFR: brique.titleFR, titleEN: brique.titleEN,
+      descFR: brique.descFR, descEN: brique.descEN,
+      duration: Math.round(duration), phase: phase,
+      action: brique.action
+    };
+  }
+
+  function _pickPreferring(pool, focus) {
+    // Préférence pour la brique qui matche exactement le focus
+    var strong = pool.filter(function(b){
+      return b.matchFocus.length <= 4 && b.matchFocus.indexOf(focus)!==-1;
+    });
+    if (strong.length) return strong[Math.floor(Math.random()*strong.length)];
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  // ─── Rendu séance ───
+  function _renderSession() {
+    var en = _flang()==='en';
+    var c = document.getElementById('senseiai-container');
+    if (!c || !STATE.session) return;
+    var s = STATE.session;
+    var focusLabel = _focusLabel(s.focus, en);
+    var etatLabel = _etatLabel(s.etat, en);
+    var lieuLabel = _lieuLabel(s.lieu, en);
+
+    var html = '';
+    html += '<div class="ai-topbar">';
+    html += '  <button class="ai-btn-back" onclick="_senseiAI_open()">'+(en?'← NEW':'← NOUVELLE')+'</button>';
+    html += '  <div style="font-family:\'Barlow Condensed\',sans-serif;color:#f5c518;font-size:11px;letter-spacing:1.5px;font-weight:700">✨ '+(en?'GENERATED':'GÉNÉRÉE')+'</div>';
+    html += '</div>';
+
+    html += '<div class="ai-session-header">';
+    html += '  <div class="ai-session-title">✨ '+(en?'YOUR SESSION':'TA SÉANCE')+' — '+s.totalMin+' MIN</div>';
+    html += '  <div class="ai-session-meta">';
+    html += '    <span>'+_posteName(s.poste,en)+'</span>';
+    html += '    <span>'+_nivName(s.niveau,en)+'</span>';
+    html += '    <span>'+focusLabel+'</span>';
+    html += '    <span>'+etatLabel+'</span>';
+    html += '    <span>'+lieuLabel+'</span>';
+    html += '  </div>';
+    html += '</div>';
+
+    // Blocks
+    s.blocks.forEach(function(b, i){
+      html += '<div class="ai-block" onclick="_senseiAI_launch('+i+')">';
+      html += '  <div class="ai-block-num">'+(i+1)+'</div>';
+      html += '  <div class="ai-block-content">';
+      html += '    <div class="ai-block-cat">'+(en?b.catEN:b.catFR)+'</div>';
+      html += '    <div class="ai-block-title">'+(en?b.titleEN:b.titleFR)+'</div>';
+      html += '    <div class="ai-block-desc">'+(en?b.descEN:b.descFR)+'</div>';
+      html += '    <div class="ai-block-launch">▶ '+(en?'LAUNCH':'LANCER')+'</div>';
+      html += '  </div>';
+      html += '  <div class="ai-block-duration">'+b.duration+' MIN</div>';
+      html += '</div>';
+    });
+
+    html += '<div class="ai-actions">';
+    html += '  <button class="ai-btn-action" onclick="_senseiAI_regenerate()">🔄 '+(en?'REGENERATE':'REGÉNÉRER')+'</button>';
+    html += '  <button class="ai-btn-action" onclick="_senseiAI_open()">⚙️ '+(en?'MODIFY':'MODIFIER')+'</button>';
+    html += '  <button class="ai-btn-action wide" onclick="_senseiAI_close()">'+(en?'← RETURN TO HOME':'← RETOUR ACCUEIL')+'</button>';
+    html += '</div>';
+
+    c.innerHTML = html;
+    document.getElementById('senseiai-overlay').scrollTop = 0;
+  }
+
+  window._senseiAI_launch = function(idx) {
+    if (!STATE.session || !STATE.session.blocks[idx]) return;
+    var b = STATE.session.blocks[idx];
+    _senseiAI_close();
+    setTimeout(function(){ if (typeof b.action === 'function') b.action(); }, 100);
+  };
+
+  window._senseiAI_regenerate = function() {
+    var en = _flang()==='en';
+    var c = document.getElementById('senseiai-container');
+    if (c) {
+      c.innerHTML = '<div class="ai-loading">'
+        + '<div class="ai-loading-icon">✨</div>'
+        + '<div class="ai-loading-text">'+(en?'REGENERATING':'REGÉNÉRATION')+'</div>'
+        + '</div>';
+    }
+    setTimeout(function(){
+      STATE.session = _buildSession();
+      _renderSession();
+    }, 1200);
+  };
+
+  function _focusLabel(f, en) {
+    var m = {
+      surprise: en?'Surprise':'Surprise', handling: en?'Handling':'Handling',
+      tir: en?'Shooting':'Tir', defense: en?'Defense':'Défense',
+      physique: en?'Physical':'Physique', tactique: en?'Tactical':'Tactique',
+      mixte: en?'Mix':'Mixte'
+    };
+    return m[f] || f;
+  }
+  function _etatLabel(e, en) {
+    var m = { forme: en?'Fresh':'En forme', fatigue: en?'Tired':'Fatigué', stresse: en?'Pre-game':'Avant match' };
+    return m[e] || e;
+  }
+  function _lieuLabel(l, en) {
+    var m = { chez: en?'Home':'Chez toi', gymnase: en?'Gym':'Gymnase', dehors: en?'Outdoor':'Dehors' };
+    return m[l] || l;
   }
 })();
 </script>
