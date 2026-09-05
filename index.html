@@ -37188,13 +37188,55 @@ window._QI_DATA['pnr_05'] = {
   width: 100%; height: 100%; color: #f5c518; font-size: 20px;
 }
 
-/* ─── Overlay plein écran ─── */
+/* ─── Overlay plein écran avec photos en fond décor ─── */
 #persona-overlay {
   position: fixed; inset: 0; z-index: 100003;
   background: #0d1117; display: none; overflow-y: auto;
 }
 #persona-overlay.on { display: block; }
-.persona-container { max-width: 640px; margin: 0 auto; padding: 20px 18px 60px; }
+/* Photos en fond de TOUT l'écran (Option C) */
+#persona-overlay .persona-fullbg-a,
+#persona-overlay .persona-fullbg-b {
+  position: fixed; inset: 0;
+  background-size: cover;
+  background-position: center center;
+  z-index: 0;
+  pointer-events: none;
+  filter: brightness(0.55) saturate(0.85);
+}
+#persona-overlay .persona-fullbg-a {
+  background-image: url('bb.jpg');
+  opacity: 0.6;
+  animation: bgFullFadeA 22s ease-in-out infinite;
+}
+#persona-overlay .persona-fullbg-b {
+  background-image: url('bb2.jpg');
+  opacity: 0;
+  animation: bgFullFadeB 22s ease-in-out infinite;
+}
+@keyframes bgFullFadeA {
+  0%,42%,100% { opacity: 0.6; }
+  58%,92% { opacity: 0; }
+}
+@keyframes bgFullFadeB {
+  0%,42%,100% { opacity: 0; }
+  58%,92% { opacity: 0.6; }
+}
+/* Voile dégradé au-dessus des photos : plus sombre en bas (attributs lisibles) */
+#persona-overlay .persona-fullbg-veil {
+  position: fixed; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(13,17,23,0.20) 0%,
+    rgba(13,17,23,0.35) 30%,
+    rgba(13,17,23,0.75) 70%,
+    rgba(13,17,23,0.92) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.persona-container {
+  max-width: 640px; margin: 0 auto; padding: 20px 18px 60px;
+  position: relative; z-index: 2; /* au-dessus des photos et voile */
+}
 
 .persona-topbar {
   display: flex; justify-content: space-between; align-items: center;
@@ -37218,56 +37260,16 @@ window._QI_DATA['pnr_05'] = {
   font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1.5px;
 }
 
-/* ─── Avatar : cadre doré épuré + décor photos en fond ─── */
+/* ─── Avatar : cadre doré épuré, transparent pour laisser voir le fond global ─── */
 .persona-avatar-wrap {
   position: relative; margin: 0 auto 12px;
   width: 340px; max-width: 92%;
   aspect-ratio: 1.4;
   display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  border-radius: 18px;
-  background: #0d1117;
-}
-/* Photos décor en fond (via vraies divs, fade alterné) */
-.persona-bg-photo {
-  position: absolute; inset: 0;
-  background-size: cover;
-  background-position: center 35%;
-  filter: blur(1.5px) saturate(0.85) brightness(0.75);
-  z-index: 1;
-  pointer-events: none;
-  /* Dégradé sur les bords pour fondre proprement */
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0.5) 70%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0.5) 70%, transparent 100%);
-}
-.persona-bg-photo.a {
-  background-image: url('bb.jpg');
-  opacity: 0.5;
-  animation: bgFadeA 20s ease-in-out infinite;
-}
-.persona-bg-photo.b {
-  background-image: url('bb2.jpg');
-  opacity: 0;
-  animation: bgFadeB 20s ease-in-out infinite;
-}
-@keyframes bgFadeA {
-  0%,42%,100% { opacity: 0.5; }
-  58%,92% { opacity: 0; }
-}
-@keyframes bgFadeB {
-  0%,42%,100% { opacity: 0; }
-  58%,92% { opacity: 0.5; }
-}
-/* Voile sombre par-dessus les photos pour laisser lisible le cadre doré */
-.persona-bg-veil {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, rgba(13,17,23,0.25) 0%, rgba(13,17,23,0.55) 55%, rgba(13,17,23,0.85) 100%);
-  z-index: 2;
-  pointer-events: none;
+  overflow: visible;
 }
 .persona-avatar-composite {
   position: relative;
-  z-index: 3; /* au-dessus des photos et du voile */
   width: 280px; max-width: 82%;
   aspect-ratio: 1.1;
   animation: personaBreathe 4s ease-in-out infinite;
@@ -37469,6 +37471,9 @@ window._QI_DATA['pnr_05'] = {
 
 <!-- Overlay plein écran -->
 <div id="persona-overlay" role="dialog" aria-label="Ton personnage">
+  <div class="persona-fullbg-a"></div>
+  <div class="persona-fullbg-b"></div>
+  <div class="persona-fullbg-veil"></div>
   <div class="persona-container" id="persona-container"></div>
 </div>
 
@@ -37741,17 +37746,14 @@ window._QI_DATA['pnr_05'] = {
     return niveau === 'DEB' ? '#0d1117' : (niveau === 'COM' ? '#f5c518' : '#0d1117');
   }
 
-  // ─── Avatar épuré : cadre doré + emojis 🥷 🥋 + ceinture par niveau + photos en fond ───
+  // ─── Avatar épuré : cadre doré + emojis 🥷 🥋 + ceinture par niveau (photos maintenant en fond global overlay) ───
   function _avatarSVG(p, size) {
     size = size || 200;
     var col = _beltColor(p.niveau);
     var stroke = _beltStroke(p.niveau);
     var pseudo = p.pseudo || '';
     var numero = p.numero || '';
-    return '<div class="persona-bg-photo a"></div>'
-      + '<div class="persona-bg-photo b"></div>'
-      + '<div class="persona-bg-veil"></div>'
-      + '<div class="persona-avatar-composite">'
+    return '<div class="persona-avatar-composite">'
       + '<svg viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg">'
       // Halo doré lumineux
       + '  <defs>'
