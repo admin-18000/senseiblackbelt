@@ -36918,5 +36918,660 @@ window._QI_DATA['pnr_05'] = {
 })();
 </script>
 
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     PHASE 2 — HERO ONBOARDING (vidéo en boucle plein écran, avant onboarding 7 tuiles)
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+#hero-onboarding {
+  position: fixed; inset: 0; z-index: 100002;
+  background: #000; display: none;
+  overflow: hidden;
+}
+#hero-onboarding.on { display: block; animation: heroObFadeIn .6s ease-out; }
+@keyframes heroObFadeIn { from{opacity:0} to{opacity:1} }
+
+#hero-onboarding video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 1;
+}
+#hero-onboarding .ho-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(180deg,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0.15) 40%,
+    rgba(0,0,0,0.55) 75%,
+    rgba(0,0,0,0.85) 100%);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: max(28px, env(safe-area-inset-top)) 24px max(28px, env(safe-area-inset-bottom)) 24px;
+}
+#hero-onboarding .ho-top {
+  text-align: center;
+}
+#hero-onboarding .ho-brand {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  color: #f5c518; font-size: clamp(28px, 8vw, 44px);
+  letter-spacing: clamp(3px, 1vw, 6px); line-height: 1;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.7), 0 0 30px rgba(245,197,24,0.3);
+  animation: heroObSlideDown .8s ease-out;
+}
+#hero-onboarding .ho-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  color: rgba(255,255,255,0.85); font-size: clamp(11px, 2.5vw, 14px);
+  letter-spacing: 2px; margin-top: 8px; text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+  animation: heroObSlideDown .8s .1s both ease-out;
+}
+#hero-onboarding .ho-bottom {
+  text-align: center; animation: heroObSlideUp .9s .3s both ease-out;
+}
+#hero-onboarding .ho-msg {
+  font-family: 'Barlow Condensed', sans-serif;
+  color: #fff; font-size: clamp(16px, 4vw, 22px);
+  font-weight: 300; letter-spacing: 1px; line-height: 1.4;
+  margin-bottom: 20px; max-width: 640px; margin-left: auto; margin-right: auto;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+}
+#hero-onboarding .ho-msg strong {
+  color: #f5c518; font-weight: 600; letter-spacing: 1.5px;
+}
+#hero-onboarding .ho-btn {
+  display: inline-block; padding: 16px 40px;
+  background: linear-gradient(135deg, #f5c518, #e0a800);
+  color: #0d1117; border: none; border-radius: 999px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(15px, 3.5vw, 18px); letter-spacing: 3px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 8px 28px rgba(245,197,24,0.5);
+  transition: all 0.2s;
+  animation: heroObPulse 2.5s ease-in-out infinite;
+}
+#hero-onboarding .ho-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 36px rgba(245,197,24,0.7);
+}
+@keyframes heroObPulse {
+  0%,100% { box-shadow: 0 8px 28px rgba(245,197,24,0.5); }
+  50% { box-shadow: 0 8px 36px rgba(245,197,24,0.85); }
+}
+@keyframes heroObSlideDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes heroObSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+<div id="hero-onboarding" aria-label="Bienvenue SENSEI">
+  <video id="hero-onboarding-video" src="hero.mp4" autoplay muted loop playsinline></video>
+  <div class="ho-overlay">
+    <div class="ho-top">
+      <div class="ho-brand">SENSEI BLACKBELT</div>
+      <div class="ho-tag" data-i18n="hero_ob_tag">L'art martial du basketteur</div>
+    </div>
+    <div class="ho-bottom">
+      <div class="ho-msg" data-i18n="hero_ob_msg">
+        Bienvenue dans <strong>SENSEI</strong>.<br>
+        L'app pensée par un vulgarisateur scientifique,<br>
+        pour les basketteurs qui veulent aller plus loin.
+      </div>
+      <button class="ho-btn" onclick="_heroOnboarding_next()" data-i18n="hero_ob_btn">DÉCOUVRIR ✨</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Phase 2 — Hero onboarding video (avant l'onboarding 7 tuiles) */
+(function(){
+  'use strict';
+  var HERO_OB_VERSION = '2026.09.05';
+  var HERO_OB_KEY = 'sensei_hero_onboarding_seen_v';
+
+  // Test si le hero-onboarding doit être affiché
+  window._heroOnboarding_shouldShow = function() {
+    try {
+      var forceShow = (location.search || '').indexOf('herohello=1') >= 0;
+      if (forceShow) return true;
+      var seen = localStorage.getItem(HERO_OB_KEY);
+      return (seen !== HERO_OB_VERSION);
+    } catch(e) { return false; }
+  };
+
+  window._heroOnboarding_show = function() {
+    var el = document.getElementById('hero-onboarding');
+    if (!el) return;
+    el.classList.add('on');
+    // Redémarrer la vidéo proprement
+    var v = document.getElementById('hero-onboarding-video');
+    if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch(e){} }
+    document.body.style.overflow = 'hidden';
+  };
+
+  window._heroOnboarding_next = function() {
+    // Marquer comme vu
+    try { localStorage.setItem(HERO_OB_KEY, HERO_OB_VERSION); } catch(e){}
+    var el = document.getElementById('hero-onboarding');
+    if (el) {
+      el.style.animation = 'heroObFadeIn .4s reverse';
+      setTimeout(function(){
+        el.classList.remove('on');
+        el.style.animation = '';
+        document.body.style.overflow = '';
+        // Puis afficher l'onboarding 7 tuiles s'il doit s'afficher
+        if (typeof showOnboardingIfNeeded === 'function') {
+          setTimeout(function(){ showOnboardingIfNeeded(); }, 100);
+        }
+      }, 400);
+    }
+  };
+
+  // Traductions
+  try {
+    if (window.i18n) {
+      window.i18n.fr = window.i18n.fr || {};
+      window.i18n.en = window.i18n.en || {};
+      window.i18n.fr.hero_ob_tag = "L'art martial du basketteur";
+      window.i18n.en.hero_ob_tag = "The basketball player's martial art";
+      window.i18n.fr.hero_ob_msg = "Bienvenue dans <strong>SENSEI</strong>.<br>L'app pensée par un vulgarisateur scientifique,<br>pour les basketteurs qui veulent aller plus loin.";
+      window.i18n.en.hero_ob_msg = "Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator,<br>for basketball players who want to go further.";
+      window.i18n.fr.hero_ob_btn = "DÉCOUVRIR ✨";
+      window.i18n.en.hero_ob_btn = "DISCOVER ✨";
+    }
+  } catch(e){}
+
+  // Hook : au chargement de la page, on affiche le hero-onboarding SI besoin
+  // AVANT l'onboarding 7 tuiles. Le showOnboardingIfNeeded original ne se déclenche
+  // qu'après un clic "Découvrir" ou si le hero-onboarding a déjà été vu.
+  function _installHook() {
+    if (!window._heroOnboarding_shouldShow()) return; // Déjà vu, laisser l'onboarding 7 tuiles se comporter normalement
+    // Sinon on affiche le hero-onboarding et on désamorce temporairement le showOnboardingIfNeeded
+    // en surchargeant sa première invocation
+    var originalShow = window.showOnboardingIfNeeded;
+    var alreadyIntercepted = false;
+    window.showOnboardingIfNeeded = function() {
+      if (alreadyIntercepted) return originalShow ? originalShow.apply(this, arguments) : undefined;
+      alreadyIntercepted = true;
+      // Afficher le hero-onboarding — quand l'utilisateur clique "Découvrir", il ré-appellera showOnboardingIfNeeded
+      window._heroOnboarding_show();
+      // Restaurer la fonction originale pour les prochains appels
+      window.showOnboardingIfNeeded = originalShow;
+    };
+  }
+
+  // Déclencher l'installation du hook dès que possible
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _installHook);
+  } else {
+    _installHook();
+  }
+})();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     PHASE 3 — PERSONNAGE ENRICHI (avatar stylisé + 5 attributs + 2 accès)
+     Migration douce depuis sensei_fiche_profile_v1
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ─── Bouton d'accès haut-droit home (avatar mini) ─── */
+#persona-btn-home {
+  position: fixed; top: 12px; right: 12px; z-index: 9998;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #f5c518, #d4a300);
+  border: 2px solid rgba(0,0,0,0.35);
+  box-shadow: 0 3px 12px rgba(245,197,24,0.4), 0 0 0 3px rgba(13,17,23,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #0d1117; font-size: 20px; padding: 0;
+  transition: all 0.2s; font-family: inherit;
+}
+#persona-btn-home:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 18px rgba(245,197,24,0.65), 0 0 0 3px rgba(13,17,23,0.8);
+}
+#persona-btn-home svg { width: 28px; height: 28px; }
+
+/* ─── Overlay personnage plein écran ─── */
+#persona-overlay {
+  position: fixed; inset: 0; z-index: 100003;
+  background: #0d1117; display: none; overflow-y: auto;
+}
+#persona-overlay.on { display: block; }
+.persona-container { max-width: 620px; margin: 0 auto; padding: 20px 18px 60px; }
+
+.persona-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px;
+}
+.persona-btn-back {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: #cfd3e0; padding: 8px 14px; border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1px; cursor: pointer;
+}
+.persona-btn-back:hover { border-color: #f5c518; color: #f5c518; }
+
+.persona-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: clamp(28px, 6.5vw, 40px); letter-spacing: 3px;
+  text-align: center; margin-bottom: 4px; line-height: 1;
+}
+.persona-subtitle {
+  font-size: 12px; color: #9aa3b3; text-align: center; margin-bottom: 22px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1.5px;
+}
+
+/* ─── Avatar SVG stylisé au centre ─── */
+.persona-avatar-wrap {
+  position: relative; margin: 0 auto 24px;
+  width: 260px; max-width: 78%;
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.persona-avatar-svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 6px 24px rgba(245,197,24,0.25));
+  animation: personaBreathe 4s ease-in-out infinite;
+}
+@keyframes personaBreathe {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.02); }
+}
+
+/* ─── Attributs (badges autour de l'avatar) ─── */
+.persona-attrs {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px; margin-bottom: 22px;
+}
+.persona-attr {
+  background: linear-gradient(135deg, rgba(245,197,24,0.06), #161b22);
+  border: 1.5px solid rgba(245,197,24,0.25); border-radius: 12px;
+  padding: 12px; cursor: pointer; transition: all 0.15s;
+  text-align: center;
+}
+.persona-attr:hover {
+  border-color: #f5c518;
+  background: linear-gradient(135deg, rgba(245,197,24,0.12), #161b22);
+  transform: translateY(-1px);
+}
+.persona-attr-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  color: #9aa3b3; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px;
+}
+.persona-attr-value {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 17px; letter-spacing: 1.5px;
+}
+.persona-attr-value.empty { color: #6a7383; font-style: italic; font-size: 13px; }
+.persona-attr-icon { font-size: 22px; margin-bottom: 4px; }
+
+/* ─── Écran de choix (pour modifier un attribut) ─── */
+.persona-choose {
+  background: #161b22; border: 1px solid rgba(245,197,24,0.3);
+  border-radius: 14px; padding: 18px; margin-bottom: 14px;
+}
+.persona-choose-label {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 15px; letter-spacing: 2px;
+  margin-bottom: 12px; text-align: center;
+}
+.persona-choose-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+.persona-choose-btn {
+  background: rgba(13,17,23,0.6); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 12px 8px; color: #f0f2f8;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12.5px;
+  font-weight: 600; letter-spacing: 0.5px; cursor: pointer;
+  transition: all 0.15s;
+}
+.persona-choose-btn:hover { border-color: #f5c518; background: rgba(245,197,24,0.08); }
+.persona-choose-btn.on {
+  border-color: #f5c518; background: rgba(245,197,24,0.20); color: #f5c518;
+  box-shadow: 0 0 10px rgba(245,197,24,0.3);
+}
+
+.persona-save-info {
+  text-align: center; font-size: 11px; color: #6a7383;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+  margin-top: 6px;
+}
+</style>
+
+<!-- Bouton d'accès haut-droit (avatar mini) - visible sur la home uniquement -->
+<button id="persona-btn-home" onclick="_persona_open()" title="Ton personnage" aria-label="Ton personnage" style="display:none">
+  <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M12 14c-4.4 0-8 2.7-8 6v2h16v-2c0-3.3-3.6-6-8-6z"/>
+  </svg>
+</button>
+
+<!-- Overlay plein écran -->
+<div id="persona-overlay" role="dialog" aria-label="Ton personnage">
+  <div class="persona-container" id="persona-container"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PHASE 3 — Personnage enrichi
+   - localStorage key : sensei_personnage_v1 (fusion avec sensei_fiche_profile_v1)
+   - 5 attributs : poste, niveau, age, main forte, objectif
+   - Avatar SVG stylisé, animation subtile
+   - Accessible depuis 2 endroits : bouton flottant home + à venir dans settings
+═══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  var LS_KEY = 'sensei_personnage_v1';
+  var LEGACY_KEY = 'sensei_fiche_profile_v1';
+
+  function _flang() {
+    try { if (window._lang) return window._lang;
+      var d = (document.body || document.documentElement).getAttribute('data-lang');
+      if (d) return d;
+    } catch(e){}
+    return 'fr';
+  }
+
+  // ─── Chargement / Migration douce ───
+  function _load() {
+    var p = { poste: null, niveau: null, age: null, main: null, objectif: null };
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        p.poste = d.poste || null;
+        p.niveau = d.niveau || null;
+        p.age = d.age || null;
+        p.main = d.main || null;
+        p.objectif = d.objectif || null;
+      } else {
+        // Migration douce : lire l'ancien profil s'il existe
+        var legacy = localStorage.getItem(LEGACY_KEY);
+        if (legacy) {
+          var l = JSON.parse(legacy);
+          p.poste = l.poste || null;
+          p.niveau = l.niveau || null;
+          // Sauvegarder tout de suite le nouveau format (avec juste les 2 attributs migrés)
+          _save(p);
+        }
+      }
+    } catch(e){}
+    return p;
+  }
+
+  function _save(p) {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(p));
+      // Rétro-compatibilité : maintient sensei_fiche_profile_v1 à jour aussi
+      if (p.poste && p.niveau) {
+        try {
+          var legacy = localStorage.getItem(LEGACY_KEY);
+          var lObj = legacy ? JSON.parse(legacy) : {};
+          lObj.poste = p.poste;
+          lObj.niveau = p.niveau;
+          localStorage.setItem(LEGACY_KEY, JSON.stringify(lObj));
+        } catch(e2){}
+      }
+    } catch(e){}
+  }
+
+  // ─── API publique ───
+  window._persona_get = function() { return _load(); };
+  window._persona_set = function(attr, val) {
+    var p = _load();
+    p[attr] = val;
+    _save(p);
+    _renderMain();
+  };
+
+  window._persona_open = function() {
+    var ov = document.getElementById('persona-overlay');
+    if (!ov) return;
+    ov.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    _renderMain();
+  };
+  window._persona_close = function() {
+    var ov = document.getElementById('persona-overlay');
+    if (ov) ov.classList.remove('on');
+    document.body.style.overflow = '';
+  };
+
+  // ─── Avatar SVG stylisé (silhouette basketteur) ───
+  function _avatarSVG(poste, niveau) {
+    // Couleur évolutive selon niveau
+    var lvlColor = { DEB:'#7a8390', INT:'#f5c518', CON:'#e63946', COM:'#9d4edd' };
+    var col = lvlColor[niveau] || '#7a8390';
+    // Silhouette légèrement adaptée selon poste (proportion tête/corps)
+    // PG petit vif, C grand large
+    var scale = { PG:0.92, SG:0.96, SF:1.00, PF:1.04, C:1.08 }[poste] || 1.00;
+
+    return '<svg class="persona-avatar-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs>'
+      + '  <radialGradient id="pAvBg" cx="50%" cy="35%" r="70%">'
+      + '    <stop offset="0%" stop-color="'+col+'" stop-opacity="0.15"/>'
+      + '    <stop offset="100%" stop-color="'+col+'" stop-opacity="0"/>'
+      + '  </radialGradient>'
+      + '  <linearGradient id="pAvBody" x1="0%" y1="0%" x2="0%" y2="100%">'
+      + '    <stop offset="0%" stop-color="'+col+'"/>'
+      + '    <stop offset="100%" stop-color="'+col+'" stop-opacity="0.6"/>'
+      + '  </linearGradient>'
+      + '</defs>'
+      + '<circle cx="100" cy="100" r="95" fill="url(#pAvBg)"/>'
+      // Silhouette
+      + '<g transform="translate(100 100) scale('+scale+') translate(-100 -100)">'
+      + '  <circle cx="100" cy="68" r="22" fill="url(#pAvBody)"/>'  // Tête
+      + '  <path d="M 100 92 Q 65 100 60 145 L 60 170 Q 70 180 100 180 Q 130 180 140 170 L 140 145 Q 135 100 100 92 Z" fill="url(#pAvBody)"/>'  // Corps
+      // Ballon basket (petit) tenu sur le côté
+      + '  <circle cx="145" cy="140" r="14" fill="#e0700a" stroke="#0d1117" stroke-width="1.5"/>'
+      + '  <path d="M 131 140 Q 145 130 159 140" fill="none" stroke="#0d1117" stroke-width="1"/>'
+      + '  <path d="M 131 140 Q 145 150 159 140" fill="none" stroke="#0d1117" stroke-width="1"/>'
+      + '  <line x1="145" y1="126" x2="145" y2="154" stroke="#0d1117" stroke-width="1"/>'
+      + '</g>'
+      // Anneau doré autour (ceinture symbolique)
+      + '<circle cx="100" cy="100" r="93" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-dasharray="2 4" opacity="0.6"/>'
+      + '</svg>';
+  }
+
+  // ─── Rendu principal (avatar + attributs) ───
+  function _renderMain() {
+    var en = _flang()==='en';
+    var c = document.getElementById('persona-container');
+    if (!c) return;
+    var p = _load();
+
+    var html = '';
+    html += '<div class="persona-topbar">';
+    html += '  <button class="persona-btn-back" onclick="_persona_close()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    html += '  <div style="font-family:\'Barlow Condensed\',sans-serif;color:#9aa3b3;font-size:10px;letter-spacing:1.5px">'+(en?'AUTO-SAVED':'SAUVEGARDÉ AUTO')+'</div>';
+    html += '</div>';
+    html += '<div class="persona-title">'+(en?'YOUR CHARACTER':'TON PERSONNAGE')+'</div>';
+    html += '<div class="persona-subtitle">'+(en?'Click any attribute to edit':'Clique sur un attribut pour modifier')+'</div>';
+
+    // Avatar
+    html += '<div class="persona-avatar-wrap">'+_avatarSVG(p.poste, p.niveau)+'</div>';
+
+    // 5 attributs
+    var attrs = [
+      { key:'poste', icon:'🏀', labelFR:'POSTE', labelEN:'POSITION',
+        valLabel: p.poste ? _posteName(p.poste, en) : null },
+      { key:'niveau', icon:'📊', labelFR:'NIVEAU', labelEN:'LEVEL',
+        valLabel: p.niveau ? _nivName(p.niveau, en) : null },
+      { key:'age', icon:'🎂', labelFR:'ÂGE', labelEN:'AGE',
+        valLabel: p.age ? _ageName(p.age, en) : null },
+      { key:'main', icon:'✋', labelFR:'MAIN FORTE', labelEN:'STRONG HAND',
+        valLabel: p.main ? _mainName(p.main, en) : null },
+      { key:'objectif', icon:'🎯', labelFR:'OBJECTIF', labelEN:'GOAL',
+        valLabel: p.objectif ? _objName(p.objectif, en) : null }
+    ];
+
+    html += '<div class="persona-attrs">';
+    attrs.forEach(function(a){
+      html += '<div class="persona-attr" onclick="_persona_editAttr(\''+a.key+'\')">';
+      html += '  <div class="persona-attr-icon">'+a.icon+'</div>';
+      html += '  <div class="persona-attr-label">'+(en?a.labelEN:a.labelFR)+'</div>';
+      if (a.valLabel) {
+        html += '  <div class="persona-attr-value">'+a.valLabel+'</div>';
+      } else {
+        html += '  <div class="persona-attr-value empty">'+(en?'set':'à définir')+'</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="persona-save-info">'+(en?'Any change is saved instantly':'Chaque modification est sauvegardée immédiatement')+'</div>';
+
+    c.innerHTML = html;
+    document.getElementById('persona-overlay').scrollTop = 0;
+  }
+
+  // ─── Édition d'un attribut ───
+  window._persona_editAttr = function(attr) {
+    var en = _flang()==='en';
+    var c = document.getElementById('persona-container');
+    if (!c) return;
+    var p = _load();
+    var current = p[attr];
+    var options = _optionsFor(attr, en);
+    var titleMap = {
+      poste: en?'CHOOSE YOUR POSITION':'CHOISIS TON POSTE',
+      niveau: en?'CHOOSE YOUR LEVEL':'CHOISIS TON NIVEAU',
+      age: en?'YOUR AGE':'TON ÂGE',
+      main: en?'YOUR STRONG HAND':'TA MAIN FORTE',
+      objectif: en?'YOUR MAIN GOAL':'TON OBJECTIF PRINCIPAL'
+    };
+
+    var html = '';
+    html += '<div class="persona-topbar">';
+    html += '  <button class="persona-btn-back" onclick="_persona_open()">'+(en?'← BACK':'← RETOUR')+'</button>';
+    html += '</div>';
+    html += '<div class="persona-title">'+(en?'EDIT':'MODIFIER')+'</div>';
+    html += '<div class="persona-subtitle">'+titleMap[attr]+'</div>';
+
+    html += '<div class="persona-choose">';
+    html += '  <div class="persona-choose-grid">';
+    options.forEach(function(opt){
+      var sel = current===opt.val ? 'on' : '';
+      html += '<button class="persona-choose-btn '+sel+'" onclick="_persona_pick(\''+attr+'\',\''+opt.val+'\')">'+opt.label+'</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    html += '<div class="persona-save-info">'+(en?'Click to save and go back':'Clique pour sauvegarder et revenir')+'</div>';
+
+    c.innerHTML = html;
+    document.getElementById('persona-overlay').scrollTop = 0;
+  };
+
+  window._persona_pick = function(attr, val) {
+    var p = _load();
+    p[attr] = val;
+    _save(p);
+    setTimeout(_renderMain, 150); // Léger délai pour laisser voir la sélection
+  };
+
+  // ─── Options pour chaque attribut ───
+  function _optionsFor(attr, en) {
+    if (attr === 'poste') return [
+      {val:'PG', label:en?'POINT GUARD':'MENEUR'},
+      {val:'SG', label:en?'SHOOTING GUARD':'ARRIÈRE'},
+      {val:'SF', label:en?'SMALL FORWARD':'AILIER'},
+      {val:'PF', label:en?'POWER FORWARD':'AILIER FORT'},
+      {val:'C', label:en?'CENTER':'PIVOT'}
+    ];
+    if (attr === 'niveau') return [
+      {val:'DEB', label:en?'BEGINNER':'DÉBUTANT'},
+      {val:'INT', label:en?'INTERMEDIATE':'INTERMÉDIAIRE'},
+      {val:'CON', label:en?'ADVANCED':'CONFIRMÉ'},
+      {val:'COM', label:en?'COMPETITION':'COMPÉTITION'}
+    ];
+    if (attr === 'age') return [
+      {val:'8-12', label:'8-12'},
+      {val:'13-17', label:'13-17'},
+      {val:'18-25', label:'18-25'},
+      {val:'26+', label:'26+'}
+    ];
+    if (attr === 'main') return [
+      {val:'droite', label:en?'RIGHT':'DROITE'},
+      {val:'gauche', label:en?'LEFT':'GAUCHE'},
+      {val:'ambi', label:en?'AMBIDEXTROUS':'AMBIDEXTRE'}
+    ];
+    if (attr === 'objectif') return [
+      {val:'technique', label:en?'TECHNIQUE':'TECHNIQUE'},
+      {val:'physique', label:en?'PHYSICAL':'PHYSIQUE'},
+      {val:'tactique', label:en?'TACTICAL':'TACTIQUE'},
+      {val:'mental', label:en?'MENTAL':'MENTAL'},
+      {val:'mixte', label:en?'MIX':'MIXTE'}
+    ];
+    return [];
+  }
+
+  // ─── Labels ───
+  function _posteName(k, en) {
+    var m = { PG:['MENEUR','POINT GUARD'], SG:['ARRIÈRE','SHOOTING GUARD'],
+              SF:['AILIER','SMALL FORWARD'], PF:['AILIER FORT','POWER FORWARD'],
+              C:['PIVOT','CENTER'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+  function _nivName(k, en) {
+    var m = { DEB:['DÉBUTANT','BEGINNER'], INT:['INTERMÉDIAIRE','INTERMEDIATE'],
+              CON:['CONFIRMÉ','ADVANCED'], COM:['COMPÉTITION','COMPETITION'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+  function _ageName(k) { return k; }
+  function _mainName(k, en) {
+    var m = { droite:['DROITE','RIGHT'], gauche:['GAUCHE','LEFT'], ambi:['AMBIDEXTRE','AMBIDEXTROUS'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+  function _objName(k, en) {
+    var m = { technique:['TECHNIQUE','TECHNIQUE'], physique:['PHYSIQUE','PHYSICAL'],
+              tactique:['TACTIQUE','TACTICAL'], mental:['MENTAL','MENTAL'], mixte:['MIXTE','MIX'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
+
+  // ─── Affichage du bouton flottant SEULEMENT quand on est sur la home ───
+  function _updateBtnVisibility() {
+    var btn = document.getElementById('persona-btn-home');
+    if (!btn) return;
+    var homeVisible = false;
+    try {
+      var home = document.getElementById('s-home');
+      if (home) {
+        var style = window.getComputedStyle(home);
+        homeVisible = (style.display !== 'none' && style.visibility !== 'hidden');
+      }
+    } catch(e){}
+    // Ne pas afficher si un overlay est ouvert
+    var ovOpen = false;
+    var overlaysToCheck = ['persona-overlay','senseiai-overlay','onboarding-modal','hero-onboarding'];
+    for (var i=0; i<overlaysToCheck.length; i++) {
+      var el = document.getElementById(overlaysToCheck[i]);
+      if (el && (el.classList.contains('on') || el.style.display === 'flex' || el.style.display === 'block')) {
+        ovOpen = true; break;
+      }
+    }
+    btn.style.display = (homeVisible && !ovOpen) ? 'flex' : 'none';
+  }
+
+  // Hook : observer changements de section et overlays
+  function _installVisibilityObserver() {
+    // Observer les changements DOM sur body
+    try {
+      var mo = new MutationObserver(function(){ _updateBtnVisibility(); });
+      mo.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style','class'] });
+    } catch(e){}
+    // Check périodique de secours
+    setInterval(_updateBtnVisibility, 500);
+    _updateBtnVisibility();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _installVisibilityObserver);
+  } else {
+    _installVisibilityObserver();
+  }
+})();
+</script>
+
 </body>
 </html>
