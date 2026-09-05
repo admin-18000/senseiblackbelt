@@ -887,6 +887,13 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#e07d3f;line-height:1" data-i18n="dojo_lbl_bh">BALL HANDLING</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_bh">Drills classés par ceinture</div>
         </button>
+        <!-- TON PERSONNAGE (8e tuile - configuration, symétrique de SENSEI IA) -->
+        <button onclick="_persona_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🥷</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_persona">TON PERSONNAGE</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_persona">Crée ton avatar SENSEI</div>
+        </button>
       </div>
     </div>
   </div>
@@ -36719,6 +36726,8 @@ window._QI_DATA['pnr_05'] = {
     }
     setTimeout(function(){
       STATE.session = _buildSession();
+      // Quick win IA #1 : enregistrer l'événement generate
+      try { if (window._persona_recordEvent) window._persona_recordEvent('generate', { focus: STATE.focus, duree: STATE.duree, lieu: STATE.lieu, etat: STATE.etat }); } catch(e){}
       _renderSession();
     }, 1800);
   };
@@ -36821,8 +36830,20 @@ window._QI_DATA['pnr_05'] = {
     var strong = pool.filter(function(b){
       return b.matchFocus.length <= 4 && b.matchFocus.indexOf(focus)!==-1;
     });
-    if (strong.length) return strong[Math.floor(Math.random()*strong.length)];
-    return pool[Math.floor(Math.random()*pool.length)];
+    var candidates = strong.length ? strong : pool;
+    // Quick win IA #1 : pondération par préférences apprises de l'utilisateur
+    try {
+      if (window._persona_getBriquePreference && candidates.length > 1) {
+        var scored = candidates.map(function(b){
+          return { b: b, score: window._persona_getBriquePreference(b.id) * (0.5 + Math.random()) };
+        });
+        scored.sort(function(a,b){ return b.score - a.score; });
+        // Retourner la meilleure parmi le top 2 (introduire un peu de variété)
+        var topN = Math.min(2, scored.length);
+        return scored[Math.floor(Math.random()*topN)].b;
+      }
+    } catch(e){}
+    return candidates[Math.floor(Math.random()*candidates.length)];
   }
 
   // ─── Rendu séance ───
@@ -36850,6 +36871,17 @@ window._QI_DATA['pnr_05'] = {
     html += '    <span>'+etatLabel+'</span>';
     html += '    <span>'+lieuLabel+'</span>';
     html += '  </div>';
+    // Quick win IA #4 : Texte contextuel généré
+    try {
+      if (window._persona_generateContextText) {
+        var contextText = window._persona_generateContextText(s);
+        if (contextText) {
+          html += '  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(245,197,24,0.2);font-size:12.5px;color:#e6ebf5;line-height:1.5;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:0.3px">';
+          html += '    <span style="color:#f5c518;font-weight:700">✨ </span>' + contextText;
+          html += '  </div>';
+        }
+      }
+    } catch(e){}
     html += '</div>';
 
     // Blocks
@@ -36879,12 +36911,16 @@ window._QI_DATA['pnr_05'] = {
   window._senseiAI_launch = function(idx) {
     if (!STATE.session || !STATE.session.blocks[idx]) return;
     var b = STATE.session.blocks[idx];
+    // Quick win IA #1 : tracking du lancement
+    try { if (window._persona_recordEvent) window._persona_recordEvent('launch_brique', { id: b.id, cat: b.cat }); } catch(e){}
     _senseiAI_close();
     setTimeout(function(){ if (typeof b.action === 'function') b.action(); }, 100);
   };
 
   window._senseiAI_regenerate = function() {
     var en = _flang()==='en';
+    // Quick win IA #1 : tracking de la régénération
+    try { if (window._persona_recordEvent) window._persona_recordEvent('regenerate', { focus: STATE.focus }); } catch(e){}
     var c = document.getElementById('senseiai-container');
     if (c) {
       c.innerHTML = '<div class="ai-loading">'
@@ -37009,8 +37045,9 @@ window._QI_DATA['pnr_05'] = {
     <div class="ho-bottom">
       <div class="ho-msg" data-i18n="hero_ob_msg">
         Bienvenue dans <strong>SENSEI</strong>.<br>
-        L'app pensée par un vulgarisateur scientifique,<br>
-        pour les basketteurs qui veulent aller plus loin.
+        L'app pensée par un vulgarisateur scientifique<br>
+        <strong>et propulsée par l'IA</strong>, pour les basketteurs<br>
+        qui veulent aller plus loin.
       </div>
       <button class="ho-btn" onclick="_heroOnboarding_next()" data-i18n="hero_ob_btn">DÉCOUVRIR ✨</button>
     </div>
@@ -37069,8 +37106,8 @@ window._QI_DATA['pnr_05'] = {
       window.i18n.en = window.i18n.en || {};
       window.i18n.fr.hero_ob_tag = "L'art martial du basketteur";
       window.i18n.en.hero_ob_tag = "The basketball player's martial art";
-      window.i18n.fr.hero_ob_msg = "Bienvenue dans <strong>SENSEI</strong>.<br>L'app pensée par un vulgarisateur scientifique,<br>pour les basketteurs qui veulent aller plus loin.";
-      window.i18n.en.hero_ob_msg = "Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator,<br>for basketball players who want to go further.";
+      window.i18n.fr.hero_ob_msg = "Bienvenue dans <strong>SENSEI</strong>.<br>L'app pensée par un vulgarisateur scientifique<br><strong>et propulsée par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.";
+      window.i18n.en.hero_ob_msg = "Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.";
       window.i18n.fr.hero_ob_btn = "DÉCOUVRIR ✨";
       window.i18n.en.hero_ob_btn = "DISCOVER ✨";
     }
@@ -37105,36 +37142,47 @@ window._QI_DATA['pnr_05'] = {
 </script>
 
 
+
+
+
+
 <!-- ═══════════════════════════════════════════════════════════════════════════════
-     PHASE 3 — PERSONNAGE ENRICHI (avatar stylisé + 5 attributs + 2 accès)
-     Migration douce depuis sensei_fiche_profile_v1
+     PHASE 4 — PERSONNAGE NIVEAU 2 + QUICK WINS IA (remplace la Phase 3)
+     - Pseudo, numéro, peau, cheveux, maillot
+     - Avatar SVG détaillé (visage, tenue, chaussures)
+     - Animation de révélation quand personnage complet
+     - Bouton home affiche l'avatar mini
+     - Quick wins IA : préférences apprises + contexte temps + génération texte contextuel
 ═══════════════════════════════════════════════════════════════════════════════ -->
 
 <style>
-/* ─── Bouton d'accès haut-droit home (avatar mini) ─── */
+/* ─── Bouton d'accès haut-droit home (avatar mini dynamique) ─── */
 #persona-btn-home {
   position: fixed; top: 12px; right: 12px; z-index: 9998;
-  width: 42px; height: 42px; border-radius: 50%;
-  background: linear-gradient(135deg, #f5c518, #d4a300);
-  border: 2px solid rgba(0,0,0,0.35);
-  box-shadow: 0 3px 12px rgba(245,197,24,0.4), 0 0 0 3px rgba(13,17,23,0.7);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  color: #0d1117; font-size: 20px; padding: 0;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: #0d1117;
+  border: 2px solid #f5c518;
+  box-shadow: 0 3px 12px rgba(245,197,24,0.4), 0 0 0 2px rgba(13,17,23,0.7);
+  cursor: pointer; padding: 0; overflow: hidden;
   transition: all 0.2s; font-family: inherit;
 }
 #persona-btn-home:hover {
   transform: scale(1.08);
-  box-shadow: 0 4px 18px rgba(245,197,24,0.65), 0 0 0 3px rgba(13,17,23,0.8);
+  box-shadow: 0 4px 18px rgba(245,197,24,0.65), 0 0 0 2px rgba(13,17,23,0.8);
 }
-#persona-btn-home svg { width: 28px; height: 28px; }
+#persona-btn-home svg { width: 100%; height: 100%; display: block; }
+#persona-btn-home .home-btn-empty {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; color: #f5c518; font-size: 22px;
+}
 
-/* ─── Overlay personnage plein écran ─── */
+/* ─── Overlay plein écran ─── */
 #persona-overlay {
   position: fixed; inset: 0; z-index: 100003;
   background: #0d1117; display: none; overflow-y: auto;
 }
 #persona-overlay.on { display: block; }
-.persona-container { max-width: 620px; margin: 0 auto; padding: 20px 18px 60px; }
+.persona-container { max-width: 640px; margin: 0 auto; padding: 20px 18px 60px; }
 
 .persona-topbar {
   display: flex; justify-content: space-between; align-items: center;
@@ -37158,32 +37206,87 @@ window._QI_DATA['pnr_05'] = {
   font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1.5px;
 }
 
-/* ─── Avatar SVG stylisé au centre ─── */
+/* ─── Avatar : cadre doré épuré + décor photos en fond ─── */
 .persona-avatar-wrap {
-  position: relative; margin: 0 auto 24px;
-  width: 260px; max-width: 78%;
-  aspect-ratio: 1;
+  position: relative; margin: 0 auto 12px;
+  width: 340px; max-width: 92%;
+  aspect-ratio: 1.4;
   display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border-radius: 18px;
+  isolation: isolate;
 }
-.persona-avatar-svg {
-  width: 100%; height: 100%;
-  filter: drop-shadow(0 6px 24px rgba(245,197,24,0.25));
+/* Photos décor en fond (fade alterné) */
+.persona-avatar-wrap::before,
+.persona-avatar-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.32;
+  filter: blur(1.5px) saturate(0.9);
+  z-index: -1;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.6) 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.6) 90%, transparent 100%);
+}
+.persona-avatar-wrap::before {
+  background-image: url('bb.jpg');
+  animation: bgFadeA 16s ease-in-out infinite;
+}
+.persona-avatar-wrap::after {
+  background-image: url('bb2.jpg');
+  animation: bgFadeB 16s ease-in-out infinite;
+}
+@keyframes bgFadeA {
+  0%,45%,100% { opacity: 0.32; }
+  55%,95% { opacity: 0; }
+}
+@keyframes bgFadeB {
+  0%,45%,100% { opacity: 0; }
+  55%,95% { opacity: 0.32; }
+}
+.persona-avatar-composite {
+  position: relative;
+  width: 260px; max-width: 78%;
+  aspect-ratio: 1.1;
   animation: personaBreathe 4s ease-in-out infinite;
+}
+.persona-avatar-composite svg {
+  filter: drop-shadow(0 6px 24px rgba(245,197,24,0.35));
 }
 @keyframes personaBreathe {
   0%,100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-3px) scale(1.02); }
 }
 
-/* ─── Attributs (badges autour de l'avatar) ─── */
+/* ─── Nom + numéro sous l'avatar ─── */
+.persona-namebar {
+  text-align: center; margin-bottom: 18px;
+}
+.persona-pseudo {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #f5c518; font-size: 24px; letter-spacing: 2.5px;
+  line-height: 1;
+}
+.persona-pseudo.empty {
+  color: #6a7383; font-style: italic; font-size: 15px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.persona-numero {
+  display: inline-block; margin-left: 8px;
+  padding: 2px 10px; background: rgba(245,197,24,0.15);
+  color: #f5c518; border-radius: 4px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px;
+}
+
+/* ─── Attributs (grid) ─── */
 .persona-attrs {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px; margin-bottom: 22px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px; margin-bottom: 20px;
 }
 .persona-attr {
   background: linear-gradient(135deg, rgba(245,197,24,0.06), #161b22);
   border: 1.5px solid rgba(245,197,24,0.25); border-radius: 12px;
-  padding: 12px; cursor: pointer; transition: all 0.15s;
+  padding: 11px 8px; cursor: pointer; transition: all 0.15s;
   text-align: center;
 }
 .persona-attr:hover {
@@ -37193,17 +37296,33 @@ window._QI_DATA['pnr_05'] = {
 }
 .persona-attr-label {
   font-family: 'Barlow Condensed', sans-serif;
-  color: #9aa3b3; font-size: 10px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px;
+  color: #9aa3b3; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px;
 }
 .persona-attr-value {
   font-family: 'Bebas Neue', sans-serif;
-  color: #f5c518; font-size: 17px; letter-spacing: 1.5px;
+  color: #f5c518; font-size: 14px; letter-spacing: 1px;
 }
-.persona-attr-value.empty { color: #6a7383; font-style: italic; font-size: 13px; }
-.persona-attr-icon { font-size: 22px; margin-bottom: 4px; }
+.persona-attr-value.empty { color: #6a7383; font-style: italic; font-size: 11.5px; font-family:'Barlow Condensed',sans-serif; }
+.persona-attr-icon { font-size: 18px; margin-bottom: 3px; }
 
-/* ─── Écran de choix (pour modifier un attribut) ─── */
+/* ─── Section badge personnage complet ─── */
+.persona-badge-complete {
+  background: linear-gradient(135deg, rgba(245,197,24,0.25), rgba(245,197,24,0.05));
+  border: 1.5px solid #f5c518; border-radius: 12px;
+  padding: 14px; margin-bottom: 18px; text-align: center;
+  box-shadow: 0 0 20px rgba(245,197,24,0.2);
+}
+.persona-badge-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: 15px; letter-spacing: 2px;
+}
+.persona-badge-date {
+  font-size: 11px; color: #cfd3e0; margin-top: 4px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+
+/* ─── Écran de choix pour modifier un attribut ─── */
 .persona-choose {
   background: #161b22; border: 1px solid rgba(245,197,24,0.3);
   border-radius: 14px; padding: 18px; margin-bottom: 14px;
@@ -37215,7 +37334,7 @@ window._QI_DATA['pnr_05'] = {
 }
 .persona-choose-grid {
   display: grid; gap: 8px;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 .persona-choose-btn {
   background: rgba(13,17,23,0.6); border: 1.5px solid rgba(255,255,255,0.1);
@@ -37230,19 +37349,98 @@ window._QI_DATA['pnr_05'] = {
   box-shadow: 0 0 10px rgba(245,197,24,0.3);
 }
 
+/* Text input pour pseudo/numéro */
+.persona-text-input {
+  width: 100%; padding: 12px 14px;
+  background: rgba(13,17,23,0.6); border: 1.5px solid rgba(245,197,24,0.4);
+  border-radius: 10px; color: #f5c518;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px;
+  text-align: center; outline: none;
+}
+.persona-text-input:focus { border-color: #f5c518; box-shadow: 0 0 12px rgba(245,197,24,0.3); }
+
+/* Palette couleur (peau/maillot) */
+.persona-color-palette {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 8px;
+}
+.persona-color-swatch {
+  aspect-ratio: 1; border-radius: 50%; cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.persona-color-swatch:hover { transform: scale(1.1); }
+.persona-color-swatch.on {
+  border-color: #f5c518;
+  box-shadow: 0 0 14px rgba(245,197,24,0.5), 0 2px 6px rgba(0,0,0,0.4);
+}
+
 .persona-save-info {
   text-align: center; font-size: 11px; color: #6a7383;
   font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
   margin-top: 6px;
 }
+
+/* ─── Animation de révélation ─── */
+#persona-reveal {
+  position: fixed; inset: 0; z-index: 100005;
+  background: radial-gradient(ellipse at center, rgba(13,17,23,0.98), #000);
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; padding: 20px;
+}
+#persona-reveal.on { display: flex; }
+.reveal-avatar {
+  width: 250px; height: 250px;
+  animation: revealZoom 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes revealZoom {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.reveal-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518;
+  font-size: clamp(32px, 8vw, 48px); letter-spacing: 3px;
+  text-align: center; margin-top: 20px;
+  text-shadow: 0 0 20px rgba(245,197,24,0.6);
+  animation: revealFadeUp 0.8s 0.6s both;
+}
+.reveal-pseudo {
+  font-family: 'Bebas Neue', sans-serif; color: #fff;
+  font-size: clamp(22px, 5vw, 30px); letter-spacing: 2px;
+  margin-top: 8px; text-align: center;
+  animation: revealFadeUp 0.8s 0.9s both;
+}
+.reveal-tag {
+  font-family: 'Barlow Condensed', sans-serif; color: #cfd3e0;
+  font-size: 13px; letter-spacing: 1.5px; margin-top: 12px;
+  animation: revealFadeUp 0.8s 1.2s both;
+}
+.reveal-close-btn {
+  margin-top: 32px; padding: 14px 36px;
+  background: linear-gradient(135deg, #f5c518, #e0a800);
+  color: #0d1117; border: none; border-radius: 999px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 15px;
+  letter-spacing: 2.5px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(245,197,24,0.5);
+  animation: revealFadeUp 0.8s 1.5s both;
+}
+.reveal-close-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,197,24,0.7); }
+@keyframes revealFadeUp { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+
+/* Particules dorées */
+.reveal-particle {
+  position: absolute; width: 6px; height: 6px;
+  background: #f5c518; border-radius: 50%;
+  pointer-events: none; opacity: 0;
+  box-shadow: 0 0 10px rgba(245,197,24,0.8);
+}
 </style>
 
 <!-- Bouton d'accès haut-droit (avatar mini) - visible sur la home uniquement -->
 <button id="persona-btn-home" onclick="_persona_open()" title="Ton personnage" aria-label="Ton personnage" style="display:none">
-  <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="8" r="4"/>
-    <path d="M12 14c-4.4 0-8 2.7-8 6v2h16v-2c0-3.3-3.6-6-8-6z"/>
-  </svg>
+  <div class="home-btn-empty">🥷</div>
 </button>
 
 <!-- Overlay plein écran -->
@@ -37250,19 +37448,30 @@ window._QI_DATA['pnr_05'] = {
   <div class="persona-container" id="persona-container"></div>
 </div>
 
+<!-- Overlay de révélation -->
+<div id="persona-reveal">
+  <div class="reveal-avatar" id="persona-reveal-avatar"></div>
+  <div class="reveal-title" id="persona-reveal-title">PERSONNAGE CRÉÉ</div>
+  <div class="reveal-pseudo" id="persona-reveal-pseudo">—</div>
+  <div class="reveal-tag" id="persona-reveal-tag">Ton avatar SENSEI est prêt</div>
+  <button class="reveal-close-btn" id="persona-reveal-close" onclick="_persona_revealClose()">CONTINUER ✨</button>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════════
-   PHASE 3 — Personnage enrichi
-   - localStorage key : sensei_personnage_v1 (fusion avec sensei_fiche_profile_v1)
-   - 5 attributs : poste, niveau, age, main forte, objectif
-   - Avatar SVG stylisé, animation subtile
-   - Accessible depuis 2 endroits : bouton flottant home + à venir dans settings
+   PHASE 4 — Personnage niveau 2 + Quick wins IA
 ═══════════════════════════════════════════════════════════════════════════════ */
 (function(){
   'use strict';
 
   var LS_KEY = 'sensei_personnage_v1';
   var LEGACY_KEY = 'sensei_fiche_profile_v1';
+
+  // Palettes couleurs
+  var SKIN_COLORS = ['#f7d5b5','#e5b58a','#c88c5c','#a06a3e','#7a4a28','#4d2f1a'];
+  var HAIR_COLORS = ['#2a1a10','#4a3020','#7a5030','#a87848','#d4a55b','#f0e0b0','#8b0000','#3a3a3a','#ffffff'];
+  var JERSEY_COLORS = ['#f5c518','#e63946','#2a9d8f','#264653','#9d4edd','#e07d3f','#ffffff','#000000'];
+  var HAIR_STYLES = ['court','moyen','long','crane_ras','afro','tresses'];
 
   function _flang() {
     try { if (window._lang) return window._lang;
@@ -37274,35 +37483,36 @@ window._QI_DATA['pnr_05'] = {
 
   // ─── Chargement / Migration douce ───
   function _load() {
-    var p = { poste: null, niveau: null, age: null, main: null, objectif: null };
+    var p = {
+      poste: null, niveau: null, age: null, main: null, objectif: null,
+      pseudo: null, numero: null, skin: null, hair: null, hairStyle: null, jersey: null,
+      createdAt: null,
+      // Quick wins IA
+      history: [], preferences: {}
+    };
     try {
       var raw = localStorage.getItem(LS_KEY);
       if (raw) {
         var d = JSON.parse(raw);
-        p.poste = d.poste || null;
-        p.niveau = d.niveau || null;
-        p.age = d.age || null;
-        p.main = d.main || null;
-        p.objectif = d.objectif || null;
+        Object.keys(p).forEach(function(k){ if (d[k]!==undefined) p[k] = d[k]; });
       } else {
-        // Migration douce : lire l'ancien profil s'il existe
         var legacy = localStorage.getItem(LEGACY_KEY);
         if (legacy) {
           var l = JSON.parse(legacy);
           p.poste = l.poste || null;
           p.niveau = l.niveau || null;
-          // Sauvegarder tout de suite le nouveau format (avec juste les 2 attributs migrés)
           _save(p);
         }
       }
     } catch(e){}
+    if (!p.history) p.history = [];
+    if (!p.preferences) p.preferences = {};
     return p;
   }
 
   function _save(p) {
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(p));
-      // Rétro-compatibilité : maintient sensei_fiche_profile_v1 à jour aussi
       if (p.poste && p.niveau) {
         try {
           var legacy = localStorage.getItem(LEGACY_KEY);
@@ -37315,15 +37525,12 @@ window._QI_DATA['pnr_05'] = {
     } catch(e){}
   }
 
+  function _isComplete(p) {
+    return !!(p.poste && p.niveau && p.pseudo);
+  }
+
   // ─── API publique ───
   window._persona_get = function() { return _load(); };
-  window._persona_set = function(attr, val) {
-    var p = _load();
-    p[attr] = val;
-    _save(p);
-    _renderMain();
-  };
-
   window._persona_open = function() {
     var ov = document.getElementById('persona-overlay');
     if (!ov) return;
@@ -37335,50 +37542,222 @@ window._QI_DATA['pnr_05'] = {
     var ov = document.getElementById('persona-overlay');
     if (ov) ov.classList.remove('on');
     document.body.style.overflow = '';
+    _updateHomeButton(true);
   };
 
-  // ─── Avatar SVG stylisé (silhouette basketteur) ───
-  function _avatarSVG(poste, niveau) {
-    // Couleur évolutive selon niveau
-    var lvlColor = { DEB:'#7a8390', INT:'#f5c518', CON:'#e63946', COM:'#9d4edd' };
-    var col = lvlColor[niveau] || '#7a8390';
-    // Silhouette légèrement adaptée selon poste (proportion tête/corps)
-    // PG petit vif, C grand large
-    var scale = { PG:0.92, SG:0.96, SF:1.00, PF:1.04, C:1.08 }[poste] || 1.00;
+  // ─── Quick win IA #1 : Enregistrer une interaction (préférences apprises) ───
+  window._persona_recordEvent = function(type, data) {
+    try {
+      var p = _load();
+      if (!p.history) p.history = [];
+      p.history.push({ t: type, d: data||{}, at: Date.now() });
+      // Garder seulement les 100 derniers événements pour éviter le gonflement
+      if (p.history.length > 100) p.history = p.history.slice(-100);
+      // Mise à jour des préférences
+      if (!p.preferences) p.preferences = {};
+      if (type === 'launch_brique' && data && data.id) {
+        p.preferences[data.id] = (p.preferences[data.id] || 0) + 1;
+      } else if (type === 'regenerate') {
+        p.preferences['_regenCount'] = (p.preferences['_regenCount']||0) + 1;
+      } else if (type === 'reject_focus' && data && data.focus) {
+        p.preferences['_reject_'+data.focus] = (p.preferences['_reject_'+data.focus]||0) + 1;
+      }
+      _save(p);
+    } catch(e){}
+  };
 
-    return '<svg class="persona-avatar-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
-      + '<defs>'
-      + '  <radialGradient id="pAvBg" cx="50%" cy="35%" r="70%">'
-      + '    <stop offset="0%" stop-color="'+col+'" stop-opacity="0.15"/>'
-      + '    <stop offset="100%" stop-color="'+col+'" stop-opacity="0"/>'
-      + '  </radialGradient>'
-      + '  <linearGradient id="pAvBody" x1="0%" y1="0%" x2="0%" y2="100%">'
-      + '    <stop offset="0%" stop-color="'+col+'"/>'
-      + '    <stop offset="100%" stop-color="'+col+'" stop-opacity="0.6"/>'
-      + '  </linearGradient>'
-      + '</defs>'
-      + '<circle cx="100" cy="100" r="95" fill="url(#pAvBg)"/>'
-      // Silhouette
-      + '<g transform="translate(100 100) scale('+scale+') translate(-100 -100)">'
-      + '  <circle cx="100" cy="68" r="22" fill="url(#pAvBody)"/>'  // Tête
-      + '  <path d="M 100 92 Q 65 100 60 145 L 60 170 Q 70 180 100 180 Q 130 180 140 170 L 140 145 Q 135 100 100 92 Z" fill="url(#pAvBody)"/>'  // Corps
-      // Ballon basket (petit) tenu sur le côté
-      + '  <circle cx="145" cy="140" r="14" fill="#e0700a" stroke="#0d1117" stroke-width="1.5"/>'
-      + '  <path d="M 131 140 Q 145 130 159 140" fill="none" stroke="#0d1117" stroke-width="1"/>'
-      + '  <path d="M 131 140 Q 145 150 159 140" fill="none" stroke="#0d1117" stroke-width="1"/>'
-      + '  <line x1="145" y1="126" x2="145" y2="154" stroke="#0d1117" stroke-width="1"/>'
-      + '</g>'
-      // Anneau doré autour (ceinture symbolique)
-      + '<circle cx="100" cy="100" r="93" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-dasharray="2 4" opacity="0.6"/>'
-      + '</svg>';
+  // ─── Quick win IA #1+2 : Calcul de score pour une brique (préférences + contexte) ───
+  window._persona_getBriquePreference = function(briqueId) {
+    try {
+      var p = _load();
+      if (!p.preferences) return 1;
+      var launches = p.preferences[briqueId] || 0;
+      // Score basé sur préférences apprises (bonus si souvent lancée)
+      return 1 + (launches * 0.15);
+    } catch(e){ return 1; }
+  };
+
+  // ─── Quick win IA #2 : Contexte temps/date ───
+  window._persona_getTimeContext = function() {
+    var now = new Date();
+    var h = now.getHours();
+    var day = now.getDay(); // 0=dimanche
+    var period = 'day';
+    if (h < 7) period = 'earlymorning';
+    else if (h < 12) period = 'morning';
+    else if (h < 14) period = 'noon';
+    else if (h < 18) period = 'afternoon';
+    else if (h < 21) period = 'evening';
+    else period = 'night';
+    var isWeekend = (day === 0 || day === 6);
+    // Temps depuis dernière séance
+    var daysSinceLast = null;
+    try {
+      var p = _load();
+      if (p.history) {
+        var lastGen = p.history.filter(function(e){return e.t==='generate';}).pop();
+        if (lastGen) {
+          daysSinceLast = Math.round((Date.now() - lastGen.at) / (1000*60*60*24));
+        }
+      }
+    } catch(e){}
+    return { hour:h, day:day, period:period, isWeekend:isWeekend, daysSinceLast:daysSinceLast };
+  };
+
+  // ─── Quick win IA #4 : Génération de texte contextuel ───
+  window._persona_generateContextText = function(session) {
+    try {
+      var en = _flang()==='en';
+      var p = _load();
+      var ctx = window._persona_getTimeContext();
+      var parts = [];
+
+      // Salutation contextuelle selon période
+      if (p.pseudo) {
+        if (ctx.period === 'earlymorning' || ctx.period === 'morning') {
+          parts.push(en ? ('Good morning ' + p.pseudo + '!') : ('Bonjour ' + p.pseudo + ' !'));
+        } else if (ctx.period === 'evening' || ctx.period === 'night') {
+          parts.push(en ? ('Evening ' + p.pseudo + '!') : ('Bonsoir ' + p.pseudo + ' !'));
+        } else {
+          parts.push(en ? ('Hey ' + p.pseudo + '!') : ('Salut ' + p.pseudo + ' !'));
+        }
+      }
+
+      // Commentaire sur la séance
+      var focusMap = en
+        ? { handling:'ball handling', tir:'shooting', defense:'defense', physique:'physical', tactique:'tactical', mixte:'a mix', surprise:'a surprise mix', tir:'shooting' }
+        : { handling:'le handling', tir:'le tir', defense:'la défense', physique:'le physique', tactique:'la tactique', mixte:'un mélange', surprise:'une surprise' };
+      var focusLabel = focusMap[session.effectiveFocus] || (en?'training':'entraînement');
+
+      var s = en
+        ? ('Balanced ' + session.totalMin + '-min session focused on ' + focusLabel + '.')
+        : ('Séance de ' + session.totalMin + ' min, focus sur ' + focusLabel + '.');
+      parts.push(s);
+
+      // Justification selon état
+      if (session.etat === 'fatigue') {
+        parts.push(en
+          ? 'I lowered the intensity because you\'re tired — recovery matters.'
+          : 'J\'ai baissé l\'intensité, tu es fatigué — la récup compte aussi.');
+      } else if (session.etat === 'stresse') {
+        parts.push(en
+          ? 'Pre-game session: technical work to stay sharp without exhaustion.'
+          : 'Avant match : travail technique pour rester affûté sans t\'épuiser.');
+      } else if (session.etat === 'forme') {
+        parts.push(en ? 'You\'re fresh — let\'s push it.' : 'Tu es en forme — on pousse.');
+      }
+
+      // Justification selon contexte temps
+      if (ctx.period === 'night' && session.duree > 30) {
+        parts.push(en
+          ? 'It\'s late — consider stretching after.'
+          : 'Il est tard — pense à t\'étirer après.');
+      } else if (ctx.period === 'earlymorning') {
+        parts.push(en
+          ? 'Early morning session — great for building habits.'
+          : 'Séance matinale — parfait pour ancrer la régularité.');
+      }
+
+      // Justification selon jours depuis dernière séance
+      if (ctx.daysSinceLast !== null) {
+        if (ctx.daysSinceLast >= 5) {
+          parts.push(en
+            ? ('Been ' + ctx.daysSinceLast + ' days since your last session — welcome back.')
+            : ('Ça fait ' + ctx.daysSinceLast + ' jours depuis ta dernière séance — content de te revoir.'));
+        } else if (ctx.daysSinceLast === 0) {
+          parts.push(en
+            ? 'Second session today — respect the load.'
+            : 'Seconde séance aujourd\'hui — respecte la charge.');
+        }
+      }
+
+      // Préférence apprise
+      if (p.preferences) {
+        var topBrique = null; var maxCount = 0;
+        Object.keys(p.preferences).forEach(function(k){
+          if (k.indexOf('_')===0) return;
+          if (p.preferences[k] > maxCount) { maxCount = p.preferences[k]; topBrique = k; }
+        });
+        if (topBrique && maxCount >= 3) {
+          var briqueNames = { tboard:'TBOARD', tdr:'TDR', math:'MATHS', ballhandling:en?'ball handling':'handling', shooting:en?'shooting':'tir', defense:en?'defense':'défense' };
+          var n = briqueNames[topBrique] || topBrique;
+          parts.push(en
+            ? ('I noticed you often work on ' + n + ' — it\'s in this session.')
+            : ('J\'ai remarqué que tu travailles souvent ' + n + ' — c\'est dans cette séance.'));
+        }
+      }
+
+      return parts.join(' ');
+    } catch(e){ return ''; }
+  };
+
+  // ─── Avatar SVG détaillé (niveau 2) ───
+  // ─── Couleur ceinture par niveau (arts martiaux SENSEI) ───
+  function _beltColor(niveau) {
+    var m = { DEB:'#ffffff', INT:'#f5c518', CON:'#e63946', COM:'#000000' };
+    return m[niveau] || '#a0a5b0';
+  }
+  function _beltStroke(niveau) {
+    return niveau === 'DEB' ? '#0d1117' : (niveau === 'COM' ? '#f5c518' : '#0d1117');
   }
 
-  // ─── Rendu principal (avatar + attributs) ───
+  // ─── Avatar épuré : cadre doré + emojis 🥷 🥋 + ceinture par niveau ───
+  function _avatarSVG(p, size) {
+    size = size || 200;
+    var col = _beltColor(p.niveau);
+    var stroke = _beltStroke(p.niveau);
+    var pseudo = p.pseudo || '';
+    var numero = p.numero || '';
+    return '<div class="persona-avatar-composite">'
+      + '<svg viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;overflow:visible">'
+      // Halo doré lumineux
+      + '  <defs>'
+      + '    <radialGradient id="pAvGlow" cx="50%" cy="45%" r="55%">'
+      + '      <stop offset="0%" stop-color="#f5c518" stop-opacity="0.25"/>'
+      + '      <stop offset="70%" stop-color="#f5c518" stop-opacity="0.05"/>'
+      + '      <stop offset="100%" stop-color="#f5c518" stop-opacity="0"/>'
+      + '    </radialGradient>'
+      + '  </defs>'
+      + '  <circle cx="110" cy="100" r="105" fill="url(#pAvGlow)"/>'
+      // Cercle doré principal
+      + '  <circle cx="110" cy="100" r="82" fill="none" stroke="#f5c518" stroke-width="3" opacity="0.95"/>'
+      + '  <circle cx="110" cy="100" r="82" fill="none" stroke="#f5c518" stroke-width="1" opacity="0.4" filter="blur(4px)"/>'
+      // Emojis au centre (via <text> SVG)
+      + '  <text x="110" y="115" text-anchor="middle" font-size="58" font-family="Apple Color Emoji, Segoe UI Emoji, sans-serif">🥷 🥋</text>'
+      // Ceinture colorée au bas du cercle (bandeau martial signature)
+      + '  <g transform="translate(0 -5)">'
+      + '    <rect x="45" y="178" width="130" height="12" fill="'+col+'" stroke="'+stroke+'" stroke-width="1.5" rx="2"/>'
+      + '    <rect x="102" y="175" width="16" height="18" fill="'+col+'" stroke="'+stroke+'" stroke-width="1.5" rx="2"/>'
+      + '    <rect x="96" y="192" width="5" height="10" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" rx="1"/>'
+      + '    <rect x="119" y="192" width="5" height="10" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" rx="1"/>'
+      + '  </g>'
+      // Numéro dans badge doré (coin haut droit)
+      + (numero ? '  <g><circle cx="190" cy="30" r="18" fill="#f5c518" stroke="#0d1117" stroke-width="2"/>'
+                 + '<text x="190" y="37" text-anchor="middle" fill="#0d1117" font-family="Bebas Neue, Arial, sans-serif" font-size="20" font-weight="700">'+_escape(numero)+'</text></g>' : '')
+      // Pseudo sous le cadre
+      + (pseudo ? '  <text x="110" y="228" text-anchor="middle" fill="#f5c518" font-family="Bebas Neue, Arial, sans-serif" font-size="20" letter-spacing="2" font-weight="700">'+_escape(pseudo).toUpperCase()+'</text>' : '')
+      + '</svg>'
+      + '</div>';
+  }
+
+  function _escape(s) {
+    return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function _contrastColor(hex) {
+    var c = hex.replace('#','');
+    if (c.length === 3) c = c.split('').map(function(x){return x+x;}).join('');
+    var r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+    var lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+    return lum > 0.6 ? '#000' : '#fff';
+  }
+
+  // ─── Rendu principal ───
   function _renderMain() {
     var en = _flang()==='en';
     var c = document.getElementById('persona-container');
     if (!c) return;
     var p = _load();
+    var complete = _isComplete(p);
 
     var html = '';
     html += '<div class="persona-topbar">';
@@ -37388,21 +37767,36 @@ window._QI_DATA['pnr_05'] = {
     html += '<div class="persona-title">'+(en?'YOUR CHARACTER':'TON PERSONNAGE')+'</div>';
     html += '<div class="persona-subtitle">'+(en?'Click any attribute to edit':'Clique sur un attribut pour modifier')+'</div>';
 
-    // Avatar
-    html += '<div class="persona-avatar-wrap">'+_avatarSVG(p.poste, p.niveau)+'</div>';
+    html += '<div class="persona-avatar-wrap">'+_avatarSVG(p)+'</div>';
 
-    // 5 attributs
+    // Nom + numéro
+    html += '<div class="persona-namebar">';
+    if (p.pseudo) {
+      html += '  <span class="persona-pseudo">'+_escape(p.pseudo)+'</span>';
+      if (p.numero) html += '  <span class="persona-numero">#'+_escape(p.numero)+'</span>';
+    } else {
+      html += '  <span class="persona-pseudo empty">'+(en?'No name yet':'Aucun pseudo')+'</span>';
+    }
+    html += '</div>';
+
+    // Badge personnage complet
+    if (complete) {
+      var date = p.createdAt ? new Date(p.createdAt).toLocaleDateString(en?'en-US':'fr-FR') : '';
+      html += '<div class="persona-badge-complete">';
+      html += '  <div class="persona-badge-title">✨ '+(en?'CHARACTER CREATED':'PERSONNAGE CRÉÉ')+' ✨</div>';
+      if (date) html += '  <div class="persona-badge-date">'+(en?'On ':'Le ')+date+'</div>';
+      html += '</div>';
+    }
+
+    // Attributs
     var attrs = [
-      { key:'poste', icon:'🏀', labelFR:'POSTE', labelEN:'POSITION',
-        valLabel: p.poste ? _posteName(p.poste, en) : null },
-      { key:'niveau', icon:'📊', labelFR:'NIVEAU', labelEN:'LEVEL',
-        valLabel: p.niveau ? _nivName(p.niveau, en) : null },
-      { key:'age', icon:'🎂', labelFR:'ÂGE', labelEN:'AGE',
-        valLabel: p.age ? _ageName(p.age, en) : null },
-      { key:'main', icon:'✋', labelFR:'MAIN FORTE', labelEN:'STRONG HAND',
-        valLabel: p.main ? _mainName(p.main, en) : null },
-      { key:'objectif', icon:'🎯', labelFR:'OBJECTIF', labelEN:'GOAL',
-        valLabel: p.objectif ? _objName(p.objectif, en) : null }
+      { key:'pseudo', icon:'📝', labelFR:'PSEUDO', labelEN:'NAME', valLabel: p.pseudo ? p.pseudo : null },
+      { key:'numero', icon:'🔢', labelFR:'NUMÉRO', labelEN:'NUMBER', valLabel: p.numero ? '#'+p.numero : null },
+      { key:'poste', icon:'🏀', labelFR:'POSTE', labelEN:'POSITION', valLabel: p.poste ? _posteName(p.poste, en) : null },
+      { key:'niveau', icon:'📊', labelFR:'NIVEAU', labelEN:'LEVEL', valLabel: p.niveau ? _nivName(p.niveau, en) : null },
+      { key:'age', icon:'🎂', labelFR:'ÂGE', labelEN:'AGE', valLabel: p.age ? p.age : null },
+      { key:'main', icon:'✋', labelFR:'MAIN FORTE', labelEN:'STRONG HAND', valLabel: p.main ? _mainName(p.main, en) : null },
+      { key:'objectif', icon:'🎯', labelFR:'OBJECTIF', labelEN:'GOAL', valLabel: p.objectif ? _objName(p.objectif, en) : null }
     ];
 
     html += '<div class="persona-attrs">';
@@ -37411,7 +37805,11 @@ window._QI_DATA['pnr_05'] = {
       html += '  <div class="persona-attr-icon">'+a.icon+'</div>';
       html += '  <div class="persona-attr-label">'+(en?a.labelEN:a.labelFR)+'</div>';
       if (a.valLabel) {
-        html += '  <div class="persona-attr-value">'+a.valLabel+'</div>';
+        if (a.isColor && a.colorVal) {
+          html += '  <div class="persona-attr-value" style="color:'+a.colorVal+';font-size:22px;text-shadow:0 0 8px '+a.colorVal+'">●</div>';
+        } else {
+          html += '  <div class="persona-attr-value">'+_escape(a.valLabel)+'</div>';
+        }
       } else {
         html += '  <div class="persona-attr-value empty">'+(en?'set':'à définir')+'</div>';
       }
@@ -37425,20 +37823,26 @@ window._QI_DATA['pnr_05'] = {
     document.getElementById('persona-overlay').scrollTop = 0;
   }
 
-  // ─── Édition d'un attribut ───
+  // ─── Édition attribut ───
   window._persona_editAttr = function(attr) {
     var en = _flang()==='en';
     var c = document.getElementById('persona-container');
     if (!c) return;
     var p = _load();
     var current = p[attr];
-    var options = _optionsFor(attr, en);
+
     var titleMap = {
       poste: en?'CHOOSE YOUR POSITION':'CHOISIS TON POSTE',
       niveau: en?'CHOOSE YOUR LEVEL':'CHOISIS TON NIVEAU',
       age: en?'YOUR AGE':'TON ÂGE',
       main: en?'YOUR STRONG HAND':'TA MAIN FORTE',
-      objectif: en?'YOUR MAIN GOAL':'TON OBJECTIF PRINCIPAL'
+      objectif: en?'YOUR MAIN GOAL':'TON OBJECTIF PRINCIPAL',
+      pseudo: en?'YOUR NAME':'TON PSEUDO',
+      numero: en?'JERSEY NUMBER':'NUMÉRO DE MAILLOT',
+      skin: en?'SKIN TONE':'COULEUR DE PEAU',
+      hair: en?'HAIR COLOR':'COULEUR DE CHEVEUX',
+      hairStyle: en?'HAIR STYLE':'STYLE DE CHEVEUX',
+      jersey: en?'JERSEY COLOR':'COULEUR DE MAILLOT'
     };
 
     var html = '';
@@ -37448,29 +37852,140 @@ window._QI_DATA['pnr_05'] = {
     html += '<div class="persona-title">'+(en?'EDIT':'MODIFIER')+'</div>';
     html += '<div class="persona-subtitle">'+titleMap[attr]+'</div>';
 
-    html += '<div class="persona-choose">';
-    html += '  <div class="persona-choose-grid">';
-    options.forEach(function(opt){
-      var sel = current===opt.val ? 'on' : '';
-      html += '<button class="persona-choose-btn '+sel+'" onclick="_persona_pick(\''+attr+'\',\''+opt.val+'\')">'+opt.label+'</button>';
-    });
-    html += '  </div>';
-    html += '</div>';
+    // Aperçu avatar en haut pendant la modif
+    html += '<div class="persona-avatar-wrap" style="width:180px">'+_avatarSVG(p)+'</div>';
 
+    html += '<div class="persona-choose">';
+
+    if (attr === 'pseudo' || attr === 'numero') {
+      var maxLen = attr === 'pseudo' ? 16 : 3;
+      var placeholder = attr === 'pseudo' ? (en?'e.g. Curry':'ex : Curry') : '00';
+      html += '  <input type="text" class="persona-text-input" id="persona-input" maxlength="'+maxLen+'" placeholder="'+placeholder+'" value="'+_escape(current||'')+'" '
+           + 'oninput="_persona_liveInput(\''+attr+'\',this.value)" />';
+      html += '  <div style="text-align:center;margin-top:12px">';
+      html += '    <button class="persona-btn-back" onclick="_persona_open()" style="border-color:#f5c518;color:#f5c518;padding:10px 30px">'+(en?'DONE':'OK')+'</button>';
+      html += '  </div>';
+    } else if (attr === 'skin') {
+      html += '  <div class="persona-color-palette">';
+      SKIN_COLORS.forEach(function(col){
+        var sel = current===col ? 'on' : '';
+        html += '<div class="persona-color-swatch '+sel+'" style="background:'+col+'" onclick="_persona_pick(\'skin\',\''+col+'\')"></div>';
+      });
+      html += '  </div>';
+    } else if (attr === 'hair') {
+      html += '  <div class="persona-color-palette">';
+      HAIR_COLORS.forEach(function(col){
+        var sel = current===col ? 'on' : '';
+        html += '<div class="persona-color-swatch '+sel+'" style="background:'+col+'" onclick="_persona_pick(\'hair\',\''+col+'\')"></div>';
+      });
+      html += '  </div>';
+    } else if (attr === 'jersey') {
+      html += '  <div class="persona-color-palette">';
+      JERSEY_COLORS.forEach(function(col){
+        var sel = current===col ? 'on' : '';
+        html += '<div class="persona-color-swatch '+sel+'" style="background:'+col+'" onclick="_persona_pick(\'jersey\',\''+col+'\')"></div>';
+      });
+      html += '  </div>';
+    } else {
+      // Options standards
+      var options = _optionsFor(attr, en);
+      html += '  <div class="persona-choose-grid">';
+      options.forEach(function(opt){
+        var sel = current===opt.val ? 'on' : '';
+        html += '<button class="persona-choose-btn '+sel+'" onclick="_persona_pick(\''+attr+'\',\''+opt.val+'\')">'+opt.label+'</button>';
+      });
+      html += '  </div>';
+    }
+
+    html += '</div>';
     html += '<div class="persona-save-info">'+(en?'Click to save and go back':'Clique pour sauvegarder et revenir')+'</div>';
 
     c.innerHTML = html;
     document.getElementById('persona-overlay').scrollTop = 0;
   };
 
-  window._persona_pick = function(attr, val) {
+  // Live input for text fields
+  window._persona_liveInput = function(attr, val) {
     var p = _load();
     p[attr] = val;
     _save(p);
-    setTimeout(_renderMain, 150); // Léger délai pour laisser voir la sélection
+    // Update button avatar too
+    _updateHomeButton(true);
   };
 
-  // ─── Options pour chaque attribut ───
+  window._persona_pick = function(attr, val) {
+    var p = _load();
+    var wasComplete = _isComplete(p);
+    p[attr] = val;
+    // Marquer createdAt si personnage vient d'être complété
+    if (!wasComplete && _isComplete(p) && !p.createdAt) {
+      p.createdAt = Date.now();
+      _save(p);
+      _updateHomeButton(true);
+      // Lancer l'animation de révélation
+      _showReveal(p);
+      return;
+    }
+    _save(p);
+    _updateHomeButton(true);
+    setTimeout(_renderMain, 200);
+  };
+
+  // ─── Animation de révélation ───
+  function _showReveal(p) {
+    var en = _flang()==='en';
+    var reveal = document.getElementById('persona-reveal');
+    if (!reveal) return;
+    // Remplir avatar
+    var av = document.getElementById('persona-reveal-avatar');
+    if (av) av.innerHTML = _avatarSVG(p, 250);
+    var ps = document.getElementById('persona-reveal-pseudo');
+    if (ps) ps.textContent = p.pseudo + (p.numero ? ' #'+p.numero : '');
+    var tt = document.getElementById('persona-reveal-title');
+    if (tt) tt.textContent = en ? 'CHARACTER CREATED' : 'PERSONNAGE CRÉÉ';
+    var tg = document.getElementById('persona-reveal-tag');
+    if (tg) tg.textContent = en ? 'Your SENSEI avatar is ready' : 'Ton avatar SENSEI est prêt';
+    var cb = document.getElementById('persona-reveal-close');
+    if (cb) cb.textContent = (en?'CONTINUE':'CONTINUER')+' ✨';
+    reveal.classList.add('on');
+    // Particules dorées
+    _spawnRevealParticles(reveal);
+  }
+
+  function _spawnRevealParticles(container) {
+    for (var i = 0; i < 30; i++) {
+      (function(i){
+        var particle = document.createElement('div');
+        particle.className = 'reveal-particle';
+        var startX = 50 + (Math.random() * 20 - 10);
+        var startY = 50 + (Math.random() * 20 - 10);
+        var endX = startX + (Math.random() * 60 - 30);
+        var endY = startY + (Math.random() * 60 - 30);
+        particle.style.left = startX + '%';
+        particle.style.top = startY + '%';
+        particle.style.animation = 'revealParticle-'+i+' 2s ease-out '+(i*0.05)+'s forwards';
+        // Inject keyframes uniques
+        var style = document.createElement('style');
+        style.textContent = '@keyframes revealParticle-'+i+'{'
+          +'0%{opacity:0;transform:translate(0,0) scale(0.3)}'
+          +'20%{opacity:1;transform:translate(0,0) scale(1)}'
+          +'100%{opacity:0;transform:translate('+(endX-startX)*4+'px,'+(endY-startY)*4+'px) scale(0.5)}}';
+        document.head.appendChild(style);
+        container.appendChild(particle);
+        setTimeout(function(){
+          if (particle.parentNode) particle.parentNode.removeChild(particle);
+          if (style.parentNode) style.parentNode.removeChild(style);
+        }, 2500 + i*50);
+      })(i);
+    }
+  }
+
+  window._persona_revealClose = function() {
+    var reveal = document.getElementById('persona-reveal');
+    if (reveal) reveal.classList.remove('on');
+    setTimeout(_renderMain, 100);
+  };
+
   function _optionsFor(attr, en) {
     if (attr === 'poste') return [
       {val:'PG', label:en?'POINT GUARD':'MENEUR'},
@@ -37503,10 +38018,17 @@ window._QI_DATA['pnr_05'] = {
       {val:'mental', label:en?'MENTAL':'MENTAL'},
       {val:'mixte', label:en?'MIX':'MIXTE'}
     ];
+    if (attr === 'hairStyle') return [
+      {val:'court', label:en?'SHORT':'COURT'},
+      {val:'moyen', label:en?'MEDIUM':'MOYEN'},
+      {val:'long', label:en?'LONG':'LONG'},
+      {val:'crane_ras', label:en?'BUZZ':'RASÉ'},
+      {val:'afro', label:'AFRO'},
+      {val:'tresses', label:en?'BRAIDS':'TRESSES'}
+    ];
     return [];
   }
 
-  // ─── Labels ───
   function _posteName(k, en) {
     var m = { PG:['MENEUR','POINT GUARD'], SG:['ARRIÈRE','SHOOTING GUARD'],
               SF:['AILIER','SMALL FORWARD'], PF:['AILIER FORT','POWER FORWARD'],
@@ -37518,7 +38040,6 @@ window._QI_DATA['pnr_05'] = {
               CON:['CONFIRMÉ','ADVANCED'], COM:['COMPÉTITION','COMPETITION'] };
     return m[k] ? (en?m[k][1]:m[k][0]) : k;
   }
-  function _ageName(k) { return k; }
   function _mainName(k, en) {
     var m = { droite:['DROITE','RIGHT'], gauche:['GAUCHE','LEFT'], ambi:['AMBIDEXTRE','AMBIDEXTROUS'] };
     return m[k] ? (en?m[k][1]:m[k][0]) : k;
@@ -37528,41 +38049,82 @@ window._QI_DATA['pnr_05'] = {
               tactique:['TACTIQUE','TACTICAL'], mental:['MENTAL','MENTAL'], mixte:['MIXTE','MIX'] };
     return m[k] ? (en?m[k][1]:m[k][0]) : k;
   }
+  function _hairStyleName(k, en) {
+    var m = { court:['COURT','SHORT'], moyen:['MOYEN','MEDIUM'], long:['LONG','LONG'],
+              crane_ras:['RASÉ','BUZZ'], afro:['AFRO','AFRO'], tresses:['TRESSES','BRAIDS'] };
+    return m[k] ? (en?m[k][1]:m[k][0]) : k;
+  }
 
-  // ─── Affichage du bouton flottant SEULEMENT quand on est sur la home ───
+  // ─── Mise à jour du bouton home (avec cache pour éviter les regénérations inutiles) ───
+  var _btnStateCache = { pseudo:null, poste:null, niveau:null, numero:null, complete:false };
+  function _updateHomeButton(force) {
+    var btn = document.getElementById('persona-btn-home');
+    if (!btn) return;
+    var p = _load();
+    var complete = _isComplete(p);
+    // Cache : ne refait le rendu que si un attribut visible a changé
+    var changed = force
+      || _btnStateCache.complete !== complete
+      || _btnStateCache.pseudo !== p.pseudo
+      || _btnStateCache.poste !== p.poste
+      || _btnStateCache.niveau !== p.niveau
+      || _btnStateCache.numero !== p.numero;
+    if (!changed) return;
+    _btnStateCache = {
+      complete: complete, pseudo: p.pseudo, poste: p.poste,
+      niveau: p.niveau, numero: p.numero
+    };
+    if (complete) {
+      // Mini avatar : cercle doré + 🥷🥋 + numéro si présent
+      var col = _beltColor(p.niveau);
+      var stroke = _beltStroke(p.niveau);
+      var num = p.numero || '';
+      btn.innerHTML = '<svg viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'
+        + '<circle cx="23" cy="23" r="21" fill="#0d1117" stroke="#f5c518" stroke-width="1.5"/>'
+        + '<text x="23" y="27" text-anchor="middle" font-size="18" font-family="Apple Color Emoji, Segoe UI Emoji, sans-serif">🥷</text>'
+        + '<rect x="6" y="38" width="34" height="4" fill="'+col+'" stroke="'+stroke+'" stroke-width="0.5"/>'
+        + (num ? '<circle cx="38" cy="9" r="7" fill="#f5c518"/><text x="38" y="12" text-anchor="middle" fill="#0d1117" font-family="Bebas Neue, Arial, sans-serif" font-size="9" font-weight="700">'+_escape(num)+'</text>' : '')
+        + '</svg>';
+    } else {
+      btn.innerHTML = '<div class="home-btn-empty">🥷</div>';
+    }
+  }
+
+  // ─── Visibilité du bouton home (léger, sans DOM query lourde) ───
+  var _btnLastVisibility = null;
   function _updateBtnVisibility() {
     var btn = document.getElementById('persona-btn-home');
     if (!btn) return;
-    var homeVisible = false;
-    try {
-      var home = document.getElementById('s-home');
-      if (home) {
-        var style = window.getComputedStyle(home);
-        homeVisible = (style.display !== 'none' && style.visibility !== 'hidden');
-      }
-    } catch(e){}
-    // Ne pas afficher si un overlay est ouvert
+    // Test rapide : y a-t-il un overlay bloquant ouvert ?
     var ovOpen = false;
-    var overlaysToCheck = ['persona-overlay','senseiai-overlay','onboarding-modal','hero-onboarding'];
+    var overlaysToCheck = ['persona-overlay','senseiai-overlay','onboarding-modal','hero-onboarding','persona-reveal'];
     for (var i=0; i<overlaysToCheck.length; i++) {
       var el = document.getElementById(overlaysToCheck[i]);
-      if (el && (el.classList.contains('on') || el.style.display === 'flex' || el.style.display === 'block')) {
-        ovOpen = true; break;
+      if (el) {
+        var vis = el.classList.contains('on') || el.style.display === 'flex' || el.style.display === 'block';
+        if (vis) { ovOpen = true; break; }
       }
     }
-    btn.style.display = (homeVisible && !ovOpen) ? 'flex' : 'none';
+    // Test home visible (léger, pas de getComputedStyle qui force le reflow)
+    var homeVisible = false;
+    var home = document.getElementById('s-home');
+    if (home && home.style.display !== 'none') homeVisible = true;
+    var newVis = (homeVisible && !ovOpen) ? 'block' : 'none';
+    if (newVis !== _btnLastVisibility) {
+      btn.style.display = newVis;
+      _btnLastVisibility = newVis;
+    }
+    // Mise à jour du contenu seulement si visible (et avec cache)
+    if (newVis === 'block') _updateHomeButton(false);
   }
 
-  // Hook : observer changements de section et overlays
   function _installVisibilityObserver() {
-    // Observer les changements DOM sur body
-    try {
-      var mo = new MutationObserver(function(){ _updateBtnVisibility(); });
-      mo.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style','class'] });
-    } catch(e){}
-    // Check périodique de secours
-    setInterval(_updateBtnVisibility, 500);
+    // Plus de MutationObserver (trop coûteux sur cette app riche)
+    // Simple check périodique toutes les 1200ms — imperceptible pour l'utilisateur
+    // et 100x moins coûteux qu'un observer sur subtree
+    setInterval(_updateBtnVisibility, 1200);
     _updateBtnVisibility();
+    _updateHomeButton(true);
   }
 
   if (document.readyState === 'loading') {
@@ -37570,6 +38132,18 @@ window._QI_DATA['pnr_05'] = {
   } else {
     _installVisibilityObserver();
   }
+
+  // Traductions
+  try {
+    if (window.i18n) {
+      window.i18n.fr = window.i18n.fr || {};
+      window.i18n.en = window.i18n.en || {};
+      window.i18n.fr.dojo_lbl_persona = "TON PERSONNAGE";
+      window.i18n.en.dojo_lbl_persona = "YOUR CHARACTER";
+      window.i18n.fr.dojo_sub_persona = "Crée ton avatar SENSEI";
+      window.i18n.en.dojo_sub_persona = "Create your SENSEI avatar";
+    }
+  } catch(e){}
 })();
 </script>
 
