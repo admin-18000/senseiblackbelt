@@ -772,7 +772,7 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="hero">
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
-    <div style="font-family:var(--font-cond);font-size:clamp(10px,1.3vw,13px);font-weight:800;letter-spacing:2.5px;color:#f5c518;text-transform:uppercase;margin-bottom:14px;animation:fadeUp .7s ease both;text-align:center;padding:6px 16px;border:1px solid rgba(245,197,24,.35);border-radius:20px;background:linear-gradient(90deg,rgba(245,197,24,.08),rgba(230,57,70,.05));display:inline-block;max-width:92vw;line-height:1.3" data-i18n="hero_world_title">THE WORLD'S FIRST SCIENTIFIC AI BASKETBALL APP</div>
+    <div style="font-family:var(--font-cond);font-size:clamp(13px,2vw,18px);font-weight:800;letter-spacing:3px;color:#f5c518;text-transform:uppercase;margin-bottom:16px;animation:fadeUp .7s ease both;text-align:center;padding:8px 20px;border:1.5px solid rgba(245,197,24,.5);border-radius:22px;background:linear-gradient(90deg,rgba(245,197,24,.10),rgba(230,57,70,.06));display:inline-block;max-width:94vw;line-height:1.3;box-shadow:0 2px 12px rgba(245,197,24,.15)" data-i18n="hero_world_title">THE WORLD'S FIRST-EVER SCIENTIFIC AI BASKETBALL APP</div>
     <div style="height:8px"></div>
     <div class="hero-tag" style="white-space:nowrap;font-size:13px" data-i18n="hero_tag">Ceintures de compétences · Basket</div>
     <div style="margin-bottom:20px;animation:fadeUp .7s .05s ease both">
@@ -7609,6 +7609,12 @@ function onboardingLaunch(which) {
         if (typeof _qi_open === 'function') _qi_open();
       } else if (which === 'bh') {
         showSection('ballhandling', null);
+      } else if (which === 'senseiai') {
+        if (typeof _senseiAI_open === 'function') _senseiAI_open();
+      } else if (which === 'playbook') {
+        if (typeof _playbook_open === 'function') _playbook_open();
+      } else if (which === 'persona') {
+        if (typeof _persona_open === 'function') _persona_open();
       }
     } catch(e) {}
   }, 350);
@@ -9760,7 +9766,7 @@ function oppDisplayResults(top, region, en, profile) {
 </div>
 
 <!-- ═══════════ ONBOARDING ACCUEIL — 3 DRILLS DEMO ═══════════ -->
-<div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:100001;align-items:center;justify-content:center;padding:18px;overflow-y:auto;background:radial-gradient(ellipse at top,rgba(15,20,35,0.95),rgba(0,0,0,0.98));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:onbFadeIn .5s ease-out">
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:100001;align-items:center;justify-content:center;padding:18px;overflow-y:auto;background:linear-gradient(180deg,rgba(5,8,15,0.72),rgba(0,0,0,0.82)),url('dojo-bg.jpg') center center / cover no-repeat;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);animation:onbFadeIn .5s ease-out">
   <!-- Particules dorées flottantes -->
   <div id="onb-particles" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
 
@@ -9784,6 +9790,19 @@ function oppDisplayResults(top, region, en, profile) {
 
     <!-- 3 cartes -->
     <div id="onb-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:980px;margin:0 auto clamp(12px,2.5vw,28px);animation:onbSlideUp .8s .45s ease-out backwards">
+
+      <!-- SENSEI IA (feature phare, générateur de séance) -->
+      <button class="onb-card" onclick="onboardingLaunch('senseiai')" style="background:linear-gradient(160deg,rgba(245,197,24,.18),rgba(245,197,24,.03));border:2px solid rgba(245,197,24,.7);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 6px 24px rgba(245,197,24,.25)">
+        <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">✨</div>
+        <div data-i18n="onb_senseiai_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">SENSEI IA</div>
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 0">
+          <div style="width:8px;height:8px;background:#f5c518;border-radius:50%;animation:onbBurnoutPulse 1.2s ease-in-out infinite"></div>
+          <div style="width:8px;height:8px;background:#f5c518;border-radius:50%;animation:onbBurnoutPulse 1.2s .2s ease-in-out infinite"></div>
+          <div style="width:8px;height:8px;background:#f5c518;border-radius:50%;animation:onbBurnoutPulse 1.2s .4s ease-in-out infinite"></div>
+        </div>
+        <div data-i18n="onb_senseiai_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Ta séance personnalisée en 1 clic</div>
+      </button>
 
       <!-- TDR -->
       <button class="onb-card" onclick="onboardingLaunch('tdr')" style="background:linear-gradient(160deg,rgba(245,197,24,.12),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.35);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
@@ -9866,6 +9885,35 @@ function oppDisplayResults(top, region, en, profile) {
           <div style="width:24px;height:8px;background:#e63946;border-radius:2px;animation:onbBurnoutPulse 1.5s ease-in-out infinite"></div>
         </div>
         <div data-i18n="onb_bh_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">400+ drills classés par ceinture</div>
+      </button>
+
+      <!-- PLAYBOOK -->
+      <button class="onb-card" onclick="onboardingLaunch('playbook')" style="background:linear-gradient(160deg,rgba(245,197,24,.16),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.55);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🎯</div>
+        <div data-i18n="onb_playbook_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">PLAYBOOK</div>
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0">
+          <div style="width:8px;height:32px;background:rgba(245,197,24,.4);border-radius:2px"></div>
+          <div style="width:8px;height:44px;background:rgba(245,197,24,.65);border-radius:2px"></div>
+          <div style="width:8px;height:52px;background:#f5c518;border-radius:2px;animation:onbBurnoutPulse 1.6s ease-in-out infinite"></div>
+          <div style="width:8px;height:44px;background:rgba(245,197,24,.65);border-radius:2px"></div>
+          <div style="width:8px;height:32px;background:rgba(245,197,24,.4);border-radius:2px"></div>
+        </div>
+        <div data-i18n="onb_playbook_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">20 systèmes animés + tactic board</div>
+      </button>
+
+      <!-- TON PERSONNAGE -->
+      <button class="onb-card" onclick="onboardingLaunch('persona')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🥷</div>
+        <div data-i18n="onb_persona_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">PERSONNAGE</div>
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:3px;margin:8px 0">
+          <div style="width:22px;height:6px;background:#fff;border-radius:2px"></div>
+          <div style="width:22px;height:6px;background:#e07d3f;border-radius:2px"></div>
+          <div style="width:22px;height:6px;background:#4a90e2;border-radius:2px"></div>
+          <div style="width:22px;height:6px;background:#e63946;border-radius:2px"></div>
+          <div style="width:22px;height:6px;background:#0d1117;border-radius:2px;box-shadow:0 0 6px rgba(245,197,24,.5);animation:onbBurnoutPulse 1.5s ease-in-out infinite"></div>
+        </div>
+        <div data-i18n="onb_persona_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Ton avatar SENSEI ninja par ceinture</div>
       </button>
 
     </div>
@@ -12282,7 +12330,7 @@ function applyLangTracker(lang) {
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
     footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
-    hero_world_title:"LA PREMI\u00c8RE APP MONDIALE DE BASKET SCIENTIFIQUE PROPULS\u00c9E PAR L'IA",
+    hero_world_title:"LA TOUTE PREMI\u00c8RE APP MONDIALE DE BASKET FOND\u00c9E SUR LA SCIENCE ET L'IA",
     // Opportunités — Nav
     nav_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
     mob_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
@@ -12375,6 +12423,12 @@ function applyLangTracker(lang) {
     onb_math_desc:'Calcule en dribblant \u2014 dissociation cognitive',
     onb_burnout_title:'BURNOUT',
     onb_burnout_desc:'M\u00e9tronome qui s\u2019acc\u00e9l\u00e8re \u2014 endurance pure',
+    onb_senseiai_title:'SENSEI IA',
+    onb_senseiai_desc:'Ta s\u00e9ance personnalis\u00e9e en 1 clic',
+    onb_playbook_title:'PLAYBOOK',
+    onb_playbook_desc:'20 syst\u00e8mes anim\u00e9s + tactic board',
+    onb_persona_title:'PERSONNAGE',
+    onb_persona_desc:'Ton avatar SENSEI ninja par ceinture',
     onb_skip:'Plus tard \u2192',
     // Politique de confidentialité
     privacy_title_1:'POLITIQUE', privacy_title_2:'CONFIDENTIALIT\u00c9',
@@ -12426,7 +12480,7 @@ function applyLangTracker(lang) {
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
     footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
-    hero_world_title:"THE WORLD'S FIRST SCIENTIFIC AI BASKETBALL APP",
+    hero_world_title:"THE WORLD'S FIRST-EVER SCIENTIFIC AI BASKETBALL APP",
     // Opportunities — Nav
     nav_opportunities:'\ud83d\ude80 Opportunities',
     mob_opportunities:'\ud83d\ude80 Opportunities',
@@ -12519,6 +12573,12 @@ function applyLangTracker(lang) {
     onb_math_desc:'Compute while dribbling \u2014 cognitive dissociation',
     onb_burnout_title:'BURNOUT',
     onb_burnout_desc:'Metronome speeding up \u2014 pure endurance',
+    onb_senseiai_title:'SENSEI AI',
+    onb_senseiai_desc:'Your personalized session in 1 click',
+    onb_playbook_title:'PLAYBOOK',
+    onb_playbook_desc:'20 animated systems + tactic board',
+    onb_persona_title:'CHARACTER',
+    onb_persona_desc:'Your SENSEI ninja avatar by belt',
     onb_skip:'Later \u2192',
     // Privacy Policy
     privacy_title_1:'PRIVACY', privacy_title_2:'POLICY',
@@ -37055,7 +37115,7 @@ window._QI_DATA['pnr_05'] = {
       <div class="ho-tag" data-i18n="hero_ob_tag">L'art martial du basketteur</div>
     </div>
     <div class="ho-bottom">
-      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;color:#f5c518;font-size:clamp(20px,5.5vw,34px);font-weight:800;letter-spacing:clamp(2px,0.6vw,4px);line-height:1.15;text-transform:uppercase;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;text-shadow:0 2px 20px rgba(0,0,0,.85),0 0 30px rgba(245,197,24,.35);padding:0 8px" data-i18n="hero_world_title">LA PREMIÈRE APP MONDIALE DE BASKET SCIENTIFIQUE PROPULSÉE PAR L'IA</div>
+      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;color:#f5c518;font-size:clamp(20px,5.5vw,34px);font-weight:800;letter-spacing:clamp(2px,0.6vw,4px);line-height:1.15;text-transform:uppercase;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;text-shadow:0 2px 20px rgba(0,0,0,.85),0 0 30px rgba(245,197,24,.35);padding:0 8px" data-i18n="hero_world_title">LA TOUTE PREMIÈRE APP MONDIALE DE BASKET FONDÉE SUR LA SCIENCE ET L'IA</div>
       <div class="ho-msg" data-i18n="hero_ob_msg">
         Bienvenue dans <strong>SENSEI</strong>.<br>
         L'app pensée par un vulgarisateur scientifique<br>
