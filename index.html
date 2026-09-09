@@ -804,7 +804,7 @@ body.unlocked .sensei-only{display:revert !important}
 
   <!-- ═══════════ POSITIONNEMENT COACH/ATHLÈTE — Vague 5 ═══════════ -->
   <div style="padding:clamp(20px,3vw,30px) clamp(16px,4vw,40px) 0;background:#0d1117">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+    <div id="dojo-interactive-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
       <div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.35);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
         <div style="font-size:28px;line-height:1;flex-shrink:0">🥋</div>
         <div>
@@ -38875,7 +38875,8 @@ window._QI_DATA['pnr_05'] = {
   function _getAllSystems() {
     var data = _load();
     var personal = (data.personalSystems || []).map(function(s){ s._personal = true; return s; });
-    return BASE_SYSTEMS.concat(personal);
+    var extra = (window._playbook_EXTRA_SYSTEMS || []);
+    return BASE_SYSTEMS.concat(extra).concat(personal);
   }
 
   // ─── API publique ───
@@ -39235,6 +39236,10 @@ window._QI_DATA['pnr_05'] = {
 
   // ─── Terrain SVG ───
   function _renderCourtSVG(s, editable) {
+    // Si fullCourt : déléguer au rendu externe (patch full court)
+    if (s && s.fullCourt && window._playbook_renderCourtSVG_fc) {
+      return window._playbook_renderCourtSVG_fc(s, editable);
+    }
     var svg = '<svg class="pb-court-svg" viewBox="0 0 140 150" xmlns="http://www.w3.org/2000/svg"' + (editable?' id="pb-court-svg"':'') + '>';
     // Fond terrain (parquet réaliste type NBA/FIBA)
     svg += '<defs>';
@@ -39895,10 +39900,17 @@ window._QI_DATA['pnr_05'] = {
     function _renderAnimStep(step) {
       var wrap = document.getElementById('pb-anim-court');
       if (!wrap) return;
+      // Récupérer le système d'origine pour préserver fullCourt (fix bug animation)
+      var origSys = null;
+      if (typeof window._playbook_getAllSystems === 'function' && ANIM.systemId) {
+        var _all = window._playbook_getAllSystems();
+        for (var _i = 0; _i < _all.length; _i++) { if (_all[_i].id === ANIM.systemId) { origSys = _all[_i]; break; } }
+      }
       // Utiliser _renderCourtSVG existant si on peut, sinon rendu manuel
       var systemForRender = {
         players: step.players || [],
-        arrows: step.arrows || []
+        arrows: step.arrows || [],
+        fullCourt: origSys ? !!origSys.fullCourt : false
       };
       // On appelle la fonction interne _renderCourtSVG via un wrapper exposé
       if (typeof window._playbook_renderCourtSVG === 'function') {
@@ -40274,6 +40286,489 @@ window._QI_DATA['pnr_05'] = {
         players:[{n:3,x:145,y:60,ball:false},{n:1,x:110,y:55,ball:true},{n:2,x:70,y:50},{n:4,x:70,y:95},{n:5,x:70,y:125}],
         arrows:[{type:'pass',x1:145,y1:60,x2:110,y2:55}], duration:3000 }
     ], ["1. Line formation, passer (3) at sideline","2. (2) sets screen on (1)'s defender","3. (1) cuts to ball using the screen","4. Sideline pass to open (1)"]);
+
+  });
+})();
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     PATCH FINAL : 3×3 PC + Terrain full court + 5 systèmes transition
+═══════════════════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── 3×3 sur PC pour DOJO + Onboarding ─── */
+@media (min-width: 900px) {
+  #dojo-interactive-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  #onb-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* ─── Wrap terrain full court (portrait allongé) ─── */
+.pb-court-wrap.fullcourt {
+  aspect-ratio: 30 / 14 !important;
+  max-width: 600px !important;
+}
+</style>
+
+<script>
+(function(){
+  'use strict';
+  function waitForPB(cb, tries) {
+    tries = tries || 0;
+    if (tries > 60) return;
+    if (typeof window._playbook_renderCourtSVG === 'function' &&
+        typeof window._playbook_getAllSystems === 'function' &&
+        typeof window._playbook_registerAnim === 'function') return cb();
+    setTimeout(function(){ waitForPB(cb, tries+1); }, 100);
+  }
+
+  waitForPB(function(){
+
+    // ─── Extension : maintenir un tableau EXTRA_SYSTEMS ───
+    // Exposé sur window pour que _getAllSystems interne du playbook original le lise
+    window._playbook_EXTRA_SYSTEMS = window._playbook_EXTRA_SYSTEMS || [];
+    var EXTRA_SYSTEMS = window._playbook_EXTRA_SYSTEMS;
+    var originalGetAllSystems = window._playbook_getAllSystems;
+    window._playbook_getAllSystems = function() {
+      var base = originalGetAllSystems();
+      // Éviter les doublons : ne concat que si base ne contient pas déjà ces ids
+      var baseIds = {};
+      base.forEach(function(s){ baseIds[s.id] = true; });
+      var toAdd = EXTRA_SYSTEMS.filter(function(s){ return !baseIds[s.id]; });
+      return base.concat(toAdd);
+    };
+    window._playbook_registerSystem = function(sys) {
+      if (!sys || !sys.id) return false;
+      // Éviter doublons si patch relancé
+      if (EXTRA_SYSTEMS.some(function(s){ return s.id === sys.id; })) return false;
+      EXTRA_SYSTEMS.push(sys);
+      return true;
+    };
+
+    // ─── Fonction dédiée FULL COURT (viewBox 140x300) ───
+    // Utilisée par _renderCourtSVG interne quand s.fullCourt === true
+    window._playbook_renderCourtSVG_fc = function(s, editable) {
+      // Transformation à la volée : coordonnées portrait (140x300) → paysage (300x140)
+      // Un point (x, y) portrait devient (y, x) paysage
+      // Résultat : défense à gauche (x faible), attaque à droite (x fort)
+      var players = (s.players || []).map(function(p){
+        var np = {};
+        for (var k in p) if (p.hasOwnProperty(k)) np[k] = p[k];
+        np.x = p.y; np.y = p.x;
+        return np;
+      });
+      var arrows = (s.arrows || []).map(function(a){
+        var na = {};
+        for (var k in a) if (a.hasOwnProperty(k)) na[k] = a[k];
+        na.x1 = a.y1; na.y1 = a.x1;
+        na.x2 = a.y2; na.y2 = a.x2;
+        return na;
+      });
+
+      // Rendu SVG PAYSAGE (viewBox 300x140)
+      var svg = '<svg class="pb-court-svg" viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg"' + (editable?' id="pb-court-svg"':'') + '>';
+      svg += '<defs>';
+      svg += '<linearGradient id="woodGradFC" x1="0" y1="0" x2="0" y2="1">';
+      svg += '<stop offset="0%" stop-color="#d9a668"/>';
+      svg += '<stop offset="50%" stop-color="#c48a4a"/>';
+      svg += '<stop offset="100%" stop-color="#b0763a"/>';
+      svg += '</linearGradient>';
+      svg += '<pattern id="woodFC" width="30" height="7" patternUnits="userSpaceOnUse">';
+      svg += '<rect width="30" height="7" fill="url(#woodGradFC)"/>';
+      svg += '<line x1="0" y1="0" x2="30" y2="0" stroke="rgba(60,30,10,0.35)" stroke-width="0.25"/>';
+      svg += '<line x1="6" y1="0" x2="6" y2="7" stroke="rgba(120,70,30,0.15)" stroke-width="0.2"/>';
+      svg += '<line x1="13" y1="0" x2="13" y2="7" stroke="rgba(255,220,170,0.10)" stroke-width="0.15"/>';
+      svg += '<line x1="22" y1="0" x2="22" y2="7" stroke="rgba(90,50,20,0.18)" stroke-width="0.2"/>';
+      svg += '<ellipse cx="17" cy="3.5" rx="0.6" ry="0.3" fill="rgba(80,40,15,0.20)"/>';
+      svg += '<line x1="15" y1="0" x2="15" y2="7" stroke="rgba(50,25,8,0.28)" stroke-width="0.15"/>';
+      svg += '</pattern>';
+      svg += '<radialGradient id="courtLightFC" cx="50%" cy="50%" r="70%">';
+      svg += '<stop offset="0%" stop-color="rgba(255,240,210,0.15)"/>';
+      svg += '<stop offset="70%" stop-color="rgba(0,0,0,0)"/>';
+      svg += '<stop offset="100%" stop-color="rgba(20,10,0,0.18)"/>';
+      svg += '</radialGradient>';
+      svg += '<marker id="mArrowFC" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">';
+      svg += '<path d="M0,0 L0,6 L9,3 z" fill="#0d1117"/></marker>';
+      svg += '</defs>';
+      svg += '<rect width="300" height="140" fill="url(#woodFC)"/>';
+      svg += '<rect width="300" height="140" fill="url(#courtLightFC)"/>';
+
+      // Bordures terrain
+      svg += '<rect x="0" y="0" width="300" height="140" fill="none" stroke="#fff" stroke-width="0.8"/>';
+      // Ligne médiane (verticale au centre)
+      svg += '<line x1="150" y1="0" x2="150" y2="140" stroke="#fff" stroke-width="0.6"/>';
+      // Cercle central
+      svg += '<circle cx="150" cy="70" r="12" fill="none" stroke="#fff" stroke-width="0.5"/>';
+
+      // ─── PANIER GAUCHE (défense) ───
+      // Ligne 3 pts gauche : arc ouvert vers la droite, rayon 50 centré sur panier
+      svg += '<path d="M 0 20 L 32 20 A 50 50 0 0 1 32 120 L 0 120" fill="none" stroke="#fff" stroke-width="0.6"/>';
+      // Raquette gauche (42 large × 36 haut, centrée verticalement)
+      svg += '<rect x="0" y="52" width="42" height="36" fill="none" stroke="#fff" stroke-width="0.6"/>';
+      // Ligne LF gauche (cercle sur la ligne à x=42)
+      svg += '<circle cx="42" cy="70" r="12" fill="none" stroke="#fff" stroke-width="0.5" stroke-dasharray="1.5 1.5"/>';
+      // Panier gauche
+      svg += '<circle cx="9" cy="70" r="2.3" fill="none" stroke="#f28c28" stroke-width="0.9"/>';
+      svg += '<line x1="2" y1="63" x2="2" y2="77" stroke="#fff" stroke-width="0.6"/>';
+      // Zone restrictive gauche
+      svg += '<path d="M 7 65 A 5 5 0 0 0 7 75" fill="none" stroke="#fff" stroke-width="0.4"/>';
+
+      // ─── PANIER DROITE (attaque) ───
+      // Ligne 3 pts droite : arc ouvert vers la gauche
+      svg += '<path d="M 300 20 L 268 20 A 50 50 0 0 0 268 120 L 300 120" fill="none" stroke="#fff" stroke-width="0.6"/>';
+      // Raquette droite
+      svg += '<rect x="258" y="52" width="42" height="36" fill="none" stroke="#fff" stroke-width="0.6"/>';
+      // Ligne LF droite
+      svg += '<circle cx="258" cy="70" r="12" fill="none" stroke="#fff" stroke-width="0.5" stroke-dasharray="1.5 1.5"/>';
+      // Panier droite
+      svg += '<circle cx="291" cy="70" r="2.3" fill="none" stroke="#f28c28" stroke-width="0.9"/>';
+      svg += '<line x1="298" y1="63" x2="298" y2="77" stroke="#fff" stroke-width="0.6"/>';
+      // Zone restrictive droite
+      svg += '<path d="M 293 65 A 5 5 0 0 1 293 75" fill="none" stroke="#fff" stroke-width="0.4"/>';
+
+      // ─── Flèches (avec coords swappées) ───
+      arrows.forEach(function(a, i){
+        var attr = editable ? ' data-arrow-idx="'+i+'" style="cursor:pointer" class="pb-arrow"' : '';
+        if (a.type === 'screen') {
+          var dx = a.x2 - a.x1, dy = a.y2 - a.y1;
+          var len = Math.sqrt(dx*dx+dy*dy) || 1;
+          var px = -dy/len * 3, py = dx/len * 3;
+          svg += '<g'+attr+'><line x1="'+a.x1+'" y1="'+a.y1+'" x2="'+a.x2+'" y2="'+a.y2+'" stroke="#0d1117" stroke-width="0.8"/>';
+          svg += '<line x1="'+(a.x2-px)+'" y1="'+(a.y2-py)+'" x2="'+(a.x2+px)+'" y2="'+(a.y2+py)+'" stroke="#0d1117" stroke-width="0.8"/></g>';
+        } else if (a.type === 'pass') {
+          svg += '<g'+attr+'><line x1="'+a.x1+'" y1="'+a.y1+'" x2="'+a.x2+'" y2="'+a.y2+'" stroke="#0d1117" stroke-width="0.6" stroke-dasharray="2 1.5" marker-end="url(#mArrowFC)"/></g>';
+        } else if (a.type === 'dribble') {
+          var dx = a.x2 - a.x1, dy = a.y2 - a.y1;
+          var len = Math.sqrt(dx*dx+dy*dy) || 1;
+          var segs = Math.max(3, Math.round(len/6));
+          var px = -dy/len * 2, py = dx/len * 2;
+          var d = 'M '+a.x1+' '+a.y1;
+          for (var k = 1; k <= segs; k++) {
+            var t = k/segs;
+            var x = a.x1 + dx*t, y = a.y1 + dy*t;
+            var sign = (k%2===0) ? 1 : -1;
+            d += ' Q '+(x+px*sign*0.6)+' '+(y+py*sign*0.6)+' '+x+' '+y;
+          }
+          svg += '<g'+attr+'><path d="'+d+'" fill="none" stroke="#0d1117" stroke-width="0.7" marker-end="url(#mArrowFC)"/></g>';
+        } else {
+          svg += '<g'+attr+'><line x1="'+a.x1+'" y1="'+a.y1+'" x2="'+a.x2+'" y2="'+a.y2+'" stroke="#0d1117" stroke-width="0.7" marker-end="url(#mArrowFC)"/></g>';
+        }
+      });
+
+      // ─── Joueurs (avec coords swappées) ───
+      players.forEach(function(p, i){
+        var isDef = p.isDef;
+        var color = isDef ? '#e63946' : '#f5c518';
+        var textCol = isDef ? '#fff' : '#0d1117';
+        var attr = editable ? ' data-player-idx="'+i+'" style="cursor:pointer;touch-action:none" class="pb-player"' : '';
+        svg += '<g'+attr+'>';
+        if (isDef) {
+          svg += '<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="rgba(230,57,70,0.15)" stroke="'+color+'" stroke-width="0.8"/>';
+          svg += '<line x1="'+(p.x-3.5)+'" y1="'+(p.y-3.5)+'" x2="'+(p.x+3.5)+'" y2="'+(p.y+3.5)+'" stroke="'+color+'" stroke-width="1.4"/>';
+          svg += '<line x1="'+(p.x-3.5)+'" y1="'+(p.y+3.5)+'" x2="'+(p.x+3.5)+'" y2="'+(p.y-3.5)+'" stroke="'+color+'" stroke-width="1.4"/>';
+        } else {
+          svg += '<circle cx="'+p.x+'" cy="'+p.y+'" r="5.5" fill="'+color+'" stroke="#0d1117" stroke-width="0.6"/>';
+          svg += '<text x="'+p.x+'" y="'+(p.y+2)+'" text-anchor="middle" fill="'+textCol+'" font-family="Bebas Neue, Arial, sans-serif" font-size="6" font-weight="700">'+p.n+'</text>';
+        }
+        svg += '</g>';
+      });
+
+      // Ballon (sur le joueur porteur)
+      var ballHolder = players.filter(function(p){return p.ball;})[0];
+      if (ballHolder) {
+        svg += '<circle cx="'+(ballHolder.x + 6)+'" cy="'+(ballHolder.y - 6)+'" r="2.5" fill="#e07d3f" stroke="#0d1117" stroke-width="0.5"/>';
+      }
+
+      svg += '</svg>';
+      return svg;
+    };
+
+    // ─── Monkey-patch _playbook_viewSystem : après rendu, adapter le wrap si fullCourt ───
+    var originalViewSystem = window._playbook_viewSystem;
+    window._playbook_viewSystem = function(id) {
+      originalViewSystem(id);
+      setTimeout(function(){
+        var systems = window._playbook_getAllSystems();
+        var sys = systems.filter(function(s){return s.id===id;})[0];
+        if (!sys || !sys.fullCourt) return;
+        var wrap = document.querySelector('#pb-container .pb-court-wrap');
+        if (wrap && !wrap.classList.contains('fullcourt')) {
+          wrap.classList.add('fullcourt');
+        }
+      }, 60);
+    };
+
+    // ─── Monkey-patch _playbook_openAnim : adapter wrap si fullCourt ───
+    var originalOpenAnim = window._playbook_openAnim;
+    window._playbook_openAnim = function(systemId) {
+      originalOpenAnim(systemId);
+      setTimeout(function(){
+        var systems = window._playbook_getAllSystems();
+        var sys = systems.filter(function(s){return s.id===systemId;})[0];
+        if (!sys || !sys.fullCourt) return;
+        var wrap = document.getElementById('pb-anim-court');
+        if (wrap && !wrap.classList.contains('fullcourt')) {
+          wrap.classList.add('fullcourt');
+        }
+      }, 100);
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  5 SYSTÈMES DE TRANSITION EN FULL COURT
+    //  viewBox 140x300 : y=0 haut (défense, panier adverse) → y=300 bas (attaque, notre panier)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ─── 1. Fast Break 5v5 secondary ───
+    window._playbook_registerSystem({
+      id: 'trans_fastbreak_5v5', cat: 'tra', fullCourt: true,
+      nameFR: 'Fast Break 5v5 (Secondary)', nameEN: 'Fast Break 5v5 (Secondary)',
+      descFR: "Contre-attaque à 5 joueurs après récupération : le meneur (1) mène la balle, les ailiers (2, 3) sprintent aux couloirs, l'intérieur (4) suit en trailer, le pivot (5) rim-runner. Objectif : conclusion avant que la défense ne soit installée. Si pas de tir facile, secondary break avec DHO ou drag screen du trailer.",
+      descEN: "5-player break after steal: point guard (1) leads ball, wings (2, 3) sprint lanes, big (4) as trailer, center (5) rim-runner. Goal: score before defense sets. If no easy shot, secondary break with DHO or drag screen from trailer.",
+      players: [
+        {n:1, x:70, y:50, ball:true},
+        {n:2, x:15, y:40},
+        {n:3, x:125, y:40},
+        {n:4, x:70, y:20},
+        {n:5, x:70, y:80}
+      ],
+      arrows: []
+    });
+    window._playbook_registerAnim('trans_fastbreak_5v5', [
+      { label:"1. Récupération défensive, tous en zone haute",
+        players:[{n:1,x:70,y:50,ball:true},{n:2,x:15,y:40},{n:3,x:125,y:40},{n:4,x:70,y:20},{n:5,x:70,y:80}],
+        arrows:[], duration:2500 },
+      { label:"2. Sprint : (5) rim-runner, (2)(3) couloirs, (4) trailer",
+        players:[{n:1,x:70,y:130,ball:true},{n:2,x:15,y:150},{n:3,x:125,y:150},{n:4,x:70,y:100},{n:5,x:70,y:180}],
+        arrows:[{type:'dribble',x1:70,y1:50,x2:70,y2:130},{type:'move',x1:15,y1:40,x2:15,y2:150},{type:'move',x1:125,y1:40,x2:125,y2:150},{type:'move',x1:70,y1:80,x2:70,y2:180}], duration:3000 },
+      { label:"3. Passage ligne médiane, (5) attaque le panier",
+        players:[{n:1,x:70,y:200,ball:true},{n:2,x:20,y:230},{n:3,x:120,y:230},{n:4,x:70,y:170},{n:5,x:70,y:260}],
+        arrows:[{type:'dribble',x1:70,y1:130,x2:70,y2:200},{type:'move',x1:15,y1:150,x2:20,y2:230},{type:'move',x1:125,y1:150,x2:120,y2:230},{type:'move',x1:70,y1:180,x2:70,y2:260}], duration:3000 },
+      { label:"4. Option A : passe intérieure au rim-runner (5)",
+        players:[{n:1,x:70,y:220,ball:false},{n:2,x:20,y:250},{n:3,x:120,y:250},{n:4,x:70,y:190},{n:5,x:70,y:285,ball:true}],
+        arrows:[{type:'pass',x1:70,y1:220,x2:70,y2:285}], duration:3000 },
+      { label:"5. Option B : kick-out à l'aile pour 3 pts",
+        players:[{n:1,x:70,y:220},{n:2,x:15,y:255,ball:true},{n:3,x:120,y:250},{n:4,x:70,y:190},{n:5,x:70,y:285,ball:false}],
+        arrows:[{type:'pass',x1:70,y1:220,x2:15,y2:255}], duration:3000 }
+    ], ["1. Defensive rebound, all in high zone","2. Sprint: (5) rim-runner, (2)(3) lanes, (4) trailer","3. Cross mid-court line, (5) attacks basket","4. Option A: interior pass to rim-runner (5)","5. Option B: kick-out to wing for 3"]);
+
+    // ─── 2. Early Offense ───
+    window._playbook_registerSystem({
+      id: 'trans_early_offense', cat: 'tra', fullCourt: true,
+      nameFR: 'Early Offense (style Warriors)', nameEN: 'Early Offense (Warriors style)',
+      descFR: "Attaque rapide avant que la défense ne se replace complètement. Le meneur (1) monte fort, (2) sprinte au corner opposé, (3) coupe au coude, (4) drag screen sur (1) au sommet, (5) rim-run. Génère un DHO ou pick and roll immédiat avant que l'adversaire n'organise sa défense placée.",
+      descEN: "Quick attack before defense fully sets. PG (1) pushes hard, (2) sprints opposite corner, (3) cuts to elbow, (4) drag screen on (1) at top, (5) rim-runs. Generates immediate DHO or pick and roll before opponent organizes half-court defense.",
+      players: [
+        {n:1, x:70, y:60, ball:true},
+        {n:2, x:20, y:80},
+        {n:3, x:120, y:80},
+        {n:4, x:70, y:35},
+        {n:5, x:70, y:110}
+      ],
+      arrows: []
+    });
+    window._playbook_registerAnim('trans_early_offense', [
+      { label:"1. Départ après action défensive",
+        players:[{n:1,x:70,y:60,ball:true},{n:2,x:20,y:80},{n:3,x:120,y:80},{n:4,x:70,y:35},{n:5,x:70,y:110}],
+        arrows:[], duration:2500 },
+      { label:"2. Montée rapide : (1) dribble, (5) rim-run",
+        players:[{n:1,x:70,y:140,ball:true},{n:2,x:15,y:170},{n:3,x:125,y:170},{n:4,x:70,y:110},{n:5,x:70,y:200}],
+        arrows:[{type:'dribble',x1:70,y1:60,x2:70,y2:140},{type:'move',x1:70,y1:110,x2:70,y2:200},{type:'move',x1:20,y1:80,x2:15,y2:170},{type:'move',x1:120,y1:80,x2:125,y2:170}], duration:3000 },
+      { label:"3. (3) cut au coude, (2) au corner opposé",
+        players:[{n:1,x:70,y:220,ball:true},{n:2,x:15,y:290},{n:3,x:88,y:258},{n:4,x:70,y:200},{n:5,x:70,y:280}],
+        arrows:[{type:'dribble',x1:70,y1:140,x2:70,y2:220},{type:'move',x1:125,y1:170,x2:88,y2:258},{type:'move',x1:15,y1:170,x2:15,y2:290}], duration:3000 },
+      { label:"4. (4) drag screen sur (1) au sommet",
+        players:[{n:1,x:70,y:220,ball:true},{n:2,x:15,y:290},{n:3,x:88,y:258},{n:4,x:70,y:230},{n:5,x:70,y:280}],
+        arrows:[{type:'screen',x1:70,y1:230,x2:70,y2:222}], duration:2500 },
+      { label:"5. Pick and roll immédiat : (1) drive, (4) roll",
+        players:[{n:1,x:85,y:250,ball:true},{n:2,x:15,y:290},{n:3,x:88,y:258},{n:4,x:70,y:280},{n:5,x:60,y:260}],
+        arrows:[{type:'dribble',x1:70,y1:220,x2:85,y2:250},{type:'move',x1:70,y1:230,x2:70,y2:280}], duration:3000 }
+    ], ["1. Start after defensive action","2. Fast push: (1) dribbles, (5) rim-runs","3. (3) cuts to elbow, (2) opposite corner","4. (4) drag screen for (1) at top","5. Immediate pick and roll: (1) drives, (4) rolls"]);
+
+    // ─── 3. Retour défensif après turnover ───
+    window._playbook_registerSystem({
+      id: 'trans_def_return', cat: 'tra', fullCourt: true,
+      nameFR: 'Retour défensif après turnover', nameEN: 'Defensive Transition after Turnover',
+      descFR: "Après perte de balle en attaque, retour défensif organisé : 1 joueur (le plus proche) freine le porteur, les autres sprintent en priorité vers la ligne des lancers-francs pour protéger le panier, puis match up. Règle d'or : protéger le panier AVANT de matcher son homme.",
+      descEN: "After turnover in offense, organized defensive transition: 1 player (closest) slows ball handler, others sprint priority to free-throw line to protect basket, then match up. Golden rule: protect basket BEFORE matching your man.",
+      players: [
+        {n:1, x:70, y:260, isDef:true},
+        {n:2, x:25, y:240, isDef:true},
+        {n:3, x:115, y:240, isDef:true},
+        {n:4, x:45, y:280, isDef:true},
+        {n:5, x:95, y:280, isDef:true}
+      ],
+      arrows: []
+    });
+    window._playbook_registerAnim('trans_def_return', [
+      { label:"1. Turnover : les 5 attaquants sont en zone offensive",
+        players:[{n:1,x:70,y:260,isDef:true},{n:2,x:25,y:240,isDef:true},{n:3,x:115,y:240,isDef:true},{n:4,x:45,y:280,isDef:true},{n:5,x:95,y:280,isDef:true}],
+        arrows:[], duration:2500 },
+      { label:"2. (1) le plus proche freine le porteur adverse",
+        players:[{n:1,x:70,y:200,isDef:true},{n:2,x:25,y:240,isDef:true},{n:3,x:115,y:240,isDef:true},{n:4,x:45,y:280,isDef:true},{n:5,x:95,y:280,isDef:true}],
+        arrows:[{type:'move',x1:70,y1:260,x2:70,y2:200}], duration:2500 },
+      { label:"3. (2)(3)(4)(5) sprintent vers leur zone défensive",
+        players:[{n:1,x:70,y:150,isDef:true},{n:2,x:25,y:130,isDef:true},{n:3,x:115,y:130,isDef:true},{n:4,x:45,y:100,isDef:true},{n:5,x:95,y:100,isDef:true}],
+        arrows:[{type:'move',x1:70,y1:200,x2:70,y2:150},{type:'move',x1:25,y1:240,x2:25,y2:130},{type:'move',x1:115,y1:240,x2:115,y2:130},{type:'move',x1:45,y1:280,x2:45,y2:100},{type:'move',x1:95,y1:280,x2:95,y2:100}], duration:3000 },
+      { label:"4. Protection panier prioritaire (ligne LF défensive)",
+        players:[{n:1,x:70,y:80,isDef:true},{n:2,x:35,y:65,isDef:true},{n:3,x:105,y:65,isDef:true},{n:4,x:55,y:40,isDef:true},{n:5,x:85,y:40,isDef:true}],
+        arrows:[{type:'move',x1:70,y1:150,x2:70,y2:80},{type:'move',x1:25,y1:130,x2:35,y2:65},{type:'move',x1:115,y1:130,x2:105,y2:65},{type:'move',x1:45,y1:100,x2:55,y2:40},{type:'move',x1:95,y1:100,x2:85,y2:40}], duration:3000 },
+      { label:"5. Match up : chacun retrouve son adversaire",
+        players:[{n:1,x:70,y:60,isDef:true},{n:2,x:25,y:80,isDef:true},{n:3,x:115,y:80,isDef:true},{n:4,x:50,y:50,isDef:true},{n:5,x:90,y:50,isDef:true}],
+        arrows:[], duration:2500 }
+    ], ["1. Turnover: 5 attackers in offensive zone","2. (1) closest slows ball handler","3. (2)(3)(4)(5) sprint to defensive zone","4. Basket protection priority (defensive FT line)","5. Match up: each finds his opponent"]);
+
+    // ─── 4. Outlet Pass to Break ───
+    window._playbook_registerSystem({
+      id: 'trans_outlet', cat: 'tra', fullCourt: true,
+      nameFR: 'Outlet Pass to Break', nameEN: 'Outlet Pass to Break',
+      descFR: "Après rebond défensif : (5) capture le rebond, tourne rapidement, cherche l'outlet pass vers (1) qui vient à sa rencontre sur l'aile. (2) et (3) sprintent immédiatement dans les couloirs. Cette action est la clé pour déclencher un fast break — sans outlet rapide, pas de contre-attaque.",
+      descEN: "After defensive rebound: (5) captures rebound, pivots fast, seeks outlet pass to (1) meeting him on wing. (2) and (3) immediately sprint lanes. This action is the key to trigger a fast break — without quick outlet, no break.",
+      players: [
+        {n:5, x:70, y:15, ball:true},
+        {n:1, x:20, y:50},
+        {n:2, x:120, y:65},
+        {n:3, x:30, y:120},
+        {n:4, x:110, y:120}
+      ],
+      arrows: []
+    });
+    window._playbook_registerAnim('trans_outlet', [
+      { label:"1. (5) capture le rebond défensif près du panier",
+        players:[{n:5,x:70,y:15,ball:true},{n:1,x:20,y:50},{n:2,x:120,y:65},{n:3,x:30,y:120},{n:4,x:110,y:120}],
+        arrows:[], duration:2500 },
+      { label:"2. Outlet pass rapide vers (1) sur l'aile",
+        players:[{n:5,x:70,y:15,ball:false},{n:1,x:20,y:80,ball:true},{n:2,x:120,y:65},{n:3,x:30,y:120},{n:4,x:110,y:120}],
+        arrows:[{type:'pass',x1:70,y1:15,x2:20,y2:80},{type:'move',x1:20,y1:50,x2:20,y2:80}], duration:2500 },
+      { label:"3. (2)(3)(4) sprintent couloirs, (1) monte",
+        players:[{n:5,x:70,y:80,ball:false},{n:1,x:40,y:150,ball:true},{n:2,x:125,y:170},{n:3,x:15,y:200},{n:4,x:70,y:130}],
+        arrows:[{type:'dribble',x1:20,y1:80,x2:40,y2:150},{type:'move',x1:120,y1:65,x2:125,y2:170},{type:'move',x1:30,y1:120,x2:15,y2:200},{type:'move',x1:110,y1:120,x2:70,y2:130},{type:'move',x1:70,y1:15,x2:70,y2:80}], duration:3000 },
+      { label:"4. (1) trouve (3) démarqué au poteau",
+        players:[{n:5,x:70,y:150,ball:false},{n:1,x:60,y:220,ball:false},{n:2,x:125,y:250},{n:3,x:20,y:280,ball:true},{n:4,x:70,y:210}],
+        arrows:[{type:'dribble',x1:40,y1:150,x2:60,y2:220},{type:'pass',x1:60,y1:220,x2:20,y2:280},{type:'move',x1:15,y1:200,x2:20,y2:280},{type:'move',x1:70,y1:130,x2:70,y2:210},{type:'move',x1:70,y1:80,x2:70,y2:150}], duration:3000 }
+    ], ["1. (5) captures defensive rebound near basket","2. Fast outlet pass to (1) on wing","3. (2)(3)(4) sprint lanes, (1) pushes","4. (1) finds open (3) at post"]);
+
+    // ─── 5. Transition contre press ───
+    window._playbook_registerSystem({
+      id: 'trans_vs_press', cat: 'tra', fullCourt: true,
+      nameFR: 'Sortie de Press 2-2-1', nameEN: 'Press Break vs 2-2-1',
+      descFR: "Face à une full-court press adverse : (5) reste devant en outlet safety, (1) et (2) forment le premier rideau, (4) au milieu comme relais, (3) au dernier tiers offensif. Règle : chercher le milieu (le relais 4) pour casser le press, puis 4v3 en avantage numérique jusqu'à la conclusion.",
+      descEN: "Against opponent full-court press: (5) stays as outlet safety, (1) and (2) form first curtain, (4) middle as relay, (3) in offensive third. Rule: seek middle (relay 4) to break press, then 4v3 numeric advantage to conclusion.",
+      players: [
+        {n:5, x:70, y:20, ball:true},
+        {n:1, x:30, y:60},
+        {n:2, x:110, y:60},
+        {n:4, x:70, y:130},
+        {n:3, x:70, y:220}
+      ],
+      arrows: []
+    });
+    window._playbook_registerAnim('trans_vs_press', [
+      { label:"1. Formation contre press : (5) safety, (4) relais milieu",
+        players:[{n:5,x:70,y:20,ball:true},{n:1,x:30,y:60},{n:2,x:110,y:60},{n:4,x:70,y:130},{n:3,x:70,y:220}],
+        arrows:[], duration:2500 },
+      { label:"2. (5) remise à (1) qui vient à sa rencontre",
+        players:[{n:5,x:70,y:20,ball:false},{n:1,x:30,y:50,ball:true},{n:2,x:110,y:60},{n:4,x:70,y:130},{n:3,x:70,y:220}],
+        arrows:[{type:'pass',x1:70,y1:20,x2:30,y2:50},{type:'move',x1:30,y1:60,x2:30,y2:50}], duration:2500 },
+      { label:"3. Cherche le relais (4) au milieu pour casser le press",
+        players:[{n:5,x:70,y:40,ball:false},{n:1,x:30,y:50,ball:false},{n:2,x:110,y:60},{n:4,x:70,y:120,ball:true},{n:3,x:70,y:220}],
+        arrows:[{type:'pass',x1:30,y1:50,x2:70,y2:120},{type:'move',x1:70,y1:130,x2:70,y2:120}], duration:3000 },
+      { label:"4. (4) tourne et attaque en 4v3 (avantage numérique)",
+        players:[{n:5,x:70,y:100,ball:false},{n:1,x:30,y:150,ball:false},{n:2,x:110,y:150},{n:4,x:70,y:170,ball:true},{n:3,x:70,y:230}],
+        arrows:[{type:'dribble',x1:70,y1:120,x2:70,y2:170},{type:'move',x1:30,y1:50,x2:30,y2:150},{type:'move',x1:110,y1:60,x2:110,y2:150}], duration:3000 },
+      { label:"5. Conclusion : passe à (3) démarqué en zone offensive",
+        players:[{n:5,x:70,y:180},{n:1,x:25,y:230},{n:2,x:115,y:230},{n:4,x:70,y:220,ball:false},{n:3,x:70,y:280,ball:true}],
+        arrows:[{type:'pass',x1:70,y1:220,x2:70,y2:280},{type:'move',x1:70,y1:220,x2:70,y2:280}], duration:3000 }
+    ], ["1. Press break formation: (5) safety, (4) middle relay","2. (5) inbound to (1) meeting him","3. Seek middle relay (4) to break the press","4. (4) turns and attacks 4v3 (numeric advantage)","5. Finish: pass to open (3) in offensive zone"]);
+
+  });
+})();
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     PATCH FINAL — Convertir 2 systèmes existants en FULL COURT
+     Fast break 3v2 + Full-court press 2-2-1 (car leur nom l'indique)
+     Coordonnées en portrait (140x300), rendues en paysage via swap dans _fc
+═══════════════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  'use strict';
+  function waitPB(cb, tries) {
+    tries = tries || 0;
+    if (tries > 60) return;
+    if (typeof window._playbook_getAllSystems === 'function' &&
+        typeof window._playbook_registerAnim === 'function') return cb();
+    setTimeout(function(){ waitPB(cb, tries+1); }, 100);
+  }
+
+  waitPB(function(){
+
+    var allSys = window._playbook_getAllSystems();
+
+    // ─── Fast break 3v2 → FULL COURT ───
+    // La contre-attaque part de la défense (haut, y=0-50) vers l'attaque (bas, y=250-300)
+    var fb = allSys.filter(function(s){return s.id === 'fast_break_3v2';})[0];
+    if (fb) {
+      fb.fullCourt = true;
+      fb.players = [
+        {n:1, x:70, y:50, ball:true},
+        {n:2, x:20, y:60},
+        {n:3, x:120, y:60}
+      ];
+      fb.arrows = [];
+      window._playbook_registerAnim('fast_break_3v2', [
+        { label:"1. Récupération : les 3 attaquants en zone défensive",
+          players:[{n:1,x:70,y:50,ball:true},{n:2,x:20,y:60},{n:3,x:120,y:60}],
+          arrows:[], duration:2500 },
+        { label:"2. Montée rapide en triangle",
+          players:[{n:1,x:70,y:130,ball:true},{n:2,x:15,y:160},{n:3,x:125,y:160}],
+          arrows:[{type:'dribble',x1:70,y1:50,x2:70,y2:130},{type:'move',x1:20,y1:60,x2:15,y2:160},{type:'move',x1:120,y1:60,x2:125,y2:160}], duration:3000 },
+        { label:"3. Passage ligne médiane, tempo maintenu",
+          players:[{n:1,x:70,y:200,ball:true},{n:2,x:15,y:230},{n:3,x:125,y:230}],
+          arrows:[{type:'dribble',x1:70,y1:130,x2:70,y2:200},{type:'move',x1:15,y1:160,x2:15,y2:230},{type:'move',x1:125,y1:160,x2:125,y2:230}], duration:3000 },
+        { label:"4. Le porteur (1) attaque la raquette",
+          players:[{n:1,x:70,y:260,ball:true},{n:2,x:25,y:275},{n:3,x:115,y:275}],
+          arrows:[{type:'dribble',x1:70,y1:200,x2:70,y2:260},{type:'move',x1:15,y1:230,x2:25,y2:275},{type:'move',x1:125,y1:230,x2:115,y2:275}], duration:3000 },
+        { label:"5. Passe à l'aile démarquée pour la conclusion",
+          players:[{n:1,x:70,y:260,ball:false},{n:2,x:25,y:280},{n:3,x:115,y:280,ball:true}],
+          arrows:[{type:'pass',x1:70,y1:260,x2:115,y2:280}], duration:3000 }
+      ], ["1. Steal: 3 attackers in defensive zone","2. Fast push in triangle","3. Crossing mid-court, tempo maintained","4. Ball handler (1) attacks the paint","5. Pass to open wing for finish"]);
+    }
+
+    // ─── Full-court press 2-2-1 → FULL COURT ───
+    // Défense sur tout le terrain, remise en jeu adverse en haut (y=0-20)
+    // 2 défenseurs avant (piégeurs), 2 défenseurs milieu (interceptions), 1 safety arrière
+    var pr = allSys.filter(function(s){return s.id === 'press_221';})[0];
+    if (pr) {
+      pr.fullCourt = true;
+      pr.players = [
+        {n:1, x:40, y:20, isDef:true},
+        {n:2, x:100, y:20, isDef:true},
+        {n:3, x:35, y:110, isDef:true},
+        {n:4, x:105, y:110, isDef:true},
+        {n:5, x:70, y:230, isDef:true}
+      ];
+      pr.arrows = [];
+      window._playbook_registerAnim('press_221', [
+        { label:"1. Formation 2-2-1 sur tout le terrain",
+          players:[{n:1,x:40,y:20,isDef:true},{n:2,x:100,y:20,isDef:true},{n:3,x:35,y:110,isDef:true},{n:4,x:105,y:110,isDef:true},{n:5,x:70,y:230,isDef:true}],
+          arrows:[], duration:2500 },
+        { label:"2. (1) piège la remise en jeu, (2) coupe la passe",
+          players:[{n:1,x:30,y:30,isDef:true},{n:2,x:70,y:30,isDef:true},{n:3,x:35,y:110,isDef:true},{n:4,x:105,y:110,isDef:true},{n:5,x:70,y:230,isDef:true}],
+          arrows:[{type:'move',x1:40,y1:20,x2:30,y2:30},{type:'move',x1:100,y1:20,x2:70,y2:30}], duration:3000 },
+        { label:"3. Le ballon dépasse : (3) et (4) piègent au milieu",
+          players:[{n:1,x:30,y:30,isDef:true},{n:2,x:70,y:30,isDef:true},{n:3,x:50,y:100,isDef:true},{n:4,x:85,y:100,isDef:true},{n:5,x:70,y:230,isDef:true}],
+          arrows:[{type:'move',x1:35,y1:110,x2:50,y2:100},{type:'move',x1:105,y1:110,x2:85,y2:100}], duration:3000 },
+        { label:"4. (5) protège en dernière ligne (safety)",
+          players:[{n:1,x:30,y:30,isDef:true},{n:2,x:70,y:30,isDef:true},{n:3,x:50,y:100,isDef:true},{n:4,x:85,y:100,isDef:true},{n:5,x:70,y:210,isDef:true}],
+          arrows:[{type:'move',x1:70,y1:230,x2:70,y2:210}], duration:2500 }
+      ], ["1. 2-2-1 formation on full court","2. (1) traps inbound, (2) cuts passing lane","3. Ball advances: (3) and (4) trap at middle","4. (5) protects last line (safety)"]);
+    }
 
   });
 })();
