@@ -835,8 +835,8 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="display:inline-block;font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(22px,3.2vw,36px);font-weight:700;letter-spacing:2.5px;color:#fff;line-height:1.1">🥋🏀 DOJO <span style="color:#f5c518">INTERACTIVE DRILLS</span></div>
         <div style="width:60px;height:3px;background:#f5c518;margin:10px auto 0;border-radius:2px"></div>
       </div>
-      <!-- Grille 3 boutons : responsive auto-fit -->
-      <div style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
+      <!-- Grille 9 tuiles DOJO : responsive auto-fit sur mobile, forcée 3×3 sur PC -->
+      <div id="dojo-tiles-grid" style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
         <!-- SENSEI IA (1ère tuile - générateur de séance) -->
         <button onclick="_senseiAI_open()" ontouchstart=""
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
@@ -37115,6 +37115,7 @@ window._QI_DATA['pnr_05'] = {
       <div class="ho-tag" data-i18n="hero_ob_tag">L'art martial du basketteur</div>
     </div>
     <div class="ho-bottom">
+      <div style="font-size:clamp(48px,10vw,72px);line-height:1;margin-bottom:14px;text-align:center;filter:drop-shadow(0 4px 20px rgba(245,197,24,.5));animation:onbSlideUp .6s ease-out backwards">🐐🥋</div>
       <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;color:#f5c518;font-size:clamp(20px,5.5vw,34px);font-weight:800;letter-spacing:clamp(2px,0.6vw,4px);line-height:1.15;text-transform:uppercase;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;text-shadow:0 2px 20px rgba(0,0,0,.85),0 0 30px rgba(245,197,24,.35);padding:0 8px" data-i18n="hero_world_title">LA TOUTE PREMIÈRE APP MONDIALE DE BASKET FONDÉE SUR LA SCIENCE ET L'IA</div>
       <div class="ho-msg" data-i18n="hero_ob_msg">
         Bienvenue dans <strong>SENSEI</strong>.<br>
@@ -37278,12 +37279,12 @@ window._QI_DATA['pnr_05'] = {
   filter: brightness(0.55) saturate(0.85);
 }
 #persona-overlay .persona-fullbg-a {
-  background-image: url('bb.jpg');
+  background-image: url('dojo-bg.jpg');
   opacity: 0.6;
   animation: bgFullFadeA 22s ease-in-out infinite;
 }
 #persona-overlay .persona-fullbg-b {
-  background-image: url('bb2.jpg');
+  background-image: url('dojo-bg.jpg');
   opacity: 0;
   animation: bgFullFadeB 22s ease-in-out infinite;
 }
@@ -40297,9 +40298,9 @@ window._QI_DATA['pnr_05'] = {
      PATCH FINAL : 3×3 PC + Terrain full court + 5 systèmes transition
 ═══════════════════════════════════════════════════════════════════════════════ -->
 <style>
-/* ─── 3×3 sur PC pour DOJO + Onboarding ─── */
+/* ─── 3×3 sur PC pour DOJO (9 tuiles) + Onboarding (9 tuiles) ─── */
 @media (min-width: 900px) {
-  #dojo-interactive-grid {
+  #dojo-tiles-grid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
   #onb-cards {
