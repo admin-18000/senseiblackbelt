@@ -9918,6 +9918,16 @@ function oppDisplayResults(top, region, en, profile) {
 
     </div>
 
+    <!-- CTA Install PWA (timing psychologique optimal : après avoir vu la valeur) -->
+    <button class="si-onb-cta" onclick="_si_install_click()" style="animation:onbSlideUp .9s .55s ease-out backwards;background:linear-gradient(135deg,rgba(245,197,24,0.15),rgba(245,197,24,0.05));border:1.5px solid rgba(245,197,24,0.6);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left;font-family:inherit;max-width:520px;margin:0 auto 12px;width:calc(100% - 20px)">
+      <div style="font-size:32px;line-height:1;flex-shrink:0">📱</div>
+      <div style="flex:1">
+        <div data-i18n="si_onb_title" style="font-family:'Bebas Neue',sans-serif;color:#f5c518;font-size:17px;letter-spacing:1.5px;line-height:1;margin-bottom:4px">AJOUTE SENSEI À TON ÉCRAN D'ACCUEIL</div>
+        <div data-i18n="si_onb_sub" style="color:#cfd3e0;font-size:12px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.3px">Accès en 1 clic · Fonctionne hors-ligne · Sans compte</div>
+      </div>
+      <div style="color:#f5c518;font-size:20px;font-weight:700;flex-shrink:0">→</div>
+    </button>
+
     <!-- Skip -->
     <button onclick="onboardingSkip()" data-i18n="onb_skip" style="background:transparent;border:none;color:#7b82a0;font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;padding:10px 20px;animation:onbSlideUp .9s .6s ease-out backwards;transition:color .2s">
       Plus tard →
@@ -40880,6 +40890,350 @@ window._QI_DATA['pnr_05'] = {
     }
 
   });
+})();
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     PATCH INSTALL PWA — Bandeau haut + Modal iOS + CTA onboarding + Lien footer
+     Réutilise deferredPrompt & installApp() déjà existants (ligne 9990-9993)
+═══════════════════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── Bandeau haut ─── */
+#si-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100050;
+  background: linear-gradient(90deg, rgba(245,197,24,0.98), rgba(224,168,0,0.98));
+  color: #0d1117; padding: 10px 14px; display: none;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.5px; align-items: center; justify-content: space-between; gap: 12px;
+  box-shadow: 0 4px 20px rgba(245,197,24,0.35);
+  animation: siSlideDown 0.5s ease-out;
+}
+#si-banner.on { display: flex; }
+@keyframes siSlideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+.si-banner-text { flex: 1; line-height: 1.35; min-width: 0; }
+.si-banner-text strong { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px; }
+.si-banner-btn {
+  background: #0d1117; color: #f5c518; border: none; padding: 8px 16px;
+  border-radius: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+  letter-spacing: 1.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  flex-shrink: 0;
+}
+.si-banner-btn:hover { background: #1a2233; }
+.si-banner-close {
+  background: transparent; border: none; color: #0d1117; font-size: 22px;
+  font-weight: 700; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
+}
+
+/* Push le contenu vers le bas quand le bandeau est visible */
+body.si-banner-on { padding-top: 52px; }
+@media (max-width: 600px) { body.si-banner-on { padding-top: 64px; } }
+
+/* ─── Modal iOS (instructions) ─── */
+#si-modal {
+  position: fixed; inset: 0; z-index: 100051;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  animation: siFadeIn 0.3s ease-out;
+}
+#si-modal.on { display: flex; }
+@keyframes siFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.si-modal-card {
+  background: linear-gradient(180deg, #161b22, #0d1117);
+  border: 1.5px solid rgba(245,197,24,0.5); border-radius: 18px;
+  padding: 24px; max-width: 420px; width: 100%; position: relative;
+  box-shadow: 0 20px 60px rgba(245,197,24,0.3);
+  animation: siSlideUp 0.4s ease-out;
+}
+@keyframes siSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.si-modal-close {
+  position: absolute; top: 12px; right: 12px; background: transparent; border: none;
+  color: #7a8299; font-size: 26px; cursor: pointer; padding: 4px 8px; line-height: 1;
+}
+.si-modal-close:hover { color: #f5c518; }
+.si-modal-icon { font-size: 44px; text-align: center; margin-bottom: 12px; }
+.si-modal-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518; font-size: 24px;
+  letter-spacing: 2px; text-align: center; margin-bottom: 6px; line-height: 1.1;
+}
+.si-modal-sub {
+  color: #cfd3e0; font-size: 13px; text-align: center; margin-bottom: 18px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px;
+}
+.si-step {
+  display: flex; gap: 12px; align-items: flex-start; padding: 12px;
+  background: rgba(245,197,24,0.06); border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 10px; margin-bottom: 10px;
+}
+.si-step-num {
+  background: #f5c518; color: #0d1117; font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px; font-weight: 800; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.si-step-content { flex: 1; }
+.si-step-text {
+  color: #e6ebf5; font-size: 13px; font-family: 'Barlow Condensed', sans-serif;
+  line-height: 1.5; margin-bottom: 4px;
+}
+.si-step-text strong { color: #f5c518; }
+.si-step-icon {
+  display: inline-block; background: rgba(245,197,24,0.15); border-radius: 5px;
+  padding: 2px 6px; font-size: 13px; vertical-align: middle;
+}
+.si-modal-footer-note {
+  color: #7a8299; font-size: 11px; text-align: center; margin-top: 14px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px;
+}
+
+/* ─── CTA install dans onboarding 2 ─── */
+.si-onb-cta {
+  margin: 16px auto 8px; max-width: 520px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(245,197,24,0.15), rgba(245,197,24,0.05));
+  border: 1.5px solid rgba(245,197,24,0.6);
+  border-radius: 14px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: all 0.2s; text-align: left;
+}
+.si-onb-cta:hover {
+  border-color: #f5c518;
+  background: linear-gradient(135deg, rgba(245,197,24,0.22), rgba(245,197,24,0.08));
+  box-shadow: 0 6px 20px rgba(245,197,24,0.25);
+  transform: translateY(-2px);
+}
+.si-onb-cta-icon { font-size: 32px; line-height: 1; flex-shrink: 0; }
+.si-onb-cta-text { flex: 1; }
+.si-onb-cta-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518; font-size: 17px;
+  letter-spacing: 1.5px; line-height: 1; margin-bottom: 4px;
+}
+.si-onb-cta-sub {
+  color: #cfd3e0; font-size: 12px; font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.3px;
+}
+.si-onb-cta-arrow {
+  color: #f5c518; font-size: 20px; font-weight: 700; flex-shrink: 0;
+}
+
+/* ─── Lien discret footer ─── */
+.si-footer-link {
+  display: inline-block; margin-top: 10px; padding: 6px 12px;
+  color: #f5c518; background: rgba(245,197,24,0.08);
+  border: 1px solid rgba(245,197,24,0.25); border-radius: 999px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.si-footer-link:hover { background: rgba(245,197,24,0.18); border-color: #f5c518; }
+</style>
+
+<!-- Bandeau haut (fermable) -->
+<div id="si-banner" role="dialog" aria-label="Installer l'app">
+  <div class="si-banner-text">
+    📱 <strong data-i18n="si_banner_title">Installe SENSEI comme une vraie app</strong>
+    <span style="opacity:0.85" data-i18n="si_banner_sub"> · Gratuit · Sans compte · Hors-ligne</span>
+  </div>
+  <button class="si-banner-btn" onclick="_si_install_click()" data-i18n="si_banner_btn">INSTALLER</button>
+  <button class="si-banner-close" onclick="_si_banner_close()" aria-label="Fermer">×</button>
+</div>
+
+<!-- Modal iOS (instructions guidées) -->
+<div id="si-modal" role="dialog" aria-label="Installation iPhone">
+  <div class="si-modal-card">
+    <button class="si-modal-close" onclick="_si_modal_close()" aria-label="Fermer">×</button>
+    <div class="si-modal-icon">📱</div>
+    <div class="si-modal-title" data-i18n="si_modal_title">AJOUTE SENSEI À TON IPHONE</div>
+    <div class="si-modal-sub" data-i18n="si_modal_sub">En 3 étapes rapides · Ouvre-la comme une vraie app</div>
+
+    <div class="si-step">
+      <div class="si-step-num">1</div>
+      <div class="si-step-content">
+        <div class="si-step-text" data-i18n="si_ios_step1">Appuie sur <strong>Partager</strong> <span class="si-step-icon">⎘</span> en bas de Safari</div>
+      </div>
+    </div>
+    <div class="si-step">
+      <div class="si-step-num">2</div>
+      <div class="si-step-content">
+        <div class="si-step-text" data-i18n="si_ios_step2">Fais défiler et choisis <strong>"Sur l'écran d'accueil"</strong> <span class="si-step-icon">+</span></div>
+      </div>
+    </div>
+    <div class="si-step">
+      <div class="si-step-num">3</div>
+      <div class="si-step-content">
+        <div class="si-step-text" data-i18n="si_ios_step3">Appuie sur <strong>"Ajouter"</strong> en haut à droite</div>
+      </div>
+    </div>
+
+    <div class="si-modal-footer-note" data-i18n="si_ios_note">L'app s'ouvrira en plein écran, sans barre Safari</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var LS_KEY = 'sensei_install_banner_dismissed_v1';
+
+  // ─── Détection plateforme ───
+  function _si_isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+  function _si_isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+  }
+  function _si_isStandalone() {
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+           (window.navigator && window.navigator.standalone === true);
+  }
+
+  // ─── Gestion bandeau haut ───
+  window._si_banner_show = function() {
+    // Ne pas montrer si déjà installé
+    if (_si_isStandalone()) return;
+    // Ne pas montrer si l'utilisateur a déjà fermé
+    try { if (localStorage.getItem(LS_KEY) === '1') return; } catch(e){}
+    var banner = document.getElementById('si-banner');
+    if (banner) {
+      banner.classList.add('on');
+      document.body.classList.add('si-banner-on');
+    }
+  };
+  window._si_banner_close = function() {
+    var banner = document.getElementById('si-banner');
+    if (banner) {
+      banner.classList.remove('on');
+      document.body.classList.remove('si-banner-on');
+    }
+    try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+  };
+
+  // ─── Modal iOS ───
+  window._si_modal_open = function() {
+    var m = document.getElementById('si-modal');
+    if (m) m.classList.add('on');
+  };
+  window._si_modal_close = function() {
+    var m = document.getElementById('si-modal');
+    if (m) m.classList.remove('on');
+  };
+
+  // ─── Clic sur "INSTALLER" (bandeau, CTA onboarding, lien footer) ───
+  window._si_install_click = function() {
+    // iOS : Apple bloque beforeinstallprompt → afficher instructions
+    if (_si_isIOS()) {
+      _si_modal_open();
+      return;
+    }
+    // Android / PC : utiliser la variable globale deferredPrompt existante
+    if (typeof deferredPrompt !== 'undefined' && deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(result){
+          if (result.outcome === 'accepted') {
+            _si_banner_close();
+            var oldBtn = document.getElementById('install-btn');
+            if (oldBtn) oldBtn.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } catch(e) {
+        // Fallback si prompt échoue
+        alert(_si_lang()==='en'
+          ? "Use your browser menu:\n\nChrome/Edge: menu ⋮ → \"Install app\"\nSafari Mac: File → \"Add to Dock\""
+          : "Utilise le menu de ton navigateur :\n\nChrome/Edge : menu ⋮ → \"Installer l'application\"\nSafari Mac : Fichier → \"Ajouter au Dock\"");
+      }
+    } else {
+      // Pas de prompt disponible (déjà installé, ou navigateur non compatible)
+      if (_si_isStandalone()) {
+        alert(_si_lang()==='en' ? "SENSEI is already installed!" : "SENSEI est déjà installé !");
+      } else {
+        alert(_si_lang()==='en'
+          ? "Use your browser menu:\n\nChrome/Edge: menu ⋮ → \"Install app\"\nSafari Mac: File → \"Add to Dock\""
+          : "Utilise le menu de ton navigateur :\n\nChrome/Edge : menu ⋮ → \"Installer l'application\"\nSafari Mac : Fichier → \"Ajouter au Dock\"");
+      }
+    }
+  };
+
+  function _si_lang() {
+    try { return window._lang || document.body.getAttribute('data-lang') || 'fr'; } catch(e) { return 'fr'; }
+  }
+
+  // ─── Traductions i18n ───
+  try {
+    window.i18n = window.i18n || { fr: {}, en: {} };
+    // Bandeau
+    window.i18n.fr.si_banner_title = "Installe SENSEI comme une vraie app";
+    window.i18n.en.si_banner_title = "Install SENSEI as a real app";
+    window.i18n.fr.si_banner_sub = " · Gratuit · Sans compte · Hors-ligne";
+    window.i18n.en.si_banner_sub = " · Free · No account · Offline";
+    window.i18n.fr.si_banner_btn = "INSTALLER";
+    window.i18n.en.si_banner_btn = "INSTALL";
+    // Modal iOS
+    window.i18n.fr.si_modal_title = "AJOUTE SENSEI À TON IPHONE";
+    window.i18n.en.si_modal_title = "ADD SENSEI TO YOUR IPHONE";
+    window.i18n.fr.si_modal_sub = "En 3 étapes rapides · Ouvre-la comme une vraie app";
+    window.i18n.en.si_modal_sub = "In 3 quick steps · Open it like a real app";
+    window.i18n.fr.si_ios_step1 = "Appuie sur <strong>Partager</strong> <span class=\"si-step-icon\">⎘</span> en bas de Safari";
+    window.i18n.en.si_ios_step1 = "Tap <strong>Share</strong> <span class=\"si-step-icon\">⎘</span> at the bottom of Safari";
+    window.i18n.fr.si_ios_step2 = "Fais défiler et choisis <strong>\"Sur l'écran d'accueil\"</strong> <span class=\"si-step-icon\">+</span>";
+    window.i18n.en.si_ios_step2 = "Scroll and choose <strong>\"Add to Home Screen\"</strong> <span class=\"si-step-icon\">+</span>";
+    window.i18n.fr.si_ios_step3 = "Appuie sur <strong>\"Ajouter\"</strong> en haut à droite";
+    window.i18n.en.si_ios_step3 = "Tap <strong>\"Add\"</strong> in the top right";
+    window.i18n.fr.si_ios_note = "L'app s'ouvrira en plein écran, sans barre Safari";
+    window.i18n.en.si_ios_note = "The app will open fullscreen, without Safari bar";
+    // CTA onboarding
+    window.i18n.fr.si_onb_title = "AJOUTE SENSEI À TON ÉCRAN D'ACCUEIL";
+    window.i18n.en.si_onb_title = "ADD SENSEI TO YOUR HOME SCREEN";
+    window.i18n.fr.si_onb_sub = "Accès en 1 clic · Fonctionne hors-ligne · Sans compte";
+    window.i18n.en.si_onb_sub = "1-click access · Works offline · No account";
+    // Lien footer
+    window.i18n.fr.si_footer_link = "📱 Installer l'app";
+    window.i18n.en.si_footer_link = "📱 Install the app";
+  } catch(e){}
+
+  // ─── Hook si appinstalled : nettoyer partout ───
+  window.addEventListener('appinstalled', function() {
+    _si_banner_close();
+    try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+    // Cacher aussi les CTA onboarding et footer
+    document.querySelectorAll('.si-onb-cta, .si-footer-link').forEach(function(el){
+      el.style.display = 'none';
+    });
+  });
+
+  // ─── Injecter lien discret dans le footer (si présent) ───
+  function _si_inject_footer_link() {
+    if (_si_isStandalone()) return;
+    var footer = document.querySelector('footer') || document.querySelector('[role="contentinfo"]');
+    if (!footer) return;
+    // Ne pas injecter deux fois
+    if (footer.querySelector('.si-footer-link')) return;
+    var link = document.createElement('button');
+    link.className = 'si-footer-link';
+    link.setAttribute('data-i18n', 'si_footer_link');
+    link.innerHTML = '📱 ' + (_si_lang()==='en' ? 'Install the app' : "Installer l'app");
+    link.onclick = function(){ _si_install_click(); };
+    // Insérer avant le copyright ou à la fin
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'text-align:center;margin-top:12px';
+    wrap.appendChild(link);
+    footer.appendChild(wrap);
+  }
+
+  // ─── Auto-show bandeau après 2s si conditions OK ───
+  function _si_init() {
+    setTimeout(function(){
+      _si_banner_show();
+      _si_inject_footer_link();
+    }, 2000);
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    _si_init();
+  } else {
+    document.addEventListener('DOMContentLoaded', _si_init);
+  }
 })();
 </script>
 
