@@ -11833,7 +11833,12 @@ function applyLang(lang) {
   // Éléments data-i18n HTML
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (T[key] !== undefined) el.innerHTML = T[key];
+    if (T[key] !== undefined) {
+      el.innerHTML = T[key];
+    } else if (window.i18n && window.i18n[lang] && window.i18n[lang][key] !== undefined) {
+      // Fallback : clé définie via window.i18n (Personnage, Playbook, etc.)
+      el.innerHTML = window.i18n[lang][key];
+    }
   });
 
   // Bouton toggle
@@ -12334,6 +12339,14 @@ function applyLangTracker(lang) {
     hero_ob_tag:"L'art martial du basketteur",
     hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
     hero_ob_btn:"D\u00c9COUVRIR \u2728",
+    dojo_lbl_ai:"SENSEI IA",
+    dojo_sub_ai:"G\u00e9n\u00e8re ta s\u00e9ance personnalis\u00e9e avec l'IA",
+    dojo_lbl_fiche:"TON ENTRA\u00ceNEMENT",
+    dojo_sub_fiche:"Fiche perso adapt\u00e9e \u00e0 ton poste",
+    dojo_lbl_qi:"QI BASKET",
+    dojo_sub_qi:"Lecture de jeu \u00b7 Prise de d\u00e9cision",
+    dojo_lbl_bh:"BALL HANDLING",
+    dojo_sub_bh:"Drills class\u00e9s par ceinture",
     // Opportunités — Nav
     nav_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
     mob_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
@@ -12487,6 +12500,14 @@ function applyLangTracker(lang) {
     hero_ob_tag:"The basketball player's martial art",
     hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
     hero_ob_btn:"DISCOVER \u2728",
+    dojo_lbl_ai:"SENSEI AI",
+    dojo_sub_ai:"Generate your personalized session with AI",
+    dojo_lbl_fiche:"YOUR TRAINING",
+    dojo_sub_fiche:"Personal card adapted to your position",
+    dojo_lbl_qi:"BASKET IQ",
+    dojo_sub_qi:"Game reading \u00b7 Decision-making",
+    dojo_lbl_bh:"BALL HANDLING",
+    dojo_sub_bh:"Drills sorted by belt",
     // Opportunities — Nav
     nav_opportunities:'\ud83d\ude80 Opportunities',
     mob_opportunities:'\ud83d\ude80 Opportunities',
