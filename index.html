@@ -11580,6 +11580,10 @@ document.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════════
 // 🌐 SYSTÈME DE TRADUCTION SENSEI i18n
 // ═══════════════════════════════════════════════════════════════
+// Initialisation window.i18n (utilisé par des patches ultérieurs qui font `if (window.i18n) {...}`)
+// Sans cette ligne, tous ces blocs sont skippés silencieusement et leurs clés jamais enregistrées.
+window.i18n = window.i18n || { fr: {}, en: {} };
+
 const LANG_DATA = {
 
 // ── NAVIGATION DESKTOP ──────────────────────────────────────────
