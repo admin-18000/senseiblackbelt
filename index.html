@@ -12330,7 +12330,7 @@ function applyLangTracker(lang) {
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
     footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
-    hero_world_title:"LA TOUTE PREMI\u00c8RE APP MONDIALE DE BASKET FOND\u00c9E SUR LA SCIENCE ET L'IA",
+    hero_world_title:"PREMI\u00c8RE MONDIALE : UNE APP DE BASKET FOND\u00c9E SUR LA SCIENCE, LES MATH\u00c9MATIQUES ET L'IA",
     // Opportunités — Nav
     nav_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
     mob_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
@@ -12480,7 +12480,7 @@ function applyLangTracker(lang) {
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
     footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
-    hero_world_title:"THE WORLD'S FIRST-EVER SCIENTIFIC AI BASKETBALL APP",
+    hero_world_title:"WORLD PREMIERE: A BASKETBALL APP BUILT ON SCIENCE, MATHEMATICS AND AI",
     // Opportunities — Nav
     nav_opportunities:'\ud83d\ude80 Opportunities',
     mob_opportunities:'\ud83d\ude80 Opportunities',
@@ -37113,10 +37113,15 @@ window._QI_DATA['pnr_05'] = {
     <div class="ho-top">
       <div class="ho-brand">SENSEI BLACKBELT</div>
       <div class="ho-tag" data-i18n="hero_ob_tag">L'art martial du basketteur</div>
+      <div style="font-size:clamp(38px,7vw,56px);line-height:1;margin-top:10px;text-align:center;filter:drop-shadow(0 4px 20px rgba(245,197,24,.5));animation:onbSlideUp .6s ease-out backwards">🐐🥋</div>
+      <!-- Toggle FR/EN dans onboarding -->
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:12px;animation:onbSlideUp .7s ease-out backwards">
+        <button id="ho-lang-fr" onclick="_heroOnboarding_setLang('fr')" style="background:transparent;border:1px solid rgba(245,197,24,.4);color:#cfd3e0;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;border-radius:999px;cursor:pointer;transition:all .2s">FR</button>
+        <button id="ho-lang-en" onclick="_heroOnboarding_setLang('en')" style="background:transparent;border:1px solid rgba(245,197,24,.4);color:#cfd3e0;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;border-radius:999px;cursor:pointer;transition:all .2s">EN</button>
+      </div>
     </div>
     <div class="ho-bottom">
-      <div style="font-size:clamp(48px,10vw,72px);line-height:1;margin-bottom:14px;text-align:center;filter:drop-shadow(0 4px 20px rgba(245,197,24,.5));animation:onbSlideUp .6s ease-out backwards">🐐🥋</div>
-      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;color:#f5c518;font-size:clamp(20px,5.5vw,34px);font-weight:800;letter-spacing:clamp(2px,0.6vw,4px);line-height:1.15;text-transform:uppercase;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;text-shadow:0 2px 20px rgba(0,0,0,.85),0 0 30px rgba(245,197,24,.35);padding:0 8px" data-i18n="hero_world_title">LA TOUTE PREMIÈRE APP MONDIALE DE BASKET FONDÉE SUR LA SCIENCE ET L'IA</div>
+      <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;color:#f5c518;font-size:clamp(20px,5.5vw,34px);font-weight:800;letter-spacing:clamp(2px,0.6vw,4px);line-height:1.15;text-transform:uppercase;margin-bottom:20px;max-width:900px;margin-left:auto;margin-right:auto;text-shadow:0 2px 20px rgba(0,0,0,.85),0 0 30px rgba(245,197,24,.35);padding:0 8px" data-i18n="hero_world_title">PREMIÈRE MONDIALE : UNE APP DE BASKET FONDÉE SUR LA SCIENCE, LES MATHÉMATIQUES ET L'IA</div>
       <div class="ho-msg" data-i18n="hero_ob_msg">
         Bienvenue dans <strong>SENSEI</strong>.<br>
         L'app pensée par un vulgarisateur scientifique<br>
@@ -37153,6 +37158,8 @@ window._QI_DATA['pnr_05'] = {
     var v = document.getElementById('hero-onboarding-video');
     if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch(e){} }
     document.body.style.overflow = 'hidden';
+    // Détection auto de la langue navigateur au 1er affichage
+    setTimeout(function(){ if (typeof _heroOnboarding_autoLang === 'function') _heroOnboarding_autoLang(); }, 50);
   };
 
   window._heroOnboarding_next = function() {
@@ -37171,6 +37178,81 @@ window._QI_DATA['pnr_05'] = {
         }
       }, 400);
     }
+  };
+
+  // ─── Toggle de langue dans l'onboarding (bascule immédiate) ───
+  window._heroOnboarding_setLang = function(lang) {
+    if (lang !== 'fr' && lang !== 'en') return;
+    try {
+      // Utiliser la fonction i18n globale du site si disponible
+      if (typeof window.setLanguage === 'function') {
+        window.setLanguage(lang);
+      } else if (typeof window.applyLang === 'function') {
+        window.applyLang(lang);
+      } else {
+        // Fallback : mise à jour manuelle des data-i18n dans l'onboarding
+        window._lang = lang;
+        try { localStorage.setItem('sensei_lang', lang); } catch(e){}
+        if (window.i18n && window.i18n[lang]) {
+          var el = document.getElementById('hero-onboarding');
+          if (el) {
+            el.querySelectorAll('[data-i18n]').forEach(function(node){
+              var k = node.getAttribute('data-i18n');
+              if (window.i18n[lang][k]) node.innerHTML = window.i18n[lang][k];
+            });
+          }
+        }
+      }
+      _heroOnboarding_updateLangUI(lang);
+    } catch(e) {}
+  };
+
+  // Mise à jour visuelle des boutons FR/EN (sélection active)
+  function _heroOnboarding_updateLangUI(lang) {
+    var frBtn = document.getElementById('ho-lang-fr');
+    var enBtn = document.getElementById('ho-lang-en');
+    if (frBtn) {
+      if (lang === 'fr') {
+        frBtn.style.background = 'rgba(245,197,24,.25)';
+        frBtn.style.color = '#f5c518';
+        frBtn.style.borderColor = '#f5c518';
+      } else {
+        frBtn.style.background = 'transparent';
+        frBtn.style.color = '#cfd3e0';
+        frBtn.style.borderColor = 'rgba(245,197,24,.4)';
+      }
+    }
+    if (enBtn) {
+      if (lang === 'en') {
+        enBtn.style.background = 'rgba(245,197,24,.25)';
+        enBtn.style.color = '#f5c518';
+        enBtn.style.borderColor = '#f5c518';
+      } else {
+        enBtn.style.background = 'transparent';
+        enBtn.style.color = '#cfd3e0';
+        enBtn.style.borderColor = 'rgba(245,197,24,.4)';
+      }
+    }
+  }
+
+  // ─── Détection auto de la langue du navigateur au 1er affichage ───
+  window._heroOnboarding_autoLang = function() {
+    try {
+      // Ne pas override si l'utilisateur a déjà choisi une langue
+      var stored = null;
+      try { stored = localStorage.getItem('sensei_lang'); } catch(e){}
+      var currentLang = stored || window._lang || 'fr';
+      // Si aucune langue enregistrée, détecter via navigator.language
+      if (!stored) {
+        var nav = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+        var detected = nav.indexOf('fr') === 0 ? 'fr' : 'en';
+        if (detected !== currentLang) {
+          _heroOnboarding_setLang(detected);
+          currentLang = detected;
+        }
+      }
+      _heroOnboarding_updateLangUI(currentLang);
+    } catch(e) {}
   };
 
   // Traductions
