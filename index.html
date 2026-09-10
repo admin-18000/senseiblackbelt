@@ -12331,6 +12331,9 @@ function applyLangTracker(lang) {
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
     footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
     hero_world_title:"PREMI\u00c8RE MONDIALE : UNE APP DE BASKET FOND\u00c9E SUR LA SCIENCE, LES MATH\u00c9MATIQUES ET L'IA",
+    hero_ob_tag:"L'art martial du basketteur",
+    hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
+    hero_ob_btn:"D\u00c9COUVRIR \u2728",
     // Opportunités — Nav
     nav_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
     mob_opportunities:'\ud83d\ude80 Opportunit\u00e9s',
@@ -12481,6 +12484,9 @@ function applyLangTracker(lang) {
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
     footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
     hero_world_title:"WORLD PREMIERE: A BASKETBALL APP BUILT ON SCIENCE, MATHEMATICS AND AI",
+    hero_ob_tag:"The basketball player's martial art",
+    hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
+    hero_ob_btn:"DISCOVER \u2728",
     // Opportunities — Nav
     nav_opportunities:'\ud83d\ude80 Opportunities',
     mob_opportunities:'\ud83d\ude80 Opportunities',
@@ -37180,27 +37186,22 @@ window._QI_DATA['pnr_05'] = {
     }
   };
 
-  // ─── Toggle de langue dans l'onboarding (bascule immédiate) ───
+  // ─── Toggle de langue dans l'onboarding (bascule GLOBALE de toute l'app) ───
   window._heroOnboarding_setLang = function(lang) {
     if (lang !== 'fr' && lang !== 'en') return;
     try {
-      // Utiliser la fonction i18n globale du site si disponible
-      if (typeof window.setLanguage === 'function') {
-        window.setLanguage(lang);
-      } else if (typeof window.applyLang === 'function') {
+      // Utiliser applyLang() qui bascule TOUTE l'app (data-i18n + belts + piliers + quiz + tracker + etc.)
+      if (typeof window.applyLang === 'function') {
         window.applyLang(lang);
       } else {
-        // Fallback : mise à jour manuelle des data-i18n dans l'onboarding
+        // Fallback minimal si applyLang n'existe pas encore
         window._lang = lang;
         try { localStorage.setItem('sensei_lang', lang); } catch(e){}
         if (window.i18n && window.i18n[lang]) {
-          var el = document.getElementById('hero-onboarding');
-          if (el) {
-            el.querySelectorAll('[data-i18n]').forEach(function(node){
-              var k = node.getAttribute('data-i18n');
-              if (window.i18n[lang][k]) node.innerHTML = window.i18n[lang][k];
-            });
-          }
+          document.querySelectorAll('[data-i18n]').forEach(function(node){
+            var k = node.getAttribute('data-i18n');
+            if (window.i18n[lang][k] !== undefined) node.innerHTML = window.i18n[lang][k];
+          });
         }
       }
       _heroOnboarding_updateLangUI(lang);
