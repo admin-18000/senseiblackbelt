@@ -3,6 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<!-- ═══════════════════════════════════════════════════════════
+     ANTI-FLASH ONBOARDING — s'exécute AVANT le rendu du body
+     Si l'utilisateur n'a jamais vu l'onboarding : masque le body immédiatement
+     pour ne pas voir la page principale avant que le hero-onboarding apparaisse.
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  try {
+    var HERO_OB_VERSION = '2026.09.05';
+    var HERO_OB_KEY = 'sensei_hero_onboarding_seen_v';
+    var seen = localStorage.getItem(HERO_OB_KEY);
+    if (seen !== HERO_OB_VERSION) {
+      // Onboarding pas encore vu → cacher le body immédiatement
+      document.documentElement.setAttribute('data-onb-pending', '1');
+      // Injecter CSS de blocage avant le rendu
+      var css = document.createElement('style');
+      css.textContent = 'html[data-onb-pending="1"] body { visibility: hidden !important; } html[data-onb-pending="1"] #hero-onboarding { visibility: visible !important; display: block !important; }';
+      document.head.appendChild(css);
+    }
+  } catch(e) {}
+})();
+</script>
+
 <title>SENSEI BlackBelt 🥋🏀 — Méthode Basketball Scientifique · 9 Ceintures</title>
   <meta name="description" content="SENSEI BlackBelt : la méthode basketball scientifique en 9 ceintures. Neurosciences, physique, maths appliqués au basket. Ball handling, shooting, defense — tous niveaux.">
   <meta name="keywords" content="basketball, ball handling, dribble, coaching basket, neurosciences, ceintures basketball, sensei blackbelt">
@@ -37271,6 +37295,8 @@ window._QI_DATA['pnr_05'] = {
     var el = document.getElementById('hero-onboarding');
     if (!el) return;
     el.classList.add('on');
+    // Si le body était masqué par l'anti-flash, on le laisse masqué (l'onboarding est visible via CSS)
+    // et on le rendra visible seulement quand l'utilisateur clique "DÉCOUVRIR"
     // Redémarrer la vidéo proprement
     var v = document.getElementById('hero-onboarding-video');
     if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch(e){} }
@@ -37282,6 +37308,8 @@ window._QI_DATA['pnr_05'] = {
   window._heroOnboarding_next = function() {
     // Marquer comme vu
     try { localStorage.setItem(HERO_OB_KEY, HERO_OB_VERSION); } catch(e){}
+    // Retirer l'attribut anti-flash pour rendre la page principale visible
+    try { document.documentElement.removeAttribute('data-onb-pending'); } catch(e){}
     var el = document.getElementById('hero-onboarding');
     if (el) {
       el.style.animation = 'heroObFadeIn .4s reverse';
@@ -41107,7 +41135,7 @@ body.si-banner-on { padding-top: 52px; }
 <!-- Bandeau haut (fermable) -->
 <div id="si-banner" role="dialog" aria-label="Installer l'app">
   <div class="si-banner-text">
-    📱 <strong data-i18n="si_banner_title">Installe SENSEI comme une vraie app</strong>
+    📱 <strong data-i18n="si_banner_title">Installe SENSEI sur ton écran d'accueil</strong>
     <span style="opacity:0.85" data-i18n="si_banner_sub"> · Gratuit · Sans compte · Hors-ligne</span>
   </div>
   <button class="si-banner-btn" onclick="_si_install_click()" data-i18n="si_banner_btn">INSTALLER</button>
@@ -41120,7 +41148,7 @@ body.si-banner-on { padding-top: 52px; }
     <button class="si-modal-close" onclick="_si_modal_close()" aria-label="Fermer">×</button>
     <div class="si-modal-icon">📱</div>
     <div class="si-modal-title" data-i18n="si_modal_title">AJOUTE SENSEI À TON IPHONE</div>
-    <div class="si-modal-sub" data-i18n="si_modal_sub">En 3 étapes rapides · Ouvre-la comme une vraie app</div>
+    <div class="si-modal-sub" data-i18n="si_modal_sub">En 3 étapes rapides · Ouverture plein écran</div>
 
     <div class="si-step">
       <div class="si-step-num">1</div>
@@ -41239,8 +41267,8 @@ body.si-banner-on { padding-top: 52px; }
   try {
     window.i18n = window.i18n || { fr: {}, en: {} };
     // Bandeau
-    window.i18n.fr.si_banner_title = "Installe SENSEI comme une vraie app";
-    window.i18n.en.si_banner_title = "Install SENSEI as a real app";
+    window.i18n.fr.si_banner_title = "Installe SENSEI sur ton écran d'accueil";
+    window.i18n.en.si_banner_title = "Install SENSEI on your home screen";
     window.i18n.fr.si_banner_sub = " · Gratuit · Sans compte · Hors-ligne";
     window.i18n.en.si_banner_sub = " · Free · No account · Offline";
     window.i18n.fr.si_banner_btn = "INSTALLER";
@@ -41248,8 +41276,8 @@ body.si-banner-on { padding-top: 52px; }
     // Modal iOS
     window.i18n.fr.si_modal_title = "AJOUTE SENSEI À TON IPHONE";
     window.i18n.en.si_modal_title = "ADD SENSEI TO YOUR IPHONE";
-    window.i18n.fr.si_modal_sub = "En 3 étapes rapides · Ouvre-la comme une vraie app";
-    window.i18n.en.si_modal_sub = "In 3 quick steps · Open it like a real app";
+    window.i18n.fr.si_modal_sub = "En 3 étapes rapides · Ouverture plein écran";
+    window.i18n.en.si_modal_sub = "In 3 quick steps · Opens fullscreen";
     window.i18n.fr.si_ios_step1 = "Appuie sur <strong>Partager</strong> <span class=\"si-step-icon\">⎘</span> en bas de Safari";
     window.i18n.en.si_ios_step1 = "Tap <strong>Share</strong> <span class=\"si-step-icon\">⎘</span> at the bottom of Safari";
     window.i18n.fr.si_ios_step2 = "Fais défiler et choisis <strong>\"Sur l'écran d'accueil\"</strong> <span class=\"si-step-icon\">+</span>";
