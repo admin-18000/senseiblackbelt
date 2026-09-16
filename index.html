@@ -2429,6 +2429,51 @@ body.unlocked .sensei-only{display:revert !important}
       <div id="tsc_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
     </div>
   </div>
+
+  <!-- ═══ SHOOTING SESSION — Feature caméra automatique (0 action joueur) ═══ -->
+  <div class="tr-card">
+    <div class="tr-card-title" data-i18n="ss_title">🎥 SHOOTING SESSION</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5" data-i18n="ss_intro">Pose ton trépied, lance la session, shoote librement. L'app analyse ta posture pendant que tu t'entraînes — sans que tu touches ton téléphone.</div>
+
+    <!-- Plein écran caméra immersif — bordé noir avec éléments UI bien placés -->
+    <div id="ss-video-wrap" style="display:none;position:fixed;inset:0;z-index:600;background:#000;flex-direction:column;align-items:center;justify-content:center">
+      <!-- Vidéo caméra qui remplit tout l'écran disponible -->
+      <video id="ss-video" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000"></video>
+
+      <!-- ═══ OVERLAYS ═══ -->
+
+      <!-- REC clignotant en haut à gauche (style caméra professionnelle) -->
+      <div id="ss-rec-indicator" style="position:absolute;top:20px;left:20px;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:14px;letter-spacing:2.5px;font-weight:700;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+        <span id="ss-rec-dot" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.9), 0 0 4px rgba(239,68,68,1) inset;animation:ssRecBlink 1s ease-in-out infinite"></span>
+        <span>REC</span>
+      </div>
+
+      <!-- Chrono blanc en haut à droite (style pro, contours blancs) -->
+      <div id="ss-chrono-overlay" style="position:absolute;top:20px;right:20px;background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid #fff;border-radius:14px;padding:10px 20px;font-family:'Bebas Neue','Impact',sans-serif;color:#fff;font-size:38px;letter-spacing:4px;text-shadow:0 2px 6px rgba(0,0,0,0.9);font-variant-numeric:tabular-nums;box-shadow:0 4px 20px rgba(0,0,0,0.5);line-height:1">00:00</div>
+
+      <!-- Bloc bas — statut MoveNet + bouton STOP -->
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 20px 30px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.85));display:flex;flex-direction:column;align-items:center;gap:14px">
+        <div id="ss-status" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;white-space:nowrap" data-i18n="ss_status_analyze">🧠 Analyse en cours…</div>
+        <button id="ss-btn-stop-overlay" onclick="_ss_stop()" style="background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;border:none;padding:16px 40px;border-radius:14px;font-family:'Bebas Neue','Impact',sans-serif;font-size:18px;letter-spacing:3.5px;cursor:pointer;font-weight:700;box-shadow:0 8px 30px rgba(230,57,70,0.6);text-transform:uppercase;min-width:200px" data-i18n="ss_btn_stop">⏹ TERMINER</button>
+      </div>
+    </div>
+
+    <!-- Animation REC clignotant -->
+    <style>
+    @keyframes ssRecBlink { 0%,100% { opacity: 1; transform:scale(1); } 50% { opacity: 0.35; transform:scale(0.85); } }
+    #ss-video-wrap:fullscreen { background:#000; }
+    #ss-video-wrap:-webkit-full-screen { background:#000; }
+    </style>
+
+    <!-- Bouton contrôle START (le STOP est en overlay plein écran pendant la session) -->
+    <div style="display:flex;gap:10px">
+      <button class="tr-btn tr-btn-start" id="ss-btn-start" onclick="_ss_start()" style="flex:1" data-i18n="ss_btn_start">▶ DÉMARRER LA SESSION</button>
+    </div>
+
+    <!-- Résumé fin de session (injecté dynamiquement) -->
+    <div id="ss-summary" style="display:none;margin-top:16px"></div>
+  </div>
+
   <div class="tr-card">
     <div class="tr-card-title">🏀 TERRAIN — TAPE UNE ZONE</div>
     <div style="position:relative;width:100%;background:var(--dark3);border-radius:10px;overflow:hidden;cursor:crosshair;margin-bottom:10px"
@@ -12425,7 +12470,7 @@ function applyLangTracker(lang) {
     radar_save_btn:'\ud83d\udcbe Enregistrer cette session',
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
-    footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact', footer_share:'\ud83d\udce4 Partager SENSEI', sm_voice_off:'\ud83d\udd07 Coach vocal', sm_voice_on:'\ud83d\udd0a Coach vocal ON', sm_wake_off:'\ud83c\udf19 \u00c9cran allum\u00e9', sm_wake_on:'\u2600\ufe0f \u00c9cran allum\u00e9 ON', sm_voice_hello:'Coach vocal activ\u00e9. Bienvenue dans SENSEI.', sm_wake_hello:'\u00c9cran maintenu allum\u00e9 pendant tes entra\u00eenements.', qr_title:'SCANNE POUR D\u00c9COUVRIR SENSEI', qr_sub:'L\u2019app basketball fond\u00e9e sur la science', qr_copy:'\ud83d\udccb Copier le lien', qr_share:'\ud83d\udce4 Partager', qr_copied:'Lien copi\u00e9 !',
+    footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact', footer_share:'\ud83d\udce4 Partager SENSEI', sm_voice_off:'\ud83d\udd07 Coach vocal', sm_voice_on:'\ud83d\udd0a Coach vocal ON', sm_wake_off:'\ud83c\udf19 \u00c9cran allum\u00e9', sm_wake_on:'\u2600\ufe0f \u00c9cran allum\u00e9 ON', sm_voice_hello:'Coach vocal activ\u00e9. Bienvenue dans SENSEI.', sm_wake_hello:'\u00c9cran maintenu allum\u00e9 pendant tes entra\u00eenements.', ss_title:'\ud83c\udfa5 SHOOTING SESSION', ss_intro:'Pose ton tr\u00e9pied, lance la session, shoote librement. L\'app analyse ta posture pendant que tu t\'entra\u00eenes \u2014 sans que tu touches ton t\u00e9l\u00e9phone.', ss_status_analyze:'\ud83e\udde0 Analyse en cours\u2026', ss_btn_start:'\u25b6 D\u00c9MARRER LA SESSION', ss_btn_stop:'\u23f9 TERMINER', ss_summary_title:'\ud83d\udcca R\u00c9SUM\u00c9 DE TA SESSION', ss_m1:'Dur\u00e9e', ss_m2:'Temps actif', ss_m2r:'Temps de repos', ss_m3:'Constance posturale', ss_m4:'\u00c9quilibre', ss_no_camera:'Cam\u00e9ra non accessible sur cet appareil.', ss_no_movenet:'MoveNet indisponible. R\u00e9essaie dans quelques secondes.', qr_title:'SCANNE POUR D\u00c9COUVRIR SENSEI', qr_sub:'L\u2019app basketball fond\u00e9e sur la science', qr_copy:'\ud83d\udccb Copier le lien', qr_share:'\ud83d\udce4 Partager', qr_copied:'Lien copi\u00e9 !',
     hero_world_title:"PREMI\u00c8RE MONDIALE : UNE APP DE BASKET FOND\u00c9E SUR LA SCIENCE, LES MATH\u00c9MATIQUES ET L'IA",
     hero_ob_tag:"L'art martial du basketteur",
     hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
@@ -12600,7 +12645,7 @@ function applyLangTracker(lang) {
     radar_save_btn:'Save this session',
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
-    footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact', footer_share:'\ud83d\udce4 Share SENSEI', sm_voice_off:'\ud83d\udd07 Voice coach', sm_voice_on:'\ud83d\udd0a Voice coach ON', sm_wake_off:'\ud83c\udf19 Keep screen on', sm_wake_on:'\u2600\ufe0f Screen ON', sm_voice_hello:'Voice coach activated. Welcome to SENSEI.', sm_wake_hello:'Screen kept on during your workouts.', qr_title:'SCAN TO DISCOVER SENSEI', qr_sub:'The basketball app built on science', qr_copy:'\ud83d\udccb Copy link', qr_share:'\ud83d\udce4 Share', qr_copied:'Link copied!',
+    footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact', footer_share:'\ud83d\udce4 Share SENSEI', sm_voice_off:'\ud83d\udd07 Voice coach', sm_voice_on:'\ud83d\udd0a Voice coach ON', sm_wake_off:'\ud83c\udf19 Keep screen on', sm_wake_on:'\u2600\ufe0f Screen ON', sm_voice_hello:'Voice coach activated. Welcome to SENSEI.', sm_wake_hello:'Screen kept on during your workouts.', ss_title:'\ud83c\udfa5 SHOOTING SESSION', ss_intro:'Set up your tripod, start the session, shoot freely. The app analyzes your posture while you train \u2014 without touching your phone.', ss_status_analyze:'\ud83e\udde0 Analyzing\u2026', ss_btn_start:'\u25b6 START SESSION', ss_btn_stop:'\u23f9 FINISH', ss_summary_title:'\ud83d\udcca SESSION SUMMARY', ss_m1:'Duration', ss_m2:'Active time', ss_m2r:'Rest time', ss_m3:'Postural consistency', ss_m4:'Balance', ss_no_camera:'Camera not accessible on this device.', ss_no_movenet:'MoveNet unavailable. Try again in a few seconds.', qr_title:'SCAN TO DISCOVER SENSEI', qr_sub:'The basketball app built on science', qr_copy:'\ud83d\udccb Copy link', qr_share:'\ud83d\udce4 Share', qr_copied:'Link copied!',
     hero_world_title:"WORLD PREMIERE: A BASKETBALL APP BUILT ON SCIENCE, MATHEMATICS AND AI",
     hero_ob_tag:"The basketball player's martial art",
     hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
@@ -41668,6 +41713,307 @@ body.si-banner-on { padding-top: 52px; }
       return r;
     };
   }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SHOOTING SESSION — Feature caméra 0 action joueur
+     - Chrono blanc en overlay (compteur qui monte)
+     - MoveNet analyse posture toutes les 250ms en fond
+     - 4 métriques haute confiance : Durée + Actif/Repos + Constance + Équilibre
+     - Utilise _tsym_detector (MoveNet déjà chargé pour Symétrie)
+     - 0 dépendance externe supplémentaire
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  'use strict';
+
+  var _ss_stream = null;
+  var _ss_startTime = 0;
+  var _ss_chronoInterval = null;
+  var _ss_analysisInterval = null;
+  var _ss_poseHistory = []; // Array de {t, keypoints}
+  var _ss_running = false;
+  var MOVEMENT_THRESHOLD = 12; // Pixels : au-dessus = "actif", en dessous = "repos"
+
+  function _t(key, fb) {
+    try {
+      var lang = (window._lang || document.body.getAttribute('data-lang') || 'fr');
+      if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) return window.i18n[lang][key];
+    } catch(e){}
+    return fb;
+  }
+
+  function _fmtTime(seconds) {
+    var m = Math.floor(seconds / 60);
+    var s = Math.floor(seconds % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function _updateChrono() {
+    var elapsed = (Date.now() - _ss_startTime) / 1000;
+    var el = document.getElementById('ss-chrono-overlay');
+    if (el) el.textContent = _fmtTime(elapsed);
+  }
+
+  window._ss_start = async function() {
+    // Vérifier caméra dispo
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert(_t('ss_no_camera', 'Caméra non accessible sur cet appareil.'));
+      return;
+    }
+    // Vérifier MoveNet chargé
+    if (typeof _tsym_detector === 'undefined' || !_tsym_detector) {
+      // Tenter chargement
+      if (typeof _tsym_loadModel === 'function') {
+        try { _tsym_loadModel(null, null); } catch(e){}
+      }
+      alert(_t('ss_no_movenet', 'MoveNet indisponible. Réessaie dans quelques secondes.'));
+      return;
+    }
+
+    var wrap = document.getElementById('ss-video-wrap');
+    var video = document.getElementById('ss-video');
+    var btnStart = document.getElementById('ss-btn-start');
+    var summary = document.getElementById('ss-summary');
+
+    // Demander caméra (arrière si mobile pour trépied)
+    var constraints = {
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    };
+    try {
+      _ss_stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch(e) {
+      // Fallback : caméra avant si arrière refusée
+      try {
+        _ss_stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+      } catch(e2) {
+        alert(_t('ss_no_camera', 'Caméra non accessible.'));
+        return;
+      }
+    }
+
+    video.srcObject = _ss_stream;
+    wrap.style.display = 'flex';
+    btnStart.style.display = 'none';
+    summary.style.display = 'none';
+
+    // Passer en vrai plein écran natif (cache barre navigateur sur PC/Android)
+    // Fallback silencieux si non supporté (iOS Safari)
+    try {
+      var reqFS = wrap.requestFullscreen || wrap.webkitRequestFullscreen || wrap.mozRequestFullScreen || wrap.msRequestFullscreen;
+      if (reqFS) reqFS.call(wrap).catch(function(){ /* refusé, on garde le pseudo plein écran */ });
+    } catch(e) { /* silencieux */ }
+    if (window._haptic) window._haptic.success();
+
+    _ss_running = true;
+    _ss_startTime = Date.now();
+    _ss_poseHistory = [];
+
+    // Chrono qui monte (mise à jour toutes les 500ms suffit pour l'affichage)
+    _updateChrono();
+    _ss_chronoInterval = setInterval(_updateChrono, 500);
+
+    // Analyse MoveNet toutes les 250ms
+    _ss_analysisInterval = setInterval(async function(){
+      if (!_ss_running || !_tsym_detector) return;
+      try {
+        var poses = await _tsym_detector.estimatePoses(video);
+        if (poses && poses.length > 0 && poses[0].keypoints) {
+          _ss_poseHistory.push({
+            t: Date.now() - _ss_startTime,
+            kp: poses[0].keypoints
+          });
+        }
+      } catch(e) { /* silencieux */ }
+    }, 250);
+
+    // Coach vocal si activé
+    if (window._speak) window._speak.say((window._lang === 'en') ? 'Session started. Go!' : "Session lancée. C'est parti !");
+
+    // Wake Lock auto (garder écran allumé pendant la session)
+    if (window._wake) window._wake.acquire();
+  };
+
+  window._ss_stop = function() {
+    if (!_ss_running) return;
+    _ss_running = false;
+
+    // Arrêter intervals
+    if (_ss_chronoInterval) { clearInterval(_ss_chronoInterval); _ss_chronoInterval = null; }
+    if (_ss_analysisInterval) { clearInterval(_ss_analysisInterval); _ss_analysisInterval = null; }
+
+    // Arrêter caméra
+    if (_ss_stream) {
+      _ss_stream.getTracks().forEach(function(t){ t.stop(); });
+      _ss_stream = null;
+    }
+
+    // Sortir du plein écran natif si actif
+    try {
+      var exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+      if (exitFS && (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) {
+        exitFS.call(document).catch(function(){});
+      }
+    } catch(e) { /* silencieux */ }
+
+    // UI
+    var video = document.getElementById('ss-video');
+    if (video) video.srcObject = null;
+    document.getElementById('ss-video-wrap').style.display = 'none';
+    document.getElementById('ss-btn-start').style.display = 'block';
+    if (window._haptic) window._haptic.success();
+    if (window._wake) window._wake.release();
+
+    // Calculer métriques et afficher résumé
+    _computeAndShowSummary();
+  };
+
+  function _computeAndShowSummary() {
+    var duration = (Date.now() - _ss_startTime) / 1000; // en secondes
+    var history = _ss_poseHistory;
+
+    // ─── M2 : Temps actif vs repos ───
+    // Calcul du mouvement entre 2 poses consécutives (delta position)
+    var activeSamples = 0, totalSamples = 0;
+    for (var i = 1; i < history.length; i++) {
+      var prev = history[i-1].kp, cur = history[i].kp;
+      var totalMove = 0, count = 0;
+      // Comparer keypoints principaux (nose, épaules, poignets, hanches)
+      var idxToCheck = [0, 5, 6, 9, 10, 11, 12]; // nose, shoulders, wrists, hips
+      for (var k = 0; k < idxToCheck.length; k++) {
+        var pIdx = idxToCheck[k];
+        if (prev[pIdx] && cur[pIdx] && prev[pIdx].score > 0.3 && cur[pIdx].score > 0.3) {
+          var dx = cur[pIdx].x - prev[pIdx].x;
+          var dy = cur[pIdx].y - prev[pIdx].y;
+          totalMove += Math.sqrt(dx*dx + dy*dy);
+          count++;
+        }
+      }
+      if (count > 0) {
+        var avgMove = totalMove / count;
+        if (avgMove > MOVEMENT_THRESHOLD) activeSamples++;
+        totalSamples++;
+      }
+    }
+    var activeRatio = totalSamples > 0 ? (activeSamples / totalSamples) : 0;
+    var activeTime = duration * activeRatio;
+    var restTime = duration - activeTime;
+
+    // ─── M3 : Constance posturale ───
+    // Calcul de la variance des positions des keypoints principaux au fil du temps
+    // (Une posture constante = variance faible = joueur qui répète le même geste)
+    var constancy = 100;
+    if (history.length > 5) {
+      var kpIndices = [5, 6, 11, 12]; // shoulders, hips (torse — le référentiel)
+      var variances = [];
+      for (var k = 0; k < kpIndices.length; k++) {
+        var xs = [], ys = [];
+        for (var i = 0; i < history.length; i++) {
+          var p = history[i].kp[kpIndices[k]];
+          if (p && p.score > 0.3) { xs.push(p.x); ys.push(p.y); }
+        }
+        if (xs.length > 3) {
+          var meanX = xs.reduce(function(a,b){return a+b;},0)/xs.length;
+          var meanY = ys.reduce(function(a,b){return a+b;},0)/ys.length;
+          var vx = xs.reduce(function(a,b){return a+(b-meanX)*(b-meanX);},0)/xs.length;
+          var vy = ys.reduce(function(a,b){return a+(b-meanY)*(b-meanY);},0)/ys.length;
+          variances.push(Math.sqrt(vx + vy));
+        }
+      }
+      if (variances.length > 0) {
+        var avgVar = variances.reduce(function(a,b){return a+b;},0)/variances.length;
+        // Normalisation : variance de 0 = 100%, variance de 80px+ = 0%
+        constancy = Math.max(0, Math.min(100, 100 - (avgVar / 80) * 100));
+      }
+    }
+
+    // ─── M4 : Équilibre ───
+    // Distance moyenne du centre de gravité (moyenne des hanches) par rapport à sa position moyenne
+    var balance = 100;
+    if (history.length > 5) {
+      var cogs = [];
+      for (var i = 0; i < history.length; i++) {
+        var lh = history[i].kp[11], rh = history[i].kp[12];
+        if (lh && rh && lh.score > 0.3 && rh.score > 0.3) {
+          cogs.push({x: (lh.x + rh.x)/2, y: (lh.y + rh.y)/2});
+        }
+      }
+      if (cogs.length > 3) {
+        var mx = cogs.reduce(function(a,b){return a+b.x;},0)/cogs.length;
+        var my = cogs.reduce(function(a,b){return a+b.y;},0)/cogs.length;
+        var avgDev = cogs.reduce(function(a,b){return a+Math.sqrt((b.x-mx)*(b.x-mx)+(b.y-my)*(b.y-my));},0)/cogs.length;
+        // Normalisation : 0 déviation = 100%, 60px+ déviation = 0%
+        balance = Math.max(0, Math.min(100, 100 - (avgDev / 60) * 100));
+      }
+    }
+
+    // ─── Affichage du résumé ───
+    var summary = document.getElementById('ss-summary');
+    var html = '<div style="padding:16px;background:linear-gradient(180deg,rgba(245,197,24,0.08),rgba(245,197,24,0.03));border:1px solid rgba(245,197,24,0.3);border-radius:12px">';
+    html += '<div style="font-family:var(--font-cond);color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;font-weight:700">' + _t('ss_summary_title', '📊 RÉSUMÉ DE TA SESSION') + '</div>';
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+    // M1 Durée
+    html += _ss_metricCard('⏱', _t('ss_m1','Durée'), _fmtTime(duration), '#f5c518');
+    // M2 Temps actif
+    html += _ss_metricCard('🏃', _t('ss_m2','Temps actif'), _fmtTime(activeTime) + ' <span style="font-size:10px;color:var(--muted)">(' + Math.round(activeRatio*100) + '%)</span>', '#22c55e');
+    // M2 Temps repos
+    html += _ss_metricCard('💤', _t('ss_m2r','Temps de repos'), _fmtTime(restTime) + ' <span style="font-size:10px;color:var(--muted)">(' + Math.round((1-activeRatio)*100) + '%)</span>', '#3b82f6');
+    // M3 Constance
+    html += _ss_metricCard('🎯', _t('ss_m3','Constance posturale'), Math.round(constancy) + '%', constancy >= 70 ? '#22c55e' : constancy >= 50 ? '#f97316' : '#ef4444');
+    html += '</div>';
+    // M4 Équilibre (pleine largeur car unique restant)
+    html += '<div style="margin-top:10px">';
+    html += _ss_metricCard('⚖️', _t('ss_m4','Équilibre'), Math.round(balance) + '%', balance >= 70 ? '#22c55e' : balance >= 50 ? '#f97316' : '#ef4444', true);
+    html += '</div>';
+
+    html += '<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:1px;text-transform:uppercase">Analyse par MoveNet · 100% locale · Aucune donnée envoyée</div>';
+    html += '</div>';
+
+    summary.innerHTML = html;
+    summary.style.display = 'block';
+    // Scroll doux vers le résumé
+    setTimeout(function(){ summary.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 100);
+
+    // Coach vocal si activé
+    if (window._speak) {
+      var msg = (window._lang === 'en')
+        ? 'Session finished. Duration: ' + Math.floor(duration/60) + ' minutes.'
+        : 'Session terminée. Durée : ' + Math.floor(duration/60) + ' minutes.';
+      window._speak.say(msg);
+    }
+  }
+
+  function _ss_metricCard(icon, label, value, color, wide) {
+    var w = wide ? 'width:100%' : '';
+    return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;' + w + '">' +
+      '<div style="font-size:22px;margin-bottom:4px">' + icon + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">' + label + '</div>' +
+      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:1px;color:' + color + ';line-height:1;font-variant-numeric:tabular-nums">' + value + '</div>' +
+      '</div>';
+  }
+
+  // Sécurité : si l'utilisateur quitte l'onglet ou ferme la page, on relâche la caméra
+  window.addEventListener('beforeunload', function(){
+    if (_ss_stream) { _ss_stream.getTracks().forEach(function(t){ t.stop(); }); }
+    if (window._wake) window._wake.release();
+  });
+
+  // Écouter la sortie de plein écran (touche ESC ou geste utilisateur)
+  // → si session en cours et sortie fullscreen manuel, on arrête proprement
+  function _ss_onFsChange() {
+    var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    if (!isFs && _ss_running) {
+      // L'utilisateur a quitté le plein écran manuellement → on arrête la session
+      _ss_stop();
+    }
+  }
+  document.addEventListener('fullscreenchange', _ss_onFsChange);
+  document.addEventListener('webkitfullscreenchange', _ss_onFsChange);
+  document.addEventListener('mozfullscreenchange', _ss_onFsChange);
+  document.addEventListener('MSFullscreenChange', _ss_onFsChange);
 })();
 </script>
 </body>
