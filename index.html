@@ -10063,6 +10063,8 @@ function oppDisplayResults(top, region, en, profile) {
     <span style="color:#3a4060">·</span>
     <a href="mailto:contact@senseiblackbelt.com" style="color:#9aa3bf;text-decoration:none" data-i18n="footer_contact">Contact</a>
     <span style="color:#3a4060">·</span>
+    <a href="javascript:_qr_share_open()" style="color:#f5c518;text-decoration:none;cursor:pointer;font-weight:700" data-i18n="footer_share">📤 Partager SENSEI</a>
+    <span style="color:#3a4060">·</span>
     <span style="color:#7b82a0">v2026.05.10</span>
   </div>
   <span data-i18n="footer_text">© 2026 Thibault NJECKIL — Tous droits réservés · Dépôt INPI · Propriété intellectuelle protégée · Toute reproduction interdite sans autorisation écrite</span>
@@ -12419,7 +12421,7 @@ function applyLangTracker(lang) {
     radar_save_btn:'\ud83d\udcbe Enregistrer cette session',
     radar_saved:'\u2705 Session enregistr\u00e9e\u00a0!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 Tous droits r\u00e9serv\u00e9s \u00b7 D\u00e9p\u00f4t INPI \u00b7 Propri\u00e9t\u00e9 intellectuelle prot\u00e9g\u00e9e \u00b7 Toute reproduction interdite sans autorisation \u00e9crite',
-    footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact',
+    footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact', footer_share:'\ud83d\udce4 Partager SENSEI', qr_title:'SCANNE POUR D\u00c9COUVRIR SENSEI', qr_sub:'L\u2019app basketball fond\u00e9e sur la science', qr_copy:'\ud83d\udccb Copier le lien', qr_share:'\ud83d\udce4 Partager', qr_copied:'Lien copi\u00e9 !',
     hero_world_title:"PREMI\u00c8RE MONDIALE : UNE APP DE BASKET FOND\u00c9E SUR LA SCIENCE, LES MATH\u00c9MATIQUES ET L'IA",
     hero_ob_tag:"L'art martial du basketteur",
     hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
@@ -12594,7 +12596,7 @@ function applyLangTracker(lang) {
     radar_save_btn:'Save this session',
     radar_saved:'Session saved!',
     footer_text:'\u00a9 2026 Thibault NJECKIL \u2014 All rights reserved \u00b7 INPI filing \u00b7 Intellectual property protected \u00b7 Any reproduction prohibited without written authorization',
-    footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact',
+    footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact', footer_share:'\ud83d\udce4 Share SENSEI', qr_title:'SCAN TO DISCOVER SENSEI', qr_sub:'The basketball app built on science', qr_copy:'\ud83d\udccb Copy link', qr_share:'\ud83d\udce4 Share', qr_copied:'Link copied!',
     hero_world_title:"WORLD PREMIERE: A BASKETBALL APP BUILT ON SCIENCE, MATHEMATICS AND AI",
     hero_ob_tag:"The basketball player's martial art",
     hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
@@ -41341,5 +41343,141 @@ body.si-banner-on { padding-top: 52px; }
 })();
 </script>
 
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL QR CODE — Partage SENSEI (déclenché via _qr_share_open)
+     ═══════════════════════════════════════════════════════════ -->
+<style>
+#qr-share-modal {
+  position: fixed; inset: 0; z-index: 100060;
+  background: rgba(0,0,0,0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  animation: qrFadeIn 0.3s ease-out;
+}
+#qr-share-modal.on { display: flex; }
+@keyframes qrFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.qr-modal-card {
+  background: linear-gradient(180deg, #161b22, #0d1117);
+  border: 2px solid rgba(245,197,24,0.5); border-radius: 20px;
+  padding: 30px 24px; max-width: 400px; width: 100%; position: relative;
+  box-shadow: 0 20px 60px rgba(245,197,24,0.35);
+  animation: qrSlideUp 0.4s ease-out;
+  text-align: center;
+}
+@keyframes qrSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.qr-modal-close {
+  position: absolute; top: 12px; right: 14px; background: transparent; border: none;
+  color: #7a8299; font-size: 28px; cursor: pointer; padding: 4px 8px; line-height: 1;
+}
+.qr-modal-close:hover { color: #f5c518; }
+.qr-modal-title {
+  font-family: 'Bebas Neue', sans-serif; color: #f5c518; font-size: 22px;
+  letter-spacing: 2.5px; margin-bottom: 8px; line-height: 1.1;
+}
+.qr-modal-sub {
+  color: #cfd3e0; font-size: 13px; margin-bottom: 20px;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; font-style: italic;
+}
+.qr-image-wrap {
+  background: #0d1117; padding: 12px; border-radius: 12px;
+  margin: 0 auto 20px; display: inline-block;
+  box-shadow: 0 6px 24px rgba(245,197,24,0.25);
+  border: 1px solid rgba(245,197,24,0.3);
+}
+.qr-image-wrap img {
+  display: block; width: 240px; height: 240px; max-width: 100%;
+  image-rendering: pixelated; -ms-interpolation-mode: nearest-neighbor;
+}
+.qr-url {
+  color: #f5c518; font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+  letter-spacing: 2px; margin-bottom: 20px; word-break: break-all;
+}
+.qr-buttons {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+.qr-btn {
+  background: linear-gradient(135deg, #f5c518, #e0a800); color: #0d1117;
+  border: none; padding: 12px 20px; border-radius: 10px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1.5px;
+  cursor: pointer; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(245,197,24,0.35);
+  transition: transform .15s;
+}
+.qr-btn:hover { transform: translateY(-2px); }
+.qr-btn.secondary {
+  background: transparent; color: #f5c518;
+  border: 1.5px solid rgba(245,197,24,0.5); box-shadow: none;
+}
+.qr-copied-toast {
+  position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+  background: #22c55e; color: #fff; padding: 8px 16px; border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s, bottom 0.3s;
+}
+.qr-copied-toast.on { opacity: 1; bottom: -50px; }
+</style>
+
+<div id="qr-share-modal" role="dialog" aria-label="Partager SENSEI">
+  <div class="qr-modal-card">
+    <button class="qr-modal-close" onclick="_qr_share_close()" aria-label="Fermer">×</button>
+    <div class="qr-modal-title" data-i18n="qr_title">SCANNE POUR DÉCOUVRIR SENSEI</div>
+    <div class="qr-modal-sub" data-i18n="qr_sub">L'app basketball fondée sur la science</div>
+    <div class="qr-image-wrap">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyCAIAAABnRsZeAAAHr0lEQVR4nO3cPW6tNRhGUYJumyJVGBTDZVDMAtpISBYXb/P6O1mrPzm/2XLxyG/vH5+/AHR+nX4BwKuRFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQOzHzoP//OOteh2X+O33v0aed/1Jvt6rmvrlrF/zzvv1v/CV0woQkxUgJitATFaAmKwAMVkBYrICxGQFiMkKENta2a5NbUPXzq0hp5ayd25Dp17Vnb+6O1/VuW/faQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiB1c2a6dW/i93p719Rar597RE++UfeL/wprTChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQG1vZ8tXUUnZq+7vzl9em7u7lK6cVICYrQExWgJisADFZAWKyAsRkBYjJChCTFSBmZfsTpharO49dv+add3TnjnbH1M2vr8dpBYjJChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIja1sX2/ReG51urOFnVrK7qx7p5733Ge19nr/C04rQExWgJisADFZAWKyAsRkBYjJChCTFSAmK0Ds4Mp2577SO53bwk49dscT3+/UnvX1/hfWnFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQExWgNjb+8fn9Gt4ETtLynN3uz7RuS3snRvc1+O0AsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLEDt5lu+PcYnVqCzt14+yade9Xd25wp36xO5xWgJisADFZAWKyAsRkBYjJChCTFSAmK0BMVoDY1sr2iYvVqV3p1G54at079bxTf3lq233n1tlpBYjJChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIba1s79z/TW1wp+4NPefOd/R6a9c770jeeVVOK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgJitA7O394/M/P/i77WjXpu6FPWdqo3nOnff+rt15G/Ga0woQkxUgJitATFaAmKwAMVkBYrICxGQFiMkKEDu4st1Z6U3dOTq1333i+nPH1G9jx9Tvas1dtsC3ICtATFaAmKwAMVkBYrICxGQFiMkKEJMVIPZj58Hn7iudWqyu3XmH7o6p5eidy+Cp7/eJt9WuOa0AMVkBYrICxGQFiMkKEJMVICYrQExWgJisALGtle2dt4quPXEreecmdccT98rnnvfcb2Pqs3JaAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFiWyvbtalV4rkN7o4777Kd2v7euRu+89s/d2ewu2yBx5AVICYrQExWgJisADFZAWKyAsRkBYjJChB7e//4PPSn71xSrp27j/acO/e7a3fewLp257e/5i5b4EXIChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIba1sd7aSd94bOvWO7vysPG/12HOmfu1rTitATFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQOwF77KdWlKee+yOc9vfKa/3Ldy53rayBS4iK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgNnaX7Z3ufEd33u16519eu/MG5bUn7qSdVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaA2I9zf/rOjeaOJ+4d186tiqdub12787baHVPf0ZrTChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQG7vL9on7zqnH7nBb7b//y3d+gzvcZQu8CFkBYrICxGQFiMkKEJMVICYrQExWgJisALGDd9ne6Yn3pN55X+nUQnf92Klt9zk772hq6+y0AsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLExu6y3XHnVnLqNtM771i9c7H6xBt2d/7y2rnvyGkFiMkKEJMVICYrQExWgJisADFZAWKyAsRkBYgdXNnumNod7rhzV7pjZxvqt/H/OPctuMsWuIisADFZAWKyAsRkBYjJChCTFSAmK0BMVoDY1sr2u7nzJtRzz3vO1Ab3zk/yzruZdzitADFZAWKyAsRkBYjJChCTFSAmK0BMVoCYrACxHzsP/m43g06ZelXn1p87W9g7v6Nzr/mJn4bTChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQ21rZrt25/7vzNtMdUyvMnec999gpdy6h1869ZqcVICYrQExWgJisADFZAWKyAsRkBYjJChCTFSB2cGW7dm4rObUrXbtzobt2bu36xB3tna/qzk/SaQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiI2tbL+b77Yq3nHncnTt3N29T+S0AsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLErGx/ws4acmpnufO859aubgX+aurTOPebdFoBYrICxGQFiMkKEJMVICYrQExWgJisADFZAWJjK9snbiXXdjaL5x475Ymr4qnnfeL3u+a0AsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLE3t4/Pv/zg5+4/1s7dzPonaa2znfe3nruedem9tnnOK0AMVkBYrICxGQFiMkKEJMVICYrQExWgJisALGtlS3APzmtADFZAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaAmKwAMVkBYrICxP4GZ7G4urbS0cUAAAAASUVORK5CYII=" alt="QR Code SENSEI BlackBelt">
+    </div>
+    <div class="qr-url">senseiblackbelt.com</div>
+    <div class="qr-buttons">
+      <button class="qr-btn" onclick="_qr_copy_link()" data-i18n="qr_copy">📋 Copier le lien</button>
+      <button class="qr-btn secondary" onclick="_qr_native_share()" data-i18n="qr_share">📤 Partager</button>
+    </div>
+    <div class="qr-copied-toast" id="qr-copied-toast" data-i18n="qr_copied">Lien copié !</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var URL_TO_SHARE = 'https://senseiblackbelt.com';
+
+  window._qr_share_open = function() {
+    var m = document.getElementById('qr-share-modal');
+    if (m) m.classList.add('on');
+  };
+  window._qr_share_close = function() {
+    var m = document.getElementById('qr-share-modal');
+    if (m) m.classList.remove('on');
+  };
+  window._qr_copy_link = function() {
+    var text = URL_TO_SHARE;
+    var toast = document.getElementById('qr-copied-toast');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){
+        if (toast) { toast.classList.add('on'); setTimeout(function(){ toast.classList.remove('on'); }, 2000); }
+      }).catch(function(){ _qr_fallback_copy(text, toast); });
+    } else {
+      _qr_fallback_copy(text, toast);
+    }
+  };
+  function _qr_fallback_copy(text, toast) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.top = '-1000px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); if(toast){toast.classList.add('on'); setTimeout(function(){ toast.classList.remove('on'); }, 2000);} } catch(e){}
+    document.body.removeChild(ta);
+  }
+  window._qr_native_share = function() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'SENSEI BlackBelt',
+        text: 'L\'app basketball fondée sur la science, les mathématiques et l\'IA.',
+        url: URL_TO_SHARE
+      }).catch(function(){});
+    } else {
+      _qr_copy_link();
+    }
+  };
+})();
+</script>
 </body>
 </html>
