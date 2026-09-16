@@ -2435,35 +2435,8 @@ body.unlocked .sensei-only{display:revert !important}
     <div class="tr-card-title" data-i18n="ss_title">🎥 SHOOTING SESSION</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5" data-i18n="ss_intro">Pose ton trépied, lance la session, shoote librement. L'app analyse ta posture pendant que tu t'entraînes — sans que tu touches ton téléphone.</div>
 
-    <!-- Plein écran caméra immersif — bordé noir avec éléments UI bien placés -->
-    <div id="ss-video-wrap" style="display:none;position:fixed;inset:0;z-index:600;background:#000;flex-direction:column;align-items:center;justify-content:center">
-      <!-- Vidéo caméra qui remplit tout l'écran disponible -->
-      <video id="ss-video" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;background:#000"></video>
-
-      <!-- ═══ OVERLAYS ═══ -->
-
-      <!-- REC clignotant en haut à gauche (style caméra professionnelle) -->
-      <div id="ss-rec-indicator" style="position:absolute;top:20px;left:20px;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:14px;letter-spacing:2.5px;font-weight:700;text-transform:uppercase;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-        <span id="ss-rec-dot" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.9), 0 0 4px rgba(239,68,68,1) inset;animation:ssRecBlink 1s ease-in-out infinite"></span>
-        <span>REC</span>
-      </div>
-
-      <!-- Chrono blanc en haut à droite (style pro, contours blancs) -->
-      <div id="ss-chrono-overlay" style="position:absolute;top:20px;right:20px;background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid #fff;border-radius:14px;padding:10px 20px;font-family:'Bebas Neue','Impact',sans-serif;color:#fff;font-size:38px;letter-spacing:4px;text-shadow:0 2px 6px rgba(0,0,0,0.9);font-variant-numeric:tabular-nums;box-shadow:0 4px 20px rgba(0,0,0,0.5);line-height:1">00:00</div>
-
-      <!-- Bloc bas — statut MoveNet + bouton STOP -->
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 20px 30px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.85));display:flex;flex-direction:column;align-items:center;gap:14px">
-        <div id="ss-status" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;color:#fff;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;white-space:nowrap" data-i18n="ss_status_analyze">🧠 Analyse en cours…</div>
-        <button id="ss-btn-stop-overlay" onclick="_ss_stop()" style="background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;border:none;padding:16px 40px;border-radius:14px;font-family:'Bebas Neue','Impact',sans-serif;font-size:18px;letter-spacing:3.5px;cursor:pointer;font-weight:700;box-shadow:0 8px 30px rgba(230,57,70,0.6);text-transform:uppercase;min-width:200px" data-i18n="ss_btn_stop">⏹ TERMINER</button>
-      </div>
-    </div>
-
-    <!-- Animation REC clignotant -->
-    <style>
-    @keyframes ssRecBlink { 0%,100% { opacity: 1; transform:scale(1); } 50% { opacity: 0.35; transform:scale(0.85); } }
-    #ss-video-wrap:fullscreen { background:#000; }
-    #ss-video-wrap:-webkit-full-screen { background:#000; }
-    </style>
+    <!-- Le plein écran caméra utilise l'overlay officiel SENSEI (senseiCamShow)
+         → boutons STOP, REC, logo, canvas déjà fournis par le système -->
 
     <!-- Bouton contrôle START (le STOP est en overlay plein écran pendant la session) -->
     <div style="display:flex;gap:10px">
@@ -31615,6 +31588,7 @@ function senseiCamShow(mod,stream){
     if(mod==='tdr'&&typeof _tdr_onCamReady==='function')_tdr_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='ss'&&typeof _ss_onCamReady==='function')_ss_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -31645,6 +31619,7 @@ function senseiCamStop(){
   if(m==='tdr'&&typeof _tdr_stop==='function')_tdr_stop();
   if(m==='dcog'&&typeof _dcog_stop==='function')_dcog_stop();
   if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
+  if(m==='ss'&&typeof _ss_stopCamera==='function')_ss_stopCamera();
   // Restaurer tous les panels tr-panel
   document.querySelectorAll('.tr-panel').forEach(function(p){
     p.style.visibility = '';
@@ -31676,6 +31651,7 @@ function senseiCamToggleRec(){
   if(m==='tdr' && typeof _tdr_toggleRec==='function') _tdr_toggleRec();
   else if(m==='tsym' && typeof _tsym_toggleRec==='function') _tsym_toggleRec();
   else if(m==='dcog' && typeof _dcog_toggleRec==='function') _dcog_toggleRec();
+  else if(m==='ss' && typeof _ss_toggleRec==='function') _ss_toggleRec();
 }
 // i18n portrait warning
 (function(){
@@ -41718,23 +41694,24 @@ body.si-banner-on { padding-top: 52px; }
 
 <!-- ═══════════════════════════════════════════════════════════
      SHOOTING SESSION — Feature caméra 0 action joueur
-     - Chrono blanc en overlay (compteur qui monte)
-     - MoveNet analyse posture toutes les 250ms en fond
-     - 4 métriques haute confiance : Durée + Actif/Repos + Constance + Équilibre
-     - Utilise _tsym_detector (MoveNet déjà chargé pour Symétrie)
-     - 0 dépendance externe supplémentaire
+     Utilise l'overlay officiel SENSEI (senseiCamShow) comme les autres
+     features caméra (tsym, tdr, dcog) — cohérence garantie
      ═══════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   'use strict';
 
-  var _ss_stream = null;
   var _ss_startTime = 0;
   var _ss_chronoInterval = null;
   var _ss_analysisInterval = null;
-  var _ss_poseHistory = []; // Array de {t, keypoints}
+  var _ss_poseHistory = [];
   var _ss_running = false;
-  var MOVEMENT_THRESHOLD = 12; // Pixels : au-dessus = "actif", en dessous = "repos"
+  var _ss_chronoEl = null;
+  var _ss_rafId = null;
+  var _ss_video = null;
+  var _ss_canvas = null;
+  var _ss_ctx = null;
+  var MOVEMENT_THRESHOLD = 12;
 
   function _t(key, fb) {
     try {
@@ -41752,74 +41729,103 @@ body.si-banner-on { padding-top: 52px; }
 
   function _updateChrono() {
     var elapsed = (Date.now() - _ss_startTime) / 1000;
-    var el = document.getElementById('ss-chrono-overlay');
-    if (el) el.textContent = _fmtTime(elapsed);
+    if (_ss_chronoEl) _ss_chronoEl.textContent = _fmtTime(elapsed);
   }
 
-  window._ss_start = async function() {
-    // Vérifier caméra dispo
+  // ═══ START : demande caméra + délègue à senseiCamShow (overlay officiel) ═══
+  window._ss_start = function() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       alert(_t('ss_no_camera', 'Caméra non accessible sur cet appareil.'));
       return;
     }
-    // Vérifier MoveNet chargé
     if (typeof _tsym_detector === 'undefined' || !_tsym_detector) {
-      // Tenter chargement
-      if (typeof _tsym_loadModel === 'function') {
-        try { _tsym_loadModel(null, null); } catch(e){}
-      }
+      if (typeof _tsym_loadModel === 'function') { try { _tsym_loadModel(null, null); } catch(e){} }
       alert(_t('ss_no_movenet', 'MoveNet indisponible. Réessaie dans quelques secondes.'));
       return;
     }
 
-    var wrap = document.getElementById('ss-video-wrap');
-    var video = document.getElementById('ss-video');
-    var btnStart = document.getElementById('ss-btn-start');
     var summary = document.getElementById('ss-summary');
+    if (summary) summary.style.display = 'none';
 
-    // Demander caméra (arrière si mobile pour trépied)
-    var constraints = {
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
-    };
-    try {
-      _ss_stream = await navigator.mediaDevices.getUserMedia(constraints);
-    } catch(e) {
-      // Fallback : caméra avant si arrière refusée
-      try {
-        _ss_stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-      } catch(e2) {
-        alert(_t('ss_no_camera', 'Caméra non accessible.'));
+    // Demande caméra arrière (idéal pour trépied) puis fallback avant
+    var vConstraints = [
+      { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      true
+    ];
+    function tryCam(i) {
+      if (i >= vConstraints.length) {
+        alert(_t('ss_no_camera', 'Caméra inaccessible.'));
         return;
       }
+      navigator.mediaDevices.getUserMedia({ video: vConstraints[i], audio: false })
+        .then(function(stream) {
+          if (window._haptic) window._haptic.success();
+          if (window._wake) window._wake.acquire();
+          // Utilise l'overlay officiel SENSEI (comme tsym/tdr/dcog)
+          if (typeof senseiCamShow === 'function') {
+            senseiCamShow('ss', stream);
+          }
+        })
+        .catch(function(){ tryCam(i + 1); });
     }
+    tryCam(0);
+  };
 
-    video.srcObject = _ss_stream;
-    wrap.style.display = 'flex';
-    btnStart.style.display = 'none';
-    summary.style.display = 'none';
+  // ═══ Boucle de dessin — indispensable car #sensei-cam-overlay video{display:none} ═══
+  //     Le rendu à l'écran vient EXCLUSIVEMENT du canvas → il faut dessiner la vidéo dedans à chaque frame
+  function _ss_drawLoop() {
+    if (!_ss_running || !_ss_video || !_ss_canvas || !_ss_ctx) return;
+    var W = _ss_canvas.width, H = _ss_canvas.height;
+    var vw = _ss_video.videoWidth || 0, vh = _ss_video.videoHeight || 0;
+    if (vw > 0 && vh > 0) {
+      _ss_ctx.clearRect(0, 0, W, H);
+      // Fit "cover" — la vidéo remplit le canvas sans déformation
+      var cr = W / H, vr = vw / vh;
+      var sx, sy, sw, sh;
+      if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw - sw) / 2; sy = 0; }
+      else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh - sh) / 2; }
+      _ss_ctx.save();
+      _ss_ctx.imageSmoothingEnabled = true;
+      if ('imageSmoothingQuality' in _ss_ctx) _ss_ctx.imageSmoothingQuality = 'high';
+      // PAS de miroir — trépied fixe filme la scène telle qu'elle est
+      _ss_ctx.drawImage(_ss_video, sx, sy, sw, sh, 0, 0, W, H);
+      _ss_ctx.restore();
+    }
+    _ss_rafId = requestAnimationFrame(_ss_drawLoop);
+  }
 
-    // Passer en vrai plein écran natif (cache barre navigateur sur PC/Android)
-    // Fallback silencieux si non supporté (iOS Safari)
-    try {
-      var reqFS = wrap.requestFullscreen || wrap.webkitRequestFullscreen || wrap.mozRequestFullScreen || wrap.msRequestFullscreen;
-      if (reqFS) reqFS.call(wrap).catch(function(){ /* refusé, on garde le pseudo plein écran */ });
-    } catch(e) { /* silencieux */ }
-    if (window._haptic) window._haptic.success();
-
+  // ═══ onCamReady : appelé par senseiCamShow quand la vidéo est prête ═══
+  window._ss_onCamReady = function(video, canvas, ctx) {
+    _ss_video = video;
+    _ss_canvas = canvas;
+    _ss_ctx = ctx;
     _ss_running = true;
     _ss_startTime = Date.now();
     _ss_poseHistory = [];
+    // Démarrer la boucle de dessin de la vidéo sur le canvas
+    _ss_rafId = requestAnimationFrame(_ss_drawLoop);
 
-    // Chrono qui monte (mise à jour toutes les 500ms suffit pour l'affichage)
+    // Injecter le chrono blanc en overlay (par-dessus l'overlay officiel)
+    var ov = document.getElementById('sensei-cam-overlay');
+    if (ov) {
+      var oldCh = document.getElementById('ss-chrono-live');
+      if (oldCh) oldCh.remove();
+      _ss_chronoEl = document.createElement('div');
+      _ss_chronoEl.id = 'ss-chrono-live';
+      _ss_chronoEl.style.cssText = 'position:absolute;top:70px;right:14px;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid #fff;border-radius:12px;padding:8px 16px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;color:#fff;font-size:28px;letter-spacing:3px;text-shadow:0 2px 6px rgba(0,0,0,0.9);font-variant-numeric:tabular-nums;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,0.4)';
+      _ss_chronoEl.textContent = '00:00';
+      ov.appendChild(_ss_chronoEl);
+    }
+
     _updateChrono();
     _ss_chronoInterval = setInterval(_updateChrono, 500);
 
-    // Analyse MoveNet toutes les 250ms
+    // Analyse MoveNet toutes les 250ms (utilise _ss_video, cohérent avec drawLoop)
     _ss_analysisInterval = setInterval(async function(){
-      if (!_ss_running || !_tsym_detector) return;
+      if (!_ss_running || !_tsym_detector || !_ss_video) return;
       try {
-        var poses = await _tsym_detector.estimatePoses(video);
+        var poses = await _tsym_detector.estimatePoses(_ss_video);
         if (poses && poses.length > 0 && poses[0].keypoints) {
           _ss_poseHistory.push({
             t: Date.now() - _ss_startTime,
@@ -41829,59 +41835,62 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) { /* silencieux */ }
     }, 250);
 
-    // Coach vocal si activé
     if (window._speak) window._speak.say((window._lang === 'en') ? 'Session started. Go!' : "Session lancée. C'est parti !");
-
-    // Wake Lock auto (garder écran allumé pendant la session)
-    if (window._wake) window._wake.acquire();
   };
 
-  window._ss_stop = function() {
+  // ═══ stopCamera : appelé par senseiCamStop → nettoie et affiche résumé ═══
+  window._ss_stopCamera = function() {
     if (!_ss_running) return;
     _ss_running = false;
 
-    // Arrêter intervals
+    // Arrêter la boucle de dessin
+    if (_ss_rafId) { cancelAnimationFrame(_ss_rafId); _ss_rafId = null; }
+    _ss_video = null; _ss_canvas = null; _ss_ctx = null;
+
     if (_ss_chronoInterval) { clearInterval(_ss_chronoInterval); _ss_chronoInterval = null; }
     if (_ss_analysisInterval) { clearInterval(_ss_analysisInterval); _ss_analysisInterval = null; }
 
-    // Arrêter caméra
-    if (_ss_stream) {
-      _ss_stream.getTracks().forEach(function(t){ t.stop(); });
-      _ss_stream = null;
-    }
+    var ch = document.getElementById('ss-chrono-live');
+    if (ch) ch.remove();
+    _ss_chronoEl = null;
 
-    // Sortir du plein écran natif si actif
-    try {
-      var exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-      if (exitFS && (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) {
-        exitFS.call(document).catch(function(){});
-      }
-    } catch(e) { /* silencieux */ }
-
-    // UI
-    var video = document.getElementById('ss-video');
-    if (video) video.srcObject = null;
-    document.getElementById('ss-video-wrap').style.display = 'none';
-    document.getElementById('ss-btn-start').style.display = 'block';
     if (window._haptic) window._haptic.success();
     if (window._wake) window._wake.release();
 
-    // Calculer métriques et afficher résumé
     _computeAndShowSummary();
   };
 
+  // ═══ toggleRec : bouton REC officiel — pas de vrai enregistrement (juste visuel) ═══
+  window._ss_toggleRec = function() {
+    var rb = document.getElementById('sensei-cam-rec-btn');
+    if (rb) {
+      var isOn = rb.dataset.ssActive === '1';
+      if (isOn) {
+        rb.dataset.ssActive = '0';
+        rb.innerHTML = '&#9679; REC';
+        rb.style.background = 'rgba(230,57,70,.92)';
+        rb.style.animation = '';
+      } else {
+        rb.dataset.ssActive = '1';
+        rb.innerHTML = '&#9679; REC ON';
+        rb.style.background = 'rgba(239,68,68,1)';
+        rb.style.animation = 'ssRecBlink 1s ease-in-out infinite';
+      }
+    }
+    if (window._haptic) window._haptic.tap();
+  };
+
+  // ═══ Calcul et affichage du résumé ═══
   function _computeAndShowSummary() {
-    var duration = (Date.now() - _ss_startTime) / 1000; // en secondes
+    var duration = (Date.now() - _ss_startTime) / 1000;
     var history = _ss_poseHistory;
 
-    // ─── M2 : Temps actif vs repos ───
-    // Calcul du mouvement entre 2 poses consécutives (delta position)
+    // M2 : Temps actif vs repos
     var activeSamples = 0, totalSamples = 0;
     for (var i = 1; i < history.length; i++) {
       var prev = history[i-1].kp, cur = history[i].kp;
       var totalMove = 0, count = 0;
-      // Comparer keypoints principaux (nose, épaules, poignets, hanches)
-      var idxToCheck = [0, 5, 6, 9, 10, 11, 12]; // nose, shoulders, wrists, hips
+      var idxToCheck = [0, 5, 6, 9, 10, 11, 12];
       for (var k = 0; k < idxToCheck.length; k++) {
         var pIdx = idxToCheck[k];
         if (prev[pIdx] && cur[pIdx] && prev[pIdx].score > 0.3 && cur[pIdx].score > 0.3) {
@@ -41892,8 +41901,7 @@ body.si-banner-on { padding-top: 52px; }
         }
       }
       if (count > 0) {
-        var avgMove = totalMove / count;
-        if (avgMove > MOVEMENT_THRESHOLD) activeSamples++;
+        if ((totalMove / count) > MOVEMENT_THRESHOLD) activeSamples++;
         totalSamples++;
       }
     }
@@ -41901,12 +41909,10 @@ body.si-banner-on { padding-top: 52px; }
     var activeTime = duration * activeRatio;
     var restTime = duration - activeTime;
 
-    // ─── M3 : Constance posturale ───
-    // Calcul de la variance des positions des keypoints principaux au fil du temps
-    // (Une posture constante = variance faible = joueur qui répète le même geste)
+    // M3 : Constance posturale
     var constancy = 100;
     if (history.length > 5) {
-      var kpIndices = [5, 6, 11, 12]; // shoulders, hips (torse — le référentiel)
+      var kpIndices = [5, 6, 11, 12];
       var variances = [];
       for (var k = 0; k < kpIndices.length; k++) {
         var xs = [], ys = [];
@@ -41924,13 +41930,11 @@ body.si-banner-on { padding-top: 52px; }
       }
       if (variances.length > 0) {
         var avgVar = variances.reduce(function(a,b){return a+b;},0)/variances.length;
-        // Normalisation : variance de 0 = 100%, variance de 80px+ = 0%
         constancy = Math.max(0, Math.min(100, 100 - (avgVar / 80) * 100));
       }
     }
 
-    // ─── M4 : Équilibre ───
-    // Distance moyenne du centre de gravité (moyenne des hanches) par rapport à sa position moyenne
+    // M4 : Équilibre
     var balance = 100;
     if (history.length > 5) {
       var cogs = [];
@@ -41944,40 +41948,29 @@ body.si-banner-on { padding-top: 52px; }
         var mx = cogs.reduce(function(a,b){return a+b.x;},0)/cogs.length;
         var my = cogs.reduce(function(a,b){return a+b.y;},0)/cogs.length;
         var avgDev = cogs.reduce(function(a,b){return a+Math.sqrt((b.x-mx)*(b.x-mx)+(b.y-my)*(b.y-my));},0)/cogs.length;
-        // Normalisation : 0 déviation = 100%, 60px+ déviation = 0%
         balance = Math.max(0, Math.min(100, 100 - (avgDev / 60) * 100));
       }
     }
 
-    // ─── Affichage du résumé ───
     var summary = document.getElementById('ss-summary');
     var html = '<div style="padding:16px;background:linear-gradient(180deg,rgba(245,197,24,0.08),rgba(245,197,24,0.03));border:1px solid rgba(245,197,24,0.3);border-radius:12px">';
-    html += '<div style="font-family:var(--font-cond);color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;font-weight:700">' + _t('ss_summary_title', '📊 RÉSUMÉ DE TA SESSION') + '</div>';
-
+    html += '<div style="font-family:var(--font-cond);color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:14px;font-weight:700">' + _t('ss_summary_title', 'RESUME DE TA SESSION') + '</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-    // M1 Durée
     html += _ss_metricCard('⏱', _t('ss_m1','Durée'), _fmtTime(duration), '#f5c518');
-    // M2 Temps actif
     html += _ss_metricCard('🏃', _t('ss_m2','Temps actif'), _fmtTime(activeTime) + ' <span style="font-size:10px;color:var(--muted)">(' + Math.round(activeRatio*100) + '%)</span>', '#22c55e');
-    // M2 Temps repos
     html += _ss_metricCard('💤', _t('ss_m2r','Temps de repos'), _fmtTime(restTime) + ' <span style="font-size:10px;color:var(--muted)">(' + Math.round((1-activeRatio)*100) + '%)</span>', '#3b82f6');
-    // M3 Constance
     html += _ss_metricCard('🎯', _t('ss_m3','Constance posturale'), Math.round(constancy) + '%', constancy >= 70 ? '#22c55e' : constancy >= 50 ? '#f97316' : '#ef4444');
     html += '</div>';
-    // M4 Équilibre (pleine largeur car unique restant)
     html += '<div style="margin-top:10px">';
     html += _ss_metricCard('⚖️', _t('ss_m4','Équilibre'), Math.round(balance) + '%', balance >= 70 ? '#22c55e' : balance >= 50 ? '#f97316' : '#ef4444', true);
     html += '</div>';
-
     html += '<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:1px;text-transform:uppercase">Analyse par MoveNet · 100% locale · Aucune donnée envoyée</div>';
     html += '</div>';
 
     summary.innerHTML = html;
     summary.style.display = 'block';
-    // Scroll doux vers le résumé
     setTimeout(function(){ summary.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 100);
 
-    // Coach vocal si activé
     if (window._speak) {
       var msg = (window._lang === 'en')
         ? 'Session finished. Duration: ' + Math.floor(duration/60) + ' minutes.'
@@ -41995,25 +41988,13 @@ body.si-banner-on { padding-top: 52px; }
       '</div>';
   }
 
-  // Sécurité : si l'utilisateur quitte l'onglet ou ferme la page, on relâche la caméra
-  window.addEventListener('beforeunload', function(){
-    if (_ss_stream) { _ss_stream.getTracks().forEach(function(t){ t.stop(); }); }
-    if (window._wake) window._wake.release();
-  });
-
-  // Écouter la sortie de plein écran (touche ESC ou geste utilisateur)
-  // → si session en cours et sortie fullscreen manuel, on arrête proprement
-  function _ss_onFsChange() {
-    var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-    if (!isFs && _ss_running) {
-      // L'utilisateur a quitté le plein écran manuellement → on arrête la session
-      _ss_stop();
-    }
+  // Animation REC clignotant (utilisée quand toggleRec ON)
+  if (!document.getElementById('ss-rec-blink-style')) {
+    var st = document.createElement('style');
+    st.id = 'ss-rec-blink-style';
+    st.textContent = '@keyframes ssRecBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }';
+    document.head.appendChild(st);
   }
-  document.addEventListener('fullscreenchange', _ss_onFsChange);
-  document.addEventListener('webkitfullscreenchange', _ss_onFsChange);
-  document.addEventListener('mozfullscreenchange', _ss_onFsChange);
-  document.addEventListener('MSFullscreenChange', _ss_onFsChange);
 })();
 </script>
 </body>
