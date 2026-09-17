@@ -41711,6 +41711,12 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_video = null;
   var _ss_canvas = null;
   var _ss_ctx = null;
+  var _ss_recorder = null;
+  var _ss_recActive = false;
+  var _ss_recChunks = [];
+  var _ss_recTimer = null;
+  var _ss_recSec = 0;
+  var _ss_REC_LIMIT = 600; // 10 min max pour une session de shoot (fichier ~150-200 Mo max)
   var MOVEMENT_THRESHOLD = 12;
 
   function _t(key, fb) {
@@ -41791,6 +41797,8 @@ body.si-banner-on { padding-top: 52px; }
       // PAS de miroir — trépied fixe filme la scène telle qu'elle est
       _ss_ctx.drawImage(_ss_video, sx, sy, sw, sh, 0, 0, W, H);
       _ss_ctx.restore();
+      // Logo SENSEI dessiné sur le canvas (visible ET capturé par MediaRecorder)
+      if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_ss_ctx, W, H);
     }
     _ss_rafId = requestAnimationFrame(_ss_drawLoop);
   }
@@ -41803,6 +41811,16 @@ body.si-banner-on { padding-top: 52px; }
     _ss_running = true;
     _ss_startTime = Date.now();
     _ss_poseHistory = [];
+    _ss_recActive = false;
+    _ss_recChunks = [];
+    // Afficher le bouton REC officiel (masqué par défaut par senseiCamShow)
+    var recBtn = document.getElementById('sensei-cam-rec-btn');
+    if (recBtn) {
+      recBtn.style.display = 'flex';
+      recBtn.innerHTML = '&#9679; REC';
+      recBtn.style.background = 'rgba(230,57,70,.92)';
+      recBtn.style.animation = '';
+    }
     // Démarrer la boucle de dessin de la vidéo sur le canvas
     _ss_rafId = requestAnimationFrame(_ss_drawLoop);
 
@@ -41843,6 +41861,13 @@ body.si-banner-on { padding-top: 52px; }
     if (!_ss_running) return;
     _ss_running = false;
 
+    // Arrêter l'enregistrement AVANT tout (finaliser le fichier proprement)
+    if (_ss_recActive) {
+      if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+      try { _ss_recorder.stop(); } catch(e){}
+      _ss_recActive = false;
+    }
+
     // Arrêter la boucle de dessin
     if (_ss_rafId) { cancelAnimationFrame(_ss_rafId); _ss_rafId = null; }
     _ss_video = null; _ss_canvas = null; _ss_ctx = null;
@@ -41860,24 +41885,162 @@ body.si-banner-on { padding-top: 52px; }
     _computeAndShowSummary();
   };
 
-  // ═══ toggleRec : bouton REC officiel — pas de vrai enregistrement (juste visuel) ═══
-  window._ss_toggleRec = function() {
-    var rb = document.getElementById('sensei-cam-rec-btn');
-    if (rb) {
-      var isOn = rb.dataset.ssActive === '1';
-      if (isOn) {
-        rb.dataset.ssActive = '0';
-        rb.innerHTML = '&#9679; REC';
-        rb.style.background = 'rgba(230,57,70,.92)';
-        rb.style.animation = '';
-      } else {
-        rb.dataset.ssActive = '1';
-        rb.innerHTML = '&#9679; REC ON';
-        rb.style.background = 'rgba(239,68,68,1)';
-        rb.style.animation = 'ssRecBlink 1s ease-in-out infinite';
+  // ═══ Enregistrement vidéo réel (MediaRecorder) — sur le même modèle que tsym/tdr ═══
+  function _ss_getBestMime() {
+    if (typeof MediaRecorder === 'undefined') return '';
+    var mimes = [
+      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+      'video/mp4;codecs=avc1',
+      'video/mp4',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      ''
+    ];
+    for (var i=0; i<mimes.length; i++) {
+      if (!mimes[i]) return '';
+      if (MediaRecorder.isTypeSupported(mimes[i])) return mimes[i];
+    }
+    return '';
+  }
+
+  function _ss_startRec() {
+    if (typeof MediaRecorder === 'undefined') {
+      alert((window._lang === 'en') ? 'Recording not supported — please update your browser' : 'Enregistrement non supporté — mets à jour ton navigateur');
+      return false;
+    }
+    if (!_ss_canvas) return false;
+    var stream = null;
+    try {
+      stream = _ss_canvas.captureStream ? _ss_canvas.captureStream(25) :
+               _ss_canvas.mozCaptureStream ? _ss_canvas.mozCaptureStream(25) : null;
+    } catch(e) { stream = null; }
+    if (!stream) {
+      alert((window._lang === 'en') ? 'Canvas capture not supported' : 'Capture du canvas non supportée sur cet appareil');
+      return false;
+    }
+    var mime = _ss_getBestMime();
+    try {
+      _ss_recorder = mime
+        ? new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: 3500000})
+        : new MediaRecorder(stream, {videoBitsPerSecond: 3500000});
+    } catch(e) {
+      try { _ss_recorder = new MediaRecorder(stream); }
+      catch(e2) {
+        alert((window._lang === 'en') ? 'Unable to start recording' : "Impossible de démarrer l'enregistrement");
+        return false;
       }
     }
+    _ss_recChunks = [];
+    _ss_recSec = 0;
+    _ss_recorder.ondataavailable = function(e){ if (e.data && e.data.size > 0) _ss_recChunks.push(e.data); };
+    _ss_recorder.onstop = function(){
+      if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+      var mimeUsed = (_ss_recorder && _ss_recorder.mimeType) || mime || 'video/webm';
+      var blob = new Blob(_ss_recChunks, {type: mimeUsed});
+      _ss_saveBlob(blob);
+      _ss_recActive = false;
+      _ss_updateRecBtnUI();
+    };
+    _ss_recorder.onerror = function(e) {
+      if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+      _ss_recActive = false;
+      _ss_updateRecBtnUI();
+    };
+
+    // ═══════ FIX durée corrompue (1988:xx:xx / 1755:xxx) ═══════
+    // Flush canvas + délai 200ms avant start() pour garantir une frame stable
+    // dans le pipeline captureStream avant l'écriture du header WebM/MP4.
+    try {
+      var _cvFix = document.getElementById('sensei-cam-canvas');
+      if (_cvFix) {
+        var _cxFix = _cvFix.getContext('2d');
+        if (_cxFix) { _cxFix.save(); _cxFix.globalAlpha = 0; _cxFix.fillRect(0,0,1,1); _cxFix.restore(); }
+      }
+    } catch(eFix) { /* silencieux */ }
+
+    setTimeout(function() {
+      if (!_ss_recorder) return;
+      try { _ss_recorder.start(1000); }
+      catch(e) {
+        alert((window._lang === 'en') ? 'Recording error' : "Erreur d'enregistrement");
+        return;
+      }
+      _ss_recActive = true;
+      _ss_updateRecBtnUI();
+      if (window._haptic) window._haptic.success();
+
+      // Timer + arrêt automatique à _ss_REC_LIMIT (10 min)
+      _ss_recTimer = setInterval(function() {
+        _ss_recSec++;
+        var remaining = _ss_REC_LIMIT - _ss_recSec;
+        var btn = document.getElementById('sensei-cam-rec-btn');
+        if (btn) {
+          var mm = Math.floor(_ss_recSec/60), ss = _ss_recSec%60;
+          btn.innerHTML = '&#9632; ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
+            (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+        }
+        if (_ss_recSec >= _ss_REC_LIMIT) { _ss_stopRec(); }
+      }, 1000);
+    }, 200);
+
+    return true;
+  }
+
+  function _ss_stopRec() {
+    if (_ss_recorder && _ss_recActive) {
+      if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+      try { _ss_recorder.stop(); } catch(e) {}
+    }
+  }
+
+  function _ss_saveBlob(blob) {
+    var ext = /mp4/i.test(blob.type) ? 'mp4' : 'webm';
+    var filename = 'SENSEI_shooting_' + new Date().toISOString().slice(0,10) + '.' + ext;
+    // Partage natif iOS/Android si dispo
+    if (navigator.share && typeof File !== 'undefined') {
+      try {
+        var file = new File([blob], filename, {type: blob.type});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          navigator.share({title:'SENSEI Shooting Session', files:[file]})
+            .catch(function(e){ if (e && e.name !== 'AbortError') _ss_downloadBlob(blob, filename); });
+          return;
+        }
+      } catch(e){}
+    }
+    // Fallback download desktop
+    _ss_downloadBlob(blob, filename);
+  }
+
+  function _ss_downloadBlob(blob, filename) {
+    try {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ if (a.parentNode) document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    } catch(e){}
+  }
+
+  function _ss_updateRecBtnUI() {
+    var btn = document.getElementById('sensei-cam-rec-btn');
+    if (!btn) return;
+    if (_ss_recActive) {
+      btn.innerHTML = '&#9632; STOP REC';
+      btn.style.background = '#7a0000';
+      btn.style.animation = 'ssRecBlink 1s ease-in-out infinite';
+    } else {
+      btn.innerHTML = '&#9679; REC';
+      btn.style.background = 'rgba(230,57,70,.92)';
+      btn.style.animation = '';
+    }
+  }
+
+  // ═══ toggleRec : bouton REC officiel — vrai enregistrement démarré/arrêté ═══
+  window._ss_toggleRec = function() {
     if (window._haptic) window._haptic.tap();
+    if (_ss_recActive) _ss_stopRec();
+    else _ss_startRec();
   };
 
   // ═══ Calcul et affichage du résumé ═══
