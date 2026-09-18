@@ -26009,6 +26009,8 @@ function _tsym_startCamera() {
 }
 
 function _tsym_stopCamera() {
+  // Coach vocal : annonce de fin de session
+  if (typeof _tsym_stream !== 'undefined' && _tsym_stream && window._speak) window._speak.say((window._lang === 'en') ? 'Symmetry session ended.' : 'Session Symétrie terminée.');
   _tsym_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   if (_tsym_rafId) { cancelAnimationFrame(_tsym_rafId); _tsym_rafId = null; }
@@ -26072,6 +26074,8 @@ function _tsym_startSessTimer(){
 function _tsym_onCamReady(video,canvas,ctx){
   _tsym_video=video; _tsym_canvas=canvas; _tsym_ctx=ctx;
   _tsym_startSessTimer();
+  // Coach vocal : annonce de démarrage
+  if (window._speak) window._speak.say((window._lang === 'en') ? 'Symmetry started. Position yourself in front of the camera.' : 'Symétrie lancée. Positionne-toi face à la caméra.');
   var status=document.getElementById('tsym_status');
   if(status)status.textContent=_t('Chargement IA...','Loading AI...');
   var _lt=setTimeout(function(){_tsym_onError(_t('Chargement trop long','Loading timeout'));},12000);
@@ -27630,6 +27634,8 @@ function _tdr_start() {
 }
 
 function _tdr_stop() {
+  // Coach vocal : annonce de fin de session
+  if (typeof _tdr_running !== 'undefined' && _tdr_running && window._speak) window._speak.say((window._lang === 'en') ? 'Reaction session ended.' : 'Session Réaction terminée.');
   _tdr_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   // Mode Sensei : couper la vidéo + restaurer l'affichage normal
@@ -27657,6 +27663,8 @@ function _tdr_stop() {
 /* ── Calibration 3s ───────────────────────────────────────────── */
 function _tdr_onCamReady(video,canvas,ctx){
   _tdr_video=video; _tdr_canvas=canvas; _tdr_ctx=ctx;
+  // Coach vocal : annonce de démarrage
+  if (window._speak) window._speak.say((window._lang === 'en') ? 'Dribble Reaction started. Get ready!' : 'Dribble Réaction lancé. Prépare-toi !');
   // Mode Sensei : pas de calibration, pas de détection, pas de cibles.
   // Juste le flux caméra en miroir (le joueur s'observe et reproduit).
   if (_tdr_mode === 'sensei') {
@@ -28571,6 +28579,8 @@ function _dcog_start() {
 }
 
 function _dcog_stop() {
+  // Coach vocal : annonce de fin de session
+  if (typeof _dcog_running !== 'undefined' && _dcog_running && window._speak) window._speak.say((window._lang === 'en') ? 'Cognition session ended.' : 'Session Cognition terminée.');
   _dcog_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   _dcog_particles = []; // nettoyer particules résiduelles
@@ -28701,6 +28711,8 @@ function _dcog_updateTimerDisplay() {
 
 function _dcog_onCamReady(video,canvas,ctx){
   _dcog_video=video; _dcog_canvas=canvas; _dcog_ctx=ctx;
+  // Coach vocal : annonce de démarrage
+  if (window._speak) window._speak.say((window._lang === 'en') ? 'Dribble Cognition started. Focus on the signals!' : 'Dribble Cognition lancé. Focus sur les signaux !');
   if(!_tsym_detector){
     _dcog_setStatus(_t('Chargement IA...','Loading AI...'),'#f5c518');
     _tsym_loadModel(function(){_dcog_launchDrill();},function(err){_dcog_setStatus('❌ '+(err||'Erreur IA'),'#e63946');});
@@ -41953,6 +41965,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_saveBlob(blob);
       _ss_recActive = false;
       _ss_updateRecBtnUI();
+      if (window._speak) window._speak.say((window._lang === 'en') ? 'Recording saved.' : 'Enregistrement sauvegardé.');
     };
     _ss_recorder.onerror = function(e) {
       if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
@@ -41981,6 +41994,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_recActive = true;
       _ss_updateRecBtnUI();
       if (window._haptic) window._haptic.success();
+      if (window._speak) window._speak.say((window._lang === 'en') ? 'Recording started.' : 'Enregistrement démarré.');
 
       // Timer + arrêt automatique à _ss_REC_LIMIT (10 min)
       _ss_recTimer = setInterval(function() {
@@ -42250,14 +42264,14 @@ body.si-banner-on { padding-top: 52px; }
     },
     {
       icon:'👣',
-      titreFR:'Marcher (travelling)',
+      titreFR:'Marcher (traveling)',
       titreEN:'Traveling',
       textFR:'Un joueur ne peut pas déplacer son pied de pivot après avoir arrêté son dribble. Il ne peut faire que 2 appuis maximum avant de tirer, passer ou dribbler.',
       textEN:'A player cannot move their pivot foot after stopping their dribble. They can only take 2 steps maximum before shooting, passing, or dribbling.'
     },
     {
       icon:'🔄',
-      titreFR:'Reprise du dribble',
+      titreFR:'Reprise du dribble (double dribble)',
       titreEN:'Double dribble',
       textFR:'Un joueur ne peut pas reprendre son dribble après l\'avoir arrêté (ballon tenu à 2 mains). Violation = ballon à l\'adversaire.',
       textEN:'A player cannot resume dribbling after stopping (ball held with 2 hands). Violation = ball to opponent.'
@@ -42285,7 +42299,7 @@ body.si-banner-on { padding-top: 52px; }
     },
     {
       icon:'⚖️',
-      titreFR:'Rotation possession (jump ball)',
+      titreFR:'Flèche de possession (jump ball)',
       titreEN:'Possession arrow (jump ball)',
       textFR:'Sauf entre-deux initial, en cas de balle contestée, la possession alterne entre les 2 équipes selon la flèche de possession (FIBA). NBA : jump ball systématique à l\'engagement puis contre-attaque.',
       textEN:'Except initial jump ball, on contested ball, possession alternates between teams via possession arrow (FIBA). NBA: systematic jump ball at tip-off, then alternating.'
@@ -42338,7 +42352,7 @@ body.si-banner-on { padding-top: 52px; }
     },
     {
       critereFR:'Take foul (faute anti-jeu)',
-      critereEN:'Take foul (anti-play foul)',
+      critereEN:'Take foul (clear-path foul)',
       ffbb:'Faute normale',
       fiba:'Faute normale',
       euroleague:'Faute normale',
@@ -42612,13 +42626,13 @@ body.si-banner-on { padding-top: 52px; }
       astuceEN:'Requires an intelligent and technical team. Base of many modern systems.'
     },
     // PHYSIQUE (3)
-    { nom:'Explosivité', cat:'physique', catFR:'Physique', catEN:'Physical',
+    { nom:'Explosivité', nomEN:'Explosiveness', cat:'physique', catFR:'Physique', catEN:'Physical',
       defFR:'Capacité à générer une force maximale en un temps minimal. Fondamentale pour les premiers appuis, la détente et le premier pas.',
       defEN:'Ability to generate maximum force in minimum time. Fundamental for first steps, vertical jump and first move.',
       astuceFR:'Se travaille avec la pliométrie (sauts, bonds), pas juste la musculation.',
       astuceEN:'Trained with plyometrics (jumps, bounds), not just weightlifting.'
     },
-    { nom:'Détente verticale', cat:'physique', catFR:'Physique', catEN:'Physical',
+    { nom:'Détente verticale', nomEN:'Vertical jump', cat:'physique', catFR:'Physique', catEN:'Physical',
       defFR:'Hauteur de saut vertical. Mesure clé pour les tirs, rebonds, et dunks.',
       defEN:'Vertical jump height. Key measurement for shots, rebounds, and dunks.',
       astuceFR:'La détente est 70% technique (utiliser les bras, plier les genoux) et 30% force pure.',
@@ -42940,14 +42954,14 @@ body.si-banner-on { padding-top: 52px; }
     var filtered = _biblio_glossaire.filter(function(t) {
       if (_biblio_glos_filter !== 'all' && t.cat !== _biblio_glos_filter) return false;
       if (_biblio_glos_search) {
-        var searchIn = (t.nom + ' ' + (en ? t.defEN : t.defFR) + ' ' + (en ? t.catEN : t.catFR)).toLowerCase();
+        var searchIn = (t.nom + ' ' + (t.nomEN || '') + ' ' + (en ? t.defEN : t.defFR) + ' ' + (en ? t.catEN : t.catFR)).toLowerCase();
         if (searchIn.indexOf(_biblio_glos_search) === -1) return false;
       }
       return true;
     });
 
     // Sort A-Z
-    filtered.sort(function(a, b) { return a.nom.localeCompare(b.nom); });
+    filtered.sort(function(a, b) { var na = (en && a.nomEN) ? a.nomEN : a.nom; var nb = (en && b.nomEN) ? b.nomEN : b.nom; return na.localeCompare(nb); });
 
     if (filtered.length === 0) {
       container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase">' + (en ? 'No results' : 'Aucun résultat') + '</div>';
@@ -42959,7 +42973,7 @@ body.si-banner-on { padding-top: 52px; }
     filtered.forEach(function(t) {
       html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px">';
       html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">';
-      html += '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:1.5px;color:#a97fff;line-height:1">' + t.nom + '</div>';
+      html += '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:1.5px;color:#a97fff;line-height:1">' + (en && t.nomEN ? t.nomEN : t.nom) + '</div>';
       html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#a97fff;background:rgba(169,127,255,0.15);border:1px solid rgba(169,127,255,0.3);padding:4px 10px;border-radius:12px">🏷️ ' + (en ? t.catEN : t.catFR) + '</div>';
       html += '</div>';
       html += '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.55;margin-bottom:12px">' + (en ? t.defEN : t.defFR) + '</div>';
