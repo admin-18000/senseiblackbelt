@@ -594,10 +594,11 @@ body.unlocked .sensei-only{display:revert !important}
 
 /* Timer */
 .tr-timer-big {
-  font-size:clamp(40px,10vw,58px);font-weight:bold;color:var(--gold);
+  font-size:clamp(40px,10vw,58px);font-weight:bold;color:#ffffff;
   letter-spacing:4px;line-height:1;text-align:center;
+  font-variant-numeric:tabular-nums;
 }
-.tr-timer-big.running { color:#2dc653; }
+.tr-timer-big.running { color:#ffffff; }
 .tr-timer-big.done    { color:var(--muted); }
 
 /* Score boxes */
@@ -24551,14 +24552,21 @@ function _tag_dSave() {
 function _tag_drawCircle(prog) {
   var cv=document.getElementById('tag_timerCircle');
   if(!cv)return;
-  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=58;
+  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=56;
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='var(--tr-border)';ctx.lineWidth=8;
-  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);ctx.stroke();
+  // Anneau de fond (blanc fantôme)
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.lineWidth=10;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  // Anneau de progression (blanc pur, style Apple Watch)
   if(prog>0){
-    ctx.strokeStyle=prog<0.6?'var(--tr-green)':prog<0.9?'var(--tr-gold)':'var(--tr-red)';
-    ctx.lineWidth=8;ctx.lineCap='round';
-    ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);ctx.stroke();
+    // Couleur : blanc jusqu'à 80%, or à 90%, rouge à 100%
+    ctx.strokeStyle = prog < 0.8 ? '#ffffff' : prog < 0.95 ? '#f5c518' : '#e63946';
+    ctx.lineWidth=10;
+    ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);
+    ctx.stroke();
   }
 }
 
@@ -24688,14 +24696,20 @@ function _tsc_scUpdateTimer() {
 
 function _tsc_scDrawCircle(prog) {
   var cv=document.getElementById('tsc_scTimerCircle');if(!cv)return;
-  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=58;
+  var ctx=cv.getContext('2d'),W=140,H=140,cx=70,cy=70,r=56;
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='var(--tr-border)';ctx.lineWidth=8;
-  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);ctx.stroke();
+  // Anneau de fond (blanc fantôme)
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.lineWidth=10;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  // Anneau de progression (blanc pur, style Apple Watch)
   if(prog>0){
-    ctx.strokeStyle=prog<0.6?'var(--tr-green)':prog<0.9?'var(--tr-gold)':'var(--tr-red)';
-    ctx.lineWidth=8;ctx.lineCap='round';
-    ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);ctx.stroke();
+    ctx.strokeStyle = prog < 0.8 ? '#ffffff' : prog < 0.95 ? '#f5c518' : '#e63946';
+    ctx.lineWidth=10;
+    ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.min(1,prog)*Math.PI*2);
+    ctx.stroke();
   }
 }
 
@@ -26009,8 +26023,12 @@ function _tsym_startCamera() {
 }
 
 function _tsym_stopCamera() {
-  // Coach vocal : annonce de fin de session
-  if (typeof _tsym_stream !== 'undefined' && _tsym_stream && window._speak) window._speak.say((window._lang === 'en') ? 'Symmetry session ended.' : 'Session Symétrie terminée.');
+  // Coach vocal : annonce EN uniquement de fin de session
+  if (typeof _tsym_stream !== 'undefined' && _tsym_stream && window._speak) {
+    var _tsymLE = { dribble:'Dribble', shot:'Shot', footwork:'Footwork', posture:'Posture' };
+    var _tsymDE = _tsymLE[_tsym_mode] || '';
+    window._speak.say('Symmetry ' + _tsymDE + ' session ended. Good work!', {lang:'en-US'});
+  }
   _tsym_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   if (_tsym_rafId) { cancelAnimationFrame(_tsym_rafId); _tsym_rafId = null; }
@@ -26074,8 +26092,12 @@ function _tsym_startSessTimer(){
 function _tsym_onCamReady(video,canvas,ctx){
   _tsym_video=video; _tsym_canvas=canvas; _tsym_ctx=ctx;
   _tsym_startSessTimer();
-  // Coach vocal : annonce de démarrage
-  if (window._speak) window._speak.say((window._lang === 'en') ? 'Symmetry started. Position yourself in front of the camera.' : 'Symétrie lancée. Positionne-toi face à la caméra.');
+  // Coach vocal : annonce EN uniquement avec nom exact du drill
+  if (window._speak) {
+    var _tsymL = { dribble:'Dribble', shot:'Shot', footwork:'Footwork', posture:'Posture' };
+    var _tsymD = _tsymL[_tsym_mode] || '';
+    window._speak.say('Symmetry ' + _tsymD + ' started. Position yourself in front of the camera.', {lang:'en-US'});
+  }
   var status=document.getElementById('tsym_status');
   if(status)status.textContent=_t('Chargement IA...','Loading AI...');
   var _lt=setTimeout(function(){_tsym_onError(_t('Chargement trop long','Loading timeout'));},12000);
@@ -27634,8 +27656,12 @@ function _tdr_start() {
 }
 
 function _tdr_stop() {
-  // Coach vocal : annonce de fin de session
-  if (typeof _tdr_running !== 'undefined' && _tdr_running && window._speak) window._speak.say((window._lang === 'en') ? 'Reaction session ended.' : 'Session Réaction terminée.');
+  // Coach vocal : annonce EN uniquement de fin de session
+  if (typeof _tdr_running !== 'undefined' && _tdr_running && window._speak) {
+    var _tdrLE = { reaction:'Reaction', rhythm:'Rhythm', sensei:'Sensei' };
+    var _tdrDE = _tdrLE[_tdr_mode] || '';
+    window._speak.say('Dribble ' + _tdrDE + ' session complete. Well done!', {lang:'en-US'});
+  }
   _tdr_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   // Mode Sensei : couper la vidéo + restaurer l'affichage normal
@@ -27663,8 +27689,12 @@ function _tdr_stop() {
 /* ── Calibration 3s ───────────────────────────────────────────── */
 function _tdr_onCamReady(video,canvas,ctx){
   _tdr_video=video; _tdr_canvas=canvas; _tdr_ctx=ctx;
-  // Coach vocal : annonce de démarrage
-  if (window._speak) window._speak.say((window._lang === 'en') ? 'Dribble Reaction started. Get ready!' : 'Dribble Réaction lancé. Prépare-toi !');
+  // Coach vocal : annonce EN uniquement avec nom exact du drill
+  if (window._speak) {
+    var _tdrL = { reaction:'Reaction', rhythm:'Rhythm', sensei:'Sensei' };
+    var _tdrD = _tdrL[_tdr_mode] || '';
+    window._speak.say('Dribble ' + _tdrD + ' started. Get ready, focus up!', {lang:'en-US'});
+  }
   // Mode Sensei : pas de calibration, pas de détection, pas de cibles.
   // Juste le flux caméra en miroir (le joueur s'observe et reproduit).
   if (_tdr_mode === 'sensei') {
@@ -28579,8 +28609,12 @@ function _dcog_start() {
 }
 
 function _dcog_stop() {
-  // Coach vocal : annonce de fin de session
-  if (typeof _dcog_running !== 'undefined' && _dcog_running && window._speak) window._speak.say((window._lang === 'en') ? 'Cognition session ended.' : 'Session Cognition terminée.');
+  // Coach vocal : annonce EN uniquement de fin de session
+  if (typeof _dcog_running !== 'undefined' && _dcog_running && window._speak) {
+    var _dcogLE = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
+    var _dcogDE = _dcogLE[_dcog_drill] || '';
+    window._speak.say('Cognition ' + _dcogDE + ' session complete. Great work!', {lang:'en-US'});
+  }
   _dcog_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
   _dcog_particles = []; // nettoyer particules résiduelles
@@ -28711,8 +28745,12 @@ function _dcog_updateTimerDisplay() {
 
 function _dcog_onCamReady(video,canvas,ctx){
   _dcog_video=video; _dcog_canvas=canvas; _dcog_ctx=ctx;
-  // Coach vocal : annonce de démarrage
-  if (window._speak) window._speak.say((window._lang === 'en') ? 'Dribble Cognition started. Focus on the signals!' : 'Dribble Cognition lancé. Focus sur les signaux !');
+  // Coach vocal : annonce EN uniquement avec nom exact du drill
+  if (window._speak) {
+    var _dcogL = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
+    var _dcogD = _dcogL[_dcog_drill] || '';
+    window._speak.say('Cognition ' + _dcogD + ' started. Stay sharp, focus on the signals!', {lang:'en-US'});
+  }
   if(!_tsym_detector){
     _dcog_setStatus(_t('Chargement IA...','Loading AI...'),'#f5c518');
     _tsym_loadModel(function(){_dcog_launchDrill();},function(err){_dcog_setStatus('❌ '+(err||'Erreur IA'),'#e63946');});
@@ -41621,8 +41659,10 @@ body.si-banner-on { padding-top: 52px; }
         // Stop toute élocution en cours
         speechSynthesis.cancel();
         var u = new SpeechSynthesisUtterance(text);
-        var lang = (window._lang || document.body.getAttribute('data-lang') || 'fr');
-        u.lang = (lang === 'en') ? 'en-US' : 'fr-FR';
+        // Priorité : opts.lang (forçage explicite) > window._lang > fallback
+        var lang = opts.lang || (window._lang || document.body.getAttribute('data-lang') || 'fr');
+        // Normaliser : 'en' -> 'en-US', 'fr' -> 'fr-FR', sinon utiliser tel quel
+        u.lang = (lang === 'en') ? 'en-US' : (lang === 'fr') ? 'fr-FR' : lang;
         u.rate = opts.rate || 1.0;
         u.pitch = opts.pitch || 1.0;
         u.volume = opts.volume !== undefined ? opts.volume : 1.0;
@@ -41877,7 +41917,7 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) { /* silencieux */ }
     }, 250);
 
-    if (window._speak) window._speak.say((window._lang === 'en') ? 'Session started. Go!' : "Session lancée. C'est parti !");
+    if (window._speak) window._speak.say('Shooting session started. Grab your ball and go!', {lang:'en-US'});
   };
 
   // ═══ stopCamera : appelé par senseiCamStop → nettoie et affiche résumé ═══
@@ -41965,7 +42005,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_saveBlob(blob);
       _ss_recActive = false;
       _ss_updateRecBtnUI();
-      if (window._speak) window._speak.say((window._lang === 'en') ? 'Recording saved.' : 'Enregistrement sauvegardé.');
+      if (window._speak) window._speak.say('Recording saved. Check your gallery!', {lang:'en-US'});
     };
     _ss_recorder.onerror = function(e) {
       if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
@@ -41994,7 +42034,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_recActive = true;
       _ss_updateRecBtnUI();
       if (window._haptic) window._haptic.success();
-      if (window._speak) window._speak.say((window._lang === 'en') ? 'Recording started.' : 'Enregistrement démarré.');
+      if (window._speak) window._speak.say('Recording started.', {lang:'en-US'});
 
       // Timer + arrêt automatique à _ss_REC_LIMIT (10 min)
       _ss_recTimer = setInterval(function() {
@@ -42161,10 +42201,9 @@ body.si-banner-on { padding-top: 52px; }
     setTimeout(function(){ summary.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 100);
 
     if (window._speak) {
-      var msg = (window._lang === 'en')
-        ? 'Session finished. Duration: ' + Math.floor(duration/60) + ' minutes.'
-        : 'Session terminée. Durée : ' + Math.floor(duration/60) + ' minutes.';
-      window._speak.say(msg);
+      var _mins = Math.floor(duration/60);
+      var _msg = 'Shooting session complete. Duration: ' + _mins + ' minute' + (_mins > 1 ? 's' : '') + '. Well done, keep grinding!';
+      window._speak.say(_msg, {lang:'en-US'});
     }
   }
 
