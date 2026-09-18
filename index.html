@@ -984,6 +984,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_biblio">BIBLIOTHÈQUE</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_biblio">Règlement + Glossaire</div>
         </button>
+        <!-- BALL TRACKER (11e tuile - Feature caméra IA compteur dribbles) -->
+        <button onclick="_bt_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🏀</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_bt">BALL TRACKER</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_bt">AI dribble counter</div>
+        </button>
       </div>
     </div>
   </div>
@@ -31647,6 +31655,7 @@ function senseiCamShow(mod,stream){
     if(mod==='dcog'&&typeof _dcog_onCamReady==='function')_dcog_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='ss'&&typeof _ss_onCamReady==='function')_ss_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='bt'&&typeof _bt_onCamReady==='function')_bt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -31678,6 +31687,7 @@ function senseiCamStop(){
   if(m==='dcog'&&typeof _dcog_stop==='function')_dcog_stop();
   if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
   if(m==='ss'&&typeof _ss_stopCamera==='function')_ss_stopCamera();
+  if(m==='bt'&&typeof _bt_stopCamera==='function')_bt_stopCamera();
   // Restaurer tous les panels tr-panel
   document.querySelectorAll('.tr-panel').forEach(function(p){
     p.style.visibility = '';
@@ -31710,6 +31720,7 @@ function senseiCamToggleRec(){
   else if(m==='tsym' && typeof _tsym_toggleRec==='function') _tsym_toggleRec();
   else if(m==='dcog' && typeof _dcog_toggleRec==='function') _dcog_toggleRec();
   else if(m==='ss' && typeof _ss_toggleRec==='function') _ss_toggleRec();
+  else if(m==='bt' && typeof _bt_toggleRec==='function') _bt_toggleRec();
 }
 // i18n portrait warning
 (function(){
@@ -39776,6 +39787,10 @@ window._QI_DATA['pnr_05'] = {
       window.i18n.en.dojo_lbl_biblio = "LIBRARY";
       window.i18n.fr.dojo_sub_biblio = "Règlement + Glossaire";
       window.i18n.en.dojo_sub_biblio = "Rules + Glossary";
+      window.i18n.fr.dojo_lbl_bt = "BALL TRACKER";
+      window.i18n.en.dojo_lbl_bt = "BALL TRACKER";
+      window.i18n.fr.dojo_sub_bt = "Compteur dribbles IA";
+      window.i18n.en.dojo_sub_bt = "AI dribble counter";
     }
   } catch(e){}
 
@@ -42235,800 +42250,658 @@ body.si-banner-on { padding-top: 52px; }
   'use strict';
 
   // ═══════════════════════════════════════════════════════════
-  // DONNÉES : RÈGLES ESSENTIELLES (15 règles bilingues)
+  // BALL TRACKER V2 — Un seul drill "BALL POUNDS"
+  // Le titre + instruction s'adaptent EN TEMPS RÉEL à la main utilisée
+  // Détection basée sur les 5 dernières reps
   // ═══════════════════════════════════════════════════════════
-  var _biblio_regles = [
-    {
-      icon:'⏱️',
-      titreFR:'Durée du match',
-      titreEN:'Game duration',
-      textFR:'FIBA : 4 quart-temps de 10 minutes. NBA : 4 quart-temps de 12 minutes. Mi-temps de 15 minutes. Si égalité, prolongation de 5 minutes (répétée si nécessaire).',
-      textEN:'FIBA: 4 quarters of 10 minutes. NBA: 4 quarters of 12 minutes. Halftime of 15 minutes. If tied, 5-minute overtime (repeated if necessary).'
-    },
-    {
-      icon:'🎯',
-      titreFR:'Valeur des paniers',
-      titreEN:'Basket values',
-      textFR:'Panier dans la raquette ou zone intermédiaire : 2 points. Panier au-delà de la ligne à 3 points : 3 points. Lancer franc : 1 point.',
-      textEN:'Basket inside the arc: 2 points. Basket beyond the 3-point line: 3 points. Free throw: 1 point.'
-    },
-    {
-      icon:'⏰',
-      titreFR:'Règle des 24 secondes',
-      titreEN:'24-second rule',
-      textFR:'Une équipe dispose de 24 secondes pour tenter un tir. Le chrono se relance à 14 secondes après un rebond offensif. Si le tir touche le cercle, le chrono se réinitialise.',
-      textEN:'A team has 24 seconds to attempt a shot. The clock resets to 14 seconds after an offensive rebound. If the shot touches the rim, the clock resets.'
-    },
-    {
-      icon:'🏃',
-      titreFR:'Règle des 8 secondes',
-      titreEN:'8-second rule',
-      textFR:'Une équipe a 8 secondes pour amener le ballon dans le camp adverse après une remise en jeu ou un rebond dans son propre camp.',
-      textEN:'A team has 8 seconds to bring the ball into the opponent\'s half after an inbound or defensive rebound.'
-    },
-    {
-      icon:'📥',
-      titreFR:'Règle des 5 secondes (remise en jeu)',
-      titreEN:'5-second rule (inbound)',
-      textFR:'Sur une remise en jeu, le joueur a 5 secondes pour passer le ballon. Dépassé, c\'est une violation et le ballon revient à l\'adversaire.',
-      textEN:'On an inbound, the player has 5 seconds to pass the ball. Exceeded, it\'s a violation and the ball goes to the opponent.'
-    },
-    {
-      icon:'🔒',
-      titreFR:'Règle des 3 secondes offensive',
-      titreEN:'3-second rule (offense)',
-      textFR:'Un attaquant ne peut pas rester plus de 3 secondes dans la raquette adverse sans action de jeu. Violation = ballon à l\'adversaire.',
-      textEN:'An offensive player cannot stay more than 3 seconds in the opponent\'s paint without game action. Violation = ball to opponent.'
-    },
-    {
-      icon:'🚫',
-      titreFR:'Faute personnelle',
-      titreEN:'Personal foul',
-      textFR:'Contact illégal avec un adversaire. FIBA : 5 fautes = exclusion. NBA : 6 fautes = exclusion. Au-delà d\'un certain nombre par équipe, l\'adversaire tire des lancers francs.',
-      textEN:'Illegal contact with an opponent. FIBA: 5 fouls = ejection. NBA: 6 fouls = ejection. Beyond a certain team foul limit, opponent shoots free throws.'
-    },
-    {
-      icon:'⚖️',
-      titreFR:'Faute d\'équipe (bonus)',
-      titreEN:'Team foul (bonus)',
-      textFR:'FIBA : à partir de la 5ème faute d\'équipe dans un quart-temps, chaque nouvelle faute = 2 lancers francs pour l\'adversaire. NBA : à partir de la 5ème.',
-      textEN:'FIBA: from the 5th team foul in a quarter, each new foul = 2 free throws for the opponent. NBA: from the 5th.'
-    },
-    {
-      icon:'🎯',
-      titreFR:'Procédure lancer franc',
-      titreEN:'Free throw procedure',
-      textFR:'Le tireur a 5 secondes pour tirer, seul dans la raquette. Les autres joueurs se placent en couloir alterné. Après le dernier lancer, le rebond est ouvert.',
-      textEN:'Shooter has 5 seconds to shoot, alone in the paint. Other players line up alternately. After the last shot, rebound is open.'
-    },
-    {
-      icon:'👣',
-      titreFR:'Marcher (traveling)',
-      titreEN:'Traveling',
-      textFR:'Un joueur ne peut pas déplacer son pied de pivot après avoir arrêté son dribble. Il ne peut faire que 2 appuis maximum avant de tirer, passer ou dribbler.',
-      textEN:'A player cannot move their pivot foot after stopping their dribble. They can only take 2 steps maximum before shooting, passing, or dribbling.'
-    },
-    {
-      icon:'🔄',
-      titreFR:'Reprise du dribble (double dribble)',
-      titreEN:'Double dribble',
-      textFR:'Un joueur ne peut pas reprendre son dribble après l\'avoir arrêté (ballon tenu à 2 mains). Violation = ballon à l\'adversaire.',
-      textEN:'A player cannot resume dribbling after stopping (ball held with 2 hands). Violation = ball to opponent.'
-    },
-    {
-      icon:'↩️',
-      titreFR:'Retour en zone (backcourt)',
-      titreEN:'Backcourt violation',
-      textFR:'Une fois que l\'attaque a franchi la ligne médiane, elle ne peut plus renvoyer le ballon dans son propre camp. Violation = ballon à l\'adversaire.',
-      textEN:'Once the offense has crossed the midline, they cannot send the ball back to their own half. Violation = ball to opponent.'
-    },
-    {
-      icon:'🛡️',
-      titreFR:'Défense de zone vs individuelle',
-      titreEN:'Zone vs man-to-man defense',
-      textFR:'FIBA : les 2 types de défense sont autorisés. NBA : autorisées mais avec règle des 3 secondes défensive (défenseur ne peut pas rester + de 3s dans la raquette sans marquer un attaquant).',
-      textEN:'FIBA: both defenses allowed. NBA: allowed but with defensive 3-second rule (defender cannot stay + than 3s in paint without guarding an offensive player).'
-    },
-    {
-      icon:'🏆',
-      titreFR:'Prolongation',
-      titreEN:'Overtime',
-      textFR:'En cas d\'égalité à la fin du temps réglementaire, prolongation de 5 minutes. Si toujours égalité, nouvelles prolongations jusqu\'à ce qu\'une équipe l\'emporte.',
-      textEN:'If tied at the end of regulation, 5-minute overtime. If still tied, additional overtimes until one team wins.'
-    },
-    {
-      icon:'⚖️',
-      titreFR:'Flèche de possession (jump ball)',
-      titreEN:'Possession arrow (jump ball)',
-      textFR:'Sauf entre-deux initial, en cas de balle contestée, la possession alterne entre les 2 équipes selon la flèche de possession (FIBA). NBA : jump ball systématique à l\'engagement puis contre-attaque.',
-      textEN:'Except initial jump ball, on contested ball, possession alternates between teams via possession arrow (FIBA). NBA: systematic jump ball at tip-off, then alternating.'
-    }
-  ];
+
+  var _bt_targets = [10, 20, 30, 50];
+
+  // Titres et instructions dynamiques selon la main détectée
+  var _bt_titles = {
+    left:       { title: 'LEFT HAND POUNDS',       instr: 'Left hand grind — hard pounds only!' },
+    right:      { title: 'RIGHT HAND POUNDS',      instr: 'Right hand power — pound the floor!' },
+    alternating:{ title: 'ALTERNATING POUNDS',     instr: 'Nice rhythm — keep alternating!' },
+    initial:    { title: 'BALL POUNDS',            instr: 'Start dribbling — any hand!' }
+  };
+
+  // État
+  var _bt_startTime = 0;
+  var _bt_running = false;
+  var _bt_video = null;
+  var _bt_canvas = null;
+  var _bt_ctx = null;
+  var _bt_rafId = null;
+  var _bt_analysisInterval = null;
+  var _bt_target = 20;
+  var _bt_reps = 0;
+  var _bt_lastRepTime = 0;
+
+  // Historique des reps (avec côté) pour détection dynamique
+  var _bt_repHistory = []; // [{t, side}]
+  var _bt_wristHistory = { left: [], right: [] };
+  var _bt_MIN_REP_INTERVAL = 200;
+
+  // Stats symétrie
+  var _bt_repsLeft = 0;
+  var _bt_repsRight = 0;
+
+  // Mode dynamique courant (affiché en overlay)
+  var _bt_currentMode = 'initial'; // initial | left | right | alternating
+
+  // REC
+  var _bt_recorder = null;
+  var _bt_recActive = false;
+  var _bt_recChunks = [];
+  var _bt_recTimer = null;
+  var _bt_recSec = 0;
+  var _bt_REC_LIMIT = 600;
 
   // ═══════════════════════════════════════════════════════════
-  // DONNÉES : DIFFÉRENCES LIGUE PAR LIGUE (8 comparaisons)
+  // OUVRIR — Modal de sélection (1 drill BALL POUNDS + objectif)
   // ═══════════════════════════════════════════════════════════
-  var _biblio_differences = [
-    {
-      critereFR:'Durée quart-temps',
-      critereEN:'Quarter duration',
-      ffbb:'10 min',
-      fiba:'10 min',
-      euroleague:'10 min',
-      nba:'12 min'
-    },
-    {
-      critereFR:'Ligne à 3 points',
-      critereEN:'3-point line',
-      ffbb:'6.75 m',
-      fiba:'6.75 m',
-      euroleague:'6.75 m',
-      nba:'7.24 m'
-    },
-    {
-      critereFR:'Fautes personnelles (exclusion)',
-      critereEN:'Personal fouls (ejection)',
-      ffbb:'5',
-      fiba:'5',
-      euroleague:'5',
-      nba:'6'
-    },
-    {
-      critereFR:'Défense de zone',
-      critereEN:'Zone defense',
-      ffbb:'✅ Autorisée',
-      fiba:'✅ Autorisée',
-      euroleague:'✅ Autorisée',
-      nba:'⚠️ Autorisée (règle 3s défensive)'
-    },
-    {
-      critereFR:'Timeouts par mi-temps',
-      critereEN:'Timeouts per half',
-      ffbb:'2 (1ère) + 3 (2ème)',
-      fiba:'2 (1ère) + 3 (2ème)',
-      euroleague:'2 (1ère) + 3 (2ème)',
-      nba:'7 au total'
-    },
-    {
-      critereFR:'Take foul (faute anti-jeu)',
-      critereEN:'Take foul (clear-path foul)',
-      ffbb:'Faute normale',
-      fiba:'Faute normale',
-      euroleague:'Faute normale',
-      nba:'🆕 1 LF + possession (2022+)'
-    },
-    {
-      critereFR:'Prolongation',
-      critereEN:'Overtime',
-      ffbb:'5 min',
-      fiba:'5 min',
-      euroleague:'5 min',
-      nba:'5 min'
-    },
-    {
-      critereFR:'Joueurs par équipe',
-      critereEN:'Players per team',
-      ffbb:'12',
-      fiba:'12',
-      euroleague:'12',
-      nba:'15 (13 actifs)'
-    }
-  ];
-
-  // ═══════════════════════════════════════════════════════════
-  // DONNÉES : CAS CONCRETS (10 cas Q&R)
-  // ═══════════════════════════════════════════════════════════
-  var _biblio_cas = [
-    {
-      icon:'🚫',
-      titreFR:'Interference offensive',
-      titreEN:'Offensive interference',
-      qFR:'Un attaquant touche le ballon alors qu\'il est sur le cercle ou dans la zone au-dessus du panier. Que se passe-t-il ?',
-      qEN:'An offensive player touches the ball while it\'s on the rim or in the zone above the basket. What happens?',
-      rFR:'Le panier est annulé. Le ballon est rendu à l\'équipe adverse. C\'est une violation.',
-      rEN:'The basket is cancelled. The ball is given to the opposing team. It\'s a violation.'
-    },
-    {
-      icon:'🛡️',
-      titreFR:'Goaltending',
-      titreEN:'Goaltending',
-      qFR:'Un défenseur bloque un ballon qui descend vers le panier, alors qu\'il est encore dans sa trajectoire descendante. Verdict ?',
-      qEN:'A defender blocks a ball descending toward the basket, while still in its downward trajectory. Verdict?',
-      rFR:'Le panier est accordé à l\'attaquant (2 ou 3 points selon la position). C\'est une violation défensive.',
-      rEN:'The basket is awarded to the offensive player (2 or 3 points depending on position). Defensive violation.'
-    },
-    {
-      icon:'⚠️',
-      titreFR:'Faute technique',
-      titreEN:'Technical foul',
-      qFR:'Un joueur conteste violemment une décision d\'arbitre. Sanction ?',
-      qEN:'A player violently contests a referee\'s call. Sanction?',
-      rFR:'Faute technique : 1 lancer franc + possession pour l\'adversaire. En NBA : 1 LF sans possession. 2 techniques = expulsion.',
-      rEN:'Technical foul: 1 free throw + possession for opponent. In NBA: 1 FT without possession. 2 techs = ejection.'
-    },
-    {
-      icon:'💢',
-      titreFR:'Faute antisportive vs technique',
-      titreEN:'Unsportsmanlike vs technical foul',
-      qFR:'Quelle est la différence entre une faute antisportive et une faute technique ?',
-      qEN:'What\'s the difference between an unsportsmanlike foul and a technical foul?',
-      rFR:'Antisportive (UF) : contact excessif volontaire. 2 LF + possession. Technique : sans contact (protestation, geste). 1 LF + possession (FIBA).',
-      rEN:'Unsportsmanlike (UF): excessive voluntary contact. 2 FT + possession. Technical: without contact (protest, gesture). 1 FT + possession (FIBA).'
-    },
-    {
-      icon:'🔒',
-      titreFR:'3 secondes offensive',
-      titreEN:'3-second offensive',
-      qFR:'Un joueur reste dans la raquette adverse pendant 4 secondes sans action. Que fait l\'arbitre ?',
-      qEN:'A player stays in the opponent\'s paint for 4 seconds without action. What does the referee do?',
-      rFR:'Violation des 3 secondes offensives : ballon rendu à l\'adversaire par une remise en jeu.',
-      rEN:'3-second offensive violation: ball returned to opponent via inbound.'
-    },
-    {
-      icon:'🏃',
-      titreFR:'8 secondes traversée',
-      titreEN:'8-second violation',
-      qFR:'Une équipe met 9 secondes à traverser la ligne médiane après une remise en jeu. Verdict ?',
-      qEN:'A team takes 9 seconds to cross the midline after an inbound. Verdict?',
-      rFR:'Violation des 8 secondes : le ballon est rendu à l\'adversaire, remise en jeu à hauteur de la ligne médiane.',
-      rEN:'8-second violation: ball returned to opponent, inbound at the midline.'
-    },
-    {
-      icon:'↩️',
-      titreFR:'Retour en zone',
-      titreEN:'Backcourt violation',
-      qFR:'Après avoir franchi la ligne médiane, un joueur passe le ballon à un coéquipier dans le camp arrière. Erreur ?',
-      qEN:'After crossing the midline, a player passes the ball to a teammate in the backcourt. Error?',
-      rFR:'Oui, retour en zone : violation. Le ballon est rendu à l\'adversaire, remise en jeu à hauteur de la ligne médiane.',
-      rEN:'Yes, backcourt violation. Ball returned to opponent, inbound at midline.'
-    },
-    {
-      icon:'💥',
-      titreFR:'Charge vs faute défensive',
-      titreEN:'Charge vs defensive foul',
-      qFR:'Un attaquant fonce vers un défenseur bien placé et le percute. Faute offensive ou défensive ?',
-      qEN:'An offensive player charges into a well-positioned defender. Offensive or defensive foul?',
-      rFR:'Si le défenseur avait établi sa position (2 pieds au sol, torse face) AVANT le contact : charge offensive. Sinon : faute défensive.',
-      rEN:'If the defender established position (2 feet down, chest facing) BEFORE contact: offensive charge. Otherwise: defensive foul.'
-    },
-    {
-      icon:'⏱️',
-      titreFR:'Panier après la sirène',
-      titreEN:'Buzzer beater',
-      qFR:'La sirène retentit alors que le ballon est en l\'air. Le panier rentre. Compté ?',
-      qEN:'The buzzer sounds while the ball is in the air. The basket goes in. Counted?',
-      rFR:'Oui, si le ballon avait quitté la main du tireur AVANT la sirène. Vérification vidéo possible (dernières minutes).',
-      rEN:'Yes, if the ball left the shooter\'s hand BEFORE the buzzer. Video review possible (last minutes).'
-    },
-    {
-      icon:'⚖️',
-      titreFR:'Balle contestée (jump ball)',
-      titreEN:'Held ball (jump ball)',
-      qFR:'Deux joueurs tiennent fermement le ballon en même temps. Qui récupère la possession ?',
-      qEN:'Two players firmly hold the ball at the same time. Who gets possession?',
-      rFR:'FIBA/EuroLeague : l\'équipe indiquée par la flèche de possession. NBA : entre-deux au centre (jump ball).',
-      rEN:'FIBA/EuroLeague: team indicated by possession arrow. NBA: jump ball at center court.'
-    }
-  ];
-
-  // ═══════════════════════════════════════════════════════════
-  // DONNÉES : GLOSSAIRE (30 termes bilingues)
-  // ═══════════════════════════════════════════════════════════
-  var _biblio_glossaire = [
-    // DRIBBLE (5)
-    { nom:'Crossover', cat:'dribble', catFR:'Dribble', catEN:'Dribble',
-      defFR:'Mouvement de dribble qui consiste à transférer rapidement la balle d\'une main à l\'autre pour déséquilibrer le défenseur.',
-      defEN:'Dribble move that consists of quickly transferring the ball from one hand to the other to unbalance the defender.',
-      astuceFR:'Plus le crossover est bas et rapide, plus il est efficace. Regarde toujours le défenseur dans les yeux.',
-      astuceEN:'The lower and faster the crossover, the more effective. Always look the defender in the eyes.'
-    },
-    { nom:'Behind the back', cat:'dribble', catFR:'Dribble', catEN:'Dribble',
-      defFR:'Dribble effectué en passant la balle derrière son dos pour changer de main sans exposer le ballon au défenseur.',
-      defEN:'Dribble performed by passing the ball behind the back to change hands without exposing it to the defender.',
-      astuceFR:'Utile quand le défenseur anticipe ton crossover classique. Nécessite beaucoup de pratique.',
-      astuceEN:'Useful when the defender anticipates your classic crossover. Requires a lot of practice.'
-    },
-    { nom:'Between the legs', cat:'dribble', catFR:'Dribble', catEN:'Dribble',
-      defFR:'Dribble effectué en passant la balle entre les jambes pour changer de main tout en avançant.',
-      defEN:'Dribble performed by passing the ball between the legs to change hands while moving forward.',
-      astuceFR:'Excellent mouvement de protection : la jambe fait barrière naturelle contre le défenseur.',
-      astuceEN:'Excellent protection move: the leg forms a natural barrier against the defender.'
-    },
-    { nom:'Spin move', cat:'dribble', catFR:'Dribble', catEN:'Dribble',
-      defFR:'Rotation à 360° du corps autour de son pied de pivot pour éliminer un défenseur, tout en gardant le contrôle du ballon.',
-      defEN:'360° rotation of the body around the pivot foot to eliminate a defender, while keeping ball control.',
-      astuceFR:'Regarde par-dessus l\'épaule pendant la rotation pour anticiper la défense d\'aide.',
-      astuceEN:'Look over your shoulder during rotation to anticipate help defense.'
-    },
-    { nom:'Hesitation', cat:'dribble', catFR:'Dribble', catEN:'Dribble',
-      defFR:'Feinte de dribble avec une pause volontaire pour faire réagir le défenseur, puis explosion en direction opposée.',
-      defEN:'Dribble fake with a voluntary pause to make the defender react, then explosion in the opposite direction.',
-      astuceFR:'Le secret : que la pause paraisse naturelle. Change de rythme, pas juste de direction.',
-      astuceEN:'The secret: make the pause look natural. Change rhythm, not just direction.'
-    },
-    // SHOOT (5)
-    { nom:'Jump shot', cat:'shoot', catFR:'Shoot', catEN:'Shoot',
-      defFR:'Tir effectué en sautant, avec relâche du ballon au sommet du saut. Le tir de référence du basketball moderne.',
-      defEN:'Shot performed by jumping, releasing the ball at the peak of the jump. The reference shot of modern basketball.',
-      astuceFR:'Le tir se joue avec les jambes, pas les bras. Fléchis fort, alignement coude-genou-orteils.',
-      astuceEN:'The shot is with the legs, not the arms. Bend deep, elbow-knee-toes alignment.'
-    },
-    { nom:'Fadeaway', cat:'shoot', catFR:'Shoot', catEN:'Shoot',
-      defFR:'Tir en sautant en arrière pour créer de la distance avec le défenseur. Signature de Michael Jordan et Kobe Bryant.',
-      defEN:'Shot with a backward jump to create distance from the defender. Signature move of Michael Jordan and Kobe Bryant.',
-      astuceFR:'Difficile à contrer mais aussi difficile à réussir : donne moins de puissance aux jambes.',
-      astuceEN:'Hard to block but also hard to make: gives less power to the legs.'
-    },
-    { nom:'Step-back', cat:'shoot', catFR:'Shoot', catEN:'Shoot',
-      defFR:'Recul rapide d\'un pas ou deux avant de tirer, créant de l\'espace face au défenseur. Signature de James Harden et Luka Doncic.',
-      defEN:'Quick step back before shooting, creating space against the defender. Signature move of James Harden and Luka Doncic.',
-      astuceFR:'Combine avec un dribble puissant vers l\'avant pour faire mordre le défenseur, puis recule.',
-      astuceEN:'Combine with a strong forward dribble to bait the defender, then step back.'
-    },
-    { nom:'Floater', cat:'shoot', catFR:'Shoot', catEN:'Shoot',
-      defFR:'Tir haut et court, effectué en pleine course, pour passer par-dessus les grands défenseurs. Aussi appelé "tear drop".',
-      defEN:'High, short shot, performed while running, to go over tall defenders. Also called "tear drop".',
-      astuceFR:'Utilisé principalement par les meneurs. Nécessite un toucher fin et beaucoup d\'entraînement.',
-      astuceEN:'Mainly used by point guards. Requires soft touch and lots of practice.'
-    },
-    { nom:'Layup', cat:'shoot', catFR:'Shoot', catEN:'Shoot',
-      defFR:'Tir près du panier après une pénétration, en s\'appuyant sur la planche ou en douceur. Le tir le plus fondamental.',
-      defEN:'Shot near the basket after penetration, using the backboard or a soft touch. The most fundamental shot.',
-      astuceFR:'Toujours protéger le ballon avec le corps entre le défenseur et le ballon.',
-      astuceEN:'Always protect the ball with the body between the defender and the ball.'
-    },
-    // DÉFENSE (5)
-    { nom:'Man-to-man', cat:'defense', catFR:'Défense', catEN:'Defense',
-      defFR:'Défense individuelle : chaque défenseur est responsable d\'un adversaire spécifique qu\'il suit partout sur le terrain.',
-      defEN:'Individual defense: each defender is responsible for a specific opponent they follow everywhere on the court.',
-      astuceFR:'Reste toujours entre ton homme et le panier. Vois le ballon ET ton adversaire.',
-      astuceEN:'Always stay between your man and the basket. See the ball AND your opponent.'
-    },
-    { nom:'Zone defense', cat:'defense', catFR:'Défense', catEN:'Defense',
-      defFR:'Défense de zone : chaque défenseur couvre une zone du terrain plutôt qu\'un joueur spécifique. Interdit longtemps en NBA.',
-      defEN:'Zone defense: each defender covers a zone of the court rather than a specific player. Long forbidden in NBA.',
-      astuceFR:'La communication est essentielle : "man in your zone", "screen coming", etc.',
-      astuceEN:'Communication is essential: "man in your zone", "screen coming", etc.'
-    },
-    { nom:'Switch', cat:'defense', catFR:'Défense', catEN:'Defense',
-      defFR:'Changement d\'adversaire entre deux défenseurs sur un écran ou un croisement, pour éviter d\'être dépassé.',
-      defEN:'Switching opponents between two defenders on a screen or crossing, to avoid being beaten.',
-      astuceFR:'Communique clairement "SWITCH!" pour éviter le trou dans la défense.',
-      astuceEN:'Communicate clearly "SWITCH!" to avoid a gap in the defense.'
-    },
-    { nom:'Help defense', cat:'defense', catFR:'Défense', catEN:'Defense',
-      defFR:'Défense d\'aide : quitter temporairement son homme pour couvrir un coéquipier dépassé par son défenseur direct.',
-      defEN:'Help defense: temporarily leaving your man to cover a teammate beaten by their direct defender.',
-      astuceFR:'Anticipe : sois prêt à aider AVANT que ton coéquipier ne soit dépassé.',
-      astuceEN:'Anticipate: be ready to help BEFORE your teammate is beaten.'
-    },
-    { nom:'Deny', cat:'defense', catFR:'Défense', catEN:'Defense',
-      defFR:'Empêcher un attaquant de recevoir le ballon en se plaçant sur la ligne de passe avec un bras tendu.',
-      defEN:'Preventing an offensive player from receiving the ball by positioning on the pass line with an extended arm.',
-      astuceFR:'Face au passeur, bras dans la ligne de passe. Utile contre les shooteurs adverses.',
-      astuceEN:'Face the passer, arm in the pass line. Useful against opposing shooters.'
-    },
-    // PASSE (4)
-    { nom:'Bounce pass', cat:'passe', catFR:'Passe', catEN:'Pass',
-      defFR:'Passe rebond : le ballon touche le sol une fois avant d\'atteindre le receveur. Passe difficile à intercepter.',
-      defEN:'Bounce pass: the ball touches the ground once before reaching the receiver. Hard to intercept.',
-      astuceFR:'Le rebond doit se produire aux 2/3 de la distance vers le receveur.',
-      astuceEN:'The bounce should happen at 2/3 of the distance toward the receiver.'
-    },
-    { nom:'Chest pass', cat:'passe', catFR:'Passe', catEN:'Pass',
-      defFR:'Passe de poitrine directe, à deux mains, la passe la plus rapide et précise. La passe fondamentale.',
-      defEN:'Direct chest pass, two-handed, the fastest and most accurate pass. The fundamental pass.',
-      astuceFR:'Fais claquer tes poignets à la fin de la passe pour maximiser la vitesse.',
-      astuceEN:'Snap your wrists at the end of the pass to maximize speed.'
-    },
-    { nom:'Alley-oop', cat:'passe', catFR:'Passe', catEN:'Pass',
-      defFR:'Passe lobée près du panier pour qu\'un coéquipier saute et dunk directement sans redescendre.',
-      defEN:'Lob pass near the basket for a teammate to jump and dunk directly without coming down.',
-      astuceFR:'Timing crucial : passe avant même que le receveur soit en position.',
-      astuceEN:'Crucial timing: pass before the receiver is even in position.'
-    },
-    { nom:'No-look pass', cat:'passe', catFR:'Passe', catEN:'Pass',
-      defFR:'Passe effectuée sans regarder le receveur pour tromper la défense. Signature de Magic Johnson.',
-      defEN:'Pass made without looking at the receiver to fool the defense. Magic Johnson\'s signature move.',
-      astuceFR:'Style avant l\'efficacité : ne l\'utilise que si tu es sûr de la position de ton coéquipier.',
-      astuceEN:'Style over efficiency: only use if you\'re sure of your teammate\'s position.'
-    },
-    // TACTIQUE (5)
-    { nom:'Pick and roll', cat:'tactique', catFR:'Tactique', catEN:'Tactic',
-      defFR:'L\'action la plus jouée au monde : un joueur pose un écran pour son porteur de balle, puis roule vers le panier pour recevoir une passe.',
-      defEN:'The most played action in the world: a player sets a screen for the ball handler, then rolls to the basket to receive a pass.',
-      astuceFR:'Lit la réaction du défenseur : s\'il switch → shoot, s\'il aide → passe au rolleur, s\'il combat → drive.',
-      astuceEN:'Read the defender\'s reaction: switch → shoot, help → pass to roller, fight through → drive.'
-    },
-    { nom:'Give and go', cat:'tactique', catFR:'Tactique', catEN:'Tactic',
-      defFR:'Passe et va : passer le ballon à un coéquipier puis se déplacer immédiatement pour recevoir une passe en retour.',
-      defEN:'Pass the ball to a teammate then immediately move to receive a return pass.',
-      astuceFR:'Action fondamentale du basket. Trompe le défenseur qui pense que ton action est terminée.',
-      astuceEN:'Fundamental basketball action. Fools the defender who thinks your action is over.'
-    },
-    { nom:'Fast break', cat:'tactique', catFR:'Tactique', catEN:'Tactic',
-      defFR:'Contre-attaque rapide : après une récupération, l\'équipe court vite pour marquer avant que la défense adverse ne soit en place.',
-      defEN:'Fast counter-attack: after a recovery, the team runs quickly to score before the opposing defense sets up.',
-      astuceFR:'La clé : la première passe longue. Anticipe la récupération avant même qu\'elle arrive.',
-      astuceEN:'The key: the first long pass. Anticipate the recovery before it even happens.'
-    },
-    { nom:'Isolation', cat:'tactique', catFR:'Tactique', catEN:'Tactic',
-      defFR:'Un attaquant seul face à son défenseur, les autres joueurs s\'écartent pour lui laisser l\'espace de créer.',
-      defEN:'One offensive player alone against their defender, other players spread out to give them creating space.',
-      astuceFR:'Utilisé pour tes stars. Mais attention : si le défenseur tient, ça devient stérile.',
-      astuceEN:'Used for your stars. But beware: if the defender holds up, it becomes sterile.'
-    },
-    { nom:'Motion offense', cat:'tactique', catFR:'Tactique', catEN:'Tactic',
-      defFR:'Attaque en mouvement continu : tous les joueurs bougent et passent en permanence pour créer des opportunités, sans schéma figé.',
-      defEN:'Continuous motion offense: all players constantly move and pass to create opportunities, without a fixed pattern.',
-      astuceFR:'Nécessite une équipe intelligente et technique. Base de nombreux systèmes modernes.',
-      astuceEN:'Requires an intelligent and technical team. Base of many modern systems.'
-    },
-    // PHYSIQUE (3)
-    { nom:'Explosivité', nomEN:'Explosiveness', cat:'physique', catFR:'Physique', catEN:'Physical',
-      defFR:'Capacité à générer une force maximale en un temps minimal. Fondamentale pour les premiers appuis, la détente et le premier pas.',
-      defEN:'Ability to generate maximum force in minimum time. Fundamental for first steps, vertical jump and first move.',
-      astuceFR:'Se travaille avec la pliométrie (sauts, bonds), pas juste la musculation.',
-      astuceEN:'Trained with plyometrics (jumps, bounds), not just weightlifting.'
-    },
-    { nom:'Détente verticale', nomEN:'Vertical jump', cat:'physique', catFR:'Physique', catEN:'Physical',
-      defFR:'Hauteur de saut vertical. Mesure clé pour les tirs, rebonds, et dunks.',
-      defEN:'Vertical jump height. Key measurement for shots, rebounds, and dunks.',
-      astuceFR:'La détente est 70% technique (utiliser les bras, plier les genoux) et 30% force pure.',
-      astuceEN:'Vertical jump is 70% technique (using arms, bending knees) and 30% pure strength.'
-    },
-    { nom:'Lateral quickness', cat:'physique', catFR:'Physique', catEN:'Physical',
-      defFR:'Vitesse de déplacement latéral. Essentielle en défense pour rester devant son homme.',
-      defEN:'Lateral movement speed. Essential in defense to stay in front of your man.',
-      astuceFR:'S\'entraîne avec les shuffles, cariocas, et exercices d\'agilité.',
-      astuceEN:'Trained with shuffles, cariocas, and agility drills.'
-    },
-    // MENTAL (3)
-    { nom:'Clutch', cat:'mental', catFR:'Mental', catEN:'Mental',
-      defFR:'Capacité à performer dans les moments décisifs (fin de match, prolongation, égalisation). "Clutch player" = joueur qui prend feu quand ça compte.',
-      defEN:'Ability to perform in decisive moments (end of game, overtime, tie). "Clutch player" = player who catches fire when it counts.',
-      astuceFR:'Se cultive : refais mentalement tes actions décisives à l\'entraînement, encore et encore.',
-      astuceEN:'Cultivated: mentally replay your decisive actions in training, over and over.'
-    },
-    { nom:'Killer instinct', cat:'mental', catFR:'Mental', catEN:'Mental',
-      defFR:'Instinct du tueur : la capacité à enfoncer un adversaire quand il est vulnérable, sans pitié. Signature de Kobe Bryant, MJ.',
-      defEN:'Killer instinct: the ability to finish off an opponent when vulnerable, without mercy. Signature of Kobe Bryant, MJ.',
-      astuceFR:'Non pas de la cruauté, mais du focus total. "Get the job done, no matter what".',
-      astuceEN:'Not cruelty, but total focus. "Get the job done, no matter what".'
-    },
-    { nom:'Basketball IQ', cat:'mental', catFR:'Mental', catEN:'Mental',
-      defFR:'Intelligence de jeu : capacité à lire le jeu, anticiper, prendre les bonnes décisions au bon moment.',
-      defEN:'Game intelligence: ability to read the game, anticipate, make the right decisions at the right moment.',
-      astuceFR:'Se développe en regardant BEAUCOUP de matchs, avec analyse. "Student of the Game".',
-      astuceEN:'Developed by watching LOTS of games, with analysis. "Student of the Game".'
-    }
-  ];
-
-  // ═══════════════════════════════════════════════════════════
-  // Helper : détecter la langue
-  // ═══════════════════════════════════════════════════════════
-  function _lang() {
-    return (window._lang || document.body.getAttribute('data-lang') || 'fr');
-  }
-  function _isEN() { return _lang() === 'en'; }
-
-  // ═══════════════════════════════════════════════════════════
-  // OUVRIR LA BIBLIOTHÈQUE (Modal principal)
-  // ═══════════════════════════════════════════════════════════
-  window._biblio_open = function() {
-    var en = _isEN();
+  window._bt_open = function() {
     if (window._haptic) window._haptic.tap();
-
-    var existing = document.getElementById('biblio-modal');
+    var existing = document.getElementById('bt-select-modal');
     if (existing) existing.remove();
 
     var modal = document.createElement('div');
-    modal.id = 'biblio-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;animation:biblioFadeIn 0.3s ease-out';
+    modal.id = 'bt-select-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;animation:btFadeIn 0.3s ease-out';
 
-    modal.innerHTML =
-      '<div style="max-width:1000px;margin:0 auto">' +
-      // Header
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(245,197,24,0.2)">' +
-      '<div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:32px;letter-spacing:3px;color:#f5c518;line-height:1">🏛️ ' + (en ? 'SENSEI LIBRARY' : 'BIBLIOTHÈQUE SENSEI') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#9aa3bf;margin-top:6px">' + (en ? 'Student of the Game — Master the science of basketball' : 'Student of the Game — Maîtriser la science du basket') + '</div>' +
-      '</div>' +
-      '<button onclick="_biblio_close()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:2px;padding:10px 18px;border-radius:8px;cursor:pointer">✕ ' + (en ? 'CLOSE' : 'FERMER') + '</button>' +
-      '</div>' +
-      // 2 grosses tuiles
-      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:24px">' +
-      // Tuile Règlement
-      '<button onclick="_biblio_regl_open()" style="cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,0.15),rgba(245,197,24,0.02));border:1.5px solid rgba(245,197,24,0.5);border-radius:16px;padding:32px 24px;color:#fff;text-align:left;transition:all 0.2s;box-shadow:0 4px 24px rgba(245,197,24,0.2);font-family:inherit">' +
-      '<div style="font-size:48px;margin-bottom:12px">📖</div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:8px">' + (en ? 'RULES' : 'RÈGLEMENT') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4">' + (en ? 'Essential rules, league differences (FFBB / FIBA / EuroLeague / NBA) and real-game cases' : 'Règles essentielles, différences entre ligues (FFBB / FIBA / EuroLeague / NBA) et cas concrets') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#f5c518;margin-top:16px;letter-spacing:1.5px;text-transform:uppercase">' + (en ? '→ Consult' : '→ Consulter') + '</div>' +
-      '</button>' +
-      // Tuile Glossaire
-      '<button onclick="_biblio_glos_open()" style="cursor:pointer;background:linear-gradient(160deg,rgba(102,51,204,0.15),rgba(102,51,204,0.02));border:1.5px solid rgba(102,51,204,0.5);border-radius:16px;padding:32px 24px;color:#fff;text-align:left;transition:all 0.2s;box-shadow:0 4px 24px rgba(102,51,204,0.2);font-family:inherit">' +
-      '<div style="font-size:48px;margin-bottom:12px">📗</div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:2px;color:#a97fff;line-height:1;margin-bottom:8px">' + (en ? 'GLOSSARY' : 'GLOSSAIRE') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4">' + (en ? '30 essential basketball terms with definitions and SENSEI tips — Dribble, Shoot, Defense, Pass, Tactic, Physical, Mental' : '30 termes essentiels du basket avec définitions et astuces SENSEI — Dribble, Shoot, Défense, Passe, Tactique, Physique, Mental') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#a97fff;margin-top:16px;letter-spacing:1.5px;text-transform:uppercase">' + (en ? '→ Search' : '→ Rechercher') + '</div>' +
-      '</button>' +
-      '</div>' +
-      // Note "extensible"
-      '<div style="text-align:center;margin-top:32px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#666;letter-spacing:1.5px;text-transform:uppercase">' + (en ? 'Other sections coming soon' : 'D\'autres rubriques bientôt') + '</div>' +
-      '</div>';
-
-    document.body.appendChild(modal);
-
-    // Ajouter animation CSS si pas déjà présente
-    if (!document.getElementById('biblio-anim-style')) {
-      var st = document.createElement('style');
-      st.id = 'biblio-anim-style';
-      st.textContent = '@keyframes biblioFadeIn { from { opacity:0; transform:scale(0.98); } to { opacity:1; transform:scale(1); } }';
-      document.head.appendChild(st);
-    }
-  };
-
-  window._biblio_close = function() {
-    var modal = document.getElementById('biblio-modal');
-    if (modal) modal.remove();
-    if (window._haptic) window._haptic.tap();
-  };
-
-  // ═══════════════════════════════════════════════════════════
-  // OUVRIR LE RÈGLEMENT
-  // ═══════════════════════════════════════════════════════════
-  var _biblio_regl_tab = 'regles';
-
-  window._biblio_regl_open = function() {
-    var en = _isEN();
-    if (window._haptic) window._haptic.tap();
-
-    var existing = document.getElementById('biblio-regl-modal');
-    if (existing) existing.remove();
-
-    var modal = document.createElement('div');
-    modal.id = 'biblio-regl-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;animation:biblioFadeIn 0.3s ease-out';
-
-    modal.innerHTML =
-      '<div style="max-width:1100px;margin:0 auto">' +
+    var html = '<div style="max-width:640px;margin:0 auto">' +
       // Header
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(245,197,24,0.2)">' +
       '<div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:3px;color:#f5c518">📖 ' + (en ? 'RULES' : 'RÈGLEMENT') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">' + (en ? 'Understand basketball as a science' : 'Comprendre le basket comme une science') + '</div>' +
+      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:30px;letter-spacing:3px;color:#f5c518;line-height:1">🏀 BALL TRACKER</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">AI-powered dribble counter · MoveNet</div>' +
       '</div>' +
-      '<button onclick="_biblio_regl_close()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:8px;cursor:pointer">✕</button>' +
+      '<button onclick="_bt_close_select()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:8px;cursor:pointer">✕</button>' +
       '</div>' +
-      // Onglets
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">' +
-      '<button id="brt-regles" onclick="_biblio_regl_tab(\'regles\')" class="biblio-regl-tab" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:10px 18px;border-radius:8px;border:1px solid rgba(245,197,24,0.5);background:rgba(245,197,24,0.1);color:#f5c518">🎯 ' + (en ? 'Essential rules' : 'Règles essentielles') + '</button>' +
-      '<button id="brt-diff" onclick="_biblio_regl_tab(\'diff\')" class="biblio-regl-tab" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:10px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">⚖️ ' + (en ? 'League differences' : 'Différences entre ligues') + '</button>' +
-      '<button id="brt-cas" onclick="_biblio_regl_tab(\'cas\')" class="biblio-regl-tab" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:10px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">🔍 ' + (en ? 'Real cases' : 'Cas concrets') + '</button>' +
+      // Section : description du drill (informatif, pas de sélection)
+      '<div style="margin-bottom:24px;background:linear-gradient(160deg,rgba(245,197,24,0.10),rgba(245,197,24,0.02));border:1.5px solid rgba(245,197,24,0.4);border-radius:14px;padding:20px">' +
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
+      '<div style="font-size:38px">🏀</div>' +
+      '<div style="flex:1">' +
+      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:4px">BALL POUNDS</div>' +
+      '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.4">Pound the floor with any hand. The AI detects which hand you\'re using in real time.</div>' +
       '</div>' +
-      // Content
-      '<div id="biblio-regl-content"></div>' +
-      '</div>';
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Left hand detection</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Right hand detection</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Alternation detection</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Symmetry analysis</div>' +
+      '</div>' +
+      '</div>' +
+      // Section : choisir un objectif
+      '<div style="margin-bottom:24px">' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;margin-bottom:12px;font-weight:700">Set your target</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
 
-    document.body.appendChild(modal);
-    _biblio_regl_render('regles');
-  };
-
-  window._biblio_regl_close = function() {
-    var modal = document.getElementById('biblio-regl-modal');
-    if (modal) modal.remove();
-    if (window._haptic) window._haptic.tap();
-  };
-
-  window._biblio_regl_tab = function(tab) {
-    _biblio_regl_tab = tab;
-    if (window._haptic) window._haptic.tap();
-    _biblio_regl_render(tab);
-  };
-
-  function _biblio_regl_render(tab) {
-    var en = _isEN();
-    var container = document.getElementById('biblio-regl-content');
-    if (!container) return;
-
-    // Update tab styles
-    ['regles', 'diff', 'cas'].forEach(function(t) {
-      var btn = document.getElementById('brt-' + t);
-      if (btn) {
-        if (t === tab) {
-          btn.style.borderColor = 'rgba(245,197,24,0.5)';
-          btn.style.background = 'rgba(245,197,24,0.1)';
-          btn.style.color = '#f5c518';
-        } else {
-          btn.style.borderColor = 'rgba(255,255,255,0.15)';
-          btn.style.background = 'rgba(255,255,255,0.03)';
-          btn.style.color = '#9aa3bf';
-        }
-      }
+    _bt_targets.forEach(function(t) {
+      html += '<button onclick="_bt_selectTarget(' + t + ')" data-target="' + t + '" class="bt-target-btn" style="cursor:pointer;background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px 8px;color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:1px;transition:all 0.15s">' + t + '</button>';
     });
 
-    var html = '';
-    if (tab === 'regles') {
-      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">';
-      _biblio_regles.forEach(function(r) {
-        html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px">';
-        html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
-        html += '<div style="font-size:28px">' + r.icon + '</div>';
-        html += '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:18px;letter-spacing:1.5px;color:#f5c518;line-height:1">' + (en ? r.titreEN : r.titreFR) + '</div>';
-        html += '</div>';
-        html += '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.5">' + (en ? r.textEN : r.textFR) + '</div>';
-        html += '</div>';
-      });
-      html += '</div>';
-    } else if (tab === 'diff') {
-      html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.03);border-radius:12px;overflow:hidden">';
-      html += '<thead><tr style="background:rgba(245,197,24,0.15)">';
-      html += '<th style="padding:14px;text-align:left;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#f5c518;border-bottom:1px solid rgba(245,197,24,0.3)">' + (en ? 'Criterion' : 'Critère') + '</th>';
-      html += '<th style="padding:14px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#f5c518;border-bottom:1px solid rgba(245,197,24,0.3)">FFBB</th>';
-      html += '<th style="padding:14px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#f5c518;border-bottom:1px solid rgba(245,197,24,0.3)">FIBA</th>';
-      html += '<th style="padding:14px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#f5c518;border-bottom:1px solid rgba(245,197,24,0.3)">EuroLeague</th>';
-      html += '<th style="padding:14px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#f5c518;border-bottom:1px solid rgba(245,197,24,0.3)">NBA</th>';
-      html += '</tr></thead><tbody>';
-      _biblio_differences.forEach(function(d, i) {
-        html += '<tr style="background:' + (i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent') + '">';
-        html += '<td style="padding:12px 14px;font-family:\'Barlow\',sans-serif;font-size:13px;color:#fff;font-weight:600">' + (en ? d.critereEN : d.critereFR) + '</td>';
-        html += '<td style="padding:12px 14px;text-align:center;font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0">' + d.ffbb + '</td>';
-        html += '<td style="padding:12px 14px;text-align:center;font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0">' + d.fiba + '</td>';
-        html += '<td style="padding:12px 14px;text-align:center;font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0">' + d.euroleague + '</td>';
-        html += '<td style="padding:12px 14px;text-align:center;font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0">' + d.nba + '</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-    } else if (tab === 'cas') {
-      html += '<div style="display:grid;gap:14px">';
-      _biblio_cas.forEach(function(c) {
-        html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">';
-        html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
-        html += '<div style="font-size:26px">' + c.icon + '</div>';
-        html += '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:18px;letter-spacing:1.5px;color:#f5c518;line-height:1">' + (en ? c.titreEN : c.titreFR) + '</div>';
-        html += '</div>';
-        html += '<div style="padding:12px;background:rgba(245,197,24,0.06);border-left:3px solid rgba(245,197,24,0.5);border-radius:6px;margin-bottom:10px">';
-        html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;color:#f5c518;text-transform:uppercase;margin-bottom:6px;font-weight:700">' + (en ? '❓ Situation' : '❓ Situation') + '</div>';
-        html += '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.5">' + (en ? c.qEN : c.qFR) + '</div>';
-        html += '</div>';
-        html += '<div style="padding:12px;background:rgba(34,197,94,0.06);border-left:3px solid rgba(34,197,94,0.5);border-radius:6px">';
-        html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;color:#22c55e;text-transform:uppercase;margin-bottom:6px;font-weight:700">' + (en ? '✅ Answer' : '✅ Verdict') + '</div>';
-        html += '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.5">' + (en ? c.rEN : c.rFR) + '</div>';
-        html += '</div>';
-        html += '</div>';
-      });
-      html += '</div>';
+    html += '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#666;text-align:center;margin-top:8px">REPS</div>' +
+      '</div>' +
+      // Bouton démarrer
+      '<button id="bt-start-btn" onclick="_bt_start()" style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;padding:18px;border-radius:12px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;font-weight:700;transition:all 0.15s">▶ START SESSION</button>' +
+      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-top:16px">Powered by MoveNet · 100% local · No data sent</div>' +
+      '</div>';
+
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+
+    // Animation CSS
+    if (!document.getElementById('bt-anim-style')) {
+      var st = document.createElement('style');
+      st.id = 'bt-anim-style';
+      st.textContent = '@keyframes btFadeIn { from { opacity:0; transform:scale(0.98); } to { opacity:1; transform:scale(1); } }';
+      document.head.appendChild(st);
     }
-    container.innerHTML = html;
-  }
 
-  // ═══════════════════════════════════════════════════════════
-  // OUVRIR LE GLOSSAIRE
-  // ═══════════════════════════════════════════════════════════
-  var _biblio_glos_filter = 'all';
-  var _biblio_glos_search = '';
-
-  window._biblio_glos_open = function() {
-    var en = _isEN();
-    if (window._haptic) window._haptic.tap();
-
-    var existing = document.getElementById('biblio-glos-modal');
-    if (existing) existing.remove();
-
-    var modal = document.createElement('div');
-    modal.id = 'biblio-glos-modal';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;animation:biblioFadeIn 0.3s ease-out';
-
-    modal.innerHTML =
-      '<div style="max-width:900px;margin:0 auto">' +
-      // Header
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(102,51,204,0.2)">' +
-      '<div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:3px;color:#a97fff">📗 ' + (en ? 'GLOSSARY' : 'GLOSSAIRE') + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">' + (en ? '30 essential basketball terms' : '30 termes essentiels du basket') + '</div>' +
-      '</div>' +
-      '<button onclick="_biblio_glos_close()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:8px;cursor:pointer">✕</button>' +
-      '</div>' +
-      // Search
-      '<div style="margin-bottom:16px">' +
-      '<input type="text" id="biblio-glos-search-input" placeholder="' + (en ? '🔍 Search a term...' : '🔍 Rechercher un terme...') + '" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:#fff;font-family:\'Barlow\',sans-serif;font-size:14px;outline:none;box-sizing:border-box" oninput="_biblio_glos_search_update(this.value)">' +
-      '</div>' +
-      // Filters
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px">' +
-      '<button onclick="_biblio_glos_filter_set(\'all\')" class="bgf" data-cat="all" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(169,127,255,0.5);background:rgba(169,127,255,0.15);color:#a97fff">' + (en ? 'All' : 'Tous') + '</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'dribble\')" class="bgf" data-cat="dribble" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">Dribble</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'shoot\')" class="bgf" data-cat="shoot" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">Shoot</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'defense\')" class="bgf" data-cat="defense" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">' + (en ? 'Defense' : 'Défense') + '</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'passe\')" class="bgf" data-cat="passe" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">' + (en ? 'Pass' : 'Passe') + '</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'tactique\')" class="bgf" data-cat="tactique" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">' + (en ? 'Tactic' : 'Tactique') + '</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'physique\')" class="bgf" data-cat="physique" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">' + (en ? 'Physical' : 'Physique') + '</button>' +
-      '<button onclick="_biblio_glos_filter_set(\'mental\')" class="bgf" data-cat="mental" style="cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);color:#9aa3bf">Mental</button>' +
-      '</div>' +
-      // Content
-      '<div id="biblio-glos-content"></div>' +
-      '</div>';
-
-    document.body.appendChild(modal);
-    _biblio_glos_render();
+    // Objectif par défaut : 20 reps
+    _bt_selectTarget(20);
   };
 
-  window._biblio_glos_close = function() {
-    var modal = document.getElementById('biblio-glos-modal');
-    if (modal) modal.remove();
-    _biblio_glos_filter = 'all';
-    _biblio_glos_search = '';
+  window._bt_close_select = function() {
+    var m = document.getElementById('bt-select-modal');
+    if (m) m.remove();
     if (window._haptic) window._haptic.tap();
   };
 
-  window._biblio_glos_filter_set = function(cat) {
-    _biblio_glos_filter = cat;
-    if (window._haptic) window._haptic.tap();
-    // Update button styles
-    document.querySelectorAll('.bgf').forEach(function(btn) {
-      var c = btn.getAttribute('data-cat');
-      if (c === cat) {
-        btn.style.borderColor = 'rgba(169,127,255,0.5)';
-        btn.style.background = 'rgba(169,127,255,0.15)';
-        btn.style.color = '#a97fff';
+  window._bt_selectTarget = function(t) {
+    _bt_target = t;
+    document.querySelectorAll('.bt-target-btn').forEach(function(b){
+      if (parseInt(b.getAttribute('data-target')) === t) {
+        b.style.borderColor = 'rgba(245,197,24,0.6)';
+        b.style.background = 'rgba(245,197,24,0.15)';
+        b.style.color = '#f5c518';
       } else {
-        btn.style.borderColor = 'rgba(255,255,255,0.15)';
-        btn.style.background = 'rgba(255,255,255,0.03)';
-        btn.style.color = '#9aa3bf';
+        b.style.borderColor = 'rgba(255,255,255,0.1)';
+        b.style.background = 'rgba(255,255,255,0.03)';
+        b.style.color = '#fff';
       }
     });
-    _biblio_glos_render();
+    if (window._haptic) window._haptic.tap();
   };
 
-  window._biblio_glos_search_update = function(val) {
-    _biblio_glos_search = val.toLowerCase().trim();
-    _biblio_glos_render();
-  };
-
-  function _biblio_glos_render() {
-    var en = _isEN();
-    var container = document.getElementById('biblio-glos-content');
-    if (!container) return;
-
-    // Filter + search + sort A-Z
-    var filtered = _biblio_glossaire.filter(function(t) {
-      if (_biblio_glos_filter !== 'all' && t.cat !== _biblio_glos_filter) return false;
-      if (_biblio_glos_search) {
-        var searchIn = (t.nom + ' ' + (t.nomEN || '') + ' ' + (en ? t.defEN : t.defFR) + ' ' + (en ? t.catEN : t.catFR)).toLowerCase();
-        if (searchIn.indexOf(_biblio_glos_search) === -1) return false;
-      }
-      return true;
-    });
-
-    // Sort A-Z
-    filtered.sort(function(a, b) { var na = (en && a.nomEN) ? a.nomEN : a.nom; var nb = (en && b.nomEN) ? b.nomEN : b.nom; return na.localeCompare(nb); });
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#666;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase">' + (en ? 'No results' : 'Aucun résultat') + '</div>';
+  // ═══════════════════════════════════════════════════════════
+  // START
+  // ═══════════════════════════════════════════════════════════
+  window._bt_start = function() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Camera not accessible on this device.');
+      return;
+    }
+    if (typeof _tsym_detector === 'undefined' || !_tsym_detector) {
+      if (typeof _tsym_loadModel === 'function') { try { _tsym_loadModel(null, null); } catch(e){} }
+      alert('MoveNet not ready. Try again in a few seconds.');
       return;
     }
 
-    var html = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#666;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">' + filtered.length + ' ' + (en ? 'term' + (filtered.length > 1 ? 's' : '') : 'terme' + (filtered.length > 1 ? 's' : '')) + '</div>';
-    html += '<div style="display:grid;gap:14px">';
-    filtered.forEach(function(t) {
-      html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">';
-      html += '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:1.5px;color:#a97fff;line-height:1">' + (en && t.nomEN ? t.nomEN : t.nom) + '</div>';
-      html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#a97fff;background:rgba(169,127,255,0.15);border:1px solid rgba(169,127,255,0.3);padding:4px 10px;border-radius:12px">🏷️ ' + (en ? t.catEN : t.catFR) + '</div>';
-      html += '</div>';
-      html += '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.55;margin-bottom:12px">' + (en ? t.defEN : t.defFR) + '</div>';
-      if (t.astuceFR && t.astuceEN) {
-        html += '<div style="padding:10px 12px;background:rgba(245,197,24,0.06);border-left:3px solid rgba(245,197,24,0.5);border-radius:6px">';
-        html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1.5px;color:#f5c518;text-transform:uppercase;margin-bottom:4px;font-weight:700">💡 ' + (en ? 'SENSEI Tip' : 'Astuce SENSEI') + '</div>';
-        html += '<div style="font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0;line-height:1.45;font-style:italic">' + (en ? t.astuceEN : t.astuceFR) + '</div>';
-        html += '</div>';
+    _bt_close_select();
+
+    var vConstraints = [
+      { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      true
+    ];
+    function tryCam(i) {
+      if (i >= vConstraints.length) { alert('Camera inaccessible.'); return; }
+      navigator.mediaDevices.getUserMedia({ video: vConstraints[i], audio: false })
+        .then(function(stream) {
+          if (window._haptic) window._haptic.success();
+          if (window._wake) window._wake.acquire();
+          if (typeof senseiCamShow === 'function') senseiCamShow('bt', stream);
+        })
+        .catch(function(){ tryCam(i + 1); });
+    }
+    tryCam(0);
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // Boucle de dessin — TOUT sur canvas
+  // ═══════════════════════════════════════════════════════════
+  function _bt_drawLoop() {
+    if (!_bt_running || !_bt_video || !_bt_canvas || !_bt_ctx) return;
+    var W = _bt_canvas.width, H = _bt_canvas.height;
+    var vw = _bt_video.videoWidth || 0, vh = _bt_video.videoHeight || 0;
+    if (vw > 0 && vh > 0) {
+      _bt_ctx.clearRect(0, 0, W, H);
+      var cr = W / H, vr = vw / vh;
+      var sx, sy, sw, sh;
+      if (vr > cr) { sh = vh; sw = vh * cr; sx = (vw - sw) / 2; sy = 0; }
+      else          { sw = vw; sh = vw / cr; sx = 0; sy = (vh - sh) / 2; }
+      _bt_ctx.save();
+      _bt_ctx.imageSmoothingEnabled = true;
+      if ('imageSmoothingQuality' in _bt_ctx) _bt_ctx.imageSmoothingQuality = 'high';
+      _bt_ctx.drawImage(_bt_video, sx, sy, sw, sh, 0, 0, W, H);
+      _bt_ctx.restore();
+
+      _bt_drawOverlay(W, H);
+
+      if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_bt_ctx, W, H);
+    }
+    _bt_rafId = requestAnimationFrame(_bt_drawLoop);
+  }
+
+  function _bt_drawOverlay(W, H) {
+    var ctx = _bt_ctx;
+    var mode = _bt_titles[_bt_currentMode] || _bt_titles.initial;
+
+    var cardW = Math.min(W * 0.7, 480);
+    var cardH = Math.min(H * 0.55, 340);
+    var cardX = (W - cardW) / 2;
+    var cardY = (H - cardH) / 2 - H * 0.05;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(10, 13, 24, 0.72)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 2;
+    _bt_roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+    ctx.fill();
+    ctx.stroke();
+
+    // Titre dynamique
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold ' + Math.round(cardW * 0.055) + "px 'Bebas Neue', Impact, sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(mode.title, W / 2, cardY + cardH * 0.08);
+
+    // Anneau progressif
+    var ringCx = W / 2;
+    var ringCy = cardY + cardH * 0.5;
+    var ringR = Math.min(cardW, cardH) * 0.22;
+    var progress = Math.min(1, _bt_reps / _bt_target);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = ringR * 0.16;
+    ctx.beginPath();
+    ctx.arc(ringCx, ringCy, ringR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    if (progress > 0) {
+      var col = progress < 0.5 ? '#ffffff' : progress < 0.9 ? '#f5c518' : '#22c55e';
+      ctx.strokeStyle = col;
+      ctx.lineWidth = ringR * 0.16;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(ringCx, ringCy, ringR, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Compteur au centre
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold ' + Math.round(ringR * 0.55) + "px 'Bebas Neue', Impact, sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(_bt_reps + '/' + _bt_target, ringCx, ringCy - ringR * 0.05);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = 'bold ' + Math.round(ringR * 0.18) + "px 'Barlow Condensed', sans-serif";
+    ctx.fillText('REPS', ringCx, ringCy + ringR * 0.35);
+
+    // Instruction dynamique
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = Math.round(cardW * 0.032) + "px 'Barlow', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    _bt_wrapText(ctx, mode.instr, W / 2, cardY + cardH * 0.92, cardW * 0.85, cardW * 0.045);
+
+    ctx.restore();
+  }
+
+  function _bt_roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function _bt_wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    var words = text.split(' ');
+    var line = '';
+    var lines = [];
+    for (var i = 0; i < words.length; i++) {
+      var testLine = line + words[i] + ' ';
+      if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+        lines.push(line.trim());
+        line = words[i] + ' ';
+      } else {
+        line = testLine;
       }
-      html += '</div>';
-    });
-    html += '</div>';
-    container.innerHTML = html;
+    }
+    lines.push(line.trim());
+    for (var j = lines.length - 1; j >= 0; j--) {
+      ctx.fillText(lines[j], x, y - (lines.length - 1 - j) * lineHeight);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // onCamReady
+  // ═══════════════════════════════════════════════════════════
+  window._bt_onCamReady = function(video, canvas, ctx) {
+    _bt_video = video;
+    _bt_canvas = canvas;
+    _bt_ctx = ctx;
+    _bt_running = true;
+    _bt_startTime = Date.now();
+    _bt_reps = 0;
+    _bt_repsLeft = 0;
+    _bt_repsRight = 0;
+    _bt_lastRepTime = 0;
+    _bt_repHistory = [];
+    _bt_wristHistory = { left: [], right: [] };
+    _bt_currentMode = 'initial';
+    _bt_recActive = false;
+    _bt_recChunks = [];
+
+    var recBtn = document.getElementById('sensei-cam-rec-btn');
+    if (recBtn) {
+      recBtn.style.display = 'flex';
+      recBtn.innerHTML = '&#9679; REC';
+      recBtn.style.background = 'rgba(230,57,70,.92)';
+      recBtn.style.animation = '';
+    }
+
+    _bt_rafId = requestAnimationFrame(_bt_drawLoop);
+
+    _bt_analysisInterval = setInterval(async function() {
+      if (!_bt_running || !_tsym_detector || !_bt_video) return;
+      try {
+        var poses = await _tsym_detector.estimatePoses(_bt_video);
+        if (poses && poses.length > 0 && poses[0].keypoints) {
+          _bt_detectRep(poses[0].keypoints);
+        }
+      } catch(e) {}
+    }, 100);
+
+    if (window._speak) window._speak.say('Ball Pounds. Get ready, focus up!', {lang:'en-US'});
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // Détection dribble sur LES 2 MAINS en parallèle
+  // ═══════════════════════════════════════════════════════════
+  function _bt_detectRep(kp) {
+    var now = Date.now();
+    var HIST_SIZE = 5;
+
+    function checkWrist(side, kpIdx) {
+      var p = kp[kpIdx];
+      if (!p || p.score < 0.3) return;
+      _bt_wristHistory[side].push({ t: now, y: p.y });
+      if (_bt_wristHistory[side].length > HIST_SIZE) _bt_wristHistory[side].shift();
+      if (_bt_wristHistory[side].length >= 3) {
+        var h = _bt_wristHistory[side];
+        var prev = h[h.length - 3];
+        var mid = h[h.length - 2];
+        var next = h[h.length - 1];
+        if (mid.y > prev.y + 15 && mid.y > next.y + 15) {
+          _bt_registerRep(side, now);
+        }
+      }
+    }
+    checkWrist('left', 9);
+    checkWrist('right', 10);
+  }
+
+  function _bt_registerRep(side, now) {
+    if (now - _bt_lastRepTime < _bt_MIN_REP_INTERVAL) return;
+    _bt_reps++;
+    _bt_lastRepTime = now;
+    if (side === 'left') _bt_repsLeft++; else _bt_repsRight++;
+    _bt_repHistory.push({ t: now, side: side });
+    if (_bt_repHistory.length > 5) _bt_repHistory.shift();
+    if (window._haptic) window._haptic.tap();
+
+    // Mise à jour du mode d'affichage EN TEMPS RÉEL (basé sur les 5 dernières reps)
+    _bt_updateMode();
+
+    // Coach vocal tous les 5 reps
+    if (window._speak) {
+      if (_bt_reps % 5 === 0 && _bt_reps < _bt_target) {
+        window._speak.say(String(_bt_reps), {lang:'en-US'});
+      } else if (_bt_reps >= _bt_target - 2 && _bt_reps < _bt_target) {
+        window._speak.say(String(_bt_target - _bt_reps) + ' to go!', {lang:'en-US'});
+      }
+    }
+
+    // Objectif atteint
+    if (_bt_reps >= _bt_target) {
+      if (window._speak) window._speak.say('Great work, target reached!', {lang:'en-US'});
+      setTimeout(function(){
+        if (typeof senseiCamStop === 'function') senseiCamStop();
+      }, 1500);
+    }
+  }
+
+  function _bt_updateMode() {
+    var h = _bt_repHistory;
+    if (h.length < 3) { _bt_currentMode = 'initial'; return; }
+    // Compter L et R dans l'historique récent
+    var nL = 0, nR = 0;
+    for (var i = 0; i < h.length; i++) {
+      if (h[i].side === 'left') nL++; else nR++;
+    }
+    // Détecter alternance : au moins 3 changements dans l'historique
+    var changes = 0;
+    for (var j = 1; j < h.length; j++) {
+      if (h[j].side !== h[j-1].side) changes++;
+    }
+    if (changes >= 2 && nL >= 1 && nR >= 1) {
+      _bt_currentMode = 'alternating';
+    } else if (nL >= h.length * 0.7) {
+      _bt_currentMode = 'left';
+    } else if (nR >= h.length * 0.7) {
+      _bt_currentMode = 'right';
+    } else {
+      _bt_currentMode = 'alternating';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // stopCamera
+  // ═══════════════════════════════════════════════════════════
+  window._bt_stopCamera = function() {
+    if (!_bt_running) return;
+    _bt_running = false;
+
+    if (_bt_recActive) {
+      if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+      try { _bt_recorder.stop(); } catch(e){}
+      _bt_recActive = false;
+    }
+
+    if (_bt_rafId) { cancelAnimationFrame(_bt_rafId); _bt_rafId = null; }
+    if (_bt_analysisInterval) { clearInterval(_bt_analysisInterval); _bt_analysisInterval = null; }
+
+    var duration = (Date.now() - _bt_startTime) / 1000;
+    _bt_video = null; _bt_canvas = null; _bt_ctx = null;
+
+    if (window._haptic) window._haptic.success();
+    if (window._wake) window._wake.release();
+
+    _bt_showSummary(duration);
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // Résumé enrichi avec stats symétrie gauche/droite
+  // ═══════════════════════════════════════════════════════════
+  function _bt_showSummary(duration) {
+    var reached = _bt_reps >= _bt_target;
+    var mm = Math.floor(duration / 60);
+    var ss = Math.floor(duration % 60);
+    var durStr = (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+    var rpm = duration > 0 ? Math.round((_bt_reps / duration) * 60) : 0;
+
+    // Symétrie : 100% si égalité, baisse selon écart
+    var totalReps = _bt_repsLeft + _bt_repsRight;
+    var symmetry = 0;
+    var dominant = '—';
+    if (totalReps > 0) {
+      var minSide = Math.min(_bt_repsLeft, _bt_repsRight);
+      var maxSide = Math.max(_bt_repsLeft, _bt_repsRight);
+      symmetry = maxSide > 0 ? Math.round((minSide / maxSide) * 100) : 0;
+      if (_bt_repsLeft === _bt_repsRight) dominant = 'Balanced';
+      else dominant = _bt_repsLeft > _bt_repsRight ? 'Left' : 'Right';
+    }
+    var symColor = symmetry >= 85 ? '#22c55e' : symmetry >= 65 ? '#f5c518' : '#e63946';
+
+    var overlay = document.createElement('div');
+    overlay.id = 'bt-summary-modal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;display:flex;align-items:center;justify-content:center;animation:btFadeIn 0.3s ease-out';
+
+    var html = '<div style="max-width:520px;width:100%">' +
+      // Header
+      '<div style="text-align:center;margin-bottom:20px">' +
+      '<div style="font-size:56px;margin-bottom:8px">' + (reached ? '🏆' : '💪') + '</div>' +
+      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:2px;color:' + (reached ? '#22c55e' : '#f5c518') + ';line-height:1">' + (reached ? 'TARGET REACHED!' : 'SESSION COMPLETE') + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;letter-spacing:1.5px;color:#9aa3bf;margin-top:6px;text-transform:uppercase">🏀 BALL POUNDS</div>' +
+      '</div>' +
+      // Stats principales
+      '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:14px">' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">' +
+      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#f5c518;line-height:1">' + _bt_reps + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Reps</div></div>' +
+      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#22c55e;line-height:1">' + durStr + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Time</div></div>' +
+      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#a97fff;line-height:1">' + rpm + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Reps/min</div></div>' +
+      '</div>' +
+      '</div>' +
+      // Stats symétrie (NOUVEAU)
+      '<div style="background:linear-gradient(160deg,rgba(245,197,24,0.08),rgba(245,197,24,0.02));border:1px solid rgba(245,197,24,0.3);border-radius:14px;padding:18px;margin-bottom:20px">' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;text-align:center;margin-bottom:14px;font-weight:700">⚖️ HAND SYMMETRY</div>' +
+      // Barre visuelle L / R
+      '<div style="display:flex;height:40px;border-radius:8px;overflow:hidden;margin-bottom:12px;background:rgba(0,0,0,0.3)">' +
+      (totalReps > 0
+        ? '<div style="flex:' + _bt_repsLeft + ';background:linear-gradient(90deg,#3b82f6,#60a5fa);display:flex;align-items:center;justify-content:center;color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px">L · ' + _bt_repsLeft + '</div>' +
+          '<div style="flex:' + _bt_repsRight + ';background:linear-gradient(90deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px">R · ' + _bt_repsRight + '</div>'
+        : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#666;font-family:\'Barlow Condensed\',sans-serif;font-size:12px">No data</div>'
+      ) +
+      '</div>' +
+      // Symétrie score + dominante
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+      '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:' + symColor + ';line-height:1">' + symmetry + '%</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Symmetry Score</div>' +
+      '</div>' +
+      '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px">' +
+      '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:#fff;line-height:1">' + dominant + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Dominant Hand</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      // Actions
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">' +
+      '<button onclick="_bt_closeSummary();_bt_open()" style="background:rgba(245,197,24,0.15);border:1.5px solid rgba(245,197,24,0.5);color:#f5c518;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">🔁 NEW SET</button>' +
+      '<button onclick="_bt_closeSummary()" style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.15);color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">✕ CLOSE</button>' +
+      '</div>' +
+      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase">Powered by MoveNet · 100% local · No data sent</div>' +
+      '</div>';
+
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+  }
+
+  window._bt_closeSummary = function() {
+    var m = document.getElementById('bt-summary-modal');
+    if (m) m.remove();
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // REC — MediaRecorder (identique SHOOTING SESSION)
+  // ═══════════════════════════════════════════════════════════
+  function _bt_getBestMime() {
+    if (typeof MediaRecorder === 'undefined') return '';
+    var mimes = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm',''];
+    for (var i=0; i<mimes.length; i++) { if (!mimes[i]) return ''; if (MediaRecorder.isTypeSupported(mimes[i])) return mimes[i]; }
+    return '';
+  }
+
+  window._bt_toggleRec = function() {
+    if (window._haptic) window._haptic.tap();
+    if (_bt_recActive) _bt_stopRec();
+    else _bt_startRec();
+  };
+
+  function _bt_startRec() {
+    if (typeof MediaRecorder === 'undefined') { alert('Recording not supported.'); return false; }
+    if (!_bt_canvas) return false;
+    var stream = null;
+    try {
+      stream = _bt_canvas.captureStream ? _bt_canvas.captureStream(25) :
+               _bt_canvas.mozCaptureStream ? _bt_canvas.mozCaptureStream(25) : null;
+    } catch(e) { stream = null; }
+    if (!stream) { alert('Canvas capture not supported.'); return false; }
+    var mime = _bt_getBestMime();
+    try {
+      _bt_recorder = mime
+        ? new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: 3500000})
+        : new MediaRecorder(stream, {videoBitsPerSecond: 3500000});
+    } catch(e) {
+      try { _bt_recorder = new MediaRecorder(stream); }
+      catch(e2) { alert('Unable to start recording.'); return false; }
+    }
+    _bt_recChunks = [];
+    _bt_recSec = 0;
+    _bt_recorder.ondataavailable = function(e){ if (e.data && e.data.size > 0) _bt_recChunks.push(e.data); };
+    _bt_recorder.onstop = function(){
+      if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+      var mimeUsed = (_bt_recorder && _bt_recorder.mimeType) || mime || 'video/webm';
+      var blob = new Blob(_bt_recChunks, {type: mimeUsed});
+      _bt_saveBlob(blob);
+      _bt_recActive = false;
+      _bt_updateRecBtnUI();
+    };
+    _bt_recorder.onerror = function() {
+      if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+      _bt_recActive = false;
+      _bt_updateRecBtnUI();
+    };
+
+    // FIX durée corrompue
+    try {
+      var cv = document.getElementById('sensei-cam-canvas');
+      if (cv) { var cx = cv.getContext('2d'); if (cx) { cx.save(); cx.globalAlpha = 0; cx.fillRect(0,0,1,1); cx.restore(); } }
+    } catch(e) {}
+
+    setTimeout(function() {
+      if (!_bt_recorder) return;
+      try { _bt_recorder.start(1000); }
+      catch(e) { alert('Recording error'); return; }
+      _bt_recActive = true;
+      _bt_updateRecBtnUI();
+      if (window._haptic) window._haptic.success();
+      if (window._speak) window._speak.say('Recording started.', {lang:'en-US'});
+      _bt_recTimer = setInterval(function() {
+        _bt_recSec++;
+        var remaining = _bt_REC_LIMIT - _bt_recSec;
+        var btn = document.getElementById('sensei-cam-rec-btn');
+        if (btn) {
+          var mm = Math.floor(_bt_recSec/60), ss = _bt_recSec%60;
+          btn.innerHTML = '&#9632; ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
+            (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+        }
+        if (_bt_recSec >= _bt_REC_LIMIT) _bt_stopRec();
+      }, 1000);
+    }, 200);
+    return true;
+  }
+
+  function _bt_stopRec() {
+    if (_bt_recorder && _bt_recActive) {
+      if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+      try { _bt_recorder.stop(); } catch(e) {}
+    }
+  }
+
+  function _bt_saveBlob(blob) {
+    var ext = /mp4/i.test(blob.type) ? 'mp4' : 'webm';
+    var filename = 'SENSEI_balltracker_' + new Date().toISOString().slice(0,10) + '.' + ext;
+    if (navigator.share && typeof File !== 'undefined') {
+      try {
+        var file = new File([blob], filename, {type: blob.type});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          navigator.share({title:'SENSEI Ball Tracker', files:[file]})
+            .catch(function(e){ if (e && e.name !== 'AbortError') _bt_downloadBlob(blob, filename); });
+          return;
+        }
+      } catch(e){}
+    }
+    _bt_downloadBlob(blob, filename);
+  }
+
+  function _bt_downloadBlob(blob, filename) {
+    try {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ if (a.parentNode) document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      if (window._speak) window._speak.say('Recording saved. Check your gallery!', {lang:'en-US'});
+    } catch(e){}
+  }
+
+  function _bt_updateRecBtnUI() {
+    var btn = document.getElementById('sensei-cam-rec-btn');
+    if (!btn) return;
+    if (_bt_recActive) {
+      btn.innerHTML = '&#9632; STOP REC';
+      btn.style.background = '#7a0000';
+      btn.style.animation = 'ssRecBlink 1s ease-in-out infinite';
+    } else {
+      btn.innerHTML = '&#9679; REC';
+      btn.style.background = 'rgba(230,57,70,.92)';
+      btn.style.animation = '';
+    }
   }
 
 })();
 </script>
+
 </body>
 </html>
