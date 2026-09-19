@@ -41848,8 +41848,9 @@ body.si-banner-on { padding-top: 52px; }
 
     // Demande caméra arrière (idéal pour trépied) puis fallback avant
     var vConstraints = [
-      { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      { facingMode: 'user' },
       true
     ];
     function tryCam(i) {
@@ -42419,8 +42420,9 @@ body.si-banner-on { padding-top: 52px; }
     _bt_close_select();
 
     var vConstraints = [
-      { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      { facingMode: 'user' },
       true
     ];
     function tryCam(i) {
@@ -42452,7 +42454,9 @@ body.si-banner-on { padding-top: 52px; }
       _bt_ctx.save();
       _bt_ctx.imageSmoothingEnabled = true;
       if ('imageSmoothingQuality' in _bt_ctx) _bt_ctx.imageSmoothingQuality = 'high';
-      _bt_ctx.drawImage(_bt_video, sx, sy, sw, sh, 0, 0, W, H);
+      // Effet miroir (selfie) — comme les autres features caméra
+      _bt_ctx.scale(-1, 1);
+      _bt_ctx.drawImage(_bt_video, sx, sy, sw, sh, -W, 0, W, H);
       _bt_ctx.restore();
 
       _bt_drawOverlay(W, H);
@@ -42472,12 +42476,18 @@ body.si-banner-on { padding-top: 52px; }
     var cardY = (H - cardH) / 2 - H * 0.05;
 
     ctx.save();
-    ctx.fillStyle = 'rgba(10, 13, 24, 0.72)';
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    // Carte quasi-transparente (le joueur reste visible a travers)
+    ctx.fillStyle = 'rgba(10, 13, 24, 0.20)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
     ctx.lineWidth = 2;
     _bt_roundRect(ctx, cardX, cardY, cardW, cardH, 20);
     ctx.fill();
     ctx.stroke();
+    // Activer ombre portee sur tous les textes qui suivent (lisibilite sur video)
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
 
     // Titre dynamique
     ctx.fillStyle = '#ffffff';
