@@ -41804,6 +41804,7 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_video = null;
   var _ss_canvas = null;
   var _ss_ctx = null;
+  var _ss_lastPosePos = null; // {x, y, t} pour mini-terrain
   var _ss_recorder = null;
   var _ss_recActive = false;
   var _ss_recChunks = [];
@@ -41874,6 +41875,121 @@ body.si-banner-on { padding-top: 52px; }
 
   // ═══ Boucle de dessin — indispensable car #sensei-cam-overlay video{display:none} ═══
   //     Le rendu à l'écran vient EXCLUSIVEMENT du canvas → il faut dessiner la vidéo dedans à chaque frame
+  // ═══ Mini-terrain Homecourt-style (bottom-left) — dessine le demi-terrain + point joueur ═══
+  function _ss_drawMiniCourt(W, H) {
+    var ctx = _ss_ctx;
+    // Dimensions et position (bottom-left, style Homecourt)
+    var mcW = Math.min(W * 0.16, 180);
+    var mcH = mcW * 0.85; // ratio demi-terrain approx
+    var pad = W * 0.025;
+    var mcX = pad;
+    var mcY = H - mcH - pad;
+
+    ctx.save();
+    // Fond noir semi-transparent + coins arrondis
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.strokeStyle = 'rgba(245, 197, 24, 0.6)';
+    ctx.lineWidth = 1.5;
+    var r = mcW * 0.06;
+    ctx.beginPath();
+    ctx.moveTo(mcX + r, mcY);
+    ctx.arcTo(mcX + mcW, mcY, mcX + mcW, mcY + mcH, r);
+    ctx.arcTo(mcX + mcW, mcY + mcH, mcX, mcY + mcH, r);
+    ctx.arcTo(mcX, mcY + mcH, mcX, mcY, r);
+    ctx.arcTo(mcX, mcY, mcX + mcW, mcY, r);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // ═══ Dessin du demi-terrain (vue du dessus) ═══
+    // Zone de jeu = intérieur du rectangle avec petits padding
+    var pd = mcW * 0.06;
+    var cx = mcX + pd;
+    var cy = mcY + pd;
+    var cw = mcW - pd * 2;
+    var ch = mcH - pd * 2;
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.lineWidth = 1.2;
+
+    // Contour terrain
+    ctx.strokeRect(cx, cy, cw, ch);
+
+    // Panier en haut (rond blanc)
+    var basketX = cx + cw / 2;
+    var basketY = cy + ch * 0.06;
+    ctx.beginPath();
+    ctx.arc(basketX, basketY, mcW * 0.02, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 100, 50, 0.9)';
+    ctx.fill();
+
+    // Raquette (rectangle vertical sous le panier)
+    var keyW = cw * 0.35;
+    var keyH = ch * 0.38;
+    var keyX = cx + (cw - keyW) / 2;
+    var keyY = cy;
+    ctx.strokeRect(keyX, keyY, keyW, keyH);
+
+    // Cercle de lancer franc (au bord bas de la raquette)
+    ctx.beginPath();
+    ctx.arc(basketX, keyY + keyH, keyW * 0.35, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Ligne à 3 points (arc large)
+    var arcR = cw * 0.42;
+    ctx.beginPath();
+    ctx.arc(basketX, basketY, arcR, 0.15 * Math.PI, 0.85 * Math.PI, false);
+    ctx.stroke();
+    // Corners 3pts (lignes verticales des extrémités de l'arc au bord)
+    var cornerY = basketY + arcR * Math.sin(0.15 * Math.PI);
+    var cornerXL = basketX - arcR * Math.cos(0.15 * Math.PI);
+    var cornerXR = basketX + arcR * Math.cos(0.15 * Math.PI);
+    ctx.beginPath();
+    ctx.moveTo(cornerXL, cy);
+    ctx.lineTo(cornerXL, cornerY);
+    ctx.moveTo(cornerXR, cy);
+    ctx.lineTo(cornerXR, cornerY);
+    ctx.stroke();
+
+    // ═══ Point du joueur (si position récente) ═══
+    if (_ss_lastPosePos && (Date.now() - _ss_lastPosePos.t) < 2000) {
+      // Position normalisée sur le mini-terrain
+      // X image (0=gauche image) → X terrain (0=gauche terrain)
+      // Y image (0=haut image, joueur loin) → Y terrain (bas terrain = loin du panier)
+      var px = cx + _ss_lastPosePos.x * cw;
+      var py = cy + _ss_lastPosePos.y * ch;
+      // Clamp dans la zone du terrain
+      px = Math.max(cx + 3, Math.min(cx + cw - 3, px));
+      py = Math.max(cy + 3, Math.min(cy + ch - 3, py));
+      // Halo doré
+      var grad = ctx.createRadialGradient(px, py, 0, px, py, mcW * 0.055);
+      grad.addColorStop(0, 'rgba(245, 197, 24, 0.9)');
+      grad.addColorStop(0.6, 'rgba(245, 197, 24, 0.3)');
+      grad.addColorStop(1, 'rgba(245, 197, 24, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, mcW * 0.055, 0, Math.PI * 2);
+      ctx.fill();
+      // Point central
+      ctx.fillStyle = '#f5c518';
+      ctx.beginPath();
+      ctx.arc(px, py, mcW * 0.022, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Label "COURT" en bas
+    ctx.fillStyle = 'rgba(245, 197, 24, 0.9)';
+    ctx.font = 'bold ' + Math.round(mcW * 0.08) + "px 'Barlow Condensed', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('COURT', mcX + mcW / 2, mcY + mcH + 2);
+
+    ctx.restore();
+  }
+
   function _ss_drawLoop() {
     if (!_ss_running || !_ss_video || !_ss_canvas || !_ss_ctx) return;
     var W = _ss_canvas.width, H = _ss_canvas.height;
@@ -41891,6 +42007,8 @@ body.si-banner-on { padding-top: 52px; }
       // PAS de miroir — trépied fixe filme la scène telle qu'elle est
       _ss_ctx.drawImage(_ss_video, sx, sy, sw, sh, 0, 0, W, H);
       _ss_ctx.restore();
+      // Mini-terrain Homecourt-style avec position joueur temps réel
+      _ss_drawMiniCourt(W, H);
       // Logo SENSEI dessiné sur le canvas (visible ET capturé par MediaRecorder)
       if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_ss_ctx, W, H);
     }
@@ -41943,6 +42061,18 @@ body.si-banner-on { padding-top: 52px; }
             t: Date.now() - _ss_startTime,
             kp: poses[0].keypoints
           });
+          // Extraire position hanches pour mini-terrain (moyenne hanches gauche + droite)
+          var kp = poses[0].keypoints;
+          var lh = kp[11], rh = kp[12];
+          if (lh && rh && lh.score > 0.3 && rh.score > 0.3 && _ss_video) {
+            var vw = _ss_video.videoWidth || 1;
+            var vh = _ss_video.videoHeight || 1;
+            _ss_lastPosePos = {
+              x: (lh.x + rh.x) / 2 / vw,  // normalise 0-1
+              y: (lh.y + rh.y) / 2 / vh,  // normalise 0-1
+              t: Date.now()
+            };
+          }
         }
       } catch(e) { /* silencieux */ }
     }, 250);
@@ -41965,6 +42095,7 @@ body.si-banner-on { padding-top: 52px; }
     // Arrêter la boucle de dessin
     if (_ss_rafId) { cancelAnimationFrame(_ss_rafId); _ss_rafId = null; }
     _ss_video = null; _ss_canvas = null; _ss_ctx = null;
+    _ss_lastPosePos = null;
 
     if (_ss_chronoInterval) { clearInterval(_ss_chronoInterval); _ss_chronoInterval = null; }
     if (_ss_analysisInterval) { clearInterval(_ss_analysisInterval); _ss_analysisInterval = null; }
