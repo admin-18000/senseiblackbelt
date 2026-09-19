@@ -4678,6 +4678,28 @@ window._camDrawLogo = function(ctx, W, H){
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 2;
     ctx.drawImage(window._camLogoImg, x, y, size, size);
+
+    // ═══ "Powered by SENSEI AI" à gauche du logo (style Homecourt) ═══
+    ctx.globalAlpha = 0.95;
+    var powSize = Math.round(size * 0.14);       // "Powered by" petit
+    var senSize = Math.round(size * 0.22);       // "SENSEI AI" plus gros
+    var textX = x - Math.round(size * 0.08);     // aligné à droite juste avant le logo
+    var yCenter = y + size / 2;
+    var lineGap = Math.round(size * 0.04);
+
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'alphabetic';
+
+    // Ligne 1 : "Powered by" (petit, blanc)
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = powSize + "px 'Barlow Condensed', 'Barlow', Arial, sans-serif";
+    ctx.fillText('Powered by', textX, yCenter - lineGap);
+
+    // Ligne 2 : "SENSEI AI" (plus gros, or SENSEI)
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold ' + senSize + "px 'Bebas Neue', 'Impact', sans-serif";
+    ctx.fillText('SENSEI AI', textX, yCenter + lineGap + senSize * 0.6);
+
     ctx.restore();
   } catch(e){}
 };
