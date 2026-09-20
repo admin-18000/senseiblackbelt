@@ -992,6 +992,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_bt">BALL TRACKER</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_bt">AI dribble counter</div>
         </button>
+        <!-- GOAT STATUS (12e tuile - Raccourci direct vers Battle Royal) -->
+        <button onclick="showSection('battle',null)" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🐐</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_goat">GOAT STATUS</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_goat">👑 Battle Royal</div>
+        </button>
       </div>
     </div>
   </div>
@@ -7745,6 +7753,12 @@ function onboardingLaunch(which) {
           var card = document.getElementById('dcog_btnStart');
           if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
         }, 300);
+      } else if (which === 'goat') {
+        showSection('battle', null);
+        setTimeout(function() {
+          var sec = document.getElementById('s-battle');
+          if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+        }, 200);
       } else if (which === 'fiche') {
         if (typeof _fiche_open === 'function') _fiche_open();
       } else if (which === 'qi') {
@@ -9970,15 +9984,15 @@ function oppDisplayResults(top, region, en, profile) {
         <div data-i18n="onb_math_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Calcule en dribblant — dissociation cognitive</div>
       </button>
 
-      <!-- BURNOUT -->
-      <button class="onb-card" onclick="onboardingLaunch('burnout')" style="background:linear-gradient(160deg,rgba(230,57,70,.12),rgba(230,57,70,.02));border:2px solid rgba(230,57,70,.35);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="font-size:48px;line-height:1;margin-bottom:6px">🔥</div>
-        <div data-i18n="onb_burnout_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#e63946;letter-spacing:3px;line-height:1">BURNOUT</div>
-        <!-- Mini-animation pulse rouge -->
-        <div style="height:60px;display:flex;align-items:center;justify-content:center;margin:8px 0">
-          <span style="display:inline-block;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#e63946,#7a1d22);box-shadow:0 0 24px rgba(230,57,70,.7);animation:onbBurnoutPulse 1.1s ease-in-out infinite"></span>
+      <!-- GOAT STATUS -->
+      <button class="onb-card" onclick="onboardingLaunch('goat')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.55);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🐐</div>
+        <div data-i18n="onb_goat_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">GOAT STATUS</div>
+        <!-- Mini-animation couronne dorée pulse -->
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;margin:8px 0;position:relative">
+          <span style="font-size:38px;line-height:1;filter:drop-shadow(0 0 10px rgba(245,197,24,.6));animation:onbBurnoutPulse 1.4s ease-in-out infinite">👑</span>
         </div>
-        <div data-i18n="onb_burnout_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Métronome qui s'accélère — endurance pure</div>
+        <div data-i18n="onb_goat_desc" style="font-size:13px;color:#cfd3e0;letter-spacing:.5px">Battle Royal — Prouve ta ceinture</div>
       </button>
 
       <!-- TON ENTRAÎNEMENT -->
@@ -15627,14 +15641,44 @@ function puzzleRender() {
 }
 
 function puzzleDownloadOne(canvas, n) {
-  const link=document.createElement('a');
-  link.download='sensei-puzzle-'+n+'-of-9.jpg';
-  link.href=canvas.toDataURL('image/jpeg',0.92);
+  const filename = 'sensei-puzzle-'+n+'-of-9.jpg';
+  // Canvas -> Blob (compatible iOS 18 PWA)
+  canvas.toBlob(function(blob){
+    if(!blob){ alert('Erreur creation image'); return; }
+    var file = new File([blob], filename, { type: 'image/jpeg' });
+    // 1. Web Share API (iOS PWA moderne + partage direct Instagram)
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      navigator.share({ files: [file], title: 'SENSEI Puzzle '+n+'/9' })
+        .catch(function(err){
+          if(err && err.name === 'AbortError') return;
+          // Fallback si le partage echoue
+          _puzzleFallbackDL(blob, filename);
+        });
+      return;
+    }
+    // 2. Fallback: download link classique (desktop, Android, Safari non-PWA)
+    _puzzleFallbackDL(blob, filename);
+  }, 'image/jpeg', 0.92);
+}
+
+function _puzzleFallbackDL(blob, filename){
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.download = filename;
+  link.href = url;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
   link.click();
+  setTimeout(function(){
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, 1000);
 }
 
 function puzzleDownloadAll() {
-  _puzzleCanvases.forEach((c,i)=>{ setTimeout(()=>puzzleDownloadOne(c,i+1), i*200); });
+  // En PWA iOS, Web Share ne peut lancer qu'un partage a la fois (blocage user gesture)
+  // On lance en sequence avec delais generous
+  _puzzleCanvases.forEach((c,i)=>{ setTimeout(()=>puzzleDownloadOne(c,i+1), i*500); });
 }
 
 function puzzleSelectTemplate(idx, btn) {
@@ -27251,6 +27295,19 @@ function _tsym_saveBlob(blob) {
   var st = document.getElementById('tsym_status');
   var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
   var filename = 'SENSEI_symetrie_' + new Date().toISOString().slice(0,10) + '.' + ext;
+  // → Preview replay avant partage/download
+  if (window._replay && window._replay.show) {
+    window._replay.show(blob, {
+      title: 'SENSEI SYMÉTRIE',
+      filename: filename,
+      onSave: function(b, fn){ _tsym_doSaveShare(b, fn, st); }
+    });
+    return;
+  }
+  _tsym_doSaveShare(blob, filename, st);
+}
+
+function _tsym_doSaveShare(blob, filename, st) {
   // iOS → navigator.share() avec File
   if (_tsym_isIOS() && navigator.share && typeof File !== 'undefined') {
     try {
@@ -39827,6 +39884,14 @@ window._QI_DATA['pnr_05'] = {
       window.i18n.en.dojo_lbl_bt = "BALL TRACKER";
       window.i18n.fr.dojo_sub_bt = "Compteur dribbles IA";
       window.i18n.en.dojo_sub_bt = "AI dribble counter";
+      window.i18n.fr.dojo_lbl_goat = "GOAT STATUS";
+      window.i18n.en.dojo_lbl_goat = "GOAT STATUS";
+      window.i18n.fr.dojo_sub_goat = "👑 Battle Royal";
+      window.i18n.en.dojo_sub_goat = "👑 Battle Royal";
+      window.i18n.fr.onb_goat_title = "GOAT STATUS";
+      window.i18n.en.onb_goat_title = "GOAT STATUS";
+      window.i18n.fr.onb_goat_desc = "Battle Royal — Prouve ta ceinture";
+      window.i18n.en.onb_goat_desc = "Battle Royal — Prove your belt";
     }
   } catch(e){}
 
@@ -42246,6 +42311,19 @@ body.si-banner-on { padding-top: 52px; }
   function _ss_saveBlob(blob) {
     var ext = /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var filename = 'SENSEI_shooting_' + new Date().toISOString().slice(0,10) + '.' + ext;
+    // → Preview replay avant partage/download
+    if (window._replay && window._replay.show) {
+      window._replay.show(blob, {
+        title: 'SHOOTING SESSION',
+        filename: filename,
+        onSave: function(b, fn){ _ss_doSaveShare(b, fn); }
+      });
+      return;
+    }
+    _ss_doSaveShare(blob, filename);
+  }
+
+  function _ss_doSaveShare(blob, filename) {
     // Partage natif iOS/Android si dispo
     if (navigator.share && typeof File !== 'undefined') {
       try {
@@ -43039,6 +43117,20 @@ body.si-banner-on { padding-top: 52px; }
   function _bt_saveBlob(blob) {
     var ext = /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var filename = 'SENSEI_balltracker_' + new Date().toISOString().slice(0,10) + '.' + ext;
+    // → Preview replay avant partage/download
+    if (window._replay && window._replay.show) {
+      window._replay.show(blob, {
+        title: 'BALL TRACKER',
+        filename: filename,
+        onSave: function(b, fn){ _bt_doSaveShare(b, fn); }
+      });
+      return;
+    }
+    // Fallback direct si module absent
+    _bt_doSaveShare(blob, filename);
+  }
+
+  function _bt_doSaveShare(blob, filename) {
     if (navigator.share && typeof File !== 'undefined') {
       try {
         var file = new File([blob], filename, {type: blob.type});
@@ -43077,6 +43169,148 @@ body.si-banner-on { padding-top: 52px; }
     }
   }
 
+})();
+</script>
+
+<!-- ═══════════ MODULE REPLAY UNIVERSEL — Preview vidéo avant sauvegarde ═══════════ -->
+<script>
+(function(){
+  'use strict';
+  // Module de replay : affiche un modal avec player video HTML5 natif
+  // avant que la vidéo soit sauvegardée/partagée
+  // API : window._replay.show(blob, { filename, title, onSave, onDiscard, lang })
+
+  var _repModal = null;
+  var _repVideo = null;
+  var _repCurrentUrl = null;
+  var _repOnSave = null;
+  var _repOnDiscard = null;
+  var _repBlob = null;
+  var _repFilename = '';
+
+  function _t(fr, en){
+    try {
+      var lang = (window._currentLang || window.currentLang || document.documentElement.lang || 'fr');
+      return (lang.indexOf('en') === 0) ? en : fr;
+    } catch(e) { return fr; }
+  }
+
+  function _repBuild(){
+    if (_repModal) return;
+    var m = document.createElement('div');
+    m.id = 'sensei-replay-modal';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99998;display:none;align-items:center;justify-content:center;padding:16px;font-family:Barlow,Arial,sans-serif';
+    m.innerHTML = ''
+      + '<div style="background:#0d1117;border:1.5px solid rgba(245,197,24,.5);border-radius:18px;max-width:640px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.7)">'
+      +   '<div style="padding:18px 20px 12px;border-bottom:1px solid rgba(245,197,24,.15);display:flex;align-items:center;justify-content:space-between;gap:12px">'
+      +     '<div style="display:flex;align-items:center;gap:10px">'
+      +       '<span style="font-size:22px">🎬</span>'
+      +       '<div>'
+      +         '<div id="sensei-replay-title" style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;color:#f5c518;letter-spacing:2px;line-height:1">REPLAY</div>'
+      +         '<div id="sensei-replay-sub" style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;letter-spacing:1px;margin-top:2px">Aperçu avant sauvegarde</div>'
+      +       '</div>'
+      +     '</div>'
+      +     '<button id="sensei-replay-x" aria-label="Fermer" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1">×</button>'
+      +   '</div>'
+      +   '<div style="padding:16px 20px">'
+      +     '<video id="sensei-replay-video" controls playsinline preload="metadata" style="width:100%;max-height:60vh;border-radius:10px;background:#000;display:block"></video>'
+      +     '<div id="sensei-replay-meta" style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;letter-spacing:.8px;text-align:center;margin-top:10px"></div>'
+      +   '</div>'
+      +   '<div style="padding:12px 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +     '<button id="sensei-replay-discard" style="background:rgba(230,57,70,.15);border:1.5px solid rgba(230,57,70,.5);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:800;letter-spacing:1.5px;padding:14px;border-radius:10px;cursor:pointer">🗑️ <span id="sensei-replay-discard-lbl">SUPPRIMER</span></button>'
+      +     '<button id="sensei-replay-save" style="background:linear-gradient(135deg,#f5c518,#ffd84a);border:none;color:#080a0f;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:900;letter-spacing:1.5px;padding:14px;border-radius:10px;cursor:pointer;box-shadow:0 4px 16px rgba(245,197,24,.35)">💾 <span id="sensei-replay-save-lbl">SAUVEGARDER</span></button>'
+      +   '</div>'
+      + '</div>';
+    document.body.appendChild(m);
+    _repModal = m;
+    _repVideo = document.getElementById('sensei-replay-video');
+
+    document.getElementById('sensei-replay-x').onclick = _repClose;
+    document.getElementById('sensei-replay-discard').onclick = _repDiscard;
+    document.getElementById('sensei-replay-save').onclick = _repSave;
+    // Click backdrop ferme
+    m.addEventListener('click', function(e){ if (e.target === m) _repClose(); });
+  }
+
+  function _repClose(){
+    try {
+      if (_repVideo) { _repVideo.pause(); _repVideo.removeAttribute('src'); _repVideo.load(); }
+    } catch(e){}
+    if (_repCurrentUrl) { try { URL.revokeObjectURL(_repCurrentUrl); } catch(e){} _repCurrentUrl = null; }
+    if (_repModal) _repModal.style.display = 'none';
+    _repBlob = null; _repOnSave = null; _repOnDiscard = null;
+    document.body.style.overflow = '';
+  }
+
+  function _repSave(){
+    var cb = _repOnSave;
+    var b = _repBlob;
+    var fn = _repFilename;
+    _repClose();
+    if (typeof cb === 'function') {
+      try { cb(b, fn); } catch(e) { console.warn('[replay] onSave err:', e); }
+    }
+  }
+
+  function _repDiscard(){
+    // Confirmation minimale pour éviter suppression accidentelle
+    var ok = confirm(_t('Supprimer cet enregistrement ? Il sera définitivement perdu.','Delete this recording? It will be lost permanently.'));
+    if (!ok) return;
+    var cb = _repOnDiscard;
+    _repClose();
+    if (typeof cb === 'function') {
+      try { cb(); } catch(e){}
+    }
+    if (window._haptic) { try { window._haptic.warning(); } catch(e){} }
+  }
+
+  function _repShow(blob, opts){
+    opts = opts || {};
+    _repBuild();
+    _repBlob = blob;
+    _repFilename = opts.filename || 'sensei-video.webm';
+    _repOnSave = opts.onSave || null;
+    _repOnDiscard = opts.onDiscard || null;
+
+    // Update titres
+    var t = document.getElementById('sensei-replay-title');
+    var s = document.getElementById('sensei-replay-sub');
+    if (t) t.textContent = opts.title || 'REPLAY';
+    if (s) s.textContent = _t('Aperçu avant sauvegarde','Preview before saving');
+    var lblSave = document.getElementById('sensei-replay-save-lbl');
+    var lblDisc = document.getElementById('sensei-replay-discard-lbl');
+    if (lblSave) lblSave.textContent = _t('SAUVEGARDER','SAVE');
+    if (lblDisc) lblDisc.textContent = _t('SUPPRIMER','DELETE');
+
+    // Métadonnées
+    var meta = document.getElementById('sensei-replay-meta');
+    if (meta) {
+      var sizeMB = (blob.size / (1024*1024)).toFixed(1);
+      meta.textContent = _repFilename + ' · ' + sizeMB + ' MB';
+    }
+
+    // Attach blob URL
+    try {
+      if (_repCurrentUrl) URL.revokeObjectURL(_repCurrentUrl);
+      _repCurrentUrl = URL.createObjectURL(blob);
+      _repVideo.src = _repCurrentUrl;
+      _repVideo.currentTime = 0;
+    } catch(e) { console.warn('[replay] video src err:', e); }
+
+    _repModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Autoplay best-effort (souvent bloqué mobile, mais tentative)
+    setTimeout(function(){
+      if (_repVideo && _repVideo.play) {
+        _repVideo.play().catch(function(){});
+      }
+    }, 150);
+
+    if (window._haptic) { try { window._haptic.light(); } catch(e){} }
+  }
+
+  window._replay = { show: _repShow, close: _repClose };
 })();
 </script>
 
