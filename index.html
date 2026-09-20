@@ -37373,7 +37373,14 @@ window._QI_DATA['pnr_05'] = {
 #hero-onboarding video {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; z-index: 1;
+  pointer-events: none; /* Empeche user d'interagir avec la video */
 }
+/* Fix iOS 18 PWA : masquer le play button natif quand autoplay est refuse */
+#hero-onboarding video::-webkit-media-controls { display: none !important; -webkit-appearance: none !important; }
+#hero-onboarding video::-webkit-media-controls-panel { display: none !important; -webkit-appearance: none !important; }
+#hero-onboarding video::-webkit-media-controls-play-button { display: none !important; -webkit-appearance: none !important; }
+#hero-onboarding video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none !important; }
+#hero-onboarding video::-webkit-media-controls-overlay-play-button { display: none !important; -webkit-appearance: none !important; }
 #hero-onboarding .ho-overlay {
   position: absolute; inset: 0; z-index: 2;
   background: linear-gradient(180deg,
@@ -37437,7 +37444,7 @@ window._QI_DATA['pnr_05'] = {
 </style>
 
 <div id="hero-onboarding" aria-label="Bienvenue SENSEI">
-  <video id="hero-onboarding-video" src="hero.mp4" autoplay muted loop playsinline></video>
+  <video id="hero-onboarding-video" src="hero.mp4" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="dojo-bg.jpg" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
   <div class="ho-overlay">
     <div class="ho-top">
       <div class="ho-brand">SENSEI BLACKBELT</div>
@@ -37486,9 +37493,34 @@ window._QI_DATA['pnr_05'] = {
     el.classList.add('on');
     // Si le body était masqué par l'anti-flash, on le laisse masqué (l'onboarding est visible via CSS)
     // et on le rendra visible seulement quand l'utilisateur clique "DÉCOUVRIR"
-    // Redémarrer la vidéo proprement
+    // Redémarrer la vidéo proprement + retry robuste iOS 18 PWA
     var v = document.getElementById('hero-onboarding-video');
-    if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch(e){} }
+    if (v) {
+      try {
+        v.muted = true;
+        v.playsInline = true;
+        v.currentTime = 0;
+        // Tentative 1 : play immediat
+        var _tryPlay = function(){
+          try {
+            var p = v.play();
+            if (p && p.catch) p.catch(function(){ /* silencieux */ });
+          } catch(e){}
+        };
+        _tryPlay();
+        // Tentative 2 : quand la video est prete (iOS 18 lag chargement)
+        v.addEventListener('canplay', _tryPlay, { once: true });
+        v.addEventListener('loadeddata', _tryPlay, { once: true });
+        // Tentative 3 : au premier touch/click de l'utilisateur (fallback ultime)
+        var _touchPlay = function(){
+          _tryPlay();
+          document.removeEventListener('touchstart', _touchPlay, true);
+          document.removeEventListener('click', _touchPlay, true);
+        };
+        document.addEventListener('touchstart', _touchPlay, { capture: true, passive: true });
+        document.addEventListener('click', _touchPlay, { capture: true });
+      } catch(e){}
+    }
     document.body.style.overflow = 'hidden';
     // Détection auto de la langue navigateur au 1er affichage
     setTimeout(function(){ if (typeof _heroOnboarding_autoLang === 'function') _heroOnboarding_autoLang(); }, 50);
