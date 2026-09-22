@@ -291,6 +291,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 
 /* ── VID SECTION GRID (universel) ── */
 .vid-section-grid{margin-top:24px}
+/* ═══ SHOOTING DRILLS + HAND-EYE COORDINATION : forcer 2 vidéos par ligne sur mobile ═══
+   Ces 2 sections uniquement (grid-shooting, grid-hec). Les autres restent inchangées.
+   Le sélecteur [style*="grid-template-columns"] cible uniquement les sous-grilles
+   dynamiques créées par buildVideoSection, pas les séparateurs. */
+@media (max-width: 900px) {
+  #grid-shooting[style*="grid-template-columns"],
+  #grid-hec[style*="grid-template-columns"],
+  #grid-shooting > div[style*="grid-template-columns"],
+  #grid-hec > div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
 
 .coming-soon{text-align:center;padding:80px 20px;border:1px dashed rgba(245,197,24,.15);border-radius:16px;background:linear-gradient(135deg,var(--dark2),var(--dark3));position:relative;overflow:hidden}
 .coming-soon::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(245,197,24,.04) 0%,transparent 70%);pointer-events:none}
@@ -28507,13 +28520,13 @@ var _dcog_inited      = false;
 
 /* ── Vidéos démo cognitive dribble (carte "🎬 CHOISIS TON DRILL") ── */
 /* Mapping drill → indice vidéo :
-   math=0, sprint=1, twoball=2, tboard=3, height=4 */
+   math=0, sprint=1, height=2, tboard=3, twoball=4 */
 var _dcog_VIDEOS = [
   {id:'gJe63xj-c6w', title:'Dribble Math'},
   {id:'d2M3gWQyA6s', title:'300 / 600'},
-  {id:'aNeIFfhsy-0', title:'Two-Ball'},
+  {id:'ar6OA2wxwzw', title:'Dribble Height'},
   {id:'DJHKF-LCaKE', title:'TBoard'},
-  {id:'ar6OA2wxwzw', title:'Dribble Height'}
+  {id:'aNeIFfhsy-0', title:'Two-Ball'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -28723,7 +28736,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
     // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
     if (!_dcog_initing) {
-      var _dcogVidMap = { math:0, sprint:1, twoball:2, tboard:3, height:4 };
+      var _dcogVidMap = { math:0, sprint:1, height:2, tboard:3, twoball:4 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
