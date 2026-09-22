@@ -1791,6 +1791,16 @@ body.unlocked .sensei-only{display:revert !important}
 
 <div id="tr-dcog" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
 
+  <!-- 🎬 CHOISIS TON DRILL (vidéos démo cognitive dribble) -->
+  <div class="tr-card" id="dcog_chooseDrillCard">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
+    <div class="vid-scroll" id="dcog_vidScroll"></div>
+    <div id="dcog_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="dcog_ytFrame" width="100%" style="aspect-ratio:16/9;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="dcog_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0;letter-spacing:1px"></div>
+    </div>
+  </div>
+
   <!-- DRILL SELECTOR -->
   <div class="tr-card">
     <div class="tr-card-title" id="dcog_cardTitle">🧠 COGNITIVE DRIBBLE TRAINING</div>
@@ -2220,6 +2230,16 @@ body.unlocked .sensei-only{display:revert !important}
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:3px 8px;border-radius:10px">✓ Symmetry</div>
     </div>
     <button class="tr-btn tr-btn-start" onclick="_bt_open()" style="width:100%">▶ LANCER BALL TRACKER</button>
+  </div>
+
+  <!-- 🎬 CHOISIS TON DRILL (vidéos démo dribble avancé) -->
+  <div class="tr-card" id="td2_chooseDrillCard">
+    <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
+    <div class="vid-scroll" id="td2_vidScroll"></div>
+    <div id="td2_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
+      <iframe id="td2_ytFrame" width="100%" style="aspect-ratio:16/9;border:none;display:block" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+      <div id="td2_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0;letter-spacing:1px"></div>
+    </div>
   </div>
 
   <!-- DRIBBLE RÉACTION + RHYTHM CHALLENGE -->
@@ -23932,6 +23952,7 @@ function initTraining_d() {
   if (_initTraining_d_done) return;
   _initTraining_d_done = true;
   _td_renderVids();
+  if (typeof _td2_renderVids === 'function') _td2_renderVids();
   _td_drawRhythm();
   _td_renderHistory();
 }
@@ -24014,6 +24035,40 @@ var _td_VIDEOS = [
   {id:'BkMXA0Z8bLc',title:'Drill #2'},
   {id:'tLthFdKJu9k',title:'Drill #3'}
 ];
+
+/* ── Vidéos démo dribble avancé (2e bloc entre BALL TRACKER et DRIBBLE RÉACTION) ── */
+var _td2_VIDEOS = [
+  {id:'-tZbJnLz858', title:'Dribble Pro #1'},
+  {id:'otg8XLylw7I', title:'Dribble Pro #2'},
+  {id:'ftfnNFPv924', title:'Dribble Pro #3'},
+  {id:'GORiKQBahLE', title:'Dribble Pro #4'}
+];
+var _td2_selVid = null;
+
+function _td2_renderVids() {
+  var el = document.getElementById('td2_vidScroll');
+  if (!el) return;
+  el.innerHTML = _td2_VIDEOS.map(function(v,i) {
+    var sel = _td2_selVid === i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td2_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _td2_selectVid(i) {
+  _td2_selVid = i;
+  var v = _td2_VIDEOS[i];
+  var p = document.getElementById('td2_vidPlayer');
+  var fr = document.getElementById('td2_ytFrame');
+  if (!p || !fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  var lbl = document.getElementById('td2_vidLabel');
+  if (lbl) lbl.textContent = v.title;
+  _td2_renderVids();
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 var _td_selVid=null, _td_running=false, _td_sec=0, _td_int=null;
 var _td_taps=[], _td_errors=0, _td_finished=false, _td_sessions=[];
 
@@ -24427,7 +24482,8 @@ function initTraining_ag2() {
 var _tag_VIDEOS = [
   {id:'xV0XuRGHsxo',title:'Agility #1'},
   {id:'KWmdHJ2A8pg',title:'Agility #2'},
-  {id:'x4mdV_OXHYU',title:'Agility #3'}
+  {id:'x4mdV_OXHYU',title:'Agility #3'},
+  {id:'VYw4s-rAtm0',title:'Agility #4'}
 ];
 var _tag_selVid = null;
 
@@ -28419,6 +28475,41 @@ var _dcog_tbMode      = 'alternate';  // 'alternate' | 'sync' | 'chaos'
 var _dcog_sessions    = [];
 var _dcog_inited      = false;
 
+/* ── Vidéos démo cognitive dribble (carte "🎬 CHOISIS TON DRILL") ── */
+var _dcog_VIDEOS = [
+  {id:'gJe63xj-c6w', title:'Cognitive #1'},
+  {id:'d2M3gWQyA6s', title:'Cognitive #2'},
+  {id:'aNeIFfhsy-0', title:'Cognitive #3'},
+  {id:'DJHKF-LCaKE', title:'Cognitive #4'},
+  {id:'ar6OA2wxwzw', title:'Cognitive #5'}
+];
+var _dcog_selVid = null;
+
+function _dcog_renderVids() {
+  var el = document.getElementById('dcog_vidScroll');
+  if (!el) return;
+  el.innerHTML = _dcog_VIDEOS.map(function(v,i) {
+    var sel = _dcog_selVid === i;
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_dcog_selectVid('+i+')">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/mqdefault.jpg" loading="lazy" alt="'+v.title+'">'
+      +'<div class="vid-thumb-title">'+v.title+'</div></div>';
+  }).join('');
+}
+
+function _dcog_selectVid(i) {
+  _dcog_selVid = i;
+  var v = _dcog_VIDEOS[i];
+  var p = document.getElementById('dcog_vidPlayer');
+  var fr = document.getElementById('dcog_ytFrame');
+  if (!p || !fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1';
+  var lbl = document.getElementById('dcog_vidLabel');
+  if (lbl) lbl.textContent = v.title;
+  _dcog_renderVids();
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 /* ── Scores session ──────────────────────────────────────────── */
 var _dcog_correct    = 0;
 var _dcog_wrong      = 0;
@@ -28452,6 +28543,7 @@ function initTraining_dcog() {
     if (saved) _dcog_sessions = JSON.parse(saved);
   } catch(e) {}
   _dcog_selectDrill('math');
+  _dcog_renderVids();
   _dcog_renderHistory();
   _dcog_updateInsight();
 }
