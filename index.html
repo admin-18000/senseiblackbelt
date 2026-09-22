@@ -24037,13 +24037,17 @@ var _td_VIDEOS = [
 ];
 
 /* ── Vidéos démo dribble avancé (2e bloc entre BALL TRACKER et DRIBBLE RÉACTION) ── */
+/* Mapping bouton → indice vidéo :
+   reaction+simple=0, rhythm=1, (alt simple)=2, reaction+double=3, twoball=4 */
 var _td2_VIDEOS = [
-  {id:'-tZbJnLz858', title:'Dribble Pro #1'},
-  {id:'otg8XLylw7I', title:'Dribble Pro #2'},
-  {id:'ftfnNFPv924', title:'Dribble Pro #3'},
-  {id:'GORiKQBahLE', title:'Dribble Pro #4'}
+  {id:'-tZbJnLz858', title:'Reaction Simple'},
+  {id:'otg8XLylw7I', title:'Reaction Rythme'},
+  {id:'ftfnNFPv924', title:'Reaction Simple (alt)'},
+  {id:'GORiKQBahLE', title:'Reaction Double'},
+  {id:'aNeIFfhsy-0', title:'Two Ball'}
 ];
 var _td2_selVid = null;
+var _td2_initing = false;
 
 function _td2_renderVids() {
   var el = document.getElementById('td2_vidScroll');
@@ -27481,11 +27485,13 @@ var _tdr_calTimer   = null;
 
 /* ── Init ─────────────────────────────────────────────────────── */
 function initTraining_dr() {
+  _td2_initing = true; // ← empêche l'ouverture auto de la vidéo pendant l'init
   _tdr_canvas = document.getElementById('tdr_canvas');
   _tdr_ctx    = _tdr_canvas ? _tdr_canvas.getContext('2d') : null;
   _tdr_renderHistory();
   _tdr_setMode('reaction');
   _tdr_setLevel('simple');
+  _td2_initing = false; // ← ok, user peut cliquer normalement
 }
 
 /* ── Sélection mode / niveau ──────────────────────────────────── */
@@ -27547,6 +27553,11 @@ function _tdr_setMode(m) {
   });
   // Mode Sensei : init du carrousel à la première sélection
   if (m === 'sensei' && typeof _tdr_senseiInit === 'function') _tdr_senseiInit();
+
+  // 🎬 Auto-open vidéo démo du bloc td2 (sauf pendant init)
+  if (!_td2_initing && typeof _td2_openForCurrent === 'function') {
+    _td2_openForCurrent();
+  }
 }
 
 function _tdr_setLevel(lvl) {
@@ -27558,6 +27569,25 @@ function _tdr_setLevel(lvl) {
     b.style.color      = active ? '#f5c518' : '#7a8299';
     b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
   });
+  // 🎬 Auto-open vidéo démo du bloc td2 (sauf pendant init)
+  if (!_td2_initing && typeof _td2_openForCurrent === 'function') {
+    _td2_openForCurrent();
+  }
+}
+
+/* ── Helper : ouvre la vidéo td2 correspondant au mode+level actuels ── */
+function _td2_openForCurrent() {
+  if (typeof _td2_selectVid !== 'function') return;
+  var idx = null;
+  if (_tdr_mode === 'reaction') {
+    idx = (_tdr_level === 'double') ? 3 : 0; // simple par défaut
+  } else if (_tdr_mode === 'rhythm') {
+    idx = 1;
+  }
+  // sensei = pas de mapping (a son propre carrousel)
+  if (idx !== null) {
+    try { _td2_selectVid(idx); } catch(e) {}
+  }
 }
 
 function _tdr_setRMode(rm) {
@@ -28476,14 +28506,17 @@ var _dcog_sessions    = [];
 var _dcog_inited      = false;
 
 /* ── Vidéos démo cognitive dribble (carte "🎬 CHOISIS TON DRILL") ── */
+/* Mapping drill → indice vidéo :
+   math=0, sprint=1, twoball=2, tboard=3, height=4 */
 var _dcog_VIDEOS = [
-  {id:'gJe63xj-c6w', title:'Cognitive #1'},
-  {id:'d2M3gWQyA6s', title:'Cognitive #2'},
-  {id:'aNeIFfhsy-0', title:'Cognitive #3'},
-  {id:'DJHKF-LCaKE', title:'Cognitive #4'},
-  {id:'ar6OA2wxwzw', title:'Cognitive #5'}
+  {id:'gJe63xj-c6w', title:'Dribble Math'},
+  {id:'d2M3gWQyA6s', title:'300 / 600'},
+  {id:'aNeIFfhsy-0', title:'Two-Ball'},
+  {id:'DJHKF-LCaKE', title:'TBoard'},
+  {id:'ar6OA2wxwzw', title:'Dribble Height'}
 ];
 var _dcog_selVid = null;
+var _dcog_initing = false; // supprime auto-open vidéo pendant init
 
 function _dcog_renderVids() {
   var el = document.getElementById('dcog_vidScroll');
@@ -28533,6 +28566,7 @@ var _dcog_tbChaosTimer=null;
 function initTraining_dcog() {
   if (_dcog_inited) return;
   _dcog_inited = true;
+  _dcog_initing = true; // ← empêche l'ouverture auto de la vidéo pendant l'init
   _dcog_video  = document.getElementById('dcog_video');
   _dcog_canvas = document.getElementById('dcog_canvas');
   _dcog_ctx    = _dcog_canvas ? _dcog_canvas.getContext('2d') : null;
@@ -28546,6 +28580,7 @@ function initTraining_dcog() {
   _dcog_renderVids();
   _dcog_renderHistory();
   _dcog_updateInsight();
+  _dcog_initing = false; // ← ok, user peut cliquer normalement
 }
 
 /* ── i18n ────────────────────────────────────────────────────── */
@@ -28685,6 +28720,15 @@ function _dcog_selectDrill(drill, langOnly) {
     // dual task bar: show only for math
     var db = document.getElementById('dcog_dualTaskBar');
     if (db) db.style.display = drill === 'math' ? 'block' : 'none';
+
+    // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
+    if (!_dcog_initing) {
+      var _dcogVidMap = { math:0, sprint:1, twoball:2, tboard:3, height:4 };
+      var _dcogVidIdx = _dcogVidMap[drill];
+      if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
+        try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
+      }
+    }
   }
 }
 
