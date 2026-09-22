@@ -291,15 +291,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 
 /* ── VID SECTION GRID (universel) ── */
 .vid-section-grid{margin-top:24px}
-/* ═══ SHOOTING DRILLS + HAND-EYE COORDINATION : forcer 2 vidéos par ligne sur mobile ═══
-   Ces 2 sections uniquement (grid-shooting, grid-hec). Les autres restent inchangées.
+/* ═══ SHOOTING + HAND-EYE + CHALLENGES + TUTORIALS : forcer 2 vidéos par ligne sur mobile ═══
+   Ces 4 sections uniquement. Les autres restent inchangées.
    Le sélecteur [style*="grid-template-columns"] cible uniquement les sous-grilles
    dynamiques créées par buildVideoSection, pas les séparateurs. */
 @media (max-width: 900px) {
   #grid-shooting[style*="grid-template-columns"],
   #grid-hec[style*="grid-template-columns"],
+  #grid-challenges[style*="grid-template-columns"],
+  #grid-tutorials[style*="grid-template-columns"],
   #grid-shooting > div[style*="grid-template-columns"],
-  #grid-hec > div[style*="grid-template-columns"] {
+  #grid-hec > div[style*="grid-template-columns"],
+  #grid-challenges > div[style*="grid-template-columns"],
+  #grid-tutorials > div[style*="grid-template-columns"] {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
   }
@@ -7174,11 +7178,13 @@ const SECTION_VIDEOS = {
     {id:'ZsyYuAx5d1U', title:'Hand-Eye Drill #13', vertical:true},
     {id:'vzbnTzUqAzQ', title:'Hand-Eye Drill #14', vertical:true},
     {id:'0Mk9lefAW58', title:'Hand-Eye Drill #15', vertical:true},
+    {id:'VYw4s-rAtm0', title:'Hand-Eye Drill #16', vertical:true},
   ],
   sc: [
     {id:'5v6kVdAqbOc', title:'Strength & Conditioning #1', vertical:true},
     {id:'P4_hDNmsrgs', title:'Strength & Conditioning #2', vertical:true},
     {id:'CGbtfK7oBEY', title:'Strength & Conditioning #3', vertical:true},
+    {id:'FT_JjsCQDww', title:'Strength & Conditioning #4', vertical:true},
   ],
   tutorials: [
     {id:'NacCJX1KFAc', title:'Tutorial #1', vertical:false},
@@ -7189,6 +7195,7 @@ const SECTION_VIDEOS = {
     {id:'vX0OXZCo290', title:'Tutorial #6', vertical:true},
     {id:'uDKUYkpB6So', title:'Tutorial #7', vertical:true},
     {id:'pcKGXjoM5qY', title:'Tutorial #8', vertical:true},
+    {id:'krAcd3FO9W0', title:'Tutorial #9', vertical:true},
   ],
   battle: [
     {id:'lSl1UPcWx3o', title:'Battle Royal — Ceinture 1', vertical:true},
@@ -7214,6 +7221,7 @@ const SECTION_VIDEOS = {
   ],
   rebounding: [
     {id:'O2TDPnLiwOM', title:'Rebounding Drill #1', vertical:true},
+    {id:'MppcUHN4gvw', title:'Rebounding Drill #2', vertical:true},
   ],
   challenges: [
     {id:'fA136hG2CP8', title:'Challenge #1', vertical:true},
