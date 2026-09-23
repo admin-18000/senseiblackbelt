@@ -12,17 +12,19 @@
 <script>
 (function() {
   try {
+    // ═══════════════════════════════════════════════════════════════════════
+    // HERO-ONBOARDING À CHAQUE OUVERTURE (choix produit : effet rituel dojo).
+    // Le body est toujours masqué au démarrage, le hero-onboarding toujours affiché.
+    // Pour revenir à l'ancien comportement (1 seule fois) : restaurer le if (seen !== VERSION).
+    // ═══════════════════════════════════════════════════════════════════════
     var HERO_OB_VERSION = '2026.09.05';
     var HERO_OB_KEY = 'sensei_hero_onboarding_seen_v';
-    var seen = localStorage.getItem(HERO_OB_KEY);
-    if (seen !== HERO_OB_VERSION) {
-      // Onboarding pas encore vu → cacher le body immédiatement
-      document.documentElement.setAttribute('data-onb-pending', '1');
-      // Injecter CSS de blocage avant le rendu
-      var css = document.createElement('style');
-      css.textContent = 'html[data-onb-pending="1"] body { visibility: hidden !important; } html[data-onb-pending="1"] #hero-onboarding { visibility: visible !important; display: block !important; }';
-      document.head.appendChild(css);
-    }
+    // Onboarding toujours affiché → masquer le body immédiatement
+    document.documentElement.setAttribute('data-onb-pending', '1');
+    // Injecter CSS de blocage avant le rendu
+    var css = document.createElement('style');
+    css.textContent = 'html[data-onb-pending="1"] body { visibility: hidden !important; } html[data-onb-pending="1"] #hero-onboarding { visibility: visible !important; display: block !important; }';
+    document.head.appendChild(css);
   } catch(e) {}
 })();
 </script>
@@ -37732,12 +37734,20 @@ window._QI_DATA['pnr_05'] = {
   var HERO_OB_KEY = 'sensei_hero_onboarding_seen_v';
 
   // Test si le hero-onboarding doit être affiché
+  // ═══════════════════════════════════════════════════════════════════════
+  // CHOIX PRODUIT : hero-onboarding affiché à CHAQUE ouverture (effet rituel dojo).
+  // Pour revenir à l'ancien comportement (1 seule fois par appareil),
+  // décommenter le bloc "seen !== HERO_OB_VERSION" ci-dessous.
+  // ═══════════════════════════════════════════════════════════════════════
   window._heroOnboarding_shouldShow = function() {
     try {
       var forceShow = (location.search || '').indexOf('herohello=1') >= 0;
       if (forceShow) return true;
-      var seen = localStorage.getItem(HERO_OB_KEY);
-      return (seen !== HERO_OB_VERSION);
+      // Toujours afficher le hero-onboarding à chaque ouverture
+      return true;
+      // Ancien comportement (1 seule fois) :
+      // var seen = localStorage.getItem(HERO_OB_KEY);
+      // return (seen !== HERO_OB_VERSION);
     } catch(e) { return false; }
   };
 
