@@ -34796,14 +34796,12 @@ Object.assign(window._FICHES_DATA, {
     document.body.style.overflow = 'hidden';
     setTimeout(function(){ _fiche_introSkip(); }, 10500);
   };
-  // Auto-play l'intro au chargement (une seule fois)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function(){
-      setTimeout(function(){ _fiche_maybeShowIntro(); }, 400);
-    });
-  } else {
-    setTimeout(function(){ _fiche_maybeShowIntro(); }, 400);
-  }
+  // ─── Auto-play désactivé (feedback user : trop de clics avant d'entrer dans le dojo) ───
+  // L'overlay fiche-intro reste dans le DOM au cas où on veut le rappeler manuellement,
+  // mais il ne s'affiche plus automatiquement au chargement.
+  // Pour le forcer manuellement : window._fiche_maybeShowIntro()
+  // Pour supprimer la mémoire du flag localStorage : localStorage.removeItem('sensei_fiche_intro_seen_v1')
+  try { localStorage.setItem(INTRO_KEY, '1'); } catch(e){} // sécurité: si un utilisateur avait déjà l'ancien code en cache, empêche l'affichage
 })();
 </script>
 
