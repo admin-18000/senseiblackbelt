@@ -7277,7 +7277,9 @@ function makeThumb(v, ratio) {
       <img src="https://img.youtube.com/vi/${v.id}/maxresdefault.jpg"
            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none"
            loading="lazy" alt="${v.title}"
-           onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${v.id}/hqdefault.jpg'">
+           data-yt-id="${v.id}" data-fb="0"
+           onload="_ytThumbCheck(this)"
+           onerror="_ytThumbFallback(this)">
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2)">
         <div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);flex-shrink:0">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px"><polygon points="6,4 20,12 6,20"/></svg>
@@ -7286,6 +7288,51 @@ function makeThumb(v, ratio) {
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
 }
+
+// Cascade fallback thumbnails YouTube : maxres -> hq -> mq -> default -> placeholder maison
+// Détecte aussi les images 120×90 (thumbnail générique YouTube "vidéo non générée")
+window._ytThumbFallback = function(img) {
+  var id = img.dataset.ytId;
+  var step = parseInt(img.dataset.fb || '0', 10) + 1;
+  var sizes = ['hqdefault', 'mqdefault', 'default'];
+  if (step > sizes.length || !id) {
+    img.onerror = null;
+    _ytThumbPlaceholder(img);
+    return;
+  }
+  img.dataset.fb = String(step);
+  img.src = 'https://img.youtube.com/vi/' + id + '/' + sizes[step-1] + '.jpg';
+};
+
+// Vérifie après chargement si l'image est une "fausse" thumbnail YouTube 120×90
+window._ytThumbCheck = function(img) {
+  if (!img || !img.naturalWidth) return;
+  // YouTube renvoie 120×90 quand la thumbnail n'existe pas vraiment
+  if (img.naturalWidth === 120 && img.naturalHeight === 90) {
+    _ytThumbFallback(img);
+  }
+};
+
+// Placeholder maison quand toutes les tailles YouTube échouent
+window._ytThumbPlaceholder = function(img) {
+  var parent = img.parentElement;
+  if (!parent) return;
+  var id = img.dataset.ytId || '';
+  // SVG placeholder : fond noir + logo SENSEI + texte "APERÇU YT INDISPONIBLE"
+  var svg = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">' +
+    '<rect width="640" height="360" fill="#0d1117"/>' +
+    '<circle cx="320" cy="150" r="46" fill="#f5c518" opacity="0.9"/>' +
+    '<polygon points="308,132 308,168 340,150" fill="#0d1117"/>' +
+    '<text x="320" y="230" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#f5c518" text-anchor="middle" letter-spacing="3">SENSEI</text>' +
+    '<text x="320" y="270" font-family="Arial,sans-serif" font-size="13" fill="#7a8299" text-anchor="middle" letter-spacing="2">APERÇU YOUTUBE INDISPONIBLE</text>' +
+    '<text x="320" y="295" font-family="Arial,sans-serif" font-size="11" fill="#7a8299" text-anchor="middle" opacity="0.6">Cliquez pour lancer la vidéo</text>' +
+    '</svg>'
+  );
+  img.onerror = null;
+  img.onload = null;
+  img.src = svg;
+};
 
 // ══ URL EMBED YOUTUBE — desktop ══
 function embedSrc(id) {
@@ -7415,7 +7462,9 @@ function _bhCarousel_build() {
       '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
         'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" ' +
         'loading="lazy" alt="" ' +
-        'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'">' +
+        'data-yt-id="' + v.id + '" data-fb="0" ' +
+        'onload="_ytThumbCheck(this)" ' +
+        'onerror="_ytThumbFallback(this)">' +
       // numéro de drill — filigrane doré, en HAUT À GAUCHE, à l'intérieur, non coupé
       '<div style="position:absolute;top:6px;left:10px;font-family:var(--font-cond);' +
         'font-size:46px;font-weight:700;line-height:1;color:rgba(245,197,24,.9);' +
@@ -24066,9 +24115,9 @@ var _td_VIDEOS = [
 /* Mapping bouton → indice vidéo :
    reaction+simple=0, rhythm=1, (alt simple)=2, reaction+double=3, twoball=4 */
 var _td2_VIDEOS = [
-  {id:'-tZbJnLz858', title:'Reaction Simple'},
+  {id:'-tZbJnLz858', title:'Reaction Simple #1'},
   {id:'otg8XLylw7I', title:'Reaction Rythme'},
-  {id:'ftfnNFPv924', title:'Reaction Simple (alt)'},
+  {id:'ftfnNFPv924', title:'Reaction Simple #2'},
   {id:'GORiKQBahLE', title:'Reaction Double'},
   {id:'aNeIFfhsy-0', title:'Two Ball'}
 ];
@@ -24930,9 +24979,9 @@ function initTraining_ch() {
 }
 
 var _tch_VIDEOS = [
-  {id:'Kptf7S6qtSA', title:'Challenge #4'},
-  {id:'9PAtDlj5l28', title:'Ball Handling Challenge #1'},
-  {id:'HHc5cNSjuBw', title:'Ball Handling Challenge #2'}
+  {id:'Kptf7S6qtSA', title:'Challenge #1'},
+  {id:'9PAtDlj5l28', title:'Challenge #2'},
+  {id:'HHc5cNSjuBw', title:'Challenge #3'}
 ];
 var _tch_selVid=null, _tch_attempts=[], _tch_inProgress=false, _tch_sessions=[];
 
