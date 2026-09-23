@@ -10415,6 +10415,17 @@ body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
 // 🌟 ONBOARDING
 // ═══════════════════════════════════════════════════════════
 (function initOnboarding() {
+  // ═══════════════════════════════════════════════════════════════════════
+  // AUTO-AFFICHAGE DÉSACTIVÉ (feedback user : trop de clics avant le dojo)
+  // Le flow onboarding officiel est : hero-onboarding (vidéo) → onboarding-modal (9 tuiles) → dojo.
+  // Cet overlay 4 étapes faisait doublon avec hero-onboarding (même titre SENSEI BLACK BELT).
+  // On force le flag localStorage pour empêcher réapparition sur les navigateurs qui auraient
+  // encore l'ancien code en cache. Le HTML #onboarding-overlay reste dans le DOM au cas où
+  // on veut le rappeler manuellement plus tard, mais n'est plus déclenché automatiquement.
+  // ═══════════════════════════════════════════════════════════════════════
+  try { localStorage.setItem('sensei_onboarded', '1'); } catch(e){}
+  return;
+  /* ═══ Ancien code conservé ci-dessous (inutilisé, jamais atteint à cause du return) ═══
   if (localStorage.getItem('sensei_onboarded')) return;
   const ov = document.getElementById('onboarding-overlay');
   ov.style.display = 'flex';
@@ -10433,6 +10444,7 @@ body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
     btn.onclick = () => { localStorage.setItem('sensei_belt_idx', i); obInitGoals(); obNext(3); };
     wrap.appendChild(btn);
   });
+  ═══ Fin ancien code ═══ */
 })();
 
 function obNext(step) {
