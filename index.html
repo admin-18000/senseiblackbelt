@@ -28617,9 +28617,9 @@ var _dcog_VIDEOS = [
   {id:'gJe63xj-c6w', title:'Dribble Math'},
   {id:'d2M3gWQyA6s', title:'300 / 600'},
   {id:'ar6OA2wxwzw', title:'Dribble Height BAS'},
-  {id:'DJHKF-LCaKE', title:'TBoard'},
-  {id:'aNeIFfhsy-0', title:'Two-Ball'},
-  {id:'Es_K91ZkKf0', title:'Dribble Height HAUT'}
+  {id:'M7DtIYt1he8', title:'TBoard UN BALLON'},
+  {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS'},
+  {id:'UHNUSFHSrOo', title:'Dribble Height HAUT'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -30846,6 +30846,13 @@ function _dcog_setTboardMode(mode) {
     b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
     b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = active ? '#f5c518' : '#7a8299';
+  }
+  // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
+  // 'one' (1 BALLON) → index 3 (TBoard UN BALLON = M7DtIYt1he8)
+  // 'two' (2 BALLONS) → index 4 (TBoard - 2 BALLONS = DJHKF-LCaKE)
+  if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
+    var idx = (mode === 'two') ? 4 : (mode === 'one') ? 3 : null;
+    if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
 
