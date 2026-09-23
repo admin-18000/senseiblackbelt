@@ -49,6 +49,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <!-- Preconnect YouTube : accélère le 1er lancement vidéo de 200-500ms (handshake TCP/TLS en avance) -->
+  <link rel="preconnect" href="https://www.youtube.com" crossorigin>
+  <link rel="preconnect" href="https://www.youtube-nocookie.com" crossorigin>
+  <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+  <link rel="preconnect" href="https://s.ytimg.com" crossorigin>
+  <link rel="dns-prefetch" href="https://youtu.be">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://www.youtube.com/iframe_api" async></script>
   <!-- TF.js + MoveNet préchargés statiquement — disponibles pour tous les modules caméra -->
@@ -7335,8 +7341,17 @@ window._ytThumbPlaceholder = function(img) {
 };
 
 // ══ URL EMBED YOUTUBE — desktop ══
+// Params optimisation :
+//   - autoplay=1 : lance direct après click
+//   - playsinline=1 : évite fullscreen forcé iOS
+//   - rel=0 : pas de vidéos suggérées
+//   - modestbranding=1 : moins de branding YouTube
+//   - iv_load_policy=3 : DÉSACTIVE les annotations (moins de JS chargé)
+//   - disablekb=1 : DÉSACTIVE les raccourcis clavier (moins de JS chargé)
+//   - fs=1 : autorise le bouton fullscreen
+//   - origin : nécessaire pour la sécurité
 function embedSrc(id) {
-  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1&origin=https://senseiblackbelt.com';
+  return 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=1&origin=https://senseiblackbelt.com';
 }
 
 // ══ VIDEO MODAL — desktop uniquement ══
