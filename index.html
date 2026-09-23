@@ -7235,6 +7235,7 @@ const SECTION_VIDEOS = {
     {id:'O2TDPnLiwOM', title:'Rebounding Drill #1', vertical:true},
     {id:'HVCjzaIEju4', title:'Rebounding Drill #2', vertical:true},
     {id:'492Vdfg1I4E', title:'Rebounding Drill #3', vertical:true},
+    {id:'3gzN2uYeSj4', title:'Rebounding Drill #4', vertical:true},
   ],
   challenges: [
     {id:'fA136hG2CP8', title:'Challenge #1', vertical:true},
@@ -28610,13 +28611,15 @@ var _dcog_inited      = false;
 
 /* ── Vidéos démo cognitive dribble (carte "🎬 CHOISIS TON DRILL") ── */
 /* Mapping drill → indice vidéo :
-   math=0, sprint=1, height=2, tboard=3, twoball=4 */
+   math=0, sprint=1, height=2, tboard=3, twoball=4
+   Bonus: Dribble Height BAS=2 (aussi), Dribble Height HAUT=5 */
 var _dcog_VIDEOS = [
   {id:'gJe63xj-c6w', title:'Dribble Math'},
   {id:'d2M3gWQyA6s', title:'300 / 600'},
-  {id:'ar6OA2wxwzw', title:'Dribble Height'},
+  {id:'ar6OA2wxwzw', title:'Dribble Height BAS'},
   {id:'DJHKF-LCaKE', title:'TBoard'},
-  {id:'aNeIFfhsy-0', title:'Two-Ball'}
+  {id:'aNeIFfhsy-0', title:'Two-Ball'},
+  {id:'Es_K91ZkKf0', title:'Dribble Height HAUT'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -28892,6 +28895,13 @@ function _dcog_setHeightZone(zone) {
     b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
     b.style.color = active?'#f5c518':'#7a8299';
   });
+  // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
+  // BAS (low) → index 2 (Dribble Height BAS = ar6OA2wxwzw)
+  // HAUT (high) → index 5 (Dribble Height HAUT = Es_K91ZkKf0)
+  if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
+    var idx = (zone === 'high') ? 5 : (zone === 'low') ? 2 : null;
+    if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
+  }
 }
 function _dcog_setTwoBallMode(mode) {
   _dcog_tbMode = mode;
