@@ -299,8 +299,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 
 /* ── VID SECTION GRID (universel) ── */
 .vid-section-grid{margin-top:24px}
-/* ═══ SHOOTING + HAND-EYE + CHALLENGES + TUTORIALS : forcer 2 vidéos par ligne sur mobile ═══
-   Ces 4 sections uniquement. Les autres restent inchangées.
+/* ═══ SHOOTING + HAND-EYE + CHALLENGES + TUTORIALS + NBA PRO : forcer 2 vidéos par ligne sur mobile ═══
+   Ces 5 sections uniquement. Les autres restent inchangées.
    Le sélecteur [style*="grid-template-columns"] cible uniquement les sous-grilles
    dynamiques créées par buildVideoSection, pas les séparateurs. */
 @media (max-width: 900px) {
@@ -308,10 +308,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
   #grid-hec[style*="grid-template-columns"],
   #grid-challenges[style*="grid-template-columns"],
   #grid-tutorials[style*="grid-template-columns"],
+  #grid-nbapro[style*="grid-template-columns"],
   #grid-shooting > div[style*="grid-template-columns"],
   #grid-hec > div[style*="grid-template-columns"],
   #grid-challenges > div[style*="grid-template-columns"],
-  #grid-tutorials > div[style*="grid-template-columns"] {
+  #grid-tutorials > div[style*="grid-template-columns"],
+  #grid-nbapro > div[style*="grid-template-columns"] {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
   }
@@ -718,6 +720,7 @@ body.unlocked .sensei-only{display:revert !important}
       <div class="nav-drop-menu">
         <button class="nav-drop-item" onclick="showSection('training',this)" data-i18n="nav_training" style="color:var(--gold)">🎥 Training Mode</button>
         <div class="nav-drop-separator"></div>
+        <button class="nav-drop-item" onclick="showSection('nbapro',this)" data-i18n="nav_nbapro" style="color:var(--gold)">🏆 NBA Pro Drills</button>
         <button class="nav-drop-item" onclick="showSection('ballhandling',this)" data-i18n="nav_ballhandling">Ball Handling</button>
         <button class="nav-drop-item" onclick="showSection('shooting',this)" data-i18n="nav_shooting">Shooting</button>
         <button class="nav-drop-item" onclick="showSection('defense',this)" data-i18n="nav_defense">Defense</button>
@@ -783,6 +786,7 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn active" onclick="showSection('home',null);closeMenu()" data-i18n="mob_home">🏠 Home</button>
   <button class="mm-btn" onclick="showSection('belts',null);closeMenu()" data-i18n="mob_belts">🥋 Belts — Ceintures</button>
   <button class="mm-btn" onclick="showSection('training',null);closeMenu()" data-i18n="mob_training">🏋️ Training Mode</button>
+  <button class="mm-btn" onclick="showSection('nbapro',null);closeMenu()" data-i18n="mob_nbapro">🏆 NBA Pro Drills</button>
   <button class="mm-btn" onclick="showSection('ballhandling',null);closeMenu()" data-i18n="mob_ballhandling">🏀 Ball Handling Drills</button>
   <button class="mm-btn" onclick="showSection('shooting',null);closeMenu()" data-i18n="mob_shooting">🎯 Shooting</button>
   <button class="mm-btn" onclick="showSection('defense',null);closeMenu()" data-i18n="mob_defense">🛡️ Defense</button>
@@ -7139,6 +7143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="s-challenges" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_chal_title">CHAL<span>LENGES</span></div><div class="sec-sub" data-i18n="sec_chal_sub">Défis · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-challenges"></div></div></div>
 <div id="s-battle" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_battle_title">BATTLE <span>ROYAL</span></div><div class="sec-sub" data-i18n="sec_battle_sub">Confrontations · 1v1 · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-battle"></div></div></div>
+<div id="s-nbapro" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-title" data-i18n="sec_nbapro_title">NBA <span>PRO DRILLS</span></div><div class="sec-sub" data-i18n="sec_nbapro_sub">Drills de niveau NBA · Références professionnelles</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-nbapro"></div></div></div>
 
 <script>
 
@@ -7224,6 +7229,21 @@ const SECTION_VIDEOS = {
     {id:'veZxovuVvXk', title:'Battle Royal — Ceinture 6', vertical:true},
     {id:'1KZJiAUGizg', title:'Battle Royal — Ceinture 7', vertical:true},
     {id:'GmXwx-jy4iE', title:'Battle Royal — Ceinture 8', vertical:true},
+  ],
+  nbapro: [
+    {id:'G-N1gH5U0jg', title:'NBA Pro Drill #1', vertical:true},
+    {id:'xxCj_BlKZsI', title:'NBA Pro Drill #2', vertical:true},
+    {id:'EdMsF-qHAbc', title:'NBA Pro Drill #3', vertical:true},
+    {id:'61XyLMmYVV0', title:'NBA Pro Drill #4', vertical:true},
+    {id:'zywykkj704k', title:'NBA Pro Drill #5', vertical:true},
+    {id:'V7kIWCOpiTw', title:'NBA Pro Drill #6', vertical:true},
+    {id:'J6U-MKJTpXM', title:'NBA Pro Drill #7', vertical:true},
+    {id:'z8bKnbpgMYs', title:'NBA Pro Drill #8', vertical:true},
+    {id:'4XMEJx_aR0E', title:'NBA Pro Drill #9', vertical:true},
+    {id:'57MUSIt0lVs', title:'NBA Pro Drill #10', vertical:true},
+    {id:'yuAdef6AiQY', title:'NBA Pro Drill #11', vertical:true},
+    {id:'OVcdiYWwAbA', title:'NBA Pro Drill #12', vertical:true},
+    {id:'8HICm-hKqoU', title:'NBA Pro Drill #13', vertical:true},
   ],
   shooting: [
     {id:'RvyX7fXgqiM', title:'Shooting #1', vertical:true},
@@ -11951,6 +11971,9 @@ fr: {
   sec_chal_sub:'Défis · Coach Sensei BlackBelt',
   sec_battle_title:'BATTLE <span style="color:var(--gold)">ROYAL</span>',
   sec_battle_sub:'Confrontations · 1v1 · Coach Sensei BlackBelt',
+  nav_nbapro:'🏆 NBA Pro Drills', mob_nbapro:'🏆 NBA Pro Drills',
+  sec_nbapro_title:'NBA <span style="color:var(--gold)">PRO DRILLS</span>',
+  sec_nbapro_sub:'Drills de niveau NBA · Références professionnelles',
   sec_vulga_title:'VULGARISATION <span style="color:var(--gold)">SCIENTIFIQUE</span>',
   sec_vulga_sub:'Physique · Maths · Neurosciences appliquées au basketball',
   sec_neuro_title:'NEURO<span style="color:var(--gold)">SCIENCES</span>',
@@ -12070,6 +12093,9 @@ en: {
   sec_chal_sub:'Challenges · Coach Sensei BlackBelt',
   sec_battle_title:'BATTLE <span style="color:var(--gold)">ROYAL</span>',
   sec_battle_sub:'Matchups · 1v1 · Coach Sensei BlackBelt',
+  nav_nbapro:'🏆 NBA Pro Drills', mob_nbapro:'🏆 NBA Pro Drills',
+  sec_nbapro_title:'NBA <span style="color:var(--gold)">PRO DRILLS</span>',
+  sec_nbapro_sub:'NBA-level drills · Professional references',
   sec_vulga_title:'APPLIED <span style="color:var(--gold)">SCIENCE</span>',
   sec_vulga_sub:'Physics · Math · Neuroscience applied to basketball',
   sec_neuro_title:'NEURO<span style="color:var(--gold)">SCIENCE</span>',
@@ -14077,6 +14103,8 @@ function applyLangTracker(lang) {
     sec_chal_sub: 'Challenges \u00b7 Coach Sensei BlackBelt',
     sec_battle_title: 'BATTLE <span style="color:var(--gold)">ROYAL</span>',
     sec_battle_sub: 'Match play \u00b7 1v1 \u00b7 Coach Sensei BlackBelt',
+    sec_nbapro_title: 'NBA <span style="color:var(--gold)">PRO DRILLS</span>',
+    sec_nbapro_sub: 'NBA-level drills \u00b7 Professional references',
     // Stats tabs
     st_tab_radar: '\ud83d\uddc8\ufe0f Radar',
     st_tab_chart: '\ud83d\udcc9 Control Chart',
