@@ -42098,17 +42098,47 @@ body.si-banner-on { padding-top: 52px; }
       if (!this.supported() || !_voiceEnabled || !text) return;
       opts = opts || {};
       try {
+        // Priorité : opts.lang > window._lang > 'fr'
+        var lang = opts.lang || (window._lang || document.body.getAttribute('data-lang') || 'fr');
+        var wantLang = (lang === 'en') ? 'en-US' : (lang === 'fr') ? 'fr-FR' : lang;
+
+        // Détermination du texte et de la voix finale
+        var finalText, finalLang, finalVoice;
+        if (typeof text === 'object' && text !== null) {
+          // Format {fr, en} : choisir selon voix disponible pour éviter accent catastrophique
+          var frVoice = this._pickVoice('fr-FR');
+          var enVoice = this._pickVoice('en-US');
+          if (wantLang.indexOf('fr') === 0 && frVoice) {
+            finalText = text.fr; finalLang = 'fr-FR'; finalVoice = frVoice;
+          } else if (wantLang.indexOf('en') === 0 && enVoice) {
+            finalText = text.en; finalLang = 'en-US'; finalVoice = enVoice;
+          } else if (frVoice) {
+            // FR demandé mais pas dispo → basculer sur EN si l'anglais est là
+            finalText = text.en || text.fr; finalLang = frVoice ? 'fr-FR' : 'en-US'; finalVoice = frVoice;
+          } else if (enVoice) {
+            // Aucune voix FR : dire le texte EN avec voix EN (évite "ECRWAN MAINTENUUU ALLUMEYYY")
+            finalText = text.en || text.fr; finalLang = 'en-US'; finalVoice = enVoice;
+          } else {
+            return; // aucune voix utilisable
+          }
+        } else {
+          // Format string classique (rétrocompat)
+          finalText = text;
+          finalLang = wantLang;
+          finalVoice = this._pickVoice(wantLang);
+          // Si texte français mais aucune voix FR → silence plutôt que massacrer
+          if (finalLang.indexOf('fr') === 0 && !finalVoice) {
+            var anyFr = this._pickVoice('fr-FR');
+            if (!anyFr) return; // pas de voix FR = on ne parle pas
+          }
+        }
+
         // Stop toute élocution en cours
         speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(text);
-        // Priorité : opts.lang (forçage explicite) > window._lang > fallback
-        var lang = opts.lang || (window._lang || document.body.getAttribute('data-lang') || 'fr');
-        // Normaliser : 'en' -> 'en-US', 'fr' -> 'fr-FR', sinon utiliser tel quel
-        u.lang = (lang === 'en') ? 'en-US' : (lang === 'fr') ? 'fr-FR' : lang;
-        // Sélectionner la meilleure voix disponible pour cette langue
-        var bestVoice = this._pickVoice(u.lang);
-        if (bestVoice) u.voice = bestVoice;
-        u.rate = opts.rate || 0.95;   // Légèrement ralenti pour meilleure articulation
+        var u = new SpeechSynthesisUtterance(finalText);
+        u.lang = finalLang;
+        if (finalVoice) u.voice = finalVoice;
+        u.rate = opts.rate || 0.95;
         u.pitch = opts.pitch || 1.0;
         u.volume = opts.volume !== undefined ? opts.volume : 1.0;
         speechSynthesis.speak(u);
@@ -42167,9 +42197,9 @@ body.si-banner-on { padding-top: 52px; }
     _sm_updateVoiceBtn();
     window._haptic.success();
     if (_voiceEnabled) {
-      var hello = _t('sm_voice_hello') || 'Coach vocal activé';
+      // Format {fr,en} : si iOS n'a pas de voix FR, on parle en anglais plutôt que massacrer le français
       // Délai court pour laisser le contexte utilisateur (nécessaire iOS)
-      setTimeout(function(){ window._speak.say(hello); }, 100);
+      setTimeout(function(){ window._speak.say({fr:'Coach vocal activé. Bienvenue dans SENSEI.', en:'Voice coach activated. Welcome to SENSEI.'}); }, 100);
     }
   };
 
@@ -42182,8 +42212,8 @@ body.si-banner-on { padding-top: 52px; }
     _sm_updateWakeBtn();
     window._haptic.success();
     if (_wakeUserPref && window._speak.isEnabled()) {
-      var hello = _t('sm_wake_hello') || 'Écran maintenu allumé';
-      setTimeout(function(){ window._speak.say(hello); }, 100);
+      // Format {fr,en} : si iOS n'a pas de voix FR, on parle en anglais plutôt que massacrer le français
+      setTimeout(function(){ window._speak.say({fr:'Écran allumé.', en:'Screen on.'}); }, 100);
     }
   };
 
