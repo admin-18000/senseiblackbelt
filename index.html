@@ -42304,6 +42304,7 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_canvas = null;
   var _ss_ctx = null;
   var _ss_lastPosePos = null; // {x, y, t} pour mini-terrain
+  var _ss_lastShotTs = 0;     // cooldown détection tir (anti-double-count)
   var _ss_recorder = null;
   var _ss_recActive = false;
   var _ss_recChunks = [];
@@ -42450,6 +42451,28 @@ body.si-banner-on { padding-top: 52px; }
     ctx.lineTo(cornerXR, cornerY);
     ctx.stroke();
 
+    // ═══ Points de tir détectés (F1 Ball AI-inspired) ═══
+    try {
+      if (window._senseiOverlays && typeof window._senseiOverlays.getShots === 'function') {
+        var shots = window._senseiOverlays.getShots();
+        for (var si = 0; si < shots.length; si++) {
+          var s = shots[si];
+          var sx = cx + s.x * cw;
+          var sy = cy + s.y * ch;
+          sx = Math.max(cx + 3, Math.min(cx + cw - 3, sx));
+          sy = Math.max(cy + 3, Math.min(cy + ch - 3, sy));
+          // Point doré avec petit halo
+          ctx.fillStyle = 'rgba(245, 197, 24, 0.85)';
+          ctx.beginPath();
+          ctx.arc(sx, sy, Math.max(2, mcW * 0.018), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    } catch(e){}
+
     // ═══ Point du joueur (si position récente) ═══
     if (_ss_lastPosePos && (Date.now() - _ss_lastPosePos.t) < 2000) {
       // Position normalisée sur le mini-terrain
@@ -42550,6 +42573,13 @@ body.si-banner-on { padding-top: 52px; }
     _updateChrono();
     _ss_chronoInterval = setInterval(_updateChrono, 500);
 
+    // 🎯 Attacher les overlays SENSEI (points × combo + micro-consignes + mini-terrain data)
+    try {
+      if (window._senseiOverlays && _ss_canvas && _ss_canvas.parentElement) {
+        window._senseiOverlays.attach(_ss_canvas.parentElement, {mode: 'ss'});
+      }
+    } catch(e){}
+
     // Analyse MoveNet toutes les 250ms (utilise _ss_video, cohérent avec drawLoop)
     _ss_analysisInterval = setInterval(async function(){
       if (!_ss_running || !_tsym_detector || !_ss_video) return;
@@ -42571,7 +42601,37 @@ body.si-banner-on { padding-top: 52px; }
               y: (lh.y + rh.y) / 2 / vh,  // normalise 0-1
               t: Date.now()
             };
+            // 🎯 Informer les overlays de la position joueur pour mini-terrain
+            try {
+              if (window._senseiOverlays && window._senseiOverlays.updatePlayerPos) {
+                window._senseiOverlays.updatePlayerPos(_ss_lastPosePos.x, _ss_lastPosePos.y);
+              }
+            } catch(e){}
           }
+
+          // 🎯 Détection tir simplifiée : poignets au-dessus des épaules + montée rapide
+          // Poignets: kp[9] gauche, kp[10] droit · Épaules: kp[5] gauche, kp[6] droit
+          try {
+            var lw = kp[9], rw = kp[10], ls = kp[5], rs = kp[6];
+            if (lw && rw && ls && rs && lw.score > 0.35 && rw.score > 0.35 && ls.score > 0.3 && rs.score > 0.3) {
+              var wristY = Math.min(lw.y, rw.y);   // le plus haut des 2 (Y petit = haut)
+              var shoulderY = Math.min(ls.y, rs.y);
+              // Poignet clairement au-dessus des épaules (marge 40px)
+              var isShootPose = (wristY < shoulderY - 40);
+              var now = Date.now();
+              if (isShootPose && (now - (_ss_lastShotTs || 0)) > 1800) {
+                _ss_lastShotTs = now;
+                // Position du tir sur le mini-terrain = position joueur au moment du tir
+                try {
+                  if (window._senseiOverlays && _ss_lastPosePos) {
+                    window._senseiOverlays.addShot(_ss_lastPosePos.x, _ss_lastPosePos.y);
+                    window._senseiOverlays.registerAction(50); // +50 pts par tir détecté
+                  }
+                } catch(e){}
+                if (window._haptic) { try { window._haptic.success(); } catch(e){} }
+              }
+            }
+          } catch(e){}
         }
       } catch(e) { /* silencieux */ }
     }, 250);
@@ -42595,6 +42655,10 @@ body.si-banner-on { padding-top: 52px; }
     if (_ss_rafId) { cancelAnimationFrame(_ss_rafId); _ss_rafId = null; }
     _ss_video = null; _ss_canvas = null; _ss_ctx = null;
     _ss_lastPosePos = null;
+    _ss_lastShotTs = 0;
+
+    // 🎯 Detach overlays SENSEI
+    try { if (window._senseiOverlays) window._senseiOverlays.detach(); } catch(e){}
 
     if (_ss_chronoInterval) { clearInterval(_ss_chronoInterval); _ss_chronoInterval = null; }
     if (_ss_analysisInterval) { clearInterval(_ss_analysisInterval); _ss_analysisInterval = null; }
@@ -43139,26 +43203,62 @@ body.si-banner-on { padding-top: 52px; }
     ctx.textBaseline = 'top';
     ctx.fillText(mode.title, W / 2, cardY + cardH * 0.10);
 
-    // Anneau progressif
+    // Anneau progressif — style Ball AI premium (glow doré, dot au bout, pulse 100%)
     var ringCx = W / 2;
     var ringCy = cardY + cardH * 0.57;
     var ringR = Math.min(cardW, cardH) * 0.23;
     var progress = Math.min(1, _bt_reps / _bt_target);
+    var isDone = progress >= 1;
+    // Pulse au 100% (scale de 1.00 à 1.05 en 1s)
+    var pulseScale = 1;
+    if (isDone) {
+      var pulseT = (Date.now() % 1000) / 1000;
+      pulseScale = 1 + 0.05 * Math.sin(pulseT * Math.PI * 2);
+    }
+    var effR = ringR * pulseScale;
+    var lineW = effR * 0.22; // plus épais qu'avant (0.16 → 0.22)
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = ringR * 0.16;
+    // Fond de l'anneau (100%) — plus subtil qu'avant
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = lineW;
     ctx.beginPath();
-    ctx.arc(ringCx, ringCy, ringR, 0, Math.PI * 2);
+    ctx.arc(ringCx, ringCy, effR, 0, Math.PI * 2);
     ctx.stroke();
 
     if (progress > 0) {
-      var col = progress < 0.5 ? '#ffffff' : progress < 0.9 ? '#f5c518' : '#22c55e';
-      ctx.strokeStyle = col;
-      ctx.lineWidth = ringR * 0.16;
+      // Glow doré sous l'arc actif (effet halo premium)
+      ctx.save();
+      ctx.shadowColor = isDone ? 'rgba(45, 198, 83, 0.7)' : 'rgba(245, 197, 24, 0.6)';
+      ctx.shadowBlur = lineW * 0.9;
+      // Couleur : or par défaut, vert à 100% (retire l'ancien blanc <50%)
+      ctx.strokeStyle = isDone ? '#2dc653' : '#f5c518';
+      ctx.lineWidth = lineW;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(ringCx, ringCy, ringR, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
+      ctx.arc(ringCx, ringCy, effR, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
       ctx.stroke();
+      ctx.restore();
+
+      // Petit dot lumineux au bout de l'arc (style Apple Watch)
+      if (progress < 1) {
+        var endAngle = -Math.PI / 2 + progress * Math.PI * 2;
+        var dotX = ringCx + Math.cos(endAngle) * effR;
+        var dotY = ringCy + Math.sin(endAngle) * effR;
+        // Halo
+        var dotGrad = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, lineW * 1.1);
+        dotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        dotGrad.addColorStop(0.5, 'rgba(245, 197, 24, 0.5)');
+        dotGrad.addColorStop(1, 'rgba(245, 197, 24, 0)');
+        ctx.fillStyle = dotGrad;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, lineW * 1.1, 0, Math.PI * 2);
+        ctx.fill();
+        // Point central
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, lineW * 0.32, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     // Compteur au centre
@@ -43239,6 +43339,13 @@ body.si-banner-on { padding-top: 52px; }
 
     _bt_rafId = requestAnimationFrame(_bt_drawLoop);
 
+    // 🎯 Attacher les overlays SENSEI (points × combo + micro-consignes rotatives)
+    try {
+      if (window._senseiOverlays && _bt_canvas && _bt_canvas.parentElement) {
+        window._senseiOverlays.attach(_bt_canvas.parentElement, {mode: 'bt'});
+      }
+    } catch(e){}
+
     _bt_analysisInterval = setInterval(async function() {
       if (!_bt_running || !_tsym_detector || !_bt_video) return;
       try {
@@ -43286,6 +43393,13 @@ body.si-banner-on { padding-top: 52px; }
     _bt_repHistory.push({ t: now, side: side });
     if (_bt_repHistory.length > 5) _bt_repHistory.shift();
     if (window._haptic) window._haptic.tap();
+
+    // 🎯 Points × Combo (module _senseiOverlays)
+    try {
+      if (window._senseiOverlays && typeof window._senseiOverlays.registerAction === 'function') {
+        window._senseiOverlays.registerAction(10);
+      }
+    } catch(e){}
 
     // Mise à jour du mode d'affichage EN TEMPS RÉEL (basé sur les 5 dernières reps)
     _bt_updateMode();
@@ -43347,6 +43461,9 @@ body.si-banner-on { padding-top: 52px; }
 
     if (_bt_rafId) { cancelAnimationFrame(_bt_rafId); _bt_rafId = null; }
     if (_bt_analysisInterval) { clearInterval(_bt_analysisInterval); _bt_analysisInterval = null; }
+
+    // 🎯 Detach overlays SENSEI
+    try { if (window._senseiOverlays) window._senseiOverlays.detach(); } catch(e){}
 
     var duration = (Date.now() - _bt_startTime) / 1000;
     _bt_video = null; _bt_canvas = null; _bt_ctx = null;
@@ -43581,6 +43698,268 @@ body.si-banner-on { padding-top: 52px; }
     }
   }
 
+})();
+</script>
+
+<!-- ═══════════ MODULE SENSEI OVERLAYS — 4 features Ball AI style ═══════════ -->
+<script>
+(function(){
+  'use strict';
+  // Module autonome pour overlay :
+  //   F1 : mini-terrain (SS uniquement, canvas géré ailleurs — ce module gère juste les points)
+  //   F2 : compteur central XX/YY
+  //   F3 : points × combo
+  //   F4 : micro-consignes rotatives (8s)
+  //
+  // API : window._senseiOverlays.attach(container, options)
+  //        window._senseiOverlays.registerAction()  → +10 pts + combo
+  //        window._senseiOverlays.setCounter(current, total, label)
+  //        window._senseiOverlays.detach()
+  //        window._senseiOverlays.addShot(xPct, yPct)  → SS uniquement
+  //        window._senseiOverlays.updatePlayerPos(xPct, yPct)  → SS uniquement
+
+  var _root = null;                // container courant
+  var _mode = null;                // 'bt' | 'ss'
+  var _points = 0;
+  var _combo = 0;                  // streak reps consécutives
+  var _multiplier = 1;
+  var _lastActionTs = 0;
+  var _COMBO_RESET_MS = 3000;      // reset combo si pause > 3s
+  var _tipsInterval = null;
+  var _tipsIdx = 0;
+  var _shots = [];                 // {x, y} en % pour SS
+  var _playerPos = null;           // {x, y} en % pour SS
+
+  // Micro-consignes par mode
+  var TIPS_BT = [
+    {name:'📌 Astuce dribble', text:'Reste sur la pointe des pieds'},
+    {name:'📌 Regard', text:'Regarde devant, pas ta main'},
+    {name:'📌 Protection', text:'Ballon bas, coudes près du corps'},
+    {name:'📌 Respiration', text:'Souffle régulier, ne bloque pas'},
+    {name:'📌 Explosivité', text:'Impulsion sèche à chaque contact'}
+  ];
+  var TIPS_SS = [
+    {name:'📌 Rappel technique', text:'Pose bien tes pieds avant de monter au tir'},
+    {name:'📌 Alignement', text:'Épaule · coude · poignet alignés vers le cercle'},
+    {name:'📌 Follow-through', text:'Poignet cassé, doigts vers le cercle'},
+    {name:'📌 Regard', text:'Fixe l\u2019arri\u00e8re du cercle avant la mont\u00e9e'},
+    {name:'📌 Impulsion', text:'Genoux fl\u00e9chis puis extension compl\u00e8te'}
+  ];
+
+  // ─── Injection CSS (une seule fois) ───
+  function _injectCSS() {
+    if (document.getElementById('sensei-overlays-css')) return;
+    var css = document.createElement('style');
+    css.id = 'sensei-overlays-css';
+    css.textContent = [
+      '.sf-ol{position:absolute;z-index:20;pointer-events:none;',
+      'font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro","Inter",system-ui,sans-serif;',
+      '-webkit-font-smoothing:antialiased;color:#fff}',
+      /* Score group top-right */
+      '.sf-ol-score{top:14px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
+      '.sf-score-pts{font-size:clamp(28px,4.5vw,42px);color:#f5c518;line-height:1;font-weight:700;',
+      'font-variant-numeric:tabular-nums;letter-spacing:-1px;text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
+      '.sf-score-lbl{font-size:clamp(9px,1.2vw,12px);color:rgba(255,255,255,0.75);letter-spacing:2.5px;',
+      'font-weight:600;text-transform:uppercase;margin-top:-2px;text-shadow:0 1px 3px rgba(0,0,0,0.9)}',
+      '.sf-score-combo{display:inline-block;background:#e63946;color:#fff;font-size:clamp(15px,2.4vw,22px);',
+      'padding:2px 12px;border-radius:10px;letter-spacing:-0.5px;font-weight:700;',
+      'box-shadow:0 0 12px rgba(230,57,70,0.7);transform-origin:top right;',
+      'animation:sfComboPulse 1s ease-in-out infinite;opacity:0;transition:opacity 0.3s}',
+      '.sf-score-combo.sf-on{opacity:1}',
+      '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
+      /* Tip top-right sous score */
+      '.sf-ol-tip{top:150px;right:14px;max-width:min(260px,45vw);background:rgba(0,0,0,0.72);',
+      'border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:9px 12px;text-align:right;',
+      'animation:sfTipFade 6s ease-in-out infinite}',
+      '@keyframes sfTipFade{0%,100%{opacity:0.4}20%,80%{opacity:1}}',
+      '.sf-tip-name{font-size:clamp(9px,1.2vw,11px);color:#f5c518;letter-spacing:1.5px;',
+      'text-transform:uppercase;font-weight:600}',
+      '.sf-tip-text{font-size:clamp(12px,1.8vw,16px);color:rgba(255,255,255,0.98);',
+      'line-height:1.35;margin-top:4px;font-weight:500}',
+      /* Compteur central (SS uniquement — BT a déjà son cercle) */
+      '.sf-ol-counter{top:52%;left:50%;transform:translate(-50%,-50%);text-align:center;',
+      'max-width:calc(100% - 300px)}',
+      '.sf-counter-big{font-size:clamp(40px,7vw,68px);line-height:1;color:#fff;font-weight:700;',
+      'font-variant-numeric:tabular-nums;letter-spacing:-1.5px;text-shadow:0 3px 12px rgba(0,0,0,0.95);white-space:nowrap}',
+      '.sf-counter-lbl{font-size:clamp(10px,1.5vw,12px);color:rgba(255,255,255,0.85);',
+      'letter-spacing:3px;margin-top:4px;font-weight:600;text-transform:uppercase;',
+      'text-shadow:0 1px 3px rgba(0,0,0,0.9)}',
+      /* Chrono SS au-dessus du compteur (si activé) */
+      '.sf-counter-chrono{font-size:clamp(16px,2.5vw,22px);color:#fff;font-weight:600;',
+      'font-variant-numeric:tabular-nums;line-height:1;margin-bottom:8px;',
+      'text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
+      /* Animation "points gagnés" flottant */
+      '.sf-pts-float{position:absolute;top:60px;right:14px;color:#f5c518;',
+      'font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:-0.5px;',
+      'pointer-events:none;animation:sfFloat 900ms ease-out forwards;font-variant-numeric:tabular-nums;',
+      'text-shadow:0 2px 6px rgba(0,0,0,0.9)}',
+      '@keyframes sfFloat{0%{opacity:0;transform:translateY(0)}20%{opacity:1}',
+      '100%{opacity:0;transform:translateY(-30px)}}',
+    ].join('');
+    document.head.appendChild(css);
+  }
+
+  function _fmtNum(n) {
+    // Format "2,736" ou "1 247" selon convention FR/EN
+    try {
+      var lang = (window._lang || 'fr');
+      return n.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US');
+    } catch(e) { return String(n); }
+  }
+
+  function _updateComboMultiplier() {
+    // Barème : ×1 (<10), ×2 (10-24), ×3 (25-49), ×5 (50+)
+    var prev = _multiplier;
+    if (_combo >= 50) _multiplier = 5;
+    else if (_combo >= 25) _multiplier = 3;
+    else if (_combo >= 10) _multiplier = 2;
+    else _multiplier = 1;
+    // Haptic tick à chaque palier atteint
+    if (_multiplier > prev && window._haptic) {
+      try { window._haptic.success(); } catch(e){}
+    }
+  }
+
+  function _renderScore() {
+    if (!_root) return;
+    var elPts = _root.querySelector('.sf-score-pts');
+    var elCombo = _root.querySelector('.sf-score-combo');
+    if (elPts) elPts.textContent = _fmtNum(_points);
+    if (elCombo) {
+      if (_multiplier > 1) {
+        elCombo.textContent = '\u00d7' + _multiplier;
+        elCombo.classList.add('sf-on');
+      } else {
+        elCombo.classList.remove('sf-on');
+      }
+    }
+  }
+
+  function _showFloat(gain) {
+    if (!_root) return;
+    var f = document.createElement('div');
+    f.className = 'sf-pts-float';
+    f.textContent = '+' + gain;
+    _root.appendChild(f);
+    setTimeout(function(){ if (f.parentNode) f.parentNode.removeChild(f); }, 950);
+  }
+
+  function _rotateTip() {
+    if (!_root) return;
+    var elName = _root.querySelector('.sf-tip-name');
+    var elText = _root.querySelector('.sf-tip-text');
+    if (!elName || !elText) return;
+    var tips = (_mode === 'ss') ? TIPS_SS : TIPS_BT;
+    _tipsIdx = (_tipsIdx + 1) % tips.length;
+    var tip = tips[_tipsIdx];
+    elName.textContent = tip.name;
+    elText.textContent = tip.text;
+  }
+
+  // ─── API publique ───
+  window._senseiOverlays = {
+    attach: function(container, options) {
+      options = options || {};
+      _mode = options.mode || 'bt';
+      _points = 0; _combo = 0; _multiplier = 1; _lastActionTs = 0;
+      _shots = []; _playerPos = null; _tipsIdx = 0;
+      _injectCSS();
+      if (!container) return;
+      _root = container;
+      // S'assurer que le container a position:relative (pour absolue enfants)
+      var cs = window.getComputedStyle(container);
+      if (cs.position === 'static') container.style.position = 'relative';
+      // Retirer overlays précédents éventuels
+      var old = container.querySelectorAll('.sf-ol');
+      for (var i=0;i<old.length;i++) old[i].parentNode.removeChild(old[i]);
+      // Construire les overlays
+      var scoreGroup = document.createElement('div');
+      scoreGroup.className = 'sf-ol sf-ol-score';
+      scoreGroup.innerHTML = ''
+        + '<div class="sf-score-pts">0</div>'
+        + '<div class="sf-score-lbl">Points</div>'
+        + '<div class="sf-score-combo">\u00d71</div>';
+      container.appendChild(scoreGroup);
+      // Tip
+      var tipEl = document.createElement('div');
+      tipEl.className = 'sf-ol sf-ol-tip';
+      var tips = (_mode === 'ss') ? TIPS_SS : TIPS_BT;
+      var t0 = tips[0];
+      tipEl.innerHTML = ''
+        + '<div class="sf-tip-name">' + t0.name + '</div>'
+        + '<div class="sf-tip-text">' + t0.text + '</div>';
+      container.appendChild(tipEl);
+      // Compteur central (SS uniquement — BT a déjà son cercle interne)
+      if (options.showCounter) {
+        var cntEl = document.createElement('div');
+        cntEl.className = 'sf-ol sf-ol-counter';
+        cntEl.innerHTML = ''
+          + (options.showChrono ? '<div class="sf-counter-chrono">00:00</div>' : '')
+          + '<div class="sf-counter-big">0 / ' + (options.target || 0) + '</div>'
+          + '<div class="sf-counter-lbl">' + (options.counterLabel || 'Reps') + '</div>';
+        container.appendChild(cntEl);
+      }
+      // Rotation micro-consignes toutes les 8s
+      if (_tipsInterval) clearInterval(_tipsInterval);
+      _tipsInterval = setInterval(_rotateTip, 8000);
+    },
+
+    registerAction: function(bonus) {
+      // Appelé à chaque rep validée (BT) ou tir détecté (SS)
+      var now = Date.now();
+      // Reset combo si pause > 3s
+      if (_lastActionTs > 0 && (now - _lastActionTs) > _COMBO_RESET_MS) {
+        _combo = 0;
+      }
+      _combo++;
+      _updateComboMultiplier();
+      _lastActionTs = now;
+      var gain = (bonus || 10) * _multiplier;
+      _points += gain;
+      _renderScore();
+      _showFloat(gain);
+    },
+
+    setCounter: function(current, total, label) {
+      if (!_root) return;
+      var elBig = _root.querySelector('.sf-counter-big');
+      var elLbl = _root.querySelector('.sf-counter-lbl');
+      if (elBig) elBig.textContent = _fmtNum(current) + ' / ' + _fmtNum(total || 0);
+      if (elLbl && label) elLbl.textContent = label;
+    },
+
+    setChrono: function(str) {
+      if (!_root) return;
+      var el = _root.querySelector('.sf-counter-chrono');
+      if (el) el.textContent = str;
+    },
+
+    // ─── Mini-terrain SS (canvas géré par _ss_drawMiniCourt — ce module stocke juste l'état) ───
+    addShot: function(xPct, yPct) {
+      _shots.push({x: xPct, y: yPct, t: Date.now()});
+      if (_shots.length > 30) _shots.shift();
+    },
+    updatePlayerPos: function(xPct, yPct) {
+      _playerPos = {x: xPct, y: yPct};
+    },
+    getShots: function() { return _shots.slice(); },
+    getPlayerPos: function() { return _playerPos; },
+
+    getState: function() {
+      return {points: _points, combo: _combo, multiplier: _multiplier};
+    },
+
+    detach: function() {
+      if (_tipsInterval) { clearInterval(_tipsInterval); _tipsInterval = null; }
+      if (_root) {
+        var old = _root.querySelectorAll('.sf-ol, .sf-pts-float');
+        for (var i=0;i<old.length;i++) old[i].parentNode.removeChild(old[i]);
+      }
+      _root = null; _mode = null;
+      _points = 0; _combo = 0; _multiplier = 1; _lastActionTs = 0;
+      _shots = []; _playerPos = null;
+    }
+  };
 })();
 </script>
 
