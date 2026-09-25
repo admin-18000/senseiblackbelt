@@ -44470,9 +44470,9 @@ body.si-banner-on { padding-top: 52px; }
         // Position pixel absolue matchant le CSS HTML (top:130) — clamp pour très petits/grands écrans
         var scoreY = Math.max(100, Math.min(H * 0.32, 160));
         var scoreX = W - 14;
-        // Tailles augmentées pour lisibilité mobile
-        var scoreSize = Math.round(Math.max(32, Math.min(H * 0.075, 56)));
-        var lblSize = Math.round(Math.max(12, Math.min(H * 0.024, 16)));
+        // Tailles maxi pour lisibilité mobile depuis le trépied
+        var scoreSize = Math.round(Math.max(42, Math.min(H * 0.10, 72)));
+        var lblSize = Math.round(Math.max(15, Math.min(H * 0.032, 22)));
         // Points
         ctx.textAlign = 'right';
         ctx.fillStyle = '#f5c518';
@@ -44491,7 +44491,7 @@ body.si-banner-on { padding-top: 52px; }
 
         // ═══ COMBO (badge rouge sous label) ═══
         if (_multiplier > 1) {
-          var comboSize = Math.round(Math.max(20, Math.min(H * 0.045, 30)));
+          var comboSize = Math.round(Math.max(26, Math.min(H * 0.06, 38)));
           var comboText = '\u00d7' + _multiplier;
           ctx.font = '700 ' + comboSize + 'px ' + fontStack;
           var comboW = ctx.measureText(comboText).width + 24;
@@ -44523,52 +44523,36 @@ body.si-banner-on { padding-top: 52px; }
           // Espace de sécurité 30px sous le combo (badge combo à scoreY + scoreSize + lblSize + comboH + gap)
           var tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
           // Max-width strict : laisser au moins 200px libre à gauche (mini-terrain ~144 + marge 56)
-          var tipMaxW = Math.min(W * 0.42, 260, W - 220);
-          // Tailles augmentées pour mobile
-          var tipNameSize = Math.round(Math.max(12, Math.min(H * 0.028, 18)));
-          var tipTextSize = Math.round(Math.max(16, Math.min(H * 0.038, 26)));
-          // Nom (petit, doré)
-          ctx.font = '600 ' + tipNameSize + 'px ' + fontStack;
+          var tipMaxW = Math.min(W * 0.44, 320, W - 220);
+          // Tailles agrandies pour lisibilité maximum
+          var tipNameSize = Math.round(Math.max(15, Math.min(H * 0.038, 24)));
+          var tipTextSize = Math.round(Math.max(20, Math.min(H * 0.05, 34)));
+
+          // 🎯 Style TRANSPARENT — pas d'encadré, juste texte avec ombre portée forte
+          // Nom (doré, top) avec ombre noire épaisse pour lisibilité sur fond variable
           ctx.textAlign = 'right';
+          ctx.font = '700 ' + tipNameSize + 'px ' + fontStack;
+          // Double ombre pour effet outline lisible sur n'importe quel fond
+          ctx.shadowColor = 'rgba(0,0,0,0.95)';
+          ctx.shadowBlur = 8;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 2;
           ctx.fillStyle = '#f5c518';
-          ctx.shadowColor = 'rgba(0,0,0,0.9)';
-          ctx.shadowBlur = 5;
-          // Fond du cartouche (calcul dimensions)
-          ctx.font = '500 ' + tipTextSize + 'px ' + fontStack;
-          var tipTextW = Math.min(ctx.measureText(currentTip.text).width, tipMaxW - 24);
-          var tipBoxW = tipTextW + 24;
-          var tipBoxH = tipNameSize + tipTextSize + 20;
-          var tipBoxX = scoreX - tipBoxW;
-          var tipBoxY = tipY - 6;
-          // Cartouche noir semi-transparent avec bordure dorée
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(0,0,0,0.72)';
-          if (typeof ctx.roundRect === 'function') {
-            ctx.beginPath();
-            ctx.roundRect(tipBoxX, tipBoxY, tipBoxW, tipBoxH, 8);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(245,197,24,0.35)';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          } else {
-            ctx.fillRect(tipBoxX, tipBoxY, tipBoxW, tipBoxH);
-          }
-          // Nom (doré, top)
-          ctx.font = '600 ' + tipNameSize + 'px ' + fontStack;
-          ctx.fillStyle = '#f5c518';
-          ctx.shadowColor = 'rgba(0,0,0,0.7)';
-          ctx.shadowBlur = 2;
-          ctx.fillText(currentTip.name, scoreX - 12, tipBoxY + 6);
-          // Texte (blanc, en dessous)
-          ctx.font = '500 ' + tipTextSize + 'px ' + fontStack;
-          ctx.fillStyle = 'rgba(255,255,255,0.98)';
-          // Word-wrap simple si trop long
+          ctx.fillText(currentTip.name, scoreX, tipY);
+
+          // Texte (blanc, en dessous) avec ombre forte
+          ctx.font = '600 ' + tipTextSize + 'px ' + fontStack;
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0,0,0,0.95)';
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetY = 2;
+          // Word-wrap si trop long
           var words = currentTip.text.split(' ');
           var line = '';
           var lines = [];
           for (var w=0;w<words.length;w++) {
             var testLine = line + (line ? ' ' : '') + words[w];
-            if (ctx.measureText(testLine).width > tipMaxW - 24 && line) {
+            if (ctx.measureText(testLine).width > tipMaxW && line) {
               lines.push(line);
               line = words[w];
             } else {
@@ -44576,14 +44560,18 @@ body.si-banner-on { padding-top: 52px; }
             }
           }
           if (line) lines.push(line);
-          // Une seule ligne max pour éviter que ça devienne énorme
-          ctx.fillText(lines[0] || currentTip.text, scoreX - 12, tipBoxY + tipNameSize + 12);
+          // Dessiner jusqu'à 2 lignes max
+          for (var li = 0; li < Math.min(lines.length, 2); li++) {
+            ctx.fillText(lines[li], scoreX, tipY + tipNameSize + 8 + li * (tipTextSize + 4));
+          }
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
         }
 
         // ═══ Animation "+X" flottante à côté du score ═══
         if (_floats.length > 0) {
           var nowFl = Date.now();
-          var floatSize = Math.round(Math.max(22, Math.min(H * 0.06, 34)));
+          var floatSize = Math.round(Math.max(28, Math.min(H * 0.078, 44)));
           ctx.font = '700 ' + floatSize + 'px ' + fontStack;
           ctx.textAlign = 'right';
           ctx.shadowColor = 'rgba(0,0,0,0.9)';
