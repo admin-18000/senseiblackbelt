@@ -44520,17 +44520,31 @@ body.si-banner-on { padding-top: 52px; }
         var tips = _getTips(_mode);
         if (tips && tips.length > 0) {
           var currentTip = tips[_tipsIdx] || tips[0];
-          // Espace de sécurité 30px sous le combo (badge combo à scoreY + scoreSize + lblSize + comboH + gap)
-          var tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
-          // Max-width strict : laisser au moins 200px libre à gauche (mini-terrain ~144 + marge 56)
-          var tipMaxW = Math.min(W * 0.44, 320, W - 220);
           // Tailles agrandies pour lisibilité maximum
           var tipNameSize = Math.round(Math.max(15, Math.min(H * 0.038, 24)));
           var tipTextSize = Math.round(Math.max(20, Math.min(H * 0.05, 34)));
 
+          // 🎯 POSITIONNEMENT selon le mode pour éviter TOUTE collision
+          var tipY, tipX, tipAlign, tipMaxW;
+          if (_mode === 'bt') {
+            // BT : astuce en BAS-CENTRE (pas de card centrale à cet endroit, pas de mini-terrain)
+            // Powered by est en bas-droite (petit), on reste sur bas-centre à distance
+            tipY = H - Math.max(70, tipNameSize + tipTextSize + 30);
+            tipX = W / 2;
+            tipAlign = 'center';
+            tipMaxW = Math.min(W * 0.6, 500, W - 200); // Marge 100px chaque côté (Powered by droite)
+          } else {
+            // SS : astuce en HAUT-DROITE sous score (pas de card centrale sur SS)
+            tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
+            tipX = scoreX;
+            tipAlign = 'right';
+            // Max-width strict : laisser au moins 200px libre à gauche (mini-terrain ~144 + marge)
+            tipMaxW = Math.min(W * 0.44, 320, W - 220);
+          }
+
           // 🎯 Style TRANSPARENT — pas d'encadré, juste texte avec ombre portée forte
           // Nom (doré, top) avec ombre noire épaisse pour lisibilité sur fond variable
-          ctx.textAlign = 'right';
+          ctx.textAlign = tipAlign;
           ctx.font = '700 ' + tipNameSize + 'px ' + fontStack;
           // Double ombre pour effet outline lisible sur n'importe quel fond
           ctx.shadowColor = 'rgba(0,0,0,0.95)';
@@ -44538,7 +44552,7 @@ body.si-banner-on { padding-top: 52px; }
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 2;
           ctx.fillStyle = '#f5c518';
-          ctx.fillText(currentTip.name, scoreX, tipY);
+          ctx.fillText(currentTip.name, tipX, tipY);
 
           // Texte (blanc, en dessous) avec ombre forte
           ctx.font = '600 ' + tipTextSize + 'px ' + fontStack;
@@ -44562,7 +44576,7 @@ body.si-banner-on { padding-top: 52px; }
           if (line) lines.push(line);
           // Dessiner jusqu'à 2 lignes max
           for (var li = 0; li < Math.min(lines.length, 2); li++) {
-            ctx.fillText(lines[li], scoreX, tipY + tipNameSize + 8 + li * (tipTextSize + 4));
+            ctx.fillText(lines[li], tipX, tipY + tipNameSize + 8 + li * (tipTextSize + 4));
           }
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 0;
