@@ -44360,46 +44360,21 @@ body.si-banner-on { padding-top: 52px; }
     }
   }
 
+  // Liste des animations "+X" flottantes (dessinées dans drawOnCanvas)
+  var _floats = [];
   function _renderScore() {
-    if (!_root) return;
-    var elPts = _root.querySelector('.sf-score-pts');
-    var elCombo = _root.querySelector('.sf-score-combo');
-    if (elPts) elPts.textContent = _fmtNum(_points);
-    if (elCombo) {
-      if (_multiplier > 1) {
-        elCombo.textContent = '\u00d7' + _multiplier;
-        elCombo.classList.add('sf-on');
-      } else {
-        elCombo.classList.remove('sf-on');
-      }
-    }
+    // No-op — tout est dessiné en canvas via drawOnCanvas()
   }
-
   function _showFloat(gain) {
-    if (!_root) return;
-    var f = document.createElement('div');
-    f.className = 'sf-pts-float';
-    f.textContent = '+' + gain;
-    _root.appendChild(f);
-    setTimeout(function(){ if (f.parentNode) f.parentNode.removeChild(f); }, 950);
+    // Stocke le float pour rendu canvas (durée 900ms)
+    _floats.push({gain: gain, ts: Date.now()});
+    // Nettoyer les floats trop vieux (au-delà de 1s)
+    var now = Date.now();
+    _floats = _floats.filter(function(f){ return (now - f.ts) < 1000; });
+    if (_floats.length > 5) _floats = _floats.slice(-5);
   }
-
   function _rotateTip() {
-    if (!_root) return;
-    var elTip = _root.querySelector('.sf-ol-tip');
-    var elName = _root.querySelector('.sf-tip-name');
-    var elText = _root.querySelector('.sf-tip-text');
-    if (!elName || !elText) return;
-    var tips = _getTips(_mode);
-    _tipsIdx = (_tipsIdx + 1) % tips.length;
-    var tip = tips[_tipsIdx];
-    // Fade transition (400ms out → change texte → fade in)
-    if (elTip) elTip.classList.add('sf-changing');
-    setTimeout(function(){
-      elName.textContent = tip.name;
-      elText.textContent = tip.text;
-      if (elTip) elTip.classList.remove('sf-changing');
-    }, 400);
+    // No-op HTML — l'index change automatiquement via setInterval dans attach
   }
 
   // ─── API publique ───
@@ -44409,45 +44384,20 @@ body.si-banner-on { padding-top: 52px; }
       _mode = options.mode || 'bt';
       _points = 0; _combo = 0; _multiplier = 1; _lastActionTs = 0;
       _shots = []; _playerPos = null; _tipsIdx = 0;
-      _injectCSS();
-      if (!container) return;
-      _root = container;
-      // S'assurer que le container a position:relative (pour absolue enfants)
-      var cs = window.getComputedStyle(container);
-      if (cs.position === 'static') container.style.position = 'relative';
-      // Retirer overlays précédents éventuels
-      var old = container.querySelectorAll('.sf-ol');
-      for (var i=0;i<old.length;i++) old[i].parentNode.removeChild(old[i]);
-      // Construire les overlays
-      var scoreGroup = document.createElement('div');
-      scoreGroup.className = 'sf-ol sf-ol-score';
-      scoreGroup.innerHTML = ''
-        + '<div class="sf-score-pts">0</div>'
-        + '<div class="sf-score-lbl">' + _lbl('Points', 'Points') + '</div>'
-        + '<div class="sf-score-combo">\u00d71</div>';
-      container.appendChild(scoreGroup);
-      // Tip
-      var tipEl = document.createElement('div');
-      tipEl.className = 'sf-ol sf-ol-tip';
-      var tips = _getTips(_mode);
-      var t0 = tips[0];
-      tipEl.innerHTML = ''
-        + '<div class="sf-tip-name">' + t0.name + '</div>'
-        + '<div class="sf-tip-text">' + t0.text + '</div>';
-      container.appendChild(tipEl);
-      // Compteur central (SS uniquement — BT a déjà son cercle interne)
-      if (options.showCounter) {
-        var cntEl = document.createElement('div');
-        cntEl.className = 'sf-ol sf-ol-counter';
-        cntEl.innerHTML = ''
-          + (options.showChrono ? '<div class="sf-counter-chrono">00:00</div>' : '')
-          + '<div class="sf-counter-big">0 / ' + (options.target || 0) + '</div>'
-          + '<div class="sf-counter-lbl">' + (options.counterLabel || _lbl('Reps', 'Reps')) + '</div>';
-        container.appendChild(cntEl);
+      // NOTE : plus d'overlay HTML — tout est dessiné dans le canvas (drawOnCanvas)
+      // pour éviter les duplications et pour être capturé dans la vidéo enregistrée
+      _root = container || null;
+      // Nettoyer d'éventuels anciens overlays HTML (compat)
+      if (container) {
+        var old = container.querySelectorAll('.sf-ol, .sf-pts-float');
+        for (var i=0;i<old.length;i++) old[i].parentNode.removeChild(old[i]);
       }
-      // Rotation micro-consignes toutes les 8s
+      // Rotation micro-consignes toutes les 8s (juste mise à jour de l'index)
       if (_tipsInterval) clearInterval(_tipsInterval);
-      _tipsInterval = setInterval(_rotateTip, 8000);
+      _tipsInterval = setInterval(function(){
+        var tips = _getTips(_mode);
+        if (tips && tips.length > 0) _tipsIdx = (_tipsIdx + 1) % tips.length;
+      }, 8000);
     },
 
     registerAction: function(bonus) {
@@ -44466,18 +44416,15 @@ body.si-banner-on { padding-top: 52px; }
       _showFloat(gain);
     },
 
+    // Stockage interne pour compteur/chrono (rendu par drawOnCanvas si besoin)
+    _counterCurrent: 0, _counterTotal: 0, _counterLabel: '',
+    _chronoStr: '',
     setCounter: function(current, total, label) {
-      if (!_root) return;
-      var elBig = _root.querySelector('.sf-counter-big');
-      var elLbl = _root.querySelector('.sf-counter-lbl');
-      if (elBig) elBig.textContent = _fmtNum(current) + ' / ' + _fmtNum(total || 0);
-      if (elLbl && label) elLbl.textContent = label;
+      this._counterCurrent = current; this._counterTotal = total || 0;
+      if (label) this._counterLabel = label;
     },
-
     setChrono: function(str) {
-      if (!_root) return;
-      var el = _root.querySelector('.sf-counter-chrono');
-      if (el) el.textContent = str;
+      this._chronoStr = str || '';
     },
 
     // ─── Mini-terrain SS (canvas géré par _ss_drawMiniCourt — ce module stocke juste l'état) ───
@@ -44616,6 +44563,28 @@ body.si-banner-on { padding-top: 52px; }
           ctx.fillText(lines[0] || currentTip.text, scoreX - 12, tipBoxY + tipNameSize + 12);
         }
 
+        // ═══ Animation "+X" flottante à côté du score ═══
+        if (_floats.length > 0) {
+          var nowFl = Date.now();
+          var floatSize = Math.round(Math.max(16, Math.min(H * 0.045, 26)));
+          ctx.font = '700 ' + floatSize + 'px ' + fontStack;
+          ctx.textAlign = 'right';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 6;
+          for (var fi = 0; fi < _floats.length; fi++) {
+            var f = _floats[fi];
+            var age = nowFl - f.ts;
+            if (age > 900) continue;
+            var progress = age / 900; // 0 to 1
+            var alpha = progress < 0.2 ? progress / 0.2 : 1 - ((progress - 0.2) / 0.8);
+            var yOffset = -progress * 30;
+            ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+            ctx.fillStyle = '#f5c518';
+            ctx.fillText('+' + f.gain, scoreX, scoreY - 4 + yOffset);
+          }
+          ctx.globalAlpha = 1;
+        }
+
         ctx.restore();
       } catch(e){}
     },
@@ -44628,7 +44597,9 @@ body.si-banner-on { padding-top: 52px; }
       }
       _root = null; _mode = null;
       _points = 0; _combo = 0; _multiplier = 1; _lastActionTs = 0;
-      _shots = []; _playerPos = null;
+      _shots = []; _playerPos = null; _floats = [];
+      this._counterCurrent = 0; this._counterTotal = 0; this._counterLabel = '';
+      this._chronoStr = '';
     }
   };
 })();
