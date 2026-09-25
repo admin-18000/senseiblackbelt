@@ -559,6 +559,39 @@ body.unlocked .sensei-only{display:revert !important}
   margin-bottom:14px;display:flex;align-items:center;gap:8px;font-family:var(--font-cond);font-weight:700;
 }
 
+/* ═══ Photos de fond style Homecourt ═══
+   Ajoute une photo en haut de la carte avec gradient sombre en bas pour la lisibilité.
+   Utilisation : <div class="tr-card tr-card-bg" style="background-image:url('bg-xxx.jpeg')">
+*/
+.tr-card.tr-card-bg {
+  position:relative;
+  overflow:hidden;
+  padding-top:clamp(160px, 34vw, 220px);
+  background-size:cover;
+  background-position:center 20%;
+  background-repeat:no-repeat;
+}
+.tr-card.tr-card-bg::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,0.15) 0%,
+    rgba(0,0,0,0.35) 35%,
+    rgba(10,13,24,0.88) 65%,
+    rgba(10,13,24,0.98) 85%);
+  pointer-events:none;
+  z-index:0;
+}
+.tr-card.tr-card-bg > * {
+  position:relative;
+  z-index:1;
+}
+/* Mobile : réduire padding-top pour ne pas prendre trop d'espace vertical */
+@media (max-width:520px) {
+  .tr-card.tr-card-bg { padding-top:150px; background-position:center 15%; }
+}
+
 /* Video thumbnails */
 .tr-card .vid-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;
   scrollbar-width:none;-ms-overflow-style:none;}
@@ -712,6 +745,7 @@ body.unlocked .sensei-only{display:revert !important}
     <!-- Directs -->
     <button class="nav-btn active" onclick="showSection('home',this)" data-i18n="nav_home">Home</button>
     <button class="nav-btn" onclick="showSection('belts',this)" data-i18n="nav_belts">Belts</button>
+    <button class="nav-btn" onclick="showSection('budo',this)" data-i18n="nav_budo">Budō</button>
     <button class="nav-btn sensei-only" onclick="showSection('programs',this)" data-i18n="nav_programs">Programs</button>
 
     <!-- TRAIN dropdown -->
@@ -785,6 +819,7 @@ body.unlocked .sensei-only{display:revert !important}
 <div class="mobile-menu" id="mobile-menu">
   <button class="mm-btn active" onclick="showSection('home',null);closeMenu()" data-i18n="mob_home">🏠 Home</button>
   <button class="mm-btn" onclick="showSection('belts',null);closeMenu()" data-i18n="mob_belts">🥋 Belts — Ceintures</button>
+  <button class="mm-btn" onclick="showSection('budo',null);closeMenu()" data-i18n="mob_budo">🥋 Budō — Passage de Ceinture</button>
   <button class="mm-btn" onclick="showSection('training',null);closeMenu()" data-i18n="mob_training">🏋️ Training Mode</button>
   <button class="mm-btn" onclick="showSection('nbapro',null);closeMenu()" data-i18n="mob_nbapro">🏆 NBA Pro Drills</button>
   <button class="mm-btn" onclick="showSection('ballhandling',null);closeMenu()" data-i18n="mob_ballhandling">🏀 Ball Handling Drills</button>
@@ -1733,6 +1768,14 @@ body.unlocked .sensei-only{display:revert !important}
     <div class="sec-sub" data-i18n="sec_belts_sub">9 niveaux de maîtrise — Seuil de passage : 7.5 / 10</div>
     <div class="sec-line"></div>
 
+    <!-- VIDÉO INTRO BELTS (au-dessus de la simulation) -->
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px">
+      <div style="font-family:var(--font-cond);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px" data-i18n="belts_intro_video_label">🎥 Introduction — Le Système Ceintures</div>
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000">
+        <iframe src="https://www.youtube.com/embed/VDJW6TqZXvs?rel=0&modestbranding=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy"></iframe>
+      </div>
+    </div>
+
     <!-- SIMULATION A : PROGRESSION TRACK ANIMÉE -->
     <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:32px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
@@ -1782,7 +1825,48 @@ body.unlocked .sensei-only{display:revert !important}
       </div>
     </div>
 
+    <!-- ═══ BUDŌ - PASSAGE DE CEINTURE (juste sous LAUNCH ANIMATION + escalier) ═══ -->
+    <div style="background:linear-gradient(160deg,rgba(245,197,24,.06),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.35);border-radius:14px;padding:24px;margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-size:24px">🥋</div>
+        <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2.5px;color:var(--gold);line-height:1" data-i18n="belts_budo_title">BUDŌ - PASSAGE DE CEINTURE</div>
+      </div>
+      <div style="font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.4" data-i18n="belts_budo_desc">Comprendre l'esprit du passage de ceinture</div>
+
+      <!-- Player vertical shorts -->
+      <div id="belts_budo_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:360px;margin:0 auto 20px;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 6px 24px rgba(245,197,24,.15)">
+        <iframe id="belts_budo_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+      </div>
+
+      <!-- Grille des thumbnails shorts -->
+      <div id="belts_budo_grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px"></div>
+    </div>
+
     <div class="belts-grid" id="belts-grid"></div>
+  </div>
+</div>
+
+<!-- ══ BUDŌ - PASSAGE DE CEINTURE (section principale) ══ -->
+<div id="s-budo" class="section">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-badge" aria-hidden="true">🥋 <span data-i18n="sec_budo_title_badge">Budō</span></div>
+    <div class="sec-title" data-i18n="sec_budo_title">BUDŌ - <span>PASSAGE DE CEINTURE</span></div>
+    <div class="sec-sub" data-i18n="sec_budo_sub">L'esprit du passage de ceinture — la voie du guerrier</div>
+    <div class="sec-line"></div>
+
+    <!-- Intro texte -->
+    <div style="background:linear-gradient(160deg,rgba(245,197,24,.06),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.35);border-radius:14px;padding:24px;margin-bottom:32px">
+      <div style="font-family:'Barlow',sans-serif;font-size:14px;color:#cfd3e0;line-height:1.6" data-i18n="budo_intro">Le Budō — 武道 — désigne « la voie martiale » : bien plus qu'une technique, c'est un chemin de vie. Chaque ceinture n'est pas une récompense mais une étape d'évolution intérieure. Découvre l'esprit qui anime chaque passage de ceinture dans le système SENSEI BlackBelt.</div>
+    </div>
+
+    <!-- Player vertical shorts -->
+    <div id="budo_page_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:420px;margin:0 auto 24px;height:0;overflow:hidden;border-radius:14px;background:#000;box-shadow:0 8px 28px rgba(245,197,24,.2)">
+      <iframe id="budo_page_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+    </div>
+
+    <!-- Grille des thumbnails shorts -->
+    <div style="font-family:var(--font-cond);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:700" data-i18n="budo_choose_video">🎬 Choisis une vidéo</div>
+    <div id="budo_page_grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px"></div>
   </div>
 </div>
 
@@ -1797,8 +1881,8 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="sec-sub">Dribble · Shot Chart · Agility · Strength · Challenges</div>
   <div class="sec-line"></div>
 
-  <!-- OBJECTIFS HEBDO -->
-  <div class="tr-card" style="margin-bottom:20px">
+  <!-- OBJECTIFS HEBDO / JOURNAL -->
+  <div class="tr-card tr-card-bg" style="margin-bottom:20px;background-image:url('bg-journal.jpeg')">
     <div class="tr-card-title" id="tr_goalsTitle">🏆 OBJECTIFS HEBDOMADAIRES</div>
     <div id="tr_weeklyGoals">
       <div style="font-size:11px;color:#7a8299;text-align:center;padding:10px">
@@ -1821,7 +1905,7 @@ body.unlocked .sensei-only{display:revert !important}
 <div id="tr-dcog" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
 
   <!-- 🎬 CHOISIS TON DRILL (vidéos démo cognitive dribble) -->
-  <div class="tr-card" id="dcog_chooseDrillCard">
+  <div class="tr-card tr-card-bg" id="dcog_chooseDrillCard" style="background-image:url('bg-cognitif.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
     <div class="vid-scroll" id="dcog_vidScroll"></div>
     <div id="dcog_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -2238,7 +2322,7 @@ body.unlocked .sensei-only{display:revert !important}
 
 </div>
 <div id="tr-dribble" class="tr-panel" style="display:block;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card" id="td_chooseDrillCard">
+  <div class="tr-card tr-card-bg" id="td_chooseDrillCard" style="background-image:url('bg-dribble.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL</div>
     <div class="vid-scroll" id="td_vidScroll"></div>
     <div id="td_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -2248,8 +2332,8 @@ body.unlocked .sensei-only{display:revert !important}
   </div>
 
   <!-- BALL TRACKER (feature caméra IA compteur dribbles) -->
-  <div class="tr-card" style="position:relative;border:1.5px solid rgba(245,197,24,.4);background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(245,197,24,.01))">
-    <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+  <div class="tr-card tr-card-bg" style="position:relative;border:1.5px solid rgba(245,197,24,.4);background-image:url('bg-ball-tracker.jpeg')">
+    <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif;z-index:2">NEW</div>
     <div class="tr-card-title">🏀 BALL TRACKER · AI COUNTER</div>
     <div id="_bt_card_desc" style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">Pose ton téléphone, dribble avec n'importe quelle main : l'IA détecte automatiquement main gauche, main droite ou alternance, et compte tes reps en temps réel.</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
@@ -2509,7 +2593,7 @@ body.unlocked .sensei-only{display:revert !important}
   </div>
 </div>
 <div id="tr-shot" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card">
+  <div class="tr-card tr-card-bg" style="background-image:url('bg-shot-chart.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL SHOOTING</div>
     <div class="vid-scroll" id="tsc_vidScroll"></div>
     <div id="tsc_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -2571,7 +2655,7 @@ body.unlocked .sensei-only{display:revert !important}
   </div>
 </div>
 <div id="tr-agility" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card">
+  <div class="tr-card tr-card-bg" style="background-image:url('bg-agility.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL HAND-EYE</div>
     <div class="vid-scroll" id="tag_vidScroll"></div>
     <div id="tag_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -2674,7 +2758,7 @@ body.unlocked .sensei-only{display:revert !important}
   </div>
 </div>
 <div id="tr-sc" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card">
+  <div class="tr-card tr-card-bg" style="background-image:url('bg-strength.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON DRILL SC</div>
     <div class="vid-scroll" id="tsc_scVidScroll"></div>
     <div id="tsc_scVidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -2711,7 +2795,7 @@ body.unlocked .sensei-only{display:revert !important}
   </div>
 </div>
 <div id="tr-ch" class="tr-panel" style="display:none;max-width:480px;margin:0 auto;padding:0">
-  <div class="tr-card">
+  <div class="tr-card tr-card-bg" style="background-image:url('bg-challenges.jpeg')">
     <div class="tr-card-title">🎬 CHOISIS TON CHALLENGE</div>
     <div class="vid-scroll" id="tch_vidScroll"></div>
     <div id="tch_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
@@ -8030,6 +8114,76 @@ function showSection(id, btn) {
   if (id === 'vulga')   { requestAnimationFrame(function(){ buildVulga(); }); }
   if (id === 'iq')      { requestAnimationFrame(function(){ buildIQ(); }); }
 }
+
+// ══ BUDŌ - PASSAGE DE CEINTURE (7 vidéos shorts YouTube) ═══════════
+var _budo_VIDS = [
+  {id:'f9Awmk_52z8', title:'BUDŌ #1'},
+  {id:'dy2_W7SG4FQ', title:'BUDŌ #2'},
+  {id:'V01cjnjFxns', title:'BUDŌ #3'},
+  {id:'doOaEFdud5M', title:'BUDŌ #4'},
+  {id:'FBP7pfAENgs', title:'BUDŌ #5'},
+  {id:'dHqfYVxqmbY', title:'BUDŌ #6'},
+  {id:'AGm_upGWeH8', title:'BUDŌ #7'}
+];
+var _budo_selVid = null;
+
+function _budo_renderVids() {
+  var el = document.getElementById('belts_budo_grid');
+  if (!el) return;
+  el.innerHTML = _budo_VIDS.map(function(v, i) {
+    var sel = _budo_selVid === i;
+    var num = i + 1;
+    return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_selectVid(' + i + ')" style="cursor:pointer;position:relative">' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg" loading="lazy" alt="' + v.title + '">' +
+      '<div style="position:absolute;top:6px;left:6px;background:#f5c518;color:#0a0d18;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:14px;font-weight:900;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.5);letter-spacing:0;z-index:2">' + num + '</div>' +
+      '<div class="vid-thumb-title">' + num + ' · ' + v.title.replace(/^BUDŌ #\d+$/, 'BUDŌ') + '</div></div>';
+  }).join('');
+}
+
+function _budo_selectVid(i) {
+  _budo_selVid = i;
+  var v = _budo_VIDS[i];
+  var p = document.getElementById('belts_budo_player');
+  var fr = document.getElementById('belts_budo_frame');
+  if (!p || !fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/' + v.id + '?rel=0&modestbranding=1&autoplay=1&playsinline=1';
+  _budo_renderVids();
+  try { p.scrollIntoView({behavior:'smooth', block:'nearest'}); } catch(e){}
+  if (window._haptic) { try { window._haptic.tap(); } catch(e){} }
+}
+
+function _budo_page_renderVids() {
+  var el = document.getElementById('budo_page_grid');
+  if (!el) return;
+  el.innerHTML = _budo_VIDS.map(function(v, i) {
+    var sel = _budo_selVid === i;
+    var num = i + 1;
+    return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_page_selectVid(' + i + ')" style="cursor:pointer;position:relative">' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg" loading="lazy" alt="' + v.title + '">' +
+      '<div style="position:absolute;top:8px;left:8px;background:#f5c518;color:#0a0d18;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:16px;font-weight:900;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.6);letter-spacing:0;z-index:2">' + num + '</div>' +
+      '<div class="vid-thumb-title">' + num + ' · ' + v.title.replace(/^BUDŌ #\d+$/, 'BUDŌ') + '</div></div>';
+  }).join('');
+}
+
+function _budo_page_selectVid(i) {
+  _budo_selVid = i;
+  var v = _budo_VIDS[i];
+  var p = document.getElementById('budo_page_player');
+  var fr = document.getElementById('budo_page_frame');
+  if (!p || !fr) return;
+  p.style.display = 'block';
+  fr.src = 'https://www.youtube.com/embed/' + v.id + '?rel=0&modestbranding=1&autoplay=1&playsinline=1';
+  _budo_page_renderVids();
+  try { p.scrollIntoView({behavior:'smooth', block:'nearest'}); } catch(e){}
+  if (window._haptic) { try { window._haptic.tap(); } catch(e){} }
+}
+
+// Init au chargement DOM
+document.addEventListener('DOMContentLoaded', function() {
+  _budo_renderVids();
+  _budo_page_renderVids();
+});
 
 // ══ BUILD BELTS ══════════════════════════════════════
 function buildBelts() {
@@ -13699,6 +13853,17 @@ function applyLangTracker(lang) {
     home_score_title: 'SCORE DATA SCIENCE',
     // Belts
     belts_score_hint: 'Votre ceinture actuelle est déterminée par votre score en Data Science',
+    belts_intro_video_label: '🎥 Introduction — Le Système Ceintures',
+    belts_budo_title: 'BUDŌ - PASSAGE DE CEINTURE',
+    belts_budo_desc: 'Comprendre l\'esprit du passage de ceinture',
+    // Budō section (grande rubrique)
+    nav_budo: 'Budō',
+    mob_budo: '🥋 Budō — Passage de Ceinture',
+    sec_budo_title_badge: 'Budō',
+    sec_budo_title: 'BUDŌ - <span>PASSAGE DE CEINTURE</span>',
+    sec_budo_sub: 'L\'esprit du passage de ceinture — la voie du guerrier',
+    budo_intro: 'Le Budō — 武道 — désigne « la voie martiale » : bien plus qu\'une technique, c\'est un chemin de vie. Chaque ceinture n\'est pas une récompense mais une étape d\'évolution intérieure. Découvre l\'esprit qui anime chaque passage de ceinture dans le système SENSEI BlackBelt.',
+    budo_choose_video: '🎬 Choisis une vidéo',
     // Data Science
     data_belt_label: "Ceinture actuelle de l'athlète",
     belt_opt_white: '🥋⚪ Blanche — Débutant', belt_opt_yellow: '🥋🟡 Jaune — Initié',
@@ -13778,6 +13943,17 @@ function applyLangTracker(lang) {
     home_score_title: 'DATA SCIENCE SCORE',
     // Belts
     belts_score_hint: 'Your current belt is determined by your Data Science score',
+    belts_intro_video_label: '🎥 Introduction — The Belt System',
+    belts_budo_title: 'BUDŌ - BELT GRADUATION SYSTEM',
+    belts_budo_desc: 'Understand the spirit of belt promotion',
+    // Budō section (main rubric)
+    nav_budo: 'Budō',
+    mob_budo: '🥋 Budō — Belt Graduation',
+    sec_budo_title_badge: 'Budō',
+    sec_budo_title: 'BUDŌ - <span>BELT GRADUATION SYSTEM</span>',
+    sec_budo_sub: 'The spirit of belt graduation — the warrior\'s way',
+    budo_intro: 'Budō — 武道 — means "the martial way": far more than a technique, it\'s a path of life. Every belt is not a reward but a step of inner evolution. Discover the spirit behind every belt promotion in the SENSEI BlackBelt system.',
+    budo_choose_video: '🎬 Choose a video',
     // Data Science
     data_belt_label: "Athlete's current belt",
     belt_opt_white: '🥋⚪ White — Beginner', belt_opt_yellow: '🥋🟡 Yellow — Initiated',
@@ -44696,6 +44872,7 @@ body.si-banner-on { padding-top: 52px; }
       +     '</div>'
       +     '<div id="sensei-replay-speed-hint" style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3b3;letter-spacing:1px;text-align:center;margin-top:6px;text-transform:uppercase"></div>'
       +     '<div id="sensei-replay-meta" style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;letter-spacing:.8px;text-align:center;margin-top:10px"></div>'
+      +     '<div id="sensei-replay-ios-hint" style="display:none;margin-top:12px;padding:10px 12px;background:rgba(52,199,89,.08);border:1px solid rgba(52,199,89,.35);border-radius:8px;font-family:\'Barlow\',sans-serif;font-size:12px;color:#e8f5ea;line-height:1.4;text-align:center"></div>'
       +   '</div>'
       +   '<div style="padding:12px 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
       +     '<button id="sensei-replay-discard" style="background:rgba(230,57,70,.15);border:1.5px solid rgba(230,57,70,.5);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:800;letter-spacing:1.5px;padding:14px;border-radius:10px;cursor:pointer">🗑️ <span id="sensei-replay-discard-lbl">SUPPRIMER</span></button>'
@@ -44899,9 +45076,9 @@ body.si-banner-on { padding-top: 52px; }
 
     // Sinon : ré-encoder à la vitesse choisie
     _repShowLoader(true, 0);
-    // Modifier le nom du fichier pour refléter la vitesse
     var speedTag = 'x' + String(speed).replace('.', '_');
-    var newFn = fn.replace(/(\.[a-z0-9]+)$/i, '_' + speedTag + '$1');
+    // Base du nom sans extension (on la déterminera après ré-encodage selon le mime réel)
+    var baseName = fn.replace(/\.[a-z0-9]+$/i, '');
 
     _repReencode(origBlob, speed, function(newBlob) {
       _repShowLoader(false);
@@ -44911,6 +45088,14 @@ body.si-banner-on { padding-top: 52px; }
         if (typeof cb === 'function') { try { cb(origBlob, fn); } catch(e){} }
         return;
       }
+      // 🎯 Détecter l'extension RÉELLE du nouveau blob (évite iOS 1988:xx:xx)
+      // Le ré-encodage peut sortir un mime différent du source (mp4 iOS 17+ / webm sinon)
+      var realExt = 'webm';
+      var t = (newBlob.type || '').toLowerCase();
+      if (t.indexOf('mp4') !== -1) realExt = 'mp4';
+      else if (t.indexOf('webm') !== -1) realExt = 'webm';
+      else if (t.indexOf('quicktime') !== -1 || t.indexOf('mov') !== -1) realExt = 'mov';
+      var newFn = baseName + '_' + speedTag + '.' + realExt;
       _repClose();
       if (typeof cb === 'function') { try { cb(newBlob, newFn); } catch(e) { console.warn('[replay] onSave err:', e); } }
     }, function(pct) {
@@ -44953,6 +45138,27 @@ body.si-banner-on { padding-top: 52px; }
     if (meta) {
       var sizeMB = (blob.size / (1024*1024)).toFixed(1);
       meta.textContent = _repFilename + ' · ' + sizeMB + ' MB';
+    }
+
+    // 💡 Hint iOS : rappeler quel bouton choisir dans le share sheet pour sauver dans Photos
+    var iosHint = document.getElementById('sensei-replay-ios-hint');
+    if (iosHint) {
+      var isIOS = false;
+      try {
+        var ua = navigator.userAgent || '';
+        // iPhone, iPad classique, ou iPad avec iPadOS 13+ (Mac UA + touch)
+        isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                (/Macintosh/.test(ua) && typeof navigator.maxTouchPoints === 'number' && navigator.maxTouchPoints > 1);
+      } catch(e){}
+      if (isIOS) {
+        iosHint.style.display = 'block';
+        iosHint.innerHTML = _t(
+          '💡 <b>Sur iPhone</b> : après avoir cliqué <b>Sauvegarder</b>, appuie sur <b>« Enregistrer la vidéo »</b> dans le menu pour l\u2019envoyer dans <b>Photos</b>.',
+          '💡 <b>On iPhone</b>: after clicking <b>Save</b>, tap <b>"Save Video"</b> in the menu to send it to <b>Photos</b>.'
+        );
+      } else {
+        iosHint.style.display = 'none';
+      }
     }
 
     // Attach blob URL
