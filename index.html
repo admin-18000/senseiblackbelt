@@ -2251,7 +2251,7 @@ body.unlocked .sensei-only{display:revert !important}
   <div class="tr-card" style="position:relative;border:1.5px solid rgba(245,197,24,.4);background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(245,197,24,.01))">
     <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
     <div class="tr-card-title">🏀 BALL TRACKER · AI COUNTER</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">Pose ton téléphone, dribble avec n'importe quelle main : l'IA détecte automatiquement main gauche, main droite ou alternance, et compte tes reps en temps réel.</div>
+    <div id="_bt_card_desc" style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">Pose ton téléphone, dribble avec n'importe quelle main : l'IA détecte automatiquement main gauche, main droite ou alternance, et compte tes reps en temps réel.</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:3px 8px;border-radius:10px">✓ Left</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:3px 8px;border-radius:10px">✓ Right</div>
@@ -24049,6 +24049,11 @@ if(typeof _origSS==='function'){
     if(typeof _dcog_running!=='undefined'&&_dcog_running&&typeof _dcog_stop==='function')_dcog_stop();
     _origSS(id,btn);
     if(id==='visusci')startVS();else stopVS();
+    // 🌐 Traduire tous les textes hardcodés visibles quand la section s'ouvre
+    setTimeout(function(){
+      if (typeof _appI18nSweep === 'function') { try { _appI18nSweep(); } catch(e){} }
+      if (id==='training' && typeof _trApplyLang === 'function') { try { _trApplyLang(); } catch(e){} }
+    }, 80);
   };
 }
 
@@ -24092,6 +24097,12 @@ function openTrainingTab(id, btn) {
   if(['dribble','sym','dcog'].indexOf(id)===-1 && typeof _tsym_loadModel==='function') {
     _tsym_loadModel(null, null);
   }
+  // 🌐 Appliquer la langue courante aux textes du panel qui vient d'ouvrir
+  // (les titres de cards sont hardcoded FR dans le HTML, on les traduit)
+  setTimeout(function(){
+    if (typeof _trApplyLang === 'function') { try { _trApplyLang(); } catch(e){} }
+    if (typeof _appI18nSweep === 'function') { try { _appI18nSweep(); } catch(e){} }
+  }, 50);
 }
 
 /* DRIBBLE */
@@ -25852,11 +25863,227 @@ function _tr_initGoals() {
 
 
 
+/* ══════════════════════════════════════════════════════════════════════
+   🌐 GLOBAL I18N SWEEP — couvre tous les textes FR hardcodés dans le HTML
+   Une seule passe DOM parcourt les classes/tags cibles et applique
+   les traductions selon le dictionnaire ci-dessous.
+   ══════════════════════════════════════════════════════════════════════ */
+var _APP_I18N_FR_TO_EN = {
+  '🎬 CHOISIS TON DRILL': '🎬 SELECT YOUR DRILL',
+  '🎬 CHOISIS TON CHALLENGE': '🎬 SELECT YOUR CHALLENGE',
+  '🎬 CHOISIS TON DRILL HAND-EYE': '🎬 SELECT YOUR HAND-EYE DRILL',
+  '🎬 CHOISIS TON DRILL SC': '🎬 SELECT YOUR SC DRILL',
+  '🎬 CHOISIS TON DRILL SHOOTING': '🎬 SELECT YOUR SHOOTING DRILL',
+  '🎮 CHOISIS TON MODE': '🎮 SELECT YOUR MODE',
+  '⚡ TEST DE RÉACTION': '⚡ REACTION TEST',
+  '🏆 TENTATIVE': '🏆 ATTEMPT',
+  '🎯 DRIBBLE RÉACTION': '🎯 REACTION DRIBBLE',
+  '🎯 MODE D\'ANALYSE': '🎯 ANALYSIS MODE',
+  '💡 ANALYSE SENSEI': '💡 SENSEI ANALYSIS',
+  '📅 HISTORIQUE': '📅 HISTORY',
+  '📊 RYTHME DU DRIBBLE': '📊 DRIBBLE RHYTHM',
+  '📊 STATS PAR ZONE': '📊 STATS BY ZONE',
+  '📊 COMPARAISON N vs N-1': '📊 COMPARISON N vs N-1',
+  '📊 Mes stats': '📊 My stats',
+  '📊 Stats globales': '📊 Global stats',
+  '🔊 MÉTRONOME & 🎤 MICRO': '🔊 METRONOME & 🎤 MIC',
+  '🏆 OBJECTIFS HEBDOMADAIRES': '🏆 WEEKLY GOALS',
+  '🎯 PLAYBOOK': '🎯 PLAYBOOK',
+  '🎯 SCORE': '🎯 SCORE',
+  '🎯 DRILL TIMER': '🎯 DRILL TIMER',
+  '⏱ SESSION': '⏱ SESSION',
+  '⏱ TIMER DRILL': '⏱ TIMER DRILL',
+  '🎯 Drill of the Week': '🎯 Drill of the Week',
+  '🎯 AUTRES VOIES': '🎯 OTHER PATHS',
+  '🎯 Shooting': '🎯 Shooting',
+  '🎯 Shot Chart': '🎯 Shot Chart',
+  '🎯 Ma simulation personnalisée': '🎯 My custom simulation',
+  '🏆 Challenges': '🏆 Challenges',
+  '🏆 NATIONAL': '🏆 NATIONAL',
+  '🏆 NBA Pro Drills': '🏆 NBA Pro Drills',
+  '🏆 Le Coach': '🏆 The Coach',
+  '🎮 Mini-Jeux': '🎮 Mini-Games',
+  '⚡ Physique': '⚡ Physics',
+  '⚡ Minimal': '⚡ Minimal',
+  '⚡ Pin & Peel': '⚡ Pin & Peel',
+  '⚡ Agility': '⚡ Agility',
+  '⚡ Simulateur de charge': '⚡ Load simulator',
+  '⚡ Simulateur de charge neuromotrice': '⚡ Neuromotor load simulator',
+  '📊 Bench Press Calculator (Excel)': '📊 Bench Press Calculator (Excel)',
+  '📊 Indice Cpk': '📊 Cpk Index',
+  '📊 Data Science': '📊 Data Science',
+  '📊 Données & Stats': '📊 Data & Stats',
+  '▶ DÉMARRER': '▶ START',
+  '▶ DÉMARRER LA SESSION': '▶ START SESSION',
+  '▶ NOUVELLE TENTATIVE': '▶ NEW ATTEMPT',
+  '▶ LANCER BALL TRACKER': '▶ LAUNCH BALL TRACKER',
+  '▶ Démo automatique': '▶ Auto demo',
+  '▶ Lancer l\'animation': '▶ Start animation',
+  '▶ START': '▶ START',
+  'Sélectionner': 'Select',
+  'Athlète SENSEI': 'SENSEI Athlete',
+  'Avancé': 'Advanced',
+  'Bénévole': 'Volunteer',
+  'Compétition': 'Competition',
+  'Brevet Fédéral': 'Federal Diploma',
+  'Confidentialité': 'Privacy',
+  'Date de début': 'Start date',
+  'Expérience': 'Experience',
+  'Choisir un créneau': 'Choose a time slot',
+  'Créativité': 'Creativity',
+  'Dernière séance': 'Last session',
+  'Diplôme actuel': 'Current diploma',
+  'Drills classés par ceinture': 'Drills sorted by belt',
+  'Drills de niveau NBA · Références professionnelles': 'NBA-level drills · Pro references',
+  'Drills travaillés': 'Drills practiced',
+  'Drills validés pour cette ceinture': 'Drills validated for this belt',
+  'Durée (min)': 'Duration (min)',
+  'Force générale': 'General strength',
+  'Fiche perso adaptée à ton poste': 'Personal sheet adapted to your position',
+  'Fiche perso à ton poste': 'Personal sheet for your position',
+  'Fais défiler et choisis': 'Scroll and pick',
+  'Cliquez pour lancer la vidéo': 'Click to play the video',
+  'Clique pour ajouter à ta séance': 'Click to add to your session',
+  'Aperçu avant sauvegarde': 'Preview before saving',
+  'Aperçu — cliquer sur une case pour télécharger': 'Preview — click a cell to download',
+  'Aucune séance enregistrée': 'No session saved',
+  'Attribuez une note pour voir le résultat': 'Give a rating to see the result',
+  'Bibliothèque de drills': 'Drill library',
+  'Bonne luminosité requise': 'Good lighting required',
+  'Calculé depuis tes sessions enregistrées': 'Calculated from your saved sessions',
+  'Cognitif · Cibles aléatoires': 'Cognitive · Random targets',
+  'Code d\'accès Sensei': 'Sensei access code',
+  'Commencer le Quiz →': 'Start the Quiz →',
+  'Commencer →': 'Start →',
+  'Consistance — 60 dernières sessions': 'Consistency — last 60 sessions',
+  'Courbe de progression animée': 'Animated progression curve',
+  'Arrière (2)': 'Guard (2)',
+  'Barème Sensei BlackBelt — /10 · Seuil passage ceinture : 7.5': 'Sensei BlackBelt scale — /10 · Belt pass threshold: 7.5',
+  'Basé sur tes sessions radar vs la distribution des élèves Sensei': 'Based on your radar sessions vs the distribution of Sensei students',
+  'Blanche à rouge — un système de progression clair et gamifié pour chaque athlète': 'White to red — a clear, gamified progression system for every athlete',
+  'Formule souhaitée': 'Desired plan',
+  'Forfait mensuel — 100€ / 4 séances': 'Monthly package — €100 / 4 sessions',
+  'Entraîneur club · Paris': 'Club coach · Paris',
+  'Ceinture actuelle de l\'athlète': 'Current belt of the athlete',
+  'Ceinture mise à jour automatiquement': 'Belt updated automatically',
+  'Ceintures de compétences · Basket': 'Skill belts · Basketball',
+  'Classification VAK pour adapter le contenu à ton style d\'apprentissage': 'VAK classification to adapt content to your learning style',
+  'Classés par ceinture (Blanc → Rouge)': 'Sorted by belt (White → Red)',
+  'Coach Sensei BlackBelt · Méthode scientifique · Tous niveaux': 'Coach Sensei BlackBelt · Scientific method · All levels',
+  'Chaque point = une session enregistrée depuis l\'onglet Radar': 'Each point = a session saved from the Radar tab',
+  'Enregistre des sessions dans l\'onglet Radar': 'Record sessions in the Radar tab',
+  'Dernière mise à jour : mai 2026': 'Last update: May 2026',
+  'Collège (6ème–3ème)': 'Middle school (6th–9th grade)',
+  'Cones, reaction sticks, bruit, fatigue, espace réduit, signal externe': 'Cones, reaction sticks, noise, fatigue, reduced space, external signal',
+  'Analyse par MoveNet · 100% locale · Aucune donnée envoyée': 'Analysis by MoveNet · 100% local · No data sent',
+  'Accès en 1 clic · Fonctionne hors-ligne · Sans compte': '1-click access · Works offline · No account',
+  'Algorithme qui te connecte aux bonnes opportunités coach ou athlète': 'Algorithm connecting you to the right coach or athlete opportunities',
+  'Constraints-Led Approach · Pédagogie non-linéaire · Sensei BlackBelt': 'Constraints-Led Approach · Non-linear pedagogy · Sensei BlackBelt',
+  'Entraîne ton cerveau · Temps de réaction · IQ Sensei · Profil VAK': 'Train your brain · Reaction time · Sensei IQ · VAK profile',
+  'Espace Sensei · Accès PIN · Outils coach exclusifs': 'Sensei Space · PIN access · Exclusive coach tools',
+  'Coaching individuel · Ball Handling · Analyse technique · Feedback personnalisé Sensei': 'Individual coaching · Ball Handling · Technical analysis · Personalized Sensei feedback',
+  'Sélectionne des drills pour composer ta séance.': 'Select drills to build your session.',
+  'Sélectionne un challenge et lance une tentative': 'Select a challenge and start an attempt',
+  'Sélectionne une zone sur le terrain': 'Select a zone on the court',
+  'Pose ton téléphone, dribble avec n\'importe quelle main : l\'IA détecte automatiquement main gauche, main droite ou alternance, et compte tes reps en temps réel.': 'Place your phone, dribble with any hand: AI detects left, right or alternating in real time and counts your reps.',
+  'Pose ton trépied, lance la session, shoote librement. L\'app analyse ta posture pendant que tu t\'entraînes — sans que tu touches ton téléphone.': 'Set up your tripod, start the session, shoot freely. The app analyzes your posture as you train — hands-free.',
+  'Choisissez votre formule · Sélectionnez votre créneau · Payez en sécurité': 'Choose your plan · Select your time slot · Pay securely',
+  'Colle ici un code exporté pour restaurer un profil sur un autre appareil.': 'Paste an exported code here to restore a profile on another device.',
+  'Femmes, hommes, personnes handicapées — la maîtrise n\'a pas de frontières': 'Women, men, people with disabilities — mastery has no borders',
+  'Geste automatisé, stable sous pression — proche ceinture noire': 'Automated gesture, stable under pressure — near black belt',
+  'Bras tendu vs fléchi : le moment d\'inertie varie du simple au triple. Impact sur la vitesse angulaire et la précision du tir.': 'Extended vs bent arm: moment of inertia varies 1x to 3x. Impact on angular velocity and shot precision.',
+  'Brevet Fédéral Adultes — encadrer occasionnellement U18-U21 ou Sénior. Premier palier pour les bénévoles.': 'Federal Adult Diploma — occasionally coach U18-U21 or Senior. First tier for volunteers.',
+  'Brevet Fédéral Enfants — encadrer le mini-basket (5-11 ans). Formation organisée par les comités départementaux.': 'Federal Children Diploma — coach mini-basketball (5-11). Training by departmental committees.',
+  'Brevet Fédéral Jeunes — encadrer les catégories U11 à U17. Bases pédagogiques et techniques.': 'Federal Youth Diploma — coach U11 to U17. Pedagogical and technical basics.',
+  'Brevet Professionnel JEPS mention Basketball. Diplôme d\'État niveau IV. Encadrer contre rémunération au niveau départemental.': 'JEPS Professional Diploma Basketball. State diploma level IV. Coach for pay at departmental level.',
+  'Camembert et barres des zones de tir d\'une équipe NBA type. Animation des pourcentages et valeur espérée.': 'Pie chart and bars of shot zones for a typical NBA team. Animated percentages and expected value.',
+  'Caméra IA, métronome, timer de drill — les outils des pros sont dans ton téléphone. Chaque session est mesurée, chaque progrès est documenté.': 'AI camera, metronome, drill timer — the pros\' tools are in your phone. Every session measured, every progress documented.',
+  'Carte de Shewhart sur le FG% session par session. Détecte la fatigue, le surentraînement ou la progression réelle.': 'Shewhart chart on FG% session by session. Detects fatigue, overtraining or real progression.',
+  'Catégories Benjamins, Minimes, Cadets — départemental A et B selon niveau.': 'Youth categories — departmental A and B levels.',
+  'Champ de valeur optimal selon le temps restant et l\'écart au score. Chemin optimal tracé par l\'équation HJB.': 'Optimal value field by remaining time and score gap. Optimal path traced by HJB equation.',
+  'Champ de vitesse autour du ballon à haute vitesse. Zones basse/haute pression, sillage turbulent et portance Magnus.': 'Velocity field around ball at high speed. Low/high pressure zones, turbulent wake and Magnus lift.',
+  'Chaque action du jeu "attend" les autres : la matrice d\'attention prédit quelle action vient ensuite.': 'Every game action "attends" to others: the attention matrix predicts what action comes next.',
+  'Chaque ceinture peut avoir un code personnel que tu donnes à tes élèves. L\'app demandera ce code avant de valider le passage de ceinture.': 'Each belt can have a personal code you give to students. The app will ask for this code before validating the belt promotion.',
+  'Chaque club Pro B / Betlic Elite / LFB possède un centre de formation. Détection sur invitation après repérage.': 'Each Pro B / Betlic Elite / LFB club has a training center. Detection by invitation after scouting.',
+  'Chaque point vote pour toutes les lignes possibles. Les lignes réelles émergent par accumulation.': 'Each point votes for all possible lines. Real lines emerge through accumulation.',
+  'Chaque rebond illustre la conservation de l\'énergie et la 3ème loi de Newton.': 'Each bounce illustrates energy conservation and Newton\'s 3rd law.',
+  'Chaque session compte. Visualise ta courbe, ton score Data Science et ta ceinture actuelle. Le plateau est normal — la méthode te guide pour en sortir.': 'Every session counts. Visualize your curve, your Data Science score and your current belt. Plateaus are normal — the method guides you through them.',
+  'Combien d\'informations le cerveau peut-il traiter en dribblant et lisant la défense ? Capacité du canal de Shannon.': 'How much info can the brain process while dribbling and reading defense? Shannon channel capacity.',
+  'Combien de paniers à 2pts pour atteindre 17 points si tu as déjà 3 pts aux LF ? L\'équation se résout graphiquement.': 'How many 2-pointers to reach 17 points if you already have 3 FT points? The equation solves graphically.',
+  'Courbe d\'apprentissage exponentielle. 10 000 rép. → automatisme (cervelet).': 'Exponential learning curve. 10,000 reps → automatism (cerebellum).',
+  'Détecte les ruptures de rythme dans un dribble. Contrairement à Fourier, l\'ondelette localise le QUAND et le COMBIEN.': 'Detects rhythm breaks in a dribble. Unlike Fourier, wavelets localize the WHEN and the HOW MUCH.',
+  'Diagonale NBA = 31.8m. Distance maximale défensive. Justifie la zone.': 'NBA diagonal = 31.8m. Max defensive distance. Justifies the zone.',
+  'Distribution des % de réussite par zone (raquette vs mi-distance vs 3pts). Médiane, quartiles, valeurs extrêmes.': 'Success rate distribution by zone (paint vs mid-range vs 3pt). Median, quartiles, outliers.',
+  'Dribble = oscillateur harmonique. Expert : 4-6 Hz. Débutant : 1-2 Hz.': 'Dribble = harmonic oscillator. Expert: 4-6 Hz. Beginner: 1-2 Hz.',
+  'Estimer le vrai FG% d\'un joueur avec seulement 10 tirs observés — courbe de vraisemblance animée.': 'Estimate the true FG% of a player with only 10 observed shots — animated likelihood curve.',
+  'Expert libère 45% capacité cognitive en automatisant le dribble.': 'Expert frees 45% cognitive capacity by automating the dribble.',
+  'Formations FFBB pour dirigeants : gestion associative, marketing, juridique, communication numérique.': 'FFBB training for managers: association management, marketing, legal, digital communication.',
+  'Glisse les joueurs sur le terrain · La densité quantique se recalcule en temps réel': 'Slide players on the court · Quantum density recalculates in real time',
+  'Diplôme d\'Entraîneur Professionnel de Basketball. Plus haut niveau : NM1, Pro B, Betlic Elite, LFB.': 'Professional Basketball Coach Diploma. Highest level: NM1, Pro B, Betlic Elite, LFB.',
+  'Diplôme d\'Entraîneur Territorial de Basketball. Remplace le CQP. 4 modules, 10 CS. Entraîner jusqu\'en D2 Régionale.': 'Territorial Basketball Coach Diploma. Replaces CQP. 4 modules, 10 CS. Coach up to Regional D2.',
+  'Ball Handling, Shooting, Defense — plus de 400 exercices classés par ceinture. Chaque drill est expliqué en vidéo par Coach Sensei BlackBelt.': 'Ball Handling, Shooting, Defense — 400+ exercises sorted by belt. Every drill explained on video by Coach Sensei BlackBelt.',
+  'Basé sur Schöllhorn et al. (2025) : un excès de charge neuromotrice peut interférer avec les patterns moteurs automatisés. Zone optimale :': 'Based on Schöllhorn et al. (2025): excess neuromotor load can interfere with automated motor patterns. Optimal zone:',
+  'Backspin 2-3 tr/s → stabilité gyroscopique en vol. L=Iω conservé.': 'Backspin 2-3 rev/s → gyroscopic stability in flight. L=Iω conserved.',
+  'Blocs, interceptions, turnover : événements rares modélisés par Poisson. NBA moyen : λ = 5,2 blocs/match.': 'Blocks, steals, turnovers: rare events modeled by Poisson. NBA average: λ = 5.2 blocks/game.',
+  'Chaque joueur = cylindre de révolution. Chevauchement = faute.': 'Each player = revolution cylinder. Overlap = foul.',
+  'Chaque joueur = nœud. Centralité forte = hub du jeu. Le neutraliser effondre la circulation.': 'Each player = node. High centrality = game hub. Neutralizing it collapses ball movement.',
+  'Chaque possession = état de Markov. Matrice de transition modélise les décisions.': 'Each possession = Markov state. Transition matrix models decisions.',
+  'Charge = Tâche1 + Tâche2 ≤ Capacité': 'Load = Task1 + Task2 ≤ Capacity',
+  'Contre légal si h\'(t)': 'Legal contest if h\'(t)',
+  'Expert en Coordination Visuomotrice\',\n    coach_bio:\'Sensei BlackBelt est le créateur d\'un concept unique au monde :': 'Visuomotor Coordination Expert\',\n    coach_bio:\'Sensei BlackBelt is the creator of a world-unique concept:',
+  'Gamma synchronise les zones cérébrales. Décision rapide': 'Gamma synchronizes brain zones. Fast decision',
+};
+
+function _appI18nSweep() {
+  var en = (window._lang === 'en');
+  if (!en) return; // Par défaut le HTML est en FR — rien à faire
+  var dict = _APP_I18N_FR_TO_EN;
+  // Sélecteurs ciblés élargis pour couvrir plus d'éléments visibles
+  var sels = [
+    '.tr-card-title', '.tr-card-desc',
+    '.tr-btn', '.tr-btn-start',
+    '.sec-title', '.sec-sub', '.sec-title-alt',
+    '.mm-btn', '.nav-btn', '.nav-drop-item',
+    '.card-title', '.card-desc', '.card-label',
+    '.btn', '.btn-primary', '.btn-secondary', '.btn-outline',
+    'h1', 'h2', 'h3', 'h4', 'h5',
+    'label', 'button', 'summary',
+    '.stat-label', '.tag', '.badge', '.chip',
+    '[data-i18n-swap]'
+  ];
+  var nodes = document.querySelectorAll(sels.join(','));
+  for (var i=0; i<nodes.length; i++) {
+    var el = nodes[i];
+    // Ne toucher que les éléments avec un seul nœud texte (pas de HTML complexe)
+    if (el.children.length > 0) continue;
+    var txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (dict[txt]) {
+      el.textContent = dict[txt];
+    }
+  }
+  // Divs simples (font-size / color inline) souvent utilisées comme descriptions
+  var descSel = '#s-training div, #s-home div, #s-belts div, #s-programs div, #s-comm div';
+  var descNodes = document.querySelectorAll(descSel);
+  for (var j=0; j<descNodes.length; j++) {
+    var eld = descNodes[j];
+    if (eld.children.length > 0) continue;
+    var tx = (eld.textContent || '').replace(/\s+/g, ' ').trim();
+    if (tx.length > 2 && tx.length < 300 && dict[tx]) {
+      eld.textContent = dict[tx];
+    }
+  }
+}
+
 /* ══ i18n COMPLET ══ */
 function _trApplyLang() {
   var en = window._lang === 'en';
   var gt=document.getElementById('tr_goalsTitle');
   if(gt)gt.textContent='🏆 '+(en?'WEEKLY GOALS':'OBJECTIFS HEBDOMADAIRES');
+  // Description Ball Tracker
+  var btd=document.getElementById('_bt_card_desc');
+  if(btd)btd.textContent = en
+    ? "Place your phone, dribble with any hand: AI detects left, right or alternating in real time and counts your reps."
+    : "Pose ton téléphone, dribble avec n'importe quelle main : l'IA détecte automatiquement main gauche, main droite ou alternance, et compte tes reps en temps réel.";
   function tx(id,fr,e){var el=document.getElementById(id);if(el)el.innerHTML=en?e:fr;}
   function timerSub(id,runFr,runEn,doneFr,doneEn,idleFr,idleEn){
     var el=document.getElementById(id);if(!el)return;
@@ -26157,7 +26384,17 @@ function _trApplyLang() {
     if (typeof _origApply === 'function') _origApply.call(this, lang);
     var s = document.getElementById('s-training');
     if (s && s.classList.contains('active')) setTimeout(_trApplyLang, 30);
+    // 🌐 Global sweep : couvre tous les textes hardcodés dans toutes les sections
+    setTimeout(function(){
+      if (typeof _appI18nSweep === 'function') { try { _appI18nSweep(); } catch(e){} }
+    }, 40);
   };
+  // 🌐 Sweep initial au chargement (si l'app démarre en anglais)
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      if (typeof _appI18nSweep === 'function') { try { _appI18nSweep(); } catch(e){} }
+    }, 500);
+  });
 })();
 
 
