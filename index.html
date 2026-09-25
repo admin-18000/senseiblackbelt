@@ -27748,11 +27748,22 @@ function _tdr_startRec(){
     clearInterval(_tdr_recTimer);
     var blob=new Blob(_tdr_recChunks,{type:_tdr_recorder.mimeType||'video/webm'});
     _tdr_recActive=false;_tdr_recChunks=[];_tdr_updateRecBtn();
-    // Choisir la bonne extension selon le type réel du blob
-    // (évite qu'iOS affiche 1988:xx:xx sur un fichier .mp4 qui contient du webm)
     var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn='SENSEI_dribble_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st=document.getElementById('tdr_status');
+    // → Preview replay avant partage/download (avec boutons vitesse x0.5/x1/x1.5/x2)
+    if (window._replay && window._replay.show) {
+      window._replay.show(blob, {
+        title: 'SENSEI DRIBBLE RÉACTION',
+        filename: fn,
+        onSave: function(b, filename){ _tdr_doSaveShare(b, filename, st); }
+      });
+      return;
+    }
+    _tdr_doSaveShare(blob, fn, st);
+  };
+  // Extraite du onstop pour être appelée après confirmation dans le preview
+  function _tdr_doSaveShare(blob, fn, st) {
     if(_tsym_isIOS()&&navigator.share&&typeof File!=='undefined'){
       try{var f=new File([blob],fn,{type:blob.type});
         navigator.share({title:'SENSEI',files:[f]})
@@ -27767,7 +27778,7 @@ function _tdr_startRec(){
             .catch(function(e){if(e.name!=='AbortError')_tdr_dlBlob(blob,fn,st);});return;}}catch(e){}
     }
     _tdr_dlBlob(blob,fn,st);
-  };
+  }
   _tdr_recorder.onerror=function(e){clearInterval(_tdr_recTimer);_tdr_recError('error'+(e.error?': '+e.error.name:''));};
   // ═══════ FIX durée corrompue (1988:xx:xx / 1755:xxx) ═══════
   // Flush canvas + délai 200ms avant start() pour garantir une frame stable
@@ -31988,11 +31999,22 @@ function _dcog_startRec() {
     clearInterval(_dcog_recTimer);
     var blob = new Blob(_dcog_recChunks, {type: _dcog_recorder.mimeType||'video/webm'});
     _dcog_recActive = false; _dcog_recChunks = []; _dcog_updateRecBtn();
-    // Choisir la bonne extension selon le type réel du blob
-    // (évite qu'iOS affiche 1988:xx:xx sur un fichier .mp4 qui contient du webm)
     var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn  = 'SENSEI_cognitive_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st  = document.getElementById('dcog_status');
+    // → Preview replay avant partage/download (avec boutons vitesse x0.5/x1/x1.5/x2)
+    if (window._replay && window._replay.show) {
+      window._replay.show(blob, {
+        title: 'SENSEI COGNITIVE DRIBBLE',
+        filename: fn,
+        onSave: function(b, filename){ _dcog_doSaveShare(b, filename, st); }
+      });
+      return;
+    }
+    _dcog_doSaveShare(blob, fn, st);
+  };
+  // Extraite du onstop pour être appelée après confirmation dans le preview
+  function _dcog_doSaveShare(blob, fn, st) {
     if (_tsym_isIOS() && navigator.share && typeof File!=='undefined') {
       try { var f=new File([blob],fn,{type:blob.type});
         navigator.share({title:'SENSEI',files:[f]})
@@ -32007,7 +32029,7 @@ function _dcog_startRec() {
             .catch(function(e){if(e.name!=='AbortError')_dcog_dlBlob(blob,fn,st);}); return; } } catch(e) {}
     }
     _dcog_dlBlob(blob, fn, st);
-  };
+  }
   _dcog_recorder.onerror = function(e) { clearInterval(_dcog_recTimer); _dcog_recError('error'+(e.error?': '+e.error.name:'')); };
   // ═══════ FIX durée corrompue (1988:xx:xx / 1755:xxx) ═══════
   // Avant de démarrer, on force un rendu de frame sur le canvas pour que
@@ -44666,6 +44688,13 @@ body.si-banner-on { padding-top: 52px; }
       +   '</div>'
       +   '<div style="padding:16px 20px">'
       +     '<video id="sensei-replay-video" controls playsinline preload="metadata" style="width:100%;max-height:60vh;border-radius:10px;background:#000;display:block"></video>'
+      +     '<div id="sensei-replay-speed" style="display:flex;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap">'
+      +       '<button class="sensei-replay-speed-btn" data-speed="0.5" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;padding:6px 12px;border-radius:6px;cursor:pointer">×0.5</button>'
+      +       '<button class="sensei-replay-speed-btn sensei-replay-speed-active" data-speed="1" style="background:rgba(245,197,24,.2);border:1px solid rgba(245,197,24,.6);color:#f5c518;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;padding:6px 12px;border-radius:6px;cursor:pointer">×1</button>'
+      +       '<button class="sensei-replay-speed-btn" data-speed="1.5" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;padding:6px 12px;border-radius:6px;cursor:pointer">×1.5</button>'
+      +       '<button class="sensei-replay-speed-btn" data-speed="2" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;padding:6px 12px;border-radius:6px;cursor:pointer">×2</button>'
+      +     '</div>'
+      +     '<div id="sensei-replay-speed-hint" style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3b3;letter-spacing:1px;text-align:center;margin-top:6px;text-transform:uppercase"></div>'
       +     '<div id="sensei-replay-meta" style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;letter-spacing:.8px;text-align:center;margin-top:10px"></div>'
       +   '</div>'
       +   '<div style="padding:12px 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
@@ -44680,6 +44709,44 @@ body.si-banner-on { padding-top: 52px; }
     document.getElementById('sensei-replay-x').onclick = _repClose;
     document.getElementById('sensei-replay-discard').onclick = _repDiscard;
     document.getElementById('sensei-replay-save').onclick = _repSave;
+
+    // 🎚️ Contrôles de vitesse de lecture
+    var speedBtns = document.querySelectorAll('.sensei-replay-speed-btn');
+    for (var si = 0; si < speedBtns.length; si++) {
+      (function(btn){
+        btn.addEventListener('click', function(){
+          var spd = parseFloat(btn.getAttribute('data-speed')) || 1;
+          if (_repVideo) {
+            try { _repVideo.playbackRate = spd; } catch(e){}
+          }
+          // Toggle style actif
+          for (var j = 0; j < speedBtns.length; j++) {
+            var b = speedBtns[j];
+            b.classList.remove('sensei-replay-speed-active');
+            b.style.background = 'rgba(255,255,255,.08)';
+            b.style.borderColor = 'rgba(255,255,255,.2)';
+            b.style.color = '#fff';
+          }
+          btn.classList.add('sensei-replay-speed-active');
+          btn.style.background = 'rgba(245,197,24,.2)';
+          btn.style.borderColor = 'rgba(245,197,24,.6)';
+          btn.style.color = '#f5c518';
+          // Update hint : indiquer si la sauvegarde sera à cette vitesse
+          var hint = document.getElementById('sensei-replay-speed-hint');
+          if (hint) {
+            if (Math.abs(spd - 1) < 0.001) {
+              hint.textContent = _t('Vitesse d\u2019export : normale','Export speed: normal');
+            } else if (spd < 1) {
+              hint.textContent = _t('💾 Sauvegarde au ralenti \u00d7' + spd,'💾 Save in slow-motion \u00d7' + spd);
+            } else {
+              hint.textContent = _t('💾 Sauvegarde en accéléré \u00d7' + spd,'💾 Save in fast-forward \u00d7' + spd);
+            }
+          }
+          if (window._haptic) { try { window._haptic.tap(); } catch(e){} }
+        });
+      })(speedBtns[si]);
+    }
+
     // Click backdrop ferme
     m.addEventListener('click', function(e){ if (e.target === m) _repClose(); });
   }
@@ -44694,14 +44761,161 @@ body.si-banner-on { padding-top: 52px; }
     document.body.style.overflow = '';
   }
 
+  // 🎬 Ré-encodage à une vitesse donnée via canvas.captureStream
+  // Retourne un nouveau blob avec la vitesse appliquée (0.5 = ralenti, 2 = accéléré)
+  function _repReencode(blob, speed, onDone, onProgress) {
+    if (typeof MediaRecorder === 'undefined') { onDone(null); return; }
+    var url = URL.createObjectURL(blob);
+    var video = document.createElement('video');
+    video.src = url; video.muted = true; video.playsInline = true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    // playbackRate appliqué APRÈS loadedmetadata pour compat iOS
+    var recorder = null, chunks = [], canvas = null, ctx = null, drawing = false, rafId = 0;
+    var cancelled = false;
+    var cleanup = function() {
+      drawing = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      try { if (recorder && recorder.state !== 'inactive') recorder.stop(); } catch(e){}
+      try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){}
+      URL.revokeObjectURL(url);
+    };
+    video.onloadedmetadata = function() {
+      var W = video.videoWidth || 720;
+      var H = video.videoHeight || 1280;
+      canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      ctx = canvas.getContext('2d');
+      // captureStream : 30 fps pour équilibre qualité/perfs mobile
+      var stream = null;
+      try { stream = canvas.captureStream(30); } catch(e) { cleanup(); onDone(null); return; }
+      // Choisir mime supporté (mp4 iOS 17+ / webm sinon)
+      var mimes = ['video/mp4;codecs=avc1.42E01E', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+      var mime = '';
+      for (var i=0;i<mimes.length;i++) { if (MediaRecorder.isTypeSupported(mimes[i])) { mime = mimes[i]; break; } }
+      try {
+        recorder = mime
+          ? new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: 3500000})
+          : new MediaRecorder(stream, {videoBitsPerSecond: 3500000});
+      } catch(e) { cleanup(); onDone(null); return; }
+      recorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = function() {
+        var newBlob = new Blob(chunks, {type: recorder.mimeType || 'video/webm'});
+        URL.revokeObjectURL(url);
+        onDone(cancelled ? null : newBlob);
+      };
+      // Appliquer vitesse — playbackRate ; iOS ignore parfois avant lecture
+      try { video.playbackRate = speed; } catch(e){}
+      try { video.currentTime = 0; } catch(e){}
+      var startPlay = function() {
+        video.play().then(function() {
+          try { video.playbackRate = speed; } catch(e){}
+          try { recorder.start(500); } catch(e) { cleanup(); onDone(null); return; }
+          drawing = true;
+          var lastPct = -1;
+          var draw = function() {
+            if (!drawing) return;
+            try { ctx.drawImage(video, 0, 0, canvas.width, canvas.height); } catch(e){}
+            if (onProgress && video.duration > 0) {
+              var pct = Math.min(1, video.currentTime / video.duration);
+              if (pct - lastPct > 0.01) { lastPct = pct; try { onProgress(pct); } catch(e){} }
+            }
+            rafId = requestAnimationFrame(draw);
+          };
+          draw();
+        }).catch(function(e) { console.warn('[repReencode] play failed', e); cleanup(); onDone(null); });
+      };
+      video.onended = function() {
+        drawing = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        // Attendre 200ms pour la dernière frame + flush
+        setTimeout(function() { try { recorder.stop(); } catch(e){} }, 200);
+      };
+      // Sur iOS il faut attendre canplay pour éviter blank frame
+      if (video.readyState >= 3) startPlay();
+      else video.oncanplay = startPlay;
+    };
+    video.onerror = function() { cleanup(); onDone(null); };
+    video.load();
+    // Retourne fonction d'annulation
+    return function() { cancelled = true; cleanup(); };
+  }
+
+  // Récupère la vitesse actuellement sélectionnée dans l'UI
+  function _repGetSelectedSpeed() {
+    try {
+      var active = document.querySelector('.sensei-replay-speed-active');
+      if (active) {
+        var s = parseFloat(active.getAttribute('data-speed'));
+        if (!isNaN(s) && s > 0) return s;
+      }
+    } catch(e) {}
+    return 1;
+  }
+
+  // Affiche un overlay loader dans le modal pendant le ré-encodage
+  function _repShowLoader(show, pct) {
+    var ex = document.getElementById('sensei-replay-loader');
+    if (show) {
+      if (!ex) {
+        var l = document.createElement('div');
+        l.id = 'sensei-replay-loader';
+        l.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.85);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:10;padding:20px';
+        l.innerHTML = ''
+          + '<div style="width:56px;height:56px;border:4px solid rgba(245,197,24,.25);border-top-color:#f5c518;border-radius:50%;animation:senseiRepSpin 1s linear infinite"></div>'
+          + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:#f5c518;letter-spacing:2px">' + _t('EXPORT EN COURS','EXPORTING') + '</div>'
+          + '<div id="sensei-replay-loader-pct" style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;color:#fff;letter-spacing:1px">0%</div>'
+          + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;max-width:260px;line-height:1.4">' + _t("Ré-encodage à la vitesse choisie. Ne ferme pas la fenêtre.","Re-encoding at chosen speed. Don't close the window.") + '</div>';
+        // Injecte l'animation CSS si absente
+        if (!document.getElementById('sensei-replay-spin-css')) {
+          var s = document.createElement('style');
+          s.id = 'sensei-replay-spin-css';
+          s.textContent = '@keyframes senseiRepSpin{to{transform:rotate(360deg)}}';
+          document.head.appendChild(s);
+        }
+        // Attacher au modal (position absolue)
+        var container = _repModal && _repModal.firstChild;
+        if (container) { container.style.position = 'relative'; container.appendChild(l); }
+      }
+      var pctEl = document.getElementById('sensei-replay-loader-pct');
+      if (pctEl && typeof pct === 'number') pctEl.textContent = Math.round(pct * 100) + '%';
+    } else {
+      if (ex && ex.parentNode) ex.parentNode.removeChild(ex);
+    }
+  }
+
   function _repSave(){
     var cb = _repOnSave;
-    var b = _repBlob;
+    var origBlob = _repBlob;
     var fn = _repFilename;
-    _repClose();
-    if (typeof cb === 'function') {
-      try { cb(b, fn); } catch(e) { console.warn('[replay] onSave err:', e); }
+    var speed = _repGetSelectedSpeed();
+
+    // Si vitesse normale (×1), pas de ré-encodage : sauvegarde directe
+    if (Math.abs(speed - 1) < 0.001) {
+      _repClose();
+      if (typeof cb === 'function') { try { cb(origBlob, fn); } catch(e) { console.warn('[replay] onSave err:', e); } }
+      return;
     }
+
+    // Sinon : ré-encoder à la vitesse choisie
+    _repShowLoader(true, 0);
+    // Modifier le nom du fichier pour refléter la vitesse
+    var speedTag = 'x' + String(speed).replace('.', '_');
+    var newFn = fn.replace(/(\.[a-z0-9]+)$/i, '_' + speedTag + '$1');
+
+    _repReencode(origBlob, speed, function(newBlob) {
+      _repShowLoader(false);
+      if (!newBlob) {
+        alert(_t('Erreur de ré-encodage. Vidéo sauvegardée à vitesse normale.','Re-encoding error. Video saved at normal speed.'));
+        _repClose();
+        if (typeof cb === 'function') { try { cb(origBlob, fn); } catch(e){} }
+        return;
+      }
+      _repClose();
+      if (typeof cb === 'function') { try { cb(newBlob, newFn); } catch(e) { console.warn('[replay] onSave err:', e); } }
+    }, function(pct) {
+      _repShowLoader(true, pct);
+    });
   }
 
   function _repDiscard(){
@@ -44747,7 +44961,23 @@ body.si-banner-on { padding-top: 52px; }
       _repCurrentUrl = URL.createObjectURL(blob);
       _repVideo.src = _repCurrentUrl;
       _repVideo.currentTime = 0;
+      _repVideo.playbackRate = 1; // Reset vitesse à x1 à chaque nouveau replay
     } catch(e) { console.warn('[replay] video src err:', e); }
+    // Reset visuel bouton vitesse à x1
+    try {
+      var speedBtnsR = document.querySelectorAll('.sensei-replay-speed-btn');
+      for (var sr = 0; sr < speedBtnsR.length; sr++) {
+        var bR = speedBtnsR[sr];
+        bR.classList.remove('sensei-replay-speed-active');
+        var isX1 = (bR.getAttribute('data-speed') === '1');
+        bR.style.background = isX1 ? 'rgba(245,197,24,.2)' : 'rgba(255,255,255,.08)';
+        bR.style.borderColor = isX1 ? 'rgba(245,197,24,.6)' : 'rgba(255,255,255,.2)';
+        bR.style.color = isX1 ? '#f5c518' : '#fff';
+        if (isX1) bR.classList.add('sensei-replay-speed-active');
+      }
+      var hint = document.getElementById('sensei-replay-speed-hint');
+      if (hint) hint.textContent = _t('Vitesse d\u2019export : normale','Export speed: normal');
+    } catch(e){}
 
     _repModal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
