@@ -44290,8 +44290,8 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-ol{position:absolute;z-index:20;pointer-events:none;',
       'font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro","Inter",system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;color:#fff}',
-      /* Score group top-right — décalé sous le bouton STOP (top:14 right:14, ~50px de haut) */
-      '.sf-ol-score{top:64px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
+      /* Score group top-right — décalé sous chrono SS (chrono top:70 hauteur ~44px, donc 70+44=114 + 16px marge = 130) */
+      '.sf-ol-score{top:130px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
       '.sf-score-pts{font-size:clamp(28px,4.5vw,42px);color:#f5c518;line-height:1;font-weight:700;',
       'font-variant-numeric:tabular-nums;letter-spacing:-1px;text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
       '.sf-score-lbl{font-size:clamp(9px,1.2vw,12px);color:rgba(255,255,255,0.75);letter-spacing:2.5px;',
@@ -44303,7 +44303,7 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-score-combo.sf-on{opacity:1}',
       '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
       /* Tip top-right sous score */
-      '.sf-ol-tip{top:200px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
+      '.sf-ol-tip{top:250px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
       'border:1.5px solid rgba(245,197,24,0.35);border-radius:10px;padding:10px 14px;text-align:right;',
       'box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 0.4s}',
       '.sf-ol-tip.sf-changing{opacity:0}',
@@ -44499,11 +44499,12 @@ body.si-banner-on { padding-top: 52px; }
         ctx.save();
         ctx.textBaseline = 'top';
 
-        // ═══ SCORE (haut-droite, décalé sous bouton STOP) ═══
-        var scoreY = H * 0.09; // ~64px sur 700 = 9%
+        // ═══ SCORE (haut-droite, décalé sous chrono SS pour éviter collision) ═══
+        // Position pixel absolue matchant le CSS HTML (top:130) — clamp pour très petits/grands écrans
+        var scoreY = Math.max(100, Math.min(H * 0.32, 160));
         var scoreX = W - 14;
-        var scoreSize = Math.round(H * 0.055);
-        var lblSize = Math.round(H * 0.017);
+        var scoreSize = Math.round(Math.max(24, Math.min(H * 0.055, 42)));
+        var lblSize = Math.round(Math.max(9, Math.min(H * 0.017, 13)));
         // Points
         ctx.textAlign = 'right';
         ctx.fillStyle = '#f5c518';
@@ -44551,7 +44552,8 @@ body.si-banner-on { padding-top: 52px; }
         var tips = _getTips(_mode);
         if (tips && tips.length > 0) {
           var currentTip = tips[_tipsIdx] || tips[0];
-          var tipY = scoreY + Math.round(H * 0.28); // Position estimée sous le combo
+          // Espace de sécurité 30px sous le combo (badge combo à scoreY + scoreSize + lblSize + comboH + gap)
+          var tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
           var tipMaxW = Math.min(W * 0.42, 300);
           var tipNameSize = Math.round(H * 0.018);
           var tipTextSize = Math.round(H * 0.026);
