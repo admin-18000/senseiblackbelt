@@ -42636,6 +42636,19 @@ body.si-banner-on { padding-top: 52px; }
       if (pref) this._voiceCache[langCode] = pref;
       return pref;
     },
+    // Speak une string simple avec une voix précise
+    _speakSegment: function(text, langCode, voice, opts) {
+      opts = opts || {};
+      try {
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = langCode;
+        if (voice) u.voice = voice;
+        u.rate = opts.rate || 0.95;
+        u.pitch = opts.pitch || 1.0;
+        u.volume = opts.volume !== undefined ? opts.volume : 1.0;
+        speechSynthesis.speak(u);
+      } catch(e){}
+    },
     say: function(text, opts) {
       if (!this.supported() || !_voiceEnabled || !text) return;
       opts = opts || {};
@@ -42643,47 +42656,43 @@ body.si-banner-on { padding-top: 52px; }
         // Priorité : opts.lang > window._lang > 'fr'
         var lang = opts.lang || (window._lang || document.body.getAttribute('data-lang') || 'fr');
         var wantLang = (lang === 'en') ? 'en-US' : (lang === 'fr') ? 'fr-FR' : lang;
+        var frVoice = this._pickVoice('fr-FR');
+        var enVoice = this._pickVoice('en-US');
 
-        // Détermination du texte et de la voix finale
-        var finalText, finalLang, finalVoice;
-        if (typeof text === 'object' && text !== null) {
-          // Format {fr, en} : choisir selon voix disponible pour éviter accent catastrophique
-          var frVoice = this._pickVoice('fr-FR');
-          var enVoice = this._pickVoice('en-US');
-          if (wantLang.indexOf('fr') === 0 && frVoice) {
-            finalText = text.fr; finalLang = 'fr-FR'; finalVoice = frVoice;
-          } else if (wantLang.indexOf('en') === 0 && enVoice) {
-            finalText = text.en; finalLang = 'en-US'; finalVoice = enVoice;
-          } else if (frVoice) {
-            // FR demandé mais pas dispo → basculer sur EN si l'anglais est là
-            finalText = text.en || text.fr; finalLang = frVoice ? 'fr-FR' : 'en-US'; finalVoice = frVoice;
-          } else if (enVoice) {
-            // Aucune voix FR : dire le texte EN avec voix EN (évite "ECRWAN MAINTENUUU ALLUMEYYY")
-            finalText = text.en || text.fr; finalLang = 'en-US'; finalVoice = enVoice;
-          } else {
-            return; // aucune voix utilisable
-          }
+        // Détection segments : text.fr ou text.en peut être un ARRAY de {l:'en'|'fr', t:'...'}
+        // Ex: {fr:[{l:'en',t:'Ball Pounds'},{l:'fr',t:'. Prêt !'}], en:'Ball Pounds. Ready!'}
+        var chosen = null, chosenLang = null;
+        if (typeof text === 'object' && text !== null && !Array.isArray(text)) {
+          // Format {fr, en}
+          if (wantLang.indexOf('fr') === 0 && frVoice) { chosen = text.fr; chosenLang = 'fr-FR'; }
+          else if (wantLang.indexOf('en') === 0 && enVoice) { chosen = text.en; chosenLang = 'en-US'; }
+          else if (enVoice) { chosen = text.en || text.fr; chosenLang = 'en-US'; }
+          else if (frVoice) { chosen = text.fr || text.en; chosenLang = 'fr-FR'; }
+          else return;
         } else {
-          // Format string classique (rétrocompat)
-          finalText = text;
-          finalLang = wantLang;
-          finalVoice = this._pickVoice(wantLang);
-          // Si texte français mais aucune voix FR → silence plutôt que massacrer
-          if (finalLang.indexOf('fr') === 0 && !finalVoice) {
-            var anyFr = this._pickVoice('fr-FR');
-            if (!anyFr) return; // pas de voix FR = on ne parle pas
-          }
+          // Format string classique
+          chosen = text; chosenLang = wantLang;
+          if (chosenLang.indexOf('fr') === 0 && !frVoice) return; // pas de voix FR = silence
         }
 
-        // Stop toute élocution en cours
         speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(finalText);
-        u.lang = finalLang;
-        if (finalVoice) u.voice = finalVoice;
-        u.rate = opts.rate || 0.95;
-        u.pitch = opts.pitch || 1.0;
-        u.volume = opts.volume !== undefined ? opts.volume : 1.0;
-        speechSynthesis.speak(u);
+
+        // Cas 1 : chosen est un array de segments [{l, t}]
+        if (Array.isArray(chosen)) {
+          for (var i = 0; i < chosen.length; i++) {
+            var seg = chosen[i];
+            if (!seg || !seg.t) continue;
+            var segLang = (seg.l === 'en') ? 'en-US' : (seg.l === 'fr') ? 'fr-FR' : chosenLang;
+            var segVoice = (segLang.indexOf('en') === 0) ? enVoice : frVoice;
+            // Fallback si la voix demandée n'existe pas
+            if (!segVoice) segVoice = enVoice || frVoice;
+            this._speakSegment(seg.t, segLang, segVoice, opts);
+          }
+        } else {
+          // Cas 2 : chosen est une string simple
+          var v = (chosenLang.indexOf('en') === 0) ? enVoice : frVoice;
+          this._speakSegment(chosen, chosenLang, v, opts);
+        }
       } catch(e){}
     },
     countdown: function(n, callback) {
@@ -43139,8 +43148,11 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) { /* silencieux */ }
     }, 250);
 
-    // Coach vocal SS — format {fr,en}
-    if (window._speak) window._speak.say({fr:'Session shooting démarrée. Prends ton ballon, c\u2019est parti !', en:'Shooting session started. Grab your ball and go!'});
+    // Coach vocal SS — segments : "shooting" prononcé anglais, reste en français
+    if (window._speak) window._speak.say({
+      fr: [{l:'fr',t:'Session '}, {l:'en',t:'shooting'}, {l:'fr',t:' démarrée. Prends ton ballon, c\u2019est parti !'}],
+      en: 'Shooting session started. Grab your ball and go!'
+    });
   };
 
   // ═══ stopCamera : appelé par senseiCamStop → nettoie et affiche résumé ═══
@@ -43871,8 +43883,11 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) {}
     }, 100);
 
-    // Coach vocal BT — format {fr,en} : utilise voix FR si dispo, sinon EN
-    if (window._speak) window._speak.say({fr:'Ball Pounds. Prêt ? Concentre-toi !', en:'Ball Pounds. Get ready, focus up!'});
+    // Coach vocal BT — segments : "Ball Pounds" prononcé anglais, reste en français
+    if (window._speak) window._speak.say({
+      fr: [{l:'en',t:'Ball Pounds'}, {l:'fr',t:'. Prêt ? Concentre-toi !'}],
+      en: 'Ball Pounds. Get ready, focus up!'
+    });
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -44455,8 +44470,9 @@ body.si-banner-on { padding-top: 52px; }
         // Position pixel absolue matchant le CSS HTML (top:130) — clamp pour très petits/grands écrans
         var scoreY = Math.max(100, Math.min(H * 0.32, 160));
         var scoreX = W - 14;
-        var scoreSize = Math.round(Math.max(24, Math.min(H * 0.055, 42)));
-        var lblSize = Math.round(Math.max(9, Math.min(H * 0.017, 13)));
+        // Tailles augmentées pour lisibilité mobile
+        var scoreSize = Math.round(Math.max(32, Math.min(H * 0.075, 56)));
+        var lblSize = Math.round(Math.max(12, Math.min(H * 0.024, 16)));
         // Points
         ctx.textAlign = 'right';
         ctx.fillStyle = '#f5c518';
@@ -44475,7 +44491,7 @@ body.si-banner-on { padding-top: 52px; }
 
         // ═══ COMBO (badge rouge sous label) ═══
         if (_multiplier > 1) {
-          var comboSize = Math.round(H * 0.032);
+          var comboSize = Math.round(Math.max(20, Math.min(H * 0.045, 30)));
           var comboText = '\u00d7' + _multiplier;
           ctx.font = '700 ' + comboSize + 'px ' + fontStack;
           var comboW = ctx.measureText(comboText).width + 24;
@@ -44508,8 +44524,9 @@ body.si-banner-on { padding-top: 52px; }
           var tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
           // Max-width strict : laisser au moins 200px libre à gauche (mini-terrain ~144 + marge 56)
           var tipMaxW = Math.min(W * 0.42, 260, W - 220);
-          var tipNameSize = Math.round(H * 0.018);
-          var tipTextSize = Math.round(H * 0.026);
+          // Tailles augmentées pour mobile
+          var tipNameSize = Math.round(Math.max(12, Math.min(H * 0.028, 18)));
+          var tipTextSize = Math.round(Math.max(16, Math.min(H * 0.038, 26)));
           // Nom (petit, doré)
           ctx.font = '600 ' + tipNameSize + 'px ' + fontStack;
           ctx.textAlign = 'right';
@@ -44566,7 +44583,7 @@ body.si-banner-on { padding-top: 52px; }
         // ═══ Animation "+X" flottante à côté du score ═══
         if (_floats.length > 0) {
           var nowFl = Date.now();
-          var floatSize = Math.round(Math.max(16, Math.min(H * 0.045, 26)));
+          var floatSize = Math.round(Math.max(22, Math.min(H * 0.06, 34)));
           ctx.font = '700 ' + floatSize + 'px ' + fontStack;
           ctx.textAlign = 'right';
           ctx.shadowColor = 'rgba(0,0,0,0.9)';
