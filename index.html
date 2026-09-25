@@ -43689,7 +43689,10 @@ body.si-banner-on { padding-top: 52px; }
     var ctx = _bt_ctx;
     var mode = _bt_titles[_bt_currentMode] || _bt_titles.initial;
 
-    var cardW = Math.min(W * 0.85, 620);
+    // Largeur réduite pour éviter chevauchement avec score group à droite (~130px)
+    // et POWERED BY / REC à gauche (~130px). Marge de sécurité : 130 * 2 = 260px total.
+    var cardW = Math.min(W - 260, 620);
+    if (cardW < 300) cardW = Math.min(W * 0.62, 300); // Fallback petits écrans
     var cardH = Math.min(H * 0.65, 440);
     var cardX = (W - cardW) / 2;
     var cardY = (H - cardH) / 2 - H * 0.05;
@@ -44303,7 +44306,9 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-score-combo.sf-on{opacity:1}',
       '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
       /* Tip top-right sous score */
-      '.sf-ol-tip{top:250px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
+      /* Tip décalé + max-width strict pour ne jamais chevaucher mini-terrain (bas-gauche, ~144px de large) */
+      /* calc(100% - 200px) = laisse au moins 200px libre à gauche pour mini-terrain + marge */
+      '.sf-ol-tip{top:250px;right:14px;max-width:min(260px,calc(100% - 200px));background:rgba(0,0,0,0.88);',
       'border:1.5px solid rgba(245,197,24,0.35);border-radius:10px;padding:10px 14px;text-align:right;',
       'box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 0.4s}',
       '.sf-ol-tip.sf-changing{opacity:0}',
@@ -44554,7 +44559,8 @@ body.si-banner-on { padding-top: 52px; }
           var currentTip = tips[_tipsIdx] || tips[0];
           // Espace de sécurité 30px sous le combo (badge combo à scoreY + scoreSize + lblSize + comboH + gap)
           var tipY = scoreY + scoreSize + lblSize + Math.round(H * 0.09) + 30;
-          var tipMaxW = Math.min(W * 0.42, 300);
+          // Max-width strict : laisser au moins 200px libre à gauche (mini-terrain ~144 + marge 56)
+          var tipMaxW = Math.min(W * 0.42, 260, W - 220);
           var tipNameSize = Math.round(H * 0.018);
           var tipTextSize = Math.round(H * 0.026);
           // Nom (petit, doré)
