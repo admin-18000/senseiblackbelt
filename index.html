@@ -43032,6 +43032,10 @@ body.si-banner-on { padding-top: 52px; }
       _ss_drawMiniCourt(W, H);
       // Logo SENSEI dessiné sur le canvas (visible ET capturé par MediaRecorder)
       if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_ss_ctx, W, H);
+      // 🎬 Overlays SENSEI (score/combo/tips) dessinés dans le canvas pour la vidéo
+      if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function') {
+        try { window._senseiOverlays.drawOnCanvas(_ss_ctx, W, H); } catch(e){}
+      }
     }
     _ss_rafId = requestAnimationFrame(_ss_drawLoop);
   }
@@ -43673,6 +43677,10 @@ body.si-banner-on { padding-top: 52px; }
       _bt_drawOverlay(W, H);
 
       if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_bt_ctx, W, H);
+      // 🎬 Overlays SENSEI (score/combo/tips) dessinés dans le canvas pour la vidéo
+      if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function') {
+        try { window._senseiOverlays.drawOnCanvas(_bt_ctx, W, H); } catch(e){}
+      }
     }
     _bt_rafId = requestAnimationFrame(_bt_drawLoop);
   }
@@ -44282,8 +44290,8 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-ol{position:absolute;z-index:20;pointer-events:none;',
       'font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro","Inter",system-ui,sans-serif;',
       '-webkit-font-smoothing:antialiased;color:#fff}',
-      /* Score group top-right */
-      '.sf-ol-score{top:14px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
+      /* Score group top-right — décalé sous le bouton STOP (top:14 right:14, ~50px de haut) */
+      '.sf-ol-score{top:64px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
       '.sf-score-pts{font-size:clamp(28px,4.5vw,42px);color:#f5c518;line-height:1;font-weight:700;',
       'font-variant-numeric:tabular-nums;letter-spacing:-1px;text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
       '.sf-score-lbl{font-size:clamp(9px,1.2vw,12px);color:rgba(255,255,255,0.75);letter-spacing:2.5px;',
@@ -44295,7 +44303,7 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-score-combo.sf-on{opacity:1}',
       '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
       /* Tip top-right sous score */
-      '.sf-ol-tip{top:150px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
+      '.sf-ol-tip{top:200px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
       'border:1.5px solid rgba(245,197,24,0.35);border-radius:10px;padding:10px 14px;text-align:right;',
       'box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 0.4s}',
       '.sf-ol-tip.sf-changing{opacity:0}',
@@ -44480,6 +44488,128 @@ body.si-banner-on { padding-top: 52px; }
 
     getState: function() {
       return {points: _points, combo: _combo, multiplier: _multiplier};
+    },
+
+    // 🎬 Dessine tous les overlays SUR le canvas (pour qu'ils apparaissent dans la vidéo enregistrée)
+    // Appelée par _bt_drawLoop et _ss_drawLoop après le dessin de base
+    drawOnCanvas: function(ctx, W, H) {
+      if (!ctx) return;
+      try {
+        var fontStack = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif';
+        ctx.save();
+        ctx.textBaseline = 'top';
+
+        // ═══ SCORE (haut-droite, décalé sous bouton STOP) ═══
+        var scoreY = H * 0.09; // ~64px sur 700 = 9%
+        var scoreX = W - 14;
+        var scoreSize = Math.round(H * 0.055);
+        var lblSize = Math.round(H * 0.017);
+        // Points
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#f5c518';
+        ctx.font = '700 ' + scoreSize + 'px ' + fontStack;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 2;
+        var ptsTxt = (function(){ try { return _points.toLocaleString(window._lang==='en'?'en-US':'fr-FR'); } catch(e){ return String(_points); } })();
+        ctx.fillText(ptsTxt, scoreX, scoreY);
+        // Label "POINTS" / "POINTS"
+        ctx.font = '600 ' + lblSize + 'px ' + fontStack;
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.shadowBlur = 3;
+        var lblTxt = (window._lang === 'en') ? 'POINTS' : 'POINTS';
+        ctx.fillText(lblTxt, scoreX, scoreY + scoreSize + 2);
+
+        // ═══ COMBO (badge rouge sous label) ═══
+        if (_multiplier > 1) {
+          var comboSize = Math.round(H * 0.032);
+          var comboText = '\u00d7' + _multiplier;
+          ctx.font = '700 ' + comboSize + 'px ' + fontStack;
+          var comboW = ctx.measureText(comboText).width + 24;
+          var comboH = comboSize + 8;
+          var comboX = scoreX - comboW;
+          var comboY = scoreY + scoreSize + lblSize + 10;
+          // Fond rouge arrondi
+          ctx.shadowColor = 'rgba(230,57,70,0.6)';
+          ctx.shadowBlur = 12;
+          ctx.fillStyle = '#e63946';
+          if (typeof ctx.roundRect === 'function') {
+            ctx.beginPath();
+            ctx.roundRect(comboX, comboY, comboW, comboH, 8);
+            ctx.fill();
+          } else {
+            ctx.fillRect(comboX, comboY, comboW, comboH);
+          }
+          // Texte combo
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = '#fff';
+          ctx.textAlign = 'right';
+          ctx.fillText(comboText, scoreX - 12, comboY + 4);
+        }
+
+        // ═══ MICRO-CONSIGNE (cartouche noir sous score+combo) ═══
+        var tips = _getTips(_mode);
+        if (tips && tips.length > 0) {
+          var currentTip = tips[_tipsIdx] || tips[0];
+          var tipY = scoreY + Math.round(H * 0.28); // Position estimée sous le combo
+          var tipMaxW = Math.min(W * 0.42, 300);
+          var tipNameSize = Math.round(H * 0.018);
+          var tipTextSize = Math.round(H * 0.026);
+          // Nom (petit, doré)
+          ctx.font = '600 ' + tipNameSize + 'px ' + fontStack;
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#f5c518';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 5;
+          // Fond du cartouche (calcul dimensions)
+          ctx.font = '500 ' + tipTextSize + 'px ' + fontStack;
+          var tipTextW = Math.min(ctx.measureText(currentTip.text).width, tipMaxW - 24);
+          var tipBoxW = tipTextW + 24;
+          var tipBoxH = tipNameSize + tipTextSize + 20;
+          var tipBoxX = scoreX - tipBoxW;
+          var tipBoxY = tipY - 6;
+          // Cartouche noir semi-transparent avec bordure dorée
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = 'rgba(0,0,0,0.72)';
+          if (typeof ctx.roundRect === 'function') {
+            ctx.beginPath();
+            ctx.roundRect(tipBoxX, tipBoxY, tipBoxW, tipBoxH, 8);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(245,197,24,0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          } else {
+            ctx.fillRect(tipBoxX, tipBoxY, tipBoxW, tipBoxH);
+          }
+          // Nom (doré, top)
+          ctx.font = '600 ' + tipNameSize + 'px ' + fontStack;
+          ctx.fillStyle = '#f5c518';
+          ctx.shadowColor = 'rgba(0,0,0,0.7)';
+          ctx.shadowBlur = 2;
+          ctx.fillText(currentTip.name, scoreX - 12, tipBoxY + 6);
+          // Texte (blanc, en dessous)
+          ctx.font = '500 ' + tipTextSize + 'px ' + fontStack;
+          ctx.fillStyle = 'rgba(255,255,255,0.98)';
+          // Word-wrap simple si trop long
+          var words = currentTip.text.split(' ');
+          var line = '';
+          var lines = [];
+          for (var w=0;w<words.length;w++) {
+            var testLine = line + (line ? ' ' : '') + words[w];
+            if (ctx.measureText(testLine).width > tipMaxW - 24 && line) {
+              lines.push(line);
+              line = words[w];
+            } else {
+              line = testLine;
+            }
+          }
+          if (line) lines.push(line);
+          // Une seule ligne max pour éviter que ça devienne énorme
+          ctx.fillText(lines[0] || currentTip.text, scoreX - 12, tipBoxY + tipNameSize + 12);
+        }
+
+        ctx.restore();
+      } catch(e){}
     },
 
     detach: function() {
