@@ -26325,7 +26325,7 @@ function _tsym_stopCamera() {
   if (typeof _tsym_stream !== 'undefined' && _tsym_stream && window._speak) {
     var _tsymLE = { dribble:'Dribble', shot:'Shot', footwork:'Footwork', posture:'Posture' };
     var _tsymDE = _tsymLE[_tsym_mode] || '';
-    window._speak.say('Symmetry ' + _tsymDE + ' session ended. Good work!', {lang:'en-US'});
+    window._speak.say({fr:'Symétrie ' + _tsymDE + ' session terminée. Bon travail !', en:'Symmetry ' + _tsymDE + ' session ended. Good work!'});
   }
   _tsym_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
@@ -26394,7 +26394,7 @@ function _tsym_onCamReady(video,canvas,ctx){
   if (window._speak) {
     var _tsymL = { dribble:'Dribble', shot:'Shot', footwork:'Footwork', posture:'Posture' };
     var _tsymD = _tsymL[_tsym_mode] || '';
-    window._speak.say('Symmetry ' + _tsymD + ' started. Position yourself in front of the camera.', {lang:'en-US'});
+    window._speak.say({fr:'Symétrie ' + _tsymD + ' démarrée. Positionne-toi face à la caméra.', en:'Symmetry ' + _tsymD + ' started. Position yourself in front of the camera.'});
   }
   var status=document.getElementById('tsym_status');
   if(status)status.textContent=_t('Chargement IA...','Loading AI...');
@@ -27997,7 +27997,7 @@ function _tdr_stop() {
   if (typeof _tdr_running !== 'undefined' && _tdr_running && window._speak) {
     var _tdrLE = { reaction:'Reaction', rhythm:'Rhythm', sensei:'Sensei' };
     var _tdrDE = _tdrLE[_tdr_mode] || '';
-    window._speak.say('Dribble ' + _tdrDE + ' session complete. Well done!', {lang:'en-US'});
+    window._speak.say({fr:'Dribble ' + _tdrDE + ' session terminée. Bien joué !', en:'Dribble ' + _tdrDE + ' session complete. Well done!'});
   }
   _tdr_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
@@ -28030,7 +28030,7 @@ function _tdr_onCamReady(video,canvas,ctx){
   if (window._speak) {
     var _tdrL = { reaction:'Reaction', rhythm:'Rhythm', sensei:'Sensei' };
     var _tdrD = _tdrL[_tdr_mode] || '';
-    window._speak.say('Dribble ' + _tdrD + ' started. Get ready, focus up!', {lang:'en-US'});
+    window._speak.say({fr:'Dribble ' + _tdrD + ' démarré. Prépare-toi, concentre-toi !', en:'Dribble ' + _tdrD + ' started. Get ready, focus up!'});
   }
   // Mode Sensei : pas de calibration, pas de détection, pas de cibles.
   // Juste le flux caméra en miroir (le joueur s'observe et reproduit).
@@ -29014,7 +29014,7 @@ function _dcog_stop() {
   if (typeof _dcog_running !== 'undefined' && _dcog_running && window._speak) {
     var _dcogLE = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
     var _dcogDE = _dcogLE[_dcog_drill] || '';
-    window._speak.say('Cognition ' + _dcogDE + ' session complete. Great work!', {lang:'en-US'});
+    window._speak.say({fr:'Cognition ' + _dcogDE + ' session terminée. Bravo !', en:'Cognition ' + _dcogDE + ' session complete. Great work!'});
   }
   _dcog_running = false;
   if (typeof _td_stopMusic === "function") _td_stopMusic();
@@ -29150,7 +29150,7 @@ function _dcog_onCamReady(video,canvas,ctx){
   if (window._speak) {
     var _dcogL = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
     var _dcogD = _dcogL[_dcog_drill] || '';
-    window._speak.say('Cognition ' + _dcogD + ' started. Stay sharp, focus on the signals!', {lang:'en-US'});
+    window._speak.say({fr:'Cognition ' + _dcogD + ' démarrée. Reste vigilant, concentre-toi sur les signaux !', en:'Cognition ' + _dcogD + ' started. Stay sharp, focus on the signals!'});
   }
   if(!_tsym_detector){
     _dcog_setStatus(_t('Chargement IA...','Loading AI...'),'#f5c518');
@@ -32496,13 +32496,14 @@ function shPlayVideo(){
           else if (score >= 45) comment = 'Focus on your weak side';
           else                  comment = 'Slow down, rebuild your base';
         } else {
-          verdictLabel = 'Note Handles';
-          if (score >= 90)      comment = 'Handles d\'élite — équilibre parfait';
-          else if (score >= 80) comment = 'Handles solides — très équilibré';
-          else if (score >= 70) comment = 'Bons handles — continue comme ça';
-          else if (score >= 60) comment = 'Correct — travaille ta main faible';
-          else if (score >= 45) comment = 'Concentre-toi sur ton côté faible';
-          else                  comment = 'Ralentis, reprends les bases';
+          var _en = (window._lang === 'en');
+          verdictLabel = _en ? 'Handles Score' : 'Note Handles';
+          if (score >= 90)      comment = _en ? 'Elite handles — perfect balance' : 'Handles d\'élite — équilibre parfait';
+          else if (score >= 80) comment = _en ? 'Solid handles — very balanced' : 'Handles solides — très équilibré';
+          else if (score >= 70) comment = _en ? 'Good handles — keep it up' : 'Bons handles — continue comme ça';
+          else if (score >= 60) comment = _en ? 'Correct — work your weak hand' : 'Correct — travaille ta main faible';
+          else if (score >= 45) comment = _en ? 'Focus on your weak side' : 'Concentre-toi sur ton côté faible';
+          else                  comment = _en ? 'Slow down, go back to basics' : 'Ralentis, reprends les bases';
         }
         var vNote    = el('sb-recap-verdict-note');
         var vLabel   = el('sb-recap-verdict-label');
@@ -42636,7 +42637,8 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) { /* silencieux */ }
     }, 250);
 
-    if (window._speak) window._speak.say('Shooting session started. Grab your ball and go!', {lang:'en-US'});
+    // Coach vocal SS — format {fr,en}
+    if (window._speak) window._speak.say({fr:'Session shooting démarrée. Prends ton ballon, c\u2019est parti !', en:'Shooting session started. Grab your ball and go!'});
   };
 
   // ═══ stopCamera : appelé par senseiCamStop → nettoie et affiche résumé ═══
@@ -42729,7 +42731,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_saveBlob(blob);
       _ss_recActive = false;
       _ss_updateRecBtnUI();
-      if (window._speak) window._speak.say('Recording saved. Check your gallery!', {lang:'en-US'});
+      if (window._speak) window._speak.say({fr:'Enregistrement sauvegardé. Vérifie ta galerie !', en:'Recording saved. Check your gallery!'});
     };
     _ss_recorder.onerror = function(e) {
       if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
@@ -42758,7 +42760,7 @@ body.si-banner-on { padding-top: 52px; }
       _ss_recActive = true;
       _ss_updateRecBtnUI();
       if (window._haptic) window._haptic.success();
-      if (window._speak) window._speak.say('Recording started.', {lang:'en-US'});
+      if (window._speak) window._speak.say({fr:'Enregistrement démarré.', en:'Recording started.'});
 
       // Timer + arrêt automatique à _ss_REC_LIMIT (10 min)
       _ss_recTimer = setInterval(function() {
@@ -43027,6 +43029,10 @@ body.si-banner-on { padding-top: 52px; }
     var existing = document.getElementById('bt-select-modal');
     if (existing) existing.remove();
 
+    // Helper i18n
+    var en = (window._lang === 'en');
+    var L = function(fr, en_){ return en ? en_ : fr; };
+
     var modal = document.createElement('div');
     modal.id = 'bt-select-modal';
     modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(10,13,24,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;padding:20px;animation:btFadeIn 0.3s ease-out';
@@ -43036,7 +43042,7 @@ body.si-banner-on { padding-top: 52px; }
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(245,197,24,0.2)">' +
       '<div>' +
       '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:30px;letter-spacing:3px;color:#f5c518;line-height:1">🏀 BALL TRACKER</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">AI-powered dribble counter · MoveNet</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">' + L('Compteur de dribbles par IA · MoveNet', 'AI-powered dribble counter · MoveNet') + '</div>' +
       '</div>' +
       '<button onclick="_bt_close_select()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:8px;cursor:pointer">✕</button>' +
       '</div>' +
@@ -43046,19 +43052,19 @@ body.si-banner-on { padding-top: 52px; }
       '<div style="font-size:38px">🏀</div>' +
       '<div style="flex:1">' +
       '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:4px">BALL POUNDS</div>' +
-      '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.4">Pound the floor with any hand. The AI detects which hand you\'re using in real time.</div>' +
+      '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.4">' + L('Frappe le sol avec n\u2019importe quelle main. L\u2019IA détecte laquelle en temps réel.', 'Pound the floor with any hand. The AI detects which hand you\'re using in real time.') + '</div>' +
       '</div>' +
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Left hand detection</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Right hand detection</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Alternation detection</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ Symmetry analysis</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ ' + L('Main gauche', 'Left hand detection') + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ ' + L('Main droite', 'Right hand detection') + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ ' + L('Alternance', 'Alternation detection') + '</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#22c55e;background:rgba(34,197,94,0.15);padding:4px 10px;border-radius:12px">✓ ' + L('Analyse symétrie', 'Symmetry analysis') + '</div>' +
       '</div>' +
       '</div>' +
       // Section : choisir un objectif
       '<div style="margin-bottom:24px">' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;margin-bottom:12px;font-weight:700">Set your target</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;margin-bottom:12px;font-weight:700">' + L('Choisis ton objectif', 'Set your target') + '</div>' +
       '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
 
     _bt_targets.forEach(function(t) {
@@ -43069,8 +43075,8 @@ body.si-banner-on { padding-top: 52px; }
       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#666;text-align:center;margin-top:8px">REPS</div>' +
       '</div>' +
       // Bouton démarrer
-      '<button id="bt-start-btn" onclick="_bt_start()" style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;padding:18px;border-radius:12px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;font-weight:700;transition:all 0.15s">▶ START SESSION</button>' +
-      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-top:16px">Powered by MoveNet · 100% local · No data sent</div>' +
+      '<button id="bt-start-btn" onclick="_bt_start()" style="width:100%;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;padding:18px;border-radius:12px;font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;font-weight:700;transition:all 0.15s">▶ ' + L('DÉMARRER LA SESSION', 'START SESSION') + '</button>' +
+      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-top:16px">' + L('Propulsé par MoveNet · 100% local · Aucune donnée envoyée', 'Powered by MoveNet · 100% local · No data sent') + '</div>' +
       '</div>';
 
     modal.innerHTML = html;
@@ -43356,7 +43362,8 @@ body.si-banner-on { padding-top: 52px; }
       } catch(e) {}
     }, 100);
 
-    if (window._speak) window._speak.say('Ball Pounds. Get ready, focus up!', {lang:'en-US'});
+    // Coach vocal BT — format {fr,en} : utilise voix FR si dispo, sinon EN
+    if (window._speak) window._speak.say({fr:'Ball Pounds. Prêt ? Concentre-toi !', en:'Ball Pounds. Get ready, focus up!'});
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -43409,13 +43416,13 @@ body.si-banner-on { padding-top: 52px; }
       if (_bt_reps % 5 === 0 && _bt_reps < _bt_target) {
         window._speak.say(String(_bt_reps), {lang:'en-US'});
       } else if (_bt_reps >= _bt_target - 2 && _bt_reps < _bt_target) {
-        window._speak.say(String(_bt_target - _bt_reps) + ' to go!', {lang:'en-US'});
+        window._speak.say({fr:'Plus que ' + String(_bt_target - _bt_reps) + ' !', en:String(_bt_target - _bt_reps) + ' to go!'});
       }
     }
 
     // Objectif atteint
     if (_bt_reps >= _bt_target) {
-      if (window._speak) window._speak.say('Great work, target reached!', {lang:'en-US'});
+      if (window._speak) window._speak.say({fr:'Excellent, objectif atteint !', en:'Great work, target reached!'});
       setTimeout(function(){
         if (typeof senseiCamStop === 'function') senseiCamStop();
       }, 1500);
@@ -43478,6 +43485,8 @@ body.si-banner-on { padding-top: 52px; }
   // Résumé enrichi avec stats symétrie gauche/droite
   // ═══════════════════════════════════════════════════════════
   function _bt_showSummary(duration) {
+    var en = (window._lang === 'en');
+    var L = function(fr, en_){ return en ? en_ : fr; };
     var reached = _bt_reps >= _bt_target;
     var mm = Math.floor(duration / 60);
     var ss = Math.floor(duration % 60);
@@ -43492,8 +43501,8 @@ body.si-banner-on { padding-top: 52px; }
       var minSide = Math.min(_bt_repsLeft, _bt_repsRight);
       var maxSide = Math.max(_bt_repsLeft, _bt_repsRight);
       symmetry = maxSide > 0 ? Math.round((minSide / maxSide) * 100) : 0;
-      if (_bt_repsLeft === _bt_repsRight) dominant = 'Balanced';
-      else dominant = _bt_repsLeft > _bt_repsRight ? 'Left' : 'Right';
+      if (_bt_repsLeft === _bt_repsRight) dominant = L('Équilibré', 'Balanced');
+      else dominant = _bt_repsLeft > _bt_repsRight ? L('Gauche', 'Left') : L('Droite', 'Right');
     }
     var symColor = symmetry >= 85 ? '#22c55e' : symmetry >= 65 ? '#f5c518' : '#e63946';
 
@@ -43505,46 +43514,46 @@ body.si-banner-on { padding-top: 52px; }
       // Header
       '<div style="text-align:center;margin-bottom:20px">' +
       '<div style="font-size:56px;margin-bottom:8px">' + (reached ? '🏆' : '💪') + '</div>' +
-      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:2px;color:' + (reached ? '#22c55e' : '#f5c518') + ';line-height:1">' + (reached ? 'TARGET REACHED!' : 'SESSION COMPLETE') + '</div>' +
+      '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:28px;letter-spacing:2px;color:' + (reached ? '#22c55e' : '#f5c518') + ';line-height:1">' + (reached ? L('OBJECTIF ATTEINT !', 'TARGET REACHED!') : L('SESSION TERMINÉE', 'SESSION COMPLETE')) + '</div>' +
       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;letter-spacing:1.5px;color:#9aa3bf;margin-top:6px;text-transform:uppercase">🏀 BALL POUNDS</div>' +
       '</div>' +
       // Stats principales
       '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:14px">' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">' +
-      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#f5c518;line-height:1">' + _bt_reps + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Reps</div></div>' +
-      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#22c55e;line-height:1">' + durStr + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Time</div></div>' +
+      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#f5c518;line-height:1">' + _bt_reps + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">' + L('Reps', 'Reps') + '</div></div>' +
+      '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#22c55e;line-height:1">' + durStr + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">' + L('Temps', 'Time') + '</div></div>' +
       '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#a97fff;line-height:1">' + rpm + '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Reps/min</div></div>' +
       '</div>' +
       '</div>' +
       // Stats symétrie (NOUVEAU)
       '<div style="background:linear-gradient(160deg,rgba(245,197,24,0.08),rgba(245,197,24,0.02));border:1px solid rgba(245,197,24,0.3);border-radius:14px;padding:18px;margin-bottom:20px">' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;text-align:center;margin-bottom:14px;font-weight:700">⚖️ HAND SYMMETRY</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c518;text-align:center;margin-bottom:14px;font-weight:700">⚖️ ' + L('SYMÉTRIE DES MAINS', 'HAND SYMMETRY') + '</div>' +
       // Barre visuelle L / R
       '<div style="display:flex;height:40px;border-radius:8px;overflow:hidden;margin-bottom:12px;background:rgba(0,0,0,0.3)">' +
       (totalReps > 0
         ? '<div style="flex:' + _bt_repsLeft + ';background:linear-gradient(90deg,#3b82f6,#60a5fa);display:flex;align-items:center;justify-content:center;color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px">L · ' + _bt_repsLeft + '</div>' +
           '<div style="flex:' + _bt_repsRight + ';background:linear-gradient(90deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1px">R · ' + _bt_repsRight + '</div>'
-        : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#666;font-family:\'Barlow Condensed\',sans-serif;font-size:12px">No data</div>'
+        : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#666;font-family:\'Barlow Condensed\',sans-serif;font-size:12px">' + L('Aucune donnée', 'No data') + '</div>'
       ) +
       '</div>' +
       // Symétrie score + dominante
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
       '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:' + symColor + ';line-height:1">' + symmetry + '%</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Symmetry Score</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">' + L('Score symétrie', 'Symmetry Score') + '</div>' +
       '</div>' +
       '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px">' +
       '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;color:#fff;line-height:1">' + dominant + '</div>' +
-      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">Dominant Hand</div>' +
+      '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;color:#9aa3bf;letter-spacing:1px;text-transform:uppercase;margin-top:4px">' + L('Main dominante', 'Dominant Hand') + '</div>' +
       '</div>' +
       '</div>' +
       '</div>' +
       // Actions
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">' +
-      '<button onclick="_bt_closeSummary();_bt_open()" style="background:rgba(245,197,24,0.15);border:1.5px solid rgba(245,197,24,0.5);color:#f5c518;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">🔁 NEW SET</button>' +
-      '<button onclick="_bt_closeSummary()" style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.15);color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">✕ CLOSE</button>' +
+      '<button onclick="_bt_closeSummary();_bt_open()" style="background:rgba(245,197,24,0.15);border:1.5px solid rgba(245,197,24,0.5);color:#f5c518;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">🔁 ' + L('NOUVELLE SÉRIE', 'NEW SET') + '</button>' +
+      '<button onclick="_bt_closeSummary()" style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.15);color:#fff;font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:2px;padding:14px;border-radius:10px;cursor:pointer">✕ ' + L('FERMER', 'CLOSE') + '</button>' +
       '</div>' +
-      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase">Powered by MoveNet · 100% local · No data sent</div>' +
+      '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase">' + L('Propulsé par MoveNet · 100% local · Aucune donnée envoyée', 'Powered by MoveNet · 100% local · No data sent') + '</div>' +
       '</div>';
 
     overlay.innerHTML = html;
@@ -43620,7 +43629,7 @@ body.si-banner-on { padding-top: 52px; }
       _bt_recActive = true;
       _bt_updateRecBtnUI();
       if (window._haptic) window._haptic.success();
-      if (window._speak) window._speak.say('Recording started.', {lang:'en-US'});
+      if (window._speak) window._speak.say({fr:'Enregistrement démarré.', en:'Recording started.'});
       _bt_recTimer = setInterval(function() {
         _bt_recSec++;
         var remaining = _bt_REC_LIMIT - _bt_recSec;
@@ -43680,7 +43689,7 @@ body.si-banner-on { padding-top: 52px; }
       a.href = url; a.download = filename;
       document.body.appendChild(a); a.click();
       setTimeout(function(){ if (a.parentNode) document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-      if (window._speak) window._speak.say('Recording saved. Check your gallery!', {lang:'en-US'});
+      if (window._speak) window._speak.say({fr:'Enregistrement sauvegardé. Vérifie ta galerie !', en:'Recording saved. Check your gallery!'});
     } catch(e){}
   }
 
@@ -43730,21 +43739,41 @@ body.si-banner-on { padding-top: 52px; }
   var _shots = [];                 // {x, y} en % pour SS
   var _playerPos = null;           // {x, y} en % pour SS
 
-  // Micro-consignes par mode
-  var TIPS_BT = [
+  // Micro-consignes par mode et par langue
+  var TIPS_BT_FR = [
     {name:'📌 Astuce dribble', text:'Reste sur la pointe des pieds'},
     {name:'📌 Regard', text:'Regarde devant, pas ta main'},
     {name:'📌 Protection', text:'Ballon bas, coudes près du corps'},
     {name:'📌 Respiration', text:'Souffle régulier, ne bloque pas'},
     {name:'📌 Explosivité', text:'Impulsion sèche à chaque contact'}
   ];
-  var TIPS_SS = [
+  var TIPS_BT_EN = [
+    {name:'📌 Dribble tip', text:'Stay on the balls of your feet'},
+    {name:'📌 Eyes', text:'Look ahead, not at your hand'},
+    {name:'📌 Protection', text:'Keep the ball low, elbows tight'},
+    {name:'📌 Breathing', text:'Steady breath, never hold it'},
+    {name:'📌 Explosiveness', text:'Sharp impulse on every contact'}
+  ];
+  var TIPS_SS_FR = [
     {name:'📌 Rappel technique', text:'Pose bien tes pieds avant de monter au tir'},
     {name:'📌 Alignement', text:'Épaule · coude · poignet alignés vers le cercle'},
     {name:'📌 Follow-through', text:'Poignet cassé, doigts vers le cercle'},
     {name:'📌 Regard', text:'Fixe l\u2019arri\u00e8re du cercle avant la mont\u00e9e'},
     {name:'📌 Impulsion', text:'Genoux fl\u00e9chis puis extension compl\u00e8te'}
   ];
+  var TIPS_SS_EN = [
+    {name:'📌 Technical tip', text:'Set your feet before rising into the shot'},
+    {name:'📌 Alignment', text:'Shoulder · elbow · wrist aligned to the rim'},
+    {name:'📌 Follow-through', text:'Snap your wrist, fingers toward the rim'},
+    {name:'📌 Eyes', text:'Focus on the back of the rim before rising'},
+    {name:'📌 Impulse', text:'Bend your knees then full extension'}
+  ];
+  function _getTips(mode) {
+    var en = (window._lang === 'en');
+    if (mode === 'ss') return en ? TIPS_SS_EN : TIPS_SS_FR;
+    return en ? TIPS_BT_EN : TIPS_BT_FR;
+  }
+  function _lbl(fr, en) { return (window._lang === 'en') ? en : fr; }
 
   // ─── Injection CSS (une seule fois) ───
   function _injectCSS() {
@@ -43768,10 +43797,10 @@ body.si-banner-on { padding-top: 52px; }
       '.sf-score-combo.sf-on{opacity:1}',
       '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
       /* Tip top-right sous score */
-      '.sf-ol-tip{top:150px;right:14px;max-width:min(260px,45vw);background:rgba(0,0,0,0.72);',
-      'border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:9px 12px;text-align:right;',
-      'animation:sfTipFade 6s ease-in-out infinite}',
-      '@keyframes sfTipFade{0%,100%{opacity:0.4}20%,80%{opacity:1}}',
+      '.sf-ol-tip{top:150px;right:14px;max-width:min(280px,48vw);background:rgba(0,0,0,0.88);',
+      'border:1.5px solid rgba(245,197,24,0.35);border-radius:10px;padding:10px 14px;text-align:right;',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 0.4s}',
+      '.sf-ol-tip.sf-changing{opacity:0}',
       '.sf-tip-name{font-size:clamp(9px,1.2vw,11px);color:#f5c518;letter-spacing:1.5px;',
       'text-transform:uppercase;font-weight:600}',
       '.sf-tip-text{font-size:clamp(12px,1.8vw,16px);color:rgba(255,255,255,0.98);',
@@ -43846,14 +43875,20 @@ body.si-banner-on { padding-top: 52px; }
 
   function _rotateTip() {
     if (!_root) return;
+    var elTip = _root.querySelector('.sf-ol-tip');
     var elName = _root.querySelector('.sf-tip-name');
     var elText = _root.querySelector('.sf-tip-text');
     if (!elName || !elText) return;
-    var tips = (_mode === 'ss') ? TIPS_SS : TIPS_BT;
+    var tips = _getTips(_mode);
     _tipsIdx = (_tipsIdx + 1) % tips.length;
     var tip = tips[_tipsIdx];
-    elName.textContent = tip.name;
-    elText.textContent = tip.text;
+    // Fade transition (400ms out → change texte → fade in)
+    if (elTip) elTip.classList.add('sf-changing');
+    setTimeout(function(){
+      elName.textContent = tip.name;
+      elText.textContent = tip.text;
+      if (elTip) elTip.classList.remove('sf-changing');
+    }, 400);
   }
 
   // ─── API publique ───
@@ -43877,13 +43912,13 @@ body.si-banner-on { padding-top: 52px; }
       scoreGroup.className = 'sf-ol sf-ol-score';
       scoreGroup.innerHTML = ''
         + '<div class="sf-score-pts">0</div>'
-        + '<div class="sf-score-lbl">Points</div>'
+        + '<div class="sf-score-lbl">' + _lbl('Points', 'Points') + '</div>'
         + '<div class="sf-score-combo">\u00d71</div>';
       container.appendChild(scoreGroup);
       // Tip
       var tipEl = document.createElement('div');
       tipEl.className = 'sf-ol sf-ol-tip';
-      var tips = (_mode === 'ss') ? TIPS_SS : TIPS_BT;
+      var tips = _getTips(_mode);
       var t0 = tips[0];
       tipEl.innerHTML = ''
         + '<div class="sf-tip-name">' + t0.name + '</div>'
@@ -43896,7 +43931,7 @@ body.si-banner-on { padding-top: 52px; }
         cntEl.innerHTML = ''
           + (options.showChrono ? '<div class="sf-counter-chrono">00:00</div>' : '')
           + '<div class="sf-counter-big">0 / ' + (options.target || 0) + '</div>'
-          + '<div class="sf-counter-lbl">' + (options.counterLabel || 'Reps') + '</div>';
+          + '<div class="sf-counter-lbl">' + (options.counterLabel || _lbl('Reps', 'Reps')) + '</div>';
         container.appendChild(cntEl);
       }
       // Rotation micro-consignes toutes les 8s
