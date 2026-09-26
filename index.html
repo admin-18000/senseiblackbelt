@@ -1800,7 +1800,7 @@ body.unlocked .sensei-only{display:revert !important}
     <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px">
       <div style="font-family:var(--font-cond);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px" data-i18n="belts_intro_video_label">🎥 Introduction — Le Système Ceintures</div>
       <div id="belts_intro_video_wrap" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000;cursor:pointer" onclick="_beltsIntroPlay()">
-        <img id="belts_intro_thumb" src="https://img.youtube.com/vi/VDJW6TqZXvs/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg'" alt="Introduction Ceintures" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" loading="lazy">
+        <img id="belts_intro_thumb" src="https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg'" alt="Introduction Ceintures" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" loading="lazy">
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55))">
           <div style="width:72px;height:72px;border-radius:50%;background:rgba(245,197,24,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.6);transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
             <div style="width:0;height:0;border-left:22px solid #0a0d18;border-top:14px solid transparent;border-bottom:14px solid transparent;margin-left:6px"></div>
@@ -7452,7 +7452,7 @@ function stopActive() {
 function makeThumb(v, ratio) {
   return `
     <div class="card-thumb" style="position:relative;padding-bottom:${ratio};height:0;background:#000;overflow:hidden">
-      <img src="https://img.youtube.com/vi/${v.id}/maxresdefault.jpg"
+      <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg"
            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none"
            loading="lazy" alt="${v.title}"
            data-yt-id="${v.id}" data-fb="0"
@@ -7482,13 +7482,18 @@ window._ytThumbFallback = function(img) {
   img.src = 'https://img.youtube.com/vi/' + id + '/' + sizes[step-1] + '.jpg';
 };
 
-// Vérifie après chargement si l'image est une "fausse" thumbnail YouTube 120×90
+// Vérifie après chargement si la thumbnail est vraiment disponible.
+// YouTube renvoie plusieurs formats génériques quand la thumbnail demandée n'existe pas :
+// - 120×90 : image "vidéo non disponible" classique
+// - Pour maxresdefault absent : retourne parfois hqdefault 480×360 en fallback silencieux (pas erreur)
+// - Pour les shorts sans HD, retourne une image dégradée
 window._ytThumbCheck = function(img) {
   if (!img || !img.naturalWidth) return;
-  // YouTube renvoie 120×90 quand la thumbnail n'existe pas vraiment
-  if (img.naturalWidth === 120 && img.naturalHeight === 90) {
-    _ytThumbFallback(img);
-  }
+  var w = img.naturalWidth, h = img.naturalHeight;
+  // 120×90 = image générique "vidéo non disponible" → fallback (mqdefault puis default)
+  if (w === 120 && h === 90) { _ytThumbFallback(img); return; }
+  // Autres tailles très petites (thumbnails cassées)
+  if (w < 100 || h < 60) { _ytThumbFallback(img); return; }
 };
 
 // Placeholder maison quand toutes les tailles YouTube échouent
@@ -7646,7 +7651,7 @@ function _bhCarousel_build() {
     var thumbWrap = document.createElement('div');
     thumbWrap.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;background:#000;overflow:hidden';
     thumbWrap.innerHTML =
-      '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
         'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none" ' +
         'loading="lazy" alt="" ' +
         'data-yt-id="' + v.id + '" data-fb="0" ' +
@@ -7763,7 +7768,7 @@ function _bhCarousel_build() {
     t.style.cssText = 'position:relative;border-radius:7px;overflow:hidden;cursor:pointer;' +
       'aspect-ratio:16/9;background:#000;border:1px solid #1e2535;transition:all .2s';
     t.innerHTML =
-      '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
         'style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none" ' +
         'loading="lazy" alt="" ' +
         'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'">' +
@@ -7879,10 +7884,62 @@ function makeCard(v) {
   card.onmouseleave = () => { if (!isMobile()) card.style.borderColor = 'var(--border)'; };
   card.innerHTML = makeThumb(v, ratio);
   card.onclick = () => {
-    if (!isMobile()) { openVideoModal(v.id, v.title, v.vertical); return; }
-    launchPlayer(card, v);
+    // 🎬 Pattern BUDO/BELTS : player inline au-dessus de la grille (mobile ET desktop)
+    _sectionInlinePlayer(card, v);
   };
   return card;
+}
+
+// 🎬 PLAYER INLINE — Pattern BUDO/BELTS appliqué à toutes les grandes rubriques
+// Affiche la vidéo dans un player fixe en HAUT de la grille de la section,
+// plutôt que dans une modal ou remplacer la card
+function _sectionInlinePlayer(cardEl, v) {
+  // Remonter jusqu'au container .vid-section-grid (le grid parent de la section)
+  var section = cardEl && cardEl.closest ? cardEl.closest('.vid-section-grid') : null;
+  if (!section) {
+    // Fallback safe : si on ne trouve pas le container, ouvrir la modal comme avant
+    if (typeof openVideoModal === 'function') openVideoModal(v.id, v.title, v.vertical);
+    return;
+  }
+  // Créer le player s'il n'existe pas déjà
+  var playerId = section.id + '-inline-player';
+  var frameId  = section.id + '-inline-frame';
+  var titleId  = section.id + '-inline-title';
+  var player = document.getElementById(playerId);
+  if (!player) {
+    player = document.createElement('div');
+    player.id = playerId;
+    // Style adapté : vertical (short) ou horizontal
+    var isVert = !!v.vertical;
+    var pb   = isVert ? '177.77%' : '56.25%';
+    var maxW = isVert ? '420px'  : '900px';
+    player.style.cssText = 'position:relative;padding-bottom:'+pb+';max-width:'+maxW+
+      ';margin:0 auto 24px;height:0;overflow:hidden;border-radius:14px;background:#000;'+
+      'box-shadow:0 8px 28px rgba(245,197,24,.2);grid-column:1/-1';
+    player.innerHTML = ''
+      + '<iframe id="'+frameId+'" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" '
+      + 'allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>'
+      + '<div id="'+titleId+'" style="position:absolute;bottom:8px;left:12px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;'
+      + 'font-size:14px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none;z-index:2">'
+      + '</div>';
+    // Insérer au TOUT DÉBUT de la section (au-dessus des cards)
+    section.insertBefore(player, section.firstChild);
+  } else {
+    // Player existant : ajuster ratio/taille selon le nouveau v.vertical
+    var isVert2 = !!v.vertical;
+    var pb2   = isVert2 ? '177.77%' : '56.25%';
+    var maxW2 = isVert2 ? '420px'  : '900px';
+    player.style.paddingBottom = pb2;
+    player.style.maxWidth = maxW2;
+  }
+  // Charger la vidéo avec autoplay
+  var fr = document.getElementById(frameId);
+  var tt = document.getElementById(titleId);
+  if (fr) fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1&autoplay=1&playsinline=1&iv_load_policy=3';
+  if (tt) tt.textContent = v.title || '';
+  // Scroll vers le player + haptic
+  try { player.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e) {}
+  if (window._haptic) { try { window._haptic.tap(); } catch(e) {} }
 }
 
 
@@ -8183,7 +8240,7 @@ function _budo_renderVids() {
   el.innerHTML = _budo_VIDS.map(function(v, i) {
     var sel = _budo_selVid === i;
     return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_selectVid(' + i + ')">' +
-      '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
       'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'" ' +
       'loading="lazy" alt="' + v.title + '">' +
       '<div class="vid-thumb-title">' + v.title + '</div></div>';
@@ -8209,7 +8266,7 @@ function _budo_page_renderVids() {
   el.innerHTML = _budo_VIDS.map(function(v, i) {
     var sel = _budo_selVid === i;
     return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_page_selectVid(' + i + ')">' +
-      '<img src="https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg" ' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
       'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'" ' +
       'loading="lazy" alt="' + v.title + '">' +
       '<div class="vid-thumb-title">' + v.title + '</div></div>';
@@ -8731,14 +8788,14 @@ window.addEventListener('load', () => {
       item.els.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) {
-          el.src = 'https://img.youtube.com/vi/' + item.vid.id + '/maxresdefault.jpg';
+          el.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg';
           el.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg'; };
         }
       });
       if (item.mob) {
         var mob = document.querySelector('.thumb-mobile-' + item.mob);
         if (mob) {
-          mob.src = 'https://img.youtube.com/vi/' + item.vid.id + '/maxresdefault.jpg';
+          mob.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg';
           mob.onerror = function(){ this.src = 'https://img.youtube.com/vi/' + item.vid.id + '/hqdefault.jpg'; };
         }
       }
@@ -16104,7 +16161,7 @@ function openPuzzleModal() {
       const ti=new Image(); ti.crossOrigin='anonymous';
       ti.onload=()=>{ _puzzleThumbImgs[id]=ti; puzzleRender(); };
       ti.onerror=()=>{};
-      ti.src='https://img.youtube.com/vi/'+id+'/maxresdefault.jpg';
+      ti.src='https://img.youtube.com/vi/'+id+'/hqdefault.jpg';
     }
   });
   document.getElementById('puzzle-modal').style.display='block';
@@ -24441,7 +24498,7 @@ function _td2_renderVids() {
   el.innerHTML = _td2_VIDEOS.map(function(v,i) {
     var sel = _td2_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td2_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -24468,7 +24525,7 @@ function _td_renderVids() {
   el.innerHTML = _td_VIDEOS.map(function(v,i) {
     var sel = _td_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -24718,7 +24775,7 @@ function _tsc_renderVids() {
   el.innerHTML = _tsc_VIDEOS.map(function(v,i){
     var sel = _tsc_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tsc_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -24908,7 +24965,7 @@ function _tag_renderVids() {
   el.innerHTML=_tag_VIDEOS.map(function(v,i){
     var sel=_tag_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tag_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -25166,7 +25223,7 @@ function _tsc_renderScVids() {
   el.innerHTML=_tsc_SC_VIDS.map(function(v,i){
     var sel=_tsc_scSelVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tsc_scSelectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -25302,7 +25359,7 @@ function _tch_renderVids() {
   el.innerHTML=_tch_VIDEOS.map(function(v,i){
     var sel=_tch_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tch_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -29417,7 +29474,7 @@ function _dcog_renderVids() {
   el.innerHTML = _dcog_VIDEOS.map(function(v,i) {
     var sel = _dcog_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_dcog_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/maxresdefault.jpg" onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
