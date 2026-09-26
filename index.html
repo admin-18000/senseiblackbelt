@@ -7891,46 +7891,41 @@ function makeCard(v) {
 }
 
 // 🎬 PLAYER INLINE — Pattern BUDO/BELTS appliqué à toutes les grandes rubriques
-// Affiche la vidéo dans un player fixe en HAUT de la grille de la section,
-// plutôt que dans une modal ou remplacer la card
+// Affiche la vidéo dans un player fixe JUSTE AU-DESSUS de la grille de la section
 function _sectionInlinePlayer(cardEl, v) {
-  // Remonter jusqu'au container .vid-section-grid (le grid parent de la section)
-  var section = cardEl && cardEl.closest ? cardEl.closest('.vid-section-grid') : null;
-  if (!section) {
-    // Fallback safe : si on ne trouve pas le container, ouvrir la modal comme avant
+  // Trouver le grid parent (.vid-section-grid), puis on insère AVANT (pas DEDANS)
+  var grid = cardEl && cardEl.closest ? cardEl.closest('.vid-section-grid') : null;
+  if (!grid || !grid.parentNode) {
+    // Fallback safe : ouvrir la modal comme avant
     if (typeof openVideoModal === 'function') openVideoModal(v.id, v.title, v.vertical);
     return;
   }
-  // Créer le player s'il n'existe pas déjà
-  var playerId = section.id + '-inline-player';
-  var frameId  = section.id + '-inline-frame';
-  var titleId  = section.id + '-inline-title';
+  var playerId = grid.id + '-inline-player';
+  var frameId  = grid.id + '-inline-frame';
+  var titleId  = grid.id + '-inline-title';
+  var isVert = !!v.vertical;
+  var pb   = isVert ? '177.77%' : '56.25%';
+  var maxW = isVert ? '420px'  : '900px';
+
   var player = document.getElementById(playerId);
   if (!player) {
+    // Créer un wrapper display:block (hors grid CSS)
     player = document.createElement('div');
     player.id = playerId;
-    // Style adapté : vertical (short) ou horizontal
-    var isVert = !!v.vertical;
-    var pb   = isVert ? '177.77%' : '56.25%';
-    var maxW = isVert ? '420px'  : '900px';
-    player.style.cssText = 'position:relative;padding-bottom:'+pb+';max-width:'+maxW+
-      ';margin:0 auto 24px;height:0;overflow:hidden;border-radius:14px;background:#000;'+
-      'box-shadow:0 8px 28px rgba(245,197,24,.2);grid-column:1/-1';
+    player.style.cssText = 'display:block;position:relative;padding-bottom:'+pb+
+      ';max-width:'+maxW+';width:100%;margin:0 auto 24px;height:0;overflow:hidden;'+
+      'border-radius:14px;background:#000;box-shadow:0 8px 28px rgba(245,197,24,.2)';
     player.innerHTML = ''
       + '<iframe id="'+frameId+'" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" '
       + 'allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>'
-      + '<div id="'+titleId+'" style="position:absolute;bottom:8px;left:12px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;'
-      + 'font-size:14px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none;z-index:2">'
-      + '</div>';
-    // Insérer au TOUT DÉBUT de la section (au-dessus des cards)
-    section.insertBefore(player, section.firstChild);
+      + '<div id="'+titleId+'" style="position:absolute;bottom:8px;left:12px;right:12px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;'
+      + 'font-size:14px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none;z-index:2"></div>';
+    // Insérer JUSTE AVANT le grid, dans le parent (pas dans le grid !)
+    grid.parentNode.insertBefore(player, grid);
   } else {
-    // Player existant : ajuster ratio/taille selon le nouveau v.vertical
-    var isVert2 = !!v.vertical;
-    var pb2   = isVert2 ? '177.77%' : '56.25%';
-    var maxW2 = isVert2 ? '420px'  : '900px';
-    player.style.paddingBottom = pb2;
-    player.style.maxWidth = maxW2;
+    // Player existant : ajuster ratio/taille
+    player.style.paddingBottom = pb;
+    player.style.maxWidth = maxW;
   }
   // Charger la vidéo avec autoplay
   var fr = document.getElementById(frameId);
@@ -7938,7 +7933,7 @@ function _sectionInlinePlayer(cardEl, v) {
   if (fr) fr.src = 'https://www.youtube.com/embed/'+v.id+'?rel=0&modestbranding=1&autoplay=1&playsinline=1&iv_load_policy=3';
   if (tt) tt.textContent = v.title || '';
   // Scroll vers le player + haptic
-  try { player.scrollIntoView({behavior:'smooth', block:'start'}); } catch(e) {}
+  try { player.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e) {}
   if (window._haptic) { try { window._haptic.tap(); } catch(e) {} }
 }
 
