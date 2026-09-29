@@ -38952,6 +38952,7 @@ window._QI_DATA['pnr_05'] = {
         if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
         if (typeof _dojoUpdateLockUI === 'function') _dojoUpdateLockUI();
         if (typeof _dojoUpdateFabUI === 'function') _dojoUpdateFabUI();
+        if (typeof _dojoTilesGuard_updateVisual === 'function') _dojoTilesGuard_updateVisual();
       }, 400);
     }
     if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
@@ -39071,6 +39072,91 @@ window._QI_DATA['pnr_05'] = {
     setTimeout(_dojoUpdateFabUI, 150);
   });
 
+  // ═══ GUARD TUILES DOJO INTERACTIVE DRILLS ═══════════════════════════════
+  // En mode freemium, seules 4 tuiles restent accessibles :
+  //   • QI BASKET (_qi_open)  • TON ENTRAÎNEMENT (_fiche_open)
+  //   • PLAYBOOK (_playbook_open)  • BIBLIOTHÈQUE (_biblio_open)
+  // Toutes les autres tuiles → modal cadenas premium
+  var DOJO_TILES_FREE_HANDLERS = ['_qi_open', '_fiche_open', '_playbook_open', '_biblio_open'];
+
+  function _dojoTileIsFree(onclickAttr) {
+    if (!onclickAttr) return false;
+    for (var i = 0; i < DOJO_TILES_FREE_HANDLERS.length; i++) {
+      if (onclickAttr.indexOf(DOJO_TILES_FREE_HANDLERS[i]) !== -1) return true;
+    }
+    return false;
+  }
+
+  window._dojoTilesGuard_setup = function() {
+    var grid = document.getElementById('dojo-tiles-grid');
+    if (!grid) return;
+    var tiles = grid.querySelectorAll('button[onclick]');
+    for (var i = 0; i < tiles.length; i++) {
+      var t = tiles[i];
+      if (t._dojoTileGuarded) continue;
+      t._dojoTileGuarded = true;
+      var oc = t.getAttribute('onclick') || '';
+      var isFree = _dojoTileIsFree(oc);
+      // Retirer l'onclick inline pour reprendre le contrôle
+      t.removeAttribute('onclick');
+      // Stocker en dataset pour rejouer plus tard
+      t.setAttribute('data-dojo-original-onclick', oc);
+      t.setAttribute('data-dojo-tile-free', isFree ? '1' : '0');
+      // Ajouter un listener guardé
+      t.addEventListener('click', function(e) {
+        var unlocked = false;
+        try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(ex){}
+        var free = this.getAttribute('data-dojo-tile-free') === '1';
+        if (!unlocked && !free) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof _dojoLock_show === 'function') _dojoLock_show();
+          return;
+        }
+        // OK, jouer l'onclick original
+        var orig = this.getAttribute('data-dojo-original-onclick') || '';
+        if (orig) {
+          try { new Function(orig).call(this); } catch(ex) { console.warn('[dojoTile] onclick err:', ex); }
+        }
+      });
+    }
+    // Mettre à jour l'affichage visuel (cadenas)
+    _dojoTilesGuard_updateVisual();
+  };
+
+  // Ajoute/retire un badge 🔒 visuel sur les tuiles verrouillées selon le mode
+  window._dojoTilesGuard_updateVisual = function() {
+    var grid = document.getElementById('dojo-tiles-grid');
+    if (!grid) return;
+    var unlocked = false;
+    try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(ex){}
+    var tiles = grid.querySelectorAll('button[data-dojo-tile-free]');
+    for (var i = 0; i < tiles.length; i++) {
+      var t = tiles[i];
+      var free = t.getAttribute('data-dojo-tile-free') === '1';
+      var shouldLock = !unlocked && !free;
+      // Nettoyer un ancien overlay
+      var existing = t.querySelector('.dojo-tile-lock-overlay');
+      if (existing) existing.remove();
+      // Retirer opacity si pas verrouillé
+      t.style.filter = shouldLock ? 'grayscale(.55) brightness(.75)' : '';
+      if (shouldLock) {
+        var ov = document.createElement('div');
+        ov.className = 'dojo-tile-lock-overlay';
+        ov.style.cssText = 'position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#f5c518,#ffdb4d);color:#0a0d18;font-size:11px;font-weight:900;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:\'Inter\',sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.5);pointer-events:none;z-index:2';
+        ov.textContent = '🔒 PREMIUM';
+        // S'assurer que le parent a position:relative (déjà le cas pour les tuiles avec badge NEW)
+        if (getComputedStyle(t).position === 'static') t.style.position = 'relative';
+        t.appendChild(ov);
+      }
+    }
+  };
+
+  // Init au DOMContentLoaded + re-appliquer après changements de mode
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(_dojoTilesGuard_setup, 150);
+  });
+
   window._dojoGate_check = function() {
     var input = document.getElementById('dojo-gate-input');
     var err   = document.getElementById('dojo-gate-error');
@@ -39102,6 +39188,7 @@ window._QI_DATA['pnr_05'] = {
             if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
             if (typeof _dojoUpdateLockUI === 'function') _dojoUpdateLockUI();
             if (typeof _dojoUpdateFabUI === 'function') _dojoUpdateFabUI();
+            if (typeof _dojoTilesGuard_updateVisual === 'function') _dojoTilesGuard_updateVisual();
           }, 400);
         }
       } else {
