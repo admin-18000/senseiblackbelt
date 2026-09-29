@@ -1876,7 +1876,7 @@ body.unlocked .sensei-only{display:revert !important}
 
       <!-- Player vertical shorts -->
       <div id="belts_budo_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:360px;margin:0 auto 20px;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 6px 24px rgba(245,197,24,.15)">
-        <iframe id="belts_budo_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <iframe id="belts_budo_frame" src="" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
 
       <!-- Grille des thumbnails shorts -->
@@ -1902,7 +1902,7 @@ body.unlocked .sensei-only{display:revert !important}
 
     <!-- Player vertical shorts -->
     <div id="budo_page_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:420px;margin:0 auto 24px;height:0;overflow:hidden;border-radius:14px;background:#000;box-shadow:0 8px 28px rgba(245,197,24,.2)">
-      <iframe id="budo_page_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <iframe id="budo_page_frame" src="" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
     <!-- Grille des thumbnails shorts -->
@@ -7543,10 +7543,28 @@ function openVideoModal(id, title, vertical) {
     inner.style.maxWidth = Math.round(maxH * 9/16) + 'px';
     wrapper.style.height = maxH + 'px';
     wrapper.style.aspectRatio = '';
+    // 🎯 FIX SHORTS DESKTOP : agrandir iframe à 316% pour cropper les bandes noires YouTube
+    // YouTube desktop affiche les shorts dans un cadre 16:9 avec bandes noires haut/bas ;
+    // on force l'iframe à faire 316% de large pour que la vidéo verticale remplisse le cadre 9:16.
+    wrapper.style.position = 'relative';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '50%';
+    iframe.style.transform = 'translateX(-50%)';
+    iframe.style.width = '316.23%';
+    iframe.style.height = '100%';
   } else {
     inner.style.maxWidth = '900px';
     wrapper.style.height = '';
     wrapper.style.aspectRatio = '16/9';
+    // Reset : horizontal marche déjà bien avec 100%/100%
+    wrapper.style.position = '';
+    iframe.style.position = '';
+    iframe.style.top = '';
+    iframe.style.left = '';
+    iframe.style.transform = '';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
   }
   iframe.src = embedSrc(id);
   modal.style.display = 'flex';
@@ -7908,24 +7926,29 @@ function _sectionInlinePlayer(cardEl, v) {
   var maxW = isVert ? '420px'  : '900px';
 
   var player = document.getElementById(playerId);
+  // 🎯 Style iframe : si vertical → 316% width + centrage pour crop bandes noires YouTube desktop
+  //                   si horizontal → 100% simple (marche déjà)
+  var iframeStyle = isVert
+    ? 'position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0'
+    : 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
   if (!player) {
-    // Créer un wrapper display:block (hors grid CSS)
     player = document.createElement('div');
     player.id = playerId;
     player.style.cssText = 'display:block;position:relative;padding-bottom:'+pb+
       ';max-width:'+maxW+';width:100%;margin:0 auto 24px;height:0;overflow:hidden;'+
       'border-radius:14px;background:#000;box-shadow:0 8px 28px rgba(245,197,24,.2)';
     player.innerHTML = ''
-      + '<iframe id="'+frameId+'" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" '
-      + 'allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>'
+      + '<iframe id="'+frameId+'" src="" style="'+iframeStyle+'" '
+      + 'allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>'
       + '<div id="'+titleId+'" style="position:absolute;bottom:8px;left:12px;right:12px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;'
-      + 'font-size:14px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none;z-index:2"></div>';
-    // Insérer JUSTE AVANT le grid, dans le parent (pas dans le grid !)
+      + 'font-size:14px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none;z-index:3"></div>';
     grid.parentNode.insertBefore(player, grid);
   } else {
-    // Player existant : ajuster ratio/taille
+    // Player existant : ajuster ratio/taille + style iframe (peut basculer V↔H)
     player.style.paddingBottom = pb;
     player.style.maxWidth = maxW;
+    var oldIframe = document.getElementById(frameId);
+    if (oldIframe) oldIframe.setAttribute('style', iframeStyle);
   }
   // Charger la vidéo avec autoplay
   var fr = document.getElementById(frameId);
