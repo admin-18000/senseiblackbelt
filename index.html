@@ -785,6 +785,7 @@ body.unlocked .sensei-only{display:revert !important}
         <button class="nav-drop-item" onclick="showSection('nbapro',this)" data-i18n="nav_nbapro" style="color:var(--gold)">🏆 NBA Pro Drills</button>
         <button class="nav-drop-item" onclick="showSection('ballhandling',this)" data-i18n="nav_ballhandling">Ball Handling</button>
         <button class="nav-drop-item" onclick="showSection('shooting',this)" data-i18n="nav_shooting">Shooting</button>
+        <button class="nav-drop-item" onclick="showSection('finishing',this)" data-i18n="nav_finishing">Finishing</button>
         <button class="nav-drop-item" onclick="showSection('defense',this)" data-i18n="nav_defense">Defense</button>
         <button class="nav-drop-item" onclick="showSection('rebounding',this)" data-i18n="nav_rebounding">Rebounding</button>
         <button class="nav-drop-item" onclick="showSection('hec',this)" data-i18n="nav_hec">Hand-Eye</button>
@@ -852,6 +853,7 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('nbapro',null);closeMenu()" data-i18n="mob_nbapro">🏆 NBA Pro Drills</button>
   <button class="mm-btn" onclick="showSection('ballhandling',null);closeMenu()" data-i18n="mob_ballhandling">🏀 Ball Handling Drills</button>
   <button class="mm-btn" onclick="showSection('shooting',null);closeMenu()" data-i18n="mob_shooting">🎯 Shooting</button>
+  <button class="mm-btn" onclick="showSection('finishing',null);closeMenu()" data-i18n="mob_finishing">🎯 Finishing</button>
   <button class="mm-btn" onclick="showSection('defense',null);closeMenu()" data-i18n="mob_defense">🛡️ Defense</button>
   <button class="mm-btn" onclick="showSection('rebounding',null);closeMenu()" data-i18n="mob_rebounding">💪 Rebounding</button>
   <button class="mm-btn" onclick="showSection('hec',null);closeMenu()" data-i18n="mob_hec">👁️ Hand-Eye Coordination</button>
@@ -4525,6 +4527,8 @@ body.unlocked .sensei-only{display:revert !important}
 </div>
 <div id="s-shooting" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">🎯 <span data-i18n="sec_shoot_title_badge">Shooting</span></div>
     <div class="sec-title" data-i18n="sec_shoot_title">SHOOTING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_shoot_sub">Tirs · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-shooting"><div class="coming-soon"><div class="cs-icon">🏀</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_shoot">Les vidéos de shoot arrivent bientôt — Coach Sensei BlackBelt</div></div></div></div></div>
+<div id="s-finishing" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">🎯 <span data-i18n="sec_finish_title_badge">Finishing</span></div>
+    <div class="sec-title" data-i18n="sec_finish_title">FINISHING <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_finish_sub">Finir au cercle · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-finishing"></div></div></div>
 <div id="s-defense" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">🛡️ <span data-i18n="sec_def_title_badge">Defense</span></div>
     <div class="sec-title" data-i18n="sec_def_title">DEFENSE <span>DRILLS</span></div><div class="sec-sub" data-i18n="sec_def_sub">Défense · Coach Sensei BlackBelt</div><div class="sec-line"></div><div class="vid-section-grid" id="grid-defense"><div class="coming-soon"><div class="cs-icon">🛡️</div><div class="cs-title">COMING SOON</div><div class="cs-sub" data-i18n="cs_defense">Les vidéos de défense arrivent bientôt</div></div></div></div></div>
 <div id="s-rebounding" class="section"><div style="max-width:1100px;margin:0 auto"><div class="sec-badge" aria-hidden="true">💪 <span data-i18n="sec_reb_title_badge">Rebounding</span></div>
@@ -7389,6 +7393,18 @@ const SECTION_VIDEOS = {
     {id:'85CdNwMIjwo', title:'Shooting #11', vertical:true},
     {id:'rjnzEstVxqo', title:'Shooting #12', vertical:true},
   ],
+  finishing: [
+    {id:'s2Gs3GcfLAY', title:'Finishing #1', vertical:true},
+    {id:'JuqylTSDesU', title:'Finishing #2', vertical:true},
+    {id:'UDa2LJK68Ss', title:'Finishing #3', vertical:true},
+    {id:'YfEK9vxpe3Q', title:'Finishing #4', vertical:true},
+    {id:'4kbztUkHVok', title:'Finishing #5', vertical:true},
+    {id:'uIhB_-jIbTY', title:'Finishing #6', vertical:true},
+    {id:'KsMBdxzsv4s', title:'Finishing #7', vertical:true},
+    {id:'kV4dFA4QPCc', title:'Finishing #8', vertical:true},
+    {id:'DDzeWeS-ocw', title:'Finishing #9', vertical:true},
+    {id:'3gPrYncT_I0', title:'Finishing #10', vertical:true},
+  ],
   defense: [
     {id:'0ZXELMe3VIU', title:'Defense #1', vertical:true},
     {id:'xXYCtNwFRHs', title:'Defense #2', vertical:true},
@@ -8011,6 +8027,16 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
+    // 🥋 GUARD DOJO : si non déverrouillé dans cette session ET le hero a déjà été vu (localStorage),
+    // afficher l'écran DOJO au lieu des tuiles / de laisser l'app libre
+    var dojoUnlocked = false;
+    try { dojoUnlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
+    var heroSeen = false;
+    try { heroSeen = !!localStorage.getItem('sensei_hero_onboarding_seen_v'); } catch(e){}
+    if (!dojoUnlocked && heroSeen && typeof window._dojoGate_show === 'function') {
+      window._dojoGate_show();
+      return;
+    }
     var ONBOARDING_VERSION = '2026.08.08';
     // Test bypass : ?onboarding=1 dans l'URL force l'affichage
     var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
@@ -12212,7 +12238,7 @@ const LANG_DATA = {
 // ── NAVIGATION DESKTOP ──────────────────────────────────────────
 fr: {
   nav_home:'Home', nav_belts:'Belts', nav_ballhandling:'Ball Handling',
-  nav_shooting:'Shooting', nav_defense:'Defense', nav_rebounding:'Rebounding',
+  nav_shooting:'Shooting', nav_finishing:'Finishing', nav_defense:'Defense', nav_rebounding:'Rebounding',
   nav_hec:'Hand-Eye Coordination', nav_iq:'Basketball IQ',
   nav_sc:'Strength &amp; Conditioning', nav_tutorials:'Tutorials',
   nav_programs:'Programs', nav_data:'Data Science',
@@ -12225,7 +12251,7 @@ fr: {
 
   // ── NAVIGATION MOBILE ──
   mob_home:'🏠 Home', mob_belts:'🥋 Belts — Ceintures',
-  mob_ballhandling:'🏀 Ball Handling Drills', mob_shooting:'🎯 Shooting',
+  mob_ballhandling:'🏀 Ball Handling Drills', mob_shooting:'🎯 Shooting', mob_finishing:'🎯 Finishing',
   mob_defense:'🛡️ Defense', mob_rebounding:'💪 Rebounding',
   mob_hec:'👁️ Hand-Eye Coordination', mob_iq:'🧠 Basketball IQ',
   mob_sc:'🏋️ Strength & Conditioning', mob_tutorials:'🎓 Tutorials',
@@ -12245,7 +12271,7 @@ fr: {
   sec_bh_title:'BALL <span style="color:var(--gold)">HANDLING</span>',
   sec_bh_sub:'Drills · Coach Sensei BlackBelt',
   sec_shoot_title:'SHOOTING <span style="color:var(--gold)">DRILLS</span>',
-  sec_shoot_sub:'Tirs · Coach Sensei BlackBelt',
+  sec_shoot_sub:'Tirs · Coach Sensei BlackBelt', sec_finish_title_badge:'Finishing', sec_finish_title:'FINISHING <span style="color:var(--gold)">DRILLS</span>', sec_finish_sub:'Finir au cercle · Coach Sensei BlackBelt',
   sec_def_title:'DEFENSE <span style="color:var(--gold)">DRILLS</span>',
   sec_def_sub:'Défense · Coach Sensei BlackBelt',
   sec_reb_title:'REBOUNDING <span style="color:var(--gold)">DRILLS</span>',
@@ -12334,7 +12360,7 @@ fr: {
 en: {
   // ── NAV DESKTOP ──
   nav_home:'Home', nav_belts:'Belts', nav_ballhandling:'Ball Handling',
-  nav_shooting:'Shooting', nav_defense:'Defense', nav_rebounding:'Rebounding',
+  nav_shooting:'Shooting', nav_finishing:'Finishing', nav_defense:'Defense', nav_rebounding:'Rebounding',
   nav_hec:'Hand-Eye Coordination', nav_iq:'Basketball IQ',
   nav_sc:'Strength &amp; Conditioning', nav_tutorials:'Tutorials',
   nav_programs:'Programs', nav_data:'Data Science',
@@ -12347,7 +12373,7 @@ en: {
 
   // ── NAV MOBILE ──
   mob_home:'🏠 Home', mob_belts:'🥋 Belts',
-  mob_ballhandling:'🏀 Ball Handling Drills', mob_shooting:'🎯 Shooting',
+  mob_ballhandling:'🏀 Ball Handling Drills', mob_shooting:'🎯 Shooting', mob_finishing:'🎯 Finishing',
   mob_defense:'🛡️ Defense', mob_rebounding:'💪 Rebounding',
   mob_hec:'👁️ Hand-Eye Coordination', mob_iq:'🧠 Basketball IQ',
   mob_sc:'🏋️ Strength & Conditioning', mob_tutorials:'🎓 Tutorials',
@@ -12367,7 +12393,7 @@ en: {
   sec_bh_title:'BALL <span style="color:var(--gold)">HANDLING</span>',
   sec_bh_sub:'Drills · Coach Sensei BlackBelt',
   sec_shoot_title:'SHOOTING <span style="color:var(--gold)">DRILLS</span>',
-  sec_shoot_sub:'Shooting · Coach Sensei BlackBelt',
+  sec_shoot_sub:'Shooting · Coach Sensei BlackBelt', sec_finish_title_badge:'Finishing', sec_finish_title:'FINISHING <span style="color:var(--gold)">DRILLS</span>', sec_finish_sub:'Finish at the rim · Coach Sensei BlackBelt',
   sec_def_title:'DEFENSE <span style="color:var(--gold)">DRILLS</span>',
   sec_def_sub:'Defense · Coach Sensei BlackBelt',
   sec_reb_title:'REBOUNDING <span style="color:var(--gold)">DRILLS</span>',
@@ -12972,6 +12998,9 @@ function applyLangTracker(lang) {
     hero_ob_tag:"L'art martial du basketteur",
     hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
     hero_ob_btn:"D\u00c9COUVRIR \u2728",
+    dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
+    dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
+    dojo_gate_btn:"VALIDER",
     dojo_lbl_ai:"SENSEI IA",
     dojo_sub_ai:"G\u00e9n\u00e8re ta s\u00e9ance personnalis\u00e9e avec l'IA",
     dojo_lbl_fiche:"TON ENTRA\u00ceNEMENT",
@@ -13147,6 +13176,9 @@ function applyLangTracker(lang) {
     hero_ob_tag:"The basketball player's martial art",
     hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
     hero_ob_btn:"DISCOVER \u2728",
+    dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
+    dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
+    dojo_gate_btn:"UNLOCK",
     dojo_lbl_ai:"SENSEI AI",
     dojo_sub_ai:"Generate your personalized session with AI",
     dojo_lbl_fiche:"YOUR TRAINING",
@@ -38587,6 +38619,34 @@ window._QI_DATA['pnr_05'] = {
 @keyframes heroObSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 </style>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     DOJO GATE — Écran de mot de passe après hero-onboarding
+     Bloque l'accès à l'app tant que MDP correct pas saisi (sessionStorage)
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="dojo-gate" style="display:none;position:fixed;inset:0;z-index:100050;background:#000;overflow:hidden">
+  <!-- Vidéo en boucle en fond -->
+  <video id="dojo-gate-video" autoplay muted loop playsinline webkit-playsinline preload="auto"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1">
+    <source src="dojo-intro.mov" type="video/quicktime">
+    <source src="dojo-intro.mp4" type="video/mp4">
+  </video>
+  <!-- Overlay dark pour lisibilité -->
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.75) 50%,rgba(0,0,0,.92) 100%);z-index:2"></div>
+  <!-- Contenu MDP -->
+  <div style="position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 24px 8vh;text-align:center;box-sizing:border-box">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(22px,5.5vw,32px);letter-spacing:3px;color:#f5c518;text-shadow:0 2px 12px rgba(0,0,0,.9);margin-bottom:10px" data-i18n="dojo_gate_title">🥋 ENTRE LE MOT DE PASSE DU DŌJŌ</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:12px;color:#cfd3e0;letter-spacing:1.5px;margin-bottom:20px;max-width:340px;line-height:1.4;text-shadow:0 1px 6px rgba(0,0,0,.9)" data-i18n="dojo_gate_sub">Accès activé uniquement par le Sensei · En présentiel</div>
+    <input id="dojo-gate-input" type="password" inputmode="numeric" autocomplete="off" maxlength="20"
+           onkeydown="if(event.key==='Enter') _dojoGate_check()"
+           style="font-family:'Bebas Neue','Impact',sans-serif;font-size:24px;letter-spacing:8px;text-align:center;padding:14px 20px;width:min(280px,80vw);border:1.5px solid rgba(245,197,24,.5);border-radius:10px;background:rgba(0,0,0,.55);color:#fff;outline:none;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.5);-webkit-appearance:none">
+    <div id="dojo-gate-error" style="font-family:'Barlow',sans-serif;font-size:12px;color:#ff6b6b;letter-spacing:1px;height:16px;margin-bottom:16px;text-shadow:0 1px 4px rgba(0,0,0,.9);opacity:0;transition:opacity .2s"></div>
+    <button onclick="_dojoGate_check()"
+            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 44px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.35);transition:transform .15s"
+            onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
+            data-i18n="dojo_gate_btn">VALIDER</button>
+  </div>
+</div>
+
 <div id="hero-onboarding" aria-label="Bienvenue SENSEI">
   <video id="hero-onboarding-video" src="hero.mp4" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="dojo-bg.jpg" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
   <div class="ho-overlay">
@@ -38690,13 +38750,93 @@ window._QI_DATA['pnr_05'] = {
         el.classList.remove('on');
         el.style.animation = '';
         document.body.style.overflow = '';
-        // Puis afficher l'onboarding 7 tuiles s'il doit s'afficher
-        if (typeof showOnboardingIfNeeded === 'function') {
+        // 🥋 DOJO GATE : si non débloqué dans cette session → afficher l'écran MDP
+        // Sinon → afficher directement les 9 tuiles comme avant
+        var unlocked = false;
+        try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
+        if (!unlocked) {
+          _dojoGate_show();
+        } else if (typeof showOnboardingIfNeeded === 'function') {
           setTimeout(function(){ showOnboardingIfNeeded(); }, 100);
         }
       }, 400);
     }
   };
+
+  // ═══ DOJO GATE — Mot de passe pour accéder à l'app ═══════════════════
+  // Le hash SHA-256 du vrai MDP est stocké ici (pas le MDP en clair)
+  var _DOJO_PW_HASH = '6dd6d77794056ba92bc53c43a5dd1b0149d7e88e4273e880d693baec4ff45860';
+
+  window._dojoGate_show = function() {
+    var g = document.getElementById('dojo-gate');
+    if (!g) return;
+    g.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Forcer la vidéo à démarrer (parfois iOS ne le fait pas automatiquement)
+    var v = document.getElementById('dojo-gate-video');
+    if (v) { try { v.play(); } catch(e){} }
+    // Focus input après un délai (pour éviter clavier iOS gênant)
+    setTimeout(function(){
+      var i = document.getElementById('dojo-gate-input');
+      if (i) { try { i.focus(); } catch(e){} }
+    }, 400);
+  };
+
+  window._dojoGate_check = function() {
+    var input = document.getElementById('dojo-gate-input');
+    var err   = document.getElementById('dojo-gate-error');
+    if (!input) return;
+    var pw = (input.value || '').trim();
+    if (!pw) return;
+    // Calculer SHA-256 du MDP saisi puis comparer au hash stocké
+    var enc = new TextEncoder();
+    var data = enc.encode(pw);
+    if (!window.crypto || !window.crypto.subtle) {
+      // Fallback : navigateur ultra-ancien sans crypto.subtle — refuser sans info
+      if (err) { err.textContent = (window._lang === 'en' ? 'Wrong password' : 'Mot de passe incorrect'); err.style.opacity = '1'; }
+      return;
+    }
+    window.crypto.subtle.digest('SHA-256', data).then(function(buf) {
+      var arr = new Uint8Array(buf);
+      var hex = Array.prototype.map.call(arr, function(b){ return ('00'+b.toString(16)).slice(-2); }).join('');
+      if (hex === _DOJO_PW_HASH) {
+        // ✅ Bon MDP → unlock session + fade out + passer aux 9 tuiles
+        try { sessionStorage.setItem('sensei_dojo_unlocked', '1'); } catch(e){}
+        var g = document.getElementById('dojo-gate');
+        if (g) {
+          g.style.transition = 'opacity .4s';
+          g.style.opacity = '0';
+          setTimeout(function(){
+            g.style.display = 'none';
+            g.style.opacity = '';
+            document.body.style.overflow = '';
+            if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
+          }, 400);
+        }
+      } else {
+        // ❌ Mauvais MDP → afficher erreur + secouer l'input + vider
+        if (err) {
+          err.textContent = (window._lang === 'en' ? 'Wrong password' : 'Mot de passe incorrect');
+          err.style.opacity = '1';
+        }
+        input.value = '';
+        input.style.animation = 'dojoGateShake .3s';
+        setTimeout(function(){ input.style.animation = ''; }, 300);
+        if (window._haptic) { try { window._haptic.error && window._haptic.error(); } catch(e){} }
+      }
+    }).catch(function() {
+      if (err) { err.textContent = (window._lang === 'en' ? 'Wrong password' : 'Mot de passe incorrect'); err.style.opacity = '1'; }
+    });
+  };
+
+  // Animation shake pour input erroné
+  (function(){
+    if (document.getElementById('dojoGateShakeCss')) return;
+    var s = document.createElement('style');
+    s.id = 'dojoGateShakeCss';
+    s.textContent = '@keyframes dojoGateShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
+    document.head.appendChild(s);
+  })();
 
   // ─── Toggle de langue dans l'onboarding (bascule GLOBALE de toute l'app) ───
   window._heroOnboarding_setLang = function(lang) {
