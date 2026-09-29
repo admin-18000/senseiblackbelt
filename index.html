@@ -8027,13 +8027,14 @@ const IQ_ITEMS = [
 /* ── Onboarding accueil (3 drills wow, mémorisé localStorage) ── */
 function showOnboardingIfNeeded() {
   try {
-    // 🥋 GUARD DOJO : si non déverrouillé dans cette session ET le hero a déjà été vu (localStorage),
-    // afficher l'écran DOJO au lieu des tuiles / de laisser l'app libre
-    var dojoUnlocked = false;
+    // 🥋 GUARD DOJO : si aucun mode choisi (ni unlocked, ni free) ET hero déjà vu,
+    // afficher l'écran DOJO. Sinon (unlocked OU free), on laisse passer.
+    var dojoUnlocked = false, dojoFree = false;
     try { dojoUnlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
+    try { dojoFree     = sessionStorage.getItem('sensei_dojo_mode') === 'free'; } catch(e){}
     var heroSeen = false;
     try { heroSeen = !!localStorage.getItem('sensei_hero_onboarding_seen_v'); } catch(e){}
-    if (!dojoUnlocked && heroSeen && typeof window._dojoGate_show === 'function') {
+    if (!dojoUnlocked && !dojoFree && heroSeen && typeof window._dojoGate_show === 'function') {
       window._dojoGate_show();
       return;
     }
@@ -13009,8 +13010,8 @@ function applyLangTracker(lang) {
     dojo_gate_free_list:"\ud83c\udfe0 Home &nbsp;\u00b7&nbsp; \ud83e\udd4b Belts &nbsp;\u00b7&nbsp; \ud83e\udd4b BUD\u014c<br>\ud83d\udca1 Communaut\u00e9 &nbsp;\u00b7&nbsp; \ud83c\udf93 Tutorials &nbsp;\u00b7&nbsp; \ud83d\udd17 Rejoindre",
     dojo_gate_premium_title:"\ud83d\udd12 D\u00c9BLOQU\u00c9 EN COACHING",
     dojo_gate_premium_list:"\ud83c\udfc0 Training Mode &nbsp;\u00b7&nbsp; \ud83e\udd16 5 IA cam\u00e9ra<br>\ud83c\udfaf Ball Tracker &nbsp;\u00b7&nbsp; \ud83d\udcca Shot Chart<br>\ud83e\udde0 Cognitif &nbsp;\u00b7&nbsp; \ud83d\udcaa Ball Pounds<br>\ud83d\udccb Playbook &nbsp;\u00b7&nbsp; \ud83d\udd2c Sciences &nbsp;\u00b7&nbsp; \ud83c\udfc6 GOAT",
-    dojo_gate_btn_free:"D\u00c9COUVRIR EN LIBRE ACC\u00c8S \u2192",
-    dojo_gate_btn_code:"\ud83d\udd11 J'AI LE CODE DU D\u014cJ\u014c",
+    dojo_gate_btn_free:"MODE FREEMIUM \u2192",
+    dojo_gate_btn_code:"\ud83d\udd11 MODE PREMIUM \u2192",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
@@ -13018,7 +13019,7 @@ function applyLangTracker(lang) {
     dojo_lock_title:"FONCTIONNALIT\u00c9 PREMIUM",
     dojo_lock_msg:"Cette rubrique s'active uniquement en s\u00e9ance de coaching avec le Sensei.",
     dojo_lock_join_btn:"\ud83d\udcc5 REJOINDRE",
-    dojo_lock_code_btn:"\ud83d\udd11 J'ai le code du D\u014dj\u014d",
+    dojo_lock_code_btn:"\ud83d\udd11 J'ai le code",
     dojo_lock_close:"Fermer",
     dojo_lbl_ai:"SENSEI IA",
     dojo_sub_ai:"G\u00e9n\u00e8re ta s\u00e9ance personnalis\u00e9e avec l'IA",
@@ -13201,8 +13202,8 @@ function applyLangTracker(lang) {
     dojo_gate_free_list:"\ud83c\udfe0 Home &nbsp;\u00b7&nbsp; \ud83e\udd4b Belts &nbsp;\u00b7&nbsp; \ud83e\udd4b BUD\u014c<br>\ud83d\udca1 Community &nbsp;\u00b7&nbsp; \ud83c\udf93 Tutorials &nbsp;\u00b7&nbsp; \ud83d\udd17 Join",
     dojo_gate_premium_title:"\ud83d\udd12 UNLOCKED IN COACHING",
     dojo_gate_premium_list:"\ud83c\udfc0 Training Mode &nbsp;\u00b7&nbsp; \ud83e\udd16 5 AI cameras<br>\ud83c\udfaf Ball Tracker &nbsp;\u00b7&nbsp; \ud83d\udcca Shot Chart<br>\ud83e\udde0 Cognitive &nbsp;\u00b7&nbsp; \ud83d\udcaa Ball Pounds<br>\ud83d\udccb Playbook &nbsp;\u00b7&nbsp; \ud83d\udd2c Sciences &nbsp;\u00b7&nbsp; \ud83c\udfc6 GOAT",
-    dojo_gate_btn_free:"EXPLORE FREE ACCESS \u2192",
-    dojo_gate_btn_code:"\ud83d\udd11 I HAVE THE D\u014cJ\u014c CODE",
+    dojo_gate_btn_free:"FREEMIUM MODE \u2192",
+    dojo_gate_btn_code:"\ud83d\udd11 PREMIUM MODE \u2192",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
@@ -13210,7 +13211,7 @@ function applyLangTracker(lang) {
     dojo_lock_title:"PREMIUM FEATURE",
     dojo_lock_msg:"This section is activated only during a coaching session with the Sensei.",
     dojo_lock_join_btn:"\ud83d\udcc5 JOIN",
-    dojo_lock_code_btn:"\ud83d\udd11 I have the D\u014dj\u014d code",
+    dojo_lock_code_btn:"\ud83d\udd11 I have the code",
     dojo_lock_close:"Close",
     dojo_lbl_ai:"SENSEI AI",
     dojo_sub_ai:"Generate your personalized session with AI",
@@ -38690,13 +38691,17 @@ window._QI_DATA['pnr_05'] = {
     <button onclick="_dojoGate_freeMode()"
             style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:13px 30px;border:1.5px solid rgba(255,255,255,.5);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-weight:700;margin-bottom:10px;width:min(340px,90vw);box-shadow:0 4px 14px rgba(0,0,0,.4);transition:transform .15s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)"
             onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
-            data-i18n="dojo_gate_btn_free">DÉCOUVRIR EN LIBRE ACCÈS →</button>
+            data-i18n="dojo_gate_btn_free">MODE FREEMIUM →</button>
 
-    <!-- Bouton "J'ai le code" -->
+    <!-- Bouton "MODE PREMIUM" -->
     <button onclick="_dojoGate_showCode()"
             style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:13px 30px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;width:min(340px,90vw);box-shadow:0 6px 18px rgba(245,197,24,.35);transition:transform .15s"
             onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
-            data-i18n="dojo_gate_btn_code">🔑 J'AI LE CODE DU DŌJŌ</button>
+            data-i18n="dojo_gate_btn_code">🔑 MODE PREMIUM →</button>
+
+    <!-- Phrases complémentaires sous le bouton PREMIUM -->
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:12px;letter-spacing:1.5px;color:#f5c518;margin-top:12px;max-width:340px;line-height:1.3;text-shadow:0 1px 3px #000,0 2px 10px rgba(0,0,0,.95)" data-i18n="dojo_gate_title">🥋 ENTRE LE MOT DE PASSE DU DŌJŌ</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:11px;color:#fff;letter-spacing:1px;margin-top:4px;max-width:340px;line-height:1.4;text-shadow:0 1px 3px #000,0 2px 10px rgba(0,0,0,.95);font-weight:500;font-style:italic;opacity:.9" data-i18n="dojo_gate_sub">Accès activé uniquement par le Sensei · En présentiel</div>
   </div>
 
   <!-- ═══ ÉCRAN 2 : INPUT MDP (masqué par défaut) ═══ -->
@@ -38731,7 +38736,7 @@ window._QI_DATA['pnr_05'] = {
             data-i18n="dojo_lock_join_btn">📅 REJOINDRE</button>
     <button onclick="_dojoLock_gotCode()"
             style="font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:1.5px;padding:8px;border:none;background:transparent;color:#9aa3b3;cursor:pointer;text-decoration:underline"
-            data-i18n="dojo_lock_code_btn">🔑 J'ai le code du Dōjō</button>
+            data-i18n="dojo_lock_code_btn">🔑 J'ai le code</button>
     <div style="margin-top:8px">
       <button onclick="_dojoLock_close()"
               style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:1px;padding:6px;border:none;background:transparent;color:#7a8299;cursor:pointer"
