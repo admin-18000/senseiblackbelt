@@ -8167,6 +8167,11 @@ function acceptHealthWarning() {
 }
 
 function showSection(id, btn) {
+  // 🔒 GUARD DOJO : si mode free et rubrique verrouillée, afficher modal cadenas
+  if (!window._dojoBypassGuard && typeof window._dojoIsAllowed === 'function' && !window._dojoIsAllowed(id)) {
+    if (typeof window._dojoLock_show === 'function') window._dojoLock_show();
+    return;
+  }
   // Disclaimer santé au premier accès Training Mode (mémorisé en localStorage)
   if (id === 'training' && typeof showHealthWarningIfNeeded === 'function') {
     showHealthWarningIfNeeded();
@@ -12998,9 +13003,23 @@ function applyLangTracker(lang) {
     hero_ob_tag:"L'art martial du basketteur",
     hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
     hero_ob_btn:"D\u00c9COUVRIR \u2728",
+    dojo_gate_welcome:"\ud83e\udd4b BIENVENUE DANS LE D\u014cJ\u014c",
+    dojo_gate_tagline:"L'art martial du basketteur",
+    dojo_gate_free_title:"\ud83c\udf81 EN LIBRE ACC\u00c8S",
+    dojo_gate_free_list:"\ud83c\udfe0 Home &nbsp;\u00b7&nbsp; \ud83e\udd4b Belts &nbsp;\u00b7&nbsp; \ud83e\udd4b BUD\u014c<br>\ud83d\udca1 Communaut\u00e9 &nbsp;\u00b7&nbsp; \ud83c\udf93 Tutorials &nbsp;\u00b7&nbsp; \ud83d\udd17 Rejoindre",
+    dojo_gate_premium_title:"\ud83d\udd12 D\u00c9BLOQU\u00c9 EN COACHING",
+    dojo_gate_premium_list:"\ud83c\udfc0 Training Mode &nbsp;\u00b7&nbsp; \ud83e\udd16 5 IA cam\u00e9ra<br>\ud83c\udfaf Ball Tracker &nbsp;\u00b7&nbsp; \ud83d\udcca Shot Chart<br>\ud83e\udde0 Cognitif &nbsp;\u00b7&nbsp; \ud83d\udcaa Ball Pounds<br>\ud83d\udccb Playbook &nbsp;\u00b7&nbsp; \ud83d\udd2c Sciences &nbsp;\u00b7&nbsp; \ud83c\udfc6 GOAT",
+    dojo_gate_btn_free:"D\u00c9COUVRIR EN LIBRE ACC\u00c8S \u2192",
+    dojo_gate_btn_code:"\ud83d\udd11 J'AI LE CODE DU D\u014cJ\u014c",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
+    dojo_gate_back:"\u2190 Retour",
+    dojo_lock_title:"FONCTIONNALIT\u00c9 PREMIUM",
+    dojo_lock_msg:"Cette rubrique s'active uniquement en s\u00e9ance de coaching avec le Sensei.",
+    dojo_lock_join_btn:"\ud83d\udcc5 REJOINDRE",
+    dojo_lock_code_btn:"\ud83d\udd11 J'ai le code du D\u014dj\u014d",
+    dojo_lock_close:"Fermer",
     dojo_lbl_ai:"SENSEI IA",
     dojo_sub_ai:"G\u00e9n\u00e8re ta s\u00e9ance personnalis\u00e9e avec l'IA",
     dojo_lbl_fiche:"TON ENTRA\u00ceNEMENT",
@@ -13176,9 +13195,23 @@ function applyLangTracker(lang) {
     hero_ob_tag:"The basketball player's martial art",
     hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
     hero_ob_btn:"DISCOVER \u2728",
+    dojo_gate_welcome:"\ud83e\udd4b WELCOME TO THE D\u014cJ\u014c",
+    dojo_gate_tagline:"The martial art of the basketball player",
+    dojo_gate_free_title:"\ud83c\udf81 FREE ACCESS",
+    dojo_gate_free_list:"\ud83c\udfe0 Home &nbsp;\u00b7&nbsp; \ud83e\udd4b Belts &nbsp;\u00b7&nbsp; \ud83e\udd4b BUD\u014c<br>\ud83d\udca1 Community &nbsp;\u00b7&nbsp; \ud83c\udf93 Tutorials &nbsp;\u00b7&nbsp; \ud83d\udd17 Join",
+    dojo_gate_premium_title:"\ud83d\udd12 UNLOCKED IN COACHING",
+    dojo_gate_premium_list:"\ud83c\udfc0 Training Mode &nbsp;\u00b7&nbsp; \ud83e\udd16 5 AI cameras<br>\ud83c\udfaf Ball Tracker &nbsp;\u00b7&nbsp; \ud83d\udcca Shot Chart<br>\ud83e\udde0 Cognitive &nbsp;\u00b7&nbsp; \ud83d\udcaa Ball Pounds<br>\ud83d\udccb Playbook &nbsp;\u00b7&nbsp; \ud83d\udd2c Sciences &nbsp;\u00b7&nbsp; \ud83c\udfc6 GOAT",
+    dojo_gate_btn_free:"EXPLORE FREE ACCESS \u2192",
+    dojo_gate_btn_code:"\ud83d\udd11 I HAVE THE D\u014cJ\u014c CODE",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
+    dojo_gate_back:"\u2190 Back",
+    dojo_lock_title:"PREMIUM FEATURE",
+    dojo_lock_msg:"This section is activated only during a coaching session with the Sensei.",
+    dojo_lock_join_btn:"\ud83d\udcc5 JOIN",
+    dojo_lock_code_btn:"\ud83d\udd11 I have the D\u014dj\u014d code",
+    dojo_lock_close:"Close",
     dojo_lbl_ai:"SENSEI AI",
     dojo_sub_ai:"Generate your personalized session with AI",
     dojo_lbl_fiche:"YOUR TRAINING",
@@ -38620,8 +38653,8 @@ window._QI_DATA['pnr_05'] = {
 </style>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     DOJO GATE — Écran de mot de passe après hero-onboarding
-     Bloque l'accès à l'app tant que MDP correct pas saisi (sessionStorage)
+     DOJO GATE — Vitrine + entrée MDP
+     2 modes : 'free' (accès rubriques libres) ou 'unlocked' (MDP)
      ═══════════════════════════════════════════════════════════════ -->
 <div id="dojo-gate" style="display:none;position:fixed;inset:0;z-index:100050;background:#000;overflow:hidden">
   <!-- Vidéo en boucle en fond -->
@@ -38629,19 +38662,81 @@ window._QI_DATA['pnr_05'] = {
          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1">
     <source src="dojo-intro.mp4" type="video/mp4">
   </video>
-  <!-- Pas d'overlay : vidéo entièrement visible. Lisibilité du texte assurée par text-shadow fort. -->
-  <!-- Contenu MDP -->
-  <div style="position:relative;z-index:3;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 24px 8vh;text-align:center;box-sizing:border-box">
-    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(22px,5.5vw,32px);letter-spacing:3px;color:#f5c518;text-shadow:0 2px 4px rgba(0,0,0,1),0 4px 20px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,1);margin-bottom:10px" data-i18n="dojo_gate_title">🥋 ENTRE LE MOT DE PASSE DU DŌJŌ</div>
-    <div style="font-family:'Barlow',sans-serif;font-size:12px;color:#fff;letter-spacing:1.5px;margin-bottom:20px;max-width:340px;line-height:1.4;text-shadow:0 1px 3px rgba(0,0,0,1),0 2px 10px rgba(0,0,0,.95),0 0 1px rgba(0,0,0,1);font-weight:600" data-i18n="dojo_gate_sub">Accès activé uniquement par le Sensei · En présentiel</div>
+
+  <!-- ═══ ÉCRAN 1 : VITRINE (par défaut) — liste des rubriques libres/premium + 2 boutons ═══ -->
+  <div id="dojo-gate-view-choice" style="position:relative;z-index:3;height:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 20px 4vh;text-align:center;box-sizing:border-box">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(22px,5.5vw,30px);letter-spacing:2.5px;color:#f5c518;text-shadow:0 2px 4px #000,0 4px 20px rgba(0,0,0,.95),0 0 2px #000;margin-bottom:6px" data-i18n="dojo_gate_welcome">🥋 BIENVENUE DANS LE DŌJŌ</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:12px;color:#fff;letter-spacing:1.5px;margin-bottom:14px;text-shadow:0 1px 3px #000,0 2px 10px rgba(0,0,0,.95);font-weight:600" data-i18n="dojo_gate_tagline">L'art martial du basketteur</div>
+
+    <!-- Bloc libre accès -->
+    <div style="background:rgba(0,0,0,.55);border:1px solid rgba(245,197,24,.35);border-radius:10px;padding:12px 14px;margin-bottom:10px;max-width:340px;width:100%;box-sizing:border-box;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:12px;letter-spacing:2px;color:#f5c518" data-i18n="dojo_gate_free_title">🎁 EN LIBRE ACCÈS</div>
+        <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:9px;letter-spacing:1.5px;color:#4ade80;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.45);padding:2px 8px;border-radius:4px">FREEMIUM</div>
+      </div>
+      <div style="font-family:'Barlow',sans-serif;font-size:11px;color:#fff;letter-spacing:.5px;line-height:1.7;text-align:left" data-i18n="dojo_gate_free_list">🏠 Home &nbsp;·&nbsp; 🥋 Belts &nbsp;·&nbsp; 🥋 BUDŌ<br>💡 Communauté &nbsp;·&nbsp; 🎓 Tutorials &nbsp;·&nbsp; 🔗 Rejoindre</div>
+    </div>
+
+    <!-- Bloc premium verrouillé -->
+    <div style="background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 14px;margin-bottom:14px;max-width:340px;width:100%;box-sizing:border-box;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:12px;letter-spacing:2px;color:#cfd3e0" data-i18n="dojo_gate_premium_title">🔒 DÉBLOQUÉ EN COACHING</div>
+        <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:9px;letter-spacing:1.5px;color:#0a0d18;background:linear-gradient(135deg,#f5c518,#ffdb4d);border:1px solid rgba(245,197,24,.9);padding:2px 8px;border-radius:4px;font-weight:900;box-shadow:0 2px 6px rgba(245,197,24,.35)">PREMIUM</div>
+      </div>
+      <div style="font-family:'Barlow',sans-serif;font-size:11px;color:#e0e4ee;letter-spacing:.5px;line-height:1.7;text-align:left" data-i18n="dojo_gate_premium_list">🏀 Training Mode &nbsp;·&nbsp; 🤖 5 IA caméra<br>🎯 Ball Tracker &nbsp;·&nbsp; 📊 Shot Chart<br>🧠 Cognitif &nbsp;·&nbsp; 💪 Ball Pounds<br>📋 Playbook &nbsp;·&nbsp; 🔬 Sciences &nbsp;·&nbsp; 🏆 GOAT</div>
+    </div>
+
+    <!-- Bouton "Découvrir gratuit" -->
+    <button onclick="_dojoGate_freeMode()"
+            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:13px 30px;border:1.5px solid rgba(255,255,255,.5);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-weight:700;margin-bottom:10px;width:min(340px,90vw);box-shadow:0 4px 14px rgba(0,0,0,.4);transition:transform .15s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)"
+            onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
+            data-i18n="dojo_gate_btn_free">DÉCOUVRIR EN LIBRE ACCÈS →</button>
+
+    <!-- Bouton "J'ai le code" -->
+    <button onclick="_dojoGate_showCode()"
+            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:13px 30px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;width:min(340px,90vw);box-shadow:0 6px 18px rgba(245,197,24,.35);transition:transform .15s"
+            onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
+            data-i18n="dojo_gate_btn_code">🔑 J'AI LE CODE DU DŌJŌ</button>
+  </div>
+
+  <!-- ═══ ÉCRAN 2 : INPUT MDP (masqué par défaut) ═══ -->
+  <div id="dojo-gate-view-code" style="display:none;position:relative;z-index:3;height:100%;display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 24px 8vh;text-align:center;box-sizing:border-box">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,5vw,28px);letter-spacing:2.5px;color:#f5c518;text-shadow:0 2px 4px #000,0 4px 20px rgba(0,0,0,.95),0 0 2px #000;margin-bottom:8px" data-i18n="dojo_gate_title">🥋 ENTRE LE MOT DE PASSE DU DŌJŌ</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:12px;color:#fff;letter-spacing:1.5px;margin-bottom:20px;max-width:340px;line-height:1.4;text-shadow:0 1px 3px #000,0 2px 10px rgba(0,0,0,.95);font-weight:600" data-i18n="dojo_gate_sub">Accès activé uniquement par le Sensei · En présentiel</div>
     <input id="dojo-gate-input" type="password" inputmode="numeric" autocomplete="off" maxlength="20"
            onkeydown="if(event.key==='Enter') _dojoGate_check()"
            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:24px;letter-spacing:8px;text-align:center;padding:14px 20px;width:min(280px,80vw);border:1.5px solid rgba(245,197,24,.5);border-radius:10px;background:rgba(0,0,0,.55);color:#fff;outline:none;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.5);-webkit-appearance:none">
     <div id="dojo-gate-error" style="font-family:'Barlow',sans-serif;font-size:12px;color:#ff6b6b;letter-spacing:1px;height:16px;margin-bottom:16px;text-shadow:0 1px 4px rgba(0,0,0,.9);opacity:0;transition:opacity .2s"></div>
     <button onclick="_dojoGate_check()"
-            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 44px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.35);transition:transform .15s"
+            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 44px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.35);transition:transform .15s;margin-bottom:12px"
             onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
             data-i18n="dojo_gate_btn">VALIDER</button>
+    <button onclick="_dojoGate_backToChoice()"
+            style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:1.5px;padding:8px 16px;border:none;background:transparent;color:#cfd3e0;cursor:pointer;text-decoration:underline;text-shadow:0 1px 3px #000"
+            data-i18n="dojo_gate_back">← Retour</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL CADENAS — Apparaît au click sur rubrique verrouillée en mode free
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="dojo-lock-modal" style="display:none;position:fixed;inset:0;z-index:100060;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px" onclick="_dojoLock_close(event)">
+  <div style="max-width:380px;width:100%;background:linear-gradient(160deg,#131820,#0a0d18);border:1.5px solid rgba(245,197,24,.4);border-radius:14px;padding:28px 24px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.7)" onclick="event.stopPropagation()">
+    <div style="font-size:48px;margin-bottom:14px">🔒</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:20px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="dojo_lock_title">FONCTIONNALITÉ PREMIUM</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.5;margin-bottom:22px;letter-spacing:.5px" data-i18n="dojo_lock_msg">Cette rubrique s'active uniquement en séance de coaching avec le Sensei.</div>
+    <button onclick="_dojoLock_join()"
+            style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2.5px;padding:13px 32px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;width:100%;box-shadow:0 6px 18px rgba(245,197,24,.4);margin-bottom:10px;transition:transform .15s"
+            onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'"
+            data-i18n="dojo_lock_join_btn">📅 REJOINDRE</button>
+    <button onclick="_dojoLock_gotCode()"
+            style="font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:1.5px;padding:8px;border:none;background:transparent;color:#9aa3b3;cursor:pointer;text-decoration:underline"
+            data-i18n="dojo_lock_code_btn">🔑 J'ai le code du Dōjō</button>
+    <div style="margin-top:8px">
+      <button onclick="_dojoLock_close()"
+              style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:1px;padding:6px;border:none;background:transparent;color:#7a8299;cursor:pointer"
+              data-i18n="dojo_lock_close">Fermer</button>
+    </div>
   </div>
 </div>
 
@@ -38765,19 +38860,153 @@ window._QI_DATA['pnr_05'] = {
   // Le hash SHA-256 du vrai MDP est stocké ici (pas le MDP en clair)
   var _DOJO_PW_HASH = '6dd6d77794056ba92bc53c43a5dd1b0149d7e88e4273e880d693baec4ff45860';
 
+  // ═══ WHITELIST DES RUBRIQUES EN LIBRE ACCÈS ═══
+  // Toutes les autres nécessitent le MDP DOJO
+  var DOJO_FREE_SECTIONS = ['home', 'belts', 'budo', 'opportunities', 'tutorials'];
+
+  // ═══ CSS pour cadenas 🔒 sur rubriques verrouillées ═══
+  (function(){
+    if (document.getElementById('dojoLockCss')) return;
+    var s = document.createElement('style');
+    s.id = 'dojoLockCss';
+    s.textContent =
+      '.dojo-locked-btn::after { content:" 🔒"; font-size:.75em; opacity:.85; margin-left:3px; letter-spacing:0; display:inline-block; vertical-align:baseline; }' +
+      '.dojo-locked-btn { position:relative; opacity:.72; transition:opacity .2s; }' +
+      '.dojo-locked-btn:hover { opacity:.95; }';
+    document.head.appendChild(s);
+  })();
+
+  // Parcourt tous les boutons showSection et marque ceux qui pointent vers une rubrique verrouillée
+  window._dojoUpdateLockUI = function() {
+    var unlocked = false;
+    try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
+    var btns = document.querySelectorAll('[onclick*="showSection("]');
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      var m = (b.getAttribute('onclick') || '').match(/showSection\(\s*['"]([^'"]+)['"]/);
+      if (!m) continue;
+      var id = m[1];
+      var shouldLock = !unlocked && DOJO_FREE_SECTIONS.indexOf(id) === -1;
+      if (shouldLock) {
+        b.classList.add('dojo-locked-btn');
+      } else {
+        b.classList.remove('dojo-locked-btn');
+      }
+    }
+  };
+
+  // Appeler à divers moments pour garder l'UI à jour
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(_dojoUpdateLockUI, 100);
+  });
+  // Re-appliquer après changement de langue (car applyLang peut retoucher le contenu des boutons)
+  var _dojoOrigApplyLang = window.applyLang;
+  if (typeof _dojoOrigApplyLang === 'function') {
+    window.applyLang = function(){
+      var r = _dojoOrigApplyLang.apply(this, arguments);
+      setTimeout(_dojoUpdateLockUI, 50);
+      return r;
+    };
+  }
+
+  // Utilitaire : true si l'utilisateur a le droit d'accéder à cette rubrique
+  window._dojoIsAllowed = function(sectionId) {
+    var unlocked = false;
+    try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
+    if (unlocked) return true;
+    return DOJO_FREE_SECTIONS.indexOf(sectionId) !== -1;
+  };
+
   window._dojoGate_show = function() {
     var g = document.getElementById('dojo-gate');
     if (!g) return;
+    // Toujours démarrer sur l'écran de choix (vitrine), pas directement sur l'input MDP
+    var vChoice = document.getElementById('dojo-gate-view-choice');
+    var vCode   = document.getElementById('dojo-gate-view-code');
+    if (vChoice) vChoice.style.display = 'flex';
+    if (vCode)   vCode.style.display   = 'none';
     g.style.display = 'block';
     document.body.style.overflow = 'hidden';
     // Forcer la vidéo à démarrer (parfois iOS ne le fait pas automatiquement)
     var v = document.getElementById('dojo-gate-video');
     if (v) { try { v.play(); } catch(e){} }
-    // Focus input après un délai (pour éviter clavier iOS gênant)
+  };
+
+  // Mode gratuit : ferme le gate, autorise les rubriques whitelist
+  window._dojoGate_freeMode = function() {
+    try { sessionStorage.setItem('sensei_dojo_mode', 'free'); } catch(e){}
+    var g = document.getElementById('dojo-gate');
+    if (g) {
+      g.style.transition = 'opacity .4s';
+      g.style.opacity = '0';
+      setTimeout(function(){
+        g.style.display = 'none';
+        g.style.opacity = '';
+        document.body.style.overflow = '';
+        if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
+        if (typeof _dojoUpdateLockUI === 'function') _dojoUpdateLockUI();
+      }, 400);
+    }
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  // Passe à l'écran input MDP
+  window._dojoGate_showCode = function() {
+    var vChoice = document.getElementById('dojo-gate-view-choice');
+    var vCode   = document.getElementById('dojo-gate-view-code');
+    if (vChoice) vChoice.style.display = 'none';
+    if (vCode)   vCode.style.display   = 'flex';
     setTimeout(function(){
       var i = document.getElementById('dojo-gate-input');
       if (i) { try { i.focus(); } catch(e){} }
-    }, 400);
+    }, 200);
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  // Retour à l'écran de choix depuis l'input MDP
+  window._dojoGate_backToChoice = function() {
+    var vChoice = document.getElementById('dojo-gate-view-choice');
+    var vCode   = document.getElementById('dojo-gate-view-code');
+    if (vChoice) vChoice.style.display = 'flex';
+    if (vCode)   vCode.style.display   = 'none';
+    var err = document.getElementById('dojo-gate-error');
+    var inp = document.getElementById('dojo-gate-input');
+    if (err) { err.textContent = ''; err.style.opacity = '0'; }
+    if (inp) inp.value = '';
+  };
+
+  // ═══ MODAL CADENAS — apparaît quand user click sur rubrique verrouillée en mode free ═══
+  window._dojoLock_show = function() {
+    var m = document.getElementById('dojo-lock-modal');
+    if (!m) return;
+    m.style.display = 'flex';
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+  window._dojoLock_close = function(e) {
+    // Si clic sur backdrop (pas sur contenu interne)
+    if (e && e.currentTarget !== e.target && e.type === 'click') {
+      // Ne fermer que si click direct sur le modal, pas sur son contenu
+      if (e.target.id !== 'dojo-lock-modal') return;
+    }
+    var m = document.getElementById('dojo-lock-modal');
+    if (m) m.style.display = 'none';
+  };
+  // Bouton "REJOINDRE" → Instagram Sensei BlackBelt (identique aux autres boutons Rejoindre de l'app)
+  window._dojoLock_join = function() {
+    _dojoLock_close();
+    try {
+      window.open('https://www.instagram.com/sensei_blackbelt/', '_blank', 'noopener,noreferrer');
+    } catch(e) {
+      // Fallback si popup bloqué
+      window.location.href = 'https://www.instagram.com/sensei_blackbelt/';
+    }
+  };
+  // Bouton "J'ai le code" → réafficher l'écran DOJO gate en mode input
+  window._dojoLock_gotCode = function() {
+    _dojoLock_close();
+    _dojoGate_show();
+    // Aller directement à l'écran code
+    setTimeout(function(){ _dojoGate_showCode(); }, 100);
   };
 
   window._dojoGate_check = function() {
@@ -38809,6 +39038,7 @@ window._QI_DATA['pnr_05'] = {
             g.style.opacity = '';
             document.body.style.overflow = '';
             if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
+            if (typeof _dojoUpdateLockUI === 'function') _dojoUpdateLockUI();
           }, 400);
         }
       } else {
@@ -42663,7 +42893,7 @@ body.si-banner-on { padding-top: 52px; }
 <div id="si-banner" role="dialog" aria-label="Installer l'app">
   <div class="si-banner-text">
     📱 <strong data-i18n="si_banner_title">Installe SENSEI sur ton écran d'accueil</strong>
-    <span style="opacity:0.85" data-i18n="si_banner_sub"> · Gratuit · Sans store · Sans compte · 100% Données protégées</span>
+    <span style="opacity:0.85" data-i18n="si_banner_sub"> · Gratuit · Sans store · Sans compte · 100% Données protégées · 🥋 Activation complète par le Sensei</span>
   </div>
   <button class="si-banner-btn" onclick="_si_install_click()" data-i18n="si_banner_btn">INSTALLER</button>
   <button class="si-banner-close" onclick="_si_banner_close()" aria-label="Fermer">×</button>
@@ -42796,8 +43026,8 @@ body.si-banner-on { padding-top: 52px; }
     // Bandeau
     window.i18n.fr.si_banner_title = "Installe SENSEI sur ton écran d'accueil";
     window.i18n.en.si_banner_title = "Install SENSEI on your home screen";
-    window.i18n.fr.si_banner_sub = " · Gratuit · Sans store · Sans compte · 100% Données protégées";
-    window.i18n.en.si_banner_sub = " · Free · No store · No account · 100% Data protected";
+    window.i18n.fr.si_banner_sub = " · Gratuit · Sans store · Sans compte · 100% Données protégées · 🥋 Activation complète par le Sensei";
+    window.i18n.en.si_banner_sub = " · Free · No store · No account · 100% Data protected · 🥋 Full activation by the Sensei";
     window.i18n.fr.si_banner_btn = "INSTALLER";
     window.i18n.en.si_banner_btn = "INSTALL";
     // Modal iOS
