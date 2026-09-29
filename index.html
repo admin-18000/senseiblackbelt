@@ -1876,7 +1876,7 @@ body.unlocked .sensei-only{display:revert !important}
 
       <!-- Player vertical shorts -->
       <div id="belts_budo_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:360px;margin:0 auto 20px;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 6px 24px rgba(245,197,24,.15)">
-        <iframe id="belts_budo_frame" src="" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <iframe id="belts_budo_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
 
       <!-- Grille des thumbnails shorts -->
@@ -1902,7 +1902,7 @@ body.unlocked .sensei-only{display:revert !important}
 
     <!-- Player vertical shorts -->
     <div id="budo_page_player" style="display:none;position:relative;padding-bottom:177.77%;max-width:420px;margin:0 auto 24px;height:0;overflow:hidden;border-radius:14px;background:#000;box-shadow:0 8px 28px rgba(245,197,24,.2)">
-      <iframe id="budo_page_frame" src="" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <iframe id="budo_page_frame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
     <!-- Grille des thumbnails shorts -->
@@ -7538,34 +7538,27 @@ function openVideoModal(id, title, vertical) {
   const iframe  = document.getElementById('video-modal-iframe');
   const inner   = document.getElementById('video-modal-inner');
   document.getElementById('video-modal-title').textContent = title;
-  if (vertical) {
+  // Détection mobile pour choisir le ratio :
+  // - Mobile : container 9:16 (Safari détecte le short et l'affiche en portrait natif)
+  // - Desktop : container 16:9 (YouTube affiche le short avec bandes latérales naturelles,
+  //   la vidéo verticale reste entière et bien visible au centre)
+  var isMob = (typeof isMobile === 'function' && isMobile());
+  if (vertical && isMob) {
     const maxH = Math.min(window.innerHeight * 0.85, 720);
     inner.style.maxWidth = Math.round(maxH * 9/16) + 'px';
     wrapper.style.height = maxH + 'px';
     wrapper.style.aspectRatio = '';
-    // 🎯 FIX SHORTS DESKTOP : agrandir iframe à 316% pour cropper les bandes noires YouTube
-    // YouTube desktop affiche les shorts dans un cadre 16:9 avec bandes noires haut/bas ;
-    // on force l'iframe à faire 316% de large pour que la vidéo verticale remplisse le cadre 9:16.
-    wrapper.style.position = 'relative';
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '50%';
-    iframe.style.transform = 'translateX(-50%)';
-    iframe.style.width = '316.23%';
-    iframe.style.height = '100%';
+  } else if (vertical && !isMob) {
+    // Desktop shorts : container 16:9, vidéo verticale au centre entourée de bandes noires latérales
+    inner.style.maxWidth = '900px';
+    wrapper.style.height = '';
+    wrapper.style.aspectRatio = '16/9';
   } else {
     inner.style.maxWidth = '900px';
     wrapper.style.height = '';
     wrapper.style.aspectRatio = '16/9';
-    // Reset : horizontal marche déjà bien avec 100%/100%
-    wrapper.style.position = '';
-    iframe.style.position = '';
-    iframe.style.top = '';
-    iframe.style.left = '';
-    iframe.style.transform = '';
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
   }
+  iframe.style.cssText = 'display:block;width:100%;height:100%;border:none';
   iframe.src = embedSrc(id);
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -7922,15 +7915,15 @@ function _sectionInlinePlayer(cardEl, v) {
   var frameId  = grid.id + '-inline-frame';
   var titleId  = grid.id + '-inline-title';
   var isVert = !!v.vertical;
-  var pb   = isVert ? '177.77%' : '56.25%';
-  var maxW = isVert ? '420px'  : '900px';
+  var isMob  = (typeof isMobile === 'function' && isMobile());
+  // Mobile short : container 9:16 (Safari détecte + affiche portrait natif)
+  // Desktop short : container 16:9 (vidéo verticale entière au centre + bandes latérales naturelles)
+  var pb   = (isVert && isMob) ? '177.77%' : '56.25%';
+  var maxW = (isVert && isMob) ? '420px'  : '900px';
 
   var player = document.getElementById(playerId);
-  // 🎯 Style iframe : si vertical → 316% width + centrage pour crop bandes noires YouTube desktop
-  //                   si horizontal → 100% simple (marche déjà)
-  var iframeStyle = isVert
-    ? 'position:absolute;top:0;left:50%;transform:translateX(-50%);width:316.23%;height:100%;border:0'
-    : 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
+  // Iframe simple 100% x 100% (marche partout, bandes noires desktop pour shorts acceptables)
+  var iframeStyle = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0';
   if (!player) {
     player = document.createElement('div');
     player.id = playerId;
@@ -8271,6 +8264,15 @@ function _budo_selectVid(i) {
   var p = document.getElementById('belts_budo_player');
   var fr = document.getElementById('belts_budo_frame');
   if (!p || !fr) return;
+  // Adapter le ratio : mobile 9:16 (portrait natif Safari), desktop 16:9 (vidéo entière + bandes latérales)
+  var isMob = (typeof isMobile === 'function' && isMobile());
+  if (isMob) {
+    p.style.paddingBottom = '177.77%';
+    p.style.maxWidth = '360px';
+  } else {
+    p.style.paddingBottom = '56.25%';
+    p.style.maxWidth = '640px';
+  }
   p.style.display = 'block';
   fr.src = 'https://www.youtube-nocookie.com/embed/' + v.id + '?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
   _budo_renderVids();
@@ -8297,6 +8299,15 @@ function _budo_page_selectVid(i) {
   var p = document.getElementById('budo_page_player');
   var fr = document.getElementById('budo_page_frame');
   if (!p || !fr) return;
+  // Adapter ratio : mobile 9:16 (portrait natif), desktop 16:9 (vidéo entière + bandes latérales)
+  var isMob = (typeof isMobile === 'function' && isMobile());
+  if (isMob) {
+    p.style.paddingBottom = '177.77%';
+    p.style.maxWidth = '420px';
+  } else {
+    p.style.paddingBottom = '56.25%';
+    p.style.maxWidth = '720px';
+  }
   p.style.display = 'block';
   fr.src = 'https://www.youtube-nocookie.com/embed/' + v.id + '?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
   _budo_page_renderVids();
