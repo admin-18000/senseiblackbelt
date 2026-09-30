@@ -288,6 +288,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .vid-card{background:var(--dark2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:all .2s}
 .vid-card:hover{transform:translateY(-4px);border-color:rgba(245,197,24,.3);box-shadow:var(--shadow-md)}
 .vid-thumb{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;cursor:pointer}
+
+/* ═══ OVERLAY PLAY DORÉ UNIVERSEL (signature SENSEI) ═══
+   S'applique automatiquement à toutes les thumbnails vidéo de l'app.
+   Utilisation : ajouter <span class="vid-play-overlay"></span> à l'intérieur de chaque thumbnail (position:relative parent). */
+.vid-play-overlay {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:clamp(38px,10vw,52px);
+  height:clamp(38px,10vw,52px);
+  border-radius:50%;
+  background:rgba(245,197,24,.92);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 3px 12px rgba(0,0,0,.55);
+  pointer-events:none;
+  z-index:2;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.vid-play-overlay::before {
+  content:'';
+  width:0; height:0;
+  border-left:clamp(11px,3vw,15px) solid #0a0d18;
+  border-top:clamp(7px,2vw,10px) solid transparent;
+  border-bottom:clamp(7px,2vw,10px) solid transparent;
+  margin-left:clamp(2px,.6vw,4px);
+}
+/* Hover : légère mise en avant (desktop) */
+.vid-thumb:hover .vid-play-overlay,
+[class*="vid-"]:hover > .vid-play-overlay {
+  transform:translate(-50%,-50%) scale(1.1);
+  box-shadow:0 4px 18px rgba(245,197,24,.65);
+  background:#f5c518;
+}
 .vid-thumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transition:transform .3s}
 .vid-thumb:hover img{transform:scale(1.04)}
 .vid-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(0,0,0,.75);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;border:2px solid rgba(255,255,255,.3)}
@@ -826,7 +859,7 @@ body.unlocked .sensei-only{display:revert !important}
         <button class="nav-drop-item" onclick="showSection('opportunities',this)" data-i18n="nav_opportunities">🚀 Opportunités</button>
         <button class="nav-drop-item" onclick="showSection('piliers',this)" data-i18n="nav_piliers">🏆 7 Piliers</button>
         <button class="nav-drop-item" onclick="showSection('eco',this)" data-i18n="nav_eco">🌿 Eco Dynamics</button>
-        <button class="nav-drop-item" onclick="showSection('coach',this)" data-i18n="nav_coach">Le Coach</button>
+        <button class="nav-drop-item" onclick="showSection('coach',this)" data-i18n="nav_coach">Le Sensei</button>
         <button class="nav-drop-item" onclick="showSection('tutorials',this)" data-i18n="nav_tutorials">Tutorials</button>
       </div>
     </div>
@@ -876,7 +909,7 @@ body.unlocked .sensei-only{display:revert !important}
   <button class="mm-btn" onclick="showSection('eco',null);closeMenu()" data-i18n="mob_eco">🌿 Eco Dynamics</button>
   <button class="mm-btn" onclick="showSection('network',null);closeMenu()" data-i18n="mob_network">🌍 Network</button>
   <button class="mm-btn" onclick="showSection('opportunities',null);closeMenu()" data-i18n="mob_opportunities">🚀 Opportunités</button>
-  <button class="mm-btn" onclick="showSection('coach',null);closeMenu()" data-i18n="mob_coach">🏆 Le Coach</button>
+  <button class="mm-btn" onclick="showSection('coach',null);closeMenu()" data-i18n="mob_coach">🏆 Le Sensei</button>
   <button class="mm-btn" onclick="showSection('testi',null);closeMenu()" data-i18n="mob_testi">⭐ Avis</button>
   <button class="mm-btn sensei-only" onclick="showSection('masters',null);closeMenu()" style="color:var(--gold)" data-i18n="mob_masters">🔒 Masters Only</button>
   <button class="mm-btn" onclick="showOnboardingForce();closeMenu()" data-i18n="mob_replay_tuto">🎓 Revoir la présentation</button>
@@ -1801,13 +1834,9 @@ body.unlocked .sensei-only{display:revert !important}
     <!-- VIDÉO INTRO BELTS (au-dessus de la simulation) — lazy-load pour bel aperçu -->
     <div style="background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px">
       <div style="font-family:var(--font-cond);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px" data-i18n="belts_intro_video_label">🎥 Introduction — Le Système Ceintures</div>
-      <div id="belts_intro_video_wrap" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000;cursor:pointer" onclick="_beltsIntroPlay()">
-        <img id="belts_intro_thumb" src="https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg'" alt="Introduction Ceintures" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" loading="lazy">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55))">
-          <div style="width:72px;height:72px;border-radius:50%;background:rgba(245,197,24,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.6);transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-            <div style="width:0;height:0;border-left:22px solid #0a0d18;border-top:14px solid transparent;border-bottom:14px solid transparent;margin-left:6px"></div>
-          </div>
-        </div>
+      <div id="belts_intro_video_wrap" class="vid-thumb" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000;cursor:pointer" onclick="_beltsIntroPlay()">
+        <img id="belts_intro_thumb" src="https://img.youtube.com/vi/VDJW6TqZXvs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/VDJW6TqZXvs/mqdefault.jpg'" alt="Introduction Ceintures" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" loading="lazy">
+        <span class="vid-play-overlay"></span>
       </div>
     </div>
 <script>
@@ -2644,7 +2673,7 @@ body.unlocked .sensei-only{display:revert !important}
     <div class="tr-card-title">🎬 CHOISIS TON DRILL SHOOTING</div>
     <div class="vid-scroll" id="tsc_vidScroll"></div>
     <div id="tsc_vidPlayer" style="display:none;border-radius:10px;overflow:hidden;margin-top:10px">
-      <iframe id="tsc_ytFrame" width="100%" style="aspect-ratio:9/16;border:none;display:block" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <iframe id="tsc_ytFrame" width="100%" style="aspect-ratio:16/9;border:none;display:block" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       <div id="tsc_vidLabel" style="font-size:10px;color:var(--muted);padding:6px 0"></div>
     </div>
   </div>
@@ -7316,6 +7345,7 @@ const SECTION_VIDEOS = {
     {id:'ftfnNFPv924', title:'Ball Handling Drill #28', vertical:false},
     {id:'ar6OA2wxwzw', title:'Ball Handling Drill #29', vertical:false},
     {id:'DJHKF-LCaKE', title:'Ball Handling Drill #30', vertical:false},
+    {id:'V0IN8mCRuHM', title:'Ball Handling Drill #31', vertical:false},
   ],
   hec: [
     {id:'xV0XuRGHsxo', title:'Hand-Eye Drill #1', vertical:true},
@@ -7352,6 +7382,10 @@ const SECTION_VIDEOS = {
     {id:'uDKUYkpB6So', title:'Tutorial #6', vertical:true},
     {id:'pcKGXjoM5qY', title:'Tutorial #7', vertical:true},
     {id:'krAcd3FO9W0', title:'Tutorial #8', vertical:true},
+    {id:'qe3EzjA_EPw', title:'Tutorial #9', vertical:true},
+    {id:'YYNApkp5l0E', title:'Tutorial #10', vertical:true},
+    {id:'1eC3n8P420g', title:'Tutorial #11', vertical:true},
+    {id:'PsaHejvOeXg', title:'Tutorial #12', vertical:true},
   ],
   battle: [
     {id:'YbLLnrpHFBs', title:'Battle Royal — Ceinture 1', vertical:true},
@@ -7378,6 +7412,8 @@ const SECTION_VIDEOS = {
     {id:'OVcdiYWwAbA', title:'NBA Pro Drill #12', vertical:true},
     {id:'8HICm-hKqoU', title:'NBA Pro Drill #13', vertical:true},
     {id:'vQK6S_6ChAQ', title:'NBA Pro Drill #14', vertical:true},
+    {id:'QnqT-cpakMI', title:'NBA Pro Drill #15', vertical:true},
+    {id:'ackL-boZm_8', title:'NBA Pro Drill #16', vertical:true},
   ],
   shooting: [
     {id:'RvyX7fXgqiM', title:'Shooting #1', vertical:true},
@@ -7392,6 +7428,7 @@ const SECTION_VIDEOS = {
     {id:'gBe0Y5ncmk8', title:'Shooting #10', vertical:true},
     {id:'85CdNwMIjwo', title:'Shooting #11', vertical:true},
     {id:'rjnzEstVxqo', title:'Shooting #12', vertical:true},
+    {id:'awrZwGlpeaw', title:'Shooting #13', vertical:true},
   ],
   finishing: [
     {id:'s2Gs3GcfLAY', title:'Finishing #1', vertical:true},
@@ -7404,6 +7441,10 @@ const SECTION_VIDEOS = {
     {id:'kV4dFA4QPCc', title:'Finishing #8', vertical:true},
     {id:'DDzeWeS-ocw', title:'Finishing #9', vertical:true},
     {id:'3gPrYncT_I0', title:'Finishing #10', vertical:true},
+    {id:'bpBjB4bNT1s', title:'Finishing #11', vertical:true},
+    {id:'PxSAvnMi0fc', title:'Finishing #12', vertical:true},
+    {id:'sYU8aBj_QtU', title:'Finishing #13', vertical:true},
+    {id:'ILrtHtna0Iw', title:'Finishing #14', vertical:true},
   ],
   defense: [
     {id:'0ZXELMe3VIU', title:'Defense #1', vertical:true},
@@ -7430,6 +7471,8 @@ const SECTION_VIDEOS = {
     {id:'JQ6URaxB4jw', title:'Challenge #12', vertical:true},
     {id:'m2pp7oaAkHo', title:'Challenge #13', vertical:true},
     {id:'Zwmuv0W9jWg', title:'Challenge #14', vertical:true},
+    {id:'3h8TDmrxtE8', title:'Challenge #15', vertical:true},
+    {id:'QnqT-cpakMI', title:'Challenge #16', vertical:true},
   ],
 };
 
@@ -7474,11 +7517,7 @@ function makeThumb(v, ratio) {
            data-yt-id="${v.id}" data-fb="0"
            onload="_ytThumbCheck(this)"
            onerror="_ytThumbFallback(this)">
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.2)">
-        <div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);flex-shrink:0">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px"><polygon points="6,4 20,12 6,20"/></svg>
-        </div>
-      </div>
+      <span class="vid-play-overlay"></span>
     </div>
     <div style="padding:10px 12px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${v.title}</div>`;
 }
@@ -7692,12 +7731,8 @@ function _bhCarousel_build() {
       // dégradé bas
       '<div style="position:absolute;left:0;right:0;bottom:0;height:46%;' +
         'background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none"></div>' +
-      // badge play
-      '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">' +
-        '<div style="width:52px;height:52px;background:rgba(255,0,0,.9);border-radius:50%;' +
-          'display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5)">' +
-          '<svg viewBox="0 0 24 24" width="22" height="22" fill="white" style="margin-left:3px">' +
-          '<polygon points="6,4 20,12 6,20"/></svg></div></div>' +
+      // badge play (style SENSEI doré, cohérent avec toute l'app)
+      '<span class="vid-play-overlay"></span>' +
       // libellé bas
       '<div style="position:absolute;bottom:7px;left:11px;font-family:var(--font-cond);' +
         'font-size:14px;font-weight:700;letter-spacing:.5px;color:#fff;pointer-events:none;z-index:2">' +
@@ -8265,6 +8300,7 @@ function showSection(id, btn) {
 }
 
 // ══ BUDŌ - PASSAGE DE CEINTURE (7 vidéos shorts YouTube) ═══════════
+// Sous-rubrique BUDŌ dans BELTS — 8 vidéos originales seulement
 var _budo_VIDS = [
   {id:'5brOMSdIfpg', title:'BUDŌ #1'},
   {id:'f9Awmk_52z8', title:'BUDŌ #2'},
@@ -8274,6 +8310,24 @@ var _budo_VIDS = [
   {id:'FBP7pfAENgs', title:'BUDŌ #6'},
   {id:'dHqfYVxqmbY', title:'BUDŌ #7'},
   {id:'AGm_upGWeH8', title:'BUDŌ #8'}
+];
+
+// Grande rubrique BUDŌ — 14 vidéos (3 nouvelles en tête + 8 anciennes + 3 nouvelles en fin)
+var _budo_page_VIDS = [
+  {id:'ZwFX9N2CM2k', title:'BUDŌ #1'},
+  {id:'QSfJP9ETvA4', title:'BUDŌ #2'},
+  {id:'EVJkjt_1W7w', title:'BUDŌ #3'},
+  {id:'5brOMSdIfpg', title:'BUDŌ #4'},
+  {id:'f9Awmk_52z8', title:'BUDŌ #5'},
+  {id:'dy2_W7SG4FQ', title:'BUDŌ #6'},
+  {id:'V01cjnjFxns', title:'BUDŌ #7'},
+  {id:'doOaEFdud5M', title:'BUDŌ #8'},
+  {id:'FBP7pfAENgs', title:'BUDŌ #9'},
+  {id:'dHqfYVxqmbY', title:'BUDŌ #10'},
+  {id:'AGm_upGWeH8', title:'BUDŌ #11'},
+  {id:'kTdfWkdQnJ8', title:'BUDŌ #12'},
+  {id:'ZnsLs1ByG-U', title:'BUDŌ #13'},
+  {id:'JXda0GVyJc4', title:'BUDŌ #14'}
 ];
 var _budo_selVid = null;
 
@@ -8285,7 +8339,7 @@ function _budo_renderVids() {
     return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_selectVid(' + i + ')">' +
       '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
       'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'" ' +
-      'loading="lazy" alt="' + v.title + '">' +
+      'loading="lazy" alt="' + v.title + '">' + '<span class="vid-play-overlay"></span>' +
       '<div class="vid-thumb-title">' + v.title + '</div></div>';
   }).join('');
 }
@@ -8312,22 +8366,24 @@ function _budo_selectVid(i) {
   if (window._haptic) { try { window._haptic.tap(); } catch(e){} }
 }
 
+var _budo_page_selVid = null;
+
 function _budo_page_renderVids() {
   var el = document.getElementById('budo_page_grid');
   if (!el) return;
-  el.innerHTML = _budo_VIDS.map(function(v, i) {
-    var sel = _budo_selVid === i;
+  el.innerHTML = _budo_page_VIDS.map(function(v, i) {
+    var sel = _budo_page_selVid === i;
     return '<div class="vid-thumb' + (sel?' selected':'') + ' vertical" onclick="_budo_page_selectVid(' + i + ')">' +
       '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" ' +
       'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg\'" ' +
-      'loading="lazy" alt="' + v.title + '">' +
+      'loading="lazy" alt="' + v.title + '">' + '<span class="vid-play-overlay"></span>' +
       '<div class="vid-thumb-title">' + v.title + '</div></div>';
   }).join('');
 }
 
 function _budo_page_selectVid(i) {
-  _budo_selVid = i;
-  var v = _budo_VIDS[i];
+  _budo_page_selVid = i;
+  var v = _budo_page_VIDS[i];
   var p = document.getElementById('budo_page_player');
   var fr = document.getElementById('budo_page_frame');
   if (!p || !fr) return;
@@ -9326,10 +9382,10 @@ function initVisuSci() {
 }
 </script>
 
-<!-- ══ LE COACH ══ -->
+<!-- ══ LE SENSEI ══ -->
 <div id="s-coach" class="section">
   <div style="max-width:1080px;margin:0 auto;padding:0 16px;overflow:hidden">
-    <div class="sec-title" data-i18n="sec_coach_title">LE <span>COACH</span></div>
+    <div class="sec-title" data-i18n="sec_coach_title">LE <span>SENSEI</span></div>
     <div class="sec-sub" data-i18n="sec_coach_sub">Sensei BlackBelt · L'homme derrière la méthode</div>
     <div class="sec-line"></div>
     <div class="coach-layout" style="display:grid;grid-template-columns:minmax(280px,340px) 1fr;gap:clamp(28px,4vw,56px);align-items:center;margin-top:36px">
@@ -12252,7 +12308,7 @@ fr: {
   nav_vulga:'Science', nav_neuro:'Neurosciences', nav_visusci:'Visualisation',
   nav_profil:'🏅 Mon Profil', nav_minijeux:'🎮 Mini-Jeux', nav_stats:'📈 Mes Stats',
   nav_piliers:'🏆 7 Piliers', nav_eco:'🌿 Eco Dynamics', nav_network:'🌍 Network',
-  nav_coach:'Le Coach', nav_masters:'🔒 Masters', nav_testi:'Avis',
+  nav_coach:'Le Sensei', nav_masters:'🔒 Masters', nav_testi:'Avis',
   nav_reserver:'Réserver', nav_inscription:"S'inscrire", nav_join:'Rejoindre →',
 
   // ── NAVIGATION MOBILE ──
@@ -12267,7 +12323,7 @@ fr: {
   mob_vulga:'📐 Vulgarisation Scientifique', mob_neuro:'🧬 Neurosciences',
   mob_visusci:'🔬 Visualisation Scientifique', mob_stats:'📈 Mes Stats',
   mob_piliers:'🏆 7 Piliers', mob_eco:'🌿 Eco Dynamics', mob_network:'🌍 Network',
-  mob_coach:'🏆 Le Coach', mob_testi:'⭐ Avis', mob_reserver:'💳 Réserver une séance',
+  mob_coach:'🏆 Le Sensei', mob_testi:'⭐ Avis', mob_reserver:'💳 Réserver une séance',
   mob_masters:'🔒 Masters Only', mob_inscription:"✍️ S'inscrire",
     mob_replay_tuto:'🎓 Revoir la présentation',
 
@@ -12315,7 +12371,7 @@ fr: {
   sec_eco_sub:'Constraints-Led Approach · Pédagogie non-linéaire · Sensei BlackBelt',
   sec_net_title:'SENSEI <span style="color:var(--gold)">NETWORK</span>',
   sec_net_sub:'La communauté mondiale Sensei BlackBelt',
-  sec_coach_title:'LE <span style="color:var(--gold)">COACH</span>',
+  sec_coach_title:'LE <span style="color:var(--gold)">SENSEI</span>',
   sec_coach_sub:'Thibault NJECKIL · Certification Lean Six Sigma 6σ',
   sec_testi_title:'ILS EN <span style="color:var(--gold)">PARLENT</span>',
   sec_testi_sub:'Ce que disent les athlètes et les experts',
@@ -12374,7 +12430,7 @@ en: {
   nav_vulga:'Science', nav_neuro:'Neurosciences', nav_visusci:'Visual Science',
   nav_profil:'🏅 My Profile', nav_minijeux:'🎮 Games', nav_stats:'📈 My Stats',
   nav_piliers:'🏆 7 Pillars', nav_eco:'🌿 Eco Dynamics', nav_network:'🌍 Network',
-  nav_coach:'The Coach', nav_masters:'🔒 Masters', nav_testi:'Reviews',
+  nav_coach:'The Sensei', nav_masters:'🔒 Masters', nav_testi:'Reviews',
   nav_reserver:'Book', nav_inscription:'Sign Up', nav_join:'Join →',
 
   // ── NAV MOBILE ──
@@ -12389,7 +12445,7 @@ en: {
   mob_vulga:'📐 Applied Science', mob_neuro:'🧬 Neuroscience',
   mob_visusci:'🔬 Visual Science', mob_stats:'📈 My Stats',
   mob_piliers:'🏆 7 Pillars', mob_eco:'🌿 Eco Dynamics', mob_network:'🌍 Network',
-  mob_coach:'🏆 The Coach', mob_testi:'⭐ Reviews', mob_reserver:'💳 Book a Session',
+  mob_coach:'🏆 The Sensei', mob_testi:'⭐ Reviews', mob_reserver:'💳 Book a Session',
   mob_masters:'🔒 Masters Only', mob_inscription:'✍️ Sign Up',
     mob_replay_tuto:'🎓 Review the presentation',
 
@@ -12437,7 +12493,7 @@ en: {
   sec_eco_sub:'Constraints-Led Approach · Nonlinear pedagogy · Sensei BlackBelt',
   sec_net_title:'SENSEI <span style="color:var(--gold)">NETWORK</span>',
   sec_net_sub:'The worldwide Sensei BlackBelt community',
-  sec_coach_title:'THE <span style="color:var(--gold)">COACH</span>',
+  sec_coach_title:'THE <span style="color:var(--gold)">SENSEI</span>',
   sec_coach_sub:'Thibault NJECKIL · Lean Six Sigma 6σ Certification',
   sec_testi_title:'WHAT THEY <span style="color:var(--gold)">SAY</span>',
   sec_testi_sub:'Athletes and experts speak out',
@@ -14470,7 +14526,7 @@ function applyLangTracker(lang) {
     sec_belts_sub: '9 mastery levels · Sensei BlackBelt Method',
     sec_data_title: 'DATA <span style="color:var(--gold)">SCIENCE</span>',
     sec_data_sub: 'Performance analytics · Sensei BlackBelt',
-    sec_coach_title: 'THE <span style="color:var(--gold)">COACH</span>',
+    sec_coach_title: 'THE <span style="color:var(--gold)">SENSEI</span>',
     sec_coach_sub: 'Thibault NJECKIL · Lean Six Sigma 6\u03c3 Certification',
     sec_testi_title: 'WHAT THEY <span style="color:var(--gold)">SAY</span>',
     sec_testi_sub: 'What athletes and experts say',
@@ -16464,7 +16520,7 @@ function closePlayerLinkModal() {
     sec_battle_title: 'BATTLE <span style="color:var(--gold)">ROYAL</span>',
     sec_chal_title: 'CHAL<span style="color:var(--gold)">LENGES</span>',
     sec_coach_sub: 'Thibault NJECKIL · Certification Lean Six Sigma 6\u03c3',
-    sec_coach_title: 'LE <span style="color:var(--gold)">COACH</span>',
+    sec_coach_title: 'LE <span style="color:var(--gold)">SENSEI</span>',
     sec_ins_sub: 'Rejoindre le programme SENSEI · Tous niveaux · Toutes pratiques',
     sec_ins_title: 'S\u2019IN<span style="color:var(--gold)">CRIRE</span>',
     sec_mas_sub: 'Espace Sensei · Acc\u00e8s PIN · Outils coach exclusifs',
@@ -24595,7 +24651,7 @@ function _td2_renderVids() {
   el.innerHTML = _td2_VIDEOS.map(function(v,i) {
     var sel = _td2_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td2_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -24622,7 +24678,7 @@ function _td_renderVids() {
   el.innerHTML = _td_VIDEOS.map(function(v,i) {
     var sel = _td_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_td_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -24872,7 +24928,7 @@ function _tsc_renderVids() {
   el.innerHTML = _tsc_VIDEOS.map(function(v,i){
     var sel = _tsc_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tsc_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -25062,7 +25118,7 @@ function _tag_renderVids() {
   el.innerHTML=_tag_VIDEOS.map(function(v,i){
     var sel=_tag_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tag_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -25320,7 +25376,7 @@ function _tsc_renderScVids() {
   el.innerHTML=_tsc_SC_VIDS.map(function(v,i){
     var sel=_tsc_scSelVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+' vertical" onclick="_tsc_scSelectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -25456,7 +25512,7 @@ function _tch_renderVids() {
   el.innerHTML=_tch_VIDEOS.map(function(v,i){
     var sel=_tch_selVid===i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_tch_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -26281,7 +26337,7 @@ var _APP_I18N_FR_TO_EN = {
   '🏆 Challenges': '🏆 Challenges',
   '🏆 NATIONAL': '🏆 NATIONAL',
   '🏆 NBA Pro Drills': '🏆 NBA Pro Drills',
-  '🏆 Le Coach': '🏆 The Coach',
+  '🏆 Le Sensei': '🏆 The Sensei',
   '🎮 Mini-Jeux': '🎮 Mini-Games',
   '⚡ Physique': '⚡ Physics',
   '⚡ Minimal': '⚡ Minimal',
@@ -29560,7 +29616,8 @@ var _dcog_VIDEOS = [
   {id:'M7DtIYt1he8', title:'TBoard UN BALLON'},
   {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS'},
   {id:'UHNUSFHSrOo', title:'Dribble Height HAUT'},
-  {id:'eFXJ32fp54Q', title:'Burnout'}
+  {id:'5Fgt7txZEQc', title:'Burnout'},
+  {id:'eFXJ32fp54Q', title:'Burnout (alt)'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -29571,7 +29628,7 @@ function _dcog_renderVids() {
   el.innerHTML = _dcog_VIDEOS.map(function(v,i) {
     var sel = _dcog_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_dcog_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'+'<span class="vid-play-overlay"></span>'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
