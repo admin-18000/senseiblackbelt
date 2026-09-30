@@ -1127,8 +1127,8 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_goat">GOAT STATUS</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_goat">👑 Battle Royal</div>
         </button>
-        <!-- SENSEI RUSH (13e tuile - Jeu vidéo endless runner ceinture par ceinture) -->
-        <button onclick="_sr_open()" ontouchstart=""
+        <!-- JEUX VIDÉOS (13e tuile - Ouvre la salle d'arcade avec choix de jeux) -->
+        <button onclick="_arcade_open()" ontouchstart=""
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎮</div>
@@ -13087,6 +13087,26 @@ function applyLangTracker(lang) {
     sr_controls:"\u2328\ufe0f Espace / \ud83d\udcf1 Tap \u00b7 Sauter<br>R\u00e9colte les ballons \u00b7 \u00c9vite les c\u00f4nes",
     sr_rotate_title:"TOURNE TON T\u00c9L\u00c9PHONE",
     sr_rotate_msg:"Le jeu se joue en mode paysage \u00b7 Bascule ton \u00e9cran \u00e0 l'horizontale",
+    dojo_lbl_sarena:"SHOOT ARENA",
+    dojo_sub_sarena:"\ud83c\udfc0 Tir au panier",
+    sa_tagline:"\ud83c\udfaf Vise, tire, marque",
+    sa_pick_mode:"CHOISIS TON MODE",
+    sa_mode_free:"\ud83c\udfaf LANCER FRANC",
+    sa_mode_three:"\ud83c\udfc0 3 POINTS",
+    sa_mode_half:"\u26a1 HALF-COURT",
+    sa_btn_retry:"\u21bb REJOUER",
+    sa_btn_menu:"\u2190 Menu",
+    sa_controls:"\ud83d\uddb1\ufe0f Glisse en arri\u00e8re depuis le ballon pour tirer \u00b7 Angle + puissance",
+    arcade_title:"SALLE D'ARCADE",
+    arcade_sub:"Choisis ton jeu",
+    arcade_rush_lbl:"SENSEI RUSH",
+    arcade_rush_sub:"\ud83c\udfc0 Endless Runner \u00b7 Cours et r\u00e9colte les ballons",
+    arcade_shoot_lbl:"SHOOT ARENA",
+    arcade_shoot_sub:"\ud83c\udfc0 Tir au panier \u00b7 Vise, tire, marque",
+    arcade_soon_lbl:"BIENT\u00d4T",
+    arcade_soon_sub:"De nouveaux jeux arrivent\u2026",
+    arcade_stats_title:"\ud83c\udfc6 TES RECORDS ARCADE",
+    arcade_stats_empty:"Joue \u00e0 ton premier jeu pour battre tes records",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
@@ -13290,6 +13310,26 @@ function applyLangTracker(lang) {
     sr_controls:"\u2328\ufe0f Space / \ud83d\udcf1 Tap \u00b7 Jump<br>Collect basketballs \u00b7 Dodge cones",
     sr_rotate_title:"ROTATE YOUR PHONE",
     sr_rotate_msg:"This game is played in landscape mode \u00b7 Turn your screen horizontally",
+    dojo_lbl_sarena:"SHOOT ARENA",
+    dojo_sub_sarena:"\ud83c\udfc0 Basket shooting",
+    sa_tagline:"\ud83c\udfaf Aim, shoot, score",
+    sa_pick_mode:"PICK YOUR MODE",
+    sa_mode_free:"\ud83c\udfaf FREE THROW",
+    sa_mode_three:"\ud83c\udfc0 3 POINTER",
+    sa_mode_half:"\u26a1 HALF-COURT",
+    sa_btn_retry:"\u21bb RETRY",
+    sa_btn_menu:"\u2190 Menu",
+    sa_controls:"\ud83d\uddb1\ufe0f Drag back from the ball to shoot \u00b7 Angle + power",
+    arcade_title:"ARCADE ROOM",
+    arcade_sub:"Pick your game",
+    arcade_rush_lbl:"SENSEI RUSH",
+    arcade_rush_sub:"\ud83c\udfc0 Endless Runner \u00b7 Run and collect basketballs",
+    arcade_shoot_lbl:"SHOOT ARENA",
+    arcade_shoot_sub:"\ud83c\udfc0 Basket shooting \u00b7 Aim, shoot, score",
+    arcade_soon_lbl:"COMING SOON",
+    arcade_soon_sub:"New games on the way\u2026",
+    arcade_stats_title:"\ud83c\udfc6 YOUR ARCADE RECORDS",
+    arcade_stats_empty:"Play your first game to set records",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
@@ -38792,6 +38832,139 @@ window._QI_DATA['pnr_05'] = {
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
+     SALLE D'ARCADE — Hub central de sélection des jeux vidéos
+     Ouvert depuis la tuile "JEUX VIDÉOS" du DOJO Interactive Drills
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="arcade-hub" style="display:none;position:fixed;inset:0;z-index:100065;background:linear-gradient(160deg,#0a0d18 0%,#131820 50%,#0a0d18 100%);overflow:auto">
+  <!-- Décor : halo doré central discret + grille -->
+  <div aria-hidden="true" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(900px,90vw);background:radial-gradient(circle,rgba(245,197,24,.08) 0%,rgba(245,197,24,0) 55%);pointer-events:none;z-index:1"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;background-image:linear-gradient(rgba(245,197,24,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,197,24,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;opacity:.6;z-index:1"></div>
+
+  <button onclick="_arcade_close()" aria-label="Fermer"
+          style="position:fixed;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .15s"
+          onmousedown="this.style.transform='scale(.9)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">✕</button>
+
+  <div style="position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:clamp(24px,5vw,60px) clamp(16px,4vw,40px)">
+    <!-- En-tête -->
+    <div style="text-align:center;margin-bottom:clamp(24px,5vw,40px)">
+      <div style="font-size:clamp(48px,10vw,72px);line-height:1;margin-bottom:8px">🕹️</div>
+      <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(32px,7vw,52px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.4),0 2px 8px #000;line-height:1;margin-bottom:8px" data-i18n="arcade_title">SALLE D'ARCADE</div>
+      <div style="font-family:'Barlow',sans-serif;font-size:clamp(12px,2.5vw,14px);color:#cfd3e0;letter-spacing:2px" data-i18n="arcade_sub">Choisis ton jeu</div>
+    </div>
+
+    <!-- Grille des jeux -->
+    <div id="arcade-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:24px">
+      <!-- Card SENSEI RUSH -->
+      <button onclick="_arcade_launch('rush')" ontouchstart="" class="arcade-card"
+        style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.15),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.6);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(0,0,0,.4);font-family:inherit;overflow:hidden">
+        <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:44px;line-height:1;margin-bottom:12px">🎮</div>
+        <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:6px" data-i18n="arcade_rush_lbl">SENSEI RUSH</div>
+        <div style="font-size:11px;color:#cfd3e0;letter-spacing:.5px;font-weight:600;margin-bottom:10px" data-i18n="arcade_rush_sub">🏀 Endless Runner · Cours et récolte les ballons</div>
+        <div id="arcade-best-rush" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
+      </button>
+
+      <!-- Card SHOOT ARENA -->
+      <button onclick="_arcade_launch('shoot')" ontouchstart="" class="arcade-card"
+        style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.15),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.6);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(0,0,0,.4);font-family:inherit;overflow:hidden">
+        <div style="position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:44px;line-height:1;margin-bottom:12px">🎯</div>
+        <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:6px" data-i18n="arcade_shoot_lbl">SHOOT ARENA</div>
+        <div style="font-size:11px;color:#cfd3e0;letter-spacing:.5px;font-weight:600;margin-bottom:10px" data-i18n="arcade_shoot_sub">🏀 Tir au panier · Vise, tire, marque</div>
+        <div id="arcade-best-shoot" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
+      </button>
+
+      <!-- Card BIENTÔT -->
+      <div class="arcade-card-soon"
+        style="position:relative;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(0,0,0,.5));border:1.5px dashed rgba(255,255,255,.2);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;font-family:inherit;overflow:hidden;opacity:.6">
+        <div style="font-size:44px;line-height:1;margin-bottom:12px">🚧</div>
+        <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:#cfd3e0;line-height:1;margin-bottom:6px" data-i18n="arcade_soon_lbl">BIENTÔT</div>
+        <div style="font-size:11px;color:#9aa3b3;letter-spacing:.5px;font-weight:600" data-i18n="arcade_soon_sub">De nouveaux jeux arrivent…</div>
+      </div>
+    </div>
+
+    <!-- Footer stats globales -->
+    <div id="arcade-stats" style="text-align:center;padding:16px;background:rgba(0,0,0,.4);border:1px solid rgba(245,197,24,.2);border-radius:10px;margin-top:12px">
+      <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:13px;letter-spacing:2px;color:#f5c518;margin-bottom:4px" data-i18n="arcade_stats_title">🏆 TES RECORDS ARCADE</div>
+      <div id="arcade-stats-body" style="font-family:'Barlow',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:.5px;line-height:1.8" data-i18n="arcade_stats_empty">Joue à ton premier jeu pour battre tes records</div>
+    </div>
+  </div>
+
+  <style>
+  .arcade-card:hover, .arcade-card:focus {
+    transform:translateY(-3px);
+    box-shadow:0 10px 30px rgba(245,197,24,.35);
+    border-color:rgba(245,197,24,.9);
+    outline:none;
+  }
+  .arcade-card:active { transform:translateY(-1px); }
+  </style>
+</div>
+
+<script>
+// ═══ ARCADE HUB — Router entre les jeux ═══════════════════════════════
+(function(){
+  // Ouvre le hub arcade (appelé depuis la tuile "JEUX VIDÉOS" du DOJO)
+  window._arcade_open = function(){
+    var m = document.getElementById('arcade-hub');
+    if (!m) return;
+    m.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Mettre à jour les meilleurs scores affichés
+    _arcade_refreshBests();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  window._arcade_close = function(){
+    var m = document.getElementById('arcade-hub');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  // Lance un jeu depuis le hub (le hub reste ouvert en fond)
+  window._arcade_launch = function(gameId){
+    if (gameId === 'rush' && typeof _sr_open === 'function') _sr_open();
+    else if (gameId === 'shoot' && typeof _sa_open === 'function') _sa_open();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  // Met à jour les meilleurs scores affichés dans les cards
+  window._arcade_refreshBests = function(){
+    // SENSEI RUSH : localStorage 'sensei_rush_best' (nombre)
+    var rushBest = 0;
+    try { rushBest = parseInt(localStorage.getItem('sensei_rush_best') || '0', 10) || 0; } catch(e){}
+    var rushEl = document.getElementById('arcade-best-rush');
+    if (rushEl) rushEl.textContent = rushBest > 0 ? ('🏆 Record : ' + rushBest + ' pts') : '🏆 Aucun record';
+
+    // SHOOT ARENA : localStorage 'sensei_shoot_arena_best' (objet {free,three,half})
+    var shootBest = { free:0, three:0, half:0 };
+    try {
+      var raw = localStorage.getItem('sensei_shoot_arena_best');
+      if (raw) shootBest = JSON.parse(raw) || shootBest;
+    } catch(e){}
+    var maxShoot = Math.max(shootBest.free||0, shootBest.three||0, shootBest.half||0);
+    var shootEl = document.getElementById('arcade-best-shoot');
+    if (shootEl) shootEl.textContent = maxShoot > 0 ? ('🏆 Record : ' + maxShoot + ' pts') : '🏆 Aucun record';
+
+    // Footer stats globales
+    var body = document.getElementById('arcade-stats-body');
+    if (body) {
+      if (rushBest === 0 && maxShoot === 0) {
+        // laisser le message par défaut (via data-i18n)
+      } else {
+        var lines = [];
+        if (rushBest > 0) lines.push('🎮 SENSEI RUSH : <span style="color:#f5c518;font-weight:700">' + rushBest + ' pts</span>');
+        if (shootBest.free > 0) lines.push('🎯 Lancer franc : <span style="color:#f5c518;font-weight:700">' + shootBest.free + ' pts</span>');
+        if (shootBest.three > 0) lines.push('🏀 3 points : <span style="color:#f5c518;font-weight:700">' + shootBest.three + ' pts</span>');
+        if (shootBest.half > 0) lines.push('⚡ Half-court : <span style="color:#f5c518;font-weight:700">' + shootBest.half + ' pts</span>');
+        body.innerHTML = lines.join(' &nbsp;·&nbsp; ');
+      }
+    }
+  };
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
      SENSEI RUSH — Jeu endless runner Canvas 2D
      Palette : noir #0a0d18 / doré #f5c518 / blanc
      Isolation totale : préfixe _sr_ partout, window._srGame unique
@@ -38939,7 +39112,13 @@ window._QI_DATA['pnr_05'] = {
     window.removeEventListener('orientationchange', _sr_checkOrientation);
     var m = document.getElementById('sr-modal');
     if (m) m.style.display = 'none';
-    document.body.style.overflow = '';
+    // Si le hub arcade est ouvert en fond, on revient sur lui (rafraîchit les scores)
+    var hub = document.getElementById('arcade-hub');
+    if (hub && hub.style.display === 'block') {
+      if (typeof _arcade_refreshBests === 'function') _arcade_refreshBests();
+    } else {
+      document.body.style.overflow = '';
+    }
   };
 
   // ─── Canvas setup + responsive ────────────────────────────────────────
@@ -39534,6 +39713,752 @@ window._QI_DATA['pnr_05'] = {
     var hearts = '';
     for (var i = 0; i < G.lives; i++) hearts += '❤️';
     ctx.fillText(hearts, G.W - 20, 20);
+  }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SHOOT ARENA — Jeu de tir au panier avec trajectoire (Canvas 2D)
+     Isolation totale : préfixe _sa_ partout, window._saGame unique
+     Réutilise basketball.png (ballon) + court.jpg (fond)
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="sa-modal" style="display:none;position:fixed;inset:0;z-index:100070;background:#0a0d18;overflow:hidden">
+  <button onclick="_sa_close()" aria-label="Fermer"
+          style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
+  <canvas id="sa-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none;cursor:crosshair"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="sa-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
+
+  <!-- Écran titre + sélection mode -->
+  <div id="sa-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(38px,9vw,66px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.4),0 2px 8px #000;line-height:1;margin-bottom:6px">SHOOT ARENA</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:clamp(11px,2.3vw,14px);color:#cfd3e0;letter-spacing:2px;margin-bottom:26px;text-shadow:0 1px 4px #000" data-i18n="sa_tagline">🎯 Vise, tire, marque</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:2px;margin-bottom:12px" data-i18n="sa_pick_mode">CHOISIS TON MODE</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:560px;margin-bottom:20px">
+      <button onclick="_sa_selectMode('free')" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:14px 22px;border:1.5px solid rgba(255,255,255,.4);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-weight:700;min-width:150px" data-i18n="sa_mode_free">🎯 LANCER FRANC</button>
+      <button onclick="_sa_selectMode('three')" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:14px 22px;border:1.5px solid rgba(245,197,24,.6);border-radius:10px;background:rgba(245,197,24,.12);color:#f5c518;cursor:pointer;font-weight:700;min-width:150px" data-i18n="sa_mode_three">🏀 3 POINTS</button>
+      <button onclick="_sa_selectMode('half')" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:14px 22px;border:1.5px solid rgba(230,57,70,.6);border-radius:10px;background:rgba(230,57,70,.12);color:#ff8a94;cursor:pointer;font-weight:700;min-width:150px" data-i18n="sa_mode_half">⚡ HALF-COURT</button>
+    </div>
+    <div id="sa-best" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;color:#f5c518;letter-spacing:2px;text-shadow:0 1px 4px #000;margin-bottom:8px"></div>
+    <div style="font-family:'Barlow',sans-serif;font-size:10px;color:#9aa3b3;letter-spacing:1px;line-height:1.6;text-shadow:0 1px 3px #000;margin-top:6px" data-i18n="sa_controls">🖱️ Glisse en arrière depuis le ballon pour tirer · Angle + puissance</div>
+  </div>
+
+  <!-- Écran résultats fin de manche -->
+  <div id="sa-results" style="display:none;position:absolute;inset:0;background:rgba(10,13,24,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px">
+    <div id="sa-results-title" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(30px,7vw,46px);letter-spacing:3px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.5),0 2px 8px #000;margin-bottom:6px">FIN DE MANCHE</div>
+    <div id="sa-results-score" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(48px,10vw,70px);color:#fff;letter-spacing:2px;text-shadow:0 3px 12px #000;margin-bottom:8px"></div>
+    <div id="sa-results-stats" style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;margin-bottom:24px;text-shadow:0 1px 3px #000;line-height:1.6"></div>
+    <button onclick="_sa_startRound()" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 36px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.45);margin-bottom:10px" data-i18n="sa_btn_retry">↻ REJOUER</button>
+    <button onclick="_sa_showTitle()" style="font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:1.5px;padding:8px 16px;border:none;background:transparent;color:#9aa3b3;cursor:pointer;text-decoration:underline;margin-bottom:4px" data-i18n="sa_btn_menu">← Menu</button>
+  </div>
+</div>
+
+<script>
+// ═══ SHOOT ARENA GAME ENGINE ═══════════════════════════════════════════
+// Jeu de tir au panier avec trajectoire physique · isolé (_sa_*)
+(function(){
+  var G = window._saGame = {
+    canvas: null, ctx: null, W: 0, H: 0,
+    running: false, rafId: null, lastT: 0,
+    mode: 'free',    // 'free' | 'three' | 'half'
+    // Physique
+    ball: { x: 0, y: 0, vx: 0, vy: 0, r: 24, launched: false, rotation: 0, trail: [] },
+    hoop: { x: 0, y: 0, ringR: 32, ringThickness: 5, backboardW: 8, backboardH: 90 },
+    aim: { active: false, sx: 0, sy: 0, cx: 0, cy: 0 },
+    wind: 0,       // -3 à +3 (px/frame² sur vx)
+    // État partie
+    shotsLeft: 10, shotsTotal: 10, score: 0, hits: 0, streak: 0, maxStreak: 0,
+    best: { free: 0, three: 0, half: 0 },
+    // Feedback
+    message: '', messageTime: 0, particles: [], scorePops: [],
+    // Images (partagées avec _srGame)
+    imgBall: null, imgCourt: null
+  };
+
+  // Précharger les images (indépendant du 1er jeu — cache navigateur si déjà chargées)
+  (function(){
+    var bi = new Image(); bi.onload = function(){ G.imgBall = bi; }; bi.src = 'basketball.png';
+    var ci = new Image(); ci.onload = function(){ G.imgCourt = ci; }; ci.src = 'court.jpg';
+  })();
+
+  // Config par mode
+  var MODES = {
+    free:  { name:'LANCER FRANC', hoopRatio:0.55, hoopHeightRatio:0.42, wind:0,    label:'FT'   },
+    three: { name:'3 POINTS',     hoopRatio:0.72, hoopHeightRatio:0.42, wind:1.5,  label:'3PT'  },
+    half:  { name:'HALF-COURT',   hoopRatio:0.90, hoopHeightRatio:0.42, wind:3,    label:'HC'   }
+  };
+
+  // ─── Open / Close ─────────────────────────────────────────────────────
+  window._sa_open = function(){
+    var m = document.getElementById('sa-modal');
+    if (!m) return;
+    m.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    _sa_setupCanvas();
+    _sa_loadBest();
+    _sa_showTitle();
+    _sa_checkOrient();
+    window.addEventListener('resize', _sa_checkOrient);
+    window.addEventListener('orientationchange', _sa_checkOrient);
+    _sa_bindInput();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+  window._sa_close = function(){
+    _sa_stop();
+    _sa_unbindInput();
+    window.removeEventListener('resize', _sa_checkOrient);
+    window.removeEventListener('orientationchange', _sa_checkOrient);
+    var m = document.getElementById('sa-modal');
+    if (m) m.style.display = 'none';
+    // Si le hub arcade est ouvert en fond, on revient sur lui (rafraîchit les scores)
+    var hub = document.getElementById('arcade-hub');
+    if (hub && hub.style.display === 'block') {
+      if (typeof _arcade_refreshBests === 'function') _arcade_refreshBests();
+    } else {
+      document.body.style.overflow = '';
+    }
+  };
+
+  function _sa_checkOrient(){
+    var rot = document.getElementById('sa-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _sa_setupCanvas();
+    _sa_placeElements();
+  }
+
+  function _sa_setupCanvas(){
+    G.canvas = document.getElementById('sa-canvas');
+    if (!G.canvas) return;
+    G.ctx = G.canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var w = G.canvas.clientWidth, h = G.canvas.clientHeight;
+    G.canvas.width = Math.floor(w * dpr);
+    G.canvas.height = Math.floor(h * dpr);
+    G.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    G.W = w; G.H = h;
+  }
+
+  // ─── Écrans ───────────────────────────────────────────────────────────
+  window._sa_showTitle = function(){
+    document.getElementById('sa-title-screen').style.display = 'flex';
+    document.getElementById('sa-results').style.display = 'none';
+    _sa_stop();
+    _sa_drawStatic();
+  };
+  function _sa_showResults(){
+    document.getElementById('sa-title-screen').style.display = 'none';
+    var r = document.getElementById('sa-results');
+    r.style.display = 'flex';
+    document.getElementById('sa-results-score').textContent = G.score + ' pts';
+    var mc = MODES[G.mode];
+    var acc = G.shotsTotal > 0 ? Math.round(100 * G.hits / G.shotsTotal) : 0;
+    var newBest = G.score > G.best[G.mode] ? '  ·  🏆 NOUVEAU RECORD' : '';
+    document.getElementById('sa-results-stats').innerHTML =
+      '🏀 ' + G.hits + '/' + G.shotsTotal + ' paniers  ·  🎯 ' + acc + '%<br>' +
+      '🔥 Meilleure série : ' + G.maxStreak +
+      '<br><span style="color:#f5c518">Mode ' + mc.name + newBest + '</span>';
+    if (G.score > G.best[G.mode]) {
+      G.best[G.mode] = G.score;
+      _sa_saveBest();
+    }
+  }
+
+  // ─── Best score ───────────────────────────────────────────────────────
+  function _sa_loadBest(){
+    try {
+      var s = localStorage.getItem('sensei_shoot_arena_best');
+      if (s) G.best = JSON.parse(s);
+    } catch(e){}
+    if (!G.best || typeof G.best !== 'object') G.best = { free:0, three:0, half:0 };
+    var bs = document.getElementById('sa-best');
+    if (bs) bs.textContent =
+      '🏆 FT: ' + (G.best.free||0) + '  ·  3PT: ' + (G.best.three||0) + '  ·  HC: ' + (G.best.half||0);
+  }
+  function _sa_saveBest(){
+    try { localStorage.setItem('sensei_shoot_arena_best', JSON.stringify(G.best)); } catch(e){}
+  }
+
+  // ─── Start round ──────────────────────────────────────────────────────
+  window._sa_selectMode = function(mode){
+    G.mode = mode;
+    _sa_startRound();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+  window._sa_startRound = function(){
+    document.getElementById('sa-title-screen').style.display = 'none';
+    document.getElementById('sa-results').style.display = 'none';
+    G.shotsLeft = 10; G.shotsTotal = 10;
+    G.score = 0; G.hits = 0; G.streak = 0; G.maxStreak = 0;
+    G.particles = []; G.scorePops = [];
+    _sa_placeElements();
+    _sa_resetBall();
+    G.running = true;
+    G.lastT = performance.now();
+    G.rafId = requestAnimationFrame(_sa_loop);
+  };
+
+  function _sa_placeElements(){
+    var mc = MODES[G.mode] || MODES.free;
+    G.hoop.x = G.W * mc.hoopRatio;
+    G.hoop.y = G.H * mc.hoopHeightRatio;
+    // Vent aléatoire dans ±wind
+    G.wind = (Math.random() * 2 - 1) * mc.wind;
+    // Ballon en bas à gauche
+    G.ball.r = Math.max(18, Math.min(28, G.W * 0.025));
+  }
+
+  function _sa_resetBall(){
+    G.ball.x = G.W * 0.12;
+    G.ball.y = G.H - 60 - G.ball.r;
+    G.ball.vx = 0; G.ball.vy = 0;
+    G.ball.launched = false;
+    G.ball.rotation = 0;
+    G.ball.trail = [];
+    G.ball.scored = false;
+    G.ball.touchedRim = false;
+    // Nouveau vent à chaque tir
+    var mc = MODES[G.mode] || MODES.free;
+    G.wind = (Math.random() * 2 - 1) * mc.wind;
+  }
+
+  function _sa_stop(){
+    G.running = false;
+    if (G.rafId) { cancelAnimationFrame(G.rafId); G.rafId = null; }
+  }
+
+  // ─── Input : drag pour tirer (comme Angry Birds) ──────────────────────
+  var _md = null, _mm = null, _mu = null, _tstart = null, _tmove = null, _tend = null;
+  function _sa_getPos(e){
+    var rect = G.canvas.getBoundingClientRect();
+    var t = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  }
+  function _sa_bindInput(){
+    if (!G.canvas) return;
+    _md = function(e){ if (!G.running || G.ball.launched) return; e.preventDefault(); var p = _sa_getPos(e); _sa_beginAim(p.x, p.y); };
+    _mm = function(e){ if (!G.aim.active) return; e.preventDefault(); var p = _sa_getPos(e); G.aim.cx = p.x; G.aim.cy = p.y; };
+    _mu = function(e){ if (!G.aim.active) return; e.preventDefault(); _sa_release(); };
+    G.canvas.addEventListener('mousedown', _md);
+    G.canvas.addEventListener('mousemove', _mm);
+    window.addEventListener('mouseup', _mu);
+    G.canvas.addEventListener('touchstart', _md, { passive:false });
+    G.canvas.addEventListener('touchmove', _mm, { passive:false });
+    G.canvas.addEventListener('touchend', _mu, { passive:false });
+  }
+  function _sa_unbindInput(){
+    if (!G.canvas) return;
+    G.canvas.removeEventListener('mousedown', _md);
+    G.canvas.removeEventListener('mousemove', _mm);
+    window.removeEventListener('mouseup', _mu);
+    G.canvas.removeEventListener('touchstart', _md);
+    G.canvas.removeEventListener('touchmove', _mm);
+    G.canvas.removeEventListener('touchend', _mu);
+  }
+
+  function _sa_beginAim(x, y){
+    G.aim.active = true;
+    G.aim.sx = G.ball.x;
+    G.aim.sy = G.ball.y;
+    G.aim.cx = x;
+    G.aim.cy = y;
+  }
+  function _sa_release(){
+    if (!G.aim.active) return;
+    G.aim.active = false;
+    // Force = distance drag, direction = vecteur inverse
+    var dx = G.aim.sx - G.aim.cx;
+    var dy = G.aim.sy - G.aim.cy;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 20) return; // trop court, on ignore
+    // Puissance normalisée puis multipliée
+    var power = Math.min(dist, 220) / 220; // 0 à 1
+    var speed = 8 + power * 16; // 8 à 24 px/frame
+    var angle = Math.atan2(dy, dx);
+    G.ball.vx = Math.cos(angle) * speed;
+    G.ball.vy = Math.sin(angle) * speed;
+    G.ball.launched = true;
+    G.ball.trail = [];
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  }
+
+  // ─── Loop ─────────────────────────────────────────────────────────────
+  function _sa_loop(ts){
+    if (!G.running) return;
+    var dt = Math.min((ts - G.lastT) / 16.67, 3);
+    G.lastT = ts;
+    _sa_update(dt);
+    _sa_draw();
+    G.rafId = requestAnimationFrame(_sa_loop);
+  }
+
+  function _sa_update(dt){
+    // Physique ballon lancé
+    if (G.ball.launched) {
+      // Trail
+      G.ball.trail.push({ x: G.ball.x, y: G.ball.y });
+      if (G.ball.trail.length > 25) G.ball.trail.shift();
+      // Gravité + vent
+      G.ball.vy += 0.45 * dt;
+      G.ball.vx += G.wind * 0.02 * dt;
+      // Léger air resistance
+      G.ball.vx *= Math.pow(0.998, dt);
+      // Position
+      G.ball.x += G.ball.vx * dt;
+      G.ball.y += G.ball.vy * dt;
+      G.ball.rotation += G.ball.vx * 0.05 * dt;
+
+      // Collision avec l'anneau du panier (2 points : gauche + droite du rim)
+      var rimY = G.hoop.y;
+      var rimLx = G.hoop.x - G.hoop.ringR;
+      var rimRx = G.hoop.x + G.hoop.ringR;
+      _sa_bounceOffPoint(rimLx, rimY);
+      _sa_bounceOffPoint(rimRx, rimY);
+      // Collision backboard (barre verticale à droite du hoop)
+      var bbX = G.hoop.x + G.hoop.ringR + 12;
+      var bbTop = G.hoop.y - G.hoop.backboardH * 0.5;
+      var bbBot = G.hoop.y + G.hoop.backboardH * 0.5;
+      if (G.ball.x + G.ball.r > bbX && G.ball.x - G.ball.r < bbX + G.hoop.backboardW &&
+          G.ball.y + G.ball.r > bbTop && G.ball.y - G.ball.r < bbBot) {
+        // Rebond horizontal
+        if (G.ball.vx > 0) {
+          G.ball.x = bbX - G.ball.r;
+          G.ball.vx = -G.ball.vx * 0.55;
+          G.ball.vy *= 0.9;
+        }
+      }
+
+      // Détection panier réussi : le centre du ballon franchit le plan du rim vers le bas,
+      // et est entre les 2 bords du rim
+      if (!G.ball.scored) {
+        var wasAbove = G.ball._prevY < rimY;
+        var isBelow = G.ball.y >= rimY;
+        if (wasAbove && isBelow && G.ball.vy > 0 &&
+            G.ball.x > rimLx + 6 && G.ball.x < rimRx - 6) {
+          _sa_score();
+        }
+      }
+      G.ball._prevY = G.ball.y;
+
+      // Fin de tir : ballon sorti du canvas ou revient au sol
+      if (G.ball.y > G.H + 100 || G.ball.x < -100 || G.ball.x > G.W + 100) {
+        _sa_endShot();
+      } else if (G.ball.y >= G.H - 60 - G.ball.r && G.ball.launched) {
+        // touche le sol → rebond puis fin
+        G.ball.y = G.H - 60 - G.ball.r;
+        if (Math.abs(G.ball.vy) > 3) {
+          G.ball.vy = -G.ball.vy * 0.4;
+          G.ball.vx *= 0.7;
+        } else {
+          G.ball.vy = 0;
+          setTimeout(_sa_endShot, 300);
+        }
+      }
+    }
+
+    // Particules
+    for (var i = G.particles.length - 1; i >= 0; i--) {
+      var p = G.particles[i];
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vy += 0.2 * dt;
+      p.life -= 0.03 * dt;
+      if (p.life <= 0) G.particles.splice(i, 1);
+    }
+    // Score pops
+    for (var sp = G.scorePops.length - 1; sp >= 0; sp--) {
+      var pop = G.scorePops[sp];
+      pop.y += pop.vy * dt;
+      pop.vy *= 0.97;
+      pop.life -= 0.02 * dt;
+      if (pop.life <= 0) G.scorePops.splice(sp, 1);
+    }
+    // Message timer
+    if (G.messageTime > 0) G.messageTime -= dt * 16.67;
+  }
+
+  function _sa_bounceOffPoint(px, py){
+    var dx = G.ball.x - px;
+    var dy = G.ball.y - py;
+    var d2 = dx*dx + dy*dy;
+    var minD = G.ball.r + G.hoop.ringThickness;
+    if (d2 < minD * minD) {
+      var d = Math.sqrt(d2) || 0.01;
+      var nx = dx / d, ny = dy / d;
+      // Pousser hors du point
+      G.ball.x = px + nx * minD;
+      G.ball.y = py + ny * minD;
+      // Rebondir (facteur d'amortissement)
+      var dot = G.ball.vx * nx + G.ball.vy * ny;
+      G.ball.vx = (G.ball.vx - 2 * dot * nx) * 0.55;
+      G.ball.vy = (G.ball.vy - 2 * dot * ny) * 0.55;
+      G.ball.touchedRim = true;
+    }
+  }
+
+  function _sa_score(){
+    G.ball.scored = true;
+    G.hits++;
+    G.streak++;
+    if (G.streak > G.maxStreak) G.maxStreak = G.streak;
+    // Points selon mode + swish + streak
+    var base = { free:100, three:200, half:400 }[G.mode] || 100;
+    var swish = !G.ball.touchedRim;
+    var mult = swish ? 1.5 : 1;
+    var streakBonus = G.streak >= 5 ? 3 : (G.streak >= 3 ? 2 : 1);
+    var pts = Math.round(base * mult * streakBonus);
+    G.score += pts;
+    // Feedback
+    var msg = swish ? '💫 SWISH !' : '🎯 PANIER !';
+    if (G.streak >= 5) msg = '🔥 EN FEU × ' + G.streak;
+    else if (G.streak >= 3) msg = '⚡ STREAK × ' + G.streak;
+    G.message = msg; G.messageTime = 1500;
+    G.scorePops.push({ x: G.hoop.x, y: G.hoop.y - 30, vy: -3, life: 1.5, txt: '+' + pts });
+    _sa_spawnParticles(G.hoop.x, G.hoop.y, '#f5c518', 25);
+    if (window._haptic) { try { window._haptic.success && window._haptic.success(); } catch(e){} }
+  }
+
+  function _sa_endShot(){
+    if (!G.ball.launched) return;
+    if (!G.ball.scored) {
+      G.streak = 0;
+      G.message = '❌ RATÉ';
+      G.messageTime = 900;
+    }
+    G.shotsLeft--;
+    if (G.shotsLeft <= 0) {
+      setTimeout(function(){
+        _sa_stop();
+        _sa_showResults();
+      }, 800);
+    } else {
+      setTimeout(_sa_resetBall, 500);
+    }
+  }
+
+  function _sa_spawnParticles(x, y, color, n){
+    for (var i = 0; i < n; i++) {
+      G.particles.push({
+        x: x, y: y,
+        vx: (Math.random()-0.5) * 6,
+        vy: (Math.random()-0.5) * 6 - 2,
+        life: 1, color: color, size: 2 + Math.random()*3
+      });
+    }
+  }
+
+  // ─── Rendering ────────────────────────────────────────────────────────
+  function _sa_drawStatic(){
+    _sa_placeElements();
+    _sa_resetBall();
+    _sa_draw();
+  }
+
+  function _sa_draw(){
+    var ctx = G.ctx;
+    if (!ctx) return;
+    ctx.clearRect(0, 0, G.W, G.H);
+
+    // Fond : image terrain
+    if (G.imgCourt) {
+      var iAR = G.imgCourt.naturalWidth / G.imgCourt.naturalHeight;
+      var cAR = G.W / G.H;
+      var dw, dh, dx, dy;
+      if (iAR > cAR) { dh = G.H; dw = G.H * iAR; dx = (G.W - dw)/2; dy = 0; }
+      else { dw = G.W; dh = G.W / iAR; dx = 0; dy = (G.H - dh)/2; }
+      ctx.drawImage(G.imgCourt, dx, dy, dw, dh);
+      ctx.fillStyle = 'rgba(0,0,0,.20)';
+      ctx.fillRect(0, 0, G.W, G.H);
+    } else {
+      ctx.fillStyle = '#131820';
+      ctx.fillRect(0, 0, G.W, G.H);
+    }
+
+    // Ligne de sol
+    ctx.strokeStyle = 'rgba(255,255,255,.7)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, G.H - 60);
+    ctx.lineTo(G.W, G.H - 60);
+    ctx.stroke();
+
+    // Panier + panneau
+    _sa_drawHoop(ctx);
+
+    // Indicateur de vent en haut
+    _sa_drawWindIndicator(ctx);
+
+    // Trajectoire prédite (pointillés dorés) pendant la visée
+    if (G.aim.active) _sa_drawTrajectory(ctx);
+
+    // Trail du ballon en vol
+    if (G.ball.launched && G.ball.trail.length > 1) {
+      ctx.strokeStyle = 'rgba(245,197,24,.4)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(G.ball.trail[0].x, G.ball.trail[0].y);
+      for (var t = 1; t < G.ball.trail.length; t++) {
+        ctx.globalAlpha = t / G.ball.trail.length * 0.6;
+        ctx.lineTo(G.ball.trail[t].x, G.ball.trail[t].y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Ballon
+    _sa_drawBall(ctx);
+
+    // Particules
+    for (var i = 0; i < G.particles.length; i++) {
+      var p = G.particles[i];
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Pops de score
+    for (var sp = 0; sp < G.scorePops.length; sp++) {
+      var pop = G.scorePops[sp];
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, pop.life);
+      ctx.fillStyle = '#f5c518';
+      ctx.strokeStyle = '#0a0d18';
+      ctx.lineWidth = 4;
+      ctx.font = "900 " + (30 + (1.5 - pop.life) * 8) + "px 'Bebas Neue','Impact',sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeText(pop.txt, pop.x, pop.y);
+      ctx.fillText(pop.txt, pop.x, pop.y);
+      ctx.restore();
+    }
+
+    // Message central (SWISH, RATÉ, STREAK...)
+    if (G.messageTime > 0 && G.message) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, G.messageTime / 500);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = "900 clamp(28px,7vw,52px)/1 'Bebas Neue','Impact',sans-serif".replace(/clamp\([^)]+\)/, Math.min(52, Math.max(28, G.W * 0.07)) + 'px');
+      ctx.fillStyle = '#f5c518';
+      ctx.strokeStyle = '#0a0d18';
+      ctx.lineWidth = 6;
+      ctx.strokeText(G.message, G.W/2, G.H * 0.28);
+      ctx.fillText(G.message, G.W/2, G.H * 0.28);
+      ctx.restore();
+    }
+
+    _sa_drawHUD(ctx);
+  }
+
+  function _sa_drawBall(ctx){
+    // Ombre sol (uniquement si près du sol)
+    var groundY = G.H - 60;
+    if (G.ball.y > groundY - 100) {
+      var shadowAlpha = Math.min(0.5, (G.ball.y - (groundY - 100)) / 100 * 0.5);
+      ctx.fillStyle = 'rgba(0,0,0,' + shadowAlpha + ')';
+      ctx.beginPath();
+      ctx.ellipse(G.ball.x, groundY + 2, G.ball.r * 0.8, G.ball.r * 0.22, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (G.imgBall) {
+      ctx.save();
+      ctx.translate(G.ball.x, G.ball.y);
+      ctx.rotate(G.ball.rotation);
+      var d = G.ball.r * 2;
+      ctx.drawImage(G.imgBall, -G.ball.r, -G.ball.r, d, d);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#ee7328';
+      ctx.beginPath();
+      ctx.arc(G.ball.x, G.ball.y, G.ball.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function _sa_drawHoop(ctx){
+    var hx = G.hoop.x, hy = G.hoop.y;
+    var ringR = G.hoop.ringR;
+    var bbX = hx + ringR + 12;
+    var bbTop = hy - G.hoop.backboardH * 0.5;
+    // Poteau
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(bbX + G.hoop.backboardW/2, hy);
+    ctx.lineTo(bbX + G.hoop.backboardW/2, G.H - 60);
+    ctx.stroke();
+    // Panneau
+    ctx.fillStyle = 'rgba(250,250,250,.95)';
+    ctx.fillRect(bbX, bbTop, G.hoop.backboardW, G.hoop.backboardH);
+    ctx.strokeStyle = '#f5c518';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bbX, bbTop, G.hoop.backboardW, G.hoop.backboardH);
+    // Carré cible rouge sur le panneau
+    ctx.strokeStyle = '#e63946';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(bbX - 30, hy - 22, 30, 30);
+    // Anneau orange (ellipse pour effet 3D)
+    ctx.strokeStyle = '#ee7328';
+    ctx.lineWidth = G.hoop.ringThickness;
+    ctx.beginPath();
+    ctx.ellipse(hx, hy, ringR, ringR * 0.28, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // Filet (lignes verticales décroissantes)
+    ctx.strokeStyle = 'rgba(255,255,255,.75)';
+    ctx.lineWidth = 1.2;
+    var netH = 32;
+    for (var n = 0; n < 9; n++) {
+      var t = n / 8;
+      var startX = hx - ringR + t * 2 * ringR;
+      var endX = hx - ringR * 0.6 + t * 1.2 * ringR;
+      ctx.beginPath();
+      ctx.moveTo(startX, hy);
+      ctx.lineTo(endX, hy + netH);
+      ctx.stroke();
+    }
+    // Lignes horizontales du filet
+    for (var h = 1; h <= 3; h++) {
+      var y = hy + h * netH / 3;
+      var w = ringR * 2 * (1 - h * 0.15);
+      ctx.beginPath();
+      ctx.ellipse(hx, y, w/2, w * 0.12, 0, 0, Math.PI);
+      ctx.stroke();
+    }
+    // 2 points de rebond visibles (bords du rim en gros dots orange)
+    ctx.fillStyle = '#c9541a';
+    ctx.beginPath();
+    ctx.arc(hx - ringR, hy, G.hoop.ringThickness, 0, Math.PI * 2);
+    ctx.arc(hx + ringR, hy, G.hoop.ringThickness, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function _sa_drawTrajectory(ctx){
+    // Simule la trajectoire avec les mêmes forces que le vrai lancer
+    var dx = G.aim.sx - G.aim.cx;
+    var dy = G.aim.sy - G.aim.cy;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 20) return;
+    var power = Math.min(dist, 220) / 220;
+    var speed = 8 + power * 16;
+    var angle = Math.atan2(dy, dx);
+    var vx = Math.cos(angle) * speed;
+    var vy = Math.sin(angle) * speed;
+    var sx = G.ball.x, sy = G.ball.y;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(245,197,24,.85)';
+    ctx.fillStyle = '#f5c518';
+    for (var i = 0; i < 40; i++) {
+      sx += vx;
+      sy += vy;
+      vy += 0.45;
+      vx += G.wind * 0.02;
+      if (sy > G.H - 60 || sx > G.W || sx < 0) break;
+      if (i % 2 === 0) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    // Ligne de tension depuis le ballon vers le curseur
+    ctx.strokeStyle = 'rgba(255,255,255,.6)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(G.ball.x, G.ball.y);
+    ctx.lineTo(G.aim.cx, G.aim.cy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Indicateur de puissance (jauge autour du ballon)
+    var powerColor = power < 0.4 ? '#22c55e' : (power < 0.75 ? '#facc15' : '#e63946');
+    ctx.strokeStyle = powerColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(G.ball.x, G.ball.y, G.ball.r + 8, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * power);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function _sa_drawWindIndicator(ctx){
+    if (Math.abs(G.wind) < 0.1) return;
+    var wx = G.W / 2, wy = 30;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(wx - 60, wy - 12, 120, 26);
+    ctx.strokeStyle = 'rgba(255,255,255,.3)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(wx - 60, wy - 12, 120, 26);
+    ctx.fillStyle = '#fff';
+    ctx.font = "10px 'Barlow',sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText('VENT', wx, wy - 3);
+    // Flèche vent
+    var arrowLen = Math.min(35, Math.abs(G.wind) * 14);
+    var dir = G.wind > 0 ? 1 : -1;
+    ctx.strokeStyle = '#f5c518';
+    ctx.fillStyle = '#f5c518';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(wx - arrowLen/2 * dir, wy + 6);
+    ctx.lineTo(wx + arrowLen/2 * dir, wy + 6);
+    ctx.stroke();
+    // Pointe
+    ctx.beginPath();
+    ctx.moveTo(wx + arrowLen/2 * dir, wy + 6);
+    ctx.lineTo(wx + (arrowLen/2 - 6) * dir, wy + 2);
+    ctx.lineTo(wx + (arrowLen/2 - 6) * dir, wy + 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function _sa_drawHUD(ctx){
+    if (!G.running) return;
+    // Score gauche
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(10, 10, 130, 52);
+    ctx.strokeStyle = 'rgba(245,197,24,.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(10, 10, 130, 52);
+    ctx.fillStyle = '#fff';
+    ctx.font = "700 22px 'Bebas Neue','Impact',sans-serif";
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillText(String(G.score) + ' pts', 20, 16);
+    ctx.font = "10px 'Barlow',sans-serif";
+    ctx.fillStyle = '#f5c518';
+    var mc = MODES[G.mode];
+    ctx.fillText('🏀 ' + G.hits + '/' + G.shotsTotal + ' · ' + mc.label, 20, 42);
+    // Tirs restants droite
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(G.W - 90, 10, 80, 52);
+    ctx.strokeStyle = 'rgba(245,197,24,.5)';
+    ctx.strokeRect(G.W - 90, 10, 80, 52);
+    ctx.fillStyle = '#fff';
+    ctx.font = "700 24px 'Bebas Neue','Impact',sans-serif";
+    ctx.fillText(String(G.shotsLeft), G.W - 20, 16);
+    ctx.font = "9px 'Barlow',sans-serif";
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText('TIRS', G.W - 20, 44);
+    // Streak (si actif)
+    if (G.streak >= 2) {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#e63946';
+      ctx.font = "700 18px 'Bebas Neue','Impact',sans-serif";
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 3;
+      ctx.strokeText('🔥 × ' + G.streak, G.W/2, G.H - 40);
+      ctx.fillText('🔥 × ' + G.streak, G.W/2, G.H - 40);
+    }
   }
 })();
 </script>
