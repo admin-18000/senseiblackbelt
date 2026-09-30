@@ -1127,6 +1127,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_goat">GOAT STATUS</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_goat">👑 Battle Royal</div>
         </button>
+        <!-- SENSEI RUSH (13e tuile - Jeu vidéo endless runner ceinture par ceinture) -->
+        <button onclick="_sr_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎮</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_srush">SENSEI RUSH</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_srush">🥋 Endless Runner</div>
+        </button>
       </div>
     </div>
   </div>
@@ -13069,6 +13077,14 @@ function applyLangTracker(lang) {
     dojo_gate_btn_free:"MODE FREEMIUM \u2192",
     dojo_gate_btn_code:"\ud83d\udd11 MODE PREMIUM \u2192",
     dojo_fab_premium:"\ud83d\udd11 MODE PREMIUM",
+    dojo_lbl_srush:"SENSEI RUSH",
+    dojo_sub_srush:"\ud83e\udd4b Endless Runner",
+    sr_tagline:"\ud83e\udd4b L'endless runner du D\u014cJ\u014c",
+    sr_btn_start:"\u25b6 COMMENCER",
+    sr_btn_retry:"\u21bb REJOUER",
+    sr_btn_quit:"\u2190 Quitter",
+    sr_gameover:"GAME OVER",
+    sr_controls:"\u2328\ufe0f Espace / \ud83d\udcf1 Tap \u00b7 Sauter<br>R\u00e9colte les ballons dor\u00e9s \u00b7 \u00c9vite les d\u00e9fenseurs",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
@@ -13262,6 +13278,14 @@ function applyLangTracker(lang) {
     dojo_gate_btn_free:"FREEMIUM MODE \u2192",
     dojo_gate_btn_code:"\ud83d\udd11 PREMIUM MODE \u2192",
     dojo_fab_premium:"\ud83d\udd11 PREMIUM MODE",
+    dojo_lbl_srush:"SENSEI RUSH",
+    dojo_sub_srush:"\ud83e\udd4b Endless Runner",
+    sr_tagline:"\ud83e\udd4b The D\u014cJ\u014c's endless runner",
+    sr_btn_start:"\u25b6 START",
+    sr_btn_retry:"\u21bb RETRY",
+    sr_btn_quit:"\u2190 Quit",
+    sr_gameover:"GAME OVER",
+    sr_controls:"\u2328\ufe0f Space / \ud83d\udcf1 Tap \u00b7 Jump<br>Collect golden balls \u00b7 Avoid defenders",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
@@ -38762,6 +38786,544 @@ window._QI_DATA['pnr_05'] = {
             data-i18n="dojo_gate_back">← Retour</button>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SENSEI RUSH — Jeu endless runner Canvas 2D
+     Palette : noir #0a0d18 / doré #f5c518 / blanc
+     Isolation totale : préfixe _sr_ partout, window._srGame unique
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="sr-modal" style="display:none;position:fixed;inset:0;z-index:100070;background:#0a0d18;overflow:hidden">
+  <!-- Bouton fermer -->
+  <button onclick="_sr_close()" aria-label="Fermer"
+          style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .15s"
+          onmousedown="this.style.transform='scale(.9)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">✕</button>
+  <!-- Canvas de jeu -->
+  <canvas id="sr-canvas" style="display:block;width:100%;height:100%;background:linear-gradient(180deg,#0a0d18 0%,#131820 60%,#1a1f2e 100%);touch-action:none"></canvas>
+  <!-- Overlay HUD titre + score -->
+  <div id="sr-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;padding:0 20px">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(42px,10vw,70px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.4),0 2px 8px #000;line-height:1;margin-bottom:8px">SENSEI RUSH</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:clamp(11px,2.5vw,14px);color:#cfd3e0;letter-spacing:2px;margin-bottom:36px;text-shadow:0 1px 4px #000" data-i18n="sr_tagline">🥋 L'endless runner du DŌJŌ</div>
+    <button onclick="_sr_start()" style="pointer-events:auto;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(16px,3.5vw,20px);letter-spacing:3px;padding:16px 48px;border:none;border-radius:12px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 24px rgba(245,197,24,.5);transition:transform .15s;margin-bottom:14px" data-i18n="sr_btn_start"
+      onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">▶ COMMENCER</button>
+    <div style="font-family:'Barlow',sans-serif;font-size:11px;color:#9aa3b3;letter-spacing:1px;line-height:1.6;text-shadow:0 1px 3px #000" data-i18n="sr_controls">
+      ⌨️ Espace / 📱 Tap · Sauter<br>Récolte les ballons dorés · Évite les défenseurs
+    </div>
+    <div id="sr-best-score" style="margin-top:24px;font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;color:#f5c518;letter-spacing:2px;text-shadow:0 1px 4px #000"></div>
+  </div>
+  <!-- Overlay Game Over -->
+  <div id="sr-gameover" style="display:none;position:absolute;inset:0;background:rgba(10,13,24,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(36px,8vw,58px);letter-spacing:4px;color:#e63946;text-shadow:0 4px 20px rgba(230,57,70,.5),0 2px 8px #000;margin-bottom:8px" data-i18n="sr_gameover">GAME OVER</div>
+    <div id="sr-final-score" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(24px,5vw,34px);color:#f5c518;letter-spacing:3px;text-shadow:0 2px 8px #000;margin-bottom:6px"></div>
+    <div id="sr-final-belt" style="font-family:'Barlow',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:1.5px;margin-bottom:28px;text-shadow:0 1px 3px #000"></div>
+    <button onclick="_sr_start()" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 40px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.45);margin-bottom:10px;transition:transform .15s" data-i18n="sr_btn_retry"
+      onmousedown="this.style.transform='scale(.96)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">↻ REJOUER</button>
+    <button onclick="_sr_close()" style="font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:1.5px;padding:8px 16px;border:none;background:transparent;color:#9aa3b3;cursor:pointer;text-decoration:underline" data-i18n="sr_btn_quit">← Quitter</button>
+  </div>
+</div>
+
+<script>
+// ═══ SENSEI RUSH GAME ENGINE ═══════════════════════════════════════════
+// Endless runner Canvas 2D · isolé · aucun conflit possible avec le reste de l'app
+(function(){
+  var G = window._srGame = {
+    canvas: null, ctx: null, W: 0, H: 0,
+    running: false, paused: false, rafId: null, lastT: 0,
+    score: 0, best: 0, lives: 3,
+    world: { speed: 5, dist: 0 },
+    ground: { y: 0, h: 60 },
+    player: { x: 100, y: 0, vy: 0, r: 22, jumping: false, doubleAvail: true, coyote: 0 },
+    obstacles: [], balls: [], particles: [], trails: [],
+    spawnObs: 0, spawnBall: 0,
+    belt: 'BLANCHE',
+    // Palette
+    C: { bg1:'#0a0d18', bg2:'#131820', ground:'#1a1f2e', line:'#f5c518',
+         player:'#f5c518', playerDark:'#0a0d18', obs:'#e63946', ball:'#f5c518', text:'#fff' }
+  };
+
+  // Ceintures selon score
+  var BELTS = [
+    { name:'BLANCHE',  min:0,    color:'#ffffff', speedMult:1.0 },
+    { name:'JAUNE',    min:200,  color:'#facc15', speedMult:1.15 },
+    { name:'ORANGE',   min:500,  color:'#f97316', speedMult:1.3 },
+    { name:'VERTE',    min:1000, color:'#22c55e', speedMult:1.5 },
+    { name:'BLEUE',    min:1800, color:'#3b82f6', speedMult:1.75 },
+    { name:'VIOLETTE', min:3000, color:'#a855f7', speedMult:2.0 },
+    { name:'MARRON',   min:5000, color:'#92400e', speedMult:2.3 },
+    { name:'ROUGE',    min:8000, color:'#dc2626', speedMult:2.6 },
+    { name:'NOIRE',    min:12000, color:'#000000', speedMult:3.0 }
+  ];
+
+  function beltFor(score){
+    var b = BELTS[0];
+    for (var i = 0; i < BELTS.length; i++) if (score >= BELTS[i].min) b = BELTS[i];
+    return b;
+  }
+
+  // ─── Open / Close modal ───────────────────────────────────────────────
+  window._sr_open = function(){
+    var m = document.getElementById('sr-modal');
+    if (!m) return;
+    m.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    _sr_setupCanvas();
+    _sr_showTitle();
+    // Load best score
+    try {
+      var s = localStorage.getItem('sensei_rush_best');
+      G.best = s ? parseInt(s,10) || 0 : 0;
+    } catch(e){ G.best = 0; }
+    var bs = document.getElementById('sr-best-score');
+    if (bs) bs.textContent = G.best > 0 ? ('🏆 Record : ' + G.best) : '';
+    // Bind controls
+    _sr_bindInput();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  window._sr_close = function(){
+    _sr_stop();
+    _sr_unbindInput();
+    var m = document.getElementById('sr-modal');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  // ─── Canvas setup + responsive ────────────────────────────────────────
+  function _sr_setupCanvas(){
+    G.canvas = document.getElementById('sr-canvas');
+    if (!G.canvas) return;
+    G.ctx = G.canvas.getContext('2d');
+    _sr_resize();
+    window.addEventListener('resize', _sr_resize);
+  }
+  function _sr_resize(){
+    if (!G.canvas) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = G.canvas.clientWidth, h = G.canvas.clientHeight;
+    G.canvas.width = Math.floor(w * dpr);
+    G.canvas.height = Math.floor(h * dpr);
+    G.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    G.W = w; G.H = h;
+    G.ground.y = h - G.ground.h;
+    G.player.x = Math.max(90, w * 0.15);
+    if (!G.running) G.player.y = G.ground.y - G.player.r;
+  }
+
+  // ─── Écrans ───────────────────────────────────────────────────────────
+  function _sr_showTitle(){
+    var t = document.getElementById('sr-title-screen');
+    var go = document.getElementById('sr-gameover');
+    if (t) t.style.display = 'flex';
+    if (go) go.style.display = 'none';
+    // Draw idle scene
+    _sr_reset(true);
+    _sr_draw();
+  }
+  function _sr_showGameOver(){
+    var t = document.getElementById('sr-title-screen');
+    var go = document.getElementById('sr-gameover');
+    if (t) t.style.display = 'none';
+    if (go) go.style.display = 'flex';
+    document.getElementById('sr-final-score').textContent = 'Score : ' + G.score;
+    var b = beltFor(G.score);
+    document.getElementById('sr-final-belt').textContent = '🥋 Ceinture ' + b.name + (G.score > G.best ? '  ·  🏆 NOUVEAU RECORD !' : '');
+  }
+
+  // ─── Start / Reset ────────────────────────────────────────────────────
+  window._sr_start = function(){
+    document.getElementById('sr-title-screen').style.display = 'none';
+    document.getElementById('sr-gameover').style.display = 'none';
+    _sr_reset(false);
+    G.running = true;
+    G.lastT = performance.now();
+    G.rafId = requestAnimationFrame(_sr_loop);
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+  };
+
+  function _sr_reset(idle){
+    G.score = 0; G.lives = 3;
+    G.world.speed = 5; G.world.dist = 0;
+    G.player.y = G.ground.y - G.player.r;
+    G.player.vy = 0; G.player.jumping = false; G.player.doubleAvail = true; G.player.coyote = 0;
+    G.obstacles = []; G.balls = []; G.particles = []; G.trails = [];
+    G.spawnObs = 1200; G.spawnBall = 800;
+    G.belt = 'BLANCHE';
+  }
+
+  function _sr_stop(){
+    G.running = false;
+    if (G.rafId) { cancelAnimationFrame(G.rafId); G.rafId = null; }
+  }
+
+  // ─── Input ────────────────────────────────────────────────────────────
+  var _kbHandler = null, _touchHandler = null;
+  function _sr_bindInput(){
+    _kbHandler = function(e){
+      if (!G.running) return;
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.key === ' ' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        _sr_jump();
+      }
+    };
+    _touchHandler = function(e){
+      if (!G.running) return;
+      e.preventDefault();
+      _sr_jump();
+    };
+    window.addEventListener('keydown', _kbHandler);
+    var c = document.getElementById('sr-canvas');
+    if (c) {
+      c.addEventListener('touchstart', _touchHandler, { passive:false });
+      c.addEventListener('mousedown', _touchHandler);
+    }
+  }
+  function _sr_unbindInput(){
+    if (_kbHandler) window.removeEventListener('keydown', _kbHandler);
+    var c = document.getElementById('sr-canvas');
+    if (c && _touchHandler) {
+      c.removeEventListener('touchstart', _touchHandler);
+      c.removeEventListener('mousedown', _touchHandler);
+    }
+    _kbHandler = null; _touchHandler = null;
+  }
+
+  function _sr_jump(){
+    // Coyote time : peut sauter jusqu'à 100ms après avoir quitté le sol
+    if (!G.player.jumping || G.player.coyote > 0) {
+      G.player.vy = -13;
+      G.player.jumping = true;
+      G.player.coyote = 0;
+      G.player.doubleAvail = true;
+      _sr_spawnParticles(G.player.x, G.player.y + G.player.r, '#f5c518', 8);
+    } else if (G.player.doubleAvail) {
+      // Double jump
+      G.player.vy = -11;
+      G.player.doubleAvail = false;
+      _sr_spawnParticles(G.player.x, G.player.y + G.player.r, '#f5c518', 12);
+    }
+  }
+
+  // ─── Spawns ───────────────────────────────────────────────────────────
+  function _sr_spawnObstacle(){
+    var kinds = ['low', 'high'];
+    // Après 500 pts, ajout occasionnel de doubles obstacles
+    if (G.score > 500 && Math.random() < 0.15) kinds.push('double');
+    var k = kinds[Math.floor(Math.random() * kinds.length)];
+    var w, h, y;
+    if (k === 'low') { w = 28 + Math.random()*15; h = 30 + Math.random()*15; y = G.ground.y - h; }
+    else if (k === 'high') { w = 34; h = 50; y = G.ground.y - h; }
+    else { w = 60; h = 40; y = G.ground.y - h; } // double
+    G.obstacles.push({ x: G.W + 20, y: y, w: w, h: h, kind: k });
+  }
+  function _sr_spawnBall(){
+    // Y varie : soit près du sol (facile), soit en l'air (nécessite jump)
+    var high = Math.random() < 0.5;
+    var y = high ? (G.ground.y - 100 - Math.random()*60) : (G.ground.y - 40 - Math.random()*30);
+    G.balls.push({ x: G.W + 20, y: y, r: 12, taken: false, pulse: 0 });
+  }
+  function _sr_spawnParticles(x, y, color, n){
+    for (var i = 0; i < n; i++) {
+      G.particles.push({
+        x: x, y: y,
+        vx: (Math.random()-0.5) * 4,
+        vy: (Math.random()-0.5) * 4 - 1,
+        life: 1, color: color, size: 2 + Math.random()*3
+      });
+    }
+  }
+
+  // ─── Update / Draw loop ───────────────────────────────────────────────
+  function _sr_loop(ts){
+    if (!G.running) return;
+    var dt = Math.min((ts - G.lastT) / 16.67, 3); // en frames de 60fps
+    G.lastT = ts;
+    _sr_update(dt);
+    _sr_draw();
+    G.rafId = requestAnimationFrame(_sr_loop);
+  }
+
+  function _sr_update(dt){
+    var speed = G.world.speed * dt;
+    G.world.dist += speed;
+
+    // Score continu (distance)
+    G.score += Math.floor(dt * 1);
+
+    // Belt progression → vitesse
+    var b = beltFor(G.score);
+    G.belt = b.name;
+    G.world.speed = 5 * b.speedMult;
+
+    // Player physics
+    G.player.vy += 0.6 * dt; // gravité
+    G.player.y += G.player.vy * dt;
+    var groundLimit = G.ground.y - G.player.r;
+    if (G.player.y >= groundLimit) {
+      G.player.y = groundLimit;
+      G.player.vy = 0;
+      G.player.jumping = false;
+      G.player.coyote = 6;
+    } else {
+      G.player.coyote = Math.max(0, G.player.coyote - dt);
+    }
+
+    // Trail joueur
+    if (G.running && Math.random() < 0.5) {
+      G.trails.push({ x: G.player.x, y: G.player.y, r: G.player.r, life: 1 });
+    }
+    for (var i = G.trails.length - 1; i >= 0; i--) {
+      G.trails[i].life -= 0.05 * dt;
+      if (G.trails[i].life <= 0) G.trails.splice(i, 1);
+    }
+
+    // Spawn timers
+    G.spawnObs -= dt * 16.67;
+    G.spawnBall -= dt * 16.67;
+    if (G.spawnObs <= 0) {
+      _sr_spawnObstacle();
+      G.spawnObs = 900 + Math.random() * 600 - Math.min(500, G.score / 30);
+    }
+    if (G.spawnBall <= 0) {
+      _sr_spawnBall();
+      G.spawnBall = 600 + Math.random() * 400;
+    }
+
+    // Move obstacles + collisions
+    for (var i = G.obstacles.length - 1; i >= 0; i--) {
+      var o = G.obstacles[i];
+      o.x -= speed;
+      // Collision AABB vs cercle
+      if (o.x < G.player.x + G.player.r && o.x + o.w > G.player.x - G.player.r &&
+          o.y < G.player.y + G.player.r && o.y + o.h > G.player.y - G.player.r) {
+        // Circle-rect precise
+        var cx = Math.max(o.x, Math.min(G.player.x, o.x + o.w));
+        var cy = Math.max(o.y, Math.min(G.player.y, o.y + o.h));
+        var dx = G.player.x - cx, dy = G.player.y - cy;
+        if (dx*dx + dy*dy < G.player.r * G.player.r) {
+          _sr_hit();
+          G.obstacles.splice(i, 1);
+          continue;
+        }
+      }
+      if (o.x + o.w < -50) G.obstacles.splice(i, 1);
+    }
+
+    // Move balls + pickup
+    for (var j = G.balls.length - 1; j >= 0; j--) {
+      var bl = G.balls[j];
+      bl.x -= speed;
+      bl.pulse = (bl.pulse + 0.15 * dt) % (Math.PI * 2);
+      var ddx = G.player.x - bl.x, ddy = G.player.y - bl.y;
+      if (ddx*ddx + ddy*ddy < (G.player.r + bl.r) * (G.player.r + bl.r)) {
+        G.score += 25;
+        _sr_spawnParticles(bl.x, bl.y, '#f5c518', 14);
+        G.balls.splice(j, 1);
+        continue;
+      }
+      if (bl.x < -30) G.balls.splice(j, 1);
+    }
+
+    // Particles
+    for (var k = G.particles.length - 1; k >= 0; k--) {
+      var p = G.particles[k];
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vy += 0.15 * dt;
+      p.life -= 0.04 * dt;
+      if (p.life <= 0) G.particles.splice(k, 1);
+    }
+  }
+
+  function _sr_hit(){
+    G.lives--;
+    _sr_spawnParticles(G.player.x, G.player.y, '#e63946', 20);
+    if (G.lives <= 0) {
+      _sr_gameOver();
+    } else {
+      // Petit rebond arrière + invincibilité brève
+      G.player.vy = -8;
+    }
+  }
+
+  function _sr_gameOver(){
+    _sr_stop();
+    if (G.score > G.best) {
+      G.best = G.score;
+      try { localStorage.setItem('sensei_rush_best', String(G.best)); } catch(e){}
+    }
+    _sr_showGameOver();
+  }
+
+  // ─── Rendering ────────────────────────────────────────────────────────
+  function _sr_draw(){
+    var ctx = G.ctx;
+    if (!ctx) return;
+    ctx.clearRect(0, 0, G.W, G.H);
+
+    // Fond parallax : décor lointain (petits carrés qui défilent lentement)
+    _sr_drawParallax(ctx);
+
+    // Terrain
+    ctx.fillStyle = G.C.ground;
+    ctx.fillRect(0, G.ground.y, G.W, G.ground.h);
+    // Ligne dorée du sol
+    ctx.strokeStyle = G.C.line;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, G.ground.y);
+    ctx.lineTo(G.W, G.ground.y);
+    ctx.stroke();
+    // Motif décoratif sol : petits tirets défilants
+    var offset = (G.world.dist % 40);
+    ctx.strokeStyle = 'rgba(245,197,24,.25)';
+    ctx.lineWidth = 1;
+    for (var x = -offset; x < G.W; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, G.ground.y + 20);
+      ctx.lineTo(x + 20, G.ground.y + 20);
+      ctx.stroke();
+    }
+
+    // Trails du joueur (fading)
+    for (var t = 0; t < G.trails.length; t++) {
+      var tr = G.trails[t];
+      ctx.globalAlpha = tr.life * 0.3;
+      ctx.fillStyle = G.C.player;
+      ctx.beginPath();
+      ctx.arc(tr.x, tr.y, tr.r * tr.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Balls dorés
+    for (var b = 0; b < G.balls.length; b++) {
+      var bl = G.balls[b];
+      var pulse = Math.sin(bl.pulse) * 3;
+      // Halo
+      var grad = ctx.createRadialGradient(bl.x, bl.y, 2, bl.x, bl.y, bl.r + 12);
+      grad.addColorStop(0, 'rgba(245,197,24,.7)');
+      grad.addColorStop(1, 'rgba(245,197,24,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(bl.x, bl.y, bl.r + 12 + pulse, 0, Math.PI * 2);
+      ctx.fill();
+      // Ball
+      ctx.fillStyle = G.C.ball;
+      ctx.beginPath();
+      ctx.arc(bl.x, bl.y, bl.r, 0, Math.PI * 2);
+      ctx.fill();
+      // Lignes du ballon (2 lignes qui simulent un ballon de basket)
+      ctx.strokeStyle = G.C.playerDark;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bl.x - bl.r, bl.y);
+      ctx.lineTo(bl.x + bl.r, bl.y);
+      ctx.moveTo(bl.x, bl.y - bl.r);
+      ctx.lineTo(bl.x, bl.y + bl.r);
+      ctx.stroke();
+    }
+
+    // Obstacles (défenseurs stylisés)
+    for (var oi = 0; oi < G.obstacles.length; oi++) {
+      var o = G.obstacles[oi];
+      // Corps
+      ctx.fillStyle = G.C.obs;
+      ctx.fillRect(o.x, o.y, o.w, o.h);
+      // Bord doré
+      ctx.strokeStyle = 'rgba(245,197,24,.6)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(o.x, o.y, o.w, o.h);
+      // Détail : petite bande en haut
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.fillRect(o.x, o.y, o.w, 6);
+    }
+
+    // Player (cercle doré avec ombre)
+    ctx.save();
+    // Ombre au sol
+    ctx.fillStyle = 'rgba(0,0,0,.4)';
+    ctx.beginPath();
+    ctx.ellipse(G.player.x, G.ground.y + 3, G.player.r * 0.9, G.player.r * 0.25, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Cercle joueur
+    var pgrad = ctx.createRadialGradient(G.player.x - 5, G.player.y - 5, 2, G.player.x, G.player.y, G.player.r);
+    pgrad.addColorStop(0, '#ffdb4d');
+    pgrad.addColorStop(1, G.C.player);
+    ctx.fillStyle = pgrad;
+    ctx.beginPath();
+    ctx.arc(G.player.x, G.player.y, G.player.r, 0, Math.PI * 2);
+    ctx.fill();
+    // Contour
+    ctx.strokeStyle = '#0a0d18';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Lignes ballon
+    ctx.strokeStyle = '#0a0d18';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(G.player.x - G.player.r, G.player.y);
+    ctx.lineTo(G.player.x + G.player.r, G.player.y);
+    ctx.moveTo(G.player.x, G.player.y - G.player.r);
+    ctx.lineTo(G.player.x, G.player.y + G.player.r);
+    ctx.stroke();
+    ctx.restore();
+
+    // Particles
+    for (var pi = 0; pi < G.particles.length; pi++) {
+      var pp = G.particles[pi];
+      ctx.globalAlpha = pp.life;
+      ctx.fillStyle = pp.color;
+      ctx.beginPath();
+      ctx.arc(pp.x, pp.y, pp.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // HUD (score, vies, ceinture)
+    _sr_drawHUD(ctx);
+  }
+
+  function _sr_drawParallax(ctx){
+    // Petits carrés lointains qui défilent lentement (silhouettes de bâtiments/tribunes)
+    var slowOffset = (G.world.dist * 0.15) % 120;
+    ctx.fillStyle = 'rgba(245,197,24,.08)';
+    for (var x = -slowOffset; x < G.W + 120; x += 120) {
+      var h = 30 + Math.sin(x * 0.03) * 15 + Math.cos(x * 0.05) * 10;
+      ctx.fillRect(x, G.ground.y - h, 60, h);
+    }
+    // Étoiles ponctuelles dans le "ciel"
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    for (var s = 0; s < 12; s++) {
+      var sx = ((s * 137 + G.world.dist * 0.05) % (G.W + 40)) - 20;
+      var sy = 30 + (s * 31) % (G.ground.y - 60);
+      ctx.fillRect(sx, sy, 1.5, 1.5);
+    }
+  }
+
+  function _sr_drawHUD(ctx){
+    if (!G.running) return;
+    var b = beltFor(G.score);
+    // Score gauche
+    ctx.fillStyle = G.C.text;
+    ctx.font = "700 24px 'Bebas Neue','Impact',sans-serif";
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillText(String(G.score), 20, 16);
+    ctx.font = "10px 'Barlow',sans-serif";
+    ctx.fillStyle = '#9aa3b3';
+    ctx.fillText('SCORE', 20, 44);
+    // Belt milieu
+    ctx.textAlign = 'center';
+    ctx.font = "700 16px 'Bebas Neue','Impact',sans-serif";
+    ctx.fillStyle = b.color === '#000000' ? '#f5c518' : b.color;
+    ctx.fillText('🥋 ' + b.name, G.W / 2, 20);
+    // Vies droite (cœurs)
+    ctx.textAlign = 'right';
+    ctx.font = "20px sans-serif";
+    var hearts = '';
+    for (var i = 0; i < G.lives; i++) hearts += '❤️';
+    ctx.fillText(hearts, G.W - 20, 20);
+  }
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════════════════════════
      BOUTON FLOTTANT "MODE PREMIUM" — visible uniquement en mode free
