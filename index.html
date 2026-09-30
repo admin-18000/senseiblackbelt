@@ -1132,8 +1132,8 @@ body.unlocked .sensei-only{display:revert !important}
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎮</div>
-          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_srush">SENSEI RUSH</div>
-          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_srush">🥋 Endless Runner</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_srush">JEUX VIDÉOS</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_srush">🕹️ Salle d'arcade</div>
         </button>
       </div>
     </div>
@@ -13077,14 +13077,16 @@ function applyLangTracker(lang) {
     dojo_gate_btn_free:"MODE FREEMIUM \u2192",
     dojo_gate_btn_code:"\ud83d\udd11 MODE PREMIUM \u2192",
     dojo_fab_premium:"\ud83d\udd11 MODE PREMIUM",
-    dojo_lbl_srush:"SENSEI RUSH",
-    dojo_sub_srush:"\ud83e\udd4b Endless Runner",
+    dojo_lbl_srush:"JEUX VID\u00c9OS",
+    dojo_sub_srush:"\ud83d\udd79\ufe0f Salle d'arcade",
     sr_tagline:"\ud83e\udd4b L'endless runner du D\u014cJ\u014c",
     sr_btn_start:"\u25b6 COMMENCER",
     sr_btn_retry:"\u21bb REJOUER",
     sr_btn_quit:"\u2190 Quitter",
     sr_gameover:"GAME OVER",
-    sr_controls:"\u2328\ufe0f Espace / \ud83d\udcf1 Tap \u00b7 Sauter<br>R\u00e9colte les ballons dor\u00e9s \u00b7 \u00c9vite les d\u00e9fenseurs",
+    sr_controls:"\u2328\ufe0f Espace / \ud83d\udcf1 Tap \u00b7 Sauter<br>R\u00e9colte les ballons \u00b7 \u00c9vite les c\u00f4nes",
+    sr_rotate_title:"TOURNE TON T\u00c9L\u00c9PHONE",
+    sr_rotate_msg:"Le jeu se joue en mode paysage \u00b7 Bascule ton \u00e9cran \u00e0 l'horizontale",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
@@ -13278,14 +13280,16 @@ function applyLangTracker(lang) {
     dojo_gate_btn_free:"FREEMIUM MODE \u2192",
     dojo_gate_btn_code:"\ud83d\udd11 PREMIUM MODE \u2192",
     dojo_fab_premium:"\ud83d\udd11 PREMIUM MODE",
-    dojo_lbl_srush:"SENSEI RUSH",
-    dojo_sub_srush:"\ud83e\udd4b Endless Runner",
+    dojo_lbl_srush:"VIDEO GAMES",
+    dojo_sub_srush:"\ud83d\udd79\ufe0f Salle d'arcade",
     sr_tagline:"\ud83e\udd4b The D\u014cJ\u014c's endless runner",
     sr_btn_start:"\u25b6 START",
     sr_btn_retry:"\u21bb RETRY",
     sr_btn_quit:"\u2190 Quit",
     sr_gameover:"GAME OVER",
-    sr_controls:"\u2328\ufe0f Space / \ud83d\udcf1 Tap \u00b7 Jump<br>Collect golden balls \u00b7 Avoid defenders",
+    sr_controls:"\u2328\ufe0f Space / \ud83d\udcf1 Tap \u00b7 Jump<br>Collect basketballs \u00b7 Dodge cones",
+    sr_rotate_title:"ROTATE YOUR PHONE",
+    sr_rotate_msg:"This game is played in landscape mode \u00b7 Turn your screen horizontally",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
@@ -38799,6 +38803,16 @@ window._QI_DATA['pnr_05'] = {
           onmousedown="this.style.transform='scale(.9)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">✕</button>
   <!-- Canvas de jeu -->
   <canvas id="sr-canvas" style="display:block;width:100%;height:100%;background:linear-gradient(180deg,#0a0d18 0%,#131820 60%,#1a1f2e 100%);touch-action:none"></canvas>
+  <!-- Overlay orientation portrait (mobile tenu verticalement) -->
+  <div id="sr-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
+  <style>
+  @keyframes srRotatePulse { 0%,100% { transform:rotate(0deg); } 50% { transform:rotate(90deg); } }
+  </style>
+
   <!-- Overlay HUD titre + score -->
   <div id="sr-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;padding:0 20px">
     <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(42px,10vw,70px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.4),0 2px 8px #000;line-height:1;margin-bottom:8px">SENSEI RUSH</div>
@@ -38828,29 +38842,44 @@ window._QI_DATA['pnr_05'] = {
   var G = window._srGame = {
     canvas: null, ctx: null, W: 0, H: 0,
     running: false, paused: false, rafId: null, lastT: 0,
-    score: 0, best: 0, lives: 3,
+    score: 0, best: 0, lives: 3, ballsCollected: 0,
     world: { speed: 5, dist: 0 },
     ground: { y: 0, h: 60 },
-    player: { x: 100, y: 0, vy: 0, r: 22, jumping: false, doubleAvail: true, coyote: 0 },
-    obstacles: [], balls: [], particles: [], trails: [],
+    player: { x: 100, y: 0, vy: 0, r: 26, jumping: false, doubleAvail: true, coyote: 0 },
+    obstacles: [], balls: [], particles: [], trails: [], scorePops: [],
     spawnObs: 0, spawnBall: 0,
     belt: 'BLANCHE',
-    // Palette
-    C: { bg1:'#0a0d18', bg2:'#131820', ground:'#1a1f2e', line:'#f5c518',
-         player:'#f5c518', playerDark:'#0a0d18', obs:'#e63946', ball:'#f5c518', text:'#fff' }
+    // Palette (utilisée pour cônes obstacles + HUD)
+    C: { text:'#fff', obs:'#ff8c1a', obsDark:'#c9541a' },
+    // Images (préchargées)
+    imgBall: null, imgCourt: null, imgReady: false
   };
 
-  // Ceintures selon score
+  // Précharger les 2 images (basketball + court)
+  (function _sr_preloadImages(){
+    var bi = new Image();
+    bi.onload = function(){ G.imgBall = bi; _sr_checkImagesReady(); };
+    bi.src = 'basketball.png';
+    var ci = new Image();
+    ci.onload = function(){ G.imgCourt = ci; _sr_checkImagesReady(); };
+    ci.src = 'court.jpg';
+  })();
+  function _sr_checkImagesReady(){
+    if (G.imgBall && G.imgCourt) G.imgReady = true;
+  }
+
+  // Ceintures selon score (ballons collectés × 100 pts)
+  // Ex: 5 ballons = JAUNE, 15 = ORANGE, 30 = VERTE...
   var BELTS = [
     { name:'BLANCHE',  min:0,    color:'#ffffff', speedMult:1.0 },
-    { name:'JAUNE',    min:200,  color:'#facc15', speedMult:1.15 },
-    { name:'ORANGE',   min:500,  color:'#f97316', speedMult:1.3 },
-    { name:'VERTE',    min:1000, color:'#22c55e', speedMult:1.5 },
-    { name:'BLEUE',    min:1800, color:'#3b82f6', speedMult:1.75 },
-    { name:'VIOLETTE', min:3000, color:'#a855f7', speedMult:2.0 },
-    { name:'MARRON',   min:5000, color:'#92400e', speedMult:2.3 },
-    { name:'ROUGE',    min:8000, color:'#dc2626', speedMult:2.6 },
-    { name:'NOIRE',    min:12000, color:'#000000', speedMult:3.0 }
+    { name:'JAUNE',    min:500,  color:'#facc15', speedMult:1.15 },
+    { name:'ORANGE',   min:1500, color:'#f97316', speedMult:1.3 },
+    { name:'VERTE',    min:3000, color:'#22c55e', speedMult:1.5 },
+    { name:'BLEUE',    min:5000, color:'#3b82f6', speedMult:1.75 },
+    { name:'VIOLETTE', min:8000, color:'#a855f7', speedMult:2.0 },
+    { name:'MARRON',   min:12000, color:'#92400e', speedMult:2.3 },
+    { name:'ROUGE',    min:17000, color:'#dc2626', speedMult:2.6 },
+    { name:'NOIRE',    min:25000, color:'#000000', speedMult:3.0 }
   ];
 
   function beltFor(score){
@@ -38867,6 +38896,9 @@ window._QI_DATA['pnr_05'] = {
     document.body.style.overflow = 'hidden';
     _sr_setupCanvas();
     _sr_showTitle();
+    _sr_checkOrientation();
+    window.addEventListener('resize', _sr_checkOrientation);
+    window.addEventListener('orientationchange', _sr_checkOrientation);
     // Load best score
     try {
       var s = localStorage.getItem('sensei_rush_best');
@@ -38874,14 +38906,37 @@ window._QI_DATA['pnr_05'] = {
     } catch(e){ G.best = 0; }
     var bs = document.getElementById('sr-best-score');
     if (bs) bs.textContent = G.best > 0 ? ('🏆 Record : ' + G.best) : '';
-    // Bind controls
     _sr_bindInput();
     if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
   };
 
+  // Vérifie l'orientation : affiche l'overlay "Tourne ton téléphone" si portrait sur mobile
+  function _sr_checkOrientation(){
+    var rot = document.getElementById('sr-rotate');
+    if (!rot) return;
+    // On considère "portrait" quand hauteur > largeur ET l'écran est petit (mobile)
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    if (isPortrait && isSmall) {
+      rot.style.display = 'flex';
+      // Pause si en cours de partie
+      if (G.running) { _sr_stop(); G._pausedByRotate = true; }
+    } else {
+      rot.style.display = 'none';
+      if (G._pausedByRotate) {
+        G._pausedByRotate = false;
+        G.running = true;
+        G.lastT = performance.now();
+        G.rafId = requestAnimationFrame(_sr_loop);
+      }
+    }
+  }
+
   window._sr_close = function(){
     _sr_stop();
     _sr_unbindInput();
+    window.removeEventListener('resize', _sr_checkOrientation);
+    window.removeEventListener('orientationchange', _sr_checkOrientation);
     var m = document.getElementById('sr-modal');
     if (m) m.style.display = 'none';
     document.body.style.overflow = '';
@@ -38940,12 +38995,12 @@ window._QI_DATA['pnr_05'] = {
   };
 
   function _sr_reset(idle){
-    G.score = 0; G.lives = 3;
+    G.score = 0; G.lives = 3; G.ballsCollected = 0;
     G.world.speed = 5; G.world.dist = 0;
     G.player.y = G.ground.y - G.player.r;
     G.player.vy = 0; G.player.jumping = false; G.player.doubleAvail = true; G.player.coyote = 0;
-    G.obstacles = []; G.balls = []; G.particles = []; G.trails = [];
-    G.spawnObs = 1200; G.spawnBall = 800;
+    G.obstacles = []; G.balls = []; G.particles = []; G.trails = []; G.scorePops = [];
+    G.spawnObs = 1200; G.spawnBall = 700;
     G.belt = 'BLANCHE';
   }
 
@@ -39045,8 +39100,7 @@ window._QI_DATA['pnr_05'] = {
     var speed = G.world.speed * dt;
     G.world.dist += speed;
 
-    // Score continu (distance)
-    G.score += Math.floor(dt * 1);
+    // AUCUN score en avançant : le score vient UNIQUEMENT des ballons collectés
 
     // Belt progression → vitesse
     var b = beltFor(G.score);
@@ -39114,8 +39168,17 @@ window._QI_DATA['pnr_05'] = {
       bl.pulse = (bl.pulse + 0.15 * dt) % (Math.PI * 2);
       var ddx = G.player.x - bl.x, ddy = G.player.y - bl.y;
       if (ddx*ddx + ddy*ddy < (G.player.r + bl.r) * (G.player.r + bl.r)) {
-        G.score += 25;
-        _sr_spawnParticles(bl.x, bl.y, '#f5c518', 14);
+        // Ballon collecté = SEULE source de score (100 pts par ballon)
+        G.score += 100;
+        G.ballsCollected++;
+        // Feedback visuel FORT :
+        // 1) Rafale de particules dorées + orange
+        _sr_spawnParticles(bl.x, bl.y, '#f5c518', 20);
+        _sr_spawnParticles(bl.x, bl.y, '#ee7328', 14);
+        // 2) Pop "+100" flottant doré
+        G.scorePops.push({ x: bl.x, y: bl.y, vy: -2, life: 1, txt: '+100' });
+        // 3) Haptic si dispo
+        if (window._haptic) { try { window._haptic.success && window._haptic.success(); } catch(e){} }
         G.balls.splice(j, 1);
         continue;
       }
@@ -39129,6 +39192,15 @@ window._QI_DATA['pnr_05'] = {
       p.vy += 0.15 * dt;
       p.life -= 0.04 * dt;
       if (p.life <= 0) G.particles.splice(k, 1);
+    }
+
+    // Score pops (+100 flottants)
+    for (var sp = G.scorePops.length - 1; sp >= 0; sp--) {
+      var pop = G.scorePops[sp];
+      pop.y += pop.vy * dt;
+      pop.vy *= 0.96;
+      pop.life -= 0.025 * dt;
+      if (pop.life <= 0) G.scorePops.splice(sp, 1);
     }
   }
 
@@ -39158,27 +39230,59 @@ window._QI_DATA['pnr_05'] = {
     if (!ctx) return;
     ctx.clearRect(0, 0, G.W, G.H);
 
-    // Fond parallax : décor lointain (petits carrés qui défilent lentement)
-    _sr_drawParallax(ctx);
+    // ═══ FOND : IMAGE TERRAIN DE BASKET (court.jpg) ═══════════════════
+    if (G.imgCourt) {
+      // Image fixe qui couvre tout le canvas, préserve l'aspect via cover
+      var imgAR = G.imgCourt.naturalWidth / G.imgCourt.naturalHeight;
+      var canvasAR = G.W / G.H;
+      var drawW, drawH, drawX, drawY;
+      if (imgAR > canvasAR) {
+        drawH = G.H;
+        drawW = G.H * imgAR;
+        drawX = (G.W - drawW) / 2;
+        drawY = 0;
+      } else {
+        drawW = G.W;
+        drawH = G.W / imgAR;
+        drawX = 0;
+        drawY = (G.H - drawH) / 2;
+      }
+      ctx.drawImage(G.imgCourt, drawX, drawY, drawW, drawH);
+      // Léger overlay sombre pour lisibilité du HUD
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.fillRect(0, 0, G.W, G.H);
+    } else {
+      // Fallback : dégradé simple si image pas encore chargée
+      var g = ctx.createLinearGradient(0, 0, 0, G.H);
+      g.addColorStop(0, '#1a2038');
+      g.addColorStop(1, '#0a0d18');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, G.W, G.H);
+    }
 
-    // Terrain
-    ctx.fillStyle = G.C.ground;
-    ctx.fillRect(0, G.ground.y, G.W, G.ground.h);
-    // Ligne dorée du sol
-    ctx.strokeStyle = G.C.line;
-    ctx.lineWidth = 2;
+    // ═══ SOL : LIGNE BLANCHE + OMBRE + MARQUES DÉFILANTES ═════════════
+    // Zone d'action en bas (légère ombre pour définir la ligne de course)
+    var shadowGrad = ctx.createLinearGradient(0, G.ground.y - 10, 0, G.H);
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    shadowGrad.addColorStop(0.4, 'rgba(0,0,0,.35)');
+    shadowGrad.addColorStop(1, 'rgba(0,0,0,.55)');
+    ctx.fillStyle = shadowGrad;
+    ctx.fillRect(0, G.ground.y - 10, G.W, G.H - G.ground.y + 10);
+    // Ligne blanche de terrain (piste de jeu)
+    ctx.strokeStyle = 'rgba(255,255,255,.85)';
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(0, G.ground.y);
     ctx.lineTo(G.W, G.ground.y);
     ctx.stroke();
-    // Motif décoratif sol : petits tirets défilants
-    var offset = (G.world.dist % 40);
-    ctx.strokeStyle = 'rgba(245,197,24,.25)';
-    ctx.lineWidth = 1;
-    for (var x = -offset; x < G.W; x += 40) {
+    // Marques défilantes sur le sol (donne le sens du mouvement)
+    var markOffset = (G.world.dist * 1.5) % 80;
+    ctx.strokeStyle = 'rgba(245,197,24,.5)';
+    ctx.lineWidth = 2;
+    for (var mx = -markOffset; mx < G.W + 80; mx += 80) {
       ctx.beginPath();
-      ctx.moveTo(x, G.ground.y + 20);
-      ctx.lineTo(x + 20, G.ground.y + 20);
+      ctx.moveTo(mx, G.ground.y + 18);
+      ctx.lineTo(mx + 30, G.ground.y + 18);
       ctx.stroke();
     }
 
@@ -39193,78 +39297,74 @@ window._QI_DATA['pnr_05'] = {
     }
     ctx.globalAlpha = 1;
 
-    // Balls dorés
+    // Ballons de basket collectibles (image PNG + halo doré pulsant)
     for (var b = 0; b < G.balls.length; b++) {
       var bl = G.balls[b];
-      var pulse = Math.sin(bl.pulse) * 3;
-      // Halo
-      var grad = ctx.createRadialGradient(bl.x, bl.y, 2, bl.x, bl.y, bl.r + 12);
+      var pulse = Math.sin(bl.pulse) * 4;
+      // Halo doré large et intense
+      var grad = ctx.createRadialGradient(bl.x, bl.y, 4, bl.x, bl.y, bl.r + 20);
       grad.addColorStop(0, 'rgba(245,197,24,.7)');
+      grad.addColorStop(0.5, 'rgba(245,197,24,.35)');
       grad.addColorStop(1, 'rgba(245,197,24,0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(bl.x, bl.y, bl.r + 12 + pulse, 0, Math.PI * 2);
+      ctx.arc(bl.x, bl.y, bl.r + 18 + pulse, 0, Math.PI * 2);
       ctx.fill();
-      // Ball
-      ctx.fillStyle = G.C.ball;
-      ctx.beginPath();
-      ctx.arc(bl.x, bl.y, bl.r, 0, Math.PI * 2);
-      ctx.fill();
-      // Lignes du ballon (2 lignes qui simulent un ballon de basket)
-      ctx.strokeStyle = G.C.playerDark;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(bl.x - bl.r, bl.y);
-      ctx.lineTo(bl.x + bl.r, bl.y);
-      ctx.moveTo(bl.x, bl.y - bl.r);
-      ctx.lineTo(bl.x, bl.y + bl.r);
-      ctx.stroke();
+      // Vraie image du ballon
+      if (G.imgBall) {
+        var d = bl.r * 2;
+        ctx.drawImage(G.imgBall, bl.x - bl.r, bl.y - bl.r, d, d);
+      } else {
+        ctx.fillStyle = '#ee7328';
+        ctx.beginPath();
+        ctx.arc(bl.x, bl.y, bl.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
-    // Obstacles (défenseurs stylisés)
+    // Obstacles : cônes d'entraînement orange (typiques du basket)
     for (var oi = 0; oi < G.obstacles.length; oi++) {
       var o = G.obstacles[oi];
-      // Corps
-      ctx.fillStyle = G.C.obs;
-      ctx.fillRect(o.x, o.y, o.w, o.h);
-      // Bord doré
-      ctx.strokeStyle = 'rgba(245,197,24,.6)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(o.x, o.y, o.w, o.h);
-      // Détail : petite bande en haut
-      ctx.fillStyle = 'rgba(0,0,0,.35)';
-      ctx.fillRect(o.x, o.y, o.w, 6);
+      _sr_drawCone(ctx, o.x + o.w/2, o.y + o.h, o.w, o.h);
     }
 
-    // Player (cercle doré avec ombre)
+    // Player = image du ballon de basket qui roule (rotation selon distance)
     ctx.save();
-    // Ombre au sol
-    ctx.fillStyle = 'rgba(0,0,0,.4)';
+    // Ombre portée au sol
+    ctx.fillStyle = 'rgba(0,0,0,.45)';
     ctx.beginPath();
     ctx.ellipse(G.player.x, G.ground.y + 3, G.player.r * 0.9, G.player.r * 0.25, 0, 0, Math.PI * 2);
     ctx.fill();
-    // Cercle joueur
-    var pgrad = ctx.createRadialGradient(G.player.x - 5, G.player.y - 5, 2, G.player.x, G.player.y, G.player.r);
-    pgrad.addColorStop(0, '#ffdb4d');
-    pgrad.addColorStop(1, G.C.player);
-    ctx.fillStyle = pgrad;
-    ctx.beginPath();
-    ctx.arc(G.player.x, G.player.y, G.player.r, 0, Math.PI * 2);
-    ctx.fill();
-    // Contour
-    ctx.strokeStyle = '#0a0d18';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    // Lignes ballon
-    ctx.strokeStyle = '#0a0d18';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(G.player.x - G.player.r, G.player.y);
-    ctx.lineTo(G.player.x + G.player.r, G.player.y);
-    ctx.moveTo(G.player.x, G.player.y - G.player.r);
-    ctx.lineTo(G.player.x, G.player.y + G.player.r);
-    ctx.stroke();
+    if (G.imgBall) {
+      var rotation = (G.world.dist / G.player.r) % (Math.PI * 2);
+      ctx.translate(G.player.x, G.player.y);
+      ctx.rotate(rotation);
+      var d = G.player.r * 2;
+      ctx.drawImage(G.imgBall, -G.player.r, -G.player.r, d, d);
+    } else {
+      // Fallback
+      ctx.fillStyle = '#ee7328';
+      ctx.beginPath();
+      ctx.arc(G.player.x, G.player.y, G.player.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
+
+    // Pop de score "+50" flottants (feedback fort à la collecte)
+    for (var sp = G.scorePops.length - 1; sp >= 0; sp--) {
+      var pop = G.scorePops[sp];
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, pop.life);
+      ctx.fillStyle = '#f5c518';
+      ctx.strokeStyle = '#0a0d18';
+      ctx.lineWidth = 4;
+      ctx.font = "900 " + (28 + (1 - pop.life) * 6) + "px 'Bebas Neue','Impact',sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeText(pop.txt, pop.x, pop.y);
+      ctx.fillText(pop.txt, pop.x, pop.y);
+      ctx.restore();
+    }
 
     // Particles
     for (var pi = 0; pi < G.particles.length; pi++) {
@@ -39281,35 +39381,148 @@ window._QI_DATA['pnr_05'] = {
     _sr_drawHUD(ctx);
   }
 
-  function _sr_drawParallax(ctx){
-    // Petits carrés lointains qui défilent lentement (silhouettes de bâtiments/tribunes)
-    var slowOffset = (G.world.dist * 0.15) % 120;
-    ctx.fillStyle = 'rgba(245,197,24,.08)';
-    for (var x = -slowOffset; x < G.W + 120; x += 120) {
-      var h = 30 + Math.sin(x * 0.03) * 15 + Math.cos(x * 0.05) * 10;
-      ctx.fillRect(x, G.ground.y - h, 60, h);
-    }
-    // Étoiles ponctuelles dans le "ciel"
-    ctx.fillStyle = 'rgba(255,255,255,.35)';
-    for (var s = 0; s < 12; s++) {
-      var sx = ((s * 137 + G.world.dist * 0.05) % (G.W + 40)) - 20;
-      var sy = 30 + (s * 31) % (G.ground.y - 60);
-      ctx.fillRect(sx, sy, 1.5, 1.5);
+  // Dessine un cône d'entraînement basket (obstacle)
+  function _sr_drawCone(ctx, baseX, baseY, w, h){
+    var topW = w * 0.25;
+    // Corps du cône (triangle isocèle tronqué)
+    var grad = ctx.createLinearGradient(baseX - w/2, 0, baseX + w/2, 0);
+    grad.addColorStop(0, '#c9541a');
+    grad.addColorStop(0.5, '#ff8c1a');
+    grad.addColorStop(1, '#c9541a');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(baseX - w/2, baseY);
+    ctx.lineTo(baseX + w/2, baseY);
+    ctx.lineTo(baseX + topW/2, baseY - h + 8);
+    ctx.lineTo(baseX - topW/2, baseY - h + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#5a2810';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Sommet arrondi
+    ctx.fillStyle = '#ff8c1a';
+    ctx.beginPath();
+    ctx.arc(baseX, baseY - h + 8, topW/2, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Bande blanche au milieu (comme les vrais cônes)
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    var bandY = baseY - h * 0.55;
+    var bandWL = (w * (h * 0.55) / h) * 0.6;
+    ctx.fillRect(baseX - bandWL, bandY, bandWL * 2, 6);
+    // Base plate
+    ctx.fillStyle = '#8b3512';
+    ctx.beginPath();
+    ctx.ellipse(baseX, baseY + 2, w/2 + 3, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // (les fonctions drawBasketball et drawBasketHoop dessinées à la main ont été
+  //  remplacées par l'image basketball.png — voir le rendu principal)
+  function _sr_drawBasketball_UNUSED(ctx, x, y, r, rotation){
+    rotation = rotation || 0;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    // Sphère avec gradient orange (relief)
+    var grad = ctx.createRadialGradient(-r*0.35, -r*0.35, r*0.1, 0, 0, r);
+    grad.addColorStop(0, '#ff9550');
+    grad.addColorStop(0.5, '#ee7328');
+    grad.addColorStop(1, '#b8461a');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    // Contour ballon
+    ctx.strokeStyle = '#5a2810';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // Les 4 lignes noires classiques d'un ballon de basket :
+    ctx.strokeStyle = '#1a0a05';
+    ctx.lineWidth = Math.max(1.3, r * 0.09);
+    ctx.lineCap = 'round';
+    // 1) Méridien vertical
+    ctx.beginPath();
+    ctx.moveTo(0, -r);
+    ctx.lineTo(0, r);
+    ctx.stroke();
+    // 2) Équateur horizontal (léger arc pour effet 3D)
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r, r * 0.35, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // 3) Arc courbe gauche (part du haut, descend en courbant vers l'extérieur gauche)
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.55, 0, r * 0.55, r * 0.95, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // 4) Arc courbe droit (symétrique)
+    ctx.beginPath();
+    ctx.ellipse(r * 0.55, 0, r * 0.55, r * 0.95, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // Highlight blanc (reflet)
+    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.4, -r * 0.4, r * 0.25, r * 0.15, -Math.PI / 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Dessine un panier de basket stylisé
+  function _sr_drawBasketHoop(ctx, x, y){
+    // Poteau (tige verticale)
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 30);
+    ctx.lineTo(x, y + 100);
+    ctx.stroke();
+    // Panneau (backboard blanc)
+    ctx.fillStyle = 'rgba(248,248,248,.9)';
+    ctx.fillRect(x - 5, y - 20, 6, 50);
+    ctx.strokeStyle = '#f5c518';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 5, y - 20, 6, 50);
+    // Carré cible sur le panneau
+    ctx.strokeStyle = '#e63946';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x - 3, y + 5, 2, 10);
+    // Anneau orange
+    ctx.strokeStyle = '#ee7328';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(x + 15, y + 20, 15, 5, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // Filet (petites lignes)
+    ctx.strokeStyle = 'rgba(255,255,255,.5)';
+    ctx.lineWidth = 1;
+    for (var n = 0; n < 6; n++) {
+      var nx = x + 2 + n * 5;
+      ctx.beginPath();
+      ctx.moveTo(nx, y + 22);
+      ctx.lineTo(nx + Math.sin(n) * 2, y + 40);
+      ctx.stroke();
     }
   }
+
+  // (l'ancienne fonction drawParallax a été remplacée par le fond salle de basket)
 
   function _sr_drawHUD(ctx){
     if (!G.running) return;
     var b = beltFor(G.score);
-    // Score gauche
+    // Score gauche (avec fond noir semi-transparent pour lisibilité)
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(10, 10, 130, 52);
+    ctx.strokeStyle = 'rgba(245,197,24,.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(10, 10, 130, 52);
     ctx.fillStyle = G.C.text;
-    ctx.font = "700 24px 'Bebas Neue','Impact',sans-serif";
+    ctx.font = "700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
-    ctx.fillText(String(G.score), 20, 16);
+    ctx.fillText(String(G.score) + ' pts', 20, 16);
     ctx.font = "10px 'Barlow',sans-serif";
-    ctx.fillStyle = '#9aa3b3';
-    ctx.fillText('SCORE', 20, 44);
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText('🏀 ' + G.ballsCollected + ' BALLONS', 20, 42);
     // Belt milieu
     ctx.textAlign = 'center';
     ctx.font = "700 16px 'Bebas Neue','Impact',sans-serif";
