@@ -39924,6 +39924,7 @@ window._QI_DATA['pnr_05'] = {
     G.ball.trail = [];
     G.ball.scored = false;
     G.ball.touchedRim = false;
+    G.ball._prevY = G.ball.y; // FIX : initialiser pour éviter détection ratée au 1er frame
     // Nouveau vent à chaque tir
     var mc = MODES[G.mode] || MODES.free;
     G.wind = (Math.random() * 2 - 1) * mc.wind;
@@ -39979,12 +39980,14 @@ window._QI_DATA['pnr_05'] = {
     var dist = Math.sqrt(dx*dx + dy*dy);
     if (dist < 20) return; // trop court, on ignore
     // Puissance normalisée puis multipliée
-    var power = Math.min(dist, 220) / 220; // 0 à 1
-    var speed = 8 + power * 16; // 8 à 24 px/frame
+    // Puissance : plage étendue pour permettre d'atteindre le panier même en Half-Court
+    var power = Math.min(dist, 260) / 260; // 0 à 1 (drag jusqu'à 260px)
+    var speed = 10 + power * 26; // 10 à 36 px/frame (au lieu de 8-24 avant)
     var angle = Math.atan2(dy, dx);
     G.ball.vx = Math.cos(angle) * speed;
     G.ball.vy = Math.sin(angle) * speed;
     G.ball.launched = true;
+    G.ball.launchPower = power; // pour debug/feedback
     G.ball.trail = [];
     if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
   }
@@ -40036,12 +40039,14 @@ window._QI_DATA['pnr_05'] = {
       }
 
       // Détection panier réussi : le centre du ballon franchit le plan du rim vers le bas,
-      // et est entre les 2 bords du rim
-      if (!G.ball.scored) {
+      // et est entre les 2 bords du rim (avec tolérance pour laisser passer le ballon)
+      // FIX : utilise prevY local (pas d'attribut sur l'objet — évite bug 1er frame)
+      if (!G.ball.scored && G.ball._prevY !== undefined) {
         var wasAbove = G.ball._prevY < rimY;
         var isBelow = G.ball.y >= rimY;
+        // Corridor élargi : ballon dans la zone du rim (avec petite tolérance de 2px sur les bords)
         if (wasAbove && isBelow && G.ball.vy > 0 &&
-            G.ball.x > rimLx + 6 && G.ball.x < rimRx - 6) {
+            G.ball.x > rimLx - 2 && G.ball.x < rimRx + 2) {
           _sa_score();
         }
       }
@@ -40196,6 +40201,10 @@ window._QI_DATA['pnr_05'] = {
 
     // Trajectoire prédite (pointillés dorés) pendant la visée
     if (G.aim.active) _sa_drawTrajectory(ctx);
+    // Hint visuel : flèche + texte quand le ballon est prêt (pas encore lancé, pas en train de viser)
+    else if (G.running && !G.ball.launched && G.shotsLeft === G.shotsTotal) {
+      _sa_drawHint(ctx);
+    }
 
     // Trail du ballon en vol
     if (G.ball.launched && G.ball.trail.length > 1) {
@@ -40347,8 +40356,9 @@ window._QI_DATA['pnr_05'] = {
     var dy = G.aim.sy - G.aim.cy;
     var dist = Math.sqrt(dx*dx + dy*dy);
     if (dist < 20) return;
-    var power = Math.min(dist, 220) / 220;
-    var speed = 8 + power * 16;
+    // Doit matcher exactement _sa_release (sinon la trajectoire prédite ment)
+    var power = Math.min(dist, 260) / 260;
+    var speed = 10 + power * 26;
     var angle = Math.atan2(dy, dx);
     var vx = Math.cos(angle) * speed;
     var vy = Math.sin(angle) * speed;
@@ -40368,22 +40378,76 @@ window._QI_DATA['pnr_05'] = {
         ctx.fill();
       }
     }
-    // Ligne de tension depuis le ballon vers le curseur
-    ctx.strokeStyle = 'rgba(255,255,255,.6)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);
+    // Ligne de tension depuis le ballon vers le curseur (comme une catapulte)
+    ctx.strokeStyle = 'rgba(255,255,255,.7)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 5]);
     ctx.beginPath();
     ctx.moveTo(G.ball.x, G.ball.y);
     ctx.lineTo(G.aim.cx, G.aim.cy);
     ctx.stroke();
     ctx.setLineDash([]);
-    // Indicateur de puissance (jauge autour du ballon)
-    var powerColor = power < 0.4 ? '#22c55e' : (power < 0.75 ? '#facc15' : '#e63946');
-    ctx.strokeStyle = powerColor;
-    ctx.lineWidth = 3;
+    // Jauge de puissance BIEN VISIBLE : anneau épais autour du ballon
+    var powerColor = power < 0.35 ? '#22c55e' : (power < 0.7 ? '#facc15' : '#e63946');
+    // Fond de la jauge (anneau gris)
+    ctx.strokeStyle = 'rgba(0,0,0,.5)';
+    ctx.lineWidth = 8;
     ctx.beginPath();
-    ctx.arc(G.ball.x, G.ball.y, G.ball.r + 8, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * power);
+    ctx.arc(G.ball.x, G.ball.y, G.ball.r + 12, 0, Math.PI * 2);
     ctx.stroke();
+    // Remplissage jauge selon puissance
+    ctx.strokeStyle = powerColor;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(G.ball.x, G.ball.y, G.ball.r + 12, -Math.PI/2, -Math.PI/2 + Math.PI * 2 * power);
+    ctx.stroke();
+    // Étiquette pourcentage au dessus du ballon
+    var pct = Math.round(power * 100);
+    ctx.font = "700 16px 'Bebas Neue','Impact',sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(0,0,0,.75)';
+    ctx.fillRect(G.ball.x - 30, G.ball.y - G.ball.r - 42, 60, 22);
+    ctx.strokeStyle = powerColor;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(G.ball.x - 30, G.ball.y - G.ball.r - 42, 60, 22);
+    ctx.fillStyle = powerColor;
+    ctx.fillText(pct + '%', G.ball.x, G.ball.y - G.ball.r - 31);
+    ctx.restore();
+  }
+
+  // Hint visuel au 1er tir : flèche animée qui indique de glisser en arrière
+  function _sa_drawHint(ctx){
+    var t = performance.now() / 500;
+    var pulse = (Math.sin(t) + 1) / 2; // 0 → 1 → 0
+    var hintX = G.ball.x - 90 - pulse * 15;
+    var hintY = G.ball.y;
+    ctx.save();
+    ctx.globalAlpha = 0.5 + pulse * 0.4;
+    // Flèche vers la gauche/bas (direction du drag)
+    ctx.strokeStyle = '#f5c518';
+    ctx.fillStyle = '#f5c518';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(G.ball.x - 30, hintY);
+    ctx.lineTo(hintX, hintY);
+    ctx.stroke();
+    // Pointe de la flèche
+    ctx.beginPath();
+    ctx.moveTo(hintX, hintY);
+    ctx.lineTo(hintX + 12, hintY - 8);
+    ctx.lineTo(hintX + 12, hintY + 8);
+    ctx.closePath();
+    ctx.fill();
+    // Texte "GLISSE"
+    ctx.font = "700 14px 'Bebas Neue','Impact',sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 4;
+    var label = (window._lang === 'en') ? 'DRAG BACK' : 'GLISSE EN ARRIÈRE';
+    ctx.strokeText(label, (hintX + G.ball.x - 30) / 2, hintY - 22);
+    ctx.fillText(label, (hintX + G.ball.x - 30) / 2, hintY - 22);
     ctx.restore();
   }
 
