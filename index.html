@@ -10846,6 +10846,21 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 <style>
 #dojo-canvas { opacity: 0; transition: opacity .5s; }
 #dojo-canvas.active { opacity: 1; display: block !important; }
+
+/* ─── Fonction utilitaire GLOBALE : récupère le pseudo du joueur ─── */
+/* _getPlayerName() : retourne le pseudo depuis localStorage, ou 'TOI' par défaut */
+/* Tronqué à 10 caractères max pour tenir dans les HUD */
+
+/* Overlays rotation portrait des jeux arcade : scrollables + safe-area iPhone */
+#sr-rotate, #sa-rotate, #bb-rotate, #dm-rotate, #hr-rotate,
+#rc-rotate, #mc-rotate, #tp-rotate, #cv-rotate {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-top: max(28px, env(safe-area-inset-top, 20px)) !important;
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 20px)) !important;
+  padding-left: max(16px, env(safe-area-inset-left, 16px)) !important;
+  padding-right: max(16px, env(safe-area-inset-right, 16px)) !important;
+}
 body.dojo-mode { background: #050709 !important; }
 body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
 </style>
@@ -39201,16 +39216,25 @@ window._QI_DATA['pnr_05'] = {
 
   // Lance un jeu depuis le hub (le hub reste ouvert en fond)
   window._arcade_launch = function(gameId){
-    if (gameId === 'rush' && typeof _sr_open === 'function') _sr_open();
-    else if (gameId === 'shoot' && typeof _sa_open === 'function') _sa_open();
-    else if (gameId === 'buzzer' && typeof _bb_open === 'function') _bb_open();
-    else if (gameId === 'dribble' && typeof _dm_open === 'function') _dm_open();
-    else if (gameId === 'horse' && typeof _hr_open === 'function') _hr_open();
-    else if (gameId === 'reaction' && typeof _rc_open === 'function') _rc_open();
-    else if (gameId === 'memory' && typeof _mc_open === 'function') _mc_open();
-    else if (gameId === 'tp' && typeof _tp_open === 'function') _tp_open();
-    else if (gameId === 'cv' && typeof _cv_open === 'function') _cv_open();
-    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+    // Avant de lancer le jeu : demander le pseudo si c'est la 1ère fois
+    var launch = function(){
+      if (gameId === 'rush' && typeof _sr_open === 'function') _sr_open();
+      else if (gameId === 'shoot' && typeof _sa_open === 'function') _sa_open();
+      else if (gameId === 'buzzer' && typeof _bb_open === 'function') _bb_open();
+      else if (gameId === 'dribble' && typeof _dm_open === 'function') _dm_open();
+      else if (gameId === 'horse' && typeof _hr_open === 'function') _hr_open();
+      else if (gameId === 'reaction' && typeof _rc_open === 'function') _rc_open();
+      else if (gameId === 'memory' && typeof _mc_open === 'function') _mc_open();
+      else if (gameId === 'tp' && typeof _tp_open === 'function') _tp_open();
+      else if (gameId === 'cv' && typeof _cv_open === 'function') _cv_open();
+      if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+    };
+    // Intercept avec le modal pseudo (si nécessaire)
+    if (typeof window._askPseudoIfNeeded === 'function') {
+      window._askPseudoIfNeeded(launch);
+    } else {
+      launch();
+    }
   };
 
   // Met à jour les meilleurs scores affichés dans les cards
@@ -40267,7 +40291,8 @@ if (G.imgBall) {
     G.ball.trail = [];
     G.ball.scored = false;
     G.ball.touchedRim = false;
-    G.ball._prevY = G.ball.y; // FIX : initialiser pour éviter détection ratée au 1er frame
+    G.ball.endScheduled = false;  // Reset flag pour permettre le prochain tir
+    G.ball._prevY = G.ball.y;
     // Nouveau vent à chaque tir
     var mc = MODES[G.mode] || MODES.free;
     G.wind = (Math.random() * 2 - 1) * mc.wind;
@@ -40397,7 +40422,7 @@ if (G.imgBall) {
 
       // Fin de tir : ballon sorti du canvas ou revient au sol
       if (G.ball.y > G.H + 100 || G.ball.x < -100 || G.ball.x > G.W + 100) {
-        _sa_endShot();
+        if (!G.ball.endScheduled) { G.ball.endScheduled = true; _sa_endShot(); }
       } else if (G.ball.y >= G.H - 60 - G.ball.r && G.ball.launched) {
         // touche le sol → rebond puis fin
         G.ball.y = G.H - 60 - G.ball.r;
@@ -40406,7 +40431,10 @@ if (G.imgBall) {
           G.ball.vx *= 0.7;
         } else {
           G.ball.vy = 0;
-          setTimeout(_sa_endShot, 300);
+          if (!G.ball.endScheduled) {
+            G.ball.endScheduled = true;
+            setTimeout(_sa_endShot, 300);
+          }
         }
       }
     }
@@ -41010,6 +41038,7 @@ if (G.imgBall) {
     G.ball.y = G.H * p.yr;
     G.ball.vx=0; G.ball.vy=0; G.ball.launched=false;
     G.ball.rotation=0; G.ball.trail=[]; G.ball.scored=false; G.ball.touchedRim=false;
+    G.ball.endScheduled = false;  // Reset flag pour permettre le prochain tir
     G.ball._prevY = G.ball.y;
     G.hoop.x = G.W * p.hoopXr;
     G.hoop.y = G.H * 0.40;
@@ -41087,11 +41116,19 @@ if (G.imgBall) {
         }
       }
       G.ball._prevY=G.ball.y;
-      if(G.ball.y>G.H+100 || G.ball.x<-100 || G.ball.x>G.W+100){ _bb_endShot(); }
+      if(G.ball.y>G.H+100 || G.ball.x<-100 || G.ball.x>G.W+100){
+        if(!G.ball.endScheduled){ G.ball.endScheduled = true; _bb_endShot(); }
+      }
       else if(G.ball.y>=G.H-40-G.ball.r && G.ball.launched){
         G.ball.y=G.H-40-G.ball.r;
         if(Math.abs(G.ball.vy)>3){ G.ball.vy=-G.ball.vy*0.4; G.ball.vx*=0.7; }
-        else { G.ball.vy=0; setTimeout(_bb_endShot,300); }
+        else {
+          G.ball.vy=0;
+          if(!G.ball.endScheduled){
+            G.ball.endScheduled = true;
+            setTimeout(_bb_endShot,300);
+          }
+        }
       }
     }
     // Particules + pops
@@ -41676,7 +41713,7 @@ if (G.imgBall) {
     G.aim.active=false;
     var dx=G.aim.sx-G.aim.cx, dy=G.aim.sy-G.aim.cy;
     var dist=Math.sqrt(dx*dx+dy*dy); if(dist<20) return;
-    var power=Math.min(dist,260)/260, speed=10+power*26, angle=Math.atan2(dy,dx);
+    var power=Math.min(dist,260)/260, speed=10+power*32, angle=Math.atan2(dy,dx);
     G.ball.vx=Math.cos(angle)*speed; G.ball.vy=Math.sin(angle)*speed;
     G.ball.launched=true; G.ball.trail=[];
     if(window._haptic){ try{window._haptic.tap&&window._haptic.tap();}catch(e){} }
@@ -41861,7 +41898,7 @@ if (G.imgBall) {
   }
   function _hr_drawTraj(ctx){
     var dx=G.aim.sx-G.aim.cx, dy=G.aim.sy-G.aim.cy, dist=Math.sqrt(dx*dx+dy*dy); if(dist<20) return;
-    var power=Math.min(dist,260)/260, speed=10+power*26, angle=Math.atan2(dy,dx);
+    var power=Math.min(dist,260)/260, speed=10+power*32, angle=Math.atan2(dy,dx);
     var vx=Math.cos(angle)*speed, vy=Math.sin(angle)*speed, sx=G.ball.x, sy=G.ball.y;
     ctx.save(); ctx.fillStyle='#f5c518';
     for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2); ctx.fill(); } }
@@ -41890,11 +41927,12 @@ if (G.imgBall) {
     if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // TOI (gauche)
     ctx.fillStyle='#fff'; ctx.font="700 14px 'Bebas Neue','Impact',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
-    // Emoji basketteur ⛹️ GROS + label TOI
+    // Emoji basketteur ⛹️ GROS + pseudo du joueur (ou 'TOI' par défaut)
     ctx.font = '32px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla",system-ui,sans-serif';
     ctx.fillText('⛹️', 18, 8);
+    var playerName = (typeof window._getPlayerName === 'function') ? window._getPlayerName() : 'TOI';
     ctx.font="700 15px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#fff';
-    ctx.fillText('TOI', 60, 18);
+    ctx.fillText(playerName, 60, 18);
     ctx.font="900 26px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#f5c518';
     ctx.fillText(G.playerLetters || '—', 20, 34);
     // AI (droite)
@@ -42042,9 +42080,9 @@ if (G.imgBall) {
     var rank=document.getElementById('rc-results-rank'), rankText='', rankColor='#fff';
     if(avg<200){ rankText='🥷 NINJA'; rankColor='#f5c518'; }
     else if(avg<250){ rankText='🏆 ÉLITE'; rankColor='#facc15'; }
-    else if(avg<280){ rankText='⭐ PRO'; rankColor='#22c55e'; }
-    else if(avg<350){ rankText='💪 AMATEUR'; rankColor='#3b82f6'; }
-    else if(avg<400){ rankText='🌱 ROOKIE'; rankColor='#9aa3b3'; }
+    else if(avg<300){ rankText='⭐ PRO'; rankColor='#22c55e'; }
+    else if(avg<400){ rankText='💪 AMATEUR'; rankColor='#3b82f6'; }
+    else if(avg<500){ rankText='🌱 ROOKIE'; rankColor='#9aa3b3'; }
     else { rankText='🐢 LENT'; rankColor='#e63946'; }
     rank.textContent=rankText; rank.style.color=rankColor;
     var isBest = (G.best===0 || avg<G.best) && avg>0;
@@ -42212,9 +42250,8 @@ if (G.imgBall) {
     var avgSoFar=0;
     if(G.times.length>0){ var s=0; for(var i=0;i<G.times.length;i++) s+=G.times[i]; avgSoFar=Math.round(s/G.times.length); }
     ctx.fillText('⚡ Moy : '+(avgSoFar?avgSoFar+' ms':'—'), 20, 42);
-    // Faux départs droite
-    ctx.textAlign='right'; ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(G.W-130,10,120,52);
-    ctx.strokeStyle='rgba(230,57,70,.5)'; ctx.strokeRect(G.W-130,10,120,52);
+    // Faux départs droite (sans encadré, juste texte avec shadow)
+    ctx.textAlign='right';
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(String(G.falseStarts), G.W-20, 16);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#e63946'; ctx.fillText('⚠️ FAUX DÉPARTS', G.W-20, 44);
@@ -42508,9 +42545,8 @@ if (G.imgBall) {
     ctx.fillText('Niveau '+G.level, 20, 16);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518';
     ctx.fillText('🧠 '+G.sequence.length+' cases', 20, 42);
-    // Phase droite
-    ctx.textAlign='right'; ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(G.W-130,10,120,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.strokeRect(G.W-130,10,120,52);
+    // Phase droite (sans encadré, juste texte avec shadow)
+    ctx.textAlign='right';
     ctx.fillStyle='#fff'; ctx.font="700 20px 'Bebas Neue','Impact',sans-serif";
     var phase = G.state==='showing'?'👀 OBSERVE':(G.state==='input'?'🎯 À TOI':'…');
     ctx.fillText(phase, G.W-20, 20);
@@ -42548,6 +42584,116 @@ if (G.imgBall) {
 </div>
 
 <script>
+// ═══ Fonction utilitaire globale : récupérer le pseudo du joueur ═══
+window._getPlayerName = function(){
+  try {
+    var raw = localStorage.getItem('sensei_personnage_v1');
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p && p.pseudo && typeof p.pseudo === 'string') {
+        var trimmed = p.pseudo.trim();
+        if (trimmed) {
+          return trimmed.length > 10 ? trimmed.substring(0, 10) : trimmed;
+        }
+      }
+    }
+  } catch(e){}
+  return 'TOI';
+};
+
+// ═══ Prompt pseudo au 1er lancement d'un jeu arcade ═══
+// Appelé par _arcade_launch avant de lancer un jeu
+// Si pseudo déjà saisi OU user a déjà skippé → appelle le callback direct
+// Sinon → affiche modal, puis callback après choix user
+window._askPseudoIfNeeded = function(callback){
+  var lang = (window._lang === 'en') ? 'en' : 'fr';
+  var hasPseudo = false, hasSkipped = false;
+  try {
+    var raw = localStorage.getItem('sensei_personnage_v1');
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p && p.pseudo && String(p.pseudo).trim()) hasPseudo = true;
+    }
+    hasSkipped = localStorage.getItem('sensei_pseudo_prompted') === '1';
+  } catch(e){}
+  if (hasPseudo || hasSkipped) { callback(); return; }
+  // Créer modal si pas déjà présent
+  var modal = document.getElementById('pseudo-prompt-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'pseudo-prompt-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:100080;background:rgba(10,13,24,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;font-family:inherit';
+    modal.innerHTML =
+      '<div style="max-width:420px;width:100%;background:linear-gradient(160deg,rgba(245,197,24,.1),rgba(13,17,23,.95));border:2px solid rgba(245,197,24,.5);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(245,197,24,.25)">'
+      + '<div style="font-size:52px;line-height:1;margin-bottom:12px">⛹️</div>'
+      + '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:26px;letter-spacing:2.5px;color:#f5c518;margin-bottom:8px" id="pp-title">COMMENT ON T\'APPELLE ?</div>'
+      + '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:.5px;line-height:1.5;margin-bottom:18px" id="pp-desc">Ton pseudo s\'affichera dans les jeux à la place de "TOI"</div>'
+      + '<input type="text" id="pp-input" maxlength="10" placeholder="Ex : KOBE" autocomplete="off" style="width:100%;padding:14px 16px;font-size:18px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;letter-spacing:2px;text-align:center;background:rgba(0,0,0,.5);border:2px solid rgba(245,197,24,.4);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;box-sizing:border-box">'
+      + '<div style="font-size:10px;color:#9aa3b3;margin-bottom:18px" id="pp-hint">Max 10 caractères · Modifiable plus tard dans "TON PERSONNAGE"</div>'
+      + '<div style="display:flex;gap:10px">'
+      + '  <button id="pp-skip" style="flex:1;padding:12px;background:transparent;border:1.5px solid rgba(154,163,179,.4);border-radius:10px;color:#9aa3b3;font-family:\'Barlow\',sans-serif;font-size:12px;letter-spacing:1px;font-weight:600;cursor:pointer">✖️ Jouer sans pseudo</button>'
+      + '  <button id="pp-ok" style="flex:1;padding:12px;background:#f5c518;border:none;border-radius:10px;color:#0a0d18;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:14px;letter-spacing:2px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(245,197,24,.4)">✅ VALIDER</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(modal);
+  }
+  // Localisation
+  var titleEl = modal.querySelector('#pp-title');
+  var descEl = modal.querySelector('#pp-desc');
+  var hintEl = modal.querySelector('#pp-hint');
+  var skipBtn = modal.querySelector('#pp-skip');
+  var okBtn = modal.querySelector('#pp-ok');
+  var input = modal.querySelector('#pp-input');
+  if (lang === 'en') {
+    titleEl.textContent = "WHAT'S YOUR NAME?";
+    descEl.textContent = 'Your nickname will show in games instead of "YOU"';
+    hintEl.textContent = 'Max 10 characters · Editable later in "YOUR CHARACTER"';
+    input.placeholder = 'Ex: KOBE';
+    skipBtn.textContent = '✖️ Play without name';
+    okBtn.textContent = '✅ CONFIRM';
+  } else {
+    titleEl.textContent = "COMMENT ON T'APPELLE ?";
+    descEl.textContent = 'Ton pseudo s\'affichera dans les jeux à la place de "TOI"';
+    hintEl.textContent = 'Max 10 caractères · Modifiable plus tard dans "TON PERSONNAGE"';
+    input.placeholder = 'Ex : KOBE';
+    skipBtn.textContent = '✖️ Jouer sans pseudo';
+    okBtn.textContent = '✅ VALIDER';
+  }
+  input.value = '';
+  var cleanup = function(){
+    modal.style.display = 'none';
+    try { localStorage.setItem('sensei_pseudo_prompted', '1'); } catch(e){}
+  };
+  var onValidate = function(){
+    var val = (input.value || '').trim();
+    if (val) {
+      try {
+        var raw = localStorage.getItem('sensei_personnage_v1');
+        var p = raw ? JSON.parse(raw) : {};
+        p.pseudo = val.substring(0, 10);
+        localStorage.setItem('sensei_personnage_v1', JSON.stringify(p));
+      } catch(e){}
+    }
+    cleanup();
+    if (window._haptic) { try { window._haptic.success && window._haptic.success(); } catch(e){} }
+    callback();
+  };
+  var onSkip = function(){
+    cleanup();
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+    callback();
+  };
+  // Clone pour nettoyer les listeners précédents
+  var newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
+  var newSkip = skipBtn.cloneNode(true); skipBtn.parentNode.replaceChild(newSkip, skipBtn);
+  newOk.addEventListener('click', onValidate);
+  newSkip.addEventListener('click', onSkip);
+  // Entrée pour valider
+  input.onkeydown = function(e){ if (e.key === 'Enter') onValidate(); };
+  modal.style.display = 'flex';
+  setTimeout(function(){ try { input.focus(); } catch(e){} }, 100);
+};
+
 // ═══ RÈGLES DES JEUX — Modal centralisé avec i18n ══════════════════════
 (function(){
   // Liste des 9 jeux avec leurs clés i18n (contenu dans les traductions)
@@ -43486,39 +43632,120 @@ if (G.imgBall) {
   }
 
   function _cv_drawCourtTopDown(ctx){
-    var padX = 30, padY = 80;
-    // Lignes blanches lumineuses (contraste maximal sur fond assombri)
+    var padX = 30, padY = 70;
+    var courtW = G.W - padX*2;
+    var courtH = G.H - padY - 25;
+    var cxMid = G.W/2;
+
+    // ─── Parquet sous-jacent (couleur douce qui laisse voir les joueurs) ───
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    var pGrad = ctx.createLinearGradient(0, padY, 0, padY + courtH);
+    pGrad.addColorStop(0, 'rgba(205,135,65,.42)');
+    pGrad.addColorStop(1, 'rgba(165,100,45,.42)');
+    ctx.fillStyle = pGrad;
+    ctx.fillRect(padX, padY, courtW, courtH);
+
+    // ─── Lignes de parquet subtiles (barres verticales) ───
+    ctx.strokeStyle = 'rgba(80,45,20,.15)';
+    ctx.lineWidth = 1;
+    for(var lx = padX + 25; lx < G.W - padX; lx += 25){
+      ctx.beginPath(); ctx.moveTo(lx, padY); ctx.lineTo(lx, padY + courtH); ctx.stroke();
+    }
+
+    // ─── Lignes blanches officielles du demi-terrain FIBA ───
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
     ctx.shadowBlur = 4;
-    ctx.strokeStyle = 'rgba(255,255,255,.95)';
+    ctx.strokeStyle = '#fff';
     ctx.lineWidth = 3;
-    // Bordure terrain
-    ctx.strokeRect(padX, padY, G.W - padX*2, G.H - padY - 30);
-    // Ligne médiane (horizontale)
+
+    // Bordure extérieure (ligne de touche + ligne de fond)
+    ctx.strokeRect(padX, padY, courtW, courtH);
+
+    // Ligne médiane (représente la moitié terrain basse)
+    var midY = padY + courtH - 2;
     ctx.beginPath();
-    ctx.moveTo(padX, padY + (G.H - padY - 30) * 0.5);
-    ctx.lineTo(G.W - padX, padY + (G.H - padY - 30) * 0.5);
+    ctx.moveTo(padX, midY);
+    ctx.lineTo(G.W - padX, midY);
     ctx.stroke();
-    // Cercle central
-    var cx = G.W/2, cy = padY + (G.H - padY - 30) * 0.5;
-    ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI*2); ctx.stroke();
-    // Panier en haut (en vue top-down c'est un cercle orange)
-    var hoopY = padY + 20;
+
+    // ─── Panier (anneau orange avec panneau) ───
+    var hoopY = padY + 24;
+    // Panneau derrière
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.fillRect(cxMid - 28, hoopY - 10, 56, 6);
+    ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(cxMid - 28, hoopY - 10, 56, 6);
+    // Anneau
     ctx.strokeStyle = '#ee7328'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(G.W/2, hoopY, 15, 0, Math.PI*2); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 2.5;
-    // Raquette (zone peinte)
-    var laneW = 70, laneH = 110;
-    ctx.strokeRect(G.W/2 - laneW/2, hoopY, laneW, laneH);
-    // Arc 3pts
+    ctx.beginPath(); ctx.arc(cxMid, hoopY, 11, 0, Math.PI*2); ctx.stroke();
+    // Filet (petites lignes)
+    ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1;
+    for(var n=0;n<6;n++){
+      var ang = Math.PI/5 * n;
+      ctx.beginPath();
+      ctx.moveTo(cxMid + Math.cos(ang)*11, hoopY + Math.sin(ang)*11);
+      ctx.lineTo(cxMid + Math.cos(ang)*8, hoopY + Math.sin(ang)*8);
+      ctx.stroke();
+    }
+
+    // ─── Raquette (zone peinte, couleur basket + bordure blanche) ───
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2.5;
+    var laneW = Math.min(100, courtW*0.22);
+    var laneH = Math.min(140, courtH*0.42);
+    // Fond de raquette coloré (bleu/rouge selon style FIBA)
+    ctx.fillStyle = 'rgba(99,139,255,.18)';
+    ctx.fillRect(cxMid - laneW/2, hoopY, laneW, laneH);
+    ctx.strokeRect(cxMid - laneW/2, hoopY, laneW, laneH);
+
+    // ─── Ligne des lancers francs + demi-cercle ───
     ctx.beginPath();
-    ctx.arc(G.W/2, hoopY+5, 170, Math.PI*0.1, Math.PI*0.9);
+    ctx.moveTo(cxMid - laneW/2, hoopY + laneH);
+    ctx.lineTo(cxMid + laneW/2, hoopY + laneH);
     ctx.stroke();
-    // Ligne lancer franc
+    // Demi-cercle du lancer franc (vers le haut dans le peinture)
     ctx.beginPath();
-    ctx.arc(G.W/2, hoopY + laneH, 40, 0, Math.PI, true);
+    ctx.arc(cxMid, hoopY + laneH, laneW/2, Math.PI, 0, false);
     ctx.stroke();
+    // Demi-cercle pointillé (sortie du peinture)
+    ctx.setLineDash([4,4]);
+    ctx.beginPath();
+    ctx.arc(cxMid, hoopY + laneH, laneW/2, 0, Math.PI, false);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // ─── Arc 3 points officiel ───
+    var threePtR = Math.min(200, courtW*0.42);
+    // Ligne 3pts : commence par 2 lignes droites verticales
+    var cornerX_L = cxMid - threePtR;
+    var cornerX_R = cxMid + threePtR;
+    var cornerBottomY = hoopY + threePtR*0.6;
+    ctx.beginPath();
+    ctx.moveTo(cornerX_L, padY);
+    ctx.lineTo(cornerX_L, cornerBottomY);
+    // Arc courbe
+    ctx.arc(cxMid, hoopY, threePtR, Math.PI + 0.35, -0.35, false);
+    ctx.moveTo(cornerX_R, cornerBottomY);
+    ctx.lineTo(cornerX_R, padY);
+    ctx.stroke();
+
+    // ─── Petit demi-cercle sous le panier (zone de non-charge) ───
+    ctx.beginPath();
+    ctx.arc(cxMid, hoopY + 6, 22, 0, Math.PI, false);
+    ctx.stroke();
+
+    // ─── Marques des lancers francs (tirets de chaque côté de la raquette) ───
+    ctx.lineWidth = 2;
+    for(var mk = 0; mk < 4; mk++){
+      var my = hoopY + 25 + mk * 22;
+      ctx.beginPath();
+      ctx.moveTo(cxMid - laneW/2 - 6, my);
+      ctx.lineTo(cxMid - laneW/2, my);
+      ctx.moveTo(cxMid + laneW/2, my);
+      ctx.lineTo(cxMid + laneW/2 + 6, my);
+      ctx.stroke();
+    }
+
     ctx.restore();
   }
 
