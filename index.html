@@ -43453,9 +43453,10 @@ window._askPseudoIfNeeded = function(callback){
     ctx.shadowColor = 'rgba(0,0,0,.95)';
     ctx.shadowBlur = 8;
     ctx.fillStyle = '#f5c518';
-    for(var i=0;i<40;i++){
+    for(var i=0;i<60;i++){
       sx += vx; sy += vy; vy += 0.42;
-      if(sy > G.H || sx < 0 || sx > G.W || sy < G.H * G.hoop.yr - 20) break;
+      // Stop seulement si vraiment hors écran (plus de coupe au niveau du panier)
+      if(sy > G.H + 20 || sx < -20 || sx > G.W + 20 || sy < -20) break;
       if(i%2===0){ ctx.beginPath(); ctx.arc(sx, sy, 3.5, 0, Math.PI*2); ctx.fill(); }
     }
     // Jauge puissance (contour sombre + arc coloré, déjà bien visible)
