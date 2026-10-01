@@ -40232,7 +40232,7 @@ if (G.imgBall) {
     ctx.font = "20px sans-serif";
     var hearts = '';
     for (var i = 0; i < G.lives; i++) hearts += '❤️';
-    ctx.fillText(hearts, G.W - 20, 20);
+    ctx.fillText(hearts, G.W - 44, 20);
       ctx.restore();
   }
 })();
@@ -41034,10 +41034,10 @@ if (G.imgBall) {
     ctx.textAlign = 'right';
     ctx.fillStyle = '#fff';
     ctx.font = "700 24px 'Bebas Neue','Impact',sans-serif";
-    ctx.fillText(String(G.shotsLeft), G.W - 20, 16);
+    ctx.fillText(String(G.shotsLeft), G.W - 44, 16);
     ctx.font = "9px 'Barlow',sans-serif";
     ctx.fillStyle = '#f5c518';
-    ctx.fillText('TIRS', G.W - 20, 44);
+    ctx.fillText('TIRS', G.W - 44, 44);
     // Streak (si actif)
     if (G.streak >= 2) {
       ctx.textAlign = 'center';
@@ -41419,8 +41419,8 @@ if (G.imgBall) {
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#cfd3e0'; ctx.fillText('⏱️ BUZZER', G.W/2, 52);
     // Shots restants droite (sans encadré, juste texte avec shadow)
     ctx.textAlign='right';
-    ctx.fillStyle='#fff'; ctx.font="700 24px 'Bebas Neue','Impact',sans-serif"; ctx.fillText(String(G.shotsLeft),G.W-20,16);
-    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TIRS RESTANTS',G.W-20,44);
+    ctx.fillStyle='#fff'; ctx.font="700 24px 'Bebas Neue','Impact',sans-serif"; ctx.fillText(String(G.shotsLeft),G.W-44,16);
+    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TIRS RESTANTS',G.W-44,44);
     // Streak
     if(G.streak>=2){ ctx.textAlign='center'; ctx.fillStyle='#e63946'; ctx.font="700 18px 'Bebas Neue','Impact',sans-serif"; ctx.strokeStyle='#000'; ctx.lineWidth=3; ctx.strokeText('🔥 × '+G.streak,G.W/2,G.H-40); ctx.fillText('🔥 × '+G.streak,G.W/2,G.H-40); }
       ctx.restore();
@@ -41693,8 +41693,8 @@ if (G.imgBall) {
     // Time restant droite
     var timeLeft = Math.max(0, G.duration - G.elapsed);
     ctx.textAlign='right';ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
-    ctx.fillText(Math.ceil(timeLeft)+'s',G.W-20,16);
-    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TEMPS',G.W-20,44);
+    ctx.fillText(Math.ceil(timeLeft)+'s',G.W-44,16);
+    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TEMPS',G.W-44,44);
       ctx.restore();
   }
 })();
@@ -41758,10 +41758,10 @@ if (G.imgBall) {
     // 5 positions
     positions:[
       { xr:0.15, yr:0.85, hoopXr:0.55, name:'LANCER FRANC' },
-      { xr:0.10, yr:0.82, hoopXr:0.72, name:'3PT GAUCHE' },
-      { xr:0.32, yr:0.82, hoopXr:0.72, name:'3PT DROITE' },
-      { xr:0.05, yr:0.88, hoopXr:0.90, name:'CORNER' },
-      { xr:0.10, yr:0.75, hoopXr:0.88, name:'LONG RANGE' }
+      { xr:0.12, yr:0.82, hoopXr:0.72, name:'3PT GAUCHE' },
+      { xr:0.30, yr:0.82, hoopXr:0.72, name:'3PT DROITE' },
+      { xr:0.13, yr:0.86, hoopXr:0.80, name:'CORNER' },
+      { xr:0.15, yr:0.78, hoopXr:0.80, name:'LONG RANGE' }
     ]
   };
 
@@ -41865,7 +41865,7 @@ if (G.imgBall) {
     G.aim.active=false;
     var dx=G.aim.sx-G.aim.cx, dy=G.aim.sy-G.aim.cy;
     var dist=Math.sqrt(dx*dx+dy*dy); if(dist<20) return;
-    var power=Math.min(dist,260)/260, speed=10+power*32, angle=Math.atan2(dy,dx);
+    var power=Math.min(dist,260)/260, speed=10+power*36, angle=Math.atan2(dy,dx);
     G.ball.vx=Math.cos(angle)*speed; G.ball.vy=Math.sin(angle)*speed;
     G.ball.launched=true; G.ball.trail=[];
     if(window._haptic){ try{window._haptic.tap&&window._haptic.tap();}catch(e){} }
@@ -42050,7 +42050,7 @@ if (G.imgBall) {
   }
   function _hr_drawTraj(ctx){
     var dx=G.aim.sx-G.aim.cx, dy=G.aim.sy-G.aim.cy, dist=Math.sqrt(dx*dx+dy*dy); if(dist<20) return;
-    var power=Math.min(dist,260)/260, speed=10+power*32, angle=Math.atan2(dy,dx);
+    var power=Math.min(dist,260)/260, speed=10+power*36, angle=Math.atan2(dy,dx);
     var vx=Math.cos(angle)*speed, vy=Math.sin(angle)*speed, sx=G.ball.x, sy=G.ball.y;
     ctx.save(); ctx.fillStyle='#f5c518';
     for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2); ctx.fill(); } }
@@ -42094,9 +42094,9 @@ if (G.imgBall) {
     ctx.fillStyle = '#fff';
     ctx.fillText('🤖', G.W - 60, 8);
     ctx.font="700 15px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#fff';
-    ctx.fillText('AI', G.W-20, 18);
+    ctx.fillText('AI', G.W-44, 18);
     ctx.font="900 26px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#e63946';
-    ctx.fillText(G.aiLetters || '—', G.W-20, 34);
+    ctx.fillText(G.aiLetters || '—', G.W-44, 34);
     // Position au centre + indicateur COPIE/DÉFINIT (crucial pour comprendre les enjeux)
     var p = G.positions[G.currentPos];
     ctx.textAlign='center';
@@ -42405,8 +42405,8 @@ if (G.imgBall) {
     // Faux départs droite (sans encadré, juste texte avec shadow)
     ctx.textAlign='right';
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
-    ctx.fillText(String(G.falseStarts), G.W-20, 16);
-    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#e63946'; ctx.fillText('⚠️ FAUX DÉPARTS', G.W-20, 44);
+    ctx.fillText(String(G.falseStarts), G.W-44, 16);
+    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#e63946'; ctx.fillText('⚠️ FAUX DÉPARTS', G.W-44, 44);
       ctx.restore();
   }
 })();
@@ -42701,8 +42701,8 @@ if (G.imgBall) {
     ctx.textAlign='right';
     ctx.fillStyle='#fff'; ctx.font="700 20px 'Bebas Neue','Impact',sans-serif";
     var phase = G.state==='showing'?'👀 OBSERVE':(G.state==='input'?'🎯 À TOI':'…');
-    ctx.fillText(phase, G.W-20, 20);
-    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('PHASE', G.W-20, 44);
+    ctx.fillText(phase, G.W-44, 20);
+    ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('PHASE', G.W-44, 44);
       ctx.restore();
   }
 })();
@@ -43024,13 +43024,13 @@ window._askPseudoIfNeeded = function(callback){
     G.shooter.x = G.W * 0.5;
     G.shooter.y = G.H * 0.82;
     G.shooter.r = Math.max(22, Math.min(30, G.W * 0.028));
-    // 5 racks en arc 3pts (vue téléspectateur)
+    // 5 racks en arc 3pts (vue téléspectateur) - positions calibrées pour tirs réussis depuis chaque spot
     G.racks = [
-      { xr:0.08, yr:0.72, remaining:5 },  // coin gauche
-      { xr:0.25, yr:0.68, remaining:5 },  // aile gauche
-      { xr:0.50, yr:0.63, remaining:5 },  // top (le plus profond)
-      { xr:0.75, yr:0.68, remaining:5 },  // aile droite
-      { xr:0.92, yr:0.72, remaining:5 }   // coin droite
+      { xr:0.12, yr:0.78, remaining:5 },  // coin gauche
+      { xr:0.28, yr:0.72, remaining:5 },  // aile gauche
+      { xr:0.50, yr:0.68, remaining:5 },  // top
+      { xr:0.72, yr:0.72, remaining:5 },  // aile droite
+      { xr:0.88, yr:0.78, remaining:5 }   // coin droite
     ];
   }
   function _tp_showTitle(){
@@ -43118,8 +43118,12 @@ window._askPseudoIfNeeded = function(callback){
     G.activeRack = rackIdx;
     // La money ball est le DERNIER ballon de chaque rack
     G.ball.isMoney = (rack.remaining === 0);
-    // Positionner le ballon à la position de tir (centre bas, grand = foreground)
-    G.ball.x = G.shooter.x; G.ball.y = G.shooter.y;
+    // Position de tir = position du rack sélectionné (concours NBA authentique)
+    // Chaque rack = angle/distance différent → 5 tirs stratégiquement différents
+    G.ball.x = G.W * rack.xr;
+    G.ball.y = G.H * rack.yr;
+    G.ball.startX = G.ball.x;  // Mémorise position initiale pour calcul pseudo-3D scale
+    G.ball.startY = G.ball.y;
     G.ball.r = G.shooter.r;
     G.ball.scale = 1;
     G.ball.vx = 0; G.ball.vy = 0;
@@ -43136,7 +43140,7 @@ window._askPseudoIfNeeded = function(callback){
     var dist = Math.sqrt(dx*dx + dy*dy);
     if(dist < 20) return;
     var power = Math.min(dist, 260) / 260;
-    var speed = 10 + power * 24;
+    var speed = 10 + power * 34;
     var angle = Math.atan2(dy, dx);
     G.ball.vx = Math.cos(angle) * speed;
     G.ball.vy = Math.sin(angle) * speed;
@@ -43176,7 +43180,7 @@ window._askPseudoIfNeeded = function(callback){
       // Pseudo-3D : scale du ballon selon sa position verticale (plus haut = plus loin = plus petit)
       // scale va de 1 (y = shooter.y) à 0.38 (y = hoop.yr * H)
       var hoopY = G.H * G.hoop.yr;
-      var startY = G.shooter.y;
+      var startY = G.ball.startY || G.shooter.y;
       var progress = Math.max(0, Math.min(1, (startY - G.ball.y) / (startY - hoopY)));
       G.ball.scale = 1 - progress * 0.62;
       G.ball.r = G.shooter.r * G.ball.scale;
@@ -43429,7 +43433,7 @@ window._askPseudoIfNeeded = function(callback){
     var dx = G.aim.sx - G.aim.cx, dy = G.aim.sy - G.aim.cy;
     var dist = Math.sqrt(dx*dx + dy*dy); if(dist < 20) return;
     var power = Math.min(dist, 260) / 260;
-    var speed = 10 + power * 24;
+    var speed = 10 + power * 34;
     var angle = Math.atan2(dy, dx);
     var vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
     var sx = G.ball.x, sy = G.ball.y;
