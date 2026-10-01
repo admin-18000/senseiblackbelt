@@ -10879,19 +10879,19 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
 }
 
-/* ═══ PAYSAGE MOBILE (max-height 500px) : compression modérée ═══ */
+/* ═══ PAYSAGE MOBILE (max-height 500px) : compression équilibrée ═══ */
 @media (max-height: 500px) {
-  /* Logo plus petit */
+  /* Logo : lisible et présent sans écraser l'écran */
   #sr-title-screen > img, #sa-title-screen > img, #bb-title-screen > img,
   #dm-title-screen > img, #hr-title-screen > img, #rc-title-screen > img,
   #mc-title-screen > img, #tp-title-screen > img, #cv-title-screen > img,
   #sr-results > img, #sa-results > img, #bb-results > img, #dm-results > img,
   #hr-results > img, #rc-results > img, #mc-results > img, #tp-results > img, #cv-results > img {
     width: auto !important;
-    height: 48px !important;
-    margin-bottom: 4px !important;
+    height: 54px !important;
+    margin-bottom: 6px !important;
   }
-  /* Titre principal (premier div avec Bebas Neue) */
+  /* Titre principal : garder du punch visuel */
   #sr-title-screen > div[style*="Bebas Neue"], #sa-title-screen > div[style*="Bebas Neue"],
   #bb-title-screen > div[style*="Bebas Neue"], #dm-title-screen > div[style*="Bebas Neue"],
   #hr-title-screen > div[style*="Bebas Neue"], #rc-title-screen > div[style*="Bebas Neue"],
@@ -10902,12 +10902,12 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   #hr-results > div[style*="Bebas Neue"], #rc-results > div[style*="Bebas Neue"],
   #mc-results > div[style*="Bebas Neue"], #tp-results > div[style*="Bebas Neue"],
   #cv-results > div[style*="Bebas Neue"] {
-    font-size: 24px !important;
-    letter-spacing: 2px !important;
-    margin-bottom: 2px !important;
+    font-size: 28px !important;
+    letter-spacing: 2.5px !important;
+    margin-bottom: 4px !important;
     line-height: 1 !important;
   }
-  /* Textes Barlow (tagline + règles) plus compacts */
+  /* Textes Barlow (tagline + règles) : lisible */
   #sr-title-screen > div[style*="Barlow"], #sa-title-screen > div[style*="Barlow"],
   #bb-title-screen > div[style*="Barlow"], #dm-title-screen > div[style*="Barlow"],
   #hr-title-screen > div[style*="Barlow"], #rc-title-screen > div[style*="Barlow"],
@@ -10918,76 +10918,83 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   #hr-results > div[style*="Barlow"], #rc-results > div[style*="Barlow"],
   #mc-results > div[style*="Barlow"], #tp-results > div[style*="Barlow"],
   #cv-results > div[style*="Barlow"] {
-    font-size: 10px !important;
-    line-height: 1.35 !important;
-    margin-bottom: 6px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
     letter-spacing: 0.5px !important;
   }
-  /* Boutons COMMENCER / REJOUER */
+  /* Boutons COMMENCER / REJOUER : tactile-friendly (hauteur ~40px) */
   #sr-title-screen > button, #sa-title-screen > button, #bb-title-screen > button,
   #dm-title-screen > button, #hr-title-screen > button, #rc-title-screen > button,
   #mc-title-screen > button, #tp-title-screen > button, #cv-title-screen > button,
   #sr-results > button, #sa-results > button, #bb-results > button, #dm-results > button,
   #hr-results > button, #rc-results > button, #mc-results > button, #tp-results > button, #cv-results > button {
-    padding: 9px 24px !important;
-    font-size: 13px !important;
-    letter-spacing: 2px !important;
-    margin-bottom: 4px !important;
+    padding: 12px 30px !important;
+    font-size: 14px !important;
+    letter-spacing: 2.5px !important;
+    margin-bottom: 6px !important;
+    min-height: 42px !important;
   }
   /* Message record */
   #sr-best, #sa-best, #bb-best, #dm-best, #hr-best,
   #rc-best, #mc-best, #tp-best, #cv-best {
-    font-size: 11px !important;
+    font-size: 12px !important;
     margin-top: 2px !important;
   }
-  /* Scores de résultats */
+  /* Score résultats : garder le punch */
   [id$="-results-score"] {
-    font-size: 36px !important;
+    font-size: 42px !important;
     margin-bottom: 2px !important;
   }
+  /* Rank résultats : point d'orgueil, pas trop petit */
   [id$="-results-rank"] {
-    font-size: 16px !important;
-    margin-bottom: 4px !important;
+    font-size: 19px !important;
+    margin-bottom: 6px !important;
+    letter-spacing: 2.5px !important;
   }
+  /* Stats résultats */
   [id$="-results-stats"] {
     font-size: 11px !important;
-    line-height: 1.4 !important;
-    margin-bottom: 10px !important;
+    line-height: 1.45 !important;
+    margin-bottom: 12px !important;
   }
 }
 
-/* ═══ TRÈS PETITS ÉCRANS (max-height 400px) : compression maximale ═══ */
+/* ═══ TRÈS PETITS ÉCRANS (max-height 400px) : compression plus poussée mais lisible ═══ */
 @media (max-height: 400px) {
   #sr-title-screen > img, #sa-title-screen > img, #bb-title-screen > img,
   #dm-title-screen > img, #hr-title-screen > img, #rc-title-screen > img,
   #mc-title-screen > img, #tp-title-screen > img, #cv-title-screen > img,
   #sr-results > img, #sa-results > img, #bb-results > img, #dm-results > img,
   #hr-results > img, #rc-results > img, #mc-results > img, #tp-results > img, #cv-results > img {
-    height: 36px !important;
-    margin-bottom: 2px !important;
+    height: 42px !important;
+    margin-bottom: 3px !important;
   }
   #sr-title-screen > div[style*="Bebas Neue"], #sa-title-screen > div[style*="Bebas Neue"],
   #bb-title-screen > div[style*="Bebas Neue"], #dm-title-screen > div[style*="Bebas Neue"],
   #hr-title-screen > div[style*="Bebas Neue"], #rc-title-screen > div[style*="Bebas Neue"],
   #mc-title-screen > div[style*="Bebas Neue"], #tp-title-screen > div[style*="Bebas Neue"],
   #cv-title-screen > div[style*="Bebas Neue"] {
-    font-size: 20px !important;
-    letter-spacing: 1.5px !important;
+    font-size: 23px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 2px !important;
   }
   #sr-title-screen > div[style*="Barlow"], #sa-title-screen > div[style*="Barlow"],
   #bb-title-screen > div[style*="Barlow"], #dm-title-screen > div[style*="Barlow"],
   #hr-title-screen > div[style*="Barlow"], #rc-title-screen > div[style*="Barlow"],
   #mc-title-screen > div[style*="Barlow"], #tp-title-screen > div[style*="Barlow"],
   #cv-title-screen > div[style*="Barlow"] {
-    font-size: 9px !important;
+    font-size: 10px !important;
     line-height: 1.3 !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 5px !important;
   }
+  /* Bouton : garder tactile-friendly même en ultra-compact */
   #sr-title-screen > button, #sa-title-screen > button, #bb-title-screen > button,
   #dm-title-screen > button, #hr-title-screen > button, #rc-title-screen > button,
   #mc-title-screen > button, #tp-title-screen > button, #cv-title-screen > button {
-    padding: 7px 20px !important;
-    font-size: 12px !important;
+    padding: 10px 26px !important;
+    font-size: 13px !important;
+    min-height: 38px !important;
   }
 }
 
