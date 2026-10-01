@@ -40883,7 +40883,9 @@ if (G.imgBall) {
     var vy = Math.sin(angle) * speed;
     var sx = G.ball.x, sy = G.ball.y;
     ctx.save();
-    ctx.strokeStyle = 'rgba(245,197,24,.85)';
+    // Contour noir sur chaque point via shadowBlur → visible sur TOUS les fonds
+    ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.shadowBlur = 8;
     ctx.fillStyle = '#f5c518';
     for (var i = 0; i < 40; i++) {
       sx += vx;
@@ -40893,10 +40895,11 @@ if (G.imgBall) {
       if (sy > G.H - 60 || sx > G.W || sx < 0) break;
       if (i % 2 === 0) {
         ctx.beginPath();
-        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+        ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
         ctx.fill();
       }
     }
+    ctx.shadowBlur = 0;
     // Ligne de tension depuis le ballon vers le curseur (comme une catapulte)
     ctx.strokeStyle = 'rgba(255,255,255,.7)';
     ctx.lineWidth = 3;
@@ -41376,8 +41379,12 @@ if (G.imgBall) {
     if(dist<20) return;
     var power=Math.min(dist,260)/260, speed=10+power*26, angle=Math.atan2(dy,dx);
     var vx=Math.cos(angle)*speed, vy=Math.sin(angle)*speed, sx=G.ball.x, sy=G.ball.y;
-    ctx.save(); ctx.fillStyle='#f5c518';
-    for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2); ctx.fill(); } }
+    ctx.save();
+    // Contour noir sur chaque point via shadowBlur → visible sur TOUS les fonds
+    ctx.shadowColor='rgba(0,0,0,.95)'; ctx.shadowBlur=8;
+    ctx.fillStyle='#f5c518';
+    for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3.5,0,Math.PI*2); ctx.fill(); } }
+    ctx.shadowBlur=0;
     ctx.strokeStyle='rgba(255,255,255,.7)'; ctx.lineWidth=3; ctx.setLineDash([8,5]); ctx.beginPath(); ctx.moveTo(G.ball.x,G.ball.y); ctx.lineTo(G.aim.cx,G.aim.cy); ctx.stroke(); ctx.setLineDash([]);
     var pc = power<0.35?'#22c55e':(power<0.7?'#facc15':'#e63946');
     ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=8; ctx.beginPath(); ctx.arc(G.ball.x,G.ball.y,G.ball.r+12,0,Math.PI*2); ctx.stroke();
@@ -42052,8 +42059,12 @@ if (G.imgBall) {
     var dx=G.aim.sx-G.aim.cx, dy=G.aim.sy-G.aim.cy, dist=Math.sqrt(dx*dx+dy*dy); if(dist<20) return;
     var power=Math.min(dist,260)/260, speed=10+power*36, angle=Math.atan2(dy,dx);
     var vx=Math.cos(angle)*speed, vy=Math.sin(angle)*speed, sx=G.ball.x, sy=G.ball.y;
-    ctx.save(); ctx.fillStyle='#f5c518';
-    for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3,0,Math.PI*2); ctx.fill(); } }
+    ctx.save();
+    // Contour noir sur chaque point via shadowBlur → visible sur TOUS les fonds
+    ctx.shadowColor='rgba(0,0,0,.95)'; ctx.shadowBlur=8;
+    ctx.fillStyle='#f5c518';
+    for(var i=0;i<40;i++){ sx+=vx; sy+=vy; vy+=0.45; if(sy>G.H-40||sx>G.W||sx<0) break; if(i%2===0){ ctx.beginPath(); ctx.arc(sx,sy,3.5,0,Math.PI*2); ctx.fill(); } }
+    ctx.shadowBlur=0;
     var pc = power<0.35?'#22c55e':(power<0.7?'#facc15':'#e63946');
     ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=8; ctx.beginPath(); ctx.arc(G.ball.x,G.ball.y,G.ball.r+12,0,Math.PI*2); ctx.stroke();
     ctx.strokeStyle=pc; ctx.lineWidth=6; ctx.beginPath(); ctx.arc(G.ball.x,G.ball.y,G.ball.r+12,-Math.PI/2,-Math.PI/2+Math.PI*2*power); ctx.stroke();
@@ -43437,15 +43448,20 @@ window._askPseudoIfNeeded = function(callback){
     var angle = Math.atan2(dy, dx);
     var vx = Math.cos(angle)*speed, vy = Math.sin(angle)*speed;
     var sx = G.ball.x, sy = G.ball.y;
-    ctx.save(); ctx.fillStyle='#f5c518';
+    ctx.save();
+    // Contour noir sur chaque point via shadowBlur → visible sur TOUS les fonds (clair ou sombre)
+    ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#f5c518';
     for(var i=0;i<40;i++){
       sx += vx; sy += vy; vy += 0.42;
       if(sy > G.H || sx < 0 || sx > G.W || sy < G.H * G.hoop.yr - 20) break;
-      if(i%2===0){ ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, Math.PI*2); ctx.fill(); }
+      if(i%2===0){ ctx.beginPath(); ctx.arc(sx, sy, 3.5, 0, Math.PI*2); ctx.fill(); }
     }
-    // Jauge puissance
+    // Jauge puissance (contour sombre + arc coloré, déjà bien visible)
+    ctx.shadowBlur = 0;  // reset shadow pour la jauge
     var pc = power<0.35?'#22c55e':(power<0.7?'#facc15':'#e63946');
-    ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=7;
+    ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=8;
     ctx.beginPath(); ctx.arc(G.ball.x, G.ball.y, G.ball.r+11, 0, Math.PI*2); ctx.stroke();
     ctx.strokeStyle=pc; ctx.lineWidth=5;
     ctx.beginPath(); ctx.arc(G.ball.x, G.ball.y, G.ball.r+11, -Math.PI/2, -Math.PI/2 + Math.PI*2*power); ctx.stroke();
