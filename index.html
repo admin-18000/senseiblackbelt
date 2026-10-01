@@ -10862,19 +10862,154 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   padding-right: max(16px, env(safe-area-inset-right, 16px)) !important;
 }
 
-/* Écrans TITRE + RÉSULTATS des 9 jeux arcade : scrollables + safe-area iPhone */
-/* Fix pour que le contenu (règles + bouton COMMENCER) ne soit JAMAIS coupé en paysage mobile */
+/* ─────────────────────────────────────────────────────────────────
+   ÉCRANS TITRE + RÉSULTATS DES 9 JEUX ARCADE
+   Objectif : TOUT visible d'un seul coup, sans scroll, sur tous écrans
+   Approche : compression des tailles sur petits écrans via media queries
+   ───────────────────────────────────────────────────────────────── */
+
+/* Safe-area iPhone (notch) sur tous les title/results screens */
 #sr-title-screen, #sa-title-screen, #bb-title-screen, #dm-title-screen,
 #hr-title-screen, #rc-title-screen, #mc-title-screen, #tp-title-screen, #cv-title-screen,
 #sr-results, #sa-results, #bb-results, #dm-results,
 #hr-results, #rc-results, #mc-results, #tp-results, #cv-results {
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  justify-content: safe center !important;
-  padding-top: max(28px, env(safe-area-inset-top, 20px)) !important;
-  padding-bottom: max(28px, env(safe-area-inset-bottom, 20px)) !important;
-  padding-left: max(20px, env(safe-area-inset-left, 20px)) !important;
-  padding-right: max(20px, env(safe-area-inset-right, 20px)) !important;
+  padding-left: max(16px, env(safe-area-inset-left, 16px)) !important;
+  padding-right: max(16px, env(safe-area-inset-right, 16px)) !important;
+  padding-top: max(14px, env(safe-area-inset-top, 14px)) !important;
+  padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+}
+
+/* ═══ PAYSAGE MOBILE (max-height 500px) : compression modérée ═══ */
+@media (max-height: 500px) {
+  /* Logo plus petit */
+  #sr-title-screen > img, #sa-title-screen > img, #bb-title-screen > img,
+  #dm-title-screen > img, #hr-title-screen > img, #rc-title-screen > img,
+  #mc-title-screen > img, #tp-title-screen > img, #cv-title-screen > img,
+  #sr-results > img, #sa-results > img, #bb-results > img, #dm-results > img,
+  #hr-results > img, #rc-results > img, #mc-results > img, #tp-results > img, #cv-results > img {
+    width: auto !important;
+    height: 48px !important;
+    margin-bottom: 4px !important;
+  }
+  /* Titre principal (premier div avec Bebas Neue) */
+  #sr-title-screen > div[style*="Bebas Neue"], #sa-title-screen > div[style*="Bebas Neue"],
+  #bb-title-screen > div[style*="Bebas Neue"], #dm-title-screen > div[style*="Bebas Neue"],
+  #hr-title-screen > div[style*="Bebas Neue"], #rc-title-screen > div[style*="Bebas Neue"],
+  #mc-title-screen > div[style*="Bebas Neue"], #tp-title-screen > div[style*="Bebas Neue"],
+  #cv-title-screen > div[style*="Bebas Neue"],
+  #sr-results > div[style*="Bebas Neue"], #sa-results > div[style*="Bebas Neue"],
+  #bb-results > div[style*="Bebas Neue"], #dm-results > div[style*="Bebas Neue"],
+  #hr-results > div[style*="Bebas Neue"], #rc-results > div[style*="Bebas Neue"],
+  #mc-results > div[style*="Bebas Neue"], #tp-results > div[style*="Bebas Neue"],
+  #cv-results > div[style*="Bebas Neue"] {
+    font-size: 24px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 2px !important;
+    line-height: 1 !important;
+  }
+  /* Textes Barlow (tagline + règles) plus compacts */
+  #sr-title-screen > div[style*="Barlow"], #sa-title-screen > div[style*="Barlow"],
+  #bb-title-screen > div[style*="Barlow"], #dm-title-screen > div[style*="Barlow"],
+  #hr-title-screen > div[style*="Barlow"], #rc-title-screen > div[style*="Barlow"],
+  #mc-title-screen > div[style*="Barlow"], #tp-title-screen > div[style*="Barlow"],
+  #cv-title-screen > div[style*="Barlow"],
+  #sr-results > div[style*="Barlow"], #sa-results > div[style*="Barlow"],
+  #bb-results > div[style*="Barlow"], #dm-results > div[style*="Barlow"],
+  #hr-results > div[style*="Barlow"], #rc-results > div[style*="Barlow"],
+  #mc-results > div[style*="Barlow"], #tp-results > div[style*="Barlow"],
+  #cv-results > div[style*="Barlow"] {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 6px !important;
+    letter-spacing: 0.5px !important;
+  }
+  /* Boutons COMMENCER / REJOUER */
+  #sr-title-screen > button, #sa-title-screen > button, #bb-title-screen > button,
+  #dm-title-screen > button, #hr-title-screen > button, #rc-title-screen > button,
+  #mc-title-screen > button, #tp-title-screen > button, #cv-title-screen > button,
+  #sr-results > button, #sa-results > button, #bb-results > button, #dm-results > button,
+  #hr-results > button, #rc-results > button, #mc-results > button, #tp-results > button, #cv-results > button {
+    padding: 9px 24px !important;
+    font-size: 13px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 4px !important;
+  }
+  /* Message record */
+  #sr-best, #sa-best, #bb-best, #dm-best, #hr-best,
+  #rc-best, #mc-best, #tp-best, #cv-best {
+    font-size: 11px !important;
+    margin-top: 2px !important;
+  }
+  /* Scores de résultats */
+  [id$="-results-score"] {
+    font-size: 36px !important;
+    margin-bottom: 2px !important;
+  }
+  [id$="-results-rank"] {
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+  }
+  [id$="-results-stats"] {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* ═══ TRÈS PETITS ÉCRANS (max-height 400px) : compression maximale ═══ */
+@media (max-height: 400px) {
+  #sr-title-screen > img, #sa-title-screen > img, #bb-title-screen > img,
+  #dm-title-screen > img, #hr-title-screen > img, #rc-title-screen > img,
+  #mc-title-screen > img, #tp-title-screen > img, #cv-title-screen > img,
+  #sr-results > img, #sa-results > img, #bb-results > img, #dm-results > img,
+  #hr-results > img, #rc-results > img, #mc-results > img, #tp-results > img, #cv-results > img {
+    height: 36px !important;
+    margin-bottom: 2px !important;
+  }
+  #sr-title-screen > div[style*="Bebas Neue"], #sa-title-screen > div[style*="Bebas Neue"],
+  #bb-title-screen > div[style*="Bebas Neue"], #dm-title-screen > div[style*="Bebas Neue"],
+  #hr-title-screen > div[style*="Bebas Neue"], #rc-title-screen > div[style*="Bebas Neue"],
+  #mc-title-screen > div[style*="Bebas Neue"], #tp-title-screen > div[style*="Bebas Neue"],
+  #cv-title-screen > div[style*="Bebas Neue"] {
+    font-size: 20px !important;
+    letter-spacing: 1.5px !important;
+  }
+  #sr-title-screen > div[style*="Barlow"], #sa-title-screen > div[style*="Barlow"],
+  #bb-title-screen > div[style*="Barlow"], #dm-title-screen > div[style*="Barlow"],
+  #hr-title-screen > div[style*="Barlow"], #rc-title-screen > div[style*="Barlow"],
+  #mc-title-screen > div[style*="Barlow"], #tp-title-screen > div[style*="Barlow"],
+  #cv-title-screen > div[style*="Barlow"] {
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
+  }
+  #sr-title-screen > button, #sa-title-screen > button, #bb-title-screen > button,
+  #dm-title-screen > button, #hr-title-screen > button, #rc-title-screen > button,
+  #mc-title-screen > button, #tp-title-screen > button, #cv-title-screen > button {
+    padding: 7px 20px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* ═══ HUB ARCADE : optimisation du header pour écrans courts ═══ */
+@media (max-height: 500px) {
+  #arcade-hub > div > div:first-child { /* En-tête */
+    margin-bottom: 14px !important;
+  }
+  #arcade-hub > div > div:first-child > img { /* Logo du hub */
+    width: 60px !important;
+    margin-bottom: 6px !important;
+  }
+  #arcade-hub > div > div:first-child > div[style*="Apple Color Emoji"] { /* Trio emojis */
+    font-size: 32px !important;
+    margin-bottom: 4px !important;
+    letter-spacing: 4px !important;
+  }
+  #arcade-hub > div > div:first-child > div[style*="Bebas Neue"] { /* Titre SALLE D'ARCADE */
+    font-size: 26px !important;
+    margin-bottom: 4px !important;
+    letter-spacing: 3px !important;
+  }
 }
 body.dojo-mode { background: #050709 !important; }
 body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
