@@ -10861,6 +10861,21 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   padding-left: max(16px, env(safe-area-inset-left, 16px)) !important;
   padding-right: max(16px, env(safe-area-inset-right, 16px)) !important;
 }
+
+/* Écrans TITRE + RÉSULTATS des 9 jeux arcade : scrollables + safe-area iPhone */
+/* Fix pour que le contenu (règles + bouton COMMENCER) ne soit JAMAIS coupé en paysage mobile */
+#sr-title-screen, #sa-title-screen, #bb-title-screen, #dm-title-screen,
+#hr-title-screen, #rc-title-screen, #mc-title-screen, #tp-title-screen, #cv-title-screen,
+#sr-results, #sa-results, #bb-results, #dm-results,
+#hr-results, #rc-results, #mc-results, #tp-results, #cv-results {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  justify-content: safe center !important;
+  padding-top: max(28px, env(safe-area-inset-top, 20px)) !important;
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 20px)) !important;
+  padding-left: max(20px, env(safe-area-inset-left, 20px)) !important;
+  padding-right: max(20px, env(safe-area-inset-right, 20px)) !important;
+}
 body.dojo-mode { background: #050709 !important; }
 body.dojo-mode nav { background: rgba(5,7,9,.98) !important; }
 </style>
