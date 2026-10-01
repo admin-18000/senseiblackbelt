@@ -39676,12 +39676,7 @@ window._QI_DATA['pnr_05'] = {
 
     // Player = image du ballon de basket qui roule (rotation selon distance)
     ctx.save();
-    // Ombre portée au sol
-    ctx.fillStyle = 'rgba(0,0,0,.45)';
-    ctx.beginPath();
-    ctx.ellipse(G.player.x, G.ground.y + 3, G.player.r * 0.9, G.player.r * 0.25, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (G.imgBall) {
+if (G.imgBall) {
       var rotation = (G.world.dist / G.player.r) % (Math.PI * 2);
       ctx.translate(G.player.x, G.player.y);
       ctx.rotate(rotation);
@@ -39854,24 +39849,22 @@ window._QI_DATA['pnr_05'] = {
 
   function _sr_drawHUD(ctx){
     if (!G.running) return;
+    // Shadow texte pour lisibilité sur fond varié
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
     // Watermark logo SENSEI en bas à gauche (discret)
     if (G.imgLogo) {
       var lw = 52;
       ctx.save();
-      ctx.globalAlpha = 0.75;
-      // Fond noir arrondi pour contraste
-      ctx.fillStyle = 'rgba(0,0,0,.4)';
-      ctx.fillRect(10, G.H - lw - 14, lw + 8, lw + 8);
-      ctx.drawImage(G.imgLogo, 14, G.H - lw - 10, lw, lw);
+      ctx.globalAlpha = 0.65;
+      // Logo en bas-droite (loin de l'action côté gauche), fond transparent
+      ctx.drawImage(G.imgLogo, G.W - lw - 14, G.H - lw - 10, lw, lw);
       ctx.restore();
     }
     var b = beltFor(G.score);
     // Score gauche (avec fond noir semi-transparent pour lisibilité)
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.fillRect(10, 10, 130, 52);
-    ctx.strokeStyle = 'rgba(245,197,24,.5)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(10, 10, 130, 52);
     ctx.fillStyle = G.C.text;
     ctx.font = "700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.textBaseline = 'top';
@@ -39891,6 +39884,7 @@ window._QI_DATA['pnr_05'] = {
     var hearts = '';
     for (var i = 0; i < G.lives; i++) hearts += '❤️';
     ctx.fillText(hearts, G.W - 20, 20);
+      ctx.restore();
   }
 })();
 </script>
@@ -40450,16 +40444,7 @@ window._QI_DATA['pnr_05'] = {
   }
 
   function _sa_drawBall(ctx){
-    // Ombre sol (uniquement si près du sol)
-    var groundY = G.H - 60;
-    if (G.ball.y > groundY - 100) {
-      var shadowAlpha = Math.min(0.5, (G.ball.y - (groundY - 100)) / 100 * 0.5);
-      ctx.fillStyle = 'rgba(0,0,0,' + shadowAlpha + ')';
-      ctx.beginPath();
-      ctx.ellipse(G.ball.x, groundY + 2, G.ball.r * 0.8, G.ball.r * 0.22, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    if (G.imgBall) {
+if (G.imgBall) {
       ctx.save();
       ctx.translate(G.ball.x, G.ball.y);
       ctx.rotate(G.ball.rotation);
@@ -40597,38 +40582,39 @@ window._QI_DATA['pnr_05'] = {
     ctx.restore();
   }
 
-  // Hint visuel au 1er tir : flèche animée qui indique de glisser en arrière
+  // Hint visuel au 1er tir : affiché AU-DESSUS du ballon pour ne pas être coupé à gauche
   function _sa_drawHint(ctx){
     var t = performance.now() / 500;
-    var pulse = (Math.sin(t) + 1) / 2; // 0 → 1 → 0
-    var hintX = G.ball.x - 90 - pulse * 15;
-    var hintY = G.ball.y;
+    var pulse = (Math.sin(t) + 1) / 2;
     ctx.save();
-    ctx.globalAlpha = 0.5 + pulse * 0.4;
-    // Flèche vers la gauche/bas (direction du drag)
-    ctx.strokeStyle = '#f5c518';
-    ctx.fillStyle = '#f5c518';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(G.ball.x - 30, hintY);
-    ctx.lineTo(hintX, hintY);
-    ctx.stroke();
-    // Pointe de la flèche
-    ctx.beginPath();
-    ctx.moveTo(hintX, hintY);
-    ctx.lineTo(hintX + 12, hintY - 8);
-    ctx.lineTo(hintX + 12, hintY + 8);
-    ctx.closePath();
-    ctx.fill();
-    // Texte "GLISSE"
-    ctx.font = "700 14px 'Bebas Neue','Impact',sans-serif";
+    ctx.globalAlpha = 0.65 + pulse * 0.35;
+    // Texte "GLISSE EN ARRIÈRE" centré au-dessus du ballon (toujours visible)
+    var label = (window._lang === 'en') ? 'DRAG BACK TO SHOOT' : 'GLISSE EN ARRIÈRE';
+    ctx.font = "900 15px 'Bebas Neue','Impact',sans-serif";
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 4;
-    var label = (window._lang === 'en') ? 'DRAG BACK' : 'GLISSE EN ARRIÈRE';
-    ctx.strokeText(label, (hintX + G.ball.x - 30) / 2, hintY - 22);
-    ctx.fillText(label, (hintX + G.ball.x - 30) / 2, hintY - 22);
+    // Mesurer et clamper position pour éviter débord
+    var textW = ctx.measureText(label).width;
+    var tx = Math.max(textW/2 + 12, Math.min(G.W - textW/2 - 12, G.ball.x));
+    var ty = G.ball.y - G.ball.r - 45;
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 5;
+    ctx.strokeText(label, tx, ty);
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText(label, tx, ty);
+    // Petite flèche pulsante qui pointe du texte vers le ballon
+    ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(tx, ty + 12);
+    ctx.lineTo(G.ball.x, G.ball.y - G.ball.r - 10 - pulse * 4);
+    ctx.stroke();
+    // Pointe flèche
+    ctx.fillStyle = '#f5c518';
+    ctx.beginPath();
+    ctx.moveTo(G.ball.x, G.ball.y - G.ball.r - 6);
+    ctx.lineTo(G.ball.x - 6, G.ball.y - G.ball.r - 14);
+    ctx.lineTo(G.ball.x + 6, G.ball.y - G.ball.r - 14);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
   }
 
@@ -40667,23 +40653,21 @@ window._QI_DATA['pnr_05'] = {
 
   function _sa_drawHUD(ctx){
     if (!G.running) return;
+    // Shadow texte pour lisibilité sur fond varié
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
     // Watermark logo SENSEI en bas à gauche (discret)
     if (G.imgLogo) {
       var lw = 52;
       ctx.save();
-      ctx.globalAlpha = 0.75;
-      // Fond noir arrondi pour contraste
-      ctx.fillStyle = 'rgba(0,0,0,.4)';
-      ctx.fillRect(10, G.H - lw - 14, lw + 8, lw + 8);
-      ctx.drawImage(G.imgLogo, 14, G.H - lw - 10, lw, lw);
+      ctx.globalAlpha = 0.65;
+      // Logo en bas-droite (loin de l'action côté gauche), fond transparent
+      ctx.drawImage(G.imgLogo, G.W - lw - 14, G.H - lw - 10, lw, lw);
       ctx.restore();
     }
     // Score gauche
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.fillRect(10, 10, 130, 52);
-    ctx.strokeStyle = 'rgba(245,197,24,.5)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(10, 10, 130, 52);
     ctx.fillStyle = '#fff';
     ctx.font = "700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.textBaseline = 'top';
@@ -40715,6 +40699,7 @@ window._QI_DATA['pnr_05'] = {
       ctx.strokeText('🔥 × ' + G.streak, G.W/2, G.H - 40);
       ctx.fillText('🔥 × ' + G.streak, G.W/2, G.H - 40);
     }
+      ctx.restore();
   }
 })();
 </script>
@@ -40727,6 +40712,13 @@ window._QI_DATA['pnr_05'] = {
   <button onclick="_bb_close()" aria-label="Fermer"
     style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
   <canvas id="bb-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none;cursor:crosshair"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="bb-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
 
   <div id="bb-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
     <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
@@ -40781,6 +40773,9 @@ window._QI_DATA['pnr_05'] = {
     var m=document.getElementById('bb-modal'); if(!m) return;
     m.style.display='block'; document.body.style.overflow='hidden';
     _bb_setupCanvas();
+    _bb_checkOrient();
+    window.addEventListener('resize', _bb_checkOrient);
+    window.addEventListener('orientationchange', _bb_checkOrient);
     try{ G.best=parseInt(localStorage.getItem('sensei_buzzer_best')||'0',10)||0; }catch(e){}
     var bs=document.getElementById('bb-best');
     if(bs) bs.textContent = G.best>0 ? ('🏆 Record : '+G.best+' pts') : '';
@@ -40789,11 +40784,21 @@ window._QI_DATA['pnr_05'] = {
   };
   window._bb_close = function(){
     _bb_stop(); _bb_unbindInput();
+    window.removeEventListener('resize', _bb_checkOrient);
+    window.removeEventListener('orientationchange', _bb_checkOrient);
     var m=document.getElementById('bb-modal'); if(m) m.style.display='none';
     var hub=document.getElementById('arcade-hub');
     if(hub && hub.style.display==='block'){ if(typeof _arcade_refreshBests==='function') _arcade_refreshBests(); }
     else { document.body.style.overflow=''; }
   };
+  function _bb_checkOrient(){
+    var rot = document.getElementById('bb-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _bb_setupCanvas();
+  }
   function _bb_setupCanvas(){
     G.canvas=document.getElementById('bb-canvas'); if(!G.canvas) return;
     G.ctx=G.canvas.getContext('2d');
@@ -40994,7 +40999,6 @@ window._QI_DATA['pnr_05'] = {
       ctx.stroke(); ctx.globalAlpha=1;
     }
     // Ballon
-    if(G.ball.y>G.H-140){ var sa=Math.min(0.5,(G.ball.y-(G.H-140))/100*0.5); ctx.fillStyle='rgba(0,0,0,'+sa+')'; ctx.beginPath(); ctx.ellipse(G.ball.x,G.H-38,G.ball.r*0.8,G.ball.r*0.22,0,0,Math.PI*2); ctx.fill(); }
     if(G.imgBall){ ctx.save(); ctx.translate(G.ball.x,G.ball.y); ctx.rotate(G.ball.rotation); var d=G.ball.r*2; ctx.drawImage(G.imgBall,-G.ball.r,-G.ball.r,d,d); ctx.restore(); }
     // Particules et pops
     for(var pi=0;pi<G.particles.length;pi++){ var pp=G.particles[pi]; ctx.globalAlpha=pp.life; ctx.fillStyle=pp.color; ctx.beginPath(); ctx.arc(pp.x,pp.y,pp.size,0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1;
@@ -41035,11 +41039,14 @@ window._QI_DATA['pnr_05'] = {
   }
   function _bb_drawHUD(ctx){
     if(!G.running) return;
+    // Shadow texte pour lisibilité sur fond varié (sans encadré)
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
     // Logo bas gauche
-    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.75; ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(10,G.H-66,60,60); ctx.drawImage(G.imgLogo,14,G.H-62,52,52); ctx.restore(); }
+    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // Score gauche
-    ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(10,10,140,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(10,10,140,52);
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif"; ctx.textBaseline='top'; ctx.textAlign='left';
     ctx.fillText(String(G.score)+' pts',20,16);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518';
@@ -41048,8 +41055,7 @@ window._QI_DATA['pnr_05'] = {
     // Timer centre (BIG)
     var tPct = G.shotTimer / 5;
     var tColor = tPct>0.5?'#22c55e':(tPct>0.2?'#facc15':'#e63946');
-    ctx.textAlign='center'; ctx.fillStyle='rgba(0,0,0,.7)'; ctx.fillRect(G.W/2-70,10,140,58);
-    ctx.strokeStyle=tColor; ctx.lineWidth=2; ctx.strokeRect(G.W/2-70,10,140,58);
+    ctx.textAlign='center';
     ctx.fillStyle=tColor; ctx.font="900 34px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(G.shotTimer.toFixed(1)+'s', G.W/2, 18);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#cfd3e0'; ctx.fillText('⏱️ BUZZER', G.W/2, 52);
@@ -41060,6 +41066,7 @@ window._QI_DATA['pnr_05'] = {
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TIRS RESTANTS',G.W-20,44);
     // Streak
     if(G.streak>=2){ ctx.textAlign='center'; ctx.fillStyle='#e63946'; ctx.font="700 18px 'Bebas Neue','Impact',sans-serif"; ctx.strokeStyle='#000'; ctx.lineWidth=3; ctx.strokeText('🔥 × '+G.streak,G.W/2,G.H-40); ctx.fillText('🔥 × '+G.streak,G.W/2,G.H-40); }
+      ctx.restore();
   }
 })();
 </script>
@@ -41072,6 +41079,13 @@ window._QI_DATA['pnr_05'] = {
   <button onclick="_dm_close()" aria-label="Fermer"
     style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
   <canvas id="dm-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="dm-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
 
   <div id="dm-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
     <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
@@ -41120,6 +41134,9 @@ window._QI_DATA['pnr_05'] = {
     var m=document.getElementById('dm-modal'); if(!m) return;
     m.style.display='block'; document.body.style.overflow='hidden';
     _dm_setupCanvas();
+    _dm_checkOrient();
+    window.addEventListener('resize', _dm_checkOrient);
+    window.addEventListener('orientationchange', _dm_checkOrient);
     try{ G.best=parseInt(localStorage.getItem('sensei_dribble_best')||'0',10)||0; }catch(e){}
     var bs=document.getElementById('dm-best'); if(bs) bs.textContent = G.best>0 ? ('🏆 Record : '+G.best+' pts') : '';
     _dm_showTitle();
@@ -41127,11 +41144,21 @@ window._QI_DATA['pnr_05'] = {
   };
   window._dm_close = function(){
     _dm_stop(); _dm_unbindInput();
+    window.removeEventListener('resize', _dm_checkOrient);
+    window.removeEventListener('orientationchange', _dm_checkOrient);
     var m=document.getElementById('dm-modal'); if(m) m.style.display='none';
     var hub=document.getElementById('arcade-hub');
     if(hub && hub.style.display==='block'){ if(typeof _arcade_refreshBests==='function') _arcade_refreshBests(); }
     else { document.body.style.overflow=''; }
   };
+  function _dm_checkOrient(){
+    var rot = document.getElementById('dm-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _dm_setupCanvas();
+  }
   function _dm_setupCanvas(){
     G.canvas=document.getElementById('dm-canvas'); if(!G.canvas) return;
     G.ctx=G.canvas.getContext('2d');
@@ -41290,12 +41317,12 @@ window._QI_DATA['pnr_05'] = {
       }
       ctx.restore();
     }
-    // HUD
+    // HUD avec shadow pour lisibilité sans encadré
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.9)'; ctx.shadowBlur=6; ctx.shadowOffsetY=1;
     // Logo
-    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.75; ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(10,G.H-66,60,60); ctx.drawImage(G.imgLogo,14,G.H-62,52,52); ctx.restore(); }
+    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // Score gauche
-    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(10,10,140,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(10,10,140,52);
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif"; ctx.textBaseline='top'; ctx.textAlign='left';
     ctx.fillText(String(G.score)+' pts', 20, 16);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518';
@@ -41308,11 +41335,10 @@ window._QI_DATA['pnr_05'] = {
     }
     // Time restant droite
     var timeLeft = Math.max(0, G.duration - G.elapsed);
-    ctx.textAlign='right'; ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(G.W-90,10,80,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.strokeRect(G.W-90,10,80,52);
-    ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
+    ctx.textAlign='right';ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(Math.ceil(timeLeft)+'s',G.W-20,16);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TEMPS',G.W-20,44);
+      ctx.restore();
   }
 })();
 </script>
@@ -41325,6 +41351,13 @@ window._QI_DATA['pnr_05'] = {
   <button onclick="_hr_close()" aria-label="Fermer"
     style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
   <canvas id="hr-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none;cursor:crosshair"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="hr-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
 
   <div id="hr-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
     <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
@@ -41384,6 +41417,9 @@ window._QI_DATA['pnr_05'] = {
     var m=document.getElementById('hr-modal'); if(!m) return;
     m.style.display='block'; document.body.style.overflow='hidden';
     _hr_setupCanvas();
+    _hr_checkOrient();
+    window.addEventListener('resize', _hr_checkOrient);
+    window.addEventListener('orientationchange', _hr_checkOrient);
     try{ G.wins=parseInt(localStorage.getItem('sensei_horse_wins')||'0',10)||0; }catch(e){}
     var bs=document.getElementById('hr-best'); if(bs) bs.textContent = G.wins>0 ? ('🏆 Victoires : '+G.wins) : '';
     _hr_showTitle();
@@ -41391,11 +41427,21 @@ window._QI_DATA['pnr_05'] = {
   };
   window._hr_close = function(){
     _hr_stop(); _hr_unbindInput();
+    window.removeEventListener('resize', _hr_checkOrient);
+    window.removeEventListener('orientationchange', _hr_checkOrient);
     var m=document.getElementById('hr-modal'); if(m) m.style.display='none';
     var hub=document.getElementById('arcade-hub');
     if(hub && hub.style.display==='block'){ if(typeof _arcade_refreshBests==='function') _arcade_refreshBests(); }
     else { document.body.style.overflow=''; }
   };
+  function _hr_checkOrient(){
+    var rot = document.getElementById('hr-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _hr_setupCanvas();
+  }
   function _hr_setupCanvas(){
     G.canvas=document.getElementById('hr-canvas'); if(!G.canvas) return;
     G.ctx=G.canvas.getContext('2d');
@@ -41593,7 +41639,6 @@ window._QI_DATA['pnr_05'] = {
       for(var t=1;t<G.ball.trail.length;t++){ ctx.globalAlpha=t/G.ball.trail.length*0.6; ctx.lineTo(G.ball.trail[t].x,G.ball.trail[t].y); }
       ctx.stroke(); ctx.globalAlpha=1;
     }
-    if(G.ball.y>G.H-140){ var sa=Math.min(0.5,(G.ball.y-(G.H-140))/100*0.5); ctx.fillStyle='rgba(0,0,0,'+sa+')'; ctx.beginPath(); ctx.ellipse(G.ball.x,G.H-38,G.ball.r*0.8,G.ball.r*0.22,0,0,Math.PI*2); ctx.fill(); }
     if(G.imgBall){ ctx.save(); ctx.translate(G.ball.x,G.ball.y); ctx.rotate(G.ball.rotation); var d=G.ball.r*2; ctx.drawImage(G.imgBall,-G.ball.r,-G.ball.r,d,d); ctx.restore(); }
     for(var pi=0;pi<G.particles.length;pi++){ var pp=G.particles[pi]; ctx.globalAlpha=pp.life; ctx.fillStyle=pp.color; ctx.beginPath(); ctx.arc(pp.x,pp.y,pp.size,0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1;
     // Message
@@ -41628,28 +41673,28 @@ window._QI_DATA['pnr_05'] = {
   }
   function _hr_drawHUD(ctx){
     if(!G.running) return;
-    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.75; ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(10,G.H-66,60,60); ctx.drawImage(G.imgLogo,14,G.H-62,52,52); ctx.restore(); }
+    // Shadow texte pour lisibilité sur fond varié (sans encadré)
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
+    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // TOI (gauche)
-    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(10,10,160,58);
-    ctx.strokeStyle=(G.turn==='player'?'#f5c518':'rgba(255,255,255,.25)'); ctx.lineWidth=2; ctx.strokeRect(10,10,160,58);
     ctx.fillStyle='#fff'; ctx.font="700 14px 'Bebas Neue','Impact',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.fillText('🎯 TOI', 20, 16);
     // Lettres du joueur (dans notre version simplifiée on n'en donne pas mais on peut afficher pour immersion)
     ctx.font="900 26px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#f5c518';
     ctx.fillText(G.playerLetters || '—', 20, 34);
     // AI (droite)
-    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(G.W-170,10,160,58);
-    ctx.strokeStyle=(G.turn==='ai'?'#e63946':'rgba(255,255,255,.25)'); ctx.lineWidth=2; ctx.strokeRect(G.W-170,10,160,58);
     ctx.fillStyle='#fff'; ctx.font="700 14px 'Bebas Neue','Impact',sans-serif"; ctx.textAlign='right';
     ctx.fillText('🤖 AI', G.W-20, 16);
     ctx.font="900 26px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#e63946';
     ctx.fillText(G.aiLetters || '—', G.W-20, 34);
     // Position au centre
     var p = G.positions[G.currentPos];
-    ctx.textAlign='center'; ctx.fillStyle='rgba(0,0,0,.7)'; ctx.fillRect(G.W/2-100,10,200,32);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(G.W/2-100,10,200,32);
-    ctx.fillStyle='#f5c518'; ctx.font="700 16px 'Bebas Neue','Impact',sans-serif";
+    ctx.textAlign='center'; ctx.fillStyle='#f5c518'; ctx.font="700 16px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText('📍 '+p.name, G.W/2, 18);
+      ctx.restore();
   }
 })();
 </script>
@@ -41662,6 +41707,13 @@ window._QI_DATA['pnr_05'] = {
   <button onclick="_rc_close()" aria-label="Fermer"
     style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
   <canvas id="rc-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none;cursor:crosshair"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="rc-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
 
   <div id="rc-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
     <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
@@ -41710,6 +41762,9 @@ window._QI_DATA['pnr_05'] = {
     var m=document.getElementById('rc-modal'); if(!m) return;
     m.style.display='block'; document.body.style.overflow='hidden';
     _rc_setupCanvas();
+    _rc_checkOrient();
+    window.addEventListener('resize', _rc_checkOrient);
+    window.addEventListener('orientationchange', _rc_checkOrient);
     try{ G.best=parseInt(localStorage.getItem('sensei_reaction_best')||'0',10)||0; }catch(e){}
     var bs=document.getElementById('rc-best'); if(bs) bs.textContent = G.best>0 ? ('🏆 Record : '+G.best+' ms') : '';
     _rc_showTitle();
@@ -41717,11 +41772,21 @@ window._QI_DATA['pnr_05'] = {
   };
   window._rc_close = function(){
     _rc_stop(); _rc_unbindInput();
+    window.removeEventListener('resize', _rc_checkOrient);
+    window.removeEventListener('orientationchange', _rc_checkOrient);
     var m=document.getElementById('rc-modal'); if(m) m.style.display='none';
     var hub=document.getElementById('arcade-hub');
     if(hub && hub.style.display==='block'){ if(typeof _arcade_refreshBests==='function') _arcade_refreshBests(); }
     else { document.body.style.overflow=''; }
   };
+  function _rc_checkOrient(){
+    var rot = document.getElementById('rc-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _rc_setupCanvas();
+  }
   function _rc_setupCanvas(){
     G.canvas=document.getElementById('rc-canvas'); if(!G.canvas) return;
     G.ctx=G.canvas.getContext('2d');
@@ -41902,11 +41967,14 @@ window._QI_DATA['pnr_05'] = {
 
   function _rc_drawHUD(ctx){
     if(!G.running) return;
+    // Shadow texte pour lisibilité sur fond varié (sans encadré)
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
     // Logo bas gauche
-    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.75; ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(10,G.H-66,60,60); ctx.drawImage(G.imgLogo,14,G.H-62,52,52); ctx.restore(); }
+    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // Round gauche
-    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(10,10,140,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(10,10,140,52);
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif"; ctx.textBaseline='top'; ctx.textAlign='left';
     ctx.fillText('Round '+G.round+'/'+G.totalRounds, 20, 16);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518';
@@ -41919,6 +41987,7 @@ window._QI_DATA['pnr_05'] = {
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(String(G.falseStarts), G.W-20, 16);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#e63946'; ctx.fillText('⚠️ FAUX DÉPARTS', G.W-20, 44);
+      ctx.restore();
   }
 })();
 </script>
@@ -41931,6 +42000,13 @@ window._QI_DATA['pnr_05'] = {
   <button onclick="_mc_close()" aria-label="Fermer"
     style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
   <canvas id="mc-canvas" style="display:block;width:100%;height:100%;background:#0a0d18;touch-action:none;cursor:pointer"></canvas>
+
+  <!-- Overlay rotation portrait -->
+  <div id="mc-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
+  </div>
 
   <div id="mc-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
     <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
@@ -41983,6 +42059,9 @@ window._QI_DATA['pnr_05'] = {
     var m=document.getElementById('mc-modal'); if(!m) return;
     m.style.display='block'; document.body.style.overflow='hidden';
     _mc_setupCanvas();
+    _mc_checkOrient();
+    window.addEventListener('resize', _mc_checkOrient);
+    window.addEventListener('orientationchange', _mc_checkOrient);
     try{ G.best=parseInt(localStorage.getItem('sensei_memory_best')||'0',10)||0; }catch(e){}
     var bs=document.getElementById('mc-best'); if(bs) bs.textContent = G.best>0 ? ('🏆 Niveau max : '+G.best) : '';
     _mc_showTitle();
@@ -41990,11 +42069,21 @@ window._QI_DATA['pnr_05'] = {
   };
   window._mc_close = function(){
     _mc_stop(); _mc_unbindInput();
+    window.removeEventListener('resize', _mc_checkOrient);
+    window.removeEventListener('orientationchange', _mc_checkOrient);
     var m=document.getElementById('mc-modal'); if(m) m.style.display='none';
     var hub=document.getElementById('arcade-hub');
     if(hub && hub.style.display==='block'){ if(typeof _arcade_refreshBests==='function') _arcade_refreshBests(); }
     else { document.body.style.overflow=''; }
   };
+  function _mc_checkOrient(){
+    var rot = document.getElementById('mc-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _mc_setupCanvas();
+  }
   function _mc_setupCanvas(){
     G.canvas=document.getElementById('mc-canvas'); if(!G.canvas) return;
     G.ctx=G.canvas.getContext('2d');
@@ -42177,10 +42266,13 @@ window._QI_DATA['pnr_05'] = {
   }
   function _mc_drawHUD(ctx){
     if(!G.running) return;
-    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.75; ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(10,G.H-66,60,60); ctx.drawImage(G.imgLogo,14,G.H-62,52,52); ctx.restore(); }
+    // Shadow texte pour lisibilité sur fond varié (sans encadré)
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
+    if(G.imgLogo){ ctx.save(); ctx.globalAlpha=0.65; ctx.drawImage(G.imgLogo,G.W-66,G.H-62,52,52); ctx.restore(); }
     // Niveau gauche
-    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(10,10,140,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.lineWidth=1; ctx.strokeRect(10,10,140,52);
     ctx.fillStyle='#fff'; ctx.font="700 22px 'Bebas Neue','Impact',sans-serif"; ctx.textBaseline='top'; ctx.textAlign='left';
     ctx.fillText('Niveau '+G.level, 20, 16);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518';
@@ -42192,6 +42284,7 @@ window._QI_DATA['pnr_05'] = {
     var phase = G.state==='showing'?'👀 OBSERVE':(G.state==='input'?'🎯 À TOI':'…');
     ctx.fillText(phase, G.W-20, 20);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('PHASE', G.W-20, 44);
+      ctx.restore();
   }
 })();
 </script>
