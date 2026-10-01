@@ -41461,6 +41461,7 @@ if (G.imgBall) {
     aim:{ active:false, sx:0,sy:0, cx:0,cy:0 },
     playerLetters:'', aiLetters:'', LETTERS:'HORSE',
     turn:'player',      // 'player' | 'ai' | 'waiting'
+    mustCopy:false,     // true si le tireur actuel doit COPIER le tir précédent (sinon il définit)
     state:'playerShoot',// 'playerShoot' | 'aiShoot' | 'result'
     currentPos:0, aiSuccessRate:0.7,
     aiTimer:0, aiPhase:0,
@@ -41534,7 +41535,7 @@ if (G.imgBall) {
     G.aiSuccessRate = rate;
     document.getElementById('hr-title-screen').style.display='none';
     document.getElementById('hr-results').style.display='none';
-    G.playerLetters=''; G.aiLetters=''; G.turn='player'; G.state='playerShoot';
+    G.playerLetters=''; G.aiLetters=''; G.turn='player'; G.mustCopy=false; G.state='playerShoot';
     _hr_nextRound();
     G.running=true; G.lastT=performance.now(); G.rafId=requestAnimationFrame(_hr_loop);
   };
@@ -41631,6 +41632,8 @@ if (G.imgBall) {
       }
       G.ball._prevY=G.ball.y;
       if(G.ball.y>G.H+100 || G.ball.x<-100 || G.ball.x>G.W+100 || (G.ball.y>=G.H-40-G.ball.r && G.ball.launched)){
+        G.ball.launched = false;    // STOP physique
+        G.state = 'waiting';         // STOP state (empêche AI de re-tirer pendant les 500ms d'attente)
         setTimeout(_hr_endShot, 500);
       }
     }
@@ -41652,40 +41655,78 @@ if (G.imgBall) {
     if(window._haptic){ try{window._haptic.success&&window._haptic.success();}catch(e){} }
   }
   function _hr_endShot(){
-    // Logique HORSE : qui gagne/perd la lettre ?
-    if(G.turn==='player'){
-      if(G.ball.scored){
-        // Player réussit → au tour de l'AI de copier
-        G.message = '✅ MARQUÉ ! AI DOIT COPIER'; G.messageTime=1400;
-        G.turn='ai';
-        setTimeout(_hr_nextRound, 1500);
+    // Vraie logique HORSE :
+    // - Celui qui DÉFINIT un tir : s'il MARQUE, l'autre doit copier. S'il RATE, l'autre définit (pas de lettre).
+    // - Celui qui COPIE un tir : s'il MARQUE, c'est à son tour de définir. S'il RATE, il prend +1 LETTRE.
+    var scored = G.ball.scored;
+    var mustCopy = !!G.mustCopy;
+
+    if(G.turn === 'player'){
+      if(mustCopy){
+        // Player devait COPIER le tir de l'AI
+        if(scored){
+          G.message = '✅ COPIE RÉUSSIE · À TOI DE DÉFINIR'; G.messageTime = 1500;
+          G.mustCopy = false;
+          // Garde la main : player définit maintenant
+          setTimeout(_hr_nextRound, 1600);
+        } else {
+          // ❌ Copie ratée → +1 lettre pour player
+          G.playerLetters = G.LETTERS.substring(0, G.playerLetters.length + 1);
+          G.message = '❌ COPIE RATÉE · +1 LETTRE'; G.messageTime = 1600;
+          if(G.playerLetters.length >= 5){
+            // Player perd (il a HORSE)
+            setTimeout(function(){ _hr_stop(); _hr_showResults(false); }, 1700);
+            return;
+          }
+          G.turn = 'ai'; G.mustCopy = false;
+          setTimeout(_hr_nextRound, 1700);
+        }
       } else {
-        // Player rate → l'AI définit
-        G.message = '❌ RATÉ · AI JOUE'; G.messageTime=1400;
-        G.turn='ai';
-        setTimeout(_hr_nextRound, 1500);
+        // Player DÉFINISSAIT le tir
+        if(scored){
+          G.message = '✅ MARQUÉ · AI DOIT COPIER'; G.messageTime = 1400;
+          G.turn = 'ai'; G.mustCopy = true;
+          setTimeout(_hr_nextRound, 1500);
+        } else {
+          // Raté sans défi → AI définit à son tour (pas de lettre)
+          G.message = '❌ RATÉ · AI DÉFINIT'; G.messageTime = 1400;
+          G.turn = 'ai'; G.mustCopy = false;
+          setTimeout(_hr_nextRound, 1500);
+        }
       }
     } else {
-      // AI a tiré
-      if(G.ball.scored){
-        G.message = '🤖 AI MARQUE ! COPIE !'; G.messageTime=1400;
-        G.turn='player';
-        setTimeout(_hr_nextRound, 1500);
-      } else {
-        // AI rate → +1 lettre pour l'AI
-        G.aiLetters = G.LETTERS.substring(0, G.aiLetters.length+1);
-        G.message = '🤖 AI RATE · +1 LETTRE'; G.messageTime=1600;
-        if(G.aiLetters.length >= 5){
-          // AI perd
-          setTimeout(function(){ _hr_stop(); _hr_showResults(true); }, 1600);
-          return;
+      // AI
+      if(mustCopy){
+        // AI devait COPIER le tir du player
+        if(scored){
+          G.message = '🤖 AI COPIE · À ELLE DE DÉFINIR'; G.messageTime = 1500;
+          G.mustCopy = false;
+          setTimeout(_hr_nextRound, 1600);
+        } else {
+          // ❌ AI rate la copie → +1 lettre pour AI
+          G.aiLetters = G.LETTERS.substring(0, G.aiLetters.length + 1);
+          G.message = '🤖 AI RATE LA COPIE · +1 LETTRE'; G.messageTime = 1600;
+          if(G.aiLetters.length >= 5){
+            // AI perd
+            setTimeout(function(){ _hr_stop(); _hr_showResults(true); }, 1700);
+            return;
+          }
+          G.turn = 'player'; G.mustCopy = false;
+          setTimeout(_hr_nextRound, 1700);
         }
-        G.turn='player';
-        setTimeout(_hr_nextRound, 1600);
+      } else {
+        // AI DÉFINISSAIT
+        if(scored){
+          G.message = '🤖 AI MARQUE · TU DOIS COPIER'; G.messageTime = 1400;
+          G.turn = 'player'; G.mustCopy = true;
+          setTimeout(_hr_nextRound, 1500);
+        } else {
+          G.message = '🤖 AI RATE · À TOI DE DÉFINIR'; G.messageTime = 1400;
+          G.turn = 'player'; G.mustCopy = false;
+          setTimeout(_hr_nextRound, 1500);
+        }
       }
     }
-    // Note : dans notre version simplifiée, quand player rate, on ne lui donne pas de lettre
-    // (pour rendre le jeu plus fun). L'user gagne s'il fait rater l'AI 5 fois.
   }
 
   function _hr_draw(){
@@ -41767,11 +41808,25 @@ if (G.imgBall) {
     ctx.fillText('AI', G.W-20, 18);
     ctx.font="900 26px 'Bebas Neue','Impact',sans-serif"; ctx.fillStyle='#e63946';
     ctx.fillText(G.aiLetters || '—', G.W-20, 34);
-    // Position au centre
+    // Position au centre + indicateur COPIE/DÉFINIT (crucial pour comprendre les enjeux)
     var p = G.positions[G.currentPos];
-    ctx.textAlign='center'; ctx.fillStyle='#f5c518'; ctx.font="700 16px 'Bebas Neue','Impact',sans-serif";
-    ctx.fillText('📍 '+p.name, G.W/2, 18);
-      ctx.restore();
+    ctx.textAlign='center';
+    // Mode : COPIE (risque = +1 lettre si raté) vs DÉFINIT (safe)
+    var modeTxt, modeColor;
+    if(G.turn === 'player'){
+      if(G.mustCopy){ modeTxt = '⚠️ TU DOIS COPIER'; modeColor = '#e63946'; }
+      else { modeTxt = '🎯 À TOI DE DÉFINIR'; modeColor = '#22c55e'; }
+    } else {
+      if(G.mustCopy){ modeTxt = '🤖 AI DOIT COPIER'; modeColor = '#facc15'; }
+      else { modeTxt = '🤖 AI DÉFINIT'; modeColor = '#9aa3b3'; }
+    }
+    ctx.fillStyle = modeColor;
+    ctx.font = "900 14px 'Bebas Neue','Impact',sans-serif";
+    ctx.fillText(modeTxt, G.W/2, 14);
+    // Nom de la position en dessous
+    ctx.fillStyle='#f5c518'; ctx.font="700 14px 'Bebas Neue','Impact',sans-serif";
+    ctx.fillText('📍 '+p.name, G.W/2, 34);
+    ctx.restore();
   }
 })();
 </script>
