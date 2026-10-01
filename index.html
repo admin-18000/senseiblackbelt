@@ -40873,12 +40873,8 @@ if (G.imgBall) {
     ctx.fillStyle = '#f5c518';
     var mc = MODES[G.mode];
     ctx.fillText('🏀 ' + G.hits + '/' + G.shotsTotal + ' · ' + mc.label, 20, 42);
-    // Tirs restants droite
+    // Tirs restants droite (sans encadré, juste texte avec shadow)
     ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.fillRect(G.W - 90, 10, 80, 52);
-    ctx.strokeStyle = 'rgba(245,197,24,.5)';
-    ctx.strokeRect(G.W - 90, 10, 80, 52);
     ctx.fillStyle = '#fff';
     ctx.font = "700 24px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(String(G.shotsLeft), G.W - 20, 16);
@@ -41264,9 +41260,8 @@ if (G.imgBall) {
     ctx.fillStyle=tColor; ctx.font="900 34px 'Bebas Neue','Impact',sans-serif";
     ctx.fillText(G.shotTimer.toFixed(1)+'s', G.W/2, 18);
     ctx.font="10px 'Barlow',sans-serif"; ctx.fillStyle='#cfd3e0'; ctx.fillText('⏱️ BUZZER', G.W/2, 52);
-    // Shots restants droite
-    ctx.textAlign='right'; ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(G.W-90,10,80,52);
-    ctx.strokeStyle='rgba(245,197,24,.5)'; ctx.strokeRect(G.W-90,10,80,52);
+    // Shots restants droite (sans encadré, juste texte avec shadow)
+    ctx.textAlign='right';
     ctx.fillStyle='#fff'; ctx.font="700 24px 'Bebas Neue','Impact',sans-serif"; ctx.fillText(String(G.shotsLeft),G.W-20,16);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('TIRS RESTANTS',G.W-20,44);
     // Streak
@@ -42626,10 +42621,8 @@ window._askPseudoIfNeeded = function(callback){
     modal.innerHTML =
       '<div style="max-width:420px;width:100%;background:linear-gradient(160deg,rgba(245,197,24,.1),rgba(13,17,23,.95));border:2px solid rgba(245,197,24,.5);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(245,197,24,.25)">'
       + '<div style="font-size:52px;line-height:1;margin-bottom:12px">⛹️</div>'
-      + '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:26px;letter-spacing:2.5px;color:#f5c518;margin-bottom:8px" id="pp-title">COMMENT ON T\'APPELLE ?</div>'
-      + '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:.5px;line-height:1.5;margin-bottom:18px" id="pp-desc">Ton pseudo s\'affichera dans les jeux à la place de "TOI"</div>'
-      + '<input type="text" id="pp-input" maxlength="10" placeholder="Ex : KOBE" autocomplete="off" style="width:100%;padding:14px 16px;font-size:18px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;letter-spacing:2px;text-align:center;background:rgba(0,0,0,.5);border:2px solid rgba(245,197,24,.4);border-radius:10px;color:#fff;margin-bottom:8px;outline:none;box-sizing:border-box">'
-      + '<div style="font-size:10px;color:#9aa3b3;margin-bottom:18px" id="pp-hint">Max 10 caractères · Modifiable plus tard dans "TON PERSONNAGE"</div>'
+      + '<div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:26px;letter-spacing:2.5px;color:#f5c518;margin-bottom:18px" id="pp-title">COMMENT ON T\'APPELLE ?</div>'
+      + '<input type="text" id="pp-input" maxlength="10" placeholder="Ex : KOBE" autocomplete="off" style="width:100%;padding:14px 16px;font-size:18px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;letter-spacing:2px;text-align:center;background:rgba(0,0,0,.5);border:2px solid rgba(245,197,24,.4);border-radius:10px;color:#fff;margin-bottom:18px;outline:none;box-sizing:border-box">'
       + '<div style="display:flex;gap:10px">'
       + '  <button id="pp-skip" style="flex:1;padding:12px;background:transparent;border:1.5px solid rgba(154,163,179,.4);border-radius:10px;color:#9aa3b3;font-family:\'Barlow\',sans-serif;font-size:12px;letter-spacing:1px;font-weight:600;cursor:pointer">✖️ Jouer sans pseudo</button>'
       + '  <button id="pp-ok" style="flex:1;padding:12px;background:#f5c518;border:none;border-radius:10px;color:#0a0d18;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:14px;letter-spacing:2px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(245,197,24,.4)">✅ VALIDER</button>'
@@ -42639,25 +42632,19 @@ window._askPseudoIfNeeded = function(callback){
   }
   // Localisation
   var titleEl = modal.querySelector('#pp-title');
-  var descEl = modal.querySelector('#pp-desc');
-  var hintEl = modal.querySelector('#pp-hint');
   var skipBtn = modal.querySelector('#pp-skip');
   var okBtn = modal.querySelector('#pp-ok');
   var input = modal.querySelector('#pp-input');
   if (lang === 'en') {
     titleEl.textContent = "WHAT'S YOUR NAME?";
-    descEl.textContent = 'Your nickname will show in games instead of "YOU"';
-    hintEl.textContent = 'Max 10 characters · Editable later in "YOUR CHARACTER"';
     input.placeholder = 'Ex: KOBE';
-    skipBtn.textContent = '✖️ Play without name';
-    okBtn.textContent = '✅ CONFIRM';
+    skipBtn.textContent = 'Skip';
+    okBtn.textContent = '✅ OK';
   } else {
     titleEl.textContent = "COMMENT ON T'APPELLE ?";
-    descEl.textContent = 'Ton pseudo s\'affichera dans les jeux à la place de "TOI"';
-    hintEl.textContent = 'Max 10 caractères · Modifiable plus tard dans "TON PERSONNAGE"';
     input.placeholder = 'Ex : KOBE';
-    skipBtn.textContent = '✖️ Jouer sans pseudo';
-    okBtn.textContent = '✅ VALIDER';
+    skipBtn.textContent = 'Passer';
+    okBtn.textContent = '✅ OK';
   }
   input.value = '';
   var cleanup = function(){
