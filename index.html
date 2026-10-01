@@ -42565,9 +42565,9 @@ if (G.imgBall) {
 
   function _translate(key, fallback){
     try {
-      if (typeof window.I18N === 'object' && window.I18N) {
+      if (window.LANG_DATA) {
         var lang = window._lang || 'fr';
-        var dict = window.I18N[lang] || window.I18N.fr;
+        var dict = window.LANG_DATA[lang] || window.LANG_DATA.fr;
         if (dict && dict[key]) return dict[key];
       }
     } catch(e){}
@@ -43786,10 +43786,12 @@ if (G.imgBall) {
   window._dojoUpdateLockUI = function() {
     var unlocked = false;
     try { unlocked = sessionStorage.getItem('sensei_dojo_unlocked') === '1'; } catch(e){}
-    var btns = document.querySelectorAll('[onclick*="showSection("]');
+    // Cherche onclick inline OU data-dojo-original-onclick (après que Guard ait retiré l'onclick)
+    var btns = document.querySelectorAll('[onclick*="showSection("], [data-dojo-original-onclick*="showSection("]');
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
-      var m = (b.getAttribute('onclick') || '').match(/showSection\(\s*['"]([^'"]+)['"]/);
+      var onclickRaw = b.getAttribute('onclick') || b.getAttribute('data-dojo-original-onclick') || '';
+      var m = onclickRaw.match(/showSection\(\s*['"]([^'"]+)['"]/);
       if (!m) continue;
       var id = m[1];
       var shouldLock = !unlocked && DOJO_FREE_SECTIONS.indexOf(id) === -1;
