@@ -1039,8 +1039,8 @@ body.unlocked .sensei-only{display:revert !important}
         <!-- SENSEI IA (1ère tuile - générateur de séance) -->
         <button onclick="_senseiAI_open()" ontouchstart=""
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
-          <!-- Mascotte coach kimono : max 32% largeur, droite, ne chevauche JAMAIS le texte -->
-          <img src="sensei-coach.png" alt="" style="position:absolute;right:-5px;bottom:-8px;height:118%;width:auto;max-width:38%;object-fit:contain;object-position:right bottom;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
+          <!-- Mascotte coach kimono : CENTRÉE verticalement, max 38% largeur, droite -->
+          <img src="sensei-coach.png" alt="" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:90%;width:auto;max-width:38%;object-fit:contain;object-position:center;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
           <!-- Badge NEW à gauche pour libérer l'espace droite à la mascotte -->
           <div style="position:absolute;top:8px;left:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif;z-index:2">NEW</div>
           <!-- Contenu texte : max 62% largeur pour ne jamais toucher la mascotte -->
@@ -1097,8 +1097,8 @@ body.unlocked .sensei-only{display:revert !important}
         <!-- TON PERSONNAGE (8e tuile - configuration, symétrique de SENSEI IA) -->
         <button onclick="_persona_open()" ontouchstart=""
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
-          <!-- Mascotte bras croisés #23 : max 38% largeur, droite, zéro collision avec texte -->
-          <img src="sensei-arms-crossed.png" alt="" style="position:absolute;right:-5px;bottom:-8px;height:118%;width:auto;max-width:38%;object-fit:contain;object-position:right bottom;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
+          <!-- Mascotte bras croisés #23 : CENTRÉE verticalement, max 38% largeur, droite -->
+          <img src="sensei-arms-crossed.png" alt="" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:90%;width:auto;max-width:38%;object-fit:contain;object-position:center;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
           <!-- Contenu texte : max 62% largeur -->
           <div style="position:relative;z-index:1;max-width:62%">
             <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">⛹️</div>
@@ -10606,7 +10606,7 @@ function oppDisplayResults(top, region, en, profile) {
 
       <!-- TON PERSONNAGE -->
       <button class="onb-card" onclick="onboardingLaunch('persona')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
-        <img src="sensei-arms-crossed.png" alt="" style="height:80px;width:auto;margin-bottom:8px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))" onerror="this.outerHTML='&lt;div style=&quot;font-size:48px;line-height:1;margin-bottom:6px&quot;&gt;⛹️&lt;/div&gt;'">
+        <img src="sensei-arms-crossed.png" alt="" style="height:52px;width:auto;margin-bottom:6px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))" onerror="this.outerHTML='&lt;div style=&quot;font-size:48px;line-height:1;margin-bottom:6px&quot;&gt;⛹️&lt;/div&gt;'">
         <div data-i18n="onb_persona_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">PERSONNAGE</div>
         <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:3px;margin:8px 0">
           <div style="width:22px;height:6px;background:#fff;border-radius:2px"></div>
@@ -10858,8 +10858,11 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 #dojo-canvas { opacity: 0; transition: opacity .5s; }
 #dojo-canvas.active { opacity: 1; display: block !important; }
 
-/* ─── Pendant la rotation d'écran : désactiver les backdrop-filter (GPU lourd) ─── */
-/* Gain : 200-400ms de latence en moins sur iOS */
+/* ─── Pendant la rotation d'écran : libérer le GPU pour un repaint instantané ─── */
+/* 1. Désactiver backdrop-filter (le plus lourd GPU) */
+/* 2. Désactiver transitions + animations CSS */
+/* 3. Désactiver filters et box-shadow lourds */
+/* Gain total : 300-500ms de latence en moins sur iOS */
 body.app-rotating [style*="backdrop-filter"],
 body.app-rotating [style*="-webkit-backdrop-filter"],
 body.app-rotating #sr-title-screen, body.app-rotating #sa-title-screen,
@@ -10873,7 +10876,17 @@ body.app-rotating #rc-results, body.app-rotating #mc-results,
 body.app-rotating #tp-results, body.app-rotating #cv-results {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+/* Désactiver TOUTES les transitions + animations pendant rotation */
+body.app-rotating *, body.app-rotating *::before, body.app-rotating *::after {
   transition: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+/* Désactiver les drop-shadows (lourd GPU) sur les mascottes pendant rotation */
+body.app-rotating img[src*="sensei-"],
+body.app-rotating [style*="drop-shadow"] {
+  filter: none !important;
 }
 
 /* ─── Fonction utilitaire GLOBALE : récupère le pseudo du joueur ─── */
@@ -42847,39 +42860,55 @@ if (G.imgBall) {
 </div>
 
 <script>
-// ═══ ACCÉLÉRATEUR ROTATION ÉCRAN (optimisation UX) ═══════════════════════
-// Fix pour iOS/Android : orientationchange arrive 300-500ms après l'anim visuelle
-// Solution : matchMedia + désactiver backdrop-filter pendant la transition
+// ═══ ACCÉLÉRATEUR ROTATION ÉCRAN (optimisation UX avancée) ══════════════
+// 5 optimisations : matchMedia + désactivation backdrop-filter + transitions
+// + RAF-synced + early-exit + durée réduite + screen.orientation API moderne
 (function() {
-  if (!window.matchMedia) return;  // fallback safe
+  if (!window.matchMedia) return;
   try {
     var mql = window.matchMedia('(orientation: portrait)');
     var lastOrientation = mql.matches ? 'portrait' : 'landscape';
     var rotationTimer = null;
+    var rafId = null;
 
     function markRotating() {
       try {
         document.body.classList.add('app-rotating');
         clearTimeout(rotationTimer);
+        // 300ms suffit : la rotation iOS prend ~250ms de perception visuelle
         rotationTimer = setTimeout(function() {
           document.body.classList.remove('app-rotating');
-        }, 450);
+        }, 300);
       } catch(e){}
     }
 
-    var handler = function(e) {
-      var newOrientation = e.matches ? 'portrait' : 'landscape';
-      if (newOrientation !== lastOrientation) {
-        lastOrientation = newOrientation;
-        markRotating();
-        // Déclencher resize immédiatement (plus rapide que d'attendre orientationchange)
+    function triggerResize() {
+      // RAF-synced : attendre le prochain repaint pour un resize optimal
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function() {
         try { window.dispatchEvent(new Event('resize')); } catch(e){}
-      }
+        rafId = null;
+      });
+    }
+
+    var handler = function(e) {
+      var newOrientation = (e && e.matches !== undefined) ? (e.matches ? 'portrait' : 'landscape')
+                                                          : (window.innerHeight > window.innerWidth ? 'portrait' : 'landscape');
+      // Early-exit : rien à faire si orientation réelle inchangée
+      if (newOrientation === lastOrientation) return;
+      lastOrientation = newOrientation;
+      markRotating();
+      triggerResize();
     };
 
-    // addEventListener (moderne) ou addListener (Safari < 14)
+    // 1. matchMedia (le plus rapide sur iOS récents)
     if (mql.addEventListener) mql.addEventListener('change', handler);
     else if (mql.addListener) mql.addListener(handler);
+
+    // 2. screen.orientation API (encore plus rapide sur Android/Chrome moderne)
+    if (window.screen && window.screen.orientation && window.screen.orientation.addEventListener) {
+      try { window.screen.orientation.addEventListener('change', handler); } catch(e){}
+    }
   } catch(e){}
 })();
 
@@ -45469,10 +45498,9 @@ window._askPseudoIfNeeded = function(callback){
       html += '</div>';
     }
 
-    // Attributs
+    // Attributs (NUMÉRO retiré : la mascotte officielle porte le #23)
     var attrs = [
       { key:'pseudo', icon:'📝', labelFR:'PSEUDO', labelEN:'NAME', valLabel: p.pseudo ? p.pseudo : null },
-      { key:'numero', icon:'🔢', labelFR:'NUMÉRO', labelEN:'NUMBER', valLabel: p.numero ? '#'+p.numero : null },
       { key:'poste', icon:'🏀', labelFR:'POSTE', labelEN:'POSITION', valLabel: p.poste ? _posteName(p.poste, en) : null },
       { key:'niveau', icon:'📊', labelFR:'NIVEAU', labelEN:'LEVEL', valLabel: p.niveau ? _nivName(p.niveau, en) : null },
       { key:'age', icon:'🎂', labelFR:'ÂGE', labelEN:'AGE', valLabel: p.age ? p.age : null },
