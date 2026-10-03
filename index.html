@@ -1122,6 +1122,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_biblio">BIBLIOTHÈQUE</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_biblio">Règlement + Glossaire</div>
         </button>
+        <!-- LABORATOIRE SENSEI (nouvelle tuile - Science + Nutrition + Sommeil) -->
+        <button onclick="_labo_open()" ontouchstart=""
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
+          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🧪</div>
+          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_labo">LABORATOIRE</div>
+          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_labo">Science · Nutrition · Sommeil</div>
+        </button>
         <!-- BALL TRACKER (11e tuile - Feature caméra IA compteur dribbles) -->
         <button onclick="_bt_open()" ontouchstart=""
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
@@ -10606,7 +10614,7 @@ function oppDisplayResults(top, region, en, profile) {
 
       <!-- TON PERSONNAGE -->
       <button class="onb-card" onclick="onboardingLaunch('persona')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
-        <img src="sensei-arms-crossed.png" alt="" style="height:52px;width:auto;margin-bottom:6px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))" onerror="this.outerHTML='&lt;div style=&quot;font-size:48px;line-height:1;margin-bottom:6px&quot;&gt;⛹️&lt;/div&gt;'">
+        <div style="font-size:48px;line-height:1;margin-bottom:6px">🥋👘</div>
         <div data-i18n="onb_persona_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">PERSONNAGE</div>
         <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:3px;margin:8px 0">
           <div style="width:22px;height:6px;background:#fff;border-radius:2px"></div>
@@ -36372,17 +36380,47 @@ Object.assign(window._FICHES_DATA, {
     ctx.font='bold 22px "Barlow Condensed", "Arial", sans-serif';
     ctx.textAlign='center';
     ctx.fillText('SENSEIBLACKBELT.COM', W/2, H-80);
-    // Download
+    // Export + partage : Web Share API (mobile) en priorité, fallback téléchargement
+    var filename = 'SENSEI_fiche_'+STATE.poste+'_'+STATE.niveau+'_'+variant+'.png';
+    // Essayer Web Share API avec fichier (iOS 15+, Android Chrome moderne)
+    if (navigator.canShare && navigator.share) {
+      cv.toBlob(function(blob){
+        if (!blob) { _fiche_fallbackDownload(cv, filename, en); return; }
+        try {
+          var file = new File([blob], filename, { type: 'image/png' });
+          if (navigator.canShare({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: 'SENSEI BlackBelt',
+              text: en ? 'My training sheet' : 'Ma fiche d\'entraînement'
+            }).catch(function(err){
+              // Si l'user annule, pas d'erreur. Sinon fallback download.
+              if (err && err.name !== 'AbortError') _fiche_fallbackDownload(cv, filename, en);
+            });
+          } else {
+            _fiche_fallbackDownload(cv, filename, en);
+          }
+        } catch(e) { _fiche_fallbackDownload(cv, filename, en); }
+      }, 'image/png');
+    } else {
+      _fiche_fallbackDownload(cv, filename, en);
+    }
+  };
+  // Fallback : téléchargement direct via dataURL (desktop + anciens mobiles)
+  function _fiche_fallbackDownload(cv, filename, en) {
     try {
       var url = cv.toDataURL('image/png');
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'SENSEI_fiche_'+STATE.poste+'_'+STATE.niveau+'_'+variant+'.png';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      a.download = filename;
+      a.target = '_blank';  // Pour iOS Safari qui ouvre dans un nouvel onglet
+      a.rel = 'noopener';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ try { document.body.removeChild(a); } catch(e){} }, 100);
     } catch(e) {
       alert(en?'Cannot export PNG on this device':'Impossible d\'exporter le PNG sur cet appareil');
     }
-  };
+  }
   function _wrap(ctx, text, x, y, maxW, lh) {
     var words = text.split(' ');
     var line = '';
@@ -42860,6 +42898,315 @@ if (G.imgBall) {
 </div>
 
 <script>
+// ═══ BIBLIOTHÈQUE SENSEI — Règlement + Glossaire bilingues ═══════════════
+(function(){
+  var RULES = {
+    fr: [
+      { icon:'⏱️', title:'Durée du match', body:'NBA : 4 × 12 min · FIBA : 4 × 10 min · Prolongations de 5 min en cas d\'égalité. Entre les quart-temps : 2 min de pause (15 min à la mi-temps).' },
+      { icon:'🎯', title:'Système de points', body:'1 point : lancer franc · 2 points : panier à l\'intérieur de l\'arc · 3 points : panier au-delà de la ligne à 6.75 m (FIBA) ou 7.24 m (NBA).' },
+      { icon:'⏳', title:'Règle des 24 secondes', body:'L\'équipe en attaque a 24 secondes pour tenter un tir qui touche l\'anneau. Après rebond offensif : nouveau cycle de 14 secondes.' },
+      { icon:'🏃', title:'Règle des 8 secondes', body:'L\'équipe en attaque doit franchir la ligne médiane en moins de 8 secondes (règle FIBA/NBA).' },
+      { icon:'🚫', title:'Les 3 secondes', body:'Un attaquant ne peut rester plus de 3 secondes consécutives dans la raquette adverse sans tir.' },
+      { icon:'🫲', title:'Faute personnelle', body:'5 fautes = exclusion (FIBA) · 6 fautes = exclusion (NBA). Pénalité collective : à partir de la 5ème faute d\'équipe par quart-temps = lancers francs.' },
+      { icon:'🚶', title:'Marcher (traveling)', body:'Interdit de faire plus de 2 appuis sans dribbler. Le pivot est autorisé si un pied reste au sol.' },
+      { icon:'↕️', title:'Double dribble', body:'Interdit de dribbler, s\'arrêter puis redribbler. Interdit de dribbler à deux mains simultanément.' },
+      { icon:'🏀', title:'Reprise de dribble', body:'Après avoir touché le ballon à deux mains ou l\'avoir immobilisé, impossible de reprendre le dribble.' },
+      { icon:'🔄', title:'Remplacements', body:'Illimités. Le remplacement se fait pendant un temps mort ou une interruption de jeu.' },
+      { icon:'⏲️', title:'Temps-morts', body:'NBA : 7 par match · FIBA : 2 en 1ère mi-temps, 3 en 2ème (max 2 dans les 2 dernières minutes).' }
+    ],
+    en: [
+      { icon:'⏱️', title:'Game duration', body:'NBA: 4 × 12 min · FIBA: 4 × 10 min · 5 min overtime if tied. Breaks: 2 min between quarters (15 min at halftime).' },
+      { icon:'🎯', title:'Scoring', body:'1 point: free throw · 2 points: inside the arc · 3 points: beyond the 6.75 m (FIBA) or 7.24 m (NBA) line.' },
+      { icon:'⏳', title:'24-second rule', body:'The offense has 24 seconds to attempt a shot that hits the rim. After offensive rebound: new 14-second cycle.' },
+      { icon:'🏃', title:'8-second rule', body:'The offense must cross the midcourt line within 8 seconds (FIBA/NBA rule).' },
+      { icon:'🚫', title:'3 seconds in the paint', body:'An offensive player cannot stay more than 3 consecutive seconds in the opponent\'s paint without shooting.' },
+      { icon:'🫲', title:'Personal foul', body:'5 fouls = disqualified (FIBA) · 6 fouls = disqualified (NBA). Team bonus: starting at the 5th team foul per quarter = free throws.' },
+      { icon:'🚶', title:'Traveling', body:'No more than 2 steps allowed without dribbling. Pivot foot must stay planted on the ground.' },
+      { icon:'↕️', title:'Double dribble', body:'Illegal to dribble, stop, then dribble again. Illegal to dribble with both hands simultaneously.' },
+      { icon:'🏀', title:'Carrying/palming', body:'After touching the ball with both hands or holding it, you cannot resume dribbling.' },
+      { icon:'🔄', title:'Substitutions', body:'Unlimited. Done during timeouts or stoppages of play.' },
+      { icon:'⏲️', title:'Timeouts', body:'NBA: 7 per game · FIBA: 2 in first half, 3 in second half (max 2 in last 2 minutes).' }
+    ]
+  };
+  var GLOSSARY = {
+    fr: [
+      { term:'ASSIST', def:'Passe décisive menant directement à un panier marqué.' },
+      { term:'ALLEY-OOP', def:'Passe lobée captée en l\'air par un coéquipier qui dunk ou dépose dans le même mouvement.' },
+      { term:'BLOCK', def:'Contre défensif : un défenseur dévie le tir d\'un attaquant en l\'air.' },
+      { term:'CROSSOVER', def:'Changement de main rapide du ballon devant soi pour déséquilibrer le défenseur.' },
+      { term:'DUNK', def:'Smash : l\'attaquant marque en plongeant la balle directement dans l\'anneau.' },
+      { term:'EURO STEP', def:'Deux appuis latéraux rapides en opposition pour éviter un défenseur avant le finish.' },
+      { term:'FADEAWAY', def:'Tir en reculant pour s\'éloigner du défenseur et créer de l\'espace.' },
+      { term:'FAST BREAK', def:'Contre-attaque rapide avant que la défense ne se replace.' },
+      { term:'FLOATER', def:'Tir en cloche à mi-distance par-dessus un défenseur intérieur.' },
+      { term:'ISO', def:'Isolation : un attaquant joue en 1v1 pendant que ses coéquipiers s\'écartent.' },
+      { term:'LAY-UP', def:'Tir en course près du cercle, souvent à une main.' },
+      { term:'PICK & ROLL', def:'Écran posé par un coéquipier, suivi d\'un roulement vers le panier.' },
+      { term:'POST UP', def:'Attaquant dos au panier qui joue sur un défenseur plus petit.' },
+      { term:'PULL-UP', def:'Tir pris en dribble après un arrêt sec.' },
+      { term:'REBOUND', def:'Récupération du ballon après un tir manqué (offensif ou défensif).' },
+      { term:'SCREEN', def:'Blocage légal pour libérer un coéquipier démarqué.' },
+      { term:'STEAL', def:'Interception du ballon par un défenseur.' },
+      { term:'STEP-BACK', def:'Déplacement en arrière pour créer de l\'espace avant le tir.' },
+      { term:'SWISH', def:'Tir parfait qui ne touche que le filet (ne touche pas l\'anneau).' },
+      { term:'TRIPLE-DOUBLE', def:'Statistique rare : 10+ dans 3 catégories (points, rebonds, passes).' },
+      { term:'TURNOVER', def:'Perte de balle (dribble, passe interceptée, violation).' },
+      { term:'ZONE', def:'Défense où chaque joueur garde une zone au lieu d\'un adversaire.' }
+    ],
+    en: [
+      { term:'ASSIST', def:'Pass that directly leads to a made basket.' },
+      { term:'ALLEY-OOP', def:'Lob pass caught in the air by a teammate who dunks or lays it in during the same motion.' },
+      { term:'BLOCK', def:'Defensive block: a defender tips an attacker\'s shot in the air.' },
+      { term:'CROSSOVER', def:'Quick ball switch from one hand to the other in front to destabilize the defender.' },
+      { term:'DUNK', def:'Slam dunk: the attacker scores by plunging the ball directly into the rim.' },
+      { term:'EURO STEP', def:'Two quick lateral steps in opposition to avoid a defender before the finish.' },
+      { term:'FADEAWAY', def:'Shot taken while leaning back to create space from the defender.' },
+      { term:'FAST BREAK', def:'Quick counter-attack before the defense can set up.' },
+      { term:'FLOATER', def:'Mid-range arcing shot over an interior defender.' },
+      { term:'ISO', def:'Isolation: one attacker plays 1v1 while teammates spread out.' },
+      { term:'LAY-UP', def:'Shot taken on the run close to the basket, usually with one hand.' },
+      { term:'PICK & ROLL', def:'Screen set by a teammate, followed by a roll toward the basket.' },
+      { term:'POST UP', def:'Attacker with back to the basket playing against a smaller defender.' },
+      { term:'PULL-UP', def:'Shot taken off the dribble after a sudden stop.' },
+      { term:'REBOUND', def:'Recovering the ball after a missed shot (offensive or defensive).' },
+      { term:'SCREEN', def:'Legal block to free up an open teammate.' },
+      { term:'STEAL', def:'Interception of the ball by a defender.' },
+      { term:'STEP-BACK', def:'Backwards move to create space before shooting.' },
+      { term:'SWISH', def:'Perfect shot that only touches the net (no rim contact).' },
+      { term:'TRIPLE-DOUBLE', def:'Rare stat: 10+ in 3 categories (points, rebounds, assists).' },
+      { term:'TURNOVER', def:'Loss of possession (dribble, intercepted pass, violation).' },
+      { term:'ZONE', def:'Defense where each player guards a zone rather than an opponent.' }
+    ]
+  };
+
+  window._biblio_open = function(){
+    var en = (window._lang === 'en');
+    var lang = en ? 'en' : 'fr';
+    var modal = document.getElementById('biblio-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'biblio-modal';
+      modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:rgba(10,13,24,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;font-family:inherit';
+      modal.innerHTML =
+        '<div style="max-width:720px;margin:0 auto;padding:20px 16px 40px;color:#fff">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;position:sticky;top:0;background:rgba(10,13,24,.96);padding:14px 0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:5">'
+        + '  <div style="display:flex;align-items:center;gap:10px">'
+        + '    <div style="font-size:28px">🏛️</div>'
+        + '    <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518" id="biblio-main-title">BIBLIOTHÈQUE SENSEI</div>'
+        + '  </div>'
+        + '  <button id="biblio-close" style="background:transparent;border:1.5px solid rgba(245,197,24,.5);color:#f5c518;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
+        + '</div>'
+        + '<div style="display:flex;gap:6px;margin-bottom:16px;background:rgba(0,0,0,.3);padding:4px;border-radius:12px">'
+        + '  <button id="biblio-tab-rules" class="biblio-tab active" style="flex:1;padding:10px;background:#f5c518;color:#0a0d18;border:none;border-radius:8px;font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1.5px;font-weight:800;cursor:pointer">📖 <span id="biblio-tab-rules-lbl">RÈGLEMENT</span></button>'
+        + '  <button id="biblio-tab-gloss" class="biblio-tab" style="flex:1;padding:10px;background:transparent;color:#9aa3b3;border:none;border-radius:8px;font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1.5px;font-weight:800;cursor:pointer">📚 <span id="biblio-tab-gloss-lbl">GLOSSAIRE</span></button>'
+        + '</div>'
+        + '<div id="biblio-content"></div>'
+        + '</div>';
+      document.body.appendChild(modal);
+    }
+    // Labels bilingues
+    modal.querySelector('#biblio-main-title').textContent = en ? 'SENSEI LIBRARY' : 'BIBLIOTHÈQUE SENSEI';
+    modal.querySelector('#biblio-tab-rules-lbl').textContent = en ? 'RULES' : 'RÈGLEMENT';
+    modal.querySelector('#biblio-tab-gloss-lbl').textContent = en ? 'GLOSSARY' : 'GLOSSAIRE';
+
+    function renderRules(){
+      var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+      RULES[lang].forEach(function(r){
+        html += '<div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1px solid rgba(245,197,24,.3);border-radius:12px;padding:14px 16px">'
+          + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+          + '  <div style="font-size:22px">'+r.icon+'</div>'
+          + '  <div style="font-family:\'Bebas Neue\',sans-serif;font-size:17px;letter-spacing:1.5px;color:#f5c518">'+r.title+'</div>'
+          + '</div>'
+          + '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;line-height:1.5;color:#cfd3e0">'+r.body+'</div>'
+          + '</div>';
+      });
+      html += '</div>';
+      return html;
+    }
+    function renderGloss(){
+      var html = '<div style="display:grid;grid-template-columns:1fr;gap:8px">';
+      GLOSSARY[lang].forEach(function(g){
+        html += '<div style="background:rgba(13,17,23,.5);border-left:3px solid #f5c518;border-radius:8px;padding:10px 14px">'
+          + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1.5px;color:#f5c518;margin-bottom:3px">'+g.term+'</div>'
+          + '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;line-height:1.4;color:#cfd3e0">'+g.def+'</div>'
+          + '</div>';
+      });
+      html += '</div>';
+      return html;
+    }
+    var content = modal.querySelector('#biblio-content');
+    var tabR = modal.querySelector('#biblio-tab-rules');
+    var tabG = modal.querySelector('#biblio-tab-gloss');
+    function setActive(which){
+      if (which === 'rules') {
+        tabR.style.background = '#f5c518'; tabR.style.color = '#0a0d18';
+        tabG.style.background = 'transparent'; tabG.style.color = '#9aa3b3';
+        content.innerHTML = renderRules();
+      } else {
+        tabG.style.background = '#f5c518'; tabG.style.color = '#0a0d18';
+        tabR.style.background = 'transparent'; tabR.style.color = '#9aa3b3';
+        content.innerHTML = renderGloss();
+      }
+    }
+    // Clone pour reset listeners
+    var newTabR = tabR.cloneNode(true); tabR.parentNode.replaceChild(newTabR, tabR);
+    var newTabG = tabG.cloneNode(true); tabG.parentNode.replaceChild(newTabG, tabG);
+    newTabR.addEventListener('click', function(){ setActive('rules'); });
+    newTabG.addEventListener('click', function(){ setActive('gloss'); });
+    var closeBtn = modal.querySelector('#biblio-close');
+    var newClose = closeBtn.cloneNode(true); closeBtn.parentNode.replaceChild(newClose, closeBtn);
+    newClose.addEventListener('click', function(){ modal.style.display = 'none'; document.body.style.overflow = ''; });
+
+    setActive('rules');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  };
+})();
+
+// ═══ LABORATOIRE SENSEI — Articles & références scientifiques ═══════════
+(function(){
+  var LABO = {
+    fr: {
+      science: [
+        { title:'Vertical jump et force explosive', ref:'McBride JM et al., J Strength Cond Res (2009)', body:'Le squat profond + plyométrie 2×/semaine augmente le détente de +4 à +8 cm en 12 semaines chez des basketteurs amateurs.' },
+        { title:'Décision < 500 ms = élite', ref:'Mann DL et al., J Sport Sci (2007)', body:'Les joueurs professionnels prennent 60% de leurs décisions en moins de 500 ms. Entraînable via drills de reconnaissance de patterns.' },
+        { title:'Load management & blessures', ref:'Gabbett TJ, Br J Sports Med (2016)', body:'Le ratio Acute:Chronic Workload >1.5 multiplie par 2 à 4 le risque de blessure. Monitoring hebdo recommandé.' },
+        { title:'Shooting percentage & fatigue', ref:'Erčulj F, Bračič M (2010)', body:'Après 30 min de match intense, le %FG chute de 8 à 12 points. L\'entraînement en fatigue est critique pour les shooters.' }
+      ],
+      nutrition: [
+        { title:'Hydratation pré-match', ref:'ACSM Position Stand (2007)', body:'500 ml d\'eau 2h avant · 200 ml 15 min avant · 150-250 ml tous les 15-20 min pendant. Déshydratation 2% = -10% perf.' },
+        { title:'Glucides pour l\'endurance', ref:'Jeukendrup AE (2014)', body:'5 à 7 g/kg/jour pour entraînement modéré · jusqu\'à 10 g/kg lors des périodes de compétition intense.' },
+        { title:'Protéines post-training', ref:'Phillips SM, Van Loon LJ (2011)', body:'20 à 40 g de protéines rapides (whey, lait) dans les 30 min post-séance = synthèse musculaire optimale.' },
+        { title:'Caféine & performance', ref:'Grgic J et al., Br J Sports Med (2020)', body:'3-6 mg/kg 60 min avant match = +3% vitesse de sprint, +2% précision tir. Attention au seuil individuel.' }
+      ],
+      sommeil: [
+        { title:'8-10h de sommeil pour les athlètes', ref:'Mah CD et al., Sleep (2011)', body:'Étude Stanford : les basketteurs qui dorment 10h voient leurs %FG augmenter de 9% et leur temps de sprint diminuer.' },
+        { title:'Sieste de 20 min', ref:'Lastella M et al., J Sports Sci (2015)', body:'Une sieste de 20-30 min après lunch améliore la vigilance de 34% et la précision de 6% pour les activités l\'après-midi.' },
+        { title:'Qualité > quantité', ref:'Simpson NS et al., Nat Rev Neurosci (2017)', body:'Les athlètes sous-performent dès que le sommeil profond chute sous 15% du total. Lumière bleue à éviter 2h avant.' },
+        { title:'Jet-lag : -1 jour par heure', ref:'Fowler P et al., Br J Sports Med (2017)', body:'Pour les voyages, compter 1 jour de récupération par fuseau horaire traversé pour retrouver la perf max.' }
+      ],
+      recup: [
+        { title:'Cryothérapie post-match', ref:'Hohenauer E et al., PLOS ONE (2015)', body:'Immersion eau froide 10-15°C pendant 10-15 min = -20% douleur musculaire DOMS à 24h.' },
+        { title:'Récupération active', ref:'Dupont G et al., Int J Sports Med (2007)', body:'15-20 min de vélo faible intensité post-match accélèrent l\'élimination du lactate et réduisent la fatigue.' },
+        { title:'Étirements : quand ?', ref:'Behm DG et al., Appl Physiol Nutr Metab (2016)', body:'Étirements statiques PRÉ-match = -5% explosivité. À faire après ou en séance dédiée. Dynamiques pré-match uniquement.' },
+        { title:'Massage & foam rolling', ref:'Weerapong P et al., Sports Med (2005)', body:'5-10 min de foam rolling post-séance = -30% raideur musculaire à 48h, sans impact sur la perf du lendemain.' }
+      ]
+    },
+    en: {
+      science: [
+        { title:'Vertical jump & explosive power', ref:'McBride JM et al., J Strength Cond Res (2009)', body:'Deep squats + plyometrics 2×/week increase vertical by +4 to +8 cm in 12 weeks in amateur players.' },
+        { title:'Decision < 500 ms = elite', ref:'Mann DL et al., J Sport Sci (2007)', body:'Professional players make 60% of decisions in under 500 ms. Trainable via pattern recognition drills.' },
+        { title:'Load management & injuries', ref:'Gabbett TJ, Br J Sports Med (2016)', body:'Acute:Chronic Workload ratio >1.5 multiplies injury risk by 2-4x. Weekly monitoring recommended.' },
+        { title:'Shooting percentage & fatigue', ref:'Erčulj F, Bračič M (2010)', body:'After 30 min of intense play, FG% drops 8-12 points. Fatigue training is critical for shooters.' }
+      ],
+      nutrition: [
+        { title:'Pre-game hydration', ref:'ACSM Position Stand (2007)', body:'500 ml of water 2h before · 200 ml 15 min before · 150-250 ml every 15-20 min during. 2% dehydration = -10% performance.' },
+        { title:'Carbs for endurance', ref:'Jeukendrup AE (2014)', body:'5-7 g/kg/day for moderate training · up to 10 g/kg during intense competition periods.' },
+        { title:'Post-training protein', ref:'Phillips SM, Van Loon LJ (2011)', body:'20-40 g fast protein (whey, milk) within 30 min post-session = optimal muscle synthesis.' },
+        { title:'Caffeine & performance', ref:'Grgic J et al., Br J Sports Med (2020)', body:'3-6 mg/kg 60 min before game = +3% sprint speed, +2% shooting accuracy. Watch individual threshold.' }
+      ],
+      sommeil: [
+        { title:'8-10h sleep for athletes', ref:'Mah CD et al., Sleep (2011)', body:'Stanford study: basketball players sleeping 10h increase FG% by 9% and decrease sprint time.' },
+        { title:'20-min nap', ref:'Lastella M et al., J Sports Sci (2015)', body:'A 20-30 min nap after lunch improves alertness by 34% and precision by 6% for afternoon activities.' },
+        { title:'Quality > quantity', ref:'Simpson NS et al., Nat Rev Neurosci (2017)', body:'Athletes underperform when deep sleep drops below 15% of total. Avoid blue light 2h before bed.' },
+        { title:'Jet-lag: -1 day per hour', ref:'Fowler P et al., Br J Sports Med (2017)', body:'For travel, count 1 recovery day per timezone crossed to regain peak performance.' }
+      ],
+      recup: [
+        { title:'Post-game cryotherapy', ref:'Hohenauer E et al., PLOS ONE (2015)', body:'Cold water immersion 10-15°C for 10-15 min = -20% DOMS muscle soreness at 24h.' },
+        { title:'Active recovery', ref:'Dupont G et al., Int J Sports Med (2007)', body:'15-20 min of low-intensity cycling post-game accelerates lactate removal and reduces fatigue.' },
+        { title:'Stretching: when?', ref:'Behm DG et al., Appl Physiol Nutr Metab (2016)', body:'Static stretching PRE-game = -5% explosiveness. Do after or in dedicated session. Dynamic only before games.' },
+        { title:'Massage & foam rolling', ref:'Weerapong P et al., Sports Med (2005)', body:'5-10 min foam rolling post-session = -30% muscle stiffness at 48h, no impact on next-day performance.' }
+      ]
+    }
+  };
+  var SECTIONS = {
+    fr: [
+      { key:'science',   icon:'🧠', label:'SCIENCE'    },
+      { key:'nutrition', icon:'🥗', label:'NUTRITION'  },
+      { key:'sommeil',   icon:'😴', label:'SOMMEIL'    },
+      { key:'recup',     icon:'♻️', label:'RÉCUPÉRATION' }
+    ],
+    en: [
+      { key:'science',   icon:'🧠', label:'SCIENCE'   },
+      { key:'nutrition', icon:'🥗', label:'NUTRITION' },
+      { key:'sommeil',   icon:'😴', label:'SLEEP'     },
+      { key:'recup',     icon:'♻️', label:'RECOVERY'  }
+    ]
+  };
+
+  window._labo_open = function(){
+    var en = (window._lang === 'en');
+    var lang = en ? 'en' : 'fr';
+    var modal = document.getElementById('labo-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'labo-modal';
+      modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:rgba(10,13,24,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;font-family:inherit';
+      modal.innerHTML =
+        '<div style="max-width:720px;margin:0 auto;padding:20px 16px 40px;color:#fff">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;position:sticky;top:0;background:rgba(10,13,24,.96);padding:14px 0;z-index:5">'
+        + '  <div style="display:flex;align-items:center;gap:10px">'
+        + '    <div style="font-size:28px">🧪</div>'
+        + '    <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518" id="labo-main-title">LABORATOIRE SENSEI</div>'
+        + '  </div>'
+        + '  <button id="labo-close" style="background:transparent;border:1.5px solid rgba(245,197,24,.5);color:#f5c518;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
+        + '</div>'
+        + '<div id="labo-tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;background:rgba(0,0,0,.3);padding:4px;border-radius:12px"></div>'
+        + '<div id="labo-content"></div>'
+        + '<div style="margin-top:24px;padding:14px;background:rgba(245,197,24,.05);border:1px dashed rgba(245,197,24,.3);border-radius:10px;font-size:11px;color:#9aa3b3;text-align:center;line-height:1.5" id="labo-footer"></div>'
+        + '</div>';
+      document.body.appendChild(modal);
+    }
+    modal.querySelector('#labo-main-title').textContent = en ? 'SENSEI LAB' : 'LABORATOIRE SENSEI';
+    modal.querySelector('#labo-footer').innerHTML = en
+      ? '📚 Scientific references · This content is informational only · Always consult a professional before changing your routine.'
+      : '📚 Références scientifiques · Contenu informatif uniquement · Consulte toujours un professionnel avant de modifier ta routine.';
+
+    var tabsEl = modal.querySelector('#labo-tabs');
+    var contentEl = modal.querySelector('#labo-content');
+    tabsEl.innerHTML = '';
+    SECTIONS[lang].forEach(function(sec, idx){
+      var btn = document.createElement('button');
+      btn.className = 'labo-tab';
+      btn.setAttribute('data-sec', sec.key);
+      btn.style.cssText = 'flex:1;min-width:70px;padding:9px 6px;background:'+(idx===0?'#f5c518':'transparent')+';color:'+(idx===0?'#0a0d18':'#9aa3b3')+';border:none;border-radius:8px;font-family:\'Bebas Neue\',sans-serif;font-size:12px;letter-spacing:1px;font-weight:800;cursor:pointer';
+      btn.innerHTML = sec.icon + ' ' + sec.label;
+      tabsEl.appendChild(btn);
+    });
+
+    function renderSection(key){
+      var items = LABO[lang][key] || [];
+      var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+      items.forEach(function(a){
+        html += '<div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1px solid rgba(245,197,24,.3);border-radius:12px;padding:14px 16px">'
+          + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:17px;letter-spacing:1.3px;color:#f5c518;margin-bottom:4px">'+a.title+'</div>'
+          + '<div style="font-family:\'Barlow\',sans-serif;font-size:11px;color:#8a95ac;font-style:italic;margin-bottom:8px">📄 '+a.ref+'</div>'
+          + '<div style="font-family:\'Barlow\',sans-serif;font-size:13px;line-height:1.5;color:#cfd3e0">'+a.body+'</div>'
+          + '</div>';
+      });
+      html += '</div>';
+      contentEl.innerHTML = html;
+      // Mettre à jour les onglets
+      tabsEl.querySelectorAll('.labo-tab').forEach(function(b){
+        var active = (b.getAttribute('data-sec') === key);
+        b.style.background = active ? '#f5c518' : 'transparent';
+        b.style.color = active ? '#0a0d18' : '#9aa3b3';
+      });
+    }
+
+    tabsEl.querySelectorAll('.labo-tab').forEach(function(b){
+      b.addEventListener('click', function(){ renderSection(b.getAttribute('data-sec')); });
+    });
+    var closeBtn = modal.querySelector('#labo-close');
+    var newClose = closeBtn.cloneNode(true); closeBtn.parentNode.replaceChild(newClose, closeBtn);
+    newClose.addEventListener('click', function(){ modal.style.display = 'none'; document.body.style.overflow = ''; });
+
+    renderSection('science');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  };
+})();
+
 // ═══ ACCÉLÉRATEUR ROTATION ÉCRAN (optimisation UX avancée) ══════════════
 // 5 optimisations : matchMedia + désactivation backdrop-filter + transitions
 // + RAF-synced + early-exit + durée réduite + screen.orientation API moderne
@@ -45427,18 +45774,9 @@ window._askPseudoIfNeeded = function(callback){
       + '  <circle cx="110" cy="95" r="80" fill="none" stroke="#f5c518" stroke-width="1.5" opacity="0.5" filter="blur(4px)"/>'
       // MASCOTTE OFFICIELLE SENSEI (bras croisés #23) centrée dans le cadre doré
       + '  <image href="sensei-arms-crossed.png" x="47" y="15" width="126" height="180" preserveAspectRatio="xMidYMid meet"/>'
-      // Ceinture colorée au bas du cercle (bandeau martial signature)
-      + '  <g transform="translate(0 -3)">'
-      + '    <rect x="35" y="176" width="150" height="14" fill="'+col+'" stroke="'+stroke+'" stroke-width="1.5" rx="2"/>'
-      + '    <rect x="100" y="173" width="20" height="20" fill="'+col+'" stroke="'+stroke+'" stroke-width="1.5" rx="2"/>'
-      + '    <rect x="93" y="193" width="6" height="12" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" rx="1"/>'
-      + '    <rect x="121" y="193" width="6" height="12" fill="'+col+'" stroke="'+stroke+'" stroke-width="1" rx="1"/>'
-      + '  </g>'
-      // Numéro dans badge doré (coin haut droit)
-      + (numero ? '  <g><circle cx="192" cy="28" r="19" fill="#f5c518" stroke="#0d1117" stroke-width="2"/>'
-                 + '<text x="192" y="36" text-anchor="middle" fill="#0d1117" font-family="Bebas Neue, Arial, sans-serif" font-size="22" font-weight="700">'+_escape(numero)+'</text></g>' : '')
-      // Pseudo sous le cadre
-      + (pseudo ? '  <text x="110" y="228" text-anchor="middle" fill="#f5c518" font-family="Bebas Neue, Arial, sans-serif" font-size="22" letter-spacing="2.5" font-weight="700">'+_escape(pseudo).toUpperCase()+'</text>' : '')
+      // Ceinture SVG retirée : la mascotte porte déjà sa ceinture noire
+      // Badge numéro retiré : la mascotte porte déjà le #23 sur son maillot
+      // Pseudo retiré : déjà affiché dans .persona-namebar juste en dessous (évite doublon)
       + '</svg>'
       + '</div>';
   }
@@ -45492,9 +45830,36 @@ window._askPseudoIfNeeded = function(callback){
            + (en ? 'Your character is now used by <strong style="color:#f5c518">SENSEI AI</strong>, TON ENTRAÎNEMENT and QI BASKET to personalize your training.'
                  : 'Ton personnage est utilisé par <strong style="color:#f5c518">SENSEI IA</strong>, TON ENTRAÎNEMENT et QI BASKET pour personnaliser ton training.')
            + '</div>';
+      // Compte le nombre de séances déjà générées pour afficher un label dynamique
+      var genCount = 0;
+      try {
+        if (p.history && p.history.length) {
+          for (var hi = 0; hi < p.history.length; hi++) {
+            if (p.history[hi] && p.history[hi].t === 'generate') genCount++;
+          }
+        }
+      } catch(e){}
+      // Nombre pour la prochaine séance
+      var nextN = genCount + 1;
+      // Label FR : "1ÈRE", "2ÈME", "3ÈME"... puis "UNE NOUVELLE" après 10
+      // Label EN : "FIRST", "2ND", "3RD"... puis "A NEW" après 10
+      var seanceLabel;
+      if (en) {
+        if (nextN > 10) seanceLabel = 'GENERATE A NEW SESSION';
+        else {
+          var ordEN = {1:'FIRST',2:'2ND',3:'3RD',4:'4TH',5:'5TH',6:'6TH',7:'7TH',8:'8TH',9:'9TH',10:'10TH'};
+          seanceLabel = 'GENERATE MY ' + ordEN[nextN] + ' SESSION';
+        }
+      } else {
+        if (nextN > 10) seanceLabel = 'GÉNÈRE UNE NOUVELLE SÉANCE';
+        else {
+          var ordFR = {1:'1ÈRE',2:'2ÈME',3:'3ÈME',4:'4ÈME',5:'5ÈME',6:'6ÈME',7:'7ÈME',8:'8ÈME',9:'9ÈME',10:'10ÈME'};
+          seanceLabel = 'GÉNÈRE MA ' + ordFR[nextN] + ' SÉANCE';
+        }
+      }
       html += '  <button onclick="_persona_close();setTimeout(function(){if(typeof _senseiAI_open===\'function\')_senseiAI_open();},100)" '
            + 'style="margin-top:12px;padding:10px 20px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#0d1117;border:none;border-radius:999px;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(245,197,24,0.4)">'
-           + '✨ '+(en?'GENERATE MY FIRST SESSION':'GÉNÈRE MA 1ÈRE SÉANCE')+' ✨</button>';
+           + '✨ '+seanceLabel+' ✨</button>';
       html += '</div>';
     }
 
@@ -45527,6 +45892,30 @@ window._askPseudoIfNeeded = function(callback){
     html += '</div>';
 
     html += '<div class="persona-save-info">'+(en?'Any change is saved instantly':'Chaque modification est sauvegardée immédiatement')+'</div>';
+
+    // ─── INSTAGRID : galerie des 4 poses du Sensei ───
+    html += '<div style="margin-top:28px;padding:18px 14px;background:linear-gradient(160deg,rgba(245,197,24,.06),rgba(13,17,23,.4));border:1px solid rgba(245,197,24,.2);border-radius:14px">'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:#f5c518;text-align:center;margin-bottom:14px">'
+      + '📸 ' + (en?'SENSEI GALLERY':'GALERIE SENSEI') + '</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'
+      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
+      + '    <img src="sensei-arms-crossed.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
+      + '  </div>'
+      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
+      + '    <img src="sensei-dribble.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
+      + '  </div>'
+      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
+      + '    <img src="sensei-coach.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
+      + '  </div>'
+      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
+      + '    <img src="sensei-back-ball.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
+      + '  </div>'
+      + '</div>'
+      + '<div style="margin-top:10px;font-size:10px;color:#8a95ac;text-align:center;letter-spacing:0.5px">'
+      + (en?'4 official Sensei poses':'4 poses officielles du Sensei')
+      + '</div>'
+      + '</div>';
+
     // Bouton reset (visible seulement si au moins un attribut est défini)
     var hasAny = !!(p.pseudo || p.numero || p.poste || p.niveau || p.age || p.main || p.objectif || p.createdAt);
     if (hasAny) {
