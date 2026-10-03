@@ -1038,11 +1038,17 @@ body.unlocked .sensei-only{display:revert !important}
       <div id="dojo-tiles-grid" style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
         <!-- SENSEI IA (1ère tuile - générateur de séance) -->
         <button onclick="_senseiAI_open()" ontouchstart=""
-          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
-          <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
-          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">✨</div>
-          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_ai">SENSEI IA</div>
-          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_ai">Génère ta séance personnalisée avec l'IA</div>
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
+          <!-- Mascotte coach kimono : max 32% largeur, droite, ne chevauche JAMAIS le texte -->
+          <img src="sensei-coach.png" alt="" style="position:absolute;right:-5px;bottom:-8px;height:118%;width:auto;max-width:38%;object-fit:contain;object-position:right bottom;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
+          <!-- Badge NEW à gauche pour libérer l'espace droite à la mascotte -->
+          <div style="position:absolute;top:8px;left:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif;z-index:2">NEW</div>
+          <!-- Contenu texte : max 62% largeur pour ne jamais toucher la mascotte -->
+          <div style="position:relative;z-index:1;max-width:62%;margin-top:16px">
+            <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">✨</div>
+            <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_ai">SENSEI IA</div>
+            <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_ai">Génère ta séance personnalisée avec l'IA</div>
+          </div>
         </button>
         <!-- SENSEI -->
         <button onclick="_dojoLaunch('sensei')" ontouchstart=""
@@ -1090,10 +1096,15 @@ body.unlocked .sensei-only{display:revert !important}
         </button>
         <!-- TON PERSONNAGE (8e tuile - configuration, symétrique de SENSEI IA) -->
         <button onclick="_persona_open()" ontouchstart=""
-          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
-          <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">⛹️</div>
-          <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_persona">TON PERSONNAGE</div>
-          <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_persona">Crée ton avatar SENSEI</div>
+          style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
+          <!-- Mascotte bras croisés #23 : max 38% largeur, droite, zéro collision avec texte -->
+          <img src="sensei-arms-crossed.png" alt="" style="position:absolute;right:-5px;bottom:-8px;height:118%;width:auto;max-width:38%;object-fit:contain;object-position:right bottom;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
+          <!-- Contenu texte : max 62% largeur -->
+          <div style="position:relative;z-index:1;max-width:62%">
+            <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">⛹️</div>
+            <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_persona">TON PERSONNAGE</div>
+            <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_persona">Crée ton avatar SENSEI</div>
+          </div>
         </button>
         <!-- PLAYBOOK (9e tuile - tactic board + systèmes) -->
         <button onclick="_playbook_open()" ontouchstart=""
@@ -10595,7 +10606,7 @@ function oppDisplayResults(top, region, en, profile) {
 
       <!-- TON PERSONNAGE -->
       <button class="onb-card" onclick="onboardingLaunch('persona')" style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(245,197,24,.02));border:2px solid rgba(245,197,24,.5);border-radius:18px;padding:24px 18px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;color:#fff;text-align:center;transition:all .25s ease;position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:space-between">
-        <div style="font-size:48px;line-height:1;margin-bottom:6px">⛹️</div>
+        <img src="sensei-arms-crossed.png" alt="" style="height:80px;width:auto;margin-bottom:8px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))" onerror="this.outerHTML='&lt;div style=&quot;font-size:48px;line-height:1;margin-bottom:6px&quot;&gt;⛹️&lt;/div&gt;'">
         <div data-i18n="onb_persona_title" style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:#f5c518;letter-spacing:3px;line-height:1">PERSONNAGE</div>
         <div style="height:60px;display:flex;align-items:center;justify-content:center;gap:3px;margin:8px 0">
           <div style="width:22px;height:6px;background:#fff;border-radius:2px"></div>
@@ -10847,6 +10858,24 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 #dojo-canvas { opacity: 0; transition: opacity .5s; }
 #dojo-canvas.active { opacity: 1; display: block !important; }
 
+/* ─── Pendant la rotation d'écran : désactiver les backdrop-filter (GPU lourd) ─── */
+/* Gain : 200-400ms de latence en moins sur iOS */
+body.app-rotating [style*="backdrop-filter"],
+body.app-rotating [style*="-webkit-backdrop-filter"],
+body.app-rotating #sr-title-screen, body.app-rotating #sa-title-screen,
+body.app-rotating #bb-title-screen, body.app-rotating #dm-title-screen,
+body.app-rotating #hr-title-screen, body.app-rotating #rc-title-screen,
+body.app-rotating #mc-title-screen, body.app-rotating #tp-title-screen,
+body.app-rotating #cv-title-screen, body.app-rotating #sr-results,
+body.app-rotating #sa-results, body.app-rotating #bb-results,
+body.app-rotating #dm-results, body.app-rotating #hr-results,
+body.app-rotating #rc-results, body.app-rotating #mc-results,
+body.app-rotating #tp-results, body.app-rotating #cv-results {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+}
+
 /* ─── Fonction utilitaire GLOBALE : récupère le pseudo du joueur ─── */
 /* _getPlayerName() : retourne le pseudo depuis localStorage, ou 'TOI' par défaut */
 /* Tronqué à 10 caractères max pour tenir dans les HUD */
@@ -10867,6 +10896,77 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
    Objectif : TOUT visible d'un seul coup, sans scroll, sur tous écrans
    Approche : compression des tailles sur petits écrans via media queries
    ───────────────────────────────────────────────────────────────── */
+
+/* ═══ MASCOTTES SUR ÉCRANS TITRE + RÉSULTATS ARCADE (anti-collision stricte) ═══ */
+/* Mascotte DRIBBLE sur écrans titre - coin droit, derrière le contenu */
+#sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
+#dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
+#mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 8px;
+  width: 28%;
+  max-width: 160px;
+  height: 72%;
+  background: url('sensei-dribble.png') no-repeat right bottom / contain;
+  opacity: 0.6;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(245,197,24,.25));
+  z-index: 1;
+}
+/* Mascotte DOS+BALLON sur écrans résultats - plus discrète (icône de récompense) */
+#sr-results::after, #sa-results::after, #bb-results::after,
+#dm-results::after, #hr-results::after, #rc-results::after,
+#mc-results::after, #tp-results::after, #cv-results::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 8px;
+  width: 24%;
+  max-width: 140px;
+  height: 68%;
+  background: url('sensei-back-ball.png') no-repeat right bottom / contain;
+  opacity: 0.55;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 14px rgba(245,197,24,.25));
+  z-index: 1;
+}
+/* Contenu enfants (logo, titre, bouton) TOUJOURS au-dessus de la mascotte */
+#sr-title-screen > *, #sa-title-screen > *, #bb-title-screen > *,
+#dm-title-screen > *, #hr-title-screen > *, #rc-title-screen > *,
+#mc-title-screen > *, #tp-title-screen > *, #cv-title-screen > *,
+#sr-results > *, #sa-results > *, #bb-results > *,
+#dm-results > *, #hr-results > *, #rc-results > *,
+#mc-results > *, #tp-results > *, #cv-results > * {
+  position: relative;
+  z-index: 2;
+}
+/* Paysage mobile : mascottes plus discrètes pour ne JAMAIS gêner le bouton CTA */
+@media (max-height: 500px) {
+  #sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
+  #dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
+  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after,
+  #sr-results::after, #sa-results::after, #bb-results::after,
+  #dm-results::after, #hr-results::after, #rc-results::after,
+  #mc-results::after, #tp-results::after, #cv-results::after {
+    opacity: 0.4;
+    width: 22%;
+    max-width: 110px;
+  }
+}
+/* Ultra-compact : mascotte quasi-invisible pour laisser la place au bouton */
+@media (max-height: 400px) {
+  #sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
+  #dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
+  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after,
+  #sr-results::after, #sa-results::after, #bb-results::after,
+  #dm-results::after, #hr-results::after, #rc-results::after,
+  #mc-results::after, #tp-results::after, #cv-results::after {
+    opacity: 0.25;
+    width: 18%;
+  }
+}
 
 /* Safe-area iPhone (notch) sur tous les title/results screens */
 #sr-title-screen, #sa-title-screen, #bb-title-screen, #dm-title-screen,
@@ -42747,6 +42847,42 @@ if (G.imgBall) {
 </div>
 
 <script>
+// ═══ ACCÉLÉRATEUR ROTATION ÉCRAN (optimisation UX) ═══════════════════════
+// Fix pour iOS/Android : orientationchange arrive 300-500ms après l'anim visuelle
+// Solution : matchMedia + désactiver backdrop-filter pendant la transition
+(function() {
+  if (!window.matchMedia) return;  // fallback safe
+  try {
+    var mql = window.matchMedia('(orientation: portrait)');
+    var lastOrientation = mql.matches ? 'portrait' : 'landscape';
+    var rotationTimer = null;
+
+    function markRotating() {
+      try {
+        document.body.classList.add('app-rotating');
+        clearTimeout(rotationTimer);
+        rotationTimer = setTimeout(function() {
+          document.body.classList.remove('app-rotating');
+        }, 450);
+      } catch(e){}
+    }
+
+    var handler = function(e) {
+      var newOrientation = e.matches ? 'portrait' : 'landscape';
+      if (newOrientation !== lastOrientation) {
+        lastOrientation = newOrientation;
+        markRotating();
+        // Déclencher resize immédiatement (plus rapide que d'attendre orientationchange)
+        try { window.dispatchEvent(new Event('resize')); } catch(e){}
+      }
+    };
+
+    // addEventListener (moderne) ou addListener (Safari < 14)
+    if (mql.addEventListener) mql.addEventListener('change', handler);
+    else if (mql.addListener) mql.addListener(handler);
+  } catch(e){}
+})();
+
 // ═══ Fonction utilitaire globale : récupérer le pseudo du joueur ═══
 window._getPlayerName = function(){
   try {
@@ -45260,8 +45396,8 @@ window._askPseudoIfNeeded = function(callback){
       // Cercle doré principal
       + '  <circle cx="110" cy="95" r="80" fill="none" stroke="#f5c518" stroke-width="3.5" opacity="1"/>'
       + '  <circle cx="110" cy="95" r="80" fill="none" stroke="#f5c518" stroke-width="1.5" opacity="0.5" filter="blur(4px)"/>'
-      // Basketteur ⛹️ GROS au centre avec skin tone
-      + '  <text x="110" y="128" text-anchor="middle" font-size="110" font-family="Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, Twemoji Mozilla, sans-serif">'+skinEmoji+'</text>'
+      // MASCOTTE OFFICIELLE SENSEI (bras croisés #23) centrée dans le cadre doré
+      + '  <image href="sensei-arms-crossed.png" x="47" y="15" width="126" height="180" preserveAspectRatio="xMidYMid meet"/>'
       // Ceinture colorée au bas du cercle (bandeau martial signature)
       + '  <g transform="translate(0 -3)">'
       + '    <rect x="35" y="176" width="150" height="14" fill="'+col+'" stroke="'+stroke+'" stroke-width="1.5" rx="2"/>'
