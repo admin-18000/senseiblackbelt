@@ -15828,6 +15828,10 @@ function applyLangTracker(lang) {
     puzzle_tpl_4: '🔄 Before / After',
     puzzle_tpl_5: '🎯 Drill of the Week',
     puzzle_tpl_6: '🎥 AI Training',
+    puzzle_tpl_7: '🥋 Le Sensei',
+    puzzle_tpl_8: '🏀 Ball Handling',
+    puzzle_tpl_9: '✨ Sensei IA',
+    puzzle_tpl_10: '💪 Hard Work',
   });
   Object.assign(T.en, {
     pr_stats_globales: '📊 Global Stats',
@@ -15852,6 +15856,10 @@ function applyLangTracker(lang) {
     puzzle_tpl_4: '🔄 Before / After',
     puzzle_tpl_5: '🎯 Drill of the Week',
     puzzle_tpl_6: '🎥 AI Training',
+    puzzle_tpl_7: '🥋 The Sensei',
+    puzzle_tpl_8: '🏀 Ball Handling',
+    puzzle_tpl_9: '✨ Sensei AI',
+    puzzle_tpl_10: '💪 Hard Work',
   });
 })();
 </script>
@@ -15889,6 +15897,10 @@ function applyLangTracker(lang) {
       <button onclick="puzzleSelectTemplate(4,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_4">🔄 Before / After</button>
       <button onclick="puzzleSelectTemplate(5,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_5">🎯 Drill of the Week</button>
       <button onclick="puzzleSelectTemplate(6,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_6">🎥 AI Training</button>
+      <button onclick="puzzleSelectTemplate(7,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_7">🥋 The Sensei</button>
+      <button onclick="puzzleSelectTemplate(8,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_8">🏀 Ball Handling</button>
+      <button onclick="puzzleSelectTemplate(9,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_9">✨ Sensei IA</button>
+      <button onclick="puzzleSelectTemplate(10,this)" style="font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:7px;border:1px solid var(--border);background:var(--dark3);color:var(--muted);cursor:pointer" data-i18n="puzzle_tpl_10">💪 Hard Work</button>
     </div>
 
     <!-- Aperçu 3×3 + téléchargement -->
@@ -16786,9 +16798,135 @@ function puzzleDrawTemplate6(canvases, d) {
 }
 
 
+// ══════════════════════════════════════════
+// TEMPLATES 7-10 — MASCOTTES SENSEI (Instagram puzzle 3×3)
+// Chaque mascotte étalée sur 3 cases verticales + branding sur les 6 autres
+// ══════════════════════════════════════════
+window._puzzleMascotteImgs = window._puzzleMascotteImgs || {};
+function puzzleDrawMascotte(canvases, d, img, cfg) {
+  const S = PUZZLE_SIZE;
+  const en = d.en;
+  // Dessiner fond + mascotte sur les 9 cases
+  // La mascotte est centrée horizontalement, étalée sur toute la hauteur (3 cases)
+  for (let row=0; row<3; row++) {
+    for (let col=0; col<3; col++) {
+      const idx = row*3 + col;
+      const ctx = canvases[idx].getContext('2d');
+      // Fond dégradé sombre+doré
+      const g = ctx.createLinearGradient(0, 0, S, S);
+      g.addColorStop(0, cfg.bgTop); g.addColorStop(1, cfg.bgBot);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+      // Pattern décoratif subtil (lignes diagonales)
+      ctx.strokeStyle = 'rgba(245,197,24,.05)'; ctx.lineWidth = 1;
+      for (let k=-S; k<S*2; k+=50) {
+        ctx.beginPath(); ctx.moveTo(k, 0); ctx.lineTo(k+S, S); ctx.stroke();
+      }
+      // Dessiner la portion de l'image mascotte sur toutes les cases
+      // L'image est centrée horizontalement + couvre toute la hauteur du puzzle 3S
+      if (img) {
+        const totalH = S * 3;
+        const imgRatio = img.width / img.height;
+        const drawH = totalH;
+        const drawW = drawH * imgRatio;
+        const offsetX = (S*3 - drawW) / 2; // centrée dans le puzzle complet
+        // Position de la zone image dans cette case
+        const caseX = col * S;
+        const caseY = row * S;
+        // Portion visible : intersection image/case
+        const imgLeftInPuzzle = offsetX;
+        const imgRightInPuzzle = offsetX + drawW;
+        const visibleLeft = Math.max(caseX, imgLeftInPuzzle);
+        const visibleRight = Math.min(caseX + S, imgRightInPuzzle);
+        if (visibleRight > visibleLeft) {
+          // Portion de l'image source correspondante
+          const srcScale = img.width / drawW;
+          const srcX = (visibleLeft - imgLeftInPuzzle) * srcScale;
+          const srcY = caseY * srcScale;
+          const srcW = (visibleRight - visibleLeft) * srcScale;
+          const srcH = S * srcScale;
+          // Destination dans le canvas
+          const dstX = visibleLeft - caseX;
+          const dstW = visibleRight - visibleLeft;
+          ctx.drawImage(img, srcX, srcY, srcW, srcH, dstX, 0, dstW, S);
+        }
+      }
+    }
+  }
+  // ─── Overlays de branding (zones ne gênant pas la mascotte centrale) ───
+  // Case 6 (haut gauche) : TITLE grand
+  const c6 = canvases[6].getContext('2d');
+  c6.fillStyle = 'rgba(10,13,24,.6)'; c6.fillRect(0, 0, S, S);
+  pF(c6, cfg.titleLine1, 60, 300, 160, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c6, cfg.titleLine2, 60, 460, 160, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c6, '🥋', 60, 650, 180, '#f5c518', 'left');
+  // Case 8 (haut droite) : TAG + emoji
+  const c8 = canvases[8].getContext('2d');
+  c8.fillStyle = 'rgba(10,13,24,.6)'; c8.fillRect(0, 0, S, S);
+  pF(c8, cfg.emoji, S-80, 400, 400, 'center', 'right');
+  pF(c8, '#'+cfg.hashtag, S-60, 850, 48, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c8, en?'FOLLOW':'SUIS-MOI', S-60, 920, 36, 'rgba(255,255,255,.6)', 'right');
+  // Case 0 (bas gauche) : QUOTE
+  const c0 = canvases[0].getContext('2d');
+  c0.fillStyle = 'rgba(10,13,24,.72)'; c0.fillRect(0, 0, S, S);
+  pF(c0, '"', 60, 400, 400, 'rgba(245,197,24,.15)', 'left', '900', 'serif');
+  pF(c0, cfg.quote1, 60, 550, 52, '#fff', 'left', '700');
+  pF(c0, cfg.quote2, 60, 630, 52, '#fff', 'left', '700');
+  pF(c0, cfg.quote3, 60, 710, 52, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c0, '— SENSEI', 60, 820, 36, 'rgba(245,197,24,.6)', 'left');
+  // Case 2 (bas droite) : CTA
+  const c2 = canvases[2].getContext('2d');
+  c2.fillStyle = 'rgba(10,13,24,.72)'; c2.fillRect(0, 0, S, S);
+  pRect(c2, S-500, S/2-80, 420, 160, 80, '#f5c518');
+  pF(c2, en?'JOIN →':'REJOINS →', S-290, S/2+15, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c2, 'senseiblackbelt.com', S-80, S-60, 32, 'rgba(245,197,24,.6)', 'right');
+  // Petit watermark sur la case 4 (centre) pour signature
+  const c4 = canvases[4].getContext('2d');
+  pF(c4, 'SENSEI BLACKBELT', S/2, S-60, 28, 'rgba(255,255,255,.4)', 'center', '700');
+}
+function puzzleDrawTemplate7(canvases, d) {
+  puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['arms-crossed'], {
+    bgTop:'rgba(13,17,23,1)', bgBot:'rgba(50,30,10,1)',
+    titleLine1:'THE', titleLine2:'SENSEI',
+    emoji:'🥋', hashtag:'SenseiBlackBelt',
+    quote1:d.en?'Discipline is the':'La discipline est',
+    quote2:d.en?'bridge between':'le pont entre',
+    quote3:d.en?'GOALS & RESULTS':'OBJECTIFS & RÉSULTATS'
+  });
+}
+function puzzleDrawTemplate8(canvases, d) {
+  puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['dribble'], {
+    bgTop:'rgba(5,12,25,1)', bgBot:'rgba(30,10,50,1)',
+    titleLine1:'BALL', titleLine2:'HANDLING',
+    emoji:'🏀', hashtag:'BallHandling',
+    quote1:d.en?'10 000 reps':'10 000 reps',
+    quote2:d.en?'to master':'pour maîtriser',
+    quote3:d.en?'THE DRIBBLE':'LE DRIBBLE'
+  });
+}
+function puzzleDrawTemplate9(canvases, d) {
+  puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['coach'], {
+    bgTop:'rgba(13,17,23,1)', bgBot:'rgba(10,30,20,1)',
+    titleLine1:'SENSEI', titleLine2:'IA',
+    emoji:'✨', hashtag:'SenseiAI',
+    quote1:d.en?'Your training,':'Ton training,',
+    quote2:d.en?'generated by':'généré par',
+    quote3:d.en?'ARTIFICIAL INTELLIGENCE':'INTELLIGENCE ARTIFICIELLE'
+  });
+}
+function puzzleDrawTemplate10(canvases, d) {
+  puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['back-ball'], {
+    bgTop:'rgba(20,8,5,1)', bgBot:'rgba(40,15,10,1)',
+    titleLine1:'HARD', titleLine2:'WORK',
+    emoji:'💪', hashtag:'NoDaysOff',
+    quote1:d.en?'The grind':'Le travail',
+    quote2:d.en?'never':'ne s\'arrête',
+    quote3:d.en?'STOPS':'JAMAIS'
+  });
+}
+
 function puzzleRender() {
   const d = puzzleGetData();
-  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6];
+  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6, puzzleDrawTemplate7, puzzleDrawTemplate8, puzzleDrawTemplate9, puzzleDrawTemplate10];
   fns[_puzzleTemplate](_puzzleCanvases, d);
   // mise à jour aperçu
   const grid = document.getElementById('puzzle-grid-preview');
@@ -16872,6 +17010,21 @@ function openPuzzleModal() {
     img.onerror=()=>{ _puzzleCoachImg=null; puzzleRender(); };
     img.src='coach.jpg';
   }
+  // Précharger les 4 mascottes pour les templates 7-10
+  const _mascottes = {
+    'arms-crossed': 'sensei-arms-crossed.png',
+    'dribble':      'sensei-dribble.png',
+    'coach':        'sensei-coach.png',
+    'back-ball':    'sensei-back-ball.png'
+  };
+  Object.keys(_mascottes).forEach(function(k){
+    if (!window._puzzleMascotteImgs[k]) {
+      const mi = new Image(); mi.crossOrigin='anonymous';
+      mi.onload = function(){ window._puzzleMascotteImgs[k]=mi; puzzleRender(); };
+      mi.onerror = function(){};
+      mi.src = _mascottes[k];
+    }
+  });
   // Charger thumbnail BH selon ceinture actuelle
   const beltIdx2 = parseInt(localStorage.getItem('sensei_belt_idx')||'0');
   const vidId = (typeof SECTION_VIDEOS!=='undefined'&&SECTION_VIDEOS.ballhandling) ? SECTION_VIDEOS.ballhandling[Math.min(beltIdx2*2,14)].id : 'ttwQywcjF6s';
@@ -45892,30 +46045,6 @@ window._askPseudoIfNeeded = function(callback){
     html += '</div>';
 
     html += '<div class="persona-save-info">'+(en?'Any change is saved instantly':'Chaque modification est sauvegardée immédiatement')+'</div>';
-
-    // ─── INSTAGRID : galerie des 4 poses du Sensei ───
-    html += '<div style="margin-top:28px;padding:18px 14px;background:linear-gradient(160deg,rgba(245,197,24,.06),rgba(13,17,23,.4));border:1px solid rgba(245,197,24,.2);border-radius:14px">'
-      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:2px;color:#f5c518;text-align:center;margin-bottom:14px">'
-      + '📸 ' + (en?'SENSEI GALLERY':'GALERIE SENSEI') + '</div>'
-      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">'
-      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
-      + '    <img src="sensei-arms-crossed.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
-      + '  </div>'
-      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
-      + '    <img src="sensei-dribble.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
-      + '  </div>'
-      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
-      + '    <img src="sensei-coach.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
-      + '  </div>'
-      + '  <div style="aspect-ratio:1;background:rgba(13,17,23,.6);border:1px solid rgba(245,197,24,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden">'
-      + '    <img src="sensei-back-ball.png" alt="" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.style.display=\'none\'">'
-      + '  </div>'
-      + '</div>'
-      + '<div style="margin-top:10px;font-size:10px;color:#8a95ac;text-align:center;letter-spacing:0.5px">'
-      + (en?'4 official Sensei poses':'4 poses officielles du Sensei')
-      + '</div>'
-      + '</div>';
-
     // Bouton reset (visible seulement si au moins un attribut est défini)
     var hasAny = !!(p.pseudo || p.numero || p.poste || p.niveau || p.age || p.main || p.objectif || p.createdAt);
     if (hasAny) {
