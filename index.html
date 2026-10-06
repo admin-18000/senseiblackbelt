@@ -1029,15 +1029,66 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- ═══════════ DOJO INTERACTIVE DRILLS — accès 1 clic aux drills caméra ═══════════ -->
   <div style="position:relative;padding:clamp(36px,6vw,72px) clamp(16px,4vw,40px);background:linear-gradient(180deg,#0d1117 0%,#0a0d14 100%);border-top:1px solid rgba(245,197,24,.18)">
     <div style="position:relative;max-width:1100px;margin:0 auto">
-      <!-- Titre (non traduit) -->
-      <div style="text-align:center;margin-bottom:clamp(20px,3vw,32px)">
-        <div style="display:inline-block;font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(22px,3.2vw,36px);font-weight:700;letter-spacing:2.5px;color:#fff;line-height:1.1">🥋🏀 DOJO <span style="color:#f5c518">INTERACTIVE DRILLS</span></div>
-        <div style="width:60px;height:3px;background:#f5c518;margin:10px auto 0;border-radius:2px"></div>
+      <!-- ═══ NOUVELLE BANNIÈRE "BIENVENUE DANS LE DOJO" ═══ -->
+      <div style="text-align:center;margin-bottom:clamp(28px,4vw,44px);max-width:900px;margin-left:auto;margin-right:auto">
+        <!-- Mascotte -->
+        <img src="sensei-arms-crossed.png" alt="" style="height:clamp(100px,16vw,160px);width:auto;filter:drop-shadow(0 6px 20px rgba(245,197,24,.25));margin-bottom:12px" onerror="this.style.display='none'">
+        <!-- Titre BIENVENUE -->
+        <div data-i18n="dojo_welcome" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:900;letter-spacing:4px;color:#f5c518;line-height:1;margin-bottom:6px;text-shadow:0 4px 20px rgba(245,197,24,.3)">BIENVENUE DANS LE DOJO</div>
+        <!-- Baseline Human-led -->
+        <div data-i18n="dojo_welcome_sub" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(11px,1.6vw,14px);color:#cfd3e0;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:clamp(18px,2.5vw,24px)">Human-led. AI-powered. 🥋</div>
+        <!-- 2 CTA principaux : Séance du jour + Sensei Vision -->
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:clamp(20px,3vw,28px)">
+          <button onclick="_senseiAI_open()" style="background:linear-gradient(135deg,#f5c518,#e0a800);color:#0d1117;border:none;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:12px 24px;box-shadow:0 4px 16px rgba(245,197,24,.4);display:flex;align-items:center;gap:8px">
+            ✨ <span>SÉANCE DU JOUR</span>
+          </button>
+          <button onclick="showSection('training',null)" style="background:transparent;color:#f5c518;border:2px solid #f5c518;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.background='rgba(245,197,24,.1)'" onmouseout="this.style.background='transparent'">
+            📸 <span>SENSEI VISION</span>
+          </button>
+        </div>
       </div>
-      <!-- Grille 9 tuiles DOJO : responsive auto-fit sur mobile, forcée 3×3 sur PC -->
-      <div id="dojo-tiles-grid" style="display:grid;gap:clamp(10px,1.5vw,16px);grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
+      <!-- 5 grosses CARDS cliquables (navigation vers pages catégorie) -->
+      <div id="dojo-cat-cards" style="display:grid;gap:clamp(12px,1.8vw,18px);grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));max-width:1100px;margin:0 auto;padding:0 clamp(4px,1vw,16px)">
+        <button onclick="_dojoShowCat('train')" style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(230,57,70,.18),rgba(13,17,23,.6));border:1.5px solid rgba(230,57,70,.5);border-radius:16px;padding:clamp(20px,2.5vw,28px) clamp(14px,2vw,20px);color:#fff;text-align:left;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(230,57,70,.15);font-family:inherit;min-height:140px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(230,57,70,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(230,57,70,.15)'">
+          <div style="font-size:clamp(40px,5vw,52px);line-height:1;margin-bottom:10px">💪</div>
+          <div>
+            <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:2px;color:#e63946;line-height:1" data-i18n="dojo_cat_train">M'ENTRAÎNER</div>
+            <div style="font-size:clamp(11px,1.3vw,13px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_cat_train_sub">5 outils · SENSEI IA · Caméra</div>
+          </div>
+        </button>
+        <button onclick="_dojoShowCat('play')" style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(76,201,240,.18),rgba(13,17,23,.6));border:1.5px solid rgba(76,201,240,.5);border-radius:16px;padding:clamp(20px,2.5vw,28px) clamp(14px,2vw,20px);color:#fff;text-align:left;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(76,201,240,.15);font-family:inherit;min-height:140px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(76,201,240,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(76,201,240,.15)'">
+          <div style="font-size:clamp(40px,5vw,52px);line-height:1;margin-bottom:10px">🎮</div>
+          <div>
+            <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:2px;color:#4cc9f0;line-height:1" data-i18n="dojo_cat_play">JOUER</div>
+            <div style="font-size:clamp(11px,1.3vw,13px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_cat_play_sub">2 modules · Arcade · QI</div>
+          </div>
+        </button>
+        <button onclick="_dojoShowCat('learn')" style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(159,100,230,.18),rgba(13,17,23,.6));border:1.5px solid rgba(159,100,230,.5);border-radius:16px;padding:clamp(20px,2.5vw,28px) clamp(14px,2vw,20px);color:#fff;text-align:left;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(159,100,230,.15);font-family:inherit;min-height:140px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(159,100,230,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(159,100,230,.15)'">
+          <div style="font-size:clamp(40px,5vw,52px);line-height:1;margin-bottom:10px">🎓</div>
+          <div>
+            <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:2px;color:#9f64e6;line-height:1" data-i18n="dojo_cat_learn">APPRENDRE</div>
+            <div style="font-size:clamp(11px,1.3vw,13px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_cat_learn_sub">3 outils · Playbook · Science</div>
+          </div>
+        </button>
+        <button onclick="_dojoShowCat('prog')" style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.2),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.5);border-radius:16px;padding:clamp(20px,2.5vw,28px) clamp(14px,2vw,20px);color:#fff;text-align:left;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(245,197,24,.15);font-family:inherit;min-height:140px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(245,197,24,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(245,197,24,.15)'">
+          <div style="font-size:clamp(40px,5vw,52px);line-height:1;margin-bottom:10px">📊</div>
+          <div>
+            <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:2px;color:#f5c518;line-height:1" data-i18n="dojo_cat_prog">PROGRESSION</div>
+            <div style="font-size:clamp(11px,1.3vw,13px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_cat_prog_sub">2 outils · Personnage · GOAT</div>
+          </div>
+        </button>
+        <button onclick="_dojoShowCat('com')" style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.18),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:16px;padding:clamp(20px,2.5vw,28px) clamp(14px,2vw,20px);color:#fff;text-align:left;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(34,197,94,.15);font-family:inherit;min-height:140px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(34,197,94,.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(34,197,94,.15)'">
+          <div style="font-size:clamp(40px,5vw,52px);line-height:1;margin-bottom:10px">🌍</div>
+          <div>
+            <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:2px;color:#22c55e;line-height:1" data-i18n="dojo_cat_com">COMMUNAUTÉ</div>
+            <div style="font-size:clamp(11px,1.3vw,13px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_cat_com_sub">Le Sensei · Network</div>
+          </div>
+        </button>
+      </div>
+      <!-- Grille 12 tuiles DOJO : MASQUÉE sur la home (sert de "pool" source pour les 5 pages catégorie) -->
+      <div id="dojo-tiles-grid" style="display:none;gap:clamp(12px,1.8vw,20px);grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));max-width:1100px;margin:0 auto">
         <!-- SENSEI IA (1ère tuile - générateur de séance) -->
-        <button onclick="_senseiAI_open()" ontouchstart=""
+        <button onclick="_senseiAI_open()" ontouchstart="" data-cat="train"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
           <!-- Mascotte coach kimono : CENTRÉE verticalement, max 38% largeur, droite -->
           <img src="sensei-coach.png" alt="" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:90%;width:auto;max-width:38%;object-fit:contain;object-position:center;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
@@ -1058,7 +1109,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_sensei">Mimétisme · Sensei live</div>
         </button>
         <!-- RÉACTION -->
-        <button onclick="_dojoLaunch('reaction')" ontouchstart=""
+        <button onclick="_dojoLaunch('reaction')" ontouchstart="" data-cat="train"
           style="cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.45);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎯</div>
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#f5c518;line-height:1" data-i18n="dojo_lbl_reaction">RÉACTION</div>
@@ -1072,7 +1123,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#2dc653;margin-top:4px;letter-spacing:.5px;font-weight:700" data-i18n="dojo_sub_math">Validé scientifiquement</div>
         </button>
         <!-- TON ENTRAÎNEMENT (fiche perso) -->
-        <button onclick="_fiche_open()" ontouchstart=""
+        <button onclick="_fiche_open()" ontouchstart="" data-cat="train"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.12),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">📋</div>
@@ -1080,7 +1131,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_fiche">Fiche perso adaptée à ton poste</div>
         </button>
         <!-- QI BASKET (lecture de jeu) -->
-        <button onclick="_qi_open()" ontouchstart=""
+        <button onclick="_qi_open()" ontouchstart="" data-cat="play"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(78,205,196,.12),rgba(13,17,23,.6));border:1px solid rgba(78,205,196,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🧠</div>
@@ -1088,14 +1139,14 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_qi">Lecture de jeu · Prise de décision</div>
         </button>
         <!-- BALL HANDLING DRILLS (bibliothèque vidéo) -->
-        <button onclick="showSection('ballhandling',null)" ontouchstart=""
+        <button onclick="showSection('ballhandling',null)" ontouchstart="" data-cat="train"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(224,125,63,.12),rgba(13,17,23,.6));border:1.5px solid rgba(224,125,63,.55);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.35);font-family:inherit">
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🏀</div>
           <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:1.5px;color:#e07d3f;line-height:1" data-i18n="dojo_lbl_bh">BALL HANDLING</div>
           <div style="font-size:clamp(10px,1.3vw,12px);color:#9aa3b3;margin-top:4px;letter-spacing:.5px" data-i18n="dojo_sub_bh">Drills classés par ceinture</div>
         </button>
         <!-- TON PERSONNAGE (8e tuile - configuration, symétrique de SENSEI IA) -->
-        <button onclick="_persona_open()" ontouchstart=""
+        <button onclick="_persona_open()" ontouchstart="" data-cat="prog"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit;overflow:hidden;min-height:120px">
           <!-- Mascotte bras croisés #23 : CENTRÉE verticalement, max 38% largeur, droite -->
           <img src="sensei-arms-crossed.png" alt="" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:90%;width:auto;max-width:38%;object-fit:contain;object-position:center;opacity:.92;pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))" onerror="this.style.display='none'">
@@ -1107,7 +1158,7 @@ body.unlocked .sensei-only{display:revert !important}
           </div>
         </button>
         <!-- PLAYBOOK (9e tuile - tactic board + systèmes) -->
-        <button onclick="_playbook_open()" ontouchstart=""
+        <button onclick="_playbook_open()" ontouchstart="" data-cat="learn"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎯</div>
@@ -1115,7 +1166,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_playbook">Tactic board + systèmes de jeu</div>
         </button>
         <!-- BIBLIOTHÈQUE SENSEI (10e tuile - Règlement + Glossaire) -->
-        <button onclick="_biblio_open()" ontouchstart=""
+        <button onclick="_biblio_open()" ontouchstart="" data-cat="learn"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🏛️</div>
@@ -1123,7 +1174,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_biblio">Règlement + Glossaire</div>
         </button>
         <!-- LABORATOIRE SENSEI (nouvelle tuile - Science + Nutrition + Sommeil) -->
-        <button onclick="_labo_open()" ontouchstart=""
+        <button onclick="_labo_open()" ontouchstart="" data-cat="learn"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🧪</div>
@@ -1131,7 +1182,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_labo">Science · Nutrition · Sommeil</div>
         </button>
         <!-- BALL TRACKER (11e tuile - Feature caméra IA compteur dribbles) -->
-        <button onclick="_bt_open()" ontouchstart=""
+        <button onclick="_bt_open()" ontouchstart="" data-cat="train"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🏀</div>
@@ -1139,7 +1190,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_bt">AI dribble counter</div>
         </button>
         <!-- GOAT STATUS (12e tuile - Raccourci direct vers Battle Royal) -->
-        <button onclick="showSection('battle',null)" ontouchstart=""
+        <button onclick="showSection('battle',null)" ontouchstart="" data-cat="prog"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🐐</div>
@@ -1147,7 +1198,7 @@ body.unlocked .sensei-only{display:revert !important}
           <div style="font-size:clamp(10px,1.3vw,12px);color:#cfd3e0;margin-top:4px;letter-spacing:.5px;font-weight:600" data-i18n="dojo_sub_goat">👑 Battle Royal</div>
         </button>
         <!-- JEUX VIDÉOS (13e tuile - Ouvre la salle d'arcade avec choix de jeux) -->
-        <button onclick="_arcade_open()" ontouchstart=""
+        <button onclick="_arcade_open()" ontouchstart="" data-cat="play"
           style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.20),rgba(245,197,24,.02));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:clamp(16px,2.5vw,22px) clamp(12px,2vw,18px);color:#fff;text-align:left;transition:all .2s;box-shadow:0 4px 20px rgba(245,197,24,.25);font-family:inherit">
           <div style="position:absolute;top:8px;right:8px;background:#e63946;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
           <div style="font-size:clamp(28px,4vw,38px);line-height:1;margin-bottom:8px">🎮</div>
@@ -1970,6 +2021,166 @@ body.unlocked .sensei-only{display:revert !important}
 </div>
 
 <!-- ══ BALL HANDLING ══ -->
+
+<!-- ══════════════════════════════════════════════════════════
+     5 SECTIONS CATÉGORIE DOJO (M'ENTRAÎNER, JOUER, APPRENDRE, PROGRESSION, COMMUNAUTÉ)
+     Chaque section = hero coloré + container qui reçoit les tuiles DOJO filtrées
+     ══════════════════════════════════════════════════════════ -->
+<style>
+.cat-hero{padding:clamp(28px,5vw,48px) clamp(16px,4vw,32px);text-align:center;position:relative;overflow:hidden}
+.cat-hero-icon{font-size:clamp(50px,8vw,72px);line-height:1;margin-bottom:8px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.4))}
+.cat-hero-title{font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(32px,6vw,58px);font-weight:900;letter-spacing:4px;line-height:1;margin-bottom:8px;text-shadow:0 4px 20px rgba(0,0,0,.4)}
+.cat-hero-sub{font-family:'Barlow Condensed',sans-serif;font-size:clamp(13px,1.8vw,16px);color:#cfd3e0;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:clamp(16px,2.5vw,22px)}
+.cat-back-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(13,17,23,.6);border:1.5px solid rgba(245,197,24,.4);color:#f5c518;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:13px;letter-spacing:2px;font-weight:800;cursor:pointer;padding:9px 20px;margin-bottom:clamp(14px,2vw,20px);transition:all .2s}
+.cat-back-btn:hover{background:rgba(245,197,24,.1);border-color:#f5c518}
+.cat-tiles-container{display:grid;gap:clamp(14px,2vw,22px);grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));max-width:1100px;margin:0 auto;padding:0 clamp(12px,3vw,24px) clamp(40px,6vw,80px)}
+.cat-tiles-container > button{min-height:160px}
+@media (min-width:900px){.cat-tiles-container{grid-template-columns:repeat(3,1fr)}}
+</style>
+
+<div id="s-cat-train" class="section" style="background:linear-gradient(180deg,rgba(230,57,70,.08) 0%,#0a0d14 300px)">
+  <div class="cat-hero">
+    <button class="cat-back-btn" onclick="_dojoBackHome()">← <span data-i18n="cat_back">RETOUR AU DOJO</span></button>
+    <div class="cat-hero-icon">💪</div>
+    <div class="cat-hero-title" style="color:#e63946" data-i18n="dojo_cat_train">M'ENTRAÎNER</div>
+    <div class="cat-hero-sub" data-i18n="cat_train_tagline">Génère ta séance · Travaille la caméra · Progresse</div>
+  </div>
+  <div class="cat-tiles-container" id="cat-tiles-train"></div>
+</div>
+
+<div id="s-cat-play" class="section" style="background:linear-gradient(180deg,rgba(76,201,240,.08) 0%,#0a0d14 300px)">
+  <div class="cat-hero">
+    <button class="cat-back-btn" onclick="_dojoBackHome()">← <span data-i18n="cat_back">RETOUR AU DOJO</span></button>
+    <div class="cat-hero-icon">🎮</div>
+    <div class="cat-hero-title" style="color:#4cc9f0" data-i18n="dojo_cat_play">JOUER</div>
+    <div class="cat-hero-sub" data-i18n="cat_play_tagline">9 jeux arcade · Teste ton QI Basket</div>
+  </div>
+  <div class="cat-tiles-container" id="cat-tiles-play"></div>
+</div>
+
+<div id="s-cat-learn" class="section" style="background:linear-gradient(180deg,rgba(159,100,230,.08) 0%,#0a0d14 300px)">
+  <div class="cat-hero">
+    <button class="cat-back-btn" onclick="_dojoBackHome()">← <span data-i18n="cat_back">RETOUR AU DOJO</span></button>
+    <div class="cat-hero-icon">🎓</div>
+    <div class="cat-hero-title" style="color:#9f64e6" data-i18n="dojo_cat_learn">APPRENDRE</div>
+    <div class="cat-hero-sub" data-i18n="cat_learn_tagline">Tactique · Science · Nutrition · Règles</div>
+  </div>
+  <div class="cat-tiles-container" id="cat-tiles-learn"></div>
+</div>
+
+<div id="s-cat-prog" class="section" style="background:linear-gradient(180deg,rgba(245,197,24,.08) 0%,#0a0d14 300px)">
+  <div class="cat-hero">
+    <button class="cat-back-btn" onclick="_dojoBackHome()">← <span data-i18n="cat_back">RETOUR AU DOJO</span></button>
+    <div class="cat-hero-icon">📊</div>
+    <div class="cat-hero-title" style="color:#f5c518" data-i18n="dojo_cat_prog">PROGRESSION</div>
+    <div class="cat-hero-sub" data-i18n="cat_prog_tagline">Ton personnage · Battle Royal · GOAT</div>
+  </div>
+  <div class="cat-tiles-container" id="cat-tiles-prog"></div>
+</div>
+
+<div id="s-cat-com" class="section" style="background:linear-gradient(180deg,rgba(34,197,94,.08) 0%,#0a0d14 300px)">
+  <div class="cat-hero">
+    <button class="cat-back-btn" onclick="_dojoBackHome()">← <span data-i18n="cat_back">RETOUR AU DOJO</span></button>
+    <div class="cat-hero-icon">🌍</div>
+    <div class="cat-hero-title" style="color:#22c55e" data-i18n="dojo_cat_com">COMMUNAUTÉ</div>
+    <div class="cat-hero-sub" data-i18n="cat_com_tagline">Le Sensei · Réseau · Opportunités</div>
+  </div>
+  <div class="cat-tiles-container" id="cat-tiles-com">
+    <!-- Cards communauté dédiées (pas de tuiles DOJO dans cette catégorie, on affiche des raccourcis directs) -->
+    <button onclick="showSection('coach',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">🧑‍🏫</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">LE SENSEI</div>
+        <div style="font-size:12px;color:#cfd3e0">Thibault NJECKIL · Mon histoire</div>
+      </div>
+    </button>
+    <button onclick="showSection('network',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">🌐</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">NETWORK</div>
+        <div style="font-size:12px;color:#cfd3e0">Rejoindre la communauté SENSEI</div>
+      </div>
+    </button>
+    <button onclick="showSection('opportunities',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">🚀</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">OPPORTUNITÉS</div>
+        <div style="font-size:12px;color:#cfd3e0">Carrière · Clubs · Universités</div>
+      </div>
+    </button>
+    <button onclick="showSection('reserver',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">📅</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">RÉSERVER</div>
+        <div style="font-size:12px;color:#cfd3e0">Session avec le Sensei</div>
+      </div>
+    </button>
+    <button onclick="showSection('inscription',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">✍️</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">S'INSCRIRE</div>
+        <div style="font-size:12px;color:#cfd3e0">Rejoindre SENSEI</div>
+      </div>
+    </button>
+    <button onclick="showSection('testi',null)" style="cursor:pointer;background:linear-gradient(160deg,rgba(34,197,94,.15),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:clamp(18px,2.5vw,24px);color:#fff;text-align:left;transition:transform .2s;font-family:inherit;min-height:160px;display:flex;flex-direction:column;justify-content:space-between" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:clamp(32px,4vw,42px);line-height:1">⭐</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.5vw,22px);letter-spacing:1.5px;color:#22c55e;margin-bottom:4px">AVIS</div>
+        <div style="font-size:12px;color:#cfd3e0">Témoignages des athlètes</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══ NAVIGATION DOJO par catégorie (option C) ═══════════════════════════
+// Les 12 tuiles DOJO vivent dans #dojo-tiles-grid (home, caché).
+// Au clic sur une card catégorie : on déplace les tuiles correspondantes
+// dans la section catégorie, puis on affiche cette section.
+// Au retour : on remet les tuiles dans la grille DOJO d'origine.
+window._dojoShowCat = function(cat){
+  try {
+    var sourceGrid = document.getElementById('dojo-tiles-grid');
+    var targetId = 'cat-tiles-' + cat;
+    var target = document.getElementById(targetId);
+    if (!sourceGrid || !target) return;
+    // 1) Déplacer les tuiles correspondantes (data-cat === cat)
+    var tiles = sourceGrid.querySelectorAll('button[data-cat="' + cat + '"]');
+    tiles.forEach(function(t){
+      t.style.display = '';  // reset display si masqué par filtre précédent
+      target.appendChild(t);
+    });
+    // 2) Afficher la section catégorie
+    if (typeof showSection === 'function') {
+      showSection('cat-' + cat, null);
+    } else {
+      // Fallback : masquer home, afficher cat
+      var home = document.getElementById('s-home'); if (home) home.classList.remove('active');
+      var sec = document.getElementById('s-cat-' + cat); if (sec) sec.classList.add('active');
+    }
+    try { window.scrollTo({top:0, behavior:'instant'}); } catch(e){ window.scrollTo(0,0); }
+  } catch(e){ console.warn('_dojoShowCat error:', e); }
+};
+// Retour home : remettre les tuiles dans dojo-tiles-grid
+window._dojoBackHome = function(){
+  try {
+    var sourceGrid = document.getElementById('dojo-tiles-grid');
+    if (sourceGrid) {
+      // Pour chaque section cat, récupérer les tuiles et les remettre dans la grille source
+      ['train','play','learn','prog'].forEach(function(cat){
+        var container = document.getElementById('cat-tiles-' + cat);
+        if (!container) return;
+        var tiles = container.querySelectorAll('button[data-cat="' + cat + '"]');
+        tiles.forEach(function(t){ sourceGrid.appendChild(t); });
+      });
+    }
+    if (typeof showSection === 'function') {
+      showSection('home', null);
+    }
+    try { window.scrollTo({top:0, behavior:'instant'}); } catch(e){ window.scrollTo(0,0); }
+  } catch(e){ console.warn('_dojoBackHome error:', e); }
+};
+</script>
 
 <!-- ══════════════════════════════════════════════════════════
      TRAINING MODE — 5 modules SENSEI
@@ -8100,27 +8311,32 @@ function showOnboardingIfNeeded() {
       window._dojoGate_show();
       return;
     }
-    var ONBOARDING_VERSION = '2026.08.08';
+    var ONBOARDING_VERSION = '2026.10.06';
     // Test bypass : ?onboarding=1 dans l'URL force l'affichage
     var forceShow = (location.search || '').indexOf('onboarding=1') >= 0;
     var seenVersion = localStorage.getItem('sensei_onboarding_seen_v');
     if (!forceShow && seenVersion === ONBOARDING_VERSION) return;
-    var m = document.getElementById('onboarding-modal');
+    // ═══ Flow simplifié (Option A validée) : skip le modal 7 tuiles,
+    // afficher directement le modal des 5 piliers (nouvelle archi)
+    var m = document.getElementById('onboarding-pillars-modal');
     if (!m) return;
     m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     try { if (typeof applyLang === 'function') applyLang(); } catch(e2) {}
-    if (typeof onboardingSpawnParticles === 'function') onboardingSpawnParticles();
-    if (typeof onboardingCycleMath === 'function') onboardingCycleMath();
+    // Marquer l'ancien onboarding comme vu pour éviter qu'il réapparaisse
+    try { localStorage.setItem('sensei_onboarding_seen_v', ONBOARDING_VERSION); } catch(e3){}
   } catch(e) {}
 }
 function showOnboardingForce() {
   try {
-    var m = document.getElementById('onboarding-modal');
+    // ═══ Flow simplifié : ouvre directement le modal des 5 piliers
+    var m = document.getElementById('onboarding-pillars-modal');
     if (!m) return;
     m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     try { if (typeof applyLang === 'function') applyLang(); } catch(e2) {}
-    if (typeof onboardingSpawnParticles === 'function') onboardingSpawnParticles();
-    if (typeof onboardingCycleMath === 'function') onboardingCycleMath();
+    // Reset du flag pillars pour permettre une nouvelle visite
+    try { localStorage.removeItem('sensei_onb_pillars_seen'); } catch(e3){}
   } catch(e) {}
 }
 function onboardingSpawnParticles() {
@@ -8153,7 +8369,7 @@ function onboardingCycleMath() {
   }, 2200);
 }
 function onboardingClose() {
-  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.08.08'); } catch(e) {}
+  try { localStorage.setItem('sensei_onboarding_seen_v', '2026.10.06'); } catch(e) {}
   var m = document.getElementById('onboarding-modal');
   if (m) {
     m.style.opacity = '0';
@@ -10638,12 +10854,146 @@ function oppDisplayResults(top, region, en, profile) {
       <div style="color:#f5c518;font-size:20px;font-weight:700;flex-shrink:0">→</div>
     </button>
 
-    <!-- Skip -->
-    <button onclick="onboardingSkip()" data-i18n="onb_skip" style="background:transparent;border:none;color:#7b82a0;font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;padding:10px 20px;animation:onbSlideUp .9s .6s ease-out backwards;transition:color .2s">
-      Plus tard →
+    <!-- CTA DÉCOUVRIR + bouton Plus tard -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:clamp(14px,2vw,22px)">
+      <button onclick="onboardingGoToPillars()" style="background:linear-gradient(135deg,#f5c518,#e0a800);color:#0d1117;border:none;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(13px,1.8vw,16px);letter-spacing:2.5px;font-weight:900;cursor:pointer;padding:13px 32px;box-shadow:0 6px 20px rgba(245,197,24,.4);animation:onbSlideUp .9s .55s ease-out backwards">
+        <span data-i18n="onb_discover">▶ DÉCOUVRIR LES 5 UNIVERS</span>
+      </button>
+      <button onclick="onboardingSkip()" data-i18n="onb_skip" style="background:transparent;border:none;color:#7b82a0;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1.5px;cursor:pointer;text-transform:uppercase;padding:6px 20px;animation:onbSlideUp .9s .7s ease-out backwards;transition:color .2s">
+        Plus tard →
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+// Transition explicite du slide 1 au slide 2 (ne dépend plus seulement du hook onboardingSkip)
+window.onboardingGoToPillars = function(){
+  try {
+    // Ferme le slide 1
+    var m1 = document.getElementById('onboarding-modal');
+    if (m1) m1.style.display = 'none';
+    // Marque le slide 1 comme vu
+    try { localStorage.setItem('sensei_onboarding_seen_v', '2026.10.06'); } catch(e){}
+    // Ouvre le slide 2 (pillars)
+    setTimeout(function(){
+      var m2 = document.getElementById('onboarding-pillars-modal');
+      if (m2) { m2.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    }, 150);
+  } catch(e){ console.warn('onboardingGoToPillars error:', e); }
+};
+</script>
+
+<!-- ═══════════ SLIDE 2 ONBOARDING : les 5 piliers de SENSEI ═══════════ -->
+<div id="onboarding-pillars-modal" style="display:none;position:fixed;inset:0;z-index:100002;align-items:center;justify-content:center;padding:18px;overflow-y:auto;background:linear-gradient(180deg,rgba(5,8,15,.78),rgba(0,0,0,.88)),url('dojo-bg.jpg') center center / cover no-repeat;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:onbFadeIn .4s ease-out">
+  <div style="max-width:900px;width:100%;padding:clamp(20px,4vw,40px) 0;text-align:center;color:#fff">
+    <!-- Logo -->
+    <div style="margin-bottom:clamp(10px,2vw,20px);animation:onbSlideDown .6s ease-out backwards">
+      <img src="logo.png" alt="SENSEI" style="width:clamp(60px,12vw,100px);height:auto;filter:drop-shadow(0 4px 20px rgba(245,197,24,.4))">
+    </div>
+    <!-- Titre -->
+    <div data-i18n="onb_pillars_title" style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:clamp(26px,6vw,52px);color:#f5c518;letter-spacing:3px;line-height:1;margin-bottom:10px;animation:onbSlideUp .6s .1s ease-out backwards">
+      SENSEI, C'EST 5 UNIVERS
+    </div>
+    <!-- Sous-titre -->
+    <div data-i18n="onb_pillars_sub" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(13px,2vw,16px);color:#cfd3e0;letter-spacing:1px;margin-bottom:clamp(20px,3vw,32px);animation:onbSlideUp .6s .2s ease-out backwards">
+      Progression martiale, pédagogie scientifique, outils augmentés par l'IA.
+    </div>
+    <!-- Grille 5 piliers -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;max-width:860px;margin:0 auto clamp(20px,3vw,32px);animation:onbSlideUp .7s .3s ease-out backwards">
+      <!-- 💪 M'ENTRAÎNER -->
+      <div style="background:linear-gradient(160deg,rgba(230,57,70,.14),rgba(13,17,23,.6));border:1.5px solid rgba(230,57,70,.5);border-radius:14px;padding:18px 14px">
+        <div style="font-size:36px;line-height:1;margin-bottom:6px">💪</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#e63946;margin-bottom:4px" data-i18n="onb_pil_train_t">M'ENTRAÎNER</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4" data-i18n="onb_pil_train_d">SENSEI IA · 7 disciplines · Playbook</div>
+      </div>
+      <!-- 🎮 JOUER -->
+      <div style="background:linear-gradient(160deg,rgba(76,201,240,.14),rgba(13,17,23,.6));border:1.5px solid rgba(76,201,240,.5);border-radius:14px;padding:18px 14px">
+        <div style="font-size:36px;line-height:1;margin-bottom:6px">🎮</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#4cc9f0;margin-bottom:4px" data-i18n="onb_pil_play_t">JOUER & TESTER</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4" data-i18n="onb_pil_play_d">9 jeux arcade · QI Basket · Battle</div>
+      </div>
+      <!-- 🎓 APPRENDRE -->
+      <div style="background:linear-gradient(160deg,rgba(123,45,139,.18),rgba(13,17,23,.6));border:1.5px solid rgba(159,100,230,.5);border-radius:14px;padding:18px 14px">
+        <div style="font-size:36px;line-height:1;margin-bottom:6px">🎓</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#9f64e6;margin-bottom:4px" data-i18n="onb_pil_learn_t">APPRENDRE</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4" data-i18n="onb_pil_learn_d">Bibliothèque · Laboratoire · Science</div>
+      </div>
+      <!-- 📊 MA PROGRESSION -->
+      <div style="background:linear-gradient(160deg,rgba(245,197,24,.14),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.5);border-radius:14px;padding:18px 14px">
+        <div style="font-size:36px;line-height:1;margin-bottom:6px">📊</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#f5c518;margin-bottom:4px" data-i18n="onb_pil_prog_t">MA PROGRESSION</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4" data-i18n="onb_pil_prog_d">9 ceintures · Stats · Personnage</div>
+      </div>
+      <!-- 🌍 COMMUNAUTÉ -->
+      <div style="background:linear-gradient(160deg,rgba(34,197,94,.14),rgba(13,17,23,.6));border:1.5px solid rgba(34,197,94,.5);border-radius:14px;padding:18px 14px">
+        <div style="font-size:36px;line-height:1;margin-bottom:6px">🌍</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#22c55e;margin-bottom:4px" data-i18n="onb_pil_com_t">COMMUNAUTÉ</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:0.5px;line-height:1.4" data-i18n="onb_pil_com_d">Le Sensei · Network · Opportunités</div>
+      </div>
+    </div>
+    <!-- CTA entrer -->
+    <button onclick="onboardingPillarsClose()" style="background:linear-gradient(135deg,#f5c518,#e0a800);color:#0d1117;border:none;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(14px,2vw,18px);letter-spacing:3px;font-weight:900;cursor:pointer;padding:14px 36px;box-shadow:0 6px 20px rgba(245,197,24,.4);animation:onbSlideUp .7s .5s ease-out backwards">
+      <span data-i18n="onb_pillars_cta">▶ ENTRER DANS LE DOJO</span>
     </button>
   </div>
 </div>
+<script>
+// ═══ Filtrage des tuiles DOJO par catégorie ═══
+window._dojoFilterCat = function(cat, btn){
+  try {
+    // 1) Reset de toutes les chips → style inactive
+    var chips = document.querySelectorAll('.dojo-cat-chip');
+    var colorMap = {
+      'all':   {bg:'#f5c518', border:'rgba(245,197,24,.5)',  active:'#f5c518'},
+      'train': {bg:'transparent', border:'rgba(230,57,70,.5)',  color:'#e63946'},
+      'play':  {bg:'transparent', border:'rgba(76,201,240,.5)', color:'#4cc9f0'},
+      'learn': {bg:'transparent', border:'rgba(159,100,230,.5)',color:'#9f64e6'},
+      'prog':  {bg:'transparent', border:'rgba(245,197,24,.5)', color:'#f5c518'},
+      'com':   {bg:'transparent', border:'rgba(34,197,94,.5)',  color:'#22c55e'}
+    };
+    chips.forEach(function(c){
+      var cCat = c.getAttribute('data-cat');
+      var m = colorMap[cCat] || colorMap['all'];
+      c.classList.remove('active');
+      c.style.background = 'transparent';
+      c.style.color = m.color || m.active;
+      c.style.border = '1.5px solid ' + m.border;
+    });
+    // 2) Activer la chip cliquée
+    if (btn) {
+      btn.classList.add('active');
+      var m = colorMap[cat] || colorMap['all'];
+      if (cat === 'all') {
+        btn.style.background = '#f5c518';
+        btn.style.color = '#0d1117';
+        btn.style.border = 'none';
+      } else {
+        btn.style.background = m.color;
+        btn.style.color = '#0d1117';
+        btn.style.border = 'none';
+      }
+    }
+    // 3) Filtrer les tuiles
+    var tiles = document.querySelectorAll('#dojo-tiles-grid > button');
+    tiles.forEach(function(t){
+      var tCat = t.getAttribute('data-cat');
+      if (cat === 'all' || tCat === cat) {
+        t.style.display = '';
+      } else {
+        t.style.display = 'none';
+      }
+    });
+  } catch(e){ console.warn('_dojoFilterCat error:', e); }
+};
+
+window.onboardingPillarsClose = function(){
+  var m = document.getElementById('onboarding-pillars-modal');
+  if (m) m.style.display = 'none';
+  document.body.style.overflow = '';
+  try { localStorage.setItem('sensei_onb_pillars_seen','1'); } catch(e){}
+};
+// Hook retiré : le modal pillars s'ouvre maintenant directement via showOnboardingIfNeeded() (Option A validée).
+</script>
 
 <style>
 @keyframes onbFadeIn { from{opacity:0} to{opacity:1} }
@@ -10865,6 +11215,8 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 <style>
 #dojo-canvas { opacity: 0; transition: opacity .5s; }
 #dojo-canvas.active { opacity: 1; display: block !important; }
+
+
 
 /* ─── Pendant la rotation d'écran : libérer le GPU pour un repaint instantané ─── */
 /* 1. Désactiver backdrop-filter (le plus lourd GPU) */
@@ -13359,7 +13711,7 @@ function applyLangTracker(lang) {
     footer_privacy:'Confidentialit\u00e9', footer_legal:'Mentions l\u00e9gales', footer_contact:'Contact', footer_share:'\ud83d\udce4 Partager SENSEI', sm_voice_off:'\ud83d\udd07 Coach vocal', sm_voice_on:'\ud83d\udd0a Coach vocal ON', sm_wake_off:'\ud83c\udf19 \u00c9cran allum\u00e9', sm_wake_on:'\u2600\ufe0f \u00c9cran allum\u00e9 ON', sm_voice_hello:'Coach vocal activ\u00e9. Bienvenue dans SENSEI.', sm_wake_hello:'\u00c9cran allum\u00e9.', ss_title:'\ud83c\udfa5 SHOOTING SESSION', ss_intro:'Pose ton tr\u00e9pied, lance la session, shoote librement. L\'app analyse ta posture pendant que tu t\'entra\u00eenes \u2014 sans que tu touches ton t\u00e9l\u00e9phone.', ss_status_analyze:'\ud83e\udde0 Analyse en cours\u2026', ss_btn_start:'\u25b6 D\u00c9MARRER LA SESSION', ss_btn_stop:'\u23f9 TERMINER', ss_summary_title:'\ud83d\udcca R\u00c9SUM\u00c9 DE TA SESSION', ss_m1:'Dur\u00e9e', ss_m2:'Temps actif', ss_m2r:'Temps de repos', ss_m3:'Constance posturale', ss_m4:'\u00c9quilibre', ss_no_camera:'Cam\u00e9ra non accessible sur cet appareil.', ss_no_movenet:'MoveNet indisponible. R\u00e9essaie dans quelques secondes.', qr_title:'SCANNE POUR D\u00c9COUVRIR SENSEI', qr_sub:'L\u2019app basketball fond\u00e9e sur la science', qr_copy:'\ud83d\udccb Copier le lien', qr_share:'\ud83d\udce4 Partager', qr_copied:'Lien copi\u00e9 !',
     hero_world_title:"PREMI\u00c8RE MONDIALE : UNE APP DE BASKET FOND\u00c9E SUR LA SCIENCE, LES MATH\u00c9MATIQUES ET L'IA",
     hero_ob_tag:"L'art martial du basketteur",
-    hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br><strong>et propuls\u00e9e par l'IA</strong>, pour les basketteurs<br>qui veulent aller plus loin.",
+    hero_ob_msg:"Bienvenue dans <strong>SENSEI</strong>.<br>L'app pens\u00e9e par un vulgarisateur scientifique<br>et propuls\u00e9e par la <strong style=\"color:#f5c518;letter-spacing:1px\">SUPERINTELLIGENCE</strong><br>(l'Intelligence Humaine du <strong>SENSEI</strong> et l'Intelligence Artificielle),<br>pour les basketteurs qui veulent aller plus loin.",
     hero_ob_btn:"D\u00c9COUVRIR \u2728",
     dojo_gate_welcome:"\ud83e\udd4b BIENVENUE DANS LE D\u014cJ\u014c",
     dojo_gate_tagline:"L'art martial du basketteur",
@@ -13618,6 +13970,39 @@ function applyLangTracker(lang) {
     opp_match_reset:'\u2190 Recommencer',
     // Onboarding accueil
     onb_title:'BIENVENUE !',
+    onb_discover:'\u25b6 D\u00c9COUVRIR LES 5 UNIVERS',
+    onb_pillars_title:'SENSEI, C\'EST 5 UNIVERS',
+    onb_pillars_sub:'Progression martiale, p\u00e9dagogie scientifique, outils augment\u00e9s par l\'IA.',
+    onb_pil_train_t:'M\'ENTRA\u00ceNER',
+    onb_pil_train_d:'SENSEI IA \u00b7 7 disciplines \u00b7 Playbook',
+    onb_pil_play_t:'JOUER & TESTER',
+    onb_pil_play_d:'9 jeux arcade \u00b7 QI Basket \u00b7 Battle',
+    onb_pil_learn_t:'APPRENDRE',
+    onb_pil_learn_d:'Biblioth\u00e8que \u00b7 Laboratoire \u00b7 Science',
+    onb_pil_prog_t:'MA PROGRESSION',
+    onb_pil_prog_d:'9 ceintures \u00b7 Stats \u00b7 Personnage',
+    onb_pil_com_t:'COMMUNAUT\u00c9',
+    onb_pil_com_d:'Le Sensei \u00b7 Network \u00b7 Opportunit\u00e9s',
+    onb_pillars_cta:'\u25b6 ENTRER DANS LE DOJO',
+    dojo_cat_all:'TOUT',
+    dojo_cat_train:'M\'ENTRA\u00ceNER',
+    dojo_cat_play:'JOUER',
+    dojo_cat_learn:'APPRENDRE',
+    dojo_cat_prog:'PROGRESSION',
+    dojo_cat_com:'COMMUNAUT\u00c9',
+    dojo_welcome:'BIENVENUE DANS LE DOJO',
+    dojo_welcome_sub:'Human-led. AI-powered. 🥋',
+    dojo_cat_train_sub:'5 outils · SENSEI IA · Caméra',
+    dojo_cat_play_sub:'2 modules · Arcade · QI',
+    dojo_cat_learn_sub:'3 outils · Playbook · Science',
+    dojo_cat_prog_sub:'2 outils · Personnage · GOAT',
+    dojo_cat_com_sub:'Le Sensei · Network',
+    cat_back:'RETOUR AU DOJO',
+    cat_train_tagline:'Génère ta séance · Travaille la caméra · Progresse',
+    cat_play_tagline:'9 jeux arcade · Teste ton QI Basket',
+    cat_learn_tagline:'Tactique · Science · Nutrition · Règles',
+    cat_prog_tagline:'Ton personnage · Battle Royal · GOAT',
+    cat_com_tagline:'Le Sensei · Réseau · Opportunités',
     onb_subtitle:'Essaie un drill maintenant \u2014 sans inscription',
     onb_positioning:'\ud83e\udd4b Pour les coachs \u00b7 \ud83c\udfc0 Pour les athl\u00e8tes d\u00e9termin\u00e9s',
     onb_tdr_title:'R\u00c9ACTION',
@@ -13685,7 +14070,7 @@ function applyLangTracker(lang) {
     footer_privacy:'Privacy', footer_legal:'Legal Notice', footer_contact:'Contact', footer_share:'\ud83d\udce4 Share SENSEI', sm_voice_off:'\ud83d\udd07 Voice coach', sm_voice_on:'\ud83d\udd0a Voice coach ON', sm_wake_off:'\ud83c\udf19 Keep screen on', sm_wake_on:'\u2600\ufe0f Screen ON', sm_voice_hello:'Voice coach activated. Welcome to SENSEI.', sm_wake_hello:'Screen on.', ss_title:'\ud83c\udfa5 SHOOTING SESSION', ss_intro:'Set up your tripod, start the session, shoot freely. The app analyzes your posture while you train \u2014 without touching your phone.', ss_status_analyze:'\ud83e\udde0 Analyzing\u2026', ss_btn_start:'\u25b6 START SESSION', ss_btn_stop:'\u23f9 FINISH', ss_summary_title:'\ud83d\udcca SESSION SUMMARY', ss_m1:'Duration', ss_m2:'Active time', ss_m2r:'Rest time', ss_m3:'Postural consistency', ss_m4:'Balance', ss_no_camera:'Camera not accessible on this device.', ss_no_movenet:'MoveNet unavailable. Try again in a few seconds.', qr_title:'SCAN TO DISCOVER SENSEI', qr_sub:'The basketball app built on science', qr_copy:'\ud83d\udccb Copy link', qr_share:'\ud83d\udce4 Share', qr_copied:'Link copied!',
     hero_world_title:"WORLD PREMIERE: A BASKETBALL APP BUILT ON SCIENCE, MATHEMATICS AND AI",
     hero_ob_tag:"The basketball player's martial art",
-    hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br><strong>and powered by AI</strong>, for basketball players<br>who want to go further.",
+    hero_ob_msg:"Welcome to <strong>SENSEI</strong>.<br>The app designed by a science communicator<br>and powered by <strong style=\"color:#f5c518;letter-spacing:1px\">SUPERINTELLIGENCE</strong><br>(the SENSEI's Human Intelligence and Artificial Intelligence),<br>for basketball players who want to go further.",
     hero_ob_btn:"DISCOVER \u2728",
     dojo_gate_welcome:"\ud83e\udd4b WELCOME TO THE D\u014cJ\u014c",
     dojo_gate_tagline:"The martial art of the basketball player",
@@ -13944,6 +14329,39 @@ function applyLangTracker(lang) {
     opp_match_reset:'\u2190 Start over',
     // Onboarding
     onb_title:'WELCOME!',
+    onb_discover:'\u25b6 DISCOVER THE 5 UNIVERSES',
+    onb_pillars_title:'SENSEI IS 5 UNIVERSES',
+    onb_pillars_sub:'Martial progression, scientific pedagogy, AI-augmented tools.',
+    onb_pil_train_t:'TRAIN',
+    onb_pil_train_d:'SENSEI AI \u00b7 7 disciplines \u00b7 Playbook',
+    onb_pil_play_t:'PLAY & TEST',
+    onb_pil_play_d:'9 arcade games \u00b7 Basketball IQ \u00b7 Battle',
+    onb_pil_learn_t:'LEARN',
+    onb_pil_learn_d:'Library \u00b7 Lab \u00b7 Science',
+    onb_pil_prog_t:'MY PROGRESS',
+    onb_pil_prog_d:'9 belts \u00b7 Stats \u00b7 Character',
+    onb_pil_com_t:'COMMUNITY',
+    onb_pil_com_d:'The Sensei \u00b7 Network \u00b7 Opportunities',
+    onb_pillars_cta:'\u25b6 ENTER THE DOJO',
+    dojo_cat_all:'ALL',
+    dojo_cat_train:'TRAIN',
+    dojo_cat_play:'PLAY',
+    dojo_cat_learn:'LEARN',
+    dojo_cat_prog:'PROGRESS',
+    dojo_cat_com:'COMMUNITY',
+    dojo_welcome:'WELCOME TO THE DOJO',
+    dojo_welcome_sub:'Human-led. AI-powered. 🥋',
+    dojo_cat_train_sub:'5 tools · SENSEI AI · Camera',
+    dojo_cat_play_sub:'2 modules · Arcade · IQ',
+    dojo_cat_learn_sub:'3 tools · Playbook · Science',
+    dojo_cat_prog_sub:'2 tools · Character · GOAT',
+    dojo_cat_com_sub:'The Sensei · Network',
+    cat_back:'BACK TO DOJO',
+    cat_train_tagline:'Generate your session · Camera analysis · Progress',
+    cat_play_tagline:'9 arcade games · Test your Basketball IQ',
+    cat_learn_tagline:'Tactics · Science · Nutrition · Rules',
+    cat_prog_tagline:'Your character · Battle Royal · GOAT',
+    cat_com_tagline:'The Sensei · Network · Opportunities',
     onb_subtitle:'Try a drill now \u2014 no sign-up needed',
     onb_positioning:'\ud83e\udd4b For coaches \u00b7 \ud83c\udfc0 For determined athletes',
     onb_tdr_title:'REACTION',
@@ -44721,8 +45139,9 @@ window._askPseudoIfNeeded = function(callback){
       <div class="ho-msg" data-i18n="hero_ob_msg">
         Bienvenue dans <strong>SENSEI</strong>.<br>
         L'app pensée par un vulgarisateur scientifique<br>
-        <strong>et propulsée par l'IA</strong>, pour les basketteurs<br>
-        qui veulent aller plus loin.
+        et propulsée par la <strong style="color:#f5c518;letter-spacing:1px">SUPERINTELLIGENCE</strong><br>
+        (l'Intelligence Humaine du <strong>SENSEI</strong> et l'Intelligence Artificielle),<br>
+        pour les basketteurs qui veulent aller plus loin.
       </div>
       <div style="margin-top:14px;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-size:clamp(11px,1.5vw,13px);color:#f5c518;letter-spacing:1.5px;text-align:center;font-style:italic;opacity:0.9;line-height:1.4;padding:0 12px" data-i18n="hero_ob_ai_line">✨ Propulsée par <strong style="font-style:normal;letter-spacing:2px">5 technologies d'IA</strong> — vision computer, séance générée par IA, apprentissage adaptatif, matching intelligent et profilage cognitif</div>
       <button class="ho-btn" onclick="_heroOnboarding_next()" data-i18n="hero_ob_btn">DÉCOUVRIR ✨</button>
