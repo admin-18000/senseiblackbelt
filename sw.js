@@ -46,6 +46,12 @@ const CDN_PATTERNS = [
   'cdnjs.cloudflare.com',
   'fonts.googleapis.com',
   'fonts.gstatic.com',
+  // Modèle MoveNet SinglePose Lightning — poids du réseau neuronal
+  // → Cache-First : fichiers immuables versionnés par URL (ex: /movenet/singlepose/lightning/4/)
+  // → Permet au Ball Tracker / Shooting Session / Training Mode d'être utilisables hors-ligne après 1er chargement
+  'tfhub.dev',
+  'storage.googleapis.com/tfjs-models',
+  'storage.googleapis.com/tfhub-tfjs-modules',
 ];
 
 const SELF_ORIGIN_PATTERNS = [

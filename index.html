@@ -30591,18 +30591,20 @@ function _tdr_spawnTarget() {
   // Y entre 32% et 50% : SOUS la grille HUD (timer + score) et AU-DESSUS
   // de la zone de dribble naturel (60-100% H).
   var radius = Math.round(Math.min(W * 0.075, H * 0.13));
+  // Palette alignée charte SENSEI : vert (COM), bleu (PLAY), or (primaire), orange (chaud),
+  // rouge (TRAIN), violet (LEARN) — toutes CVD-friendly par séparation en luminance.
   var positions = [
     // Rangée haute (Y = 34% de H) — gauche → droite
-    {x: W*0.12, y: H*0.34, color:'#2dc653'},
-    {x: W*0.30, y: H*0.34, color:'#4ecdc4'},
-    {x: W*0.50, y: H*0.32, color:'#f5c518'},
-    {x: W*0.70, y: H*0.34, color:'#e87c2a'},
-    {x: W*0.88, y: H*0.34, color:'#e63946'},
+    {x: W*0.12, y: H*0.34, color:'#22c55e'},  // vert ceinture (dojo_cat_com)
+    {x: W*0.30, y: H*0.34, color:'#4cc9f0'},  // bleu cognitif (dojo_cat_play)
+    {x: W*0.50, y: H*0.32, color:'#f5c518'},  // or SENSEI
+    {x: W*0.70, y: H*0.34, color:'#f97316'},  // orange chaud
+    {x: W*0.88, y: H*0.34, color:'#e63946'},  // rouge accent (dojo_cat_train)
     // Rangée médiane (Y = 48% de H) — gauche → droite
-    {x: W*0.20, y: H*0.48, color:'#7b2d8b'},
-    {x: W*0.40, y: H*0.46, color:'#2dc653'},
-    {x: W*0.60, y: H*0.46, color:'#f5c518'},
-    {x: W*0.80, y: H*0.48, color:'#e63946'},
+    {x: W*0.20, y: H*0.48, color:'#9f64e6'},  // violet cognition (dojo_cat_learn)
+    {x: W*0.40, y: H*0.46, color:'#22c55e'},  // vert ceinture
+    {x: W*0.60, y: H*0.46, color:'#f5c518'},  // or SENSEI
+    {x: W*0.80, y: H*0.48, color:'#e63946'},  // rouge accent
   ];
   var count = _tdr_level === 'simple' ? 1 : _tdr_level === 'double' ? 2 : Math.floor(Math.random()*2)+1;
   // Mélange + filtrage anti-chevauchement
@@ -32004,7 +32006,8 @@ function _dcog_nextQuestion() {
   // le joueur doit re-scanner l'espace à chaque fois.
   var r = Math.round(Math.min(W * 0.075, H * 0.13));
 
-  var allColors = ['#2dc653','#e63946','#f5c518','#4ecdc4','#7b2d8b','#e87c2a'];
+  // Palette alignée charte SENSEI (cohérente avec TDR) : vert · rouge · or · bleu · violet · orange chaud
+  var allColors = ['#22c55e','#e63946','#f5c518','#4cc9f0','#9f64e6','#f97316'];
   var shuffledColors = allColors.slice().sort(function(){return Math.random()-0.5;});
   var colors = shuffledColors.slice(0,3);
 
@@ -32892,11 +32895,12 @@ function _dcog_tbScheduleChaos() {
     if (!_dcog_running || _dcog_tbMode !== 'chaos') return;
     // Choisir un stimulus aléatoire parmi 4 modes
     var en_ch = window._lang === 'en';
+    // Palette CHAOS alignée charte SENSEI — 4 couleurs discernables + CVD-friendly
     var stimuli = [
-      { text: 'SYNC',                                 color: '#4ecdc4', mode: 'sync'     },
-      { text: en_ch ? 'ALTERNATE' : 'ALTERNÉ',        color: '#e87c2a', mode: 'alternate'},
-      { text: en_ch ? 'HIGH'      : 'HAUT',           color: '#2dc653', mode: 'high'     },
-      { text: en_ch ? 'LOW'       : 'BAS',            color: '#f5c518', mode: 'low'      },
+      { text: 'SYNC',                                 color: '#4cc9f0', mode: 'sync'     }, // bleu PLAY
+      { text: en_ch ? 'ALTERNATE' : 'ALTERNÉ',        color: '#f97316', mode: 'alternate'}, // orange chaud
+      { text: en_ch ? 'HIGH'      : 'HAUT',           color: '#22c55e', mode: 'high'     }, // vert ceinture
+      { text: en_ch ? 'LOW'       : 'BAS',            color: '#f5c518', mode: 'low'      }, // or SENSEI
     ];
     var s = stimuli[Math.floor(Math.random() * stimuli.length)];
     _dcog_chaosCurrentMode = s.mode;
@@ -34163,6 +34167,26 @@ if('serviceWorker' in navigator){
       .catch(function(e){console.warn('[SENSEI SW]',e);});
   });
 }
+
+// ═══════ PRÉ-CHARGEMENT MoveNet / TF.js (E) ═══════
+// Prime le cache HTTP du navigateur et le cache du SW avec les fichiers du modèle,
+// pour que la 1ère activation d'une feature caméra soit instantanée.
+// Déclenché 2s après le load (ne bloque pas la peinture initiale).
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if (location.protocol === 'file:' || !window.fetch) return;
+    var MOVENET_PRELOADS = [
+      'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js',
+      'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.2.0/dist/tf-backend-wasm.min.js',
+      'https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js',
+      // Modèle MoveNet SinglePose Lightning (TF Hub)
+      'https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4/model.json?tfjs-format=file'
+    ];
+    MOVENET_PRELOADS.forEach(function(u){
+      try { fetch(u, { mode:'no-cors', cache:'force-cache' }).catch(function(){}); } catch(e){}
+    });
+  }, 2000);
+});
 </script>
 <script>
 
@@ -50538,6 +50562,16 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_countdownActive = false;
   var _ss_countdownValue = 0;
 
+  // ═══ Métriques biomécaniques (B + F) — angle de release + hauteur de saut ═══
+  // B. Angle au coude lors du release (épaule-coude-poignet) : indicateur clé du tir
+  // F. Hauteur de saut : min(hipY) - baseline(hipY sur 2s après countdown) → convertie en cm via shoulder width
+  var _ss_releaseAngles = [];    // array des angles en degrés détectés à chaque tir
+  var _ss_releaseHeights = [];   // array des hauteurs de release (% du cadre, 0 = bas, 1 = haut)
+  var _ss_hipYBaseline = null;   // Y hanches de référence (position debout, calculée sur les 2s après countdown)
+  var _ss_hipYSamples = [];      // échantillons pour calibrer la baseline
+  var _ss_hipYMin = null;        // Y hanches minimum atteint (saut le plus haut)
+  var _ss_shoulderWidthPx = null; // largeur épaules en px (référence pour conversion cm)
+
   function _t(key, fb) {
     try {
       var lang = (window._lang || document.body.getAttribute('data-lang') || 'fr');
@@ -50801,6 +50835,13 @@ body.si-banner-on { padding-top: 52px; }
     _ss_poseHistory = [];
     _ss_wristYHist = [];
     _ss_shotsCount = 0;
+    // Reset métriques biomécaniques (B+F)
+    _ss_releaseAngles = [];
+    _ss_releaseHeights = [];
+    _ss_hipYBaseline = null;
+    _ss_hipYSamples = [];
+    _ss_hipYMin = null;
+    _ss_shoulderWidthPx = null;
     _ss_recActive = false;
     _ss_recChunks = [];
 
@@ -50870,15 +50911,42 @@ body.si-banner-on { padding-top: 52px; }
           if (lh && rh && lh.score > 0.3 && rh.score > 0.3 && _ss_video) {
             var vw = _ss_video.videoWidth || 1;
             var vh = _ss_video.videoHeight || 1;
+            var hipYCenter = (lh.y + rh.y) / 2;
             _ss_lastPosePos = {
               x: (lh.x + rh.x) / 2 / vw,  // normalise 0-1
-              y: (lh.y + rh.y) / 2 / vh,  // normalise 0-1
+              y: hipYCenter / vh,          // normalise 0-1
               t: Date.now()
             };
             // 🎯 Informer les overlays de la position joueur pour mini-terrain
             try {
               if (window._senseiOverlays && window._senseiOverlays.updatePlayerPos) {
                 window._senseiOverlays.updatePlayerPos(_ss_lastPosePos.x, _ss_lastPosePos.y);
+              }
+            } catch(e){}
+
+            // 🏀 F. HAUTEUR DE SAUT — Baseline sur les 2 premières secondes, puis tracking min(Y)
+            try {
+              var elapsedSinceStart = Date.now() - _ss_startTime;
+              if (_ss_hipYBaseline === null && elapsedSinceStart < 2500) {
+                // Phase calibration : stocker les échantillons
+                _ss_hipYSamples.push(hipYCenter);
+                if (elapsedSinceStart >= 2000 && _ss_hipYSamples.length >= 5) {
+                  // Baseline = médiane des échantillons (plus robuste que la moyenne)
+                  var sorted = _ss_hipYSamples.slice().sort(function(a,b){ return a-b; });
+                  _ss_hipYBaseline = sorted[Math.floor(sorted.length/2)];
+                }
+              } else if (_ss_hipYBaseline !== null) {
+                // Phase tracking : min(Y) = hauteur de saut max
+                if (_ss_hipYMin === null || hipYCenter < _ss_hipYMin) {
+                  _ss_hipYMin = hipYCenter;
+                }
+              }
+              // Calibrer la largeur épaules pour conversion cm (robuste : moyenne glissante)
+              var ls_f = kp[5], rs_f = kp[6];
+              if (ls_f && rs_f && ls_f.score > 0.4 && rs_f.score > 0.4) {
+                var swPx = Math.sqrt(Math.pow(rs_f.x-ls_f.x,2) + Math.pow(rs_f.y-ls_f.y,2));
+                if (_ss_shoulderWidthPx === null) _ss_shoulderWidthPx = swPx;
+                else _ss_shoulderWidthPx = _ss_shoulderWidthPx * 0.9 + swPx * 0.1; // lissage
               }
             } catch(e){}
           }
@@ -50924,6 +50992,34 @@ body.si-banner-on { padding-top: 52px; }
               if (isShootPose && (now - (_ss_lastShotTs || 0)) > 1800) {
                 _ss_lastShotTs = now;
                 _ss_shotsCount++;
+
+                // 🎯 B. ANGLE DE RELEASE — angle au coude du bras tireur (shoulder-elbow-wrist)
+                // Choix du bras : celui dont le poignet est le plus haut (= bras de release)
+                try {
+                  var le = kp[7], re = kp[8]; // coudes
+                  var isLeftArm = (lw.y < rw.y); // poignet gauche plus haut = bras de release gauche
+                  var sh = isLeftArm ? ls : rs;
+                  var el = isLeftArm ? le : re;
+                  var wr = isLeftArm ? lw : rw;
+                  if (sh && el && wr && el.score > 0.3 && sh.score > 0.3 && wr.score > 0.35) {
+                    // Vecteurs coude→épaule et coude→poignet
+                    var v1x = sh.x - el.x, v1y = sh.y - el.y;
+                    var v2x = wr.x - el.x, v2y = wr.y - el.y;
+                    var dot = v1x*v2x + v1y*v2y;
+                    var m1 = Math.sqrt(v1x*v1x + v1y*v1y);
+                    var m2 = Math.sqrt(v2x*v2x + v2y*v2y);
+                    if (m1 > 0 && m2 > 0) {
+                      var cosA = Math.max(-1, Math.min(1, dot / (m1 * m2)));
+                      var angleDeg = Math.round(Math.acos(cosA) * 180 / Math.PI);
+                      _ss_releaseAngles.push(angleDeg);
+                      // Hauteur de release normalisée (0 = bas du cadre, 1 = haut)
+                      if (_ss_video && _ss_video.videoHeight) {
+                        _ss_releaseHeights.push(1 - (wr.y / _ss_video.videoHeight));
+                      }
+                    }
+                  }
+                } catch(e){}
+
                 // Position du tir sur le mini-terrain = position joueur au moment du tir
                 try {
                   if (window._senseiOverlays && _ss_lastPosePos) {
@@ -51250,6 +51346,33 @@ body.si-banner-on { padding-top: 52px; }
       html += '<div style="margin-top:10px">';
       html += _ss_metricCard('🏀', shotsLbl, String(_ss_shotsCount), '#f5c518', true);
       html += '</div>';
+    }
+
+    // 🎯 B. Angle moyen de release du tir (coude) — métrique biomécanique
+    if (_ss_releaseAngles && _ss_releaseAngles.length > 0) {
+      var avgAngle = Math.round(_ss_releaseAngles.reduce(function(a,b){return a+b;},0) / _ss_releaseAngles.length);
+      var maxAngle = Math.max.apply(null, _ss_releaseAngles);
+      var angLbl = (window._lang === 'en') ? 'Release angle (elbow)' : 'Angle de release (coude)';
+      // Référence biomécanique : 90-120° = correct, >130° = extension incomplète, <80° = coude trop fermé
+      var angColor = (avgAngle >= 90 && avgAngle <= 130) ? '#22c55e' : (avgAngle >= 70 && avgAngle <= 150) ? '#f97316' : '#ef4444';
+      var angVal = avgAngle + '° <span style="font-size:10px;color:var(--muted)">(max ' + maxAngle + '°)</span>';
+      html += '<div style="margin-top:10px">';
+      html += _ss_metricCard('📐', angLbl, angVal, angColor, true);
+      html += '</div>';
+    }
+
+    // 🦘 F. Hauteur de saut maximale — Y hanches baseline vs minimum atteint
+    if (_ss_hipYBaseline !== null && _ss_hipYMin !== null && _ss_shoulderWidthPx) {
+      var jumpPx = _ss_hipYBaseline - _ss_hipYMin;
+      if (jumpPx > 10) { // seuil anti-bruit : au moins 10px de différence
+        // Conversion cm : largeur épaules moyenne adulte = ~45 cm, teen = ~40 cm. On prend 42 cm comme ref.
+        var jumpCm = Math.round((jumpPx / _ss_shoulderWidthPx) * 42);
+        var jumpLbl = (window._lang === 'en') ? 'Max jump height (est.)' : 'Hauteur de saut max (est.)';
+        var jColor = jumpCm >= 40 ? '#22c55e' : jumpCm >= 25 ? '#f97316' : '#4cc9f0';
+        html += '<div style="margin-top:10px">';
+        html += _ss_metricCard('🦘', jumpLbl, '+' + jumpCm + ' cm', jColor, true);
+        html += '</div>';
+      }
     }
     html += '<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:1px;text-transform:uppercase">Analyse par MoveNet · 100% locale · Aucune donnée envoyée</div>';
     html += '</div>';
