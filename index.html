@@ -1062,6 +1062,10 @@ body.unlocked .sensei-only{display:revert !important}
           <button onclick="showSection('training',null)" style="background:transparent;color:#f5c518;border:2px solid #f5c518;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.background='rgba(245,197,24,.1)'" onmouseout="this.style.background='transparent'">
             📸 <span>SENSEI VISION</span>
           </button>
+          <button onclick="_videoWeek_open()" style="background:transparent;color:#4cc9f0;border:2px solid #4cc9f0;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.background='rgba(76,201,240,.1)'" onmouseout="this.style.background='transparent'">
+            <span style="position:absolute;top:-7px;right:-7px;background:#22c55e;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:5px;letter-spacing:.5px;font-family:'Inter',sans-serif">FREE</span>
+            🎬 <span data-i18n="dojo_cta_vweek">VIDÉO DE LA SEMAINE</span>
+          </button>
         </div>
       </div>
       <!-- 5 grosses CARDS cliquables (navigation vers pages catégorie) -->
@@ -7618,6 +7622,11 @@ const SECTION_VIDEOS = {
     {id:'ar6OA2wxwzw', title:'Ball Handling Drill #29', vertical:false},
     {id:'DJHKF-LCaKE', title:'Ball Handling Drill #30', vertical:false},
     {id:'V0IN8mCRuHM', title:'Ball Handling Drill #31', vertical:false},
+    {id:'ooYwI_zXOuw', title:'Ball Handling — Sensei #1', vertical:false},
+    {id:'8UXUby-MT_o', title:'Ball Handling — Sensei #2', vertical:false},
+    {id:'epH0-akEeiI', title:'Ball Handling — Sensei #3', vertical:false},
+    {id:'QF2sOa4hwzI', title:'Ball Handling — Sensei #4', vertical:false},
+    {id:'U0ZlcorVY5c', title:'Ball Handling — Sensei #5', vertical:false},
   ],
   hec: [
     {id:'xV0XuRGHsxo', title:'Hand-Eye Drill #1', vertical:true},
@@ -14109,6 +14118,7 @@ function applyLangTracker(lang) {
     dojo_cat_com:'COMMUNAUT\u00c9',
     dojo_welcome:'BIENVENUE DANS LE DOJO',
     dojo_welcome_sub:'Human-led. AI-powered. 🥋',
+    dojo_cta_vweek:'VIDÉO DE LA SEMAINE',
     dojo_world_badge:'\ud83c\udf0d PREMI\u00c8RE MONDIALE',
     dojo_world_title:'LA 1\u00c8RE APP DE BASKET<br>SCIENTIFIQUE AU MONDE',
     dojo_world_sub:'Fond\u00e9e sur la <b style="color:#f5c518">Science</b>, les <b style="color:#f5c518">Math\u00e9matiques</b> et l\'<b style="color:#f5c518">IA</b>',
@@ -14477,6 +14487,7 @@ function applyLangTracker(lang) {
     dojo_cat_com:'COMMUNITY',
     dojo_welcome:'WELCOME TO THE DOJO',
     dojo_welcome_sub:'Human-led. AI-powered. 🥋',
+    dojo_cta_vweek:'VIDEO OF THE WEEK',
     dojo_world_badge:'\ud83c\udf0d WORLD FIRST',
     dojo_world_title:'THE WORLD\'S FIRST<br>SCIENTIFIC BASKETBALL APP',
     dojo_world_sub:'Based on <b style="color:#f5c518">Science</b>, <b style="color:#f5c518">Mathematics</b> and <b style="color:#f5c518">AI</b>',
@@ -16783,7 +16794,7 @@ function puzzleDrawTemplate2(canvases, d) {
   const lbls=d.en?['MASTERY','SYMMETRY','CREATIVITY','SPEED','VISION','RESILIENCE']:['MAÎTRISE','SYMÉTRIE','CRÉATIVITÉ','VITESSE','VISION','RÉSILIENCE'];
   const lclr=['#f5c518','#2dc653','#7b2d8b','#ff6d00','#0077b6','#c1121f'];
   const lPos=[[S/2,-20],[S-80,S/2-240],[S-60,S/2+280],[S/2,S-40],[80,S/2+280],[90,S/2-240]];
-  lbls.forEach((l,i)=>pF(c1,l,lPos[i][0],lPos[i][1],28,lclr[i],'center'));
+  lbls.forEach((l,i)=>pF(c1,l,lPos[i][0],lPos[i][1],42,lclr[i],'center'));
 
   // 2: Score global
   const c2=canvases[1].getContext('2d'); pBg(c2,'rgba(245,197,24,');
@@ -16907,9 +16918,9 @@ function puzzleDrawTemplate4(canvases, d) {
   pF(c1,en?'BEFORE':'AVANT',S/2,200,160,'rgba(193,18,31,0.12)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c1,en?'❌':' ❌',S/2,420,200,'center');
   pF(c1,en?'No method':'Sans méthode',S/2,580,52,'rgba(193,18,31,0.8)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c1,en?'Repetition without direction':'Répétition sans direction',S/2,650,30,'rgba(255,255,255,0.35)');
-  pF(c1,en?'No measurable progress':'Aucune progression mesurable',S/2,700,30,'rgba(255,255,255,0.25)');
-  pF(c1,en?'Frustration & stagnation':'Frustration & stagnation',S/2,750,30,'rgba(255,255,255,0.2)');
+  pF(c1,en?'Repetition without direction':'Répétition sans direction',S/2,650,42,'rgba(255,255,255,0.75)');
+  pF(c1,en?'No measurable progress':'Aucune progression mesurable',S/2,710,42,'rgba(255,255,255,0.7)');
+  pF(c1,en?'Frustration & stagnation':'Frustration & stagnation',S/2,770,42,'rgba(255,255,255,0.65)');
 
   // Case 2 : texte AVANT descriptif
   const c2=canvases[1].getContext('2d');
@@ -16919,7 +16930,7 @@ function puzzleDrawTemplate4(canvases, d) {
   const befores=en
     ?['Drills without structure','No performance tracking','No feedback loop','Same routine every session','No goal, no belt, no vision']
     :['Drills sans structure','Aucun suivi de performance','Pas de boucle de feedback','Même routine chaque séance','Pas d\'objectif ni de vision'];
-  befores.forEach((t,i)=>pF(c2,'✗ '+t,S/2,380+i*82,28,'rgba(193,18,31,0.75)'));
+  befores.forEach((t,i)=>pF(c2,'✗ '+t,S/2,380+i*82,40,'rgba(193,18,31,0.9)'));
   pF(c2,en?'Years of stagnation':'Des années de stagnation',S/2,S-120,40,'rgba(255,255,255,0.2)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
 
   // Case 3 : score avant (bas)
@@ -16983,7 +16994,7 @@ function puzzleDrawTemplate4(canvases, d) {
   const afters=en
     ?['Structured 9-belt progression','Data Science score tracked','Real-time radar feedback','Scientific drills per belt','Measurable, visible progress']
     :['Progression 9 ceintures structurée','Score Data Science suivi','Feedback radar en temps réel','Drills scientifiques par ceinture','Progrès mesurable et visible'];
-  afters.forEach((t,i)=>pF(c8,'✓ '+t,S/2,360+i*82,28,'rgba(45,198,83,0.85)'));
+  afters.forEach((t,i)=>pF(c8,'✓ '+t,S/2,360+i*82,40,'rgba(45,198,83,0.95)'));
   pF(c8,d.en?'ELITE LEVEL':'NIVEAU ÉLITE',S/2,S-100,44,'rgba(245,197,24,0.6)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
 
   // Case 9 : CTA émotionnel
@@ -17034,22 +17045,22 @@ function puzzleDrawTemplate5(canvases, d) {
   c1.beginPath(); c1.arc(S/2,S/2,90,0,Math.PI*2); c1.fillStyle='rgba(245,197,24,0.88)'; c1.fill();
   c1.beginPath(); c1.moveTo(S/2-30,S/2-50); c1.lineTo(S/2-30,S/2+50); c1.lineTo(S/2+60,S/2); c1.closePath(); c1.fillStyle='#080a0f'; c1.fill();
   pF(c1,en?'DRILL OF THE WEEK':'DRILL DE LA SEMAINE',S/2,120,36,'#f5c518');
-  pF(c1,drill,S/2,S-160,34,'rgba(255,255,255,0.9)');
+  pF(c1,drill,S/2,S-170,52,'rgba(255,255,255,0.95)');
   pRect(c1,S/2-200,S-110,400,60,30,bColor+'22',bColor,2);
   pF(c1,bName.toUpperCase()+' BELT',S/2,S-72,28,bColor,'center','900');
 
   // Case 2 : titre drill + description
   const c2=canvases[1].getContext('2d'); pBg(c2);
   pF(c2,en?'DRILL':'DRILL',S/2,120,40,'rgba(245,197,24,0.5)');
-  pF(c2,drill,S/2,260,46,'#ffffff','center','700');
+  pF(c2,drill,S/2,260,54,'#ffffff','center','700');
   pLine(c2,100,300,S-100,300,'rgba(245,197,24,0.15)',1);
-  pF(c2,en?'NEUROMOTOR OBJECTIVE:':'OBJECTIF NEUROMOTEUR :',S/2,380,28,'rgba(245,197,24,0.5)');
-  pF(c2,en?'Dual-task cognitive dissociation':'Dissociation cognitive double tâche',S/2,440,30,'rgba(255,255,255,0.5)');
-  pF(c2,en?'Ball automatism + attention released':'Automatisme ballon + attention libérée',S/2,500,28,'rgba(255,255,255,0.4)');
+  pF(c2,en?'NEUROMOTOR OBJECTIVE:':'OBJECTIF NEUROMOTEUR :',S/2,380,36,'rgba(245,197,24,0.75)');
+  pF(c2,en?'Dual-task cognitive dissociation':'Dissociation cognitive double tâche',S/2,445,42,'rgba(255,255,255,0.85)');
+  pF(c2,en?'Ball automatism + attention released':'Automatisme ballon + attention libérée',S/2,510,38,'rgba(255,255,255,0.75)');
   pLine(c2,100,560,S-100,560,'rgba(245,197,24,0.1)',1);
   pF(c2,en?'SETS · REPS':'SÉRIES · REPS',S/2,640,32,'rgba(245,197,24,0.5)');
   pF(c2,'3 × 45s',S/2,740,80,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c2,en?'Rest 30s between sets':'Récup 30s entre les séries',S/2,820,28,'rgba(255,255,255,0.3)');
+  pF(c2,en?'Rest 30s between sets':'Récup 30s entre les séries',S/2,830,38,'rgba(255,255,255,0.65)');
 
   // Case 3 : tag ceinture + pilier
   const c3=canvases[2].getContext('2d'); pBg(c3);
@@ -17057,8 +17068,8 @@ function puzzleDrawTemplate5(canvases, d) {
   pF(c3,bName.toUpperCase()+' BELT',S/2,520,72,bColor,'center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pLine(c3,200,580,S-200,580,'rgba(245,197,24,0.15)',1);
   pRect(c3,S/2-240,620,480,80,40,'rgba(0,0,0,0)',pilColor+'44',1);
-  pF(c3,en?'PILLAR:':'PILIER :',S/2,655,26,'rgba(255,255,255,0.3)');
-  pF(c3,pilLabel,S/2,710,30,pilColor,'center','700');
+  pF(c3,en?'PILLAR:':'PILIER :',S/2,655,36,'rgba(255,255,255,0.65)');
+  pF(c3,pilLabel,S/2,715,44,pilColor,'center','900');
   pBeltBars(c3,80,S-120,S-160,d.beltIdx,bColors);
 
   // LIGNE 2 — ECO DYNAMICS
@@ -17068,7 +17079,7 @@ function puzzleDrawTemplate5(canvases, d) {
   c4.font='160px serif'; c4.textAlign='center'; c4.fillText('🎯',S/2,360);
   pF(c4,'TASK',S/2,460,100,'#f5c518','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pLine(c4,200,510,S-200,510,'rgba(245,197,24,0.2)',1);
-  pF(c4,ecoTask,S/2,580,28,'rgba(255,255,255,0.45)',null,null,null,null,'center',S-160,true);
+  pF(c4,ecoTask,S/2,580,42,'rgba(255,255,255,0.9)',null,null,null,null,'center',S-160,true);
   // word wrap manual
   const taskWords=ecoTask.split(',');
   taskWords.forEach((w,i)=>pF(c4,w.trim()+(i<taskWords.length-1?',':''),S/2,590+i*68,28,'rgba(255,255,255,0.45)'));
@@ -43767,6 +43778,38 @@ if (G.imgBall) {
   };
 })();
 
+// ═══ VIDÉO DE LA SEMAINE (CTA FREEMIUM Home DOJO) ═══════════════════════
+window._videoWeek_open = function(){
+  var en = (window._lang === 'en');
+  var m = document.getElementById('videoweek-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'videoweek-modal';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:rgba(10,13,24,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;font-family:inherit';
+    document.body.appendChild(m);
+  }
+  m.innerHTML =
+    '<div style="max-width:720px;margin:0 auto;padding:20px 16px 60px;color:#fff">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;position:sticky;top:0;background:rgba(10,13,24,.96);padding:14px 0;z-index:5">'
+    + '  <div style="display:flex;align-items:center;gap:10px">'
+    + '    <div style="font-size:30px">🎬</div>'
+    + '    <div><div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#4cc9f0">'+(en?"VIDEO OF THE WEEK":"VIDÉO DE LA SEMAINE")+'</div>'
+    + '    <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#22c55e;letter-spacing:1.5px;font-weight:700;margin-top:2px">⭐ FREEMIUM · '+(en?"FREE ACCESS":"ACCÈS GRATUIT")+'</div></div>'
+    + '  </div>'
+    + '  <button id="vweek-close" style="background:transparent;border:1.5px solid rgba(76,201,240,.5);color:#4cc9f0;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
+    + '</div>'
+    + '<div style="position:relative;width:100%;max-width:400px;margin:0 auto;padding-bottom:min(177.78%,710px);background:#000;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(76,201,240,.25)">'
+    + '  <iframe src="https://www.youtube.com/embed/ed_mDjk-Lt8" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy" title="Video of the week — SENSEI"></iframe>'
+    + '</div>'
+    + '<div style="text-align:center;margin-top:20px;padding:16px 20px;background:rgba(76,201,240,.08);border:1px solid rgba(76,201,240,.3);border-radius:12px">'
+    + '  <div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#4cc9f0;margin-bottom:6px">'+(en?"📺 New video every week":"📺 Nouvelle vidéo chaque semaine")+'</div>'
+    + '  <div style="font-family:\'Barlow\',sans-serif;font-size:13px;color:#cfd3e0;line-height:1.5">'+(en?"A SENSEI drill, concept or insight — accessible to everyone, every week.":"Un drill, un concept ou un insight du SENSEI — accessible à tous, chaque semaine.")+'</div>'
+    + '</div>'
+    + '</div>';
+  m.querySelector('#vweek-close').addEventListener('click', function(){ m.style.display='none'; document.body.style.overflow=''; });
+  m.style.display='block'; document.body.style.overflow='hidden';
+};
+
 // ═══ SUPERINTELLIGENCE ══════════════════
 (function(){
   var DATA = {
@@ -43783,6 +43826,7 @@ if (G.imgBall) {
       m1: "<b>Premier et seul au monde</b> \u00e0 vulgariser les sciences exactes (math\u00e9matiques, physique, biom\u00e9canique, neurosciences) <b>\u00e0 travers le basketball</b> \u2014 tout en jouant, en transmettant, en enseignant.",
       m2: "L\'IA ne peut pas remplacer :<br>\u2022 le <b>math\u00e9maticien</b> qui mod\u00e9lise la trajectoire du tir<br>\u2022 le <b>scientifique</b> qui mesure la charge cognitive<br>\u2022 le <b>Sensei</b> qui transmet la culture et le sens",
       m3: "Chez SENSEI, l\'IA est un <b style=\"color:#f5c518\">outil au service du savoir humain</b>, pas son rempla\u00e7ant. Elle \u00e9claire sans d\u00e9cider, elle calcule sans comprendre. Le sens, la transmission, la culture : cela reste l\'affaire du Sensei.",
+      m_brain: "Rappel scientifique : ton <b style=\"color:#f5c518\">cerveau</b>, incroyablement sobre, r\u00e9alise <b>un milliard de milliards d\'op\u00e9rations par seconde</b> avec seulement <b style=\"color:#f5c518\">20 watts</b>. Une puce d\'IA moderne en consomme facilement <b>700</b>. L\'intelligence humaine reste la plus efficiente jamais con\u00e7ue.",
       m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b"
     },
     en: {
@@ -43798,6 +43842,7 @@ if (G.imgBall) {
       m1: "<b>First and only in the world</b> to popularize exact sciences (mathematics, physics, biomechanics, neurosciences) <b>through basketball</b> \u2014 while playing, transmitting, teaching.",
       m2: "AI cannot replace:<br>\u2022 the <b>mathematician</b> who models shot trajectory<br>\u2022 the <b>scientist</b> who measures cognitive load<br>\u2022 the <b>Sensei</b> who transmits culture and meaning",
       m3: "At SENSEI, AI is a <b style=\"color:#f5c518\">tool in service of human knowledge</b>, not its replacement. It illuminates without deciding, computes without understanding. Meaning, transmission, culture: that remains the Sensei\'s domain.",
+      m_brain: "Scientific reminder: your <b style=\"color:#f5c518\">brain</b>, incredibly sober, performs <b>a quintillion operations per second</b> with only <b style=\"color:#f5c518\">20 watts</b>. A modern AI chip easily draws <b>700</b>. Human intelligence remains the most efficient ever designed.",
       m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b"
     }
   };
@@ -43824,7 +43869,7 @@ if (G.imgBall) {
       + sec("\ud83d\udc41\ufe0f", D.s2_title, D.s2_sub, D.s2_body, "#9f64e6")
       + sec("\ud83e\udd4b", D.s3_title, D.s3_sub, D.s3_body, "#22c55e")
       + '<div style="margin-top:28px;padding:22px 20px;background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.4);border-radius:14px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2.5px;color:#f5c518;text-align:center;margin-bottom:16px">\ud83e\udd4b '+D.manifesto_title+'</div>'
-      + para(D.m1) + para(D.m2) + para(D.m3) + para(D.m4) + '</div>'
+      + para(D.m1) + para(D.m2) + para(D.m3) + para(D.m_brain) + para(D.m4) + '</div>'
       + '<div style="text-align:center;margin-top:22px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#8a95ac;letter-spacing:1.5px">\u2014 T. NJECKIL \u00b7 SENSEI BLACKBELT</div></div>';
     m.querySelector("#superint-close").addEventListener("click", function(){ m.style.display = "none"; document.body.style.overflow = ""; });
     m.style.display = "block"; document.body.style.overflow = "hidden";
