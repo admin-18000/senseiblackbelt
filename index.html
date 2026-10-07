@@ -8489,6 +8489,8 @@ function acceptHealthWarning() {
 }
 
 function showSection(id, btn) {
+  // 💾 Sauvegarder la section courante (fix bug retour onboarding au reload PWA)
+  try { if (id && id !== 'home') sessionStorage.setItem('sensei_lastSection', id); else sessionStorage.removeItem('sensei_lastSection'); } catch(e){}
   // 🔒 GUARD DOJO : si mode free et rubrique verrouillée, afficher modal cadenas
   if (!window._dojoBypassGuard && typeof window._dojoIsAllowed === 'function' && !window._dojoIsAllowed(id)) {
     if (typeof window._dojoLock_show === 'function') window._dojoLock_show();
@@ -26751,14 +26753,28 @@ function _tsc_scSelectVid(i) {
 
 function _tsc_scStart() {
   if(_tsc_scRun)return;
-  _tsc_scRun=true;_tsc_scSec=0;_tsc_scReps=0;
-  document.getElementById('tsc_scRepsNum').textContent='0';
-  document.getElementById('tsc_scBtnStart').style.display='none';
-  document.getElementById('tsc_scBtnStop').style.display='flex';
-  document.getElementById('tsc_scBtnSave').style.display='none';
-  document.getElementById('tsc_scTimerSub').textContent=_t('Session en cours...','Session running...');
-  document.getElementById('tsc_scTimerBig').className='tr-timer-big running';
-  _tsc_scInt=setInterval(function(){_tsc_scSec++;_tsc_scUpdateTimer();},1000);
+  // Compte à rebours 10s avant que le chrono démarre (cohérence avec autres features caméra)
+  var subEl = document.getElementById('tsc_scTimerSub');
+  var bigEl = document.getElementById('tsc_scTimerBig');
+  var startBtn = document.getElementById('tsc_scBtnStart');
+  var stopBtn = document.getElementById('tsc_scBtnStop');
+  if (startBtn) startBtn.style.display = 'none';
+  if (stopBtn) stopBtn.style.display = 'flex';
+  if (bigEl) bigEl.className = 'tr-timer-big';
+  (function tscCd(n){
+    if (n <= 0) {
+      // Démarrer vraiment
+      _tsc_scRun = true; _tsc_scSec = 0; _tsc_scReps = 0;
+      var repsNum = document.getElementById('tsc_scRepsNum'); if (repsNum) repsNum.textContent = '0';
+      if (bigEl) bigEl.className = 'tr-timer-big running';
+      if (subEl) subEl.textContent = _t('Session en cours...','Session running...');
+      _tsc_scInt = setInterval(function(){ _tsc_scSec++; _tsc_scUpdateTimer(); }, 1000);
+      return;
+    }
+    if (subEl) subEl.textContent = _t('Prêt dans '+n+'s...','Starting in '+n+'s...');
+    if (bigEl) bigEl.textContent = String(n);
+    setTimeout(function(){ tscCd(n-1); }, 1000);
+  })(10);
 }
 
 function _tsc_scStop() {
@@ -43904,7 +43920,8 @@ window._videoWeek_open = function(){
       m2: "L\'IA ne peut pas remplacer :<br>\u2022 le <b>math\u00e9maticien</b> qui mod\u00e9lise la trajectoire du tir<br>\u2022 le <b>scientifique</b> qui mesure la charge cognitive<br>\u2022 le <b>Sensei</b> qui transmet la culture et le sens",
       m3: "Chez SENSEI, l\'IA est un <b style=\"color:#f5c518\">outil au service du savoir humain</b>, pas son rempla\u00e7ant. Elle \u00e9claire sans d\u00e9cider, elle calcule sans comprendre. Le sens, la transmission, la culture : cela reste l\'affaire du Sensei.",
       m_brain: "Rappel scientifique : ton <b style=\"color:#f5c518\">cerveau</b>, incroyablement sobre, r\u00e9alise <b>un milliard de milliards d\'op\u00e9rations par seconde</b> avec seulement <b style=\"color:#f5c518\">20 watts</b>. Une puce d\'IA moderne en consomme facilement <b>700</b>. L\'intelligence humaine reste la plus efficiente jamais con\u00e7ue.",
-      m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b"
+      m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b",
+      m5: "<b style=\"color:#f5c518\">Anti-addiction aux \u00e9crans.</b> Le MDP (la vraie m\u00e9thode) ne se d\u00e9bloque qu'en s\u00e9ance physique avec le Sensei. L'app est un outil, pas une fin. Les champions se construisent sur le parquet, pas sur un smartphone."
     },
     en: {
       hero: "The whole is greater than the sum of its parts.",
@@ -43920,7 +43937,8 @@ window._videoWeek_open = function(){
       m2: "AI cannot replace:<br>\u2022 the <b>mathematician</b> who models shot trajectory<br>\u2022 the <b>scientist</b> who measures cognitive load<br>\u2022 the <b>Sensei</b> who transmits culture and meaning",
       m3: "At SENSEI, AI is a <b style=\"color:#f5c518\">tool in service of human knowledge</b>, not its replacement. It illuminates without deciding, computes without understanding. Meaning, transmission, culture: that remains the Sensei\'s domain.",
       m_brain: "Scientific reminder: your <b style=\"color:#f5c518\">brain</b>, incredibly sober, performs <b>a quintillion operations per second</b> with only <b style=\"color:#f5c518\">20 watts</b>. A modern AI chip easily draws <b>700</b>. Human intelligence remains the most efficient ever designed.",
-      m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b"
+      m4: "<b style=\"color:#f5c518\">HUMAN-LED. AI-POWERED.</b> \ud83e\udd4b",
+      m5: "<b style=\"color:#f5c518\">Anti screen-addiction.</b> The MDP (the real method) is only unlocked during physical sessions with the Sensei. The app is a tool, not an end in itself. Champions are built on the court, not on a smartphone."
     }
   };
   window._superint_open = function(){
@@ -43946,7 +43964,7 @@ window._videoWeek_open = function(){
       + sec("\ud83d\udc41\ufe0f", D.s2_title, D.s2_sub, D.s2_body, "#9f64e6")
       + sec("\ud83e\udd4b", D.s3_title, D.s3_sub, D.s3_body, "#22c55e")
       + '<div style="margin-top:28px;padding:22px 20px;background:linear-gradient(160deg,rgba(245,197,24,.08),rgba(13,17,23,.6));border:1.5px solid rgba(245,197,24,.4);border-radius:14px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2.5px;color:#f5c518;text-align:center;margin-bottom:16px">\ud83e\udd4b '+D.manifesto_title+'</div>'
-      + para(D.m1) + para(D.m2) + para(D.m3) + para(D.m_brain) + para(D.m4) + '</div>'
+      + para(D.m1) + para(D.m2) + para(D.m3) + para(D.m_brain) + para(D.m4) + para(D.m5) + '</div>'
       + '<div style="text-align:center;margin-top:22px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#8a95ac;letter-spacing:1.5px">\u2014 T. NJECKIL \u00b7 SENSEI BLACKBELT</div></div>';
     m.querySelector("#superint-close").addEventListener("click", function(){ m.style.display = "none"; document.body.style.overflow = ""; });
     m.style.display = "block"; document.body.style.overflow = "hidden";
@@ -44095,6 +44113,46 @@ window._videoWeek_open = function(){
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
   };
+})();
+
+// ═══ PERSISTENCE SECTION + BOUTON RETOUR GLOBAL ═══════════════════════════
+// Restaurer la dernière section visitée au reload (fix bug retour onboarding en PWA)
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    try {
+      var lastSection = sessionStorage.getItem('sensei_lastSection');
+      if (lastSection && typeof showSection === 'function') {
+        // Vérifie que la section existe avant d'y aller
+        if (document.getElementById('s-' + lastSection)) {
+          showSection(lastSection, null);
+        }
+      }
+    } catch(e){}
+  }, 800);
+});
+// Bouton retour global flottant (apparaît sauf sur home)
+(function(){
+  var btn = document.createElement('button');
+  btn.id = 'sensei-back-fab';
+  btn.innerHTML = '← ' + (window._lang === 'en' ? 'BACK' : 'RETOUR');
+  btn.style.cssText = 'position:fixed;top:70px;left:12px;z-index:9999;background:rgba(13,17,23,.9);color:#f5c518;border:1.5px solid rgba(245,197,24,.5);border-radius:999px;padding:7px 14px;font-family:"Bebas Neue","Impact",sans-serif;font-size:12px;letter-spacing:1.5px;font-weight:800;cursor:pointer;display:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 16px rgba(0,0,0,.5);transition:all .2s';
+  btn.onclick = function(){
+    if (typeof showSection === 'function') showSection('home', null);
+    try { sessionStorage.removeItem('sensei_lastSection'); } catch(e){}
+  };
+  btn.onmouseover = function(){ this.style.background = 'rgba(245,197,24,.15)'; };
+  btn.onmouseout = function(){ this.style.background = 'rgba(13,17,23,.9)'; };
+  document.body.appendChild(btn);
+  // Afficher/masquer selon la section active
+  var upd = function(){
+    try {
+      var sec = sessionStorage.getItem('sensei_lastSection');
+      btn.style.display = (sec && sec !== 'home') ? 'flex' : 'none';
+      btn.innerHTML = '← ' + (window._lang === 'en' ? 'BACK' : 'RETOUR');
+    } catch(e){}
+  };
+  // Observer les changements de section
+  setInterval(upd, 1000);
 })();
 
 // ═══ MUSIQUE DE FOND ARCADE (SPEC 1 - option A) ═══════════════════════════
@@ -50470,6 +50528,17 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_REC_LIMIT = 600; // 10 min max pour une session de shoot (fichier ~150-200 Mo max)
   var MOVEMENT_THRESHOLD = 12;
 
+  // ═══ Détection tir améliorée (anti-faux-positifs : bras levés statiques, défense, célébration) ═══
+  var _ss_wristYHist = [];       // historique [{y, t}] pour détecter la vélocité ascendante
+  var _ss_WRIST_HIST_MAX = 10;   // ~2.5s à 250ms d'échantillonnage
+  var _ss_RISE_MIN_PX = 30;      // montée min du poignet (release gesture)
+  var _ss_RISE_WINDOW_MS = 500;  // fenêtre pour détecter la montée
+  var _ss_shotsCount = 0;        // compteur local persistant jusqu'au résumé
+
+  // ═══ Compte à rebours visuel 10s avant démarrage de l'analyse (cohérence BT / Training Mode) ═══
+  var _ss_countdownActive = false;
+  var _ss_countdownValue = 0;
+
   function _t(key, fb) {
     try {
       var lang = (window._lang || document.body.getAttribute('data-lang') || 'fr');
@@ -50485,6 +50554,11 @@ body.si-banner-on { padding-top: 52px; }
   }
 
   function _updateChrono() {
+    // Pendant le countdown : afficher 00:00 (le timer "réel" ne démarre qu'après)
+    if (_ss_countdownActive) {
+      if (_ss_chronoEl) _ss_chronoEl.textContent = '00:00';
+      return;
+    }
     var elapsed = (Date.now() - _ss_startTime) / 1000;
     if (_ss_chronoEl) _ss_chronoEl.textContent = _fmtTime(elapsed);
   }
@@ -50686,13 +50760,33 @@ body.si-banner-on { padding-top: 52px; }
       // PAS de miroir — trépied fixe filme la scène telle qu'elle est
       _ss_ctx.drawImage(_ss_video, sx, sy, sw, sh, 0, 0, W, H);
       _ss_ctx.restore();
-      // Mini-terrain Homecourt-style avec position joueur temps réel
-      _ss_drawMiniCourt(W, H);
-      // Logo SENSEI dessiné sur le canvas (visible ET capturé par MediaRecorder)
-      if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_ss_ctx, W, H);
-      // 🎬 Overlays SENSEI (score/combo/tips) dessinés dans le canvas pour la vidéo
-      if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function') {
-        try { window._senseiOverlays.drawOnCanvas(_ss_ctx, W, H); } catch(e){}
+
+      // ═══ COUNTDOWN SS : overlay plein cadre pendant les 10 premières secondes ═══
+      if (_ss_countdownActive && _ss_countdownValue > 0) {
+        _ss_ctx.save();
+        _ss_ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        _ss_ctx.fillRect(0, 0, W, H);
+        _ss_ctx.fillStyle = '#f5c518';
+        _ss_ctx.font = 'bold ' + Math.round(H*0.55) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        _ss_ctx.textAlign = 'center';
+        _ss_ctx.textBaseline = 'middle';
+        _ss_ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        _ss_ctx.shadowBlur = 15;
+        _ss_ctx.fillText(String(_ss_countdownValue), W/2, H/2);
+        _ss_ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Barlow Condensed",sans-serif';
+        _ss_ctx.fillStyle = '#fff';
+        _ss_ctx.shadowBlur = 6;
+        _ss_ctx.fillText((window._lang==='en'?'GET READY TO SHOOT':'PRÊT À SHOOTER'), W/2, H*0.85);
+        _ss_ctx.restore();
+      } else {
+        // Mini-terrain Homecourt-style avec position joueur temps réel
+        _ss_drawMiniCourt(W, H);
+        // Logo SENSEI dessiné sur le canvas (visible ET capturé par MediaRecorder)
+        if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_ss_ctx, W, H);
+        // 🎬 Overlays SENSEI (score/combo/tips) dessinés dans le canvas pour la vidéo
+        if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function') {
+          try { window._senseiOverlays.drawOnCanvas(_ss_ctx, W, H); } catch(e){}
+        }
       }
     }
     _ss_rafId = requestAnimationFrame(_ss_drawLoop);
@@ -50706,8 +50800,26 @@ body.si-banner-on { padding-top: 52px; }
     _ss_running = true;
     _ss_startTime = Date.now();
     _ss_poseHistory = [];
+    _ss_wristYHist = [];
+    _ss_shotsCount = 0;
     _ss_recActive = false;
     _ss_recChunks = [];
+
+    // ═══ Countdown 10s avant que l'analyse MoveNet démarre réellement ═══
+    _ss_countdownActive = true;
+    _ss_countdownValue = 10;
+    (function ssCd(){
+      if (!_ss_running || !_ss_countdownActive) return;
+      if (_ss_countdownValue <= 0) {
+        _ss_countdownActive = false;
+        _ss_startTime = Date.now(); // Reset timer après countdown pour chrono propre
+        return;
+      }
+      setTimeout(function(){
+        _ss_countdownValue--;
+        ssCd();
+      }, 1000);
+    })();
     // Afficher le bouton REC officiel (masqué par défaut par senseiCamShow)
     var recBtn = document.getElementById('sensei-cam-rec-btn');
     if (recBtn) {
@@ -50744,6 +50856,8 @@ body.si-banner-on { padding-top: 52px; }
     // Analyse MoveNet toutes les 250ms (utilise _ss_video, cohérent avec drawLoop)
     _ss_analysisInterval = setInterval(async function(){
       if (!_ss_running || !_tsym_detector || !_ss_video) return;
+      // ⏱ Pendant le countdown : pas d'analyse (évite faux positifs pendant la mise en place)
+      if (_ss_countdownActive) return;
       try {
         var poses = await _tsym_detector.estimatePoses(_ss_video);
         if (poses && poses.length > 0 && poses[0].keypoints) {
@@ -50770,23 +50884,57 @@ body.si-banner-on { padding-top: 52px; }
             } catch(e){}
           }
 
-          // 🎯 Détection tir simplifiée : poignets au-dessus des épaules + montée rapide
-          // Poignets: kp[9] gauche, kp[10] droit · Épaules: kp[5] gauche, kp[6] droit
+          // 🎯 Détection tir AMÉLIORÉE — anti-faux-positifs (bras levés statiques, défense, célébration)
+          // Pipeline : (1) poignet au-dessus de l'épaule [compat], (2) montée rapide ≥30px/500ms,
+          // (3) si nez visible → poignet aussi au-dessus du nez pour spécificité "release"
+          // Poignets: kp[9] gauche, kp[10] droit · Épaules: kp[5] gauche, kp[6] droit · Nez: kp[0]
           try {
-            var lw = kp[9], rw = kp[10], ls = kp[5], rs = kp[6];
+            var lw = kp[9], rw = kp[10], ls = kp[5], rs = kp[6], nose = kp[0];
             if (lw && rw && ls && rs && lw.score > 0.35 && rw.score > 0.35 && ls.score > 0.3 && rs.score > 0.3) {
               var wristY = Math.min(lw.y, rw.y);   // le plus haut des 2 (Y petit = haut)
               var shoulderY = Math.min(ls.y, rs.y);
-              // Poignet clairement au-dessus des épaules (marge 40px)
-              var isShootPose = (wristY < shoulderY - 40);
               var now = Date.now();
+
+              // Historique poignet pour vélocité
+              _ss_wristYHist.push({y: wristY, t: now});
+              if (_ss_wristYHist.length > _ss_WRIST_HIST_MAX) _ss_wristYHist.shift();
+
+              // (1) Check de base : poignet au-dessus des épaules
+              var aboveShoulder = (wristY < shoulderY - 40);
+
+              // (2) Check vélocité : poignet a monté d'au moins RISE_MIN_PX dans la fenêtre RISE_WINDOW_MS
+              var hadRise = false;
+              for (var hi = _ss_wristYHist.length - 2; hi >= 0; hi--) {
+                var h = _ss_wristYHist[hi];
+                if (now - h.t > _ss_RISE_WINDOW_MS) break;
+                if ((h.y - wristY) >= _ss_RISE_MIN_PX) { hadRise = true; break; }
+              }
+
+              // (3) Check spécificité : si nez visible, poignet doit être AUSSI au-dessus du nez
+              // Sinon fallback = aboveShoulder seul (compat anciennes conditions)
+              var noseVisible = nose && nose.score > 0.3;
+              var aboveNose = noseVisible ? (wristY < nose.y) : true;
+
+              // Décision : fallback (bras au-dessus épaule seul) OU (bras au-dessus épaule + rise + aboveNose)
+              // On garde fallback pour ne pas rater les tirs quand l'historique est incomplet (<2s de session)
+              var hasHistoryEnough = (_ss_wristYHist.length >= 3);
+              var isShootPose = hasHistoryEnough
+                ? (aboveShoulder && hadRise && aboveNose)
+                : aboveShoulder; // fallback premier 2s
+
               if (isShootPose && (now - (_ss_lastShotTs || 0)) > 1800) {
                 _ss_lastShotTs = now;
+                _ss_shotsCount++;
                 // Position du tir sur le mini-terrain = position joueur au moment du tir
                 try {
                   if (window._senseiOverlays && _ss_lastPosePos) {
                     window._senseiOverlays.addShot(_ss_lastPosePos.x, _ss_lastPosePos.y);
                     window._senseiOverlays.registerAction(50); // +50 pts par tir détecté
+                    // Compteur visible via API setCounter → rendu par drawOnCanvas (mode ss)
+                    if (typeof window._senseiOverlays.setCounter === 'function') {
+                      var lblShots = (window._lang === 'en') ? 'SHOTS' : 'TIRS';
+                      window._senseiOverlays.setCounter(_ss_shotsCount, 0, lblShots);
+                    }
                   }
                 } catch(e){}
                 if (window._haptic) { try { window._haptic.success(); } catch(e){} }
@@ -50821,6 +50969,8 @@ body.si-banner-on { padding-top: 52px; }
     _ss_video = null; _ss_canvas = null; _ss_ctx = null;
     _ss_lastPosePos = null;
     _ss_lastShotTs = 0;
+    _ss_countdownActive = false;
+    _ss_countdownValue = 0;
 
     // 🎯 Detach overlays SENSEI
     try { if (window._senseiOverlays) window._senseiOverlays.detach(); } catch(e){}
@@ -51095,6 +51245,13 @@ body.si-banner-on { padding-top: 52px; }
     html += '<div style="margin-top:10px">';
     html += _ss_metricCard('⚖️', _t('ss_m4','Équilibre'), Math.round(balance) + '%', balance >= 70 ? '#22c55e' : balance >= 50 ? '#f97316' : '#ef4444', true);
     html += '</div>';
+    // 🏀 Compte des tirs détectés (capturé avant detach dans _ss_stopCamera)
+    if (_ss_shotsCount > 0) {
+      var shotsLbl = (window._lang === 'en') ? 'Shots detected' : 'Tirs détectés';
+      html += '<div style="margin-top:10px">';
+      html += _ss_metricCard('🏀', shotsLbl, String(_ss_shotsCount), '#f5c518', true);
+      html += '</div>';
+    }
     html += '<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:14px;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:1px;text-transform:uppercase">Analyse par MoveNet · 100% locale · Aucune donnée envoyée</div>';
     html += '</div>';
 
@@ -51167,7 +51324,9 @@ body.si-banner-on { padding-top: 52px; }
   // Historique des reps (avec côté) pour détection dynamique
   var _bt_repHistory = []; // [{t, side}]
   var _bt_wristHistory = { left: [], right: [] };
-  var _bt_MIN_REP_INTERVAL = 200;
+  var _bt_MIN_REP_INTERVAL = 150;  // Baissé de 300 à 150ms = dribbles rapides captés
+  var _bt_countdownActive = false;  // true pendant les 10s de countdown avant détection
+  var _bt_countdownValue = 0;        // valeur affichée (10→1) — persistée pour _bt_drawLoop
 
   // Stats symétrie
   var _bt_repsLeft = 0;
@@ -51181,6 +51340,7 @@ body.si-banner-on { padding-top: 52px; }
   var _bt_recActive = false;
   var _bt_recChunks = [];
   var _bt_recTimer = null;
+  var _bt_recWatchdog = null;
   var _bt_recSec = 0;
   var _bt_REC_LIMIT = 600;
 
@@ -51335,11 +51495,30 @@ body.si-banner-on { padding-top: 52px; }
       _bt_ctx.drawImage(_bt_video, sx, sy, sw, sh, -W, 0, W, H);
       _bt_ctx.restore();
 
-      _bt_drawOverlay(W, H);
+      // Pendant le countdown : OVERLAY COUNTDOWN à la place de l'overlay dribble (anneau/compteur)
+      if (_bt_countdownActive && _bt_countdownValue > 0) {
+        _bt_ctx.save();
+        _bt_ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        _bt_ctx.fillRect(0, 0, W, H);
+        _bt_ctx.fillStyle = '#f5c518';
+        _bt_ctx.font = 'bold ' + Math.round(H*0.55) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        _bt_ctx.textAlign = 'center';
+        _bt_ctx.textBaseline = 'middle';
+        _bt_ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        _bt_ctx.shadowBlur = 15;
+        _bt_ctx.fillText(String(_bt_countdownValue), W/2, H/2);
+        _bt_ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Barlow Condensed",sans-serif';
+        _bt_ctx.fillStyle = '#fff';
+        _bt_ctx.shadowBlur = 6;
+        _bt_ctx.fillText((window._lang==='en'?'GET READY':'PRÊT POUR DRIBBLE'), W/2, H*0.85);
+        _bt_ctx.restore();
+      } else {
+        _bt_drawOverlay(W, H);
+      }
 
       if (typeof window._camDrawLogo === 'function') window._camDrawLogo(_bt_ctx, W, H);
       // 🎬 Overlays SENSEI (score/combo/tips) dessinés dans le canvas pour la vidéo
-      if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function') {
+      if (window._senseiOverlays && typeof window._senseiOverlays.drawOnCanvas === 'function' && !_bt_countdownActive) {
         try { window._senseiOverlays.drawOnCanvas(_bt_ctx, W, H); } catch(e){}
       }
     }
@@ -51504,6 +51683,21 @@ body.si-banner-on { padding-top: 52px; }
     _bt_currentMode = 'initial';
     _bt_recActive = false;
     _bt_recChunks = [];
+    _bt_countdownActive = true;  // Countdown 10s avant détection active
+    _bt_countdownValue = 10;
+    // Compte à rebours — la valeur descend ici, le rendu visuel est fait par _bt_drawLoop (persistant à chaque frame)
+    (function btCd(){
+      if (!_bt_running || !_bt_countdownActive) return;
+      if (_bt_countdownValue <= 0) {
+        _bt_countdownActive = false;
+        _bt_startTime = Date.now();  // Reset timer après countdown
+        return;
+      }
+      setTimeout(function(){
+        _bt_countdownValue--;
+        btCd();
+      }, 1000);
+    })();
 
     var recBtn = document.getElementById('sensei-cam-rec-btn');
     if (recBtn) {
@@ -51543,12 +51737,13 @@ body.si-banner-on { padding-top: 52px; }
   // Détection dribble sur LES 2 MAINS en parallèle
   // ═══════════════════════════════════════════════════════════
   function _bt_detectRep(kp) {
+    if (_bt_countdownActive) return;  // Pas de détection pendant le countdown 10s
     var now = Date.now();
     var HIST_SIZE = 5;
 
     function checkWrist(side, kpIdx) {
       var p = kp[kpIdx];
-      if (!p || p.score < 0.3) return;
+      if (!p || p.score < 0.2) return;  // Confidence baissée 0.3 → 0.2 (meilleur en basse lumière)
       _bt_wristHistory[side].push({ t: now, y: p.y });
       if (_bt_wristHistory[side].length > HIST_SIZE) _bt_wristHistory[side].shift();
       if (_bt_wristHistory[side].length >= 3) {
@@ -51556,7 +51751,7 @@ body.si-banner-on { padding-top: 52px; }
         var prev = h[h.length - 3];
         var mid = h[h.length - 2];
         var next = h[h.length - 1];
-        if (mid.y > prev.y + 15 && mid.y > next.y + 15) {
+        if (mid.y > prev.y + 8 && mid.y > next.y + 8) {  // Seuil 15 → 8 (x2 plus sensible)
           _bt_registerRep(side, now);
         }
       }
@@ -51774,19 +51969,42 @@ body.si-banner-on { padding-top: 52px; }
     }
     _bt_recChunks = [];
     _bt_recSec = 0;
-    _bt_recorder.ondataavailable = function(e){ if (e.data && e.data.size > 0) _bt_recChunks.push(e.data); };
+    var _bt_lastChunkTime = Date.now();  // Watchdog pour détecter blocage
+    _bt_recorder.ondataavailable = function(e){
+      if (e.data && e.data.size > 0) {
+        _bt_recChunks.push(e.data);
+        _bt_lastChunkTime = Date.now();
+      }
+    };
     _bt_recorder.onstop = function(){
       if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
-      var mimeUsed = (_bt_recorder && _bt_recorder.mimeType) || mime || 'video/webm';
-      var blob = new Blob(_bt_recChunks, {type: mimeUsed});
-      _bt_saveBlob(blob);
+      if (_bt_recWatchdog) { clearInterval(_bt_recWatchdog); _bt_recWatchdog = null; }
+      try {
+        var mimeUsed = (_bt_recorder && _bt_recorder.mimeType) || mime || 'video/webm';
+        if (!_bt_recChunks || _bt_recChunks.length === 0) {
+          alert(_t('Vidéo vide ou corrompue. Réessaie.', 'Empty or corrupted video. Try again.'));
+          _bt_recActive = false; _bt_updateRecBtnUI();
+          return;
+        }
+        var blob = new Blob(_bt_recChunks, {type: mimeUsed});
+        if (blob.size < 1000) {  // Blob trop petit = probablement corrompu
+          alert(_t('Vidéo trop courte ou corrompue. Réessaie.', 'Video too short or corrupted. Try again.'));
+          _bt_recActive = false; _bt_updateRecBtnUI();
+          return;
+        }
+        _bt_saveBlob(blob);
+      } catch(err) {
+        alert(_t('Erreur de sauvegarde vidéo. Réessaie.', 'Video save error. Try again.'));
+      }
       _bt_recActive = false;
       _bt_updateRecBtnUI();
     };
-    _bt_recorder.onerror = function() {
+    _bt_recorder.onerror = function(e) {
       if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+      if (_bt_recWatchdog) { clearInterval(_bt_recWatchdog); _bt_recWatchdog = null; }
       _bt_recActive = false;
       _bt_updateRecBtnUI();
+      alert(_t('Erreur enregistrement. Vérifie les permissions caméra.', 'Recording error. Check camera permissions.'));
     };
 
     // FIX durée corrompue
@@ -51798,11 +52016,19 @@ body.si-banner-on { padding-top: 52px; }
     setTimeout(function() {
       if (!_bt_recorder) return;
       try { _bt_recorder.start(1000); }
-      catch(e) { alert('Recording error'); return; }
+      catch(e) { alert(_t('Erreur de démarrage de l\'enregistrement. Vérifie les permissions.', 'Recording start error. Check permissions.')); return; }
       _bt_recActive = true;
       _bt_updateRecBtnUI();
       if (window._haptic) window._haptic.success();
       if (window._speak) window._speak.say({fr:'Enregistrement démarré.', en:'Recording started.'});
+      // Watchdog : si aucun chunk reçu pendant 8s = bloqué
+      _bt_recWatchdog = setInterval(function(){
+        if (Date.now() - _bt_lastChunkTime > 8000) {
+          console.warn('⚠ Enregistrement bloqué détecté — tentative de récupération');
+          try { if (_bt_recorder && _bt_recorder.state === 'recording') _bt_recorder.requestData(); }
+          catch(e){}
+        }
+      }, 3000);
       _bt_recTimer = setInterval(function() {
         _bt_recSec++;
         var remaining = _bt_REC_LIMIT - _bt_recSec;
@@ -52139,6 +52365,7 @@ body.si-banner-on { padding-top: 52px; }
         ctx.fillText(lblTxt, scoreX, scoreY + scoreSize + 2);
 
         // ═══ COMBO (badge rouge sous label) ═══
+        var comboBottomY = scoreY + scoreSize + lblSize + 10; // Y de reference pour empiler sous
         if (_multiplier > 1) {
           var comboSize = Math.round(Math.max(26, Math.min(H * 0.06, 38)));
           var comboText = '\u00d7' + _multiplier;
@@ -52146,7 +52373,7 @@ body.si-banner-on { padding-top: 52px; }
           var comboW = ctx.measureText(comboText).width + 24;
           var comboH = comboSize + 8;
           var comboX = scoreX - comboW;
-          var comboY = scoreY + scoreSize + lblSize + 10;
+          var comboY = comboBottomY;
           // Fond rouge arrondi
           ctx.shadowColor = 'rgba(230,57,70,0.6)';
           ctx.shadowBlur = 12;
@@ -52163,6 +52390,30 @@ body.si-banner-on { padding-top: 52px; }
           ctx.fillStyle = '#fff';
           ctx.textAlign = 'right';
           ctx.fillText(comboText, scoreX - 12, comboY + 4);
+          comboBottomY = comboY + comboH + 8;
+        }
+
+        // ═══ COMPTEUR TIRS (SS uniquement, sous le combo/score) ═══
+        // Rendu via la valeur stockee par setCounter (API _senseiOverlays)
+        if (_mode === 'ss' && this._counterCurrent > 0) {
+          var shotLbl = this._counterLabel || ((window._lang === 'en') ? 'SHOTS' : 'TIRS');
+          var shotNum = String(this._counterCurrent);
+          var shotNumSize = Math.round(Math.max(22, Math.min(H * 0.055, 36)));
+          var shotLblSize = Math.round(Math.max(10, Math.min(H * 0.022, 14)));
+          var shotY = comboBottomY;
+          ctx.textAlign = 'right';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetY = 2;
+          // Label TIRS (petit, blanc translucide)
+          ctx.fillStyle = 'rgba(255,255,255,0.78)';
+          ctx.font = '600 ' + shotLblSize + 'px ' + fontStack;
+          ctx.fillText(shotLbl, scoreX, shotY);
+          // Nombre (gros, blanc)
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '700 ' + shotNumSize + 'px ' + fontStack;
+          ctx.fillText(shotNum, scoreX, shotY + shotLblSize + 2);
+          ctx.shadowOffsetY = 0;
         }
 
         // ═══ MICRO-CONSIGNE (cartouche noir sous score+combo) ═══
