@@ -929,12 +929,15 @@ body.unlocked .sensei-only{display:revert !important}
       <div style="text-align:center" class="hero-world-text">
         <div style="font-family:'Bebas Neue','Impact',var(--font-cond);font-size:clamp(26px,5.5vw,56px);font-weight:900;letter-spacing:1.5px;color:#fff;text-transform:uppercase;animation:fadeUp .7s ease both;line-height:1.05;text-shadow:0 4px 24px rgba(0,0,0,.5)" data-i18n="hero_world_title">THE WORLD'S FIRST-EVER SCIENTIFIC <span style="color:#f5c518;text-shadow:0 4px 24px rgba(245,197,24,.5)">AI BASKETBALL</span> APP</div>
       </div>
-      <div class="hero-world-mock" style="display:flex;justify-content:center;align-items:center;width:100%;animation:fadeUp .9s .2s ease both;box-sizing:border-box">
-        <!-- Mocker vidéo WORLD FIRST : PNG iPhone original + vidéo superposée dans la zone écran -->
-        <div style="position:relative;width:min(620px,calc(100vw - 60px));max-width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box;filter:drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15))">
-          <img src="sensei-iphone-landscape.png" alt="iPhone" style="width:100%;display:block;position:relative;z-index:0;pointer-events:none" loading="eager">
-          <div style="position:absolute;top:6.667%;left:2%;width:95.938%;height:86.538%;overflow:hidden;border-radius:5.72%/13%;z-index:1">
-            <video src="sensei-hero.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:fill;display:block"></video>
+      <div class="hero-world-mock" style="display:flex;justify-content:center;animation:fadeUp .9s .2s ease both">
+        <!-- Cadre device landscape (vidéo horizontale 1274×688, ratio natif conservé) -->
+        <div style="width:min(520px,80vw);margin:0 auto;position:relative;padding:14px;background:linear-gradient(135deg,#1c1c1e 0%,#0a0a0b 100%);border:2px solid #2a2a2d;border-radius:22px;box-sizing:border-box;box-shadow:0 0 0 1px rgba(255,255,255,.04),inset 0 1.5px 0 rgba(255,255,255,.1),inset 0 -1.5px 0 rgba(0,0,0,.3),0 30px 60px -15px rgba(0,0,0,.65),0 15px 30px -10px rgba(0,0,0,.4),0 0 60px rgba(245,197,24,.15);filter:drop-shadow(0 10px 20px rgba(245,197,24,.1))">
+          <!-- Petit indicateur caméra style device -->
+          <div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:radial-gradient(circle,#1a3a4a 0%,#000 60%);border-radius:50%;box-shadow:inset 0 0 0 1px rgba(100,180,220,.3);z-index:10"></div>
+          <div style="background:#000;border-radius:10px;overflow:hidden;position:relative;margin-top:18px">
+            <video src="sensei-hero.mp4" autoplay muted loop playsinline style="width:100%;display:block;object-fit:contain"></video>
+            <!-- Reflet subtil -->
+            <div style="position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 100%);pointer-events:none;z-index:5"></div>
           </div>
         </div>
       </div>
@@ -1409,7 +1412,7 @@ body.unlocked .sensei-only{display:revert !important}
 
             <!-- Phone droit -->
             <div style="width:140px;flex-shrink:0;transform:rotate(5deg) translateY(12px);transform-origin:bottom center">
-              <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(245,197,24,.25);overflow:hidden">
+              <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(255,255,255,.2);overflow:hidden">
                 <div style="background:var(--dark3);padding:7px 10px;border-bottom:1px solid var(--border)">
                   <div style="font-family:var(--font-cond);font-size:7px;font-weight:700;color:#e0e0e0;letter-spacing:1px" data-i18n="mock_current_belt">CEINTURE ACTUELLE</div>
                 </div>
@@ -1631,7 +1634,7 @@ body.unlocked .sensei-only{display:revert !important}
 
         <!-- Phone gauche -->
         <div style="width:18vw;max-width:72px;flex-shrink:0;transform:rotate(-4deg);transform-origin:center">
-          <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(245,197,24,.25);overflow:hidden">
+          <div style="background:var(--dark2);border-radius:16px;border:1.5px solid rgba(245,197,24,.25);overflow:hidden">
             <div style="background:var(--dark3);padding:5px 7px;display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border)">
               <div style="width:14px;height:14px;border-radius:50%;background:rgba(245,197,24,.2);flex-shrink:0"></div>
               <div style="font-family:var(--font-cond);font-size:6px;font-weight:700;color:var(--text)">SENSEI</div>
@@ -1669,7 +1672,7 @@ body.unlocked .sensei-only{display:revert !important}
 
         <!-- Phone centre — courbe animée -->
         <div style="width:36vw;max-width:138px;flex-shrink:0;z-index:2">
-          <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(245,197,24,.25);overflow:hidden">
+          <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(245,197,24,.4);overflow:hidden">
             <div style="background:var(--dark3);padding:7px 9px 6px;border-bottom:1px solid var(--border)">
               <div style="font-family:var(--font-cond);font-size:7px;font-weight:700;color:var(--gold);letter-spacing:.5px" data-i18n="mock_my_progression">MA PROGRESSION</div>
               <div style="font-family:var(--font-cond);font-size:5px;color:var(--muted)" data-i18n="mock_sensei_years">SENSEI BLACKBELT · 4 ANS</div>
@@ -1719,7 +1722,7 @@ body.unlocked .sensei-only{display:revert !important}
 
         <!-- Phone droit — ceinture noire animée -->
         <div style="width:18vw;max-width:72px;flex-shrink:0;transform:rotate(4deg);transform-origin:center">
-          <div style="background:var(--dark2);border-radius:18px;border:2px solid rgba(245,197,24,.25);overflow:hidden">
+          <div style="background:var(--dark2);border-radius:16px;border:1.5px solid rgba(255,255,255,.2);overflow:hidden">
             <div style="background:var(--dark3);padding:5px 7px;border-bottom:1px solid var(--border)">
               <div style="font-family:var(--font-cond);font-size:5px;font-weight:700;color:#e0e0e0;letter-spacing:.5px">CEINTURE ACTUELLE</div>
             </div>
@@ -1785,7 +1788,7 @@ body.unlocked .sensei-only{display:revert !important}
         </div>
         <!-- Mockup Ball Handling — thumbs réels YouTube -->
         <div style="display:flex;justify-content:center">
-          <div class="iphone-mock" style="width:min(230px,70vw);filter:drop-shadow(0 20px 60px rgba(245,197,24,.2));transform:rotate(2deg)">
+          <div class="iphone-mock" style="width:min(260px,80vw);filter:drop-shadow(0 20px 60px rgba(245,197,24,.2));transform:rotate(2deg)">
             <div style="background:var(--dark2);border-radius:20px;border:2px solid rgba(245,197,24,.3);overflow:hidden">
               <div style="background:var(--dark3);padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)">
                 <div style="width:18px;height:18px;border-radius:50%;background:rgba(245,197,24,.2);border:1px solid rgba(245,197,24,.4);flex-shrink:0"></div>
@@ -1834,7 +1837,7 @@ body.unlocked .sensei-only{display:revert !important}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:80px" class="home-step-grid">
         <!-- Mockup gauche -->
         <div style="display:flex;justify-content:center;order:1">
-          <div class="iphone-mock" style="width:min(240px,70vw);filter:drop-shadow(0 20px 60px rgba(45,198,83,.15))">
+          <div class="iphone-mock" style="width:min(280px,80vw);filter:drop-shadow(0 20px 60px rgba(45,198,83,.15))">
             <div style="background:var(--dark2);border-radius:20px;border:1px solid rgba(45,198,83,.2);overflow:hidden">
               <div style="background:var(--dark3);padding:12px 16px;border-bottom:1px solid var(--border)">
                 <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(45,198,83,.7)">TRAINING MODE</div>
@@ -1878,20 +1881,18 @@ body.unlocked .sensei-only{display:revert !important}
         </div>
         <!-- Mini mockup science -->
         <div style="display:flex;justify-content:center">
-          <div class="iphone-mock" style="width:min(240px,70vw);filter:drop-shadow(0 20px 60px rgba(193,18,31,.12))">
-            <div style="background:var(--dark2);border-radius:20px;border:1px solid rgba(193,18,31,.2);overflow:hidden;display:flex;flex-direction:column;height:100%">
-              <div style="background:var(--dark3);padding:14px 18px;border-bottom:1px solid var(--border)">
+          <div class="iphone-mock" style="width:min(280px,80vw);filter:drop-shadow(0 20px 60px rgba(193,18,31,.12))">
+            <div style="background:var(--dark2);border-radius:20px;border:1px solid rgba(193,18,31,.2);overflow:hidden">
+              <div style="background:var(--dark3);padding:12px 16px;border-bottom:1px solid var(--border)">
                 <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(193,18,31,.7)" data-i18n="home_science_label">VISUAL SCIENCE</div>
               </div>
-              <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:8px;flex:1">
-                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">📐</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">PARABOLE</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Newton</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🧮</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">SHANNON</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">N-Ball</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🧬</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">NEURO</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Plasticité</div></div>
-                <div style="background:rgba(193,18,31,.08);border-radius:8px;padding:10px 8px;border:1px solid rgba(193,18,31,.2);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">⚛️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--red-belt)">DFFT</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Nature 2025</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🎯</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">BAYES</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Probabilité</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">⚙️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">BIOMÉCA</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Angle+Force</div></div>
+              <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">📐</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">PARABOLE</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Newton</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">🧮</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">SHANNON</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">N-Ball</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">🧬</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">NEURO</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Plasticité</div></div>
+                <div style="background:rgba(193,18,31,.08);border-radius:8px;padding:12px;border:1px solid rgba(193,18,31,.2);text-align:center"><div style="font-size:20px;margin-bottom:4px">⚛️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--red-belt)">DFFT</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Nature 2025</div></div>
               </div>
-              <div style="margin:0 14px 14px;padding:12px;background:rgba(193,18,31,.06);border-radius:8px;border:1px solid rgba(193,18,31,.15);text-align:center">
+              <div style="margin:0 12px 12px;padding:10px;background:rgba(193,18,31,.06);border-radius:8px;border:1px solid rgba(193,18,31,.15);text-align:center">
                 <div style="font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--red-belt)" data-i18n="home_visu_count">16 VISUALISATIONS INTERACTIVES</div>
               </div>
             </div>
@@ -11280,145 +11281,67 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
 }
 /* Sur mobile : titre centré + MP4 en-dessous centré (comportement par défaut, pas de override nécessaire) */
 
-/* ─── Vrais cadres iPhone photo-realistes (SPEC) ─── */
-/* Hero WORLD FIRST : UN iPhone landscape (règles respectées : video z-0, img z-10) */
-.hero-iphone-mock {
-  position: relative;
-  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
-}
-.hero-iphone-video-bg {
-  position: absolute;
-  top: 6.667%;
-  left: 2%;
-  width: 95.938%;
-  height: 86.538%;
-  border-radius: 5.72% / 13%;
-  object-fit: cover;
-  object-position: center;
-  z-index: 0;
-  display: block;
-  filter: blur(20px) brightness(0.5);
-  transform: scale(1.1);
-  transform-origin: center;
-}
-.hero-iphone-video {
-  position: absolute;
-  top: 6.667%;
-  left: 2%;
-  width: 95.938%;
-  height: 86.538%;
-  border-radius: 5.72% / 13%;
-  object-fit: contain;
-  object-position: center;
-  z-index: 1;
-  display: block;
-  background: transparent;
-}
-.hero-iphone-img {
-  position: relative;
-  width: 100%;
-  display: block;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.iphone-real-portrait {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 780 / 1600;
-  background: #000;
-  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
-}
-.iphone-real-portrait::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('sensei-iphone-portrait-overlay.png') center/100% 100% no-repeat;
-  pointer-events: none;
-  z-index: 10;
-}
-.iphone-real-landscape {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1600 / 780;
-  background: #000;
-  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
-  isolation: isolate;
-}
-.iphone-real-landscape::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('sensei-iphone-landscape-overlay.png') center/100% 100% no-repeat;
-  pointer-events: none;
-  z-index: 10;
-}
-.iphone-real-screen {
-  position: absolute;
-  top: 2.0%;
-  bottom: 2.5%;
-  left: 6.67%;
-  right: 6.79%;
-  overflow: hidden;
-  border-radius: 6%/3%;
-  background: transparent;
-}
-.iphone-real-landscape .iphone-real-screen {
-  top: 6.67%;
-  bottom: 6.79%;
-  left: 2.0%;
-  right: 2.06%;
-  border-radius: 3%/6%;
-}
-/* .iphone-mock : PNG iPhone portrait original + contenu superposé dans zone écran */
+/* ─── iPhone frame pro pour les mockers home (SPEC 2) ─── */
 .iphone-mock {
-  position: relative !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  padding: 0 !important;
-  box-shadow: none !important;
+  position: relative;
+  padding: 56px 10px 32px 10px !important;
+  background: linear-gradient(135deg, #1c1c1e 0%, #0a0a0b 100%) !important;
+  border-radius: 48px !important;
+  border: 2px solid #2a2a2d !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    inset 0 1.5px 0 rgba(255,255,255,.1),
+    inset 0 -1.5px 0 rgba(0,0,0,.3),
+    0 30px 60px -15px rgba(0,0,0,.65),
+    0 15px 30px -10px rgba(0,0,0,.4) !important;
   overflow: visible !important;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,.5)) drop-shadow(0 0 40px rgba(245,197,24,.1));
 }
-.iphone-mock::before { content: none !important; display: none !important; }
-/* L'image PNG iPhone s'affiche en background via ::after qui vient APRÈS le contenu interne (z-index inférieur) */
+/* Dynamic Island (iPhone 15 Pro style) */
+.iphone-mock::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 30px;
+  background: #000;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  z-index: 10;
+}
+/* Petit dot caméra à l'intérieur de la Dynamic Island */
 .iphone-mock::after {
   content: '';
-  display: block;
-  width: 100%;
-  padding-bottom: 205.13%;
-  background: url('sensei-iphone-portrait.png') center/100% 100% no-repeat;
-  position: relative;
-  z-index: 0;
-  pointer-events: none;
+  position: absolute;
+  top: 28px;
+  right: calc(50% - 36px);
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #1a3a4a 0%, #000 60%);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(100,180,220,.3);
+  z-index: 11;
 }
-/* La zone écran : positionnée précisément sur la zone écran du PNG, overflow hidden pour contenir le contenu */
+/* Enfant direct (le "screen") : coins arrondis pour s'ajuster au cadre */
 .iphone-mock > div:first-child {
-  position: absolute !important;
-  top: 2.0% !important;
-  left: 6.67% !important;
-  width: 86.54% !important;
-  height: 95.5% !important;
+  border-radius: 32px !important;
   overflow: hidden !important;
-  border-radius: 13% / 5.72% !important;
-  z-index: 1;
-  background: var(--dark2);
-  box-shadow: none !important;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.03) !important;
 }
-.iphone-mock > div:first-child::before { display: none !important; }
-/* Optimisation espace contenu : agrandir textes/paddings dans les mockers */
-.iphone-mock > div:first-child [style*="font-size:7px"] { font-size: 10px !important; }
-.iphone-mock > div:first-child [style*="font-size:8px"] { font-size: 11px !important; }
-.iphone-mock > div:first-child [style*="font-size:9px"] { font-size: 12px !important; }
-.iphone-mock > div:first-child [style*="font-size:10px"] { font-size: 13px !important; }
-.iphone-mock > div:first-child [style*="font-size:11px"] { font-size: 14px !important; }
-.iphone-mock > div:first-child [style*="font-size:12px"] { font-size: 15px !important; }
-.iphone-mock > div:first-child [style*="font-size:20px"] { font-size: 26px !important; }
-.iphone-mock > div:first-child [style*="padding:12px"] { padding: 16px !important; }
-.iphone-mock > div:first-child [style*="padding:16px"] { padding: 20px !important; }
-.iphone-mock > div:first-child [style*="gap:8px"] { gap: 12px !important; }
-.iphone-mock > div:first-child [style*="gap:10px"] { gap: 14px !important; }
+/* Reflet subtil en haut de l'écran */
+.iphone-mock > div:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+
+
 /* ─── Pendant la rotation d'écran : libérer le GPU pour un repaint instantané ─── */
 /* 1. Désactiver backdrop-filter (le plus lourd GPU) */
 /* 2. Désactiver transitions + animations CSS */
