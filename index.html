@@ -929,11 +929,12 @@ body.unlocked .sensei-only{display:revert !important}
       <div style="text-align:center" class="hero-world-text">
         <div style="font-family:'Bebas Neue','Impact',var(--font-cond);font-size:clamp(26px,5.5vw,56px);font-weight:900;letter-spacing:1.5px;color:#fff;text-transform:uppercase;animation:fadeUp .7s ease both;line-height:1.05;text-shadow:0 4px 24px rgba(0,0,0,.5)" data-i18n="hero_world_title">THE WORLD'S FIRST-EVER SCIENTIFIC <span style="color:#f5c518;text-shadow:0 4px 24px rgba(245,197,24,.5)">AI BASKETBALL</span> APP</div>
       </div>
-      <div class="hero-world-mock" style="display:flex;justify-content:center;animation:fadeUp .9s .2s ease both">
-        <!-- Mocker vidéo WORLD FIRST : cadre simple -->
-        <div style="width:min(560px,88vw);margin:0 auto;position:relative;padding:14px;background:linear-gradient(135deg,#1c1c1e 0%,#0a0a0b 100%);border:2px solid #2a2a2d;border-radius:22px;box-shadow:0 25px 60px rgba(0,0,0,.6),0 0 60px rgba(245,197,24,.15)">
-          <div style="background:#000;border-radius:12px;overflow:hidden">
-            <video src="sensei-hero.mp4" autoplay muted loop playsinline style="width:100%;display:block;object-fit:contain"></video>
+      <div class="hero-world-mock" style="display:flex;justify-content:center;align-items:center;width:100%;animation:fadeUp .9s .2s ease both;box-sizing:border-box">
+        <!-- Mocker vidéo WORLD FIRST : PNG iPhone original + vidéo superposée dans la zone écran -->
+        <div style="position:relative;width:min(620px,calc(100vw - 60px));max-width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box;filter:drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15))">
+          <img src="sensei-iphone-landscape.png" alt="iPhone" style="width:100%;display:block;position:relative;z-index:0;pointer-events:none" loading="eager">
+          <div style="position:absolute;top:6.667%;left:2%;width:95.938%;height:86.538%;overflow:hidden;border-radius:5.72%/13%;z-index:1">
+            <video src="sensei-hero.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:fill;display:block"></video>
           </div>
         </div>
       </div>
@@ -1878,17 +1879,19 @@ body.unlocked .sensei-only{display:revert !important}
         <!-- Mini mockup science -->
         <div style="display:flex;justify-content:center">
           <div class="iphone-mock" style="width:min(240px,70vw);filter:drop-shadow(0 20px 60px rgba(193,18,31,.12))">
-            <div style="background:var(--dark2);border-radius:20px;border:1px solid rgba(193,18,31,.2);overflow:hidden">
-              <div style="background:var(--dark3);padding:12px 16px;border-bottom:1px solid var(--border)">
+            <div style="background:var(--dark2);border-radius:20px;border:1px solid rgba(193,18,31,.2);overflow:hidden;display:flex;flex-direction:column;height:100%">
+              <div style="background:var(--dark3);padding:14px 18px;border-bottom:1px solid var(--border)">
                 <div style="font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(193,18,31,.7)" data-i18n="home_science_label">VISUAL SCIENCE</div>
               </div>
-              <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">📐</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">PARABOLE</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Newton</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">🧮</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">SHANNON</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">N-Ball</div></div>
-                <div style="background:var(--dark3);border-radius:8px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:20px;margin-bottom:4px">🧬</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">NEURO</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Plasticité</div></div>
-                <div style="background:rgba(193,18,31,.08);border-radius:8px;padding:12px;border:1px solid rgba(193,18,31,.2);text-align:center"><div style="font-size:20px;margin-bottom:4px">⚛️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--red-belt)">DFFT</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Nature 2025</div></div>
+              <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:8px;flex:1">
+                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">📐</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">PARABOLE</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Newton</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🧮</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">SHANNON</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">N-Ball</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🧬</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">NEURO</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Plasticité</div></div>
+                <div style="background:rgba(193,18,31,.08);border-radius:8px;padding:10px 8px;border:1px solid rgba(193,18,31,.2);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">⚛️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--red-belt)">DFFT</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Nature 2025</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">🎯</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">BAYES</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Probabilité</div></div>
+                <div style="background:var(--dark3);border-radius:8px;padding:10px 8px;border:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center"><div style="font-size:20px;margin-bottom:4px">⚙️</div><div style="font-family:var(--font-cond);font-size:8px;font-weight:700;color:var(--text)">BIOMÉCA</div><div style="font-family:var(--font-cond);font-size:7px;color:var(--muted)">Angle+Force</div></div>
               </div>
-              <div style="margin:0 12px 12px;padding:10px;background:rgba(193,18,31,.06);border-radius:8px;border:1px solid rgba(193,18,31,.15);text-align:center">
+              <div style="margin:0 14px 14px;padding:12px;background:rgba(193,18,31,.06);border-radius:8px;border:1px solid rgba(193,18,31,.15);text-align:center">
                 <div style="font-family:var(--font-cond);font-size:9px;font-weight:700;color:var(--red-belt)" data-i18n="home_visu_count">16 VISUALISATIONS INTERACTIVES</div>
               </div>
             </div>
@@ -11367,17 +11370,55 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   right: 2.06%;
   border-radius: 3%/6%;
 }
-/* .iphone-mock : style simple (clipart) — pas de PNG iPhone overlay */
+/* .iphone-mock : PNG iPhone portrait original + contenu superposé dans zone écran */
 .iphone-mock {
-  position: relative;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,.4));
+  position: relative !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,.5)) drop-shadow(0 0 40px rgba(245,197,24,.1));
 }
-.iphone-mock::before, .iphone-mock::after { content: none; display: none; }
+.iphone-mock::before { content: none !important; display: none !important; }
+/* L'image PNG iPhone s'affiche en background via ::after qui vient APRÈS le contenu interne (z-index inférieur) */
+.iphone-mock::after {
+  content: '';
+  display: block;
+  width: 100%;
+  padding-bottom: 205.13%;
+  background: url('sensei-iphone-portrait.png') center/100% 100% no-repeat;
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
+}
+/* La zone écran : positionnée précisément sur la zone écran du PNG, overflow hidden pour contenir le contenu */
 .iphone-mock > div:first-child {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
+  position: absolute !important;
+  top: 2.0% !important;
+  left: 6.67% !important;
+  width: 86.54% !important;
+  height: 95.5% !important;
+  overflow: hidden !important;
+  border-radius: 13% / 5.72% !important;
+  z-index: 1;
+  background: var(--dark2);
+  box-shadow: none !important;
 }
+.iphone-mock > div:first-child::before { display: none !important; }
+/* Optimisation espace contenu : agrandir textes/paddings dans les mockers */
+.iphone-mock > div:first-child [style*="font-size:7px"] { font-size: 10px !important; }
+.iphone-mock > div:first-child [style*="font-size:8px"] { font-size: 11px !important; }
+.iphone-mock > div:first-child [style*="font-size:9px"] { font-size: 12px !important; }
+.iphone-mock > div:first-child [style*="font-size:10px"] { font-size: 13px !important; }
+.iphone-mock > div:first-child [style*="font-size:11px"] { font-size: 14px !important; }
+.iphone-mock > div:first-child [style*="font-size:12px"] { font-size: 15px !important; }
+.iphone-mock > div:first-child [style*="font-size:20px"] { font-size: 26px !important; }
+.iphone-mock > div:first-child [style*="padding:12px"] { padding: 16px !important; }
+.iphone-mock > div:first-child [style*="padding:16px"] { padding: 20px !important; }
+.iphone-mock > div:first-child [style*="gap:8px"] { gap: 12px !important; }
+.iphone-mock > div:first-child [style*="gap:10px"] { gap: 14px !important; }
 /* ─── Pendant la rotation d'écran : libérer le GPU pour un repaint instantané ─── */
 /* 1. Désactiver backdrop-filter (le plus lourd GPU) */
 /* 2. Désactiver transitions + animations CSS */
