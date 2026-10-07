@@ -930,10 +930,11 @@ body.unlocked .sensei-only{display:revert !important}
         <div style="font-family:'Bebas Neue','Impact',var(--font-cond);font-size:clamp(26px,5.5vw,56px);font-weight:900;letter-spacing:1.5px;color:#fff;text-transform:uppercase;animation:fadeUp .7s ease both;line-height:1.05;text-shadow:0 4px 24px rgba(0,0,0,.5)" data-i18n="hero_world_title">THE WORLD'S FIRST-EVER SCIENTIFIC <span style="color:#f5c518;text-shadow:0 4px 24px rgba(245,197,24,.5)">AI BASKETBALL</span> APP</div>
       </div>
       <div class="hero-world-mock" style="display:flex;justify-content:center;animation:fadeUp .9s .2s ease both">
-        <!-- Vrai cadre iPhone landscape (vidéo horizontale 1274×688, de face, SANS CROP) -->
-        <div class="iphone-real-landscape" style="width:min(560px,88vw);margin:0 auto">
-          <div class="iphone-real-screen" style="display:flex;align-items:center;justify-content:center;background:#000">
-            <video src="sensei-hero.mp4" autoplay muted loop playsinline style="width:100%;height:auto;max-height:100%;display:block;object-fit:contain"></video>
+        <!-- Vrai cadre iPhone landscape — vidéo remplit l'écran, chaussures préservées (object-position:center 70%) -->
+        <div class="iphone-real-landscape" style="width:min(620px,92vw);margin:0 auto">
+          <div class="iphone-real-screen">
+            <video src="sensei-hero.mp4" autoplay muted loop playsinline
+              style="width:100%;height:100%;display:block;object-fit:cover;object-position:center bottom"></video>
           </div>
         </div>
       </div>
@@ -11282,15 +11283,34 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   position: relative;
   width: 100%;
   aspect-ratio: 780 / 1600;
-  background: url('sensei-iphone-portrait.png') center/contain no-repeat;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,.5));
+  background: #000;
+  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
+}
+.iphone-real-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('sensei-iphone-portrait.png') center/100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: lighten;
 }
 .iphone-real-landscape {
   position: relative;
   width: 100%;
   aspect-ratio: 1600 / 780;
-  background: url('sensei-iphone-landscape.png') center/contain no-repeat;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,.5));
+  background: #000;
+  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
+  isolation: isolate;
+}
+.iphone-real-landscape::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('sensei-iphone-landscape.png') center/100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: lighten;
 }
 .iphone-real-screen {
   position: absolute;
@@ -11300,7 +11320,7 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   right: 5.9%;
   overflow: hidden;
   border-radius: 6%/3%;
-  background: #000;
+  background: transparent;
 }
 .iphone-real-landscape .iphone-real-screen {
   top: 5.8%;
@@ -11309,32 +11329,32 @@ window.addEventListener('appinstalled', () => { document.getElementById('install
   right: 1.7%;
   border-radius: 3%/6%;
 }
-/* .iphone-mock : vrai cadre iPhone portrait via ::before (préserve hauteurs internes) */
+/* .iphone-mock : vrai cadre iPhone portrait via overlay DEVANT (préserve contenu interne) */
 .iphone-mock {
   position: relative !important;
-  padding: 7% 7% 7% 7% !important;
-  background: none !important;
+  background: #000 !important;
   border: none !important;
   border-radius: 0 !important;
+  padding: 0 !important;
   box-shadow: none !important;
   overflow: visible !important;
-  box-sizing: border-box;
+  filter: drop-shadow(0 25px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(245,197,24,.15));
   isolation: isolate;
 }
-.iphone-mock::before {
+.iphone-mock::before { content: none !important; display: none !important; }
+.iphone-mock::after {
   content: '';
   position: absolute;
   inset: 0;
   background: url('sensei-iphone-portrait.png') center/100% 100% no-repeat;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,.5));
-  z-index: 1;
   pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: lighten;
 }
-.iphone-mock::after { content: none !important; display: none !important; }
 .iphone-mock > div:first-child {
   position: relative;
-  z-index: 2;
-  border-radius: 20px !important;
+  z-index: 1;
+  border-radius: 0 !important;
   overflow: hidden !important;
   box-shadow: none !important;
 }
