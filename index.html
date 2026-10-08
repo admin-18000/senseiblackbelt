@@ -17524,38 +17524,55 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       }
     }
   }
-  // ─── Overlays de branding (zones ne gênant pas la mascotte centrale) ───
-  // FIX IG v2 : overlays uniformes mid-grey rgba(42,52,72,...) au lieu de rgba(19,24,32,...)
-  // → luminance totale ~140 au lieu de ~80 : visible sur IG + équilibre les cases avec mascotte
-  // Case 6 (haut gauche) : TITLE grand
+  // ─── Textes de branding dessinés DIRECTEMENT sur le fond uniforme (zéro overlay rectangle) ───
+  // FIX IG v4 : les 9 cases ont EXACTEMENT le même fond → mascotte identique couleur partout
+  //   (épaule, tête, bras, chaussures = même valeur chromatique entre cases adjacentes)
+  // → Textes avec shadow épaisse pour lisibilité, pas de rectangle qui briserait l'uniformité
+  const txtShadow = function(ctx, fn) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 3;
+    fn();
+    ctx.restore();
+  };
+  // Case 6 (haut gauche) : TITLE grand — texte seul avec shadow
   const c6 = canvases[6].getContext('2d');
-  c6.fillStyle = 'rgba(42,52,72,.70)'; c6.fillRect(0, 0, S, S);
-  pF(c6, cfg.titleLine1, 60, 300, 160, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c6, cfg.titleLine2, 60, 460, 160, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c6, '🥋', 60, 650, 180, '#f5c518', 'left');
-  // Case 8 (haut droite) : TAG + emoji — FIX bug args : color '#f5c518' au lieu de 'center'
+  txtShadow(c6, function(){
+    pF(c6, cfg.titleLine1, 60, 300, 160, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.titleLine2, 60, 460, 160, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, '🥋', 60, 650, 180, '#f5c518', 'left');
+  });
+  // Case 8 (haut droite) : TAG + emoji — texte seul avec shadow
   const c8 = canvases[8].getContext('2d');
-  c8.fillStyle = 'rgba(42,52,72,.70)'; c8.fillRect(0, 0, S, S);
-  pF(c8, cfg.emoji, S-80, 400, 400, '#f5c518', 'right');
-  pF(c8, '#'+cfg.hashtag, S-60, 850, 48, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c8, en?'FOLLOW':'SUIS-MOI', S-60, 920, 36, 'rgba(255,255,255,.6)', 'right');
-  // Case 0 (bas gauche) : QUOTE
-  const c0 = canvases[0].getContext('2d');
-  c0.fillStyle = 'rgba(42,52,72,.80)'; c0.fillRect(0, 0, S, S);
-  pF(c0, '"', 60, 400, 400, 'rgba(245,197,24,.15)', 'left', '900', 'serif');
-  pF(c0, cfg.quote1, 60, 550, 52, '#fff', 'left', '700');
-  pF(c0, cfg.quote2, 60, 630, 52, '#fff', 'left', '700');
-  pF(c0, cfg.quote3, 60, 710, 52, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c0, '— SENSEI', 60, 820, 36, 'rgba(245,197,24,.6)', 'left');
-  // Case 2 (bas droite) : CTA
+  txtShadow(c8, function(){
+    pF(c8, cfg.emoji, S-80, 400, 400, '#f5c518', 'right');
+    pF(c8, '#'+cfg.hashtag, S-60, 850, 48, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', S-60, 920, 36, 'rgba(255,255,255,.9)', 'right');
+  });
+  // Case 0 (bas gauche) : QUOTE — texte seul avec shadow
+  txtShadow(c0, function(){
+    pF(c0, '"', 60, 400, 400, 'rgba(245,197,24,.25)', 'left', '900', 'serif');
+    pF(c0, cfg.quote1, 60, 550, 52, '#fff', 'left', '700');
+    pF(c0, cfg.quote2, 60, 630, 52, '#fff', 'left', '700');
+    pF(c0, cfg.quote3, 60, 710, 52, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c0, '— SENSEI', 60, 820, 36, 'rgba(245,197,24,.8)', 'left');
+  });
+  // Case 2 (bas droite) : CTA — bouton or avec shadow puis texte
   const c2 = canvases[2].getContext('2d');
-  c2.fillStyle = 'rgba(42,52,72,.80)'; c2.fillRect(0, 0, S, S);
-  pRect(c2, S-500, S/2-80, 420, 160, 80, '#f5c518');
+  txtShadow(c2, function(){
+    pRect(c2, S-500, S/2-80, 420, 160, 80, '#f5c518');
+  });
   pF(c2, en?'JOIN →':'REJOINS →', S-290, S/2+15, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  pF(c2, 'senseiblackbelt.com', S-80, S-60, 32, 'rgba(245,197,24,.6)', 'right');
+  txtShadow(c2, function(){
+    pF(c2, 'senseiblackbelt.com', S-80, S-60, 32, 'rgba(245,197,24,.9)', 'right');
+  });
   // Petit watermark sur la case 4 (centre) pour signature
   const c4 = canvases[4].getContext('2d');
-  pF(c4, 'SENSEI BLACKBELT', S/2, S-60, 28, 'rgba(255,255,255,.4)', 'center', '700');
+  txtShadow(c4, function(){
+    pF(c4, 'SENSEI BLACKBELT', S/2, S-60, 28, 'rgba(255,255,255,.75)', 'center', '700');
+  });
 }
 function puzzleDrawTemplate7(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['arms-crossed'], {
