@@ -40651,6 +40651,7 @@ window._QI_DATA['pnr_05'] = {
     _sr_draw();
   }
   function _sr_showGameOver(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     var t = document.getElementById('sr-title-screen');
     var go = document.getElementById('sr-gameover');
     if (t) t.style.display = 'none';
@@ -41360,6 +41361,7 @@ if (G.imgBall) {
     _sa_drawStatic();
   };
   function _sa_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('sa-title-screen').style.display = 'none';
     var r = document.getElementById('sa-results');
     r.style.display = 'flex';
@@ -42146,6 +42148,7 @@ if (G.imgBall) {
     _bb_stop();
   }
   function _bb_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('bb-title-screen').style.display='none';
     document.getElementById('bb-results').style.display='flex';
     document.getElementById('bb-results-score').textContent = G.score+' pts';
@@ -42515,6 +42518,7 @@ if (G.imgBall) {
   }
   function _dm_showTitle(){ document.getElementById('dm-title-screen').style.display='flex'; document.getElementById('dm-results').style.display='none'; _dm_stop(); }
   function _dm_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('dm-title-screen').style.display='none';
     document.getElementById('dm-results').style.display='flex';
     document.getElementById('dm-results-score').textContent = G.score+' pts';
@@ -42798,6 +42802,7 @@ if (G.imgBall) {
   }
   window._hr_showTitle = function(){ document.getElementById('hr-title-screen').style.display='flex'; document.getElementById('hr-results').style.display='none'; _hr_stop(); };
   function _hr_showResults(playerWon){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('hr-title-screen').style.display='none';
     document.getElementById('hr-results').style.display='flex';
     var t=document.getElementById('hr-results-title');
@@ -43210,6 +43215,7 @@ if (G.imgBall) {
   }
   function _rc_showTitle(){ document.getElementById('rc-title-screen').style.display='flex'; document.getElementById('rc-results').style.display='none'; _rc_stop(); }
   function _rc_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('rc-title-screen').style.display='none';
     document.getElementById('rc-results').style.display='flex';
     // Calcul moyenne (exclure les faux départs qui pénalisent déjà)
@@ -43506,6 +43512,7 @@ if (G.imgBall) {
   }
   function _mc_showTitle(){ document.getElementById('mc-title-screen').style.display='flex'; document.getElementById('mc-results').style.display='none'; _mc_stop(); }
   function _mc_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('mc-title-screen').style.display='none';
     document.getElementById('mc-results').style.display='flex';
     var levelReached = Math.max(1, G.level - 1); // le niveau courant n'a pas été réussi
@@ -44237,6 +44244,9 @@ window.addEventListener('load', function(){
         }
       } catch(e){}
     });
+
+    // 🎮 Note: les 9 _X_showResults/_X_showGameOver sont dans des IIFE donc pas sur window.
+    // Le fix pour couper la musique au game over est appliqué directement dans leur corps.
   }, 500);
 });
 
@@ -44595,6 +44605,7 @@ window._askPseudoIfNeeded = function(callback){
     _tp_stop();
   }
   function _tp_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('tp-title-screen').style.display='none';
     document.getElementById('tp-results').style.display='flex';
     document.getElementById('tp-results-score').textContent = G.score+' pts';
@@ -45135,6 +45146,7 @@ window._askPseudoIfNeeded = function(callback){
   }
   function _cv_showTitle(){ document.getElementById('cv-title-screen').style.display='flex'; document.getElementById('cv-results').style.display='none'; _cv_stop(); }
   function _cv_showResults(){
+    try { if (typeof _arcadeBGM_stop === "function") _arcadeBGM_stop(); } catch(_bgmErr){}
     document.getElementById('cv-title-screen').style.display='none';
     document.getElementById('cv-results').style.display='flex';
     document.getElementById('cv-results-score').textContent = G.totalScore+' pts';
