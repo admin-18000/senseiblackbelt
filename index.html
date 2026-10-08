@@ -16622,20 +16622,23 @@ const PUZZLE_TEMPLATES_CONFIG = {
   5: { id:5,  name:'DRILL OF THE WEEK',     W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   6: { id:6,  name:'JOURNAL / RADAR',       W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   // ─── TPL 7-10 : mascottes SENSEI
-  //    canevas MAÎTRE 4:5 natif (3240×4050) + mode COVER → zéro bande, remplit toute la tuile
+  //    canevas MAÎTRE 4:5 natif (3240×4050) + mode CONTAIN → mascotte INTÉGRALE (zéro crop)
+  //    bgColor = '#000000' (NOIR PUR) = exactement le fond Instagram dark mode
+  //    → les bandes de padding deviennent INVISIBLES sur IG (se fondent avec le feed)
+  //    → zéro zoom manuel nécessaire, mascotte intégrale, lignes de découpe épargnent le visage
   //    focalY = position relative du visage dans l'image source (0=haut, 1=bas)
-  //    offsetYMode='cover' : l'image remplit toute la hauteur ou largeur, quitte à cropper
-  7: { id:7,  name:'THE SENSEI',            W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:4050, fit:'cover', focalY:0.18, bgColor:'#131820',
+  //    targetY=675 = centre vertical de la case 02 dans maître 4:5 (zone optimale)
+  7: { id:7,  name:'THE SENSEI',            W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:4050, fit:'contain', focalY:0.18, targetY:675, bgColor:'#000000',
                    text:{ safeTop:150, safeBot:1200 } } },
-  8: { id:8,  name:'BALL HANDLING',         W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:4050, fit:'cover', focalY:0.20, bgColor:'#131820',
+  8: { id:8,  name:'BALL HANDLING',         W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:4050, fit:'contain', focalY:0.20, targetY:675, bgColor:'#000000',
                    text:{ safeTop:150, safeBot:1200 } } },
-  9: { id:9,  name:'SENSEI IA',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:4050, fit:'cover', focalY:0.18, bgColor:'#131820',
+  9: { id:9,  name:'SENSEI IA',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:4050, fit:'contain', focalY:0.18, targetY:675, bgColor:'#000000',
                    text:{ safeTop:150, safeBot:1200 } } },
-  10:{ id:10, name:'HARD WORK',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:4050, fit:'cover', focalY:0.22, bgColor:'#131820',
+  10:{ id:10, name:'HARD WORK',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:4050, fit:'contain', focalY:0.22, targetY:675, bgColor:'#000000',
                    text:{ safeTop:150, safeBot:1200 } } },
 };
 // Helper : lire la config du template actuel (avec fallback safe)
@@ -17797,8 +17800,9 @@ function puzzleRender() {
       console.error('[Puzzle TPL '+idx+' '+T.name+'] Tuile '+(i+1)+' hors format : '+c.width+'×'+c.height+' (attendu '+T.W+'×'+T.H+')');
     }
   }
-  // mise à jour aperçu
+  // mise à jour aperçu — fond du grid aligné sur bgColor du template (gaps 3px invisibles)
   const grid = document.getElementById('puzzle-grid-preview');
+  grid.style.background = T.bgColor || '#131820';
   grid.innerHTML='';
   _puzzleCanvases.forEach((canvas,i)=>{
     const wrapper=document.createElement('div');
