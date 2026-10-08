@@ -16622,20 +16622,20 @@ const PUZZLE_TEMPLATES_CONFIG = {
   5: { id:5,  name:'DRILL OF THE WEEK',     W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   6: { id:6,  name:'JOURNAL / RADAR',       W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   // ─── TPL 7-10 : mascottes SENSEI
-  //    canevas MAÎTRE EN 1:1 (3240×3240) → continuité pixel-perfect sur grille profil IG (qui force le 1:1)
-  //    EXPORT tuile en 1080×1350 (4:5) avec padding vertical #131820 → feed IG natif sans crop
-  //    targetY=540 = centre de la case 02 dans l'espace 1:1 (hauteur de slice = 1080, centre = 540)
+  //    canevas MAÎTRE 4:5 natif (3240×4050) + mode COVER → zéro bande, remplit toute la tuile
+  //    focalY = position relative du visage dans l'image source (0=haut, 1=bas)
+  //    offsetYMode='cover' : l'image remplit toute la hauteur ou largeur, quitte à cropper
   7: { id:7,  name:'THE SENSEI',            W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:3240, focalY:0.18, targetY:540, bgColor:'#131820',
+        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:4050, fit:'cover', focalY:0.18, bgColor:'#131820',
                    text:{ safeTop:150, safeBot:1200 } } },
   8: { id:8,  name:'BALL HANDLING',         W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:3240, focalY:0.20, targetY:540, bgColor:'#131820',
+        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:4050, fit:'cover', focalY:0.20, bgColor:'#131820',
                    text:{ safeTop:150, safeBot:1200 } } },
   9: { id:9,  name:'SENSEI IA',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:3240, focalY:0.18, targetY:540, bgColor:'#131820',
+        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:4050, fit:'cover', focalY:0.18, bgColor:'#131820',
                    text:{ safeTop:150, safeBot:1200 } } },
   10:{ id:10, name:'HARD WORK',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:3240, focalY:0.22, targetY:540, bgColor:'#131820',
+        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:4050, fit:'cover', focalY:0.22, bgColor:'#131820',
                    text:{ safeTop:150, safeBot:1200 } } },
 };
 // Helper : lire la config du template actuel (avec fallback safe)
@@ -17530,25 +17530,21 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   const H       = mcfg.H       || 1350;    // Hauteur tuile (config template)
   const S       = PUZZLE_SIZE;             // Alias historique (positions horizontales)
   const TOTAL_W = mcfg.canvasW || (W * 3); // Canevas maître largeur (3240 par défaut)
-  const TOTAL_H = mcfg.canvasH || (W * 3); // Canevas maître hauteur — défaut 1:1 (3240)
-  const SLICE_W = TOTAL_W / 3;             // Largeur d'une tuile dans le maître (1080)
-  const SLICE_H = TOTAL_H / 3;             // Hauteur d'une tuile dans le maître (1080 si 1:1)
-  const PAD_Y   = Math.round((H - SLICE_H) / 2); // Padding vertical pour passer SLICE_H → tuile finale H
+  const TOTAL_H = mcfg.canvasH || (H * 3); // Canevas maître hauteur (4050 par défaut = 4:5 natif)
   const BG      = mcfg.bgColor || '#131820';
+  const FIT     = mcfg.fit     || 'cover'; // 'cover' = remplit tout (zéro bande sur IG)
   const en = d.en;
 
   // ═══════════════════════════════════════════════════════════════════
-  //  STRATÉGIE DUAL-RATIO INSTAGRAM (critique)
-  //  → Canevas MAÎTRE EN 1:1 (3240×3240) pour que la GRILLE PROFIL IG
-  //    (qui force le ratio 1:1 par crop centré auto) reste pixel-perfect.
-  //  → Chaque TUILE EXPORTÉE en 1080×1350 (4:5) avec padding vertical
-  //    #131820 pour que le FEED IG affiche en portrait natif sans crop.
-  //  → Zone centrale (y=PAD_Y à y=PAD_Y+SLICE_H) = commune aux 2 affichages.
-  //    Les textes importants doivent rester dans cette zone pour être visibles
-  //    autant sur le profil (1:1) que dans le feed (4:5).
+  //  STRATÉGIE : canevas MAÎTRE 4:5 natif (3240×4050) + MODE COVER
+  //  → la mascotte REMPLIT toute la surface du maître (zéro bande visible)
+  //  → chaque tuile exportée 1080×1350 est 100 % remplie
+  //  → zéro bande #131820 sur le feed Instagram (plus besoin de zoom manuel)
+  //  → focalY = position relative du visage dans l'image source (0=haut, 1=bas)
+  //  → le visage tombe dans la case 02 (haut-centre) grâce à focalY
   // ═══════════════════════════════════════════════════════════════════
 
-  // ── ÉTAPE 1 : composition canevas maître (1:1 par défaut) ──────
+  // ── ÉTAPE 1 : composition canevas maître 4:5 natif ─────────────
   const composite = document.createElement('canvas');
   composite.width = TOTAL_W;
   composite.height = TOTAL_H;
@@ -17566,50 +17562,59 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
 
   // ═══════════════════════════════════════════════════════════════════
   //  RÈGLE DE COMPOSITION & SÉCURITÉ DU SUJET (critique)
+  //  → En mode COVER, l'image remplit TOUT le canevas (zéro bande visible).
   //  → focalY = position relative du visage dans l'image source (0=haut, 1=bas)
-  //  → targetY = position cible du visage dans le maître (par défaut : centre
-  //    de la tuile 02 — SLICE_H/2 = 540 en 1:1, soit tuile haut-centre)
-  //  → l'image est contain dans le maître puis décalée pour que le visage
-  //    atterrisse à targetY, tout en restant clamped dans le maître.
+  //  → targetY = position cible du visage dans le maître (par défaut 675 =
+  //    centre vertical de la case 02 dans un maître 4:5 3240×4050)
   // ═══════════════════════════════════════════════════════════════════
   if (img) {
-    const imgRatio = img.width / img.height;
+    const imgRatio    = img.width / img.height;
     const masterRatio = TOTAL_W / TOTAL_H;
     let drawW, drawH;
-    if (imgRatio > masterRatio) {
-      drawW = TOTAL_W; drawH = drawW / imgRatio;
-    } else if (imgRatio < masterRatio) {
-      drawH = TOTAL_H; drawW = drawH * imgRatio;
+
+    if (FIT === 'cover') {
+      // MODE COVER : remplit entièrement le canevas (zéro bande neutre)
+      if (imgRatio > masterRatio) {
+        drawH = TOTAL_H; drawW = drawH * imgRatio;
+      } else {
+        drawW = TOTAL_W; drawH = drawW / imgRatio;
+      }
     } else {
-      drawW = TOTAL_W; drawH = TOTAL_H;
+      // MODE CONTAIN : préserve l'image intégrale, laisse des bandes si nécessaire
+      if (imgRatio > masterRatio) { drawW = TOTAL_W; drawH = drawW / imgRatio; }
+      else if (imgRatio < masterRatio) { drawH = TOTAL_H; drawW = drawH * imgRatio; }
+      else { drawW = TOTAL_W; drawH = TOTAL_H; }
     }
+
     const offsetX = (TOTAL_W - drawW) / 2;
     const focalY  = (typeof mcfg.focalY  === 'number') ? mcfg.focalY  : 0.18;
-    const targetY = (typeof mcfg.targetY === 'number') ? mcfg.targetY : (SLICE_H / 2);
+    const targetY = (typeof mcfg.targetY === 'number') ? mcfg.targetY : (TOTAL_H / 6); // 675 pour 4050
     let offsetY = targetY - drawH * focalY;
-    const minOffsetY = Math.min(0, TOTAL_H - drawH);
-    const maxOffsetY = Math.max(0, TOTAL_H - drawH);
-    offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, offsetY));
+
+    // Clamp selon le mode
+    if (FIT === 'cover') {
+      // En cover, l'image doit couvrir toute la surface → offsetY ∈ [TOTAL_H-drawH, 0]
+      offsetY = Math.max(TOTAL_H - drawH, Math.min(0, offsetY));
+    } else {
+      const minOffsetY = Math.min(0, TOTAL_H - drawH);
+      const maxOffsetY = Math.max(0, TOTAL_H - drawH);
+      offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, offsetY));
+    }
     cctx.drawImage(img, offsetX, offsetY, drawW, drawH);
   }
 
-  // ── ÉTAPE 2 : découpage 3×3 → slices SLICE_W×SLICE_H dans maître 1:1
-  //    → blit centré verticalement dans tuile finale W×H (4:5) avec padding
-  //    → les bandes top/bottom gardent le BG (déjà pré-rempli par puzzleRender)
-  //
-  //    Résultat :
-  //    - Profil IG (crop 1:1 centré auto) : voit la zone centrale = le slice 1:1 original
-  //      → continuité pixel-perfect PRÉSERVÉE entre tuiles adjacentes
-  //    - Feed IG (affichage 4:5 natif) : voit la tuile complète 1080×1350
-  //      → format portrait, zéro crop
+  // ── ÉTAPE 2 : découpage 3×3 → 9 tuiles 1080×1350 (4:5 natif plein)
+  //   src = (col*W, row*H, W, H)   dst = (0, 0, W, H)
+  //   → chaque tuile 100 % remplie par le contenu du maître
+  //   → feed IG affiche portrait 4:5 natif SANS bande, zéro besoin de zoom
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 3; col++) {
       const idx = row * 3 + col;
       const ctx = canvases[idx].getContext('2d');
-      // Ne PAS clear : on garde le BG uniforme pré-rempli (bandes top/bottom restent #131820)
+      ctx.clearRect(0, 0, W, H);
       ctx.drawImage(composite,
-        col * SLICE_W, row * SLICE_H, SLICE_W, SLICE_H,  // src : slice 1:1 dans canevas maître
-        0, PAD_Y, SLICE_W, SLICE_H                        // dst : centré verticalement dans tuile 4:5
+        col * W, row * H, W, H,   // src : zone exacte dans maître
+        0, 0, W, H                 // dst : full tuile 1080×1350
       );
     }
   }
