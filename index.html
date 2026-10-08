@@ -17448,8 +17448,9 @@ function puzzleDrawTemplate6(canvases, d) {
        ['📊','BPM','MoveNet poignet']];
   feats.forEach(function([icon,title,sub],i) {
     const y = 280+i*130;
-    pRect(c8,60,y-50,S-120,100,10,'rgba(123,45,139,0.08)','rgba(123,45,139,0.25)',1);
-    pF(c8,icon,130,y+10,40,'#fff','left');
+    // FIX IG v5 : rect lift x=60 → x=100 (safe margin)
+    pRect(c8,100,y-50,S-200,100,10,'rgba(123,45,139,0.08)','rgba(123,45,139,0.25)',1);
+    pF(c8,icon,160,y+10,40,'#fff','left');
     pF(c8,title,S/2+20,y-10,32,'#7b2d8b','left','700');
     pF(c8,sub,S/2+20,y+36,24,'rgba(255,255,255,0.3)','left');
   });
@@ -17524,10 +17525,10 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       }
     }
   }
-  // ─── Textes de branding dessinés DIRECTEMENT sur le fond uniforme (zéro overlay rectangle) ───
-  // FIX IG v4 : les 9 cases ont EXACTEMENT le même fond → mascotte identique couleur partout
-  //   (épaule, tête, bras, chaussures = même valeur chromatique entre cases adjacentes)
-  // → Textes avec shadow épaisse pour lisibilité, pas de rectangle qui briserait l'uniformité
+  // ─── Textes branding v5 — MARGES IG-SAFE 10% ───
+  // Instagram crop les bords (profile grid, feed, stories) → tout contenu < 10% du bord risque d'être coupé
+  // SAFE = 108 (10% de 1080) sur chaque côté. Watermark case 5 retiré (overlapait la ceinture mascotte).
+  const SAFE = Math.round(S * 0.10);  // 108px marge de sécurité IG
   const txtShadow = function(ctx, fn) {
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.95)';
@@ -17537,43 +17538,43 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
     fn();
     ctx.restore();
   };
-  // Case 6 (haut gauche) : TITLE grand — texte seul avec shadow
+  // Case 7 user (c6 bottom-left) : TITLE — safe left margin + taille réduite
   const c6 = canvases[6].getContext('2d');
   txtShadow(c6, function(){
-    pF(c6, cfg.titleLine1, 60, 300, 160, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.titleLine2, 60, 460, 160, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, '🥋', 60, 650, 180, '#f5c518', 'left');
+    pF(c6, cfg.titleLine1, SAFE, 340, 140, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.titleLine2, SAFE, 480, 140, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, '🥋', SAFE, 680, 160, '#f5c518', 'left');
   });
-  // Case 8 (haut droite) : TAG + emoji — texte seul avec shadow
+  // Case 9 user (c8 bottom-right) : EMOJI + HASHTAG — safe right margin
   const c8 = canvases[8].getContext('2d');
   txtShadow(c8, function(){
-    pF(c8, cfg.emoji, S-80, 400, 400, '#f5c518', 'right');
-    pF(c8, '#'+cfg.hashtag, S-60, 850, 48, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c8, en?'FOLLOW':'SUIS-MOI', S-60, 920, 36, 'rgba(255,255,255,.9)', 'right');
+    pF(c8, cfg.emoji, S-SAFE, 420, 340, '#f5c518', 'right');
+    pF(c8, '#'+cfg.hashtag, S-SAFE, 820, 44, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', S-SAFE, 890, 32, 'rgba(255,255,255,.9)', 'right');
   });
-  // Case 0 (bas gauche) : QUOTE — texte seul avec shadow
+  // Case 1 user (c0 top-left) : QUOTE — safe left margin + taille réduite pour tenir
   const c0 = canvases[0].getContext('2d');
   txtShadow(c0, function(){
-    pF(c0, '"', 60, 400, 400, 'rgba(245,197,24,.25)', 'left', '900', 'serif');
-    pF(c0, cfg.quote1, 60, 550, 52, '#fff', 'left', '700');
-    pF(c0, cfg.quote2, 60, 630, 52, '#fff', 'left', '700');
-    pF(c0, cfg.quote3, 60, 710, 52, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c0, '— SENSEI', 60, 820, 36, 'rgba(245,197,24,.8)', 'left');
+    pF(c0, '"', SAFE, 380, 340, 'rgba(245,197,24,.25)', 'left', '900', 'serif');
+    pF(c0, cfg.quote1, SAFE, 540, 46, '#fff', 'left', '700');
+    pF(c0, cfg.quote2, SAFE, 610, 46, '#fff', 'left', '700');
+    pF(c0, cfg.quote3, SAFE, 690, 46, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c0, '— SENSEI', SAFE, 790, 32, 'rgba(245,197,24,.8)', 'left');
   });
-  // Case 2 (bas droite) : CTA — bouton or avec shadow puis texte
+  // Case 3 user (c2 top-right) : CTA bouton or — safe right margin
   const c2 = canvases[2].getContext('2d');
+  const btnW = 380, btnH = 140;
+  const btnX = S - SAFE - btnW; // bouton collé au safe right
+  const btnY = S/2 - btnH/2;
   txtShadow(c2, function(){
-    pRect(c2, S-500, S/2-80, 420, 160, 80, '#f5c518');
+    pRect(c2, btnX, btnY, btnW, btnH, 70, '#f5c518');
   });
-  pF(c2, en?'JOIN →':'REJOINS →', S-290, S/2+15, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c2, en?'JOIN →':'REJOINS →', btnX + btnW/2, btnY + btnH/2 + 20, 52, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   txtShadow(c2, function(){
-    pF(c2, 'senseiblackbelt.com', S-80, S-60, 32, 'rgba(245,197,24,.9)', 'right');
+    pF(c2, 'senseiblackbelt.com', S-SAFE, S-SAFE, 28, 'rgba(245,197,24,.9)', 'right');
   });
-  // Petit watermark sur la case 4 (centre) pour signature
-  const c4 = canvases[4].getContext('2d');
-  txtShadow(c4, function(){
-    pF(c4, 'SENSEI BLACKBELT', S/2, S-60, 28, 'rgba(255,255,255,.75)', 'center', '700');
-  });
+  // Case 5 user (c4 center) : PAS de watermark — n'overlap pas la mascotte
+  // (ancien watermark 'SENSEI BLACKBELT' retiré car il mangeait la ceinture noire)
 }
 function puzzleDrawTemplate7(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['arms-crossed'], {
