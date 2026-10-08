@@ -16676,12 +16676,15 @@ function pBeltBars(ctx, x, y, w, beltIdx, beltColors) {
 
 // ── Fond commun ──
 function pBg(ctx, accent) {
-  ctx.fillStyle = '#080a0f'; ctx.fillRect(0,0,PUZZLE_SIZE,PUZZLE_SIZE);
+  // FIX Instagram : base lift de #080a0f (quasi noir, invisible sur IG dark) → #131820 (--dark2 de l'app, dark SENSEI mais visible)
+  ctx.fillStyle = '#131820'; ctx.fillRect(0,0,PUZZLE_SIZE,PUZZLE_SIZE);
   const grd = ctx.createRadialGradient(PUZZLE_SIZE/2,PUZZLE_SIZE/2,0,PUZZLE_SIZE/2,PUZZLE_SIZE/2,PUZZLE_SIZE*.7);
-  grd.addColorStop(0, (accent||'rgba(245,197,24,')+'0.04)');
+  // Alpha gradient 0.04 → 0.12 pour que l'accent couleur de case soit visible et pas écrasé
+  grd.addColorStop(0, (accent||'rgba(245,197,24,')+'0.12)');
   grd.addColorStop(1,'transparent');
   ctx.fillStyle=grd; ctx.fillRect(0,0,PUZZLE_SIZE,PUZZLE_SIZE);
-  ctx.strokeStyle='rgba(255,255,255,0.025)'; ctx.lineWidth=1;
+  // Pattern grille or (plus visible que blanc 0.025 — crée texture perceptible sans alourdir)
+  ctx.strokeStyle='rgba(245,197,24,0.04)'; ctx.lineWidth=1;
   for(let x=0;x<PUZZLE_SIZE;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,PUZZLE_SIZE);ctx.stroke();}
   for(let y=0;y<PUZZLE_SIZE;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(PUZZLE_SIZE,y);ctx.stroke();}
 }
@@ -17019,7 +17022,7 @@ function puzzleDrawTemplate4(canvases, d) {
   // LIGNE 1 — "AVANT" : le joueur sans méthode
   // Case 1 : fond rouge sombre, chaos
   const c1=canvases[0].getContext('2d');
-  c1.fillStyle='#0d0507'; c1.fillRect(0,0,S,S);
+  c1.fillStyle='#1a0b0e'; c1.fillRect(0,0,S,S); // FIX IG : lift anti-noir
   c1.strokeStyle='rgba(193,18,31,0.04)'; c1.lineWidth=1;
   for(let x=0;x<S;x+=60){c1.beginPath();c1.moveTo(x,0);c1.lineTo(x,S);c1.stroke();}
   for(let y=0;y<S;y+=60){c1.beginPath();c1.moveTo(0,y);c1.lineTo(S,y);c1.stroke();}
@@ -17032,7 +17035,7 @@ function puzzleDrawTemplate4(canvases, d) {
 
   // Case 2 : texte AVANT descriptif
   const c2=canvases[1].getContext('2d');
-  c2.fillStyle='#0d0507'; c2.fillRect(0,0,S,S);
+  c2.fillStyle='#1a0b0e'; c2.fillRect(0,0,S,S); // FIX IG : lift anti-noir
   pRect(c2,80,160,S-160,600,16,'rgba(193,18,31,0.06)','rgba(193,18,31,0.25)',2);
   pF(c2,en?'The player trains...':'Le joueur s\'entraîne...',S/2,280,38,'rgba(255,255,255,0.6)');
   const befores=en
@@ -17043,7 +17046,7 @@ function puzzleDrawTemplate4(canvases, d) {
 
   // Case 3 : score avant (bas)
   const c3=canvases[2].getContext('2d');
-  c3.fillStyle='#0d0507'; c3.fillRect(0,0,S,S);
+  c3.fillStyle='#1a0b0e'; c3.fillRect(0,0,S,S); // FIX IG : lift anti-noir
   pF(c3,en?'TYPICAL SCORE':'SCORE TYPIQUE',S/2,220,42,'rgba(193,18,31,0.5)');
   pF(c3,'3.2',S/2,560,320,'rgba(193,18,31,0.4)','center','900','"Bebas Neue",Arial Narrow,sans-serif');
   pF(c3,'/ 10',S/2,650,60,'rgba(255,255,255,0.2)');
@@ -17278,7 +17281,7 @@ function puzzleDrawTemplate6(canvases, d) {
 
     } else {
       // Fallback fond sombre
-      ctx.fillStyle = '#0a0e18'; ctx.fillRect(0, 0, S, S);
+      ctx.fillStyle = '#131820'; ctx.fillRect(0, 0, S, S); // FIX IG : lift fallback
       ctx.strokeStyle = 'rgba(255,255,255,0.02)'; ctx.lineWidth = 1;
       for(let x=0;x<S;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,S);ctx.stroke();}
       for(let y=0;y<S;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(S,y);ctx.stroke();}
