@@ -17804,12 +17804,18 @@ function puzzleRender() {
   const grid = document.getElementById('puzzle-grid-preview');
   grid.style.background = T.bgColor || '#131820';
   grid.innerHTML='';
+  // ─── ASPECT-RATIO STRICT par cellule : lit T.W / T.H du template actif ─────
+  //    → TPL 7-10 (mascottes 4:5) : chaque cellule aspect-ratio: 4/5 (rectangle vertical)
+  //    → TPL 0-6 (legacy 1:1) : chaque cellule aspect-ratio: 1/1 (carré d'origine)
+  //    → ZERO scale manuel, aucune déformation, respect strict du format du template
+  const cellAspect = T.W + '/' + T.H;    // ex: "1080/1350" = 4/5 pour mascottes
   _puzzleCanvases.forEach((canvas,i)=>{
     const wrapper=document.createElement('div');
-    wrapper.style.cssText='position:relative;cursor:pointer;border-radius:4px;overflow:hidden';
+    wrapper.style.cssText='position:relative;cursor:pointer;border-radius:4px;overflow:hidden;aspect-ratio:'+cellAspect+';background:'+(T.bgColor||'#131820');
     const img=document.createElement('img');
     img.src=canvas.toDataURL('image/jpeg',0.92);
-    img.style.cssText='width:100%;display:block;border-radius:4px';
+    // L'image remplit toute la cellule 4:5 (match 1:1 avec les dimensions du canvas 1080×1350)
+    img.style.cssText='width:100%;height:100%;display:block;object-fit:cover;border-radius:4px';
     const badge=document.createElement('div');
     badge.style.cssText='position:absolute;top:6px;left:6px;background:rgba(8,10,15,.8);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:1px';
     badge.textContent=(i+1)+'/9';
@@ -17821,6 +17827,17 @@ function puzzleRender() {
     wrapper.onclick=(function(c,n){return function(){puzzleDownloadOne(c,n);};})(canvas,i+1);
     grid.appendChild(wrapper);
   });
+  // ─── Indicateur format sous la grille (pour validation visuelle de l'user) ───
+  const fmtInfo = document.getElementById('puzzle-format-info') || (function(){
+    const d = document.createElement('div');
+    d.id = 'puzzle-format-info';
+    d.style.cssText = 'text-align:center;margin-top:10px;font-family:var(--font-cond),sans-serif;font-size:11px;letter-spacing:1.5px;color:#7a8299;font-weight:700';
+    grid.parentNode.insertBefore(d, grid.nextSibling);
+    return d;
+  })();
+  const ratio = (T.W/T.H).toFixed(3);
+  const ratioLabel = (T.W===1080 && T.H===1350) ? '4:5 PORTRAIT' : (T.W===T.H ? '1:1 CARRÉ' : ratio);
+  fmtInfo.innerHTML = '◼ FORMAT : ' + T.W + '×' + T.H + ' px · RATIO ' + ratioLabel + ' · CANEVAS MAÎTRE ' + (T.W*(T.cols||3)) + '×' + (T.H*(T.rows||3)) + ' px';
 }
 
 function puzzleDownloadOne(canvas, n) {
