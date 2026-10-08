@@ -32662,28 +32662,25 @@ function _dcog_vcm_drawTargets(ctx, W, H) {
       ? (answerIsTrue === _dcog_vcmIsTrue ? '#22c55e' : '#e63946')
       : t.color;
     ctx.fill();
-    // Label VRAI/FAUX ou TRUE/FALSE au centre
+    // Symboles ✓ / ✗ en blanc (max contraste sur fond vert/rouge) — pas d'emoji (couleurs figées)
     ctx.globalAlpha  = 1;
     ctx.fillStyle    = '#fff';
     ctx.save();
-    // Texte localisé
+    // Pré-hit : ✓ si cible TRUE, ✗ si cible FALSE — Post-hit : ✓ si joueur correct, ✗ si joueur wrong
     var lblDisplay = t.hit
       ? (answerIsTrue === _dcog_vcmIsTrue ? '✓' : '✗')
-      : (en ? (t.vcmVal === 'TRUE' ? 'TRUE' : 'FALSE')
-            : (t.vcmVal === 'TRUE' ? 'VRAI' : 'FAUX'));
-    // Font bumpé à 0.55r pour lisibilité trépied (vs 0.42 avant)
-    var fontSize = t.hit ? Math.round(t.r * 0.78) : Math.round(t.r * 0.55);
+      : (t.vcmVal === 'TRUE' ? '✓' : '✗');
+    // Font à 1.0r : symbole visible depuis 2-3m avec marge confortable dans le cercle
+    var fontSize = Math.round(t.r * 1.0);
     ctx.font         = 'bold ' + fontSize + 'px "Bebas Neue", "Arial Narrow", sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    // 🛡 Anti-overflow : mesure la largeur réelle et rétrécit si > 90% du diamètre
-    if (!t.hit) {
-      var textW = ctx.measureText(lblDisplay).width;
-      var maxW = t.r * 1.8; // 90% du diamètre 2r
-      if (textW > maxW) {
-        fontSize = Math.max(10, Math.round(fontSize * (maxW / textW)));
-        ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", "Arial Narrow", sans-serif';
-      }
+    // 🛡 Anti-overflow : safety net si le glyph fallback d'une police système est trop large
+    var textW = ctx.measureText(lblDisplay).width;
+    var maxW = t.r * 1.6; // 80% du diamètre 2r (symbole seul, large marge visuelle)
+    if (textW > maxW) {
+      fontSize = Math.max(10, Math.round(fontSize * (maxW / textW)));
+      ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", "Arial Narrow", sans-serif';
     }
     ctx.shadowColor  = 'rgba(0,0,0,0.9)';
     ctx.shadowBlur   = 5;
