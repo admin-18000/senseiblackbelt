@@ -1062,7 +1062,7 @@ body.unlocked .sensei-only{display:revert !important}
             <span style="position:absolute;top:-7px;right:-7px;background:#22c55e;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:5px;letter-spacing:.5px;font-family:'Inter',sans-serif">FREE</span>
             🎬 <span data-i18n="dojo_cta_vweek">VIDÉO DE LA SEMAINE</span>
           </button>
-          <button onclick="_calendar_open()" style="background:transparent;color:#9f64e6;border:2px solid #9f64e6;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.background='rgba(159,100,230,.1)'" onmouseout="this.style.background='transparent'">
+          <button onclick="_calendar_open()" style="background:transparent;color:#cfd3e0;border:2px solid rgba(207,211,224,.5);border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='#cfd3e0'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(207,211,224,.5)'">
             📅 <span data-i18n="dojo_cta_cal">CALENDRIER</span>
           </button>
         </div>
@@ -44529,11 +44529,11 @@ window._calendar_open = function(){
   if (!m) {
     m = document.createElement('div');
     m.id = 'calendar-modal';
-    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:rgba(10,13,24,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;font-family:inherit';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:#0a0d14;overflow-y:auto;font-family:inherit';
     document.body.appendChild(m);
   }
 
-  // ─── 14 sessions sur 7 jours · 7 types × 2 sessions = cycle complet ───
+  // ─── 14 sessions sur 7 jours · 7 types × 2 sessions ──
   // Types couverts : Shooting · Finishing · Défense · Rebounding · Hand-Eye · S&C · NBA Pro
   // (zéro Ball Handling — module dédié)
   var L = {
@@ -44541,148 +44541,193 @@ window._calendar_open = function(){
     finishing: en?'FINISHING':'FINISHING',
     defense:   en?'DEFENSE':'DÉFENSE',
     rebounding:en?'REBOUNDING':'REBOUNDING',
-    hec:       en?'HAND-EYE':'HAND-EYE',
-    sc:        en?'STRENGTH & COND.':'STRENGTH & COND.',
-    nbapro:    en?'NBA PRO':'NBA PRO'
+    hec:       en?'HAND-EYE COORDINATION':'HAND-EYE COORDINATION',
+    sc:        en?'STRENGTH & CONDITIONING':'STRENGTH & CONDITIONING',
+    nbapro:    en?'NBA PRO DRILL':'NBA PRO DRILL'
   };
   var EVENTS = [
-    // LUN
-    {day:1, start:'07:00', end:'07:45', cls:'shoot',   type:L.shooting,  title:'Shooting Form · Coach Sensei',   yt:'dbusjNVrMgA'},
-    {day:1, start:'18:30', end:'19:15', cls:'def',     type:L.defense,   title:'Defense #1 · stance & slide',     yt:'0ZXELMe3VIU'},
-    // MAR
-    {day:2, start:'07:00', end:'07:45', cls:'finish',  type:L.finishing, title:'Finishing #1 · attack the rim',   yt:'s2Gs3GcfLAY'},
-    {day:2, start:'18:30', end:'19:15', cls:'hec',     type:L.hec,       title:'Hand-Eye #1 · reaction speed',    yt:'xV0XuRGHsxo'},
-    // MER
-    {day:3, start:'07:00', end:'07:45', cls:'rebound', type:L.rebounding,title:'Rebounding #1 · positioning',      yt:'O2TDPnLiwOM'},
-    {day:3, start:'18:30', end:'19:30', cls:'nba',     type:L.nbapro,    title:'NBA Pro #1 · elite footwork',      yt:'G-N1gH5U0jg'},
-    // JEU
-    {day:4, start:'07:00', end:'07:45', cls:'shoot',   type:L.shooting,  title:'Shooting #1 · catch & shoot',      yt:'RvyX7fXgqiM'},
-    {day:4, start:'18:00', end:'19:00', cls:'sc',      type:L.sc,        title:'S&C #1 · explosive power',          yt:'5v6kVdAqbOc'},
-    // VEN
-    {day:5, start:'07:00', end:'07:45', cls:'finish',  type:L.finishing, title:'Finishing #2 · contact finish',     yt:'JuqylTSDesU'},
-    {day:5, start:'18:30', end:'19:15', cls:'def',     type:L.defense,   title:'Defense #2 · close-out',             yt:'xXYCtNwFRHs'},
-    // SAM
-    {day:6, start:'10:00', end:'10:45', cls:'rebound', type:L.rebounding,title:'Rebounding #2 · boxout',             yt:'HVCjzaIEju4'},
-    {day:6, start:'16:00', end:'16:45', cls:'hec',     type:L.hec,       title:'Hand-Eye #2 · dual tracking',        yt:'KWmdHJ2A8pg'},
-    // DIM
-    {day:7, start:'10:00', end:'11:00', cls:'nba',     type:L.nbapro,    title:'NBA Pro #2 · pro finishing',         yt:'xxCj_BlKZsI'},
-    {day:7, start:'16:00', end:'17:00', cls:'sc',      type:L.sc,        title:'S&C #2 · lower body power',          yt:'P4_hDNmsrgs'}
+    {day:1, time:'07:00', type:L.shooting,   title:'Shooting Form · Coach Sensei',  yt:'dbusjNVrMgA'},
+    {day:1, time:'18:30', type:L.defense,    title:'Defense #1 · stance & slide',   yt:'0ZXELMe3VIU'},
+    {day:2, time:'07:00', type:L.finishing,  title:'Finishing #1 · attack the rim', yt:'s2Gs3GcfLAY'},
+    {day:2, time:'18:30', type:L.hec,        title:'Hand-Eye #1 · reaction speed',  yt:'xV0XuRGHsxo'},
+    {day:3, time:'07:00', type:L.rebounding, title:'Rebounding #1 · positioning',   yt:'O2TDPnLiwOM'},
+    {day:3, time:'18:30', type:L.nbapro,     title:'NBA Pro #1 · elite footwork',   yt:'G-N1gH5U0jg'},
+    {day:4, time:'07:00', type:L.shooting,   title:'Shooting #1 · catch & shoot',   yt:'RvyX7fXgqiM'},
+    {day:4, time:'18:00', type:L.sc,         title:'S&C #1 · explosive power',       yt:'5v6kVdAqbOc'},
+    {day:5, time:'07:00', type:L.finishing,  title:'Finishing #2 · contact finish',  yt:'JuqylTSDesU'},
+    {day:5, time:'18:30', type:L.defense,    title:'Defense #2 · close-out',         yt:'xXYCtNwFRHs'},
+    {day:6, time:'10:00', type:L.rebounding, title:'Rebounding #2 · boxout',         yt:'HVCjzaIEju4'},
+    {day:6, time:'16:00', type:L.hec,        title:'Hand-Eye #2 · dual tracking',    yt:'KWmdHJ2A8pg'},
+    {day:7, time:'10:00', type:L.nbapro,     title:'NBA Pro #2 · pro finishing',     yt:'xxCj_BlKZsI'},
+    {day:7, time:'16:00', type:L.sc,         title:'S&C #2 · lower body power',      yt:'P4_hDNmsrgs'}
   ];
 
-  var DAY_NAMES = en
-    ? [{name:'Mon',date:6},{name:'Tue',date:7},{name:'Wed',date:8},{name:'Thu',date:9},{name:'Fri',date:10},{name:'Sat',date:11},{name:'Sun',date:12}]
-    : [{name:'Lun',date:6},{name:'Mar',date:7},{name:'Mer',date:8},{name:'Jeu',date:9},{name:'Ven',date:10},{name:'Sam',date:11},{name:'Dim',date:12}];
-  var TODAY_IDX = 4; // JEU 09 (ajusté dynamiquement par date réelle)
+  var DAYS_FR = ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE'];
+  var DAYS_EN = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
+  var MONTHS_FR = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var days = en?DAYS_EN:DAYS_FR;
+  var months = en?MONTHS_EN:MONTHS_FR;
+  var DAY_DATES = [6,7,8,9,10,11,12];
+  var MONTH_IDX = 9; // oct = 9
+
+  // Jour courant (surlignage neutre, pas de couleur agressive)
   var now = new Date();
-  if (now.getFullYear()===2026 && now.getMonth()===9) { // oct = 9
-    var dd = now.getDate(); if (dd>=6 && dd<=12) TODAY_IDX = (dd-6)+1;
+  var TODAY_IDX = -1;
+  if (now.getFullYear()===2026 && now.getMonth()===MONTH_IDX) {
+    var dd = now.getDate(); if (dd>=6 && dd<=12) TODAY_IDX = (dd-6);
   }
 
-  var START_H = 6, END_H = 21, HOUR_H = 44;
-  var TYPE_COLORS = {
-    shoot:'linear-gradient(135deg,#c54000,#ff6d00)',
-    finish:'linear-gradient(135deg,#8f1824,#e63946)',
-    def:'linear-gradient(135deg,#004a7a,#0077b6)',
-    rebound:'linear-gradient(135deg,#1a7a32,#2dc653)',
-    hec:'linear-gradient(135deg,#4a1a5e,#7b2d8b)',
-    sc:'linear-gradient(135deg,#1c7a9c,#4cc9f0)',
-    nba:'linear-gradient(135deg,#4a0e5f,#f5c518)'
-  };
-
-  // ─── Build the modal HTML (header + legend + grid shell + stats) ───
+  // ─── Modal shell ───
   var html = ''
-    + '<div style="max-width:1600px;margin:0 auto;padding:0 16px 60px;color:#fff">'
-    // ── Sticky header ──
-    + '<div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(10,13,24,.96);padding:16px 0;z-index:5;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px">'
-    + '  <div style="display:flex;align-items:center;gap:10px">'
-    + '    <div style="font-size:30px">📅</div>'
-    + '    <div>'
-    + '      <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#9f64e6">'+(en?'TRAINING SCHEDULE':'CALENDRIER TRAINING')+'</div>'
-    + '      <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-top:2px">'+(en?'Week 41 · Oct 06–12, 2026':'Semaine 41 · 06–12 oct. 2026')+'</div>'
-    + '    </div>'
+    + '<div style="max-width:720px;margin:0 auto;padding:0 16px 60px;color:#f0f2f8">'
+    // Sticky header NEUTRE (zero accent coloré)
+    + '<div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(10,13,20,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px 0;z-index:5;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:20px">'
+    + '  <div>'
+    + '    <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2.5px;color:#f0f2f8">'+(en?'TRAINING WEEK':'SEMAINE D\'ENTRAÎNEMENT')+'</div>'
+    + '    <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1.5px;font-weight:600;margin-top:2px">'+(en?'Week 41 · Oct 06–12, 2026':'Semaine 41 · 06–12 oct. 2026')+'</div>'
     + '  </div>'
-    + '  <button id="cal-close" style="background:transparent;border:1.5px solid rgba(159,100,230,.5);color:#9f64e6;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
+    + '  <button id="cal-close" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:#f0f2f8;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
     + '</div>'
-    // ── Legend ──
-    + '<div style="display:flex;gap:12px;padding:10px 2px 16px;flex-wrap:wrap;font-size:10px;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:14px">'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#ff6d00"></span>'+L.shooting+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#e63946"></span>'+L.finishing+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#0077b6"></span>'+L.defense+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#2dc653"></span>'+L.rebounding+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#7b2d8b"></span>'+L.hec+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#4cc9f0"></span>'+L.sc+'</div>'
-    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#9f64e6,#f5c518)"></span>'+L.nbapro+'</div>'
-    + '</div>'
-    // ── Grid container ──
-    + '<div id="cal-grid" style="display:grid;grid-template-columns:50px repeat(7,1fr);gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;font-size:11px"></div>'
-    // ── Footer tip ──
-    + '<div style="text-align:center;margin-top:18px;padding:14px 20px;background:rgba(159,100,230,.08);border:1px solid rgba(159,100,230,.3);border-radius:12px">'
-    +   '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1.5px;color:#9f64e6;margin-bottom:4px">'+(en?'▶ TAP ANY SESSION TO PLAY THE DRILL':'▶ CLIQUE SUR UNE SESSION POUR LANCER LE DRILL')+'</div>'
-    +   '<div style="font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0;line-height:1.5">'+(en?'7 drill types · 14 sessions · zero screen time without purpose.':'7 types de drills · 14 sessions · zéro écran sans objectif.')+'</div>'
-    + '</div>'
+    + '<div id="cal-days-wrap"></div>'
     + '</div>';
   m.innerHTML = html;
 
-  // ─── Build the grid (corner + 7 day heads + rows of hour-cell + 7 day-cols) ───
-  var grid = m.querySelector('#cal-grid');
-  // Corner
-  var corner = document.createElement('div');
-  corner.style.cssText = 'background:#131820;padding:10px 6px';
-  grid.appendChild(corner);
-  // Day heads
-  DAY_NAMES.forEach(function(d, i){
-    var isToday = (i+1) === TODAY_IDX;
-    var dh = document.createElement('div');
-    dh.style.cssText = 'background:#131820;padding:10px 4px;text-align:center';
-    dh.innerHTML = '<div style="font-size:9px;font-weight:700;color:'+(isToday?'#9f64e6':'#7a8299')+';letter-spacing:1.5px;text-transform:uppercase">'+d.name+'</div>'
-                 + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:'+(isToday?'#9f64e6':'#f0f2f8')+';margin-top:2px">'+d.date+'</div>';
-    grid.appendChild(dh);
-  });
-  // Hour rows
-  for (var h = START_H; h < END_H; h++) {
-    var hc = document.createElement('div');
-    hc.style.cssText = 'background:#131820;font-size:9px;color:#7a8299;font-weight:600;padding:5px 5px 0;text-align:right;letter-spacing:.3px;height:'+HOUR_H+'px';
-    hc.textContent = (h<10?'0':'')+h+':00';
-    grid.appendChild(hc);
-    for (var dc = 1; dc <= 7; dc++) {
-      var col = document.createElement('div');
-      col.style.cssText = 'background:#131820;position:relative;padding:2px;height:'+HOUR_H+'px;border-top:1px dashed rgba(255,255,255,.03)';
-      col.dataset.day = dc; col.dataset.hour = h;
-      grid.appendChild(col);
-    }
-  }
-  // ─── Place events (absolutely positioned inside the matching hour-cell day-col) ───
-  function timeToY(t){ var p=t.split(':').map(Number); return (p[0]-START_H)*HOUR_H + (p[1]/60*HOUR_H); }
-  EVENTS.forEach(function(e){
-    var startY = timeToY(e.start), endY = timeToY(e.end);
-    var startH = Math.floor(startY/HOUR_H) + START_H;
-    var col = grid.querySelector('div[data-day="'+e.day+'"][data-hour="'+startH+'"]');
-    if (!col) return;
-    var topOffset = startY - (startH-START_H)*HOUR_H;
-    var height = endY - startY;
-    var evt = document.createElement('div');
-    evt.style.cssText = 'position:absolute;left:3px;right:3px;top:'+topOffset+'px;height:'+(height-2)+'px;'
-      + 'background:'+(TYPE_COLORS[e.cls]||'#333')+';border-radius:7px;padding:5px 7px;color:#fff;cursor:pointer;'
-      + 'overflow:hidden;border-left:3px solid rgba(0,0,0,.3);box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .15s';
-    if (e.cls==='shoot') evt.style.color='#fff';
-    evt.innerHTML = '<div style="font-size:8px;font-weight:700;opacity:.9;letter-spacing:.3px">'+e.start+'–'+e.end+'</div>'
-      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:11px;letter-spacing:1px;line-height:1.1;margin-top:2px">'+e.type+'</div>'
-      + '<div style="font-size:9px;font-weight:500;opacity:.9;margin-top:2px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+e.title+'</div>';
-    evt.addEventListener('mouseover', function(){ evt.style.transform='translateY(-1px) scale(1.02)'; evt.style.zIndex='10'; });
-    evt.addEventListener('mouseout',  function(){ evt.style.transform=''; evt.style.zIndex=''; });
-    evt.addEventListener('click', function(ev){
-      ev.stopPropagation();
-      // Lance la vidéo via le player YouTube existant de l'app
-      if (typeof openVideoModal === 'function') {
-        openVideoModal(e.yt, e.title, true);
-      } else {
-        window.open('https://www.youtube.com/watch?v='+e.yt, '_blank');
-      }
-    });
-    col.appendChild(evt);
-  });
+  var wrap = m.querySelector('#cal-days-wrap');
 
-  m.querySelector('#cal-close').addEventListener('click', function(){ m.style.display='none'; document.body.style.overflow=''; });
+  // ─── Build day-by-day scroll (list, zero grid) ───
+  for (var d = 0; d < 7; d++) {
+    var dayEvents = EVENTS.filter(function(e){ return e.day === (d+1); });
+    var isToday = (d === TODAY_IDX);
+
+    var section = document.createElement('section');
+    section.style.cssText = 'margin-bottom:28px';
+
+    // Day header NEUTRE : juste le nom du jour + date, aucun gradient
+    var head = document.createElement('div');
+    head.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;padding:0 2px 10px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:14px';
+    head.innerHTML = ''
+      + '<div style="display:flex;align-items:baseline;gap:14px">'
+      + '  <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:'+(isToday?'22px':'18px')+';letter-spacing:2px;color:'+(isToday?'#f5c518':'#f0f2f8')+'">'+days[d]+'</div>'
+      + '  <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:#7a8299;letter-spacing:1px;font-weight:600">'+DAY_DATES[d]+' '+months[MONTH_IDX]+'</div>'
+      + (isToday ? '  <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#f5c518;letter-spacing:2px;font-weight:700;padding:3px 8px;background:rgba(245,197,24,.1);border-radius:5px">'+(en?'TODAY':'AUJOURD\'HUI')+'</div>' : '')
+      + '</div>'
+      + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1px;font-weight:600">'+dayEvents.length+' '+(dayEvents.length>1?(en?'sessions':'sessions'):(en?'session':'session'))+'</div>';
+    section.appendChild(head);
+
+    // Sessions : une carte par session, thumb YouTube EN GRAND (16:9)
+    dayEvents.forEach(function(e){
+      var card = document.createElement('div');
+      card.style.cssText = 'background:#131820;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;cursor:pointer;margin-bottom:12px;transition:border-color .15s,transform .15s';
+      card.addEventListener('mouseover', function(){ card.style.borderColor='rgba(245,197,24,.5)'; card.style.transform='translateY(-2px)'; });
+      card.addEventListener('mouseout',  function(){ card.style.borderColor='rgba(255,255,255,.06)'; card.style.transform=''; });
+
+      // ── Thumb preview YouTube EN GRAND (16:9) + overlay play button + heure en overlay ──
+      var thumbWrap = document.createElement('div');
+      thumbWrap.className = 'cal-thumb';
+      thumbWrap.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;background:#000;overflow:hidden;transition:padding-bottom .25s';
+      // HTML initial de la thumb (stocké pour pouvoir restaurer après lecture)
+      var thumbHTML = ''
+        + '<img src="https://img.youtube.com/vi/'+e.yt+'/hqdefault.jpg" '
+        +      'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" '
+        +      'loading="lazy" alt="'+e.title+'" '
+        +      'data-yt-id="'+e.yt+'" data-fb="0" '
+        +      (typeof _ytThumbCheck==='function'?'onload="_ytThumbCheck(this)" ':'')
+        +      (typeof _ytThumbFallback==='function'?'onerror="_ytThumbFallback(this)"':'')
+        + '>'
+        // Play overlay central
+        + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 40%,transparent 60%,rgba(0,0,0,.3));pointer-events:none">'
+        +   '<div style="width:56px;height:56px;border-radius:50%;background:rgba(245,197,24,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">'
+        +     '<div style="width:0;height:0;border-left:16px solid #0a0d14;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px"></div>'
+        +   '</div>'
+        + '</div>'
+        // Heure en overlay top-left
+        + '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);color:#fff;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:16px;letter-spacing:1.5px;padding:4px 10px;border-radius:6px">'+e.time+'</div>';
+      thumbWrap.innerHTML = thumbHTML;
+      thumbWrap.dataset.originalHtml = thumbHTML;
+      card.appendChild(thumbWrap);
+
+      // ── Infos sous la thumb : type (petit label) + titre (gros, lisible) ──
+      var info = document.createElement('div');
+      info.style.cssText = 'padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px';
+      info.innerHTML = ''
+        + '<div style="min-width:0;flex:1">'
+        +   '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:4px">'+e.type+'</div>'
+        +   '<div style="font-family:\'Inter\',system-ui,sans-serif;font-size:14px;color:#f0f2f8;font-weight:600;line-height:1.3">'+e.title+'</div>'
+        + '</div>'
+        // Bouton STOP (apparaît quand la vidéo est en lecture, masqué par défaut)
+        + '<button class="cal-stop-btn" style="display:none;background:transparent;border:1px solid rgba(255,255,255,.2);color:#f0f2f8;width:32px;height:32px;border-radius:50%;font-size:12px;cursor:pointer;flex-shrink:0" aria-label="Stop">⏹</button>';
+      card.appendChild(info);
+      var stopBtn = info.querySelector('.cal-stop-btn');
+
+      // ─── Helpers lecture inline ───
+      function stopThisCard(){
+        thumbWrap.style.paddingBottom = '56.25%';
+        thumbWrap.innerHTML = thumbWrap.dataset.originalHtml;
+        card.dataset.playing = '0';
+        stopBtn.style.display = 'none';
+      }
+      function playThisCard(){
+        // Arrêter toutes les autres vidéos en lecture dans ce modal
+        m.querySelectorAll('[data-playing="1"]').forEach(function(otherCard){
+          if (otherCard !== card) {
+            var otherThumb = otherCard.querySelector('.cal-thumb');
+            var otherStop  = otherCard.querySelector('.cal-stop-btn');
+            if (otherThumb && otherThumb.dataset.originalHtml) {
+              otherThumb.style.paddingBottom = '56.25%';
+              otherThumb.innerHTML = otherThumb.dataset.originalHtml;
+            }
+            otherCard.dataset.playing = '0';
+            if (otherStop) otherStop.style.display = 'none';
+          }
+        });
+        // Passer en ratio portrait 9:16 (vidéos verticales type Shorts)
+        thumbWrap.style.paddingBottom = '177.78%';
+        // Injecter l'iframe YouTube avec autoplay
+        thumbWrap.innerHTML = ''
+          + '<iframe src="https://www.youtube.com/embed/'+e.yt+'?autoplay=1&playsinline=1&rel=0&modestbranding=1" '
+          +         'style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" '
+          +         'allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" '
+          +         'allowfullscreen loading="lazy" title="'+e.title+'"></iframe>'
+          // Heure et bouton stop restent accessibles en overlay
+          + '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);color:#fff;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:16px;letter-spacing:1.5px;padding:4px 10px;border-radius:6px;pointer-events:none">'+e.time+'</div>';
+        card.dataset.playing = '1';
+        stopBtn.style.display = '';
+        // Scroll la carte dans la vue (centre) pour que l'user voit la vidéo quand elle démarre
+        setTimeout(function(){ card.scrollIntoView({behavior:'smooth',block:'center'}); }, 50);
+      }
+
+      // ── Clic sur thumb : lance la vidéo INLINE dans la carte ──
+      thumbWrap.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if (card.dataset.playing !== '1') playThisCard();
+      });
+      // ── Clic bouton stop : restaure la thumb ──
+      stopBtn.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        stopThisCard();
+      });
+
+      section.appendChild(card);
+    });
+
+    wrap.appendChild(section);
+  }
+
+  m.querySelector('#cal-close').addEventListener('click', function(){
+    // Arrêter toutes les vidéos en lecture avant de fermer le modal
+    m.querySelectorAll('[data-playing="1"]').forEach(function(c){
+      var tw = c.querySelector('.cal-thumb');
+      var sb = c.querySelector('.cal-stop-btn');
+      if (tw && tw.dataset.originalHtml) {
+        tw.style.paddingBottom = '56.25%';
+        tw.innerHTML = tw.dataset.originalHtml;
+      }
+      c.dataset.playing = '0';
+      if (sb) sb.style.display = 'none';
+    });
+    m.style.display='none'; document.body.style.overflow='';
+  });
   m.style.display='block'; document.body.style.overflow='hidden';
 };
 
