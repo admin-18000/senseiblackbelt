@@ -17525,56 +17525,84 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       }
     }
   }
-  // ─── Textes branding v5 — MARGES IG-SAFE 10% ───
-  // Instagram crop les bords (profile grid, feed, stories) → tout contenu < 10% du bord risque d'être coupé
-  // SAFE = 108 (10% de 1080) sur chaque côté. Watermark case 5 retiré (overlapait la ceinture mascotte).
-  const SAFE = Math.round(S * 0.10);  // 108px marge de sécurité IG
-  const txtShadow = function(ctx, fn) {
+  // ─── v6 REDESIGN RADICAL — containers texte LOCALISÉS ───
+  // Chaque élément de texte dans son propre dark box (pas full case) → mascotte reste visible partout ailleurs
+  // Hiérarchie forte : TITLE (giant top-left), MASCOT (center column intact), CTA (bottom-right)
+  const SAFE = 108;
+  // Helper : dark box arrondi + texte dedans
+  const drawTextBox = function(ctx, x, y, w, h, drawTexts) {
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.95)';
-    ctx.shadowBlur = 14;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 3;
-    fn();
+    // Fond dark avec légère bordure or
+    pRect(ctx, x, y, w, h, 18, 'rgba(10,13,24,0.88)', 'rgba(245,197,24,0.5)', 2);
+    // Shadow pour les textes qui vont suivre
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 2;
+    drawTexts();
     ctx.restore();
   };
-  // Case 7 user (c6 bottom-left) : TITLE — safe left margin + taille réduite
-  const c6 = canvases[6].getContext('2d');
-  txtShadow(c6, function(){
-    pF(c6, cfg.titleLine1, SAFE, 340, 140, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.titleLine2, SAFE, 480, 140, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, '🥋', SAFE, 680, 160, '#f5c518', 'left');
-  });
-  // Case 9 user (c8 bottom-right) : EMOJI + HASHTAG — safe right margin
-  const c8 = canvases[8].getContext('2d');
-  txtShadow(c8, function(){
-    pF(c8, cfg.emoji, S-SAFE, 420, 340, '#f5c518', 'right');
-    pF(c8, '#'+cfg.hashtag, S-SAFE, 820, 44, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c8, en?'FOLLOW':'SUIS-MOI', S-SAFE, 890, 32, 'rgba(255,255,255,.9)', 'right');
-  });
-  // Case 1 user (c0 top-left) : QUOTE — safe left margin + taille réduite pour tenir
+
+  // ─── CASE 1 (c0 top-left) : GIANT ICON décoratif 🥋 ──
+  // Zéro texte, juste un gros symbole de la marque — fallback si mascot bleed dans la case
   const c0 = canvases[0].getContext('2d');
-  txtShadow(c0, function(){
-    pF(c0, '"', SAFE, 380, 340, 'rgba(245,197,24,.25)', 'left', '900', 'serif');
-    pF(c0, cfg.quote1, SAFE, 540, 46, '#fff', 'left', '700');
-    pF(c0, cfg.quote2, SAFE, 610, 46, '#fff', 'left', '700');
-    pF(c0, cfg.quote3, SAFE, 690, 46, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c0, '— SENSEI', SAFE, 790, 32, 'rgba(245,197,24,.8)', 'left');
-  });
-  // Case 3 user (c2 top-right) : CTA bouton or — safe right margin
+  c0.save();
+  c0.shadowColor = 'rgba(0,0,0,0.9)';
+  c0.shadowBlur = 20;
+  c0.shadowOffsetY = 6;
+  c0.font = '600px serif';
+  c0.textAlign = 'center';
+  c0.textBaseline = 'middle';
+  c0.fillText('🥋', S/2, S/2);
+  c0.restore();
+
+  // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes dans un box localisé ──
   const c2 = canvases[2].getContext('2d');
-  const btnW = 380, btnH = 140;
-  const btnX = S - SAFE - btnW; // bouton collé au safe right
-  const btnY = S/2 - btnH/2;
-  txtShadow(c2, function(){
-    pRect(c2, btnX, btnY, btnW, btnH, 70, '#f5c518');
+  const titleBoxW = S - 2*SAFE;
+  const titleBoxH = 440;
+  const titleBoxX = SAFE;
+  const titleBoxY = (S - titleBoxH) / 2;
+  drawTextBox(c2, titleBoxX, titleBoxY, titleBoxW, titleBoxH, function(){
+    pF(c2, cfg.titleLine1, S/2, titleBoxY + 150, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c2, cfg.titleLine2, S/2, titleBoxY + 310, 150, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
-  pF(c2, en?'JOIN →':'REJOINS →', btnX + btnW/2, btnY + btnH/2 + 20, 52, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  txtShadow(c2, function(){
-    pF(c2, 'senseiblackbelt.com', S-SAFE, S-SAFE, 28, 'rgba(245,197,24,.9)', 'right');
+
+  // ─── CASE 7 (c6 bottom-left) : QUOTE en gold centrée dans un box localisé ──
+  const c6 = canvases[6].getContext('2d');
+  const quoteBoxW = S - 2*SAFE;
+  const quoteBoxH = 420;
+  const quoteBoxX = SAFE;
+  const quoteBoxY = (S - quoteBoxH) / 2;
+  drawTextBox(c6, quoteBoxX, quoteBoxY, quoteBoxW, quoteBoxH, function(){
+    pF(c6, '"', S/2, quoteBoxY + 110, 180, 'rgba(245,197,24,.3)', 'center', '900', 'serif');
+    pF(c6, cfg.quote1, S/2, quoteBoxY + 190, 44, '#fff', 'center', '700');
+    pF(c6, cfg.quote2, S/2, quoteBoxY + 250, 44, '#fff', 'center', '700');
+    pF(c6, cfg.quote3, S/2, quoteBoxY + 325, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
-  // Case 5 user (c4 center) : PAS de watermark — n'overlap pas la mascotte
-  // (ancien watermark 'SENSEI BLACKBELT' retiré car il mangeait la ceinture noire)
+
+  // ─── CASE 9 (c8 bottom-right) : CTA + HASHTAG empilés dans un box localisé ──
+  const c8 = canvases[8].getContext('2d');
+  const ctaBoxW = S - 2*SAFE;
+  const ctaBoxH = 480;
+  const ctaBoxX = SAFE;
+  const ctaBoxY = (S - ctaBoxH) / 2;
+  drawTextBox(c8, ctaBoxX, ctaBoxY, ctaBoxW, ctaBoxH, function(){
+    // Hashtag en haut du box (gold, bold)
+    pF(c8, '#'+cfg.hashtag, S/2, ctaBoxY + 90, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    // Bouton CTA au milieu
+    const btnW = ctaBoxW - 80, btnH = 130;
+    const btnX = (S - btnW) / 2;
+    const btnY = ctaBoxY + 170;
+    c8.shadowBlur = 0; // couper shadow pour le bouton
+    pRect(c8, btnX, btnY, btnW, btnH, 65, '#f5c518');
+    pF(c8, en?'JOIN →':'REJOINS →', S/2, btnY + btnH/2 + 20, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    // URL en bas du box
+    c8.shadowColor = 'rgba(0,0,0,0.9)';
+    c8.shadowBlur = 8;
+    c8.shadowOffsetY = 2;
+    pF(c8, 'senseiblackbelt.com', S/2, ctaBoxY + 400, 34, 'rgba(245,197,24,.95)', 'center');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', S/2, ctaBoxY + 445, 28, 'rgba(255,255,255,.75)', 'center');
+  });
+  // Case 5 user (c4 center) : PAS de watermark — mascotte reste intacte
 }
 function puzzleDrawTemplate7(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['arms-crossed'], {
