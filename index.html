@@ -17478,51 +17478,72 @@ function puzzleDrawTemplate6(canvases, d) {
 // ══════════════════════════════════════════
 window._puzzleMascotteImgs = window._puzzleMascotteImgs || {};
 function puzzleDrawMascotte(canvases, d, img, cfg) {
-  const S = PUZZLE_SIZE;
+  const S = PUZZLE_SIZE;              // 1080 par tuile
+  const TOTAL = S * 3;                // 3240 (puzzle complet 3x3)
   const en = d.en;
-  // Dessiner fond + mascotte sur les 9 cases
-  // La mascotte est centrée horizontalement, étalée sur toute la hauteur (3 cases)
-  for (let row=0; row<3; row++) {
-    for (let col=0; col<3; col++) {
-      const idx = row*3 + col;
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  RÈGLES PUZZLE GRID INSTAGRAM (strictes)
+  //  1. Composition SOURCE 1:1 carré 3240x3240 (= 3 tuiles × 1080)
+  //  2. Padding neutre #131820 si image source rectangulaire
+  //  3. Découpage symétrique 3×3 — chaque tuile pile 1080×1080
+  //  4. Continuité pixel-perfect : bras/jambes/habits qui traversent
+  //     deux tuiles s'alignent parfaitement une fois la grille assemblée
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ── ÉTAPE 1 : composition source carrée 3240x3240 ──────────────
+  const composite = document.createElement('canvas');
+  composite.width = TOTAL;
+  composite.height = TOTAL;
+  const cctx = composite.getContext('2d');
+
+  // Fond uniforme #131820 (padding neutre si image rectangulaire)
+  cctx.fillStyle = '#131820';
+  cctx.fillRect(0, 0, TOTAL, TOTAL);
+
+  // Grille or ultra-subtile (continue sur toute la composition)
+  cctx.strokeStyle = 'rgba(245,197,24,0.04)';
+  cctx.lineWidth = 1;
+  for (let x = 0; x < TOTAL; x += 60) { cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, TOTAL); cctx.stroke(); }
+  for (let y = 0; y < TOTAL; y += 60) { cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(TOTAL, y); cctx.stroke(); }
+
+  // Mascotte centrée dans le carré (preserve aspect ratio)
+  if (img) {
+    const imgRatio = img.width / img.height;
+    let drawW, drawH;
+    if (imgRatio < 1) {
+      // portrait : fit height, pad left/right
+      drawH = TOTAL;
+      drawW = drawH * imgRatio;
+    } else if (imgRatio > 1) {
+      // landscape : fit width, pad top/bottom
+      drawW = TOTAL;
+      drawH = drawW / imgRatio;
+    } else {
+      // déjà carré
+      drawW = TOTAL;
+      drawH = TOTAL;
+    }
+    const offsetX = (TOTAL - drawW) / 2;
+    const offsetY = (TOTAL - drawH) / 2;
+    cctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+  }
+
+  // ── ÉTAPE 2 : découpage symétrique en 9 tuiles 1080×1080 ──────
+  // drawImage avec source rect = srcX:col*S, srcY:row*S, srcW:S, srcH:S
+  // → chaque tuile reçoit EXACTEMENT le même nombre de pixels (1080x1080)
+  // → continuité pixel-perfect garantie (même source, même slice)
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      const idx = row * 3 + col;
       const ctx = canvases[idx].getContext('2d');
-      // 🎨 FIX IG v3 : fond strictement PLAT #131820 (zéro gradient)
-      // → Les pixels transparents/anti-alias de la mascotte ne sont PAS tintés
-      // → Bras, chaussures, habits de la mascotte conservent 100% leurs couleurs natives
-      ctx.fillStyle = '#131820'; ctx.fillRect(0, 0, S, S);
-      // Grille or ultra-subtile pour cohérence avec les autres templates (optionnel, 0.04 opacity)
-      ctx.strokeStyle = 'rgba(245,197,24,0.04)'; ctx.lineWidth = 1;
-      for (let x=0; x<S; x+=60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,S); ctx.stroke(); }
-      for (let y=0; y<S; y+=60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(S,y); ctx.stroke(); }
-      // Dessiner la portion de l'image mascotte sur toutes les cases
-      // L'image est centrée horizontalement + couvre toute la hauteur du puzzle 3S
-      if (img) {
-        const totalH = S * 3;
-        const imgRatio = img.width / img.height;
-        const drawH = totalH;
-        const drawW = drawH * imgRatio;
-        const offsetX = (S*3 - drawW) / 2; // centrée dans le puzzle complet
-        // Position de la zone image dans cette case
-        const caseX = col * S;
-        const caseY = row * S;
-        // Portion visible : intersection image/case
-        const imgLeftInPuzzle = offsetX;
-        const imgRightInPuzzle = offsetX + drawW;
-        const visibleLeft = Math.max(caseX, imgLeftInPuzzle);
-        const visibleRight = Math.min(caseX + S, imgRightInPuzzle);
-        if (visibleRight > visibleLeft) {
-          // Portion de l'image source correspondante
-          const srcScale = img.width / drawW;
-          const srcX = (visibleLeft - imgLeftInPuzzle) * srcScale;
-          const srcY = caseY * srcScale;
-          const srcW = (visibleRight - visibleLeft) * srcScale;
-          const srcH = S * srcScale;
-          // Destination dans le canvas
-          const dstX = visibleLeft - caseX;
-          const dstW = visibleRight - visibleLeft;
-          ctx.drawImage(img, srcX, srcY, srcW, srcH, dstX, 0, dstW, S);
-        }
-      }
+      // Clear tuile avant blit
+      ctx.clearRect(0, 0, S, S);
+      // Blit du morceau exact depuis composite 3240x3240
+      ctx.drawImage(composite,
+        col * S, row * S, S, S,  // source : zone exacte dans composite
+        0, 0, S, S                // destination : full tuile 1080x1080
+      );
     }
   }
   // ─── v7 : ZÉRO rectangle, texte GOLD avec SHADOW épaisse ───
