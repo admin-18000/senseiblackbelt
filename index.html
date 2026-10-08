@@ -17525,19 +17525,17 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       }
     }
   }
-  // ─── v6 REDESIGN RADICAL — containers texte LOCALISÉS ───
-  // Chaque élément de texte dans son propre dark box (pas full case) → mascotte reste visible partout ailleurs
-  // Hiérarchie forte : TITLE (giant top-left), MASCOT (center column intact), CTA (bottom-right)
+  // ─── v7 : ZÉRO rectangle, texte GOLD avec SHADOW épaisse ───
+  // Les boxes des coins masquaient les bras/jambes qui bleed.
+  // Solution : texte or (lisible sur jersey blanc ET sur fond noir) + shadow forte pour contraste max.
   const SAFE = 108;
-  // Helper : dark box arrondi + texte dedans
-  const drawTextBox = function(ctx, x, y, w, h, drawTexts) {
+  // Helper : dessine du texte avec shadow épaisse pour lisibilité sur n'importe quel fond
+  const txtWithShadow = function(ctx, drawTexts) {
     ctx.save();
-    // Fond dark avec légère bordure or
-    pRect(ctx, x, y, w, h, 18, 'rgba(10,13,24,0.88)', 'rgba(245,197,24,0.5)', 2);
-    // Shadow pour les textes qui vont suivre
-    ctx.shadowColor = 'rgba(0,0,0,0.9)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 4;
     drawTexts();
     ctx.restore();
   };
@@ -17571,84 +17569,54 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   pF(c1, '@sensei_ai_app', S/2, 70, 36, 'rgba(245,197,24,.9)', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   c1.restore();
 
-  // ─── CASE 4 (c3 middle-left) : badge vertical « 1ʳᵉ MONDIALE 🌍 » ──
-  const c3 = canvases[3].getContext('2d');
-  const badge1W = S - 2*SAFE;
-  const badge1H = 240;
-  const badge1X = SAFE;
-  const badge1Y = (S - badge1H) / 2;
-  drawTextBox(c3, badge1X, badge1Y, badge1W, badge1H, function(){
-    pF(c3, en?'🌍 WORLD':'🌍 1ʳᵉ', S/2, badge1Y + 90, 72, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c3, en?'FIRST EVER':'MONDIALE', S/2, badge1Y + 180, 72, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  });
-
-  // ─── CASE 6 (c5 middle-right) : badge « SUPERINTELLIGENCE » ──
-  const c5 = canvases[5].getContext('2d');
-  const badge2W = S - 2*SAFE;
-  const badge2H = 300;
-  const badge2X = SAFE;
-  const badge2Y = (S - badge2H) / 2;
-  drawTextBox(c5, badge2X, badge2Y, badge2W, badge2H, function(){
-    pF(c5, '🧠', S/2, badge2Y + 90, 90, '#f5c518', 'center');
-    pF(c5, en?'HUMAN + AI':'HUMAIN + IA', S/2, badge2Y + 180, 48, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c5, 'SUPERINTELLIGENCE', S/2, badge2Y + 240, 36, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  });
-
-  // ─── CASE 8 (c7 bottom-center) : micro-signature sous les pieds ──
+  // ─── CASES 4, 5, 6 (middle row) : INTOUCHABLES — bras / torse / autres bras peuvent bleed ici
+  //   → ZÉRO box, zéro texte. Si bleed de la mascotte, visible proprement. Si vide, fond uniforme.
+  //
+  // ─── CASE 8 (c7 bottom-center) : signature discrète TOUT en bas (évite les pieds en Y mi/haut) ──
   const c7 = canvases[7].getContext('2d');
   c7.save();
   c7.shadowColor = 'rgba(0,0,0,0.95)';
   c7.shadowBlur = 10;
   c7.shadowOffsetY = 2;
-  pF(c7, '— SENSEI BLACKBELT —', S/2, S - 70, 30, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7, '— SENSEI BLACKBELT —', S/2, S - 50, 26, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
   c7.restore();
 
-  // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes dans un box localisé ──
+  // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes GOLD avec shadow — zéro box ──
   const c2 = canvases[2].getContext('2d');
-  const titleBoxW = S - 2*SAFE;
-  const titleBoxH = 440;
-  const titleBoxX = SAFE;
-  const titleBoxY = (S - titleBoxH) / 2;
-  drawTextBox(c2, titleBoxX, titleBoxY, titleBoxW, titleBoxH, function(){
-    pF(c2, cfg.titleLine1, S/2, titleBoxY + 150, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c2, cfg.titleLine2, S/2, titleBoxY + 310, 150, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  txtWithShadow(c2, function(){
+    pF(c2, cfg.titleLine1, S/2, 420, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c2, cfg.titleLine2, S/2, 580, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
-  // ─── CASE 7 (c6 bottom-left) : QUOTE en gold centrée dans un box localisé ──
+  // ─── CASE 7 (c6 bottom-left) : QUOTE en 3 lignes GOLD, zéro box ──
   const c6 = canvases[6].getContext('2d');
-  const quoteBoxW = S - 2*SAFE;
-  const quoteBoxH = 420;
-  const quoteBoxX = SAFE;
-  const quoteBoxY = (S - quoteBoxH) / 2;
-  drawTextBox(c6, quoteBoxX, quoteBoxY, quoteBoxW, quoteBoxH, function(){
-    pF(c6, '"', S/2, quoteBoxY + 110, 180, 'rgba(245,197,24,.3)', 'center', '900', 'serif');
-    pF(c6, cfg.quote1, S/2, quoteBoxY + 190, 44, '#fff', 'center', '700');
-    pF(c6, cfg.quote2, S/2, quoteBoxY + 250, 44, '#fff', 'center', '700');
-    pF(c6, cfg.quote3, S/2, quoteBoxY + 325, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  txtWithShadow(c6, function(){
+    pF(c6, cfg.quote1, S/2, 400, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote2, S/2, 480, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote3, S/2, 580, 56, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
-  // ─── CASE 9 (c8 bottom-right) : CTA + HASHTAG empilés dans un box localisé ──
+  // ─── CASE 9 (c8 bottom-right) : HASHTAG + CTA button + URL — minimal, pas de box ──
   const c8 = canvases[8].getContext('2d');
-  const ctaBoxW = S - 2*SAFE;
-  const ctaBoxH = 480;
-  const ctaBoxX = SAFE;
-  const ctaBoxY = (S - ctaBoxH) / 2;
-  drawTextBox(c8, ctaBoxX, ctaBoxY, ctaBoxW, ctaBoxH, function(){
-    // Hashtag en haut du box (gold, bold)
-    pF(c8, '#'+cfg.hashtag, S/2, ctaBoxY + 90, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    // Bouton CTA au milieu
-    const btnW = ctaBoxW - 80, btnH = 130;
-    const btnX = (S - btnW) / 2;
-    const btnY = ctaBoxY + 170;
-    c8.shadowBlur = 0; // couper shadow pour le bouton
-    pRect(c8, btnX, btnY, btnW, btnH, 65, '#f5c518');
-    pF(c8, en?'JOIN →':'REJOINS →', S/2, btnY + btnH/2 + 20, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    // URL en bas du box
-    c8.shadowColor = 'rgba(0,0,0,0.9)';
-    c8.shadowBlur = 8;
-    c8.shadowOffsetY = 2;
-    pF(c8, 'senseiblackbelt.com', S/2, ctaBoxY + 400, 34, 'rgba(245,197,24,.95)', 'center');
-    pF(c8, en?'FOLLOW':'SUIS-MOI', S/2, ctaBoxY + 445, 28, 'rgba(255,255,255,.75)', 'center');
+  // Hashtag en haut
+  txtWithShadow(c8, function(){
+    pF(c8, '#'+cfg.hashtag, S/2, 380, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  });
+  // Bouton CTA au milieu (pas besoin de shadow, bouton or lui-même est le background)
+  const btnW = 540, btnH = 150;
+  const btnX = (S - btnW) / 2;
+  const btnY = S/2 - 30;
+  c8.save();
+  c8.shadowColor = 'rgba(0,0,0,0.9)';
+  c8.shadowBlur = 15;
+  c8.shadowOffsetY = 4;
+  pRect(c8, btnX, btnY, btnW, btnH, 75, '#f5c518');
+  c8.restore();
+  pF(c8, en?'JOIN →':'REJOINS →', S/2, btnY + btnH/2 + 20, 60, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  // URL + follow en bas
+  txtWithShadow(c8, function(){
+    pF(c8, 'senseiblackbelt.com', S/2, S - 180, 36, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', S/2, S - 125, 30, '#fff', 'center', '700');
   });
   // Case 5 user (c4 center) : PAS de watermark — mascotte reste intacte
 }
