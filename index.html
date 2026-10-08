@@ -16594,7 +16594,16 @@ function applyLangTracker(lang) {
 // Normes Instagram : carré 1:1, 1080×1080, sRGB, < 8MB
 // ═══════════════════════════════════════════════════════════
 
-const PUZZLE_SIZE = 1080;
+// ═══════════════════════════════════════════════════════════════════
+//  FORMAT INSTAGRAM PORTRAIT 4:5 (natif, sans crop automatique)
+//  Chaque tuile : 1080 × 1350 px (ratio exact 0.8)
+//  Canevas maître puzzle 3×3 : 3240 × 4050 px
+//  Lignes de découpe : X = 0 / 1080 / 2160 / 3240
+//                      Y = 0 / 1350 / 2700 / 4050
+// ═══════════════════════════════════════════════════════════════════
+const PUZZLE_W    = 1080;   // Largeur tuile Instagram portrait 4:5
+const PUZZLE_H    = 1350;   // Hauteur tuile Instagram portrait 4:5
+const PUZZLE_SIZE = 1080;   // Alias legacy (carré 1080×1080 utilisé par TPL 0-6)
 const PUZZLE_GAP  = 6; // gap blanc entre cases (filet Instagram)
 
 let _puzzleTemplate = 0;
@@ -17478,71 +17487,74 @@ function puzzleDrawTemplate6(canvases, d) {
 // ══════════════════════════════════════════
 window._puzzleMascotteImgs = window._puzzleMascotteImgs || {};
 function puzzleDrawMascotte(canvases, d, img, cfg) {
-  const S = PUZZLE_SIZE;              // 1080 par tuile
-  const TOTAL = S * 3;                // 3240 (puzzle complet 3x3)
+  const W = PUZZLE_W;                 // 1080 largeur tuile
+  const H = PUZZLE_H;                 // 1350 hauteur tuile (4:5)
+  const S = PUZZLE_SIZE;              // 1080 (alias legacy pour positions X horizontales)
+  const TOTAL_W = W * 3;              // 3240 (puzzle complet largeur)
+  const TOTAL_H = H * 3;              // 4050 (puzzle complet hauteur)
   const en = d.en;
 
   // ═══════════════════════════════════════════════════════════════════
-  //  RÈGLES PUZZLE GRID INSTAGRAM (strictes)
-  //  1. Composition SOURCE 1:1 carré 3240x3240 (= 3 tuiles × 1080)
-  //  2. Padding neutre #131820 si image source rectangulaire
-  //  3. Découpage symétrique 3×3 — chaque tuile pile 1080×1080
-  //  4. Continuité pixel-perfect : bras/jambes/habits qui traversent
-  //     deux tuiles s'alignent parfaitement une fois la grille assemblée
+  //  PUZZLE GRID INSTAGRAM 4:5 NATIF — RÈGLES STRICTES
+  //  1. Canevas MAÎTRE 3240×4050 (= 3 × 1080 largeur, 3 × 1350 hauteur)
+  //  2. Padding neutre #131820 : image source quelconque adaptée au maître
+  //  3. Découpage mathématique X=[0,1080,2160,3240], Y=[0,1350,2700,4050]
+  //  4. Continuité pixel-perfect : jonctions parfaites entre tuiles adjacentes
+  //  5. Export : 9 tuiles PILE 1080×1350 chacune — zéro crop Instagram
   // ═══════════════════════════════════════════════════════════════════
 
-  // ── ÉTAPE 1 : composition source carrée 3240x3240 ──────────────
+  // ── ÉTAPE 1 : composition canevas maître 3240×4050 ──────────────
   const composite = document.createElement('canvas');
-  composite.width = TOTAL;
-  composite.height = TOTAL;
+  composite.width = TOTAL_W;
+  composite.height = TOTAL_H;
   const cctx = composite.getContext('2d');
 
-  // Fond uniforme #131820 (padding neutre si image rectangulaire)
+  // Fond uniforme #131820 — toute surface non-couverte par l'image reste cohérente
   cctx.fillStyle = '#131820';
-  cctx.fillRect(0, 0, TOTAL, TOTAL);
+  cctx.fillRect(0, 0, TOTAL_W, TOTAL_H);
 
-  // Grille or ultra-subtile (continue sur toute la composition)
+  // Grille or ultra-subtile (continue sur TOUT le maître — pas de rupture aux jonctions)
   cctx.strokeStyle = 'rgba(245,197,24,0.04)';
   cctx.lineWidth = 1;
-  for (let x = 0; x < TOTAL; x += 60) { cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, TOTAL); cctx.stroke(); }
-  for (let y = 0; y < TOTAL; y += 60) { cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(TOTAL, y); cctx.stroke(); }
+  for (let x = 0; x < TOTAL_W; x += 60) { cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, TOTAL_H); cctx.stroke(); }
+  for (let y = 0; y < TOTAL_H; y += 60) { cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(TOTAL_W, y); cctx.stroke(); }
 
-  // Mascotte centrée dans le carré (preserve aspect ratio)
+  // Mascotte adaptée au maître 3240×4050 avec aspect ratio préservé (contain)
   if (img) {
     const imgRatio = img.width / img.height;
+    const masterRatio = TOTAL_W / TOTAL_H; // 3240/4050 = 0.8
     let drawW, drawH;
-    if (imgRatio < 1) {
-      // portrait : fit height, pad left/right
-      drawH = TOTAL;
-      drawW = drawH * imgRatio;
-    } else if (imgRatio > 1) {
-      // landscape : fit width, pad top/bottom
-      drawW = TOTAL;
+    if (imgRatio > masterRatio) {
+      // image plus large que 4:5 → fit largeur, pad top/bottom
+      drawW = TOTAL_W;
       drawH = drawW / imgRatio;
+    } else if (imgRatio < masterRatio) {
+      // image plus haute que 4:5 → fit hauteur, pad left/right
+      drawH = TOTAL_H;
+      drawW = drawH * imgRatio;
     } else {
-      // déjà carré
-      drawW = TOTAL;
-      drawH = TOTAL;
+      drawW = TOTAL_W;
+      drawH = TOTAL_H;
     }
-    const offsetX = (TOTAL - drawW) / 2;
-    const offsetY = (TOTAL - drawH) / 2;
+    const offsetX = (TOTAL_W - drawW) / 2;
+    const offsetY = (TOTAL_H - drawH) / 2;
     cctx.drawImage(img, offsetX, offsetY, drawW, drawH);
   }
 
-  // ── ÉTAPE 2 : découpage symétrique en 9 tuiles 1080×1080 ──────
-  // drawImage avec source rect = srcX:col*S, srcY:row*S, srcW:S, srcH:S
-  // → chaque tuile reçoit EXACTEMENT le même nombre de pixels (1080x1080)
-  // → continuité pixel-perfect garantie (même source, même slice)
+  // ── ÉTAPE 2 : découpage symétrique 3×3 en 9 tuiles 1080×1350 ──
+  // Coordonnées de découpe mathématiquement exactes :
+  //   X = 0 / 1080 / 2160 / 3240
+  //   Y = 0 / 1350 / 2700 / 4050
+  // → continuité pixel-perfect : chaque tuile adjacente reprend EXACTEMENT où la précédente s'arrête
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 3; col++) {
       const idx = row * 3 + col;
       const ctx = canvases[idx].getContext('2d');
-      // Clear tuile avant blit
-      ctx.clearRect(0, 0, S, S);
-      // Blit du morceau exact depuis composite 3240x3240
+      ctx.clearRect(0, 0, W, H);
+      // Source : zone exacte dans composite — Destination : full tuile 1080×1350
       ctx.drawImage(composite,
-        col * S, row * S, S, S,  // source : zone exacte dans composite
-        0, 0, S, S                // destination : full tuile 1080x1080
+        col * W, row * H, W, H,   // src : (col*1080, row*1350, 1080, 1350)
+        0, 0, W, H                 // dst : (0, 0, 1080, 1350)
       );
     }
   }
@@ -17561,7 +17573,14 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
     ctx.restore();
   };
 
-  // ─── CASE 1 (c0 top-left) : 🥋 géant + mini-tagline (symétrie avec case 3) ──
+  // ═══ ZONE DE SÉCURITÉ portrait 4:5 ═══════════════════════════════
+  //  Marge 150px en haut et en bas de chaque tuile 1080×1350
+  //  → textes jamais sur les lignes de découpe, jamais rognés par IG
+  // ═══════════════════════════════════════════════════════════════════
+  const SAFE_TOP = 150;
+  const SAFE_BOT = H - 150;   // = 1200
+
+  // ─── CASE 1 (c0 top-left) : 🥋 géant + mini-tagline ───────────
   const c0 = canvases[0].getContext('2d');
   c0.save();
   c0.shadowColor = 'rgba(0,0,0,0.9)';
@@ -17570,7 +17589,7 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   c0.font = '460px serif';
   c0.textAlign = 'center';
   c0.textBaseline = 'middle';
-  c0.fillText('🥋', S/2, S/2 - 80);
+  c0.fillText('🥋', W/2, H/2 - 100);
   c0.restore();
   // Tagline sous le gi (perso par template via cfg.subtitle, fallback générique)
   const subtitleTxt = cfg.subtitle || 'SENSEI BLACKBELT';
@@ -17578,66 +17597,66 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   c0.shadowColor = 'rgba(0,0,0,0.95)';
   c0.shadowBlur = 10;
   c0.shadowOffsetY = 2;
-  pF(c0, subtitleTxt, S/2, S/2 + 280, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c0, subtitleTxt, W/2, H/2 + 290, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   c0.restore();
 
-  // ─── CASE 2 (c1 top-center) : handle @ discret EN HAUT au-dessus de la tête mascotte ──
+  // ─── CASE 2 (c1 top-center) : handle @ en zone sûre haute ──
   const c1 = canvases[1].getContext('2d');
   c1.save();
   c1.shadowColor = 'rgba(0,0,0,0.95)';
   c1.shadowBlur = 10;
   c1.shadowOffsetY = 2;
-  pF(c1, '@sensei_ai_app', S/2, 70, 36, 'rgba(245,197,24,.9)', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c1, '@sensei_ai_app', W/2, SAFE_TOP, 36, 'rgba(245,197,24,.9)', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   c1.restore();
 
-  // ─── CASES 4, 5, 6 (middle row) : INTOUCHABLES — bras / torse / autres bras peuvent bleed ici
-  //   → ZÉRO box, zéro texte. Si bleed de la mascotte, visible proprement. Si vide, fond uniforme.
+  // ─── CASES 4, 5, 6 (middle row) : INTOUCHABLES — bras / torse peuvent bleed
+  //   → ZÉRO box, zéro texte. Continuité pixel-perfect préservée.
   //
-  // ─── CASE 8 (c7 bottom-center) : signature discrète TOUT en bas (évite les pieds en Y mi/haut) ──
+  // ─── CASE 8 (c7 bottom-center) : signature discrète en zone sûre basse ──
   const c7 = canvases[7].getContext('2d');
   c7.save();
   c7.shadowColor = 'rgba(0,0,0,0.95)';
   c7.shadowBlur = 10;
   c7.shadowOffsetY = 2;
-  pF(c7, '— SENSEI BLACKBELT —', S/2, S - 50, 26, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7, '— SENSEI BLACKBELT —', W/2, SAFE_BOT + 80, 26, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
   c7.restore();
 
-  // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes GOLD avec shadow — zéro box ──
+  // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes GOLD avec shadow ──
   const c2 = canvases[2].getContext('2d');
   txtWithShadow(c2, function(){
-    pF(c2, cfg.titleLine1, S/2, 420, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c2, cfg.titleLine2, S/2, 580, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c2, cfg.titleLine1, W/2, H/2 - 170, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c2, cfg.titleLine2, W/2, H/2 - 10,  150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
-  // ─── CASE 7 (c6 bottom-left) : QUOTE en 3 lignes GOLD, zéro box ──
+  // ─── CASE 7 (c6 bottom-left) : QUOTE en 3 lignes GOLD ──
   const c6 = canvases[6].getContext('2d');
   txtWithShadow(c6, function(){
-    pF(c6, cfg.quote1, S/2, 400, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.quote2, S/2, 480, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.quote3, S/2, 580, 56, '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote1, W/2, H/2 - 150, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote2, W/2, H/2 - 70,  48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote3, W/2, H/2 + 30,  56, '#fff',    'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
-  // ─── CASE 9 (c8 bottom-right) : HASHTAG + CTA button + URL — minimal, pas de box ──
+  // ─── CASE 9 (c8 bottom-right) : HASHTAG + CTA button + URL ──
   const c8 = canvases[8].getContext('2d');
-  // Hashtag en haut
+  // Hashtag en haut (zone sûre)
   txtWithShadow(c8, function(){
-    pF(c8, '#'+cfg.hashtag, S/2, 380, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, '#'+cfg.hashtag, W/2, H/2 - 200, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
-  // Bouton CTA au milieu (pas besoin de shadow, bouton or lui-même est le background)
+  // Bouton CTA au centre vertical
   const btnW = 540, btnH = 150;
-  const btnX = (S - btnW) / 2;
-  const btnY = S/2 - 30;
+  const btnX = (W - btnW) / 2;
+  const btnY = H/2 - btnH/2 + 20;
   c8.save();
   c8.shadowColor = 'rgba(0,0,0,0.9)';
   c8.shadowBlur = 15;
   c8.shadowOffsetY = 4;
   pRect(c8, btnX, btnY, btnW, btnH, 75, '#f5c518');
   c8.restore();
-  pF(c8, en?'JOIN →':'REJOINS →', S/2, btnY + btnH/2 + 20, 60, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  // URL + follow en bas
+  pF(c8, en?'JOIN →':'REJOINS →', W/2, btnY + btnH/2 + 20, 60, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  // URL + follow (zone sûre basse)
   txtWithShadow(c8, function(){
-    pF(c8, 'senseiblackbelt.com', S/2, S - 180, 36, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c8, en?'FOLLOW':'SUIS-MOI', S/2, S - 125, 30, '#fff', 'center', '700');
+    pF(c8, 'senseiblackbelt.com', W/2, H - 220, 36, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', W/2, H - 165, 30, '#fff', 'center', '700');
   });
   // Case 5 user (c4 center) : PAS de watermark — mascotte reste intacte
 }
@@ -17685,7 +17704,44 @@ function puzzleDrawTemplate10(canvases, d) {
 function puzzleRender() {
   const d = puzzleGetData();
   const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6, puzzleDrawTemplate7, puzzleDrawTemplate8, puzzleDrawTemplate9, puzzleDrawTemplate10];
-  fns[_puzzleTemplate](_puzzleCanvases, d);
+  const idx = _puzzleTemplate;
+  // ═══════════════════════════════════════════════════════════════════
+  //  Pré-remplir le fond #131820 uniforme sur TOUS les 9 canvases finaux
+  //  → les bandes 135px top/bottom (padding 4:5) se fondent dans le fond
+  //  → zéro bordure visible, zéro espace blanc, cohérence 100%
+  // ═══════════════════════════════════════════════════════════════════
+  _puzzleCanvases.forEach(c => {
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#131820';
+    ctx.fillRect(0, 0, PUZZLE_W, PUZZLE_H);
+  });
+  if (idx >= 7) {
+    // ─── TPL 7-10 (MASCOTTE) : natif 4:5 — canevas maître 3240×4050 avec continuité pixel-perfect
+    fns[idx](_puzzleCanvases, d);
+  } else {
+    // ─── TPL 0-6 : dessin legacy sur buffers carrés 1080×1080, puis blit centré verticalement
+    //    dans les canvases finaux 1080×1350 (padding 135px haut + 135px bas, fond #131820)
+    const buffers = Array.from({length:9}, () => {
+      const c = document.createElement('canvas');
+      c.width = PUZZLE_SIZE; c.height = PUZZLE_SIZE;
+      return c;
+    });
+    fns[idx](buffers, d);
+    const padY = (PUZZLE_H - PUZZLE_SIZE) / 2; // = 135
+    _puzzleCanvases.forEach((canvas, i) => {
+      const ctx = canvas.getContext('2d');
+      // Blit du buffer carré 1080×1080 à l'exact position (0, 135) sur canvas 1080×1350
+      ctx.drawImage(buffers[i], 0, padY, PUZZLE_W, PUZZLE_SIZE);
+    });
+  }
+  // ─── Validation auto-dimensions (zero crop Instagram) ──
+  // Chaque tuile DOIT être exactement 1080×1350 (ratio 0.8 = Instagram portrait natif)
+  for (let i = 0; i < 9; i++) {
+    const c = _puzzleCanvases[i];
+    if (c.width !== PUZZLE_W || c.height !== PUZZLE_H) {
+      console.error('[Puzzle] Tuile '+(i+1)+' hors format : '+c.width+'×'+c.height+' (attendu '+PUZZLE_W+'×'+PUZZLE_H+')');
+    }
+  }
   // mise à jour aperçu
   const grid = document.getElementById('puzzle-grid-preview');
   grid.innerHTML='';
@@ -17709,7 +17765,10 @@ function puzzleRender() {
 }
 
 function puzzleDownloadOne(canvas, n) {
-  const filename = 'sensei-puzzle-'+n+'-of-9.jpg';
+  // Nommage dans l'ordre officiel Instagram (01 = haut-gauche → 09 = bas-droite)
+  // Numérotation zero-padded pour tri alphabétique correct dans la photothèque
+  const num = (n < 10 ? '0' : '') + n;
+  const filename = num + '.jpg';
   // Canvas -> Blob (compatible iOS 18 PWA)
   canvas.toBlob(function(blob){
     if(!blob){ alert('Erreur creation image'); return; }
@@ -17759,8 +17818,8 @@ function puzzleSelectTemplate(idx, btn) {
 }
 
 function openPuzzleModal() {
-  // Créer les 9 canvases offscreen 1080×1080
-  _puzzleCanvases = Array.from({length:9},()=>{ const c=document.createElement('canvas'); c.width=PUZZLE_SIZE; c.height=PUZZLE_SIZE; return c; });
+  // Créer les 9 canvases offscreen 1080×1350 (portrait Instagram 4:5 natif, zero crop)
+  _puzzleCanvases = Array.from({length:9},()=>{ const c=document.createElement('canvas'); c.width=PUZZLE_W; c.height=PUZZLE_H; return c; });
   // Charger coach.jpg
   if(!_puzzleCoachImg) {
     const img=new Image(); img.crossOrigin='anonymous';
