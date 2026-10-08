@@ -2292,6 +2292,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🔥<div id="dcog_lbl_burnout">BURNOUT</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('vcmath')" id="dcog_btn_vcmath"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        👁<div id="dcog_lbl_vcmath">VISUAL MATH</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2365,6 +2369,21 @@ window._dojoBackHome = function(){
         ↕ <span id="dcog_lbl_diffheight">HAUTEUR DIFF.</span><br><span id="dcog_sub_diffheight" style="font-size:9px;opacity:.7">2 lignes</span>
       </button>
     </div>
+    <!-- VISUAL COGNITIVE MATHS — niveaux (toutes opérations à chaque niveau, difficulté = taille des opérandes) -->
+    <div id="dcog_optVcmath" style="display:none;flex-wrap:wrap;gap:8px">
+      <button class="dcog-vcm-btn" onclick="_dcog_setVcmLevel('easy')" data-level="easy"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        🟢 <span id="dcog_lbl_vcmEasy">FACILE</span><br><span style="font-size:9px;opacity:.7">1-10</span>
+      </button>
+      <button class="dcog-vcm-btn" onclick="_dcog_setVcmLevel('medium')" data-level="medium"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        🟡 <span id="dcog_lbl_vcmMedium">MOYEN</span><br><span style="font-size:9px;opacity:.7">1-20</span>
+      </button>
+      <button class="dcog-vcm-btn" onclick="_dcog_setVcmLevel('hard')" data-level="hard"
+        style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
+        🔥 <span id="dcog_lbl_vcmHard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">10-99</span>
+      </button>
+    </div>
     <!-- TBOARD : choix 1 ballon / 2 ballons -->
     <div id="dcog_optTboard" style="display:none;gap:8px">
       <button class="dcog-tbd-btn" onclick="_dcog_setTboardMode('one')" data-tbdmode="one"
@@ -2412,6 +2431,17 @@ window._dojoBackHome = function(){
         <!-- Dual-task live feedback -->
         <div style="margin-top:14px;font-size:10px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:1px;text-align:center">
           <span id="dcog_mathBpmLabel">DRIBBLE BPM</span>: <span id="dcog_mathBpmLive" style="color:#f5c518;font-weight:700">--</span>
+        </div>
+      </div>
+      <!-- VISUAL COGNITIVE MATHS overlay -->
+      <div id="dcog_vcmOverlay"
+        style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;background:transparent;pointer-events:none">
+        <div id="dcog_vcmQuestion"
+          style="font-family:var(--font-display);font-size:clamp(48px,13vw,100px);color:#fff;letter-spacing:4px;text-shadow:0 4px 24px rgba(0,0,0,.95);margin-bottom:16px;text-align:center;font-weight:900">
+          ? + ? = ?
+        </div>
+        <div id="dcog_vcmHint" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px;text-align:center">
+          Touche VRAI ou FAUX avec ta main
         </div>
       </div>
       <!-- Sprint overlay -->
@@ -31122,8 +31152,13 @@ function _dcog_applyLang(en) {
     'dcog_zlbl_C': en?'CENTER':'CENTRE',
     'dcog_zlbl_R': en?'RIGHT':'DROITE',
     'dcog_mathZoneHint': en?'Touch the correct target while dribbling':'Touche la bonne target avec ta main en dribblant',
+    'dcog_vcmHint': en?'Touch TRUE or FALSE while dribbling':'Touche VRAI ou FAUX en dribblant',
     'dcog_dualLbl': en?'Cognitive-motor score':'Score cognitif-moteur',
     'dcog_heightZoneLbl': en?'TARGET ZONE':'ZONE CIBLE',
+    'dcog_lbl_vcmath': en?'VISUAL MATH':'VISUAL MATH',
+    'dcog_lbl_vcmEasy': en?'EASY':'FACILE',
+    'dcog_lbl_vcmMedium': en?'MEDIUM':'MOYEN',
+    'dcog_lbl_vcmHard': en?'HARD':'DIFFICILE',
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id); if (el) el.textContent = map[id];
@@ -31157,14 +31192,16 @@ function _dcog_selectDrill(drill, langOnly) {
     tboard:  en ? 'Read & execute — instructions appear on a LED board while you dribble. Adaptive cognitive drill.'
                : 'Lis & exécute — des instructions s\'affichent sur un tableau LED pendant que tu dribbles. Drill cognitif adaptatif.',
     burnout: en ? 'Push to your limit — max intensity dribble under fatigue'
-               : 'Pousse à ta limite — dribble à intensité maximale sous fatigue'
+               : 'Pousse à ta limite — dribble à intensité maximale sous fatigue',
+    vcmath:  en ? 'Visual equation challenge — touch TRUE or FALSE while dribbling'
+               : 'Défi visuel d\'équations — touche VRAI ou FAUX en dribblant'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['math','sprint','height','twoball','tboard','burnout'].forEach(function(d) {
+    ['math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -31173,7 +31210,7 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard'};
+    var optIds = {math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) { el2.style.display = d === drill ? 'flex' : 'none'; if (d === drill) el2.style.gap = '8px'; }
@@ -31185,7 +31222,8 @@ function _dcog_selectDrill(drill, langOnly) {
       height:  en ? '📏 HEIGHT ZONE'    : '📏 ZONE DE HAUTEUR',
       twoball: en ? '🔄 MODE'           : '🔄 MODE',
       tboard:  en ? '🥋 BOARD MODE'     : '🥋 MODE TABLEAU',
-      burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ'
+      burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ',
+      vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -31196,15 +31234,16 @@ function _dcog_selectDrill(drill, langOnly) {
       height:  [en?'IN ZONE %':'% EN ZONE', en?'FRAMES':'FRAMES',   en?'TIME':'TEMPS'],
       twoball: [en?'ANTIPHASE %':'% ANTIPHASE', en?'FRAMES':'FRAMES', en?'TIME':'TEMPS'],
       tboard:  [en?'CORRECT':'CORRECTS', en?'BEST STREAK':'STREAK MAX', en?'BEST SPEED':'VITESSE MAX'],
-      burnout: [en?'REPS':'REPS', en?'MAX SPEED':'VITESSE MAX', en?'TIME':'TEMPS']
+      burnout: [en?'REPS':'REPS', en?'MAX SPEED':'VITESSE MAX', en?'TIME':'TEMPS'],
+      vcmath:  [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.']
     };
     var lbls = scoreLabels[drill] || ['--','--','--'];
     ['dcog_lbl_correct','dcog_lbl_wrong','dcog_lbl_time'].forEach(function(id,i){
       var e2=document.getElementById(id); if(e2) e2.textContent=lbls[i];
     });
-    // dual task bar: show only for math
+    // dual task bar: show for math and vcmath (both ont scores correct/wrong)
     var db = document.getElementById('dcog_dualTaskBar');
-    if (db) db.style.display = drill === 'math' ? 'block' : 'none';
+    if (db) db.style.display = (drill === 'math' || drill === 'vcmath') ? 'block' : 'none';
 
     // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
     if (!_dcog_initing) {
@@ -31220,7 +31259,7 @@ function _dcog_selectDrill(drill, langOnly) {
 /* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   // tr-tab : onglets Training
-  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn').forEach(function(btn) {
+  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn').forEach(function(btn) {
     btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
   });
   // tr-btn : boutons START/STOP/SAVE
@@ -31340,7 +31379,7 @@ function _dcog_start() {
 function _dcog_stop() {
   // Coach vocal : annonce EN uniquement de fin de session
   if (typeof _dcog_running !== 'undefined' && _dcog_running && window._speak) {
-    var _dcogLE = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
+    var _dcogLE = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball', vcmath:'Visual Math' };
     var _dcogDE = _dcogLE[_dcog_drill] || '';
     window._speak.say({fr:'Cognition ' + _dcogDE + ' session terminée. Bravo !', en:'Cognition ' + _dcogDE + ' session complete. Great work!'});
   }
@@ -31389,6 +31428,10 @@ function _dcog_recordToProgression() {
     var totMath = _dcog_correct + _dcog_wrong;
     dcogPct = totMath > 0 ? Math.round(_dcog_correct / totMath * 100) : 0;
     _sb_recordSession('math', dcogPct);
+  } else if (_dcog_drill === 'vcmath') {
+    var totVcm = _dcog_correct + _dcog_wrong;
+    dcogPct = totVcm > 0 ? Math.round(_dcog_correct / totVcm * 100) : 0;
+    _sb_recordSession('vcmath', dcogPct);
   } else if (_dcog_drill === 'tboard') {
     var totTb = _dcog_tbd_correct + (typeof _dcog_tbd_wrong === 'number' ? _dcog_tbd_wrong : 0);
     dcogPct = totTb > 0 ? Math.round(_dcog_tbd_correct / totTb * 100) : 0;
@@ -31438,7 +31481,8 @@ function _dcog_startTimer() {
   if (disp) disp.style.display = 'inline-block';
   clearInterval(_dcog_mathTimer);
   _dcog_mathTimer = setInterval(function() {
-    if (!_dcog_running || _dcog_drill !== 'math') { clearInterval(_dcog_mathTimer); return; }
+    // Timer couvre à la fois math et vcmath (même format de drill chronométré par question)
+    if (!_dcog_running || (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath')) { clearInterval(_dcog_mathTimer); return; }
     _dcog_mathSec--;
     _dcog_updateTimerDisplay();
     if (_dcog_mathSec <= 0) {
@@ -31448,6 +31492,7 @@ function _dcog_startTimer() {
       if(navigator.vibrate) navigator.vibrate([100,50,100,50,200]);
       _sensei_speak(window._lang==='en'?'Time up!':'Temps écoulé !', 0);
       _dcog_mathTargets = [];
+      if (typeof _dcog_vcmTargets !== 'undefined') _dcog_vcmTargets = [];
       _dcog_stop();
       _dcog_showResults();
       _dcog_recordToProgression();
@@ -31476,7 +31521,7 @@ function _dcog_onCamReady(video,canvas,ctx){
   _dcog_video=video; _dcog_canvas=canvas; _dcog_ctx=ctx;
   // Coach vocal : annonce EN uniquement avec nom exact du drill
   if (window._speak) {
-    var _dcogL = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball' };
+    var _dcogL = { math:'Math', sprint:'Sprint', height:'Height', tboard:'Tactic Board', twoball:'Two Ball', vcmath:'Visual Math' };
     var _dcogD = _dcogL[_dcog_drill] || '';
     window._speak.say({fr:'Cognition ' + _dcogD + ' démarrée. Reste vigilant, concentre-toi sur les signaux !', en:'Cognition ' + _dcogD + ' started. Stay sharp, focus on the signals!'});
   }
@@ -31502,14 +31547,15 @@ function _dcog_launchDrill() {
   _dcog_burnoutLastTick = 0;
   _dcog_running = true;
   if (typeof _td_startMusic === 'function') _td_startMusic();
-  // Démarrer le timer si drill math
-  if (_dcog_drill === 'math') _dcog_startTimer();
+  // Démarrer le timer pour math ET vcmath (même format : timer global + sous-timer par question)
+  if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') _dcog_startTimer();
   // Update score display
   _dcog_updateScores();
   // Show correct overlay
   var overlays = {
     math:'dcog_mathOverlay', sprint:'dcog_sprintOverlay',
-    height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay'
+    height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay',
+    vcmath:'dcog_vcmOverlay'
   };
   Object.keys(overlays).forEach(function(d){
     var el = document.getElementById(overlays[d]);
@@ -31522,8 +31568,8 @@ function _dcog_launchDrill() {
   // Note : pour math, _dcog_nextQuestion() est différé à la fin du countdown 10s
   //        (évite d'afficher une opération pendant le "PRÊT ?")
   if (_dcog_drill === 'sprint')  _dcog_startSprintTimer();
-  // Timer session pour les drills non-math (sprint/height/twoball)
-  if (_dcog_drill !== 'math') {
+  // Timer session pour les drills non-math/vcmath (sprint/height/twoball/tboard/burnout)
+  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath') {
     _dcog_sessSec = 0;
     if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
     _dcog_sessTimer = setInterval(function(){
@@ -31567,6 +31613,10 @@ function _dcog_launchDrill() {
       // (évite qu'une opération soit visible pendant le "PRÊT ?")
       if (_dcog_drill === 'math' && typeof _dcog_nextQuestion === 'function') {
         _dcog_nextQuestion();
+      }
+      // Visual Cognitive Maths : même logique, générer la 1ère équation après le countdown
+      if (_dcog_drill === 'vcmath' && typeof _dcog_vcm_nextQuestion === 'function') {
+        _dcog_vcm_nextQuestion();
       }
       // Two Ball Burnout : démarrer le métronome à 60 BPM SEULEMENT ici
       // (sinon il tourne pendant le countdown et arrive à 65 BPM au GO)
@@ -31612,6 +31662,7 @@ function _dcog_detect() {
     _dcog_poses = poses; // stocker pour proximity feedback
     _dcog_drawFrame(poses);
     if (_dcog_drill === 'math')    _dcog_analyzeMathZone(poses);
+    if (_dcog_drill === 'vcmath' && typeof _dcog_vcm_analyzeZone === 'function') _dcog_vcm_analyzeZone(poses);
     if (_dcog_drill === 'height')  _dcog_analyzeHeight(poses);
     if (_dcog_drill === 'twoball') _dcog_analyzeTwoBall(poses);
     if (_dcog_drill === 'sprint')  _dcog_analyzeSprintWrist(poses);
@@ -31655,7 +31706,8 @@ function _dcog_drawFrame(poses) {
     ctx.save();
 
     // ── Ligne 1 : Timer principal au CENTRE (entre REC et STOP) ──
-    var _ds = _dcog_drill === 'math'
+    // math et vcmath partagent le même timer global (_dcog_mathDuration/_dcog_mathSec)
+    var _ds = (_dcog_drill === 'math' || _dcog_drill === 'vcmath')
       ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
       : Math.max(0, _dcog_sessDur - _dcog_sessSec);
     var _dm=Math.floor(_ds/60),_dss=_ds%60;
@@ -31672,8 +31724,8 @@ function _dcog_drawFrame(poses) {
     ctx.fillText(_dtStr, tx, ty);
     ctx.shadowBlur=0;
 
-    // ── Ligne 2 : scores math (✓ gauche, ✗ droite) — sous REC/STOP ──
-    if (_dcog_drill === 'math') {
+    // ── Ligne 2 : scores math/vcmath (✓ gauche, ✗ droite) — sous REC/STOP ──
+    if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
       var scoreY = Math.round(H * 0.20);
       var scoreFs = _sf(H, 0.075);
       ctx.font = 'bold '+scoreFs+'px "Bebas Neue", "Arial Narrow", sans-serif';
@@ -31934,6 +31986,10 @@ function _dcog_drawFrame(poses) {
   // Cibles math dessinées EN DERNIER (au-dessus du HUD pour qu'elles restent visibles)
   if (_dcog_drill === 'math' && _dcog_running) {
     _dcog_drawMathTargets(ctx, W, H);
+  }
+  // Cibles vcmath : même rendu, labels VRAI/FAUX au lieu de chiffres
+  if (_dcog_drill === 'vcmath' && _dcog_running && typeof _dcog_vcm_drawTargets === 'function') {
+    _dcog_vcm_drawTargets(ctx, W, H);
   }
   // TBOARD — panneau LED + couches d'ambiance (dessiné dans le canvas)
   if (_dcog_drill === 'tboard' && _dcog_running && typeof _dcog_tbd_draw === 'function') {
@@ -32314,6 +32370,351 @@ function _dcog_answerMath(val, idx) {
     _dcog_mathTargets = [];
     setTimeout(function() {
       if (_dcog_running && _dcog_drill === 'math') _dcog_nextQuestion();
+    }, 300);
+  }, 1200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DRILL — VISUAL COGNITIVE MATHS (`vcmath`)
+   Même moteur que Dribble Math mais 2 cibles VRAI/FAUX au lieu de 3 chiffres.
+   Les équations incluent toutes les opérations (+ − × ÷) ET tous les
+   comparateurs (= < >). La difficulté progresse via la taille des opérandes.
+   Positions des 2 cibles : diagonales opposées, random swap VRAI/FAUX
+   à chaque question → force le re-scan visuel comme Dribble Maths.
+═══════════════════════════════════════════════════════════════════ */
+var _dcog_vcmLevel     = 'easy';     // 'easy' | 'medium' | 'hard'
+var _dcog_vcmIsTrue    = false;      // réponse correcte à l'équation affichée
+var _dcog_vcmTargets   = [];         // {x, y, r, color, born, ttl, hit, hitTime, vcmVal:'TRUE'|'FALSE'}
+var _dcog_vcmAnswering = false;
+var _dcog_vcmPrevWrist = {};         // {leftWrist:{x,y}, rightWrist:{x,y}} pour direction
+
+function _dcog_setVcmLevel(lvl) {
+  _dcog_vcmLevel = lvl;
+  var btns = document.querySelectorAll('.dcog-vcm-btn');
+  for (var i = 0; i < btns.length; i++) {
+    var b = btns[i];
+    var active = b.getAttribute('data-level') === lvl;
+    b.style.background  = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color       = active ? '#f5c518' : '#7a8299';
+    b.style.borderColor = active ? 'rgba(245,197,24,.5)' : '#1e2535';
+  }
+}
+
+/* Générateur d'équation : opération + comparateur + résultat proposé
+   Retourne {text:"a OP b CMP c", isTrue:bool} */
+function _dcog_vcm_genQuestion() {
+  var lvl = _dcog_vcmLevel;
+  var ops = ['+','-','×','÷'];
+  var op  = ops[Math.floor(Math.random() * ops.length)];
+  var a, b, real;
+  // Bornes opérandes selon niveau — max 2 chiffres en hard
+  var maxAdd = lvl === 'easy' ? 10 : lvl === 'medium' ? 20 : 99;
+  var maxMul = lvl === 'easy' ? 5  : lvl === 'medium' ? 9  : 12;
+  var maxDiv = lvl === 'easy' ? 5  : lvl === 'medium' ? 9  : 12;
+  if (op === '+') {
+    a = Math.floor(Math.random() * maxAdd) + 1;
+    b = Math.floor(Math.random() * maxAdd) + 1;
+    real = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * maxAdd) + 1;
+    b = Math.floor(Math.random() * a) + 1; // garantit résultat ≥ 0
+    real = a - b;
+  } else if (op === '×') {
+    a = Math.floor(Math.random() * maxMul) + 1;
+    b = Math.floor(Math.random() * maxMul) + 1;
+    real = a * b;
+  } else { // ÷
+    b = Math.floor(Math.random() * (maxDiv - 1)) + 2; // 2..maxDiv (jamais 1 pour éviter trivialité)
+    var q = Math.floor(Math.random() * maxDiv) + 1;
+    a = b * q;    // garantit division entière propre
+    real = q;
+  }
+  // Comparateur aléatoire
+  var cmps = ['=','<','>'];
+  var cmp  = cmps[Math.floor(Math.random() * cmps.length)];
+  // Décider si l'équation sera VRAIE ou FAUSSE (50/50)
+  var wantTrue = Math.random() < 0.5;
+  var shown;
+  if (cmp === '=') {
+    if (wantTrue) {
+      shown = real;
+    } else {
+      // Décaler de 1 à 5 (jamais 0 pour éviter accident)
+      var dEq = Math.floor(Math.random() * 5) + 1;
+      shown = Math.random() < 0.5 ? real + dEq : real - dEq;
+      if (shown === real) shown = real + dEq; // garde-fou
+    }
+  } else if (cmp === '<') {
+    if (wantTrue) {
+      // real < shown : shown > real
+      shown = real + Math.floor(Math.random() * 5) + 1;
+    } else {
+      // real >= shown : on fait shown <= real, prend shown = real (égalité falsifie <) ou shown < real
+      shown = Math.max(0, real - Math.floor(Math.random() * 5));
+    }
+  } else { // '>'
+    if (wantTrue) {
+      // real > shown : shown < real
+      shown = Math.max(0, real - Math.floor(Math.random() * 5) - 1);
+      if (shown >= real) shown = Math.max(0, real - 1);
+    } else {
+      // real <= shown
+      shown = real + Math.floor(Math.random() * 5);
+    }
+  }
+  // Vérif indépendante de wantTrue (anti-bug) : on calcule la vraie valeur de l'équation telle qu'affichée
+  var actualTrue;
+  if (cmp === '=') actualTrue = (real === shown);
+  else if (cmp === '<') actualTrue = (real < shown);
+  else                  actualTrue = (real > shown);
+  var text = a + ' ' + op + ' ' + b + ' ' + cmp + ' ' + shown;
+  return { text: text, isTrue: actualTrue };
+}
+
+function _dcog_vcm_nextQuestion() {
+  if (!_dcog_running || _dcog_drill !== 'vcmath') return;
+  _dcog_questionAt    = Date.now();
+  _dcog_vcmAnswering  = false;
+  _dcog_lastAnswerTime = 0;
+  _dcog_vcmPrevWrist  = {};
+  // Timer par question (réutilise le mécanisme existant qui est spécifique math : on fait notre propre version)
+  if (_dcog_qTimer) clearInterval(_dcog_qTimer);
+  _dcog_qTimerSec = _dcog_qTimerDur;
+  _dcog_qTimer = setInterval(function(){
+    _dcog_qTimerSec--;
+    if (_dcog_qTimerSec <= 0) {
+      clearInterval(_dcog_qTimer); _dcog_qTimer = null;
+      if (_dcog_running && _dcog_drill === 'vcmath') {
+        _dcog_wrong++;
+        _td_soundFail();
+        if (navigator.vibrate) navigator.vibrate([40,10,40]);
+        _dcog_updateScores();
+        setTimeout(_dcog_vcm_nextQuestion, 400);
+      }
+    }
+  }, 1000);
+  var q = _dcog_vcm_genQuestion();
+  _dcog_vcmIsTrue = q.isTrue;
+  // Afficher l'équation en overlay HTML et dans l'overlay caméra plein écran
+  var qEl = document.getElementById('dcog_vcmQuestion');
+  if (qEl) qEl.textContent = q.text;
+  var qOv = document.getElementById('sensei-cam-question');
+  if (qOv) {
+    qOv.textContent = q.text;
+    qOv.style.transform = 'translate(-50%,-50%)';
+    qOv.style.display = 'block';
+  }
+  // Vider et respawn 2 cibles en diagonale (positions aléatoires pour re-scan visuel)
+  _dcog_vcmTargets = [];
+  var cv = _dcog_canvas;
+  var W  = cv ? cv.width  : 640;
+  var H  = cv ? cv.height : 480;
+  var r  = Math.round(Math.min(W * 0.075, H * 0.13));
+  var yHaut = Math.round(H * 0.30);
+  var yBas  = Math.round(H * 0.62);
+  if ((yBas - yHaut) < r * 2.4) {
+    var mid = (yHaut + yBas) / 2;
+    yHaut = Math.round(mid - r * 1.2);
+    yBas  = Math.round(mid + r * 1.2);
+  }
+  var xG = Math.round(W * (1/6));
+  var xD = Math.round(W * (5/6));
+  // 4 configurations diagonales possibles — tirage aléatoire chaque question
+  var diagonals = [
+    [{x:xG, y:yHaut}, {x:xD, y:yBas}],   // ↘
+    [{x:xD, y:yHaut}, {x:xG, y:yBas}],   // ↙
+    [{x:xG, y:yBas},  {x:xD, y:yHaut}],  // ↗
+    [{x:xD, y:yBas},  {x:xG, y:yHaut}]   // ↖
+  ];
+  var picked = diagonals[Math.floor(Math.random() * diagonals.length)];
+  // VRAI / FAUX attribués aléatoirement aux 2 positions
+  var trueFirst = Math.random() < 0.5;
+  var labels = trueFirst ? ['TRUE','FALSE'] : ['FALSE','TRUE'];
+  var colors = trueFirst ? ['#22c55e','#e63946'] : ['#e63946','#22c55e']; // vert = VRAI, rouge = FAUX
+  // Afficher les labels dans la langue de l'utilisateur
+  var en = (window._lang === 'en');
+  // PHASE 2 : après 2s, cacher la question et afficher les cibles (comme Dribble Maths)
+  var _vcm_qOvRef = document.getElementById('sensei-cam-question');
+  setTimeout(function(){
+    if (_vcm_qOvRef) _vcm_qOvRef.style.display = 'none';
+    _dcog_vcmTargets = picked.map(function(z, i) {
+      return { x: z.x, y: z.y, r: r,
+               color: colors[i],
+               born: Date.now(), ttl: 99999,
+               hit: false, hitTime: 0,
+               vcmVal: labels[i] };  // 'TRUE' | 'FALSE' — toujours stocké en EN pour la logique
+    });
+  }, 2000);
+  _dcog_updateMathBpm();
+}
+
+/* Hit detection — même approche que _dcog_analyzeMathZone */
+function _dcog_vcm_analyzeZone(poses) {
+  if (!poses || !poses[0] || _dcog_vcmAnswering) return;
+  if (!_dcog_canvas || !_dcog_video) return;
+  var W  = _dcog_canvas.width;
+  var H  = _dcog_canvas.height;
+  var sx = W / (_dcog_video.videoWidth  || 640);
+  var sy = H / (_dcog_video.videoHeight || 480);
+  ['left','right'].forEach(function(side) {
+    var name = side + 'Wrist';
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    var prev = _dcog_vcmPrevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dcog_vcmPrevWrist[name] = {x:wx, y:wy};
+    var moveThresh = Math.max(8, Math.round(W * 0.02));
+    if (moved < moveThresh) return;
+    var vxd = prev ? wx - prev.x : 0;
+    var vyd = prev ? wy - prev.y : 0;
+    _dcog_vcmTargets.forEach(function(t) {
+      if (t.hit) return;
+      if (Date.now() - t.born < 500) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 1.2) return;
+      var dot = (-dx)*vxd + (-dy)*vyd;
+      if (dot <= 0) return;
+      t.hit = true; t.hitTime = Date.now();
+      var rt = Date.now() - t.born;
+      var freq = rt < 500 ? 880 : rt < 1000 ? 660 : 440;
+      var vol  = rt < 500 ? 0.15 : 0.08;
+      _td_beep(freq, 0.1, vol);
+      if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
+      _dcog_flashHit(t, _dcog_ctx);
+      // Voix coaching
+      var answerIsTrue = (t.vcmVal === 'TRUE');
+      if (answerIsTrue === _dcog_vcmIsTrue) {
+        if (rt < 600) _sensei_speak(window._lang==='en'?'Fast!':'Rapide !', 2500);
+        else _sensei_speak(window._lang==='en'?'Good':'Bien', 2500);
+      } else {
+        _sensei_speak(window._lang==='en'?'Wrong answer':'Mauvaise réponse', 2500);
+      }
+      if (_dcog_ctx) {
+        _dcog_ctx.save();
+        _dcog_ctx.globalAlpha = 0.7;
+        _dcog_ctx.fillStyle = t.color;
+        _dcog_ctx.beginPath();
+        _dcog_ctx.arc(t.x, t.y, t.r*2, 0, Math.PI*2);
+        _dcog_ctx.fill();
+        _dcog_ctx.restore();
+      }
+      _dcog_vcm_answer(answerIsTrue);
+    });
+  });
+}
+
+/* Rendu des 2 cibles — identique à _dcog_drawMathTargets mais label VRAI/FAUX */
+function _dcog_vcm_drawTargets(ctx, W, H) {
+  var now = Date.now();
+  var dcWrists = [];
+  if (_dcog_poses && _dcog_poses[0] && _dcog_canvas && _dcog_video) {
+    var _dsx = _dcog_canvas.width  / (_dcog_video.videoWidth  || 640);
+    var _dsy = _dcog_canvas.height / (_dcog_video.videoHeight || 480);
+    ['left','right'].forEach(function(side){
+      var kp = _tsym_kp_hand(_dcog_poses, side);
+      if(kp) dcWrists.push({x: _dcog_canvas.width - kp.x*_dsx, y: kp.y*_dsy});
+    });
+  }
+  var en = (window._lang === 'en');
+  _dcog_vcmTargets.forEach(function(t) {
+    if (t.hit && (now - t.hitTime) > 400) return;
+    var age   = (now - t.born) / Math.min(t.ttl, 10000);
+    var alpha = Math.max(0.3, 1 - age);
+    var proximity = 0;
+    dcWrists.forEach(function(w){
+      var dist = Math.sqrt(Math.pow(w.x-t.x,2)+Math.pow(w.y-t.y,2));
+      var prox = Math.max(0, 1 - dist/(t.r*3.5));
+      if(prox > proximity) proximity = prox;
+    });
+    var spawnRamp = Math.min(1, (now - t.born) / 250);
+    var pulse = 1 + (0.08 + proximity*0.15) * spawnRamp * Math.sin(now / (120 - proximity*60));
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    if(!t.hit && proximity > 0.15) {
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, t.r * 2.2, 0, Math.PI*2);
+      ctx.strokeStyle = t.color;
+      ctx.globalAlpha = alpha * proximity * 0.5;
+      ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.globalAlpha = alpha;
+    }
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
+    ctx.strokeStyle = t.hit ? '#fff' : t.color;
+    ctx.lineWidth = 2 + (t.hit ? 0 : proximity*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r, 0, Math.PI*2);
+    var answerIsTrue = (t.vcmVal === 'TRUE');
+    ctx.fillStyle = t.hit
+      ? (answerIsTrue === _dcog_vcmIsTrue ? '#22c55e' : '#e63946')
+      : t.color;
+    ctx.fill();
+    // Label VRAI/FAUX ou TRUE/FALSE au centre
+    ctx.globalAlpha  = 1;
+    ctx.fillStyle    = '#fff';
+    ctx.save();
+    // Texte localisé
+    var lblDisplay = t.hit
+      ? (answerIsTrue === _dcog_vcmIsTrue ? '✓' : '✗')
+      : (en ? (t.vcmVal === 'TRUE' ? 'TRUE' : 'FALSE')
+            : (t.vcmVal === 'TRUE' ? 'VRAI' : 'FAUX'));
+    // Font bumpé à 0.55r pour lisibilité trépied (vs 0.42 avant)
+    var fontSize = t.hit ? Math.round(t.r * 0.78) : Math.round(t.r * 0.55);
+    ctx.font         = 'bold ' + fontSize + 'px "Bebas Neue", "Arial Narrow", sans-serif';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    // 🛡 Anti-overflow : mesure la largeur réelle et rétrécit si > 90% du diamètre
+    if (!t.hit) {
+      var textW = ctx.measureText(lblDisplay).width;
+      var maxW = t.r * 1.8; // 90% du diamètre 2r
+      if (textW > maxW) {
+        fontSize = Math.max(10, Math.round(fontSize * (maxW / textW)));
+        ctx.font = 'bold ' + fontSize + 'px "Bebas Neue", "Arial Narrow", sans-serif';
+      }
+    }
+    ctx.shadowColor  = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur   = 5;
+    ctx.fillText(lblDisplay, t.x, t.y);
+    ctx.shadowBlur   = 0;
+    ctx.restore();
+    ctx.restore();
+  });
+}
+
+/* Enregistre la réponse (correct/wrong) + enchaîne la question suivante */
+function _dcog_vcm_answer(playerAnsweredTrue) {
+  if (!_dcog_running || _dcog_drill !== 'vcmath' || _dcog_vcmAnswering) return;
+  _dcog_vcmAnswering = true;
+  var rt = Date.now() - _dcog_questionAt;
+  _dcog_respTimes.push(rt);
+  var correct = (playerAnsweredTrue === _dcog_vcmIsTrue);
+  if (correct) {
+    _dcog_correct++;
+    _td_soundOK();
+    if (navigator.vibrate) navigator.vibrate(30);
+  } else {
+    _dcog_wrong++;
+    _td_soundFail();
+    if (navigator.vibrate) navigator.vibrate([40,10,40]);
+  }
+  _dcog_updateScores();
+  // Dual task bar
+  var total = _dcog_correct + _dcog_wrong;
+  var pct   = total > 0 ? Math.round(_dcog_correct/total*100) : 0;
+  var fill  = document.getElementById('dcog_dualFill');
+  var pctEl = document.getElementById('dcog_dualPct');
+  if (fill)  fill.style.width   = pct+'%';
+  if (pctEl) pctEl.textContent  = pct+'%';
+  // Transition : 1200ms feedback puis nouvelle question
+  if (_dcog_qTimer) { clearInterval(_dcog_qTimer); _dcog_qTimer = null; }
+  setTimeout(function() {
+    _dcog_vcmTargets = [];
+    setTimeout(function() {
+      if (_dcog_running && _dcog_drill === 'vcmath') _dcog_vcm_nextQuestion();
     }, 300);
   }, 1200);
 }
@@ -32978,7 +33379,8 @@ function _dcog_burnoutSchedule() {
 /* ── Score update / status ───────────────────────────────────── */
 function _dcog_updateScores() {
   var en = window._lang === 'en';
-  if (_dcog_drill === 'math') {
+  // math et vcmath partagent le même format de scores (correct/wrong/avgRT)
+  if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
     var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = _dcog_correct;
     var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_wrong;
     var avgRT = _dcog_respTimes.length > 0
@@ -33007,7 +33409,7 @@ function _dcog_showResults() {
     _dcog_updateInsight();
     return;
   }
-  if (_dcog_drill === 'math') {
+  if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
     var total = _dcog_correct + _dcog_wrong;
     var pct   = total > 0 ? Math.round(_dcog_correct/total*100) : 0;
     var avgRT = _dcog_respTimes.length > 0
@@ -33921,7 +34323,7 @@ function _dcog_updateInsight() {
     el.textContent = (typeof _dcog_tbd_insight === 'function') ? _dcog_tbd_insight() : '';
     return;
   }
-  if (_dcog_drill === 'math') {
+  if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
     var total = _dcog_correct + _dcog_wrong;
     if (total === 0) { el.textContent = en ? 'Start a session to see the analysis...' : 'Lance une session pour voir l\'analyse...'; return; }
     var pct = Math.round(_dcog_correct/total*100);
