@@ -1062,6 +1062,9 @@ body.unlocked .sensei-only{display:revert !important}
             <span style="position:absolute;top:-7px;right:-7px;background:#22c55e;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:5px;letter-spacing:.5px;font-family:'Inter',sans-serif">FREE</span>
             🎬 <span data-i18n="dojo_cta_vweek">VIDÉO DE LA SEMAINE</span>
           </button>
+          <button onclick="_calendar_open()" style="background:transparent;color:#9f64e6;border:2px solid #9f64e6;border-radius:999px;font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(12px,1.8vw,15px);letter-spacing:2px;font-weight:900;cursor:pointer;padding:10px 22px;display:flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.background='rgba(159,100,230,.1)'" onmouseout="this.style.background='transparent'">
+            📅 <span data-i18n="dojo_cta_cal">CALENDRIER</span>
+          </button>
         </div>
       </div>
       <!-- 5 grosses CARDS cliquables (navigation vers pages catégorie) -->
@@ -14227,6 +14230,7 @@ function applyLangTracker(lang) {
     dojo_welcome:'BIENVENUE DANS LE DOJO',
     dojo_welcome_sub:'Human-led. AI-powered. 🥋',
     dojo_cta_vweek:'VIDÉO DE LA SEMAINE',
+    dojo_cta_cal:'CALENDRIER',
     dojo_world_badge:'\ud83c\udf0d PREMI\u00c8RE MONDIALE',
     dojo_world_title:'LA 1\u00c8RE APP DE BASKET<br>SCIENTIFIQUE AU MONDE',
     dojo_world_sub:'Fond\u00e9e sur la <b style="color:#f5c518">Science</b>, les <b style="color:#f5c518">Math\u00e9matiques</b> et l\'<b style="color:#f5c518">IA</b>',
@@ -14596,6 +14600,7 @@ function applyLangTracker(lang) {
     dojo_welcome:'WELCOME TO THE DOJO',
     dojo_welcome_sub:'Human-led. AI-powered. 🥋',
     dojo_cta_vweek:'VIDEO OF THE WEEK',
+    dojo_cta_cal:'SCHEDULE',
     dojo_world_badge:'\ud83c\udf0d WORLD FIRST',
     dojo_world_title:'THE WORLD\'S FIRST<br>SCIENTIFIC BASKETBALL APP',
     dojo_world_sub:'Based on <b style="color:#f5c518">Science</b>, <b style="color:#f5c518">Mathematics</b> and <b style="color:#f5c518">AI</b>',
@@ -17519,7 +17524,17 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   for (let x = 0; x < TOTAL_W; x += 60) { cctx.beginPath(); cctx.moveTo(x, 0); cctx.lineTo(x, TOTAL_H); cctx.stroke(); }
   for (let y = 0; y < TOTAL_H; y += 60) { cctx.beginPath(); cctx.moveTo(0, y); cctx.lineTo(TOTAL_W, y); cctx.stroke(); }
 
-  // Mascotte adaptée au maître 3240×4050 avec aspect ratio préservé (contain)
+  // ═══════════════════════════════════════════════════════════════════
+  //  RÈGLE DE COMPOSITION & SÉCURITÉ DU SUJET (critique)
+  //  → le visage de la mascotte ne doit JAMAIS tomber sur une ligne de
+  //     découpe horizontale (Y=1350 ou Y=2700 dans le maître 3240×4050).
+  //  → focalY = position relative du visage dans l'image source (0=haut, 1=bas).
+  //     Mascottes SENSEI pleine hauteur : visage ≈ 0.18 du haut.
+  //  → targetY = position cible du visage dans le maître : y=675 = centre
+  //     de la tuile 02 (haut-centre) = position optimale Instagram.
+  //  → fallback : si l'image dépasserait du maître après décalage,
+  //     on réduit l'offset pour que l'image reste contain dans 3240×4050.
+  // ═══════════════════════════════════════════════════════════════════
   if (img) {
     const imgRatio = img.width / img.height;
     const masterRatio = TOTAL_W / TOTAL_H; // 3240/4050 = 0.8
@@ -17537,7 +17552,14 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       drawH = TOTAL_H;
     }
     const offsetX = (TOTAL_W - drawW) / 2;
-    const offsetY = (TOTAL_H - drawH) / 2;
+    // Décalage vertical intelligent pour positionner le visage au centre tuile 02
+    const focalY  = (cfg && typeof cfg.focalY === 'number') ? cfg.focalY : 0.18;
+    const targetY = 675; // centre vertical de la tuile 02 (0-1350)
+    let offsetY = targetY - drawH * focalY;
+    // Clamp : l'image doit rester dans [0, TOTAL_H - drawH] pour couvrir le maître
+    const minOffsetY = Math.min(0, TOTAL_H - drawH);
+    const maxOffsetY = Math.max(0, TOTAL_H - drawH);
+    offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, offsetY));
     cctx.drawImage(img, offsetX, offsetY, drawW, drawH);
   }
 
@@ -44492,6 +44514,175 @@ window._videoWeek_open = function(){
     + '</div>'
     + '</div>';
   m.querySelector('#vweek-close').addEventListener('click', function(){ m.style.display='none'; document.body.style.overflow=''; });
+  m.style.display='block'; document.body.style.overflow='hidden';
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  CALENDRIER TRAINING WEEK (CTA Home DOJO, 4e position)
+//  → Grille horaire des drills (hors Ball Handling, qui a son propre module)
+//  → 6 types + NBA Pro Drills — chaque event = vidéo YouTube cliquable
+//  → UX : clic sur event → openVideoModal lance la vidéo en plein écran
+// ═══════════════════════════════════════════════════════════════════
+window._calendar_open = function(){
+  var en = (window._lang === 'en');
+  var m = document.getElementById('calendar-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'calendar-modal';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:100090;background:rgba(10,13,24,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;font-family:inherit';
+    document.body.appendChild(m);
+  }
+
+  // ─── 14 sessions sur 7 jours · 7 types × 2 sessions = cycle complet ───
+  // Types couverts : Shooting · Finishing · Défense · Rebounding · Hand-Eye · S&C · NBA Pro
+  // (zéro Ball Handling — module dédié)
+  var L = {
+    shooting:  en?'SHOOTING':'SHOOTING',
+    finishing: en?'FINISHING':'FINISHING',
+    defense:   en?'DEFENSE':'DÉFENSE',
+    rebounding:en?'REBOUNDING':'REBOUNDING',
+    hec:       en?'HAND-EYE':'HAND-EYE',
+    sc:        en?'STRENGTH & COND.':'STRENGTH & COND.',
+    nbapro:    en?'NBA PRO':'NBA PRO'
+  };
+  var EVENTS = [
+    // LUN
+    {day:1, start:'07:00', end:'07:45', cls:'shoot',   type:L.shooting,  title:'Shooting Form · Coach Sensei',   yt:'dbusjNVrMgA'},
+    {day:1, start:'18:30', end:'19:15', cls:'def',     type:L.defense,   title:'Defense #1 · stance & slide',     yt:'0ZXELMe3VIU'},
+    // MAR
+    {day:2, start:'07:00', end:'07:45', cls:'finish',  type:L.finishing, title:'Finishing #1 · attack the rim',   yt:'s2Gs3GcfLAY'},
+    {day:2, start:'18:30', end:'19:15', cls:'hec',     type:L.hec,       title:'Hand-Eye #1 · reaction speed',    yt:'xV0XuRGHsxo'},
+    // MER
+    {day:3, start:'07:00', end:'07:45', cls:'rebound', type:L.rebounding,title:'Rebounding #1 · positioning',      yt:'O2TDPnLiwOM'},
+    {day:3, start:'18:30', end:'19:30', cls:'nba',     type:L.nbapro,    title:'NBA Pro #1 · elite footwork',      yt:'G-N1gH5U0jg'},
+    // JEU
+    {day:4, start:'07:00', end:'07:45', cls:'shoot',   type:L.shooting,  title:'Shooting #1 · catch & shoot',      yt:'RvyX7fXgqiM'},
+    {day:4, start:'18:00', end:'19:00', cls:'sc',      type:L.sc,        title:'S&C #1 · explosive power',          yt:'5v6kVdAqbOc'},
+    // VEN
+    {day:5, start:'07:00', end:'07:45', cls:'finish',  type:L.finishing, title:'Finishing #2 · contact finish',     yt:'JuqylTSDesU'},
+    {day:5, start:'18:30', end:'19:15', cls:'def',     type:L.defense,   title:'Defense #2 · close-out',             yt:'xXYCtNwFRHs'},
+    // SAM
+    {day:6, start:'10:00', end:'10:45', cls:'rebound', type:L.rebounding,title:'Rebounding #2 · boxout',             yt:'HVCjzaIEju4'},
+    {day:6, start:'16:00', end:'16:45', cls:'hec',     type:L.hec,       title:'Hand-Eye #2 · dual tracking',        yt:'KWmdHJ2A8pg'},
+    // DIM
+    {day:7, start:'10:00', end:'11:00', cls:'nba',     type:L.nbapro,    title:'NBA Pro #2 · pro finishing',         yt:'xxCj_BlKZsI'},
+    {day:7, start:'16:00', end:'17:00', cls:'sc',      type:L.sc,        title:'S&C #2 · lower body power',          yt:'P4_hDNmsrgs'}
+  ];
+
+  var DAY_NAMES = en
+    ? [{name:'Mon',date:6},{name:'Tue',date:7},{name:'Wed',date:8},{name:'Thu',date:9},{name:'Fri',date:10},{name:'Sat',date:11},{name:'Sun',date:12}]
+    : [{name:'Lun',date:6},{name:'Mar',date:7},{name:'Mer',date:8},{name:'Jeu',date:9},{name:'Ven',date:10},{name:'Sam',date:11},{name:'Dim',date:12}];
+  var TODAY_IDX = 4; // JEU 09 (ajusté dynamiquement par date réelle)
+  var now = new Date();
+  if (now.getFullYear()===2026 && now.getMonth()===9) { // oct = 9
+    var dd = now.getDate(); if (dd>=6 && dd<=12) TODAY_IDX = (dd-6)+1;
+  }
+
+  var START_H = 6, END_H = 21, HOUR_H = 44;
+  var TYPE_COLORS = {
+    shoot:'linear-gradient(135deg,#c54000,#ff6d00)',
+    finish:'linear-gradient(135deg,#8f1824,#e63946)',
+    def:'linear-gradient(135deg,#004a7a,#0077b6)',
+    rebound:'linear-gradient(135deg,#1a7a32,#2dc653)',
+    hec:'linear-gradient(135deg,#4a1a5e,#7b2d8b)',
+    sc:'linear-gradient(135deg,#1c7a9c,#4cc9f0)',
+    nba:'linear-gradient(135deg,#4a0e5f,#f5c518)'
+  };
+
+  // ─── Build the modal HTML (header + legend + grid shell + stats) ───
+  var html = ''
+    + '<div style="max-width:1600px;margin:0 auto;padding:0 16px 60px;color:#fff">'
+    // ── Sticky header ──
+    + '<div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(10,13,24,.96);padding:16px 0;z-index:5;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px">'
+    + '  <div style="display:flex;align-items:center;gap:10px">'
+    + '    <div style="font-size:30px">📅</div>'
+    + '    <div>'
+    + '      <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2px;color:#9f64e6">'+(en?'TRAINING SCHEDULE':'CALENDRIER TRAINING')+'</div>'
+    + '      <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-top:2px">'+(en?'Week 41 · Oct 06–12, 2026':'Semaine 41 · 06–12 oct. 2026')+'</div>'
+    + '    </div>'
+    + '  </div>'
+    + '  <button id="cal-close" style="background:transparent;border:1.5px solid rgba(159,100,230,.5);color:#9f64e6;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
+    + '</div>'
+    // ── Legend ──
+    + '<div style="display:flex;gap:12px;padding:10px 2px 16px;flex-wrap:wrap;font-size:10px;letter-spacing:.5px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:14px">'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#ff6d00"></span>'+L.shooting+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#e63946"></span>'+L.finishing+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#0077b6"></span>'+L.defense+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#2dc653"></span>'+L.rebounding+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#7b2d8b"></span>'+L.hec+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:#4cc9f0"></span>'+L.sc+'</div>'
+    +   '<div style="display:flex;align-items:center;gap:5px;font-weight:600;color:#cfd3e0"><span style="width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#9f64e6,#f5c518)"></span>'+L.nbapro+'</div>'
+    + '</div>'
+    // ── Grid container ──
+    + '<div id="cal-grid" style="display:grid;grid-template-columns:50px repeat(7,1fr);gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;font-size:11px"></div>'
+    // ── Footer tip ──
+    + '<div style="text-align:center;margin-top:18px;padding:14px 20px;background:rgba(159,100,230,.08);border:1px solid rgba(159,100,230,.3);border-radius:12px">'
+    +   '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1.5px;color:#9f64e6;margin-bottom:4px">'+(en?'▶ TAP ANY SESSION TO PLAY THE DRILL':'▶ CLIQUE SUR UNE SESSION POUR LANCER LE DRILL')+'</div>'
+    +   '<div style="font-family:\'Barlow\',sans-serif;font-size:12px;color:#cfd3e0;line-height:1.5">'+(en?'7 drill types · 14 sessions · zero screen time without purpose.':'7 types de drills · 14 sessions · zéro écran sans objectif.')+'</div>'
+    + '</div>'
+    + '</div>';
+  m.innerHTML = html;
+
+  // ─── Build the grid (corner + 7 day heads + rows of hour-cell + 7 day-cols) ───
+  var grid = m.querySelector('#cal-grid');
+  // Corner
+  var corner = document.createElement('div');
+  corner.style.cssText = 'background:#131820;padding:10px 6px';
+  grid.appendChild(corner);
+  // Day heads
+  DAY_NAMES.forEach(function(d, i){
+    var isToday = (i+1) === TODAY_IDX;
+    var dh = document.createElement('div');
+    dh.style.cssText = 'background:#131820;padding:10px 4px;text-align:center';
+    dh.innerHTML = '<div style="font-size:9px;font-weight:700;color:'+(isToday?'#9f64e6':'#7a8299')+';letter-spacing:1.5px;text-transform:uppercase">'+d.name+'</div>'
+                 + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:'+(isToday?'#9f64e6':'#f0f2f8')+';margin-top:2px">'+d.date+'</div>';
+    grid.appendChild(dh);
+  });
+  // Hour rows
+  for (var h = START_H; h < END_H; h++) {
+    var hc = document.createElement('div');
+    hc.style.cssText = 'background:#131820;font-size:9px;color:#7a8299;font-weight:600;padding:5px 5px 0;text-align:right;letter-spacing:.3px;height:'+HOUR_H+'px';
+    hc.textContent = (h<10?'0':'')+h+':00';
+    grid.appendChild(hc);
+    for (var dc = 1; dc <= 7; dc++) {
+      var col = document.createElement('div');
+      col.style.cssText = 'background:#131820;position:relative;padding:2px;height:'+HOUR_H+'px;border-top:1px dashed rgba(255,255,255,.03)';
+      col.dataset.day = dc; col.dataset.hour = h;
+      grid.appendChild(col);
+    }
+  }
+  // ─── Place events (absolutely positioned inside the matching hour-cell day-col) ───
+  function timeToY(t){ var p=t.split(':').map(Number); return (p[0]-START_H)*HOUR_H + (p[1]/60*HOUR_H); }
+  EVENTS.forEach(function(e){
+    var startY = timeToY(e.start), endY = timeToY(e.end);
+    var startH = Math.floor(startY/HOUR_H) + START_H;
+    var col = grid.querySelector('div[data-day="'+e.day+'"][data-hour="'+startH+'"]');
+    if (!col) return;
+    var topOffset = startY - (startH-START_H)*HOUR_H;
+    var height = endY - startY;
+    var evt = document.createElement('div');
+    evt.style.cssText = 'position:absolute;left:3px;right:3px;top:'+topOffset+'px;height:'+(height-2)+'px;'
+      + 'background:'+(TYPE_COLORS[e.cls]||'#333')+';border-radius:7px;padding:5px 7px;color:#fff;cursor:pointer;'
+      + 'overflow:hidden;border-left:3px solid rgba(0,0,0,.3);box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .15s';
+    if (e.cls==='shoot') evt.style.color='#fff';
+    evt.innerHTML = '<div style="font-size:8px;font-weight:700;opacity:.9;letter-spacing:.3px">'+e.start+'–'+e.end+'</div>'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:11px;letter-spacing:1px;line-height:1.1;margin-top:2px">'+e.type+'</div>'
+      + '<div style="font-size:9px;font-weight:500;opacity:.9;margin-top:2px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+e.title+'</div>';
+    evt.addEventListener('mouseover', function(){ evt.style.transform='translateY(-1px) scale(1.02)'; evt.style.zIndex='10'; });
+    evt.addEventListener('mouseout',  function(){ evt.style.transform=''; evt.style.zIndex=''; });
+    evt.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      // Lance la vidéo via le player YouTube existant de l'app
+      if (typeof openVideoModal === 'function') {
+        openVideoModal(e.yt, e.title, true);
+      } else {
+        window.open('https://www.youtube.com/watch?v='+e.yt, '_blank');
+      }
+    });
+    col.appendChild(evt);
+  });
+
+  m.querySelector('#cal-close').addEventListener('click', function(){ m.style.display='none'; document.body.style.overflow=''; });
   m.style.display='block'; document.body.style.overflow='hidden';
 };
 
