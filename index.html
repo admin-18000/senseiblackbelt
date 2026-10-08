@@ -16600,16 +16600,43 @@ function applyLangTracker(lang) {
 // ═══════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
-//  FORMAT INSTAGRAM PORTRAIT 4:5 (natif, sans crop automatique)
-//  Chaque tuile : 1080 × 1350 px (ratio exact 0.8)
-//  Canevas maître puzzle 3×3 : 3240 × 4050 px
-//  Lignes de découpe : X = 0 / 1080 / 2160 / 3240
-//                      Y = 0 / 1350 / 2700 / 4050
+//  ARCHITECTURE PUZZLE GRID — 11 TEMPLATES, 11 CONFIGS INDÉPENDANTES
+//  → MOTEUR COMMUN + 1 config par template (PUZZLE_TEMPLATES_CONFIG)
+//  → zéro constante globale qui force un format universel sur les 11
+//  → chaque config déclare : W, H, mode, bgColor, grid, options spécifiques
 // ═══════════════════════════════════════════════════════════════════
-const PUZZLE_W    = 1080;   // Largeur tuile Instagram portrait 4:5
-const PUZZLE_H    = 1350;   // Hauteur tuile Instagram portrait 4:5
-const PUZZLE_SIZE = 1080;   // Alias legacy (carré 1080×1080 utilisé par TPL 0-6)
-const PUZZLE_GAP  = 6; // gap blanc entre cases (filet Instagram)
+const PUZZLE_SIZE = 1080;   // Legacy — utilisé en interne par TPL 0-6 (format carré d'origine)
+const PUZZLE_GAP  = 6;      // Gap blanc entre cases (filet Instagram, usage legacy)
+
+// ─── 11 CONFIGS INDÉPENDANTES ───────────────────────────────────────
+//  mode:'legacy'   → TPL 0-6, format CARRÉ 1080×1080 (design d'origine préservé)
+//  mode:'mascotte' → TPL 7-10, format PORTRAIT 1080×1350 (4:5 natif Instagram)
+//                     avec canevas maître 3240×4050 pour continuité pixel-perfect
+//  Chaque config peut être modifiée indépendamment sans impacter les autres.
+const PUZZLE_TEMPLATES_CONFIG = {
+  0: { id:0,  name:'COACH + APP',           W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  1: { id:1,  name:'HOME SENSEI',           W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  2: { id:2,  name:'DATA SCIENCE',          W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  3: { id:3,  name:'MINIMAL',               W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  4: { id:4,  name:'BEFORE / AFTER',        W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  5: { id:5,  name:'DRILL OF THE WEEK',     W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  6: { id:6,  name:'JOURNAL / RADAR',       W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
+  // ─── TPL 7-10 : mascottes SENSEI, canevas maître 3240×4050, portrait 4:5
+  7: { id:7,  name:'THE SENSEI',            W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:4050, focalY:0.18, targetY:675, bgColor:'#131820',
+                   text:{ safeTop:150, safeBot:1200, subtitleY:'auto', titleYs:['H/2-170','H/2-10'], quoteYs:['H/2-150','H/2-70','H/2+30'], hashtagY:'H/2-200', urlY:'H-220', followY:'H-165', signatureY:'H-70' } } },
+  8: { id:8,  name:'BALL HANDLING',         W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:4050, focalY:0.20, targetY:675, bgColor:'#131820',
+                   text:{ safeTop:150, safeBot:1200 } } },
+  9: { id:9,  name:'SENSEI IA',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:4050, focalY:0.18, targetY:675, bgColor:'#131820',
+                   text:{ safeTop:150, safeBot:1200 } } },
+  10:{ id:10, name:'HARD WORK',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#131820', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:4050, focalY:0.22, targetY:675, bgColor:'#131820',
+                   text:{ safeTop:150, safeBot:1200 } } },
+};
+// Helper : lire la config du template actuel (avec fallback safe)
+function puzzleCfg(idx){ return PUZZLE_TEMPLATES_CONFIG[idx] || PUZZLE_TEMPLATES_CONFIG[0]; }
 
 let _puzzleTemplate = 0;
 let _puzzleCanvases = [];
@@ -17492,11 +17519,16 @@ function puzzleDrawTemplate6(canvases, d) {
 // ══════════════════════════════════════════
 window._puzzleMascotteImgs = window._puzzleMascotteImgs || {};
 function puzzleDrawMascotte(canvases, d, img, cfg) {
-  const W = PUZZLE_W;                 // 1080 largeur tuile
-  const H = PUZZLE_H;                 // 1350 hauteur tuile (4:5)
-  const S = PUZZLE_SIZE;              // 1080 (alias legacy pour positions X horizontales)
-  const TOTAL_W = W * 3;              // 3240 (puzzle complet largeur)
-  const TOTAL_H = H * 3;              // 4050 (puzzle complet hauteur)
+  // ─── Config INDÉPENDANTE lue depuis PUZZLE_TEMPLATES_CONFIG[templateId].mascotte ──
+  //    → chaque TPL 7-10 utilise SES propres paramètres (W, H, focalY, bgColor…)
+  const _tplCfg = (typeof PUZZLE_TEMPLATES_CONFIG !== 'undefined') ? PUZZLE_TEMPLATES_CONFIG[_puzzleTemplate] : null;
+  const mcfg    = (cfg && cfg._master) || (_tplCfg && _tplCfg.mascotte) || {};
+  const W       = mcfg.W       || 1080;    // Largeur tuile (config template)
+  const H       = mcfg.H       || 1350;    // Hauteur tuile (config template)
+  const S       = PUZZLE_SIZE;             // Alias historique (positions horizontales)
+  const TOTAL_W = mcfg.canvasW || (W * 3); // Canevas maître largeur (3240 par défaut)
+  const TOTAL_H = mcfg.canvasH || (H * 3); // Canevas maître hauteur (4050 par défaut)
+  const BG      = mcfg.bgColor || '#131820';
   const en = d.en;
 
   // ═══════════════════════════════════════════════════════════════════
@@ -17514,8 +17546,8 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   composite.height = TOTAL_H;
   const cctx = composite.getContext('2d');
 
-  // Fond uniforme #131820 — toute surface non-couverte par l'image reste cohérente
-  cctx.fillStyle = '#131820';
+  // Fond uniforme (de la config template) — toute surface non-couverte par l'image reste cohérente
+  cctx.fillStyle = BG;
   cctx.fillRect(0, 0, TOTAL_W, TOTAL_H);
 
   // Grille or ultra-subtile (continue sur TOUT le maître — pas de rupture aux jonctions)
@@ -17552,9 +17584,9 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       drawH = TOTAL_H;
     }
     const offsetX = (TOTAL_W - drawW) / 2;
-    // Décalage vertical intelligent pour positionner le visage au centre tuile 02
-    const focalY  = (cfg && typeof cfg.focalY === 'number') ? cfg.focalY : 0.18;
-    const targetY = 675; // centre vertical de la tuile 02 (0-1350)
+    // Décalage vertical intelligent — valeurs PROPRES À CHAQUE TEMPLATE via sa config
+    const focalY  = (typeof mcfg.focalY  === 'number') ? mcfg.focalY  : 0.18;
+    const targetY = (typeof mcfg.targetY === 'number') ? mcfg.targetY : (H / 2);
     let offsetY = targetY - drawH * focalY;
     // Clamp : l'image doit rester dans [0, TOTAL_H - drawH] pour couvrir le maître
     const minOffsetY = Math.min(0, TOTAL_H - drawH);
@@ -17725,43 +17757,38 @@ function puzzleDrawTemplate10(canvases, d) {
 
 function puzzleRender() {
   const d = puzzleGetData();
-  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6, puzzleDrawTemplate7, puzzleDrawTemplate8, puzzleDrawTemplate9, puzzleDrawTemplate10];
   const idx = _puzzleTemplate;
+  const T   = puzzleCfg(idx);                 // Config INDÉPENDANTE du template actif
+  const fns = [puzzleDrawTemplate0, puzzleDrawTemplate1, puzzleDrawTemplate2, puzzleDrawTemplate3, puzzleDrawTemplate4, puzzleDrawTemplate5, puzzleDrawTemplate6, puzzleDrawTemplate7, puzzleDrawTemplate8, puzzleDrawTemplate9, puzzleDrawTemplate10];
+
   // ═══════════════════════════════════════════════════════════════════
-  //  Pré-remplir le fond #131820 uniforme sur TOUS les 9 canvases finaux
-  //  → les bandes 135px top/bottom (padding 4:5) se fondent dans le fond
-  //  → zéro bordure visible, zéro espace blanc, cohérence 100%
+  //  MOTEUR DE RENDU COMMUN — lit la config du template, applique ses règles
+  //  → les 11 templates gardent leur identité : dimensions, fond, mode, position…
   // ═══════════════════════════════════════════════════════════════════
-  _puzzleCanvases.forEach(c => {
+
+  // 1. Adapter les canvases aux dimensions PROPRES À CE TEMPLATE
+  const nCells = (T.rows || 3) * (T.cols || 3);
+  _puzzleCanvases.forEach((c, i) => {
+    if (i >= nCells) return;
+    if (c.width !== T.W || c.height !== T.H) {
+      c.width = T.W; c.height = T.H;
+    }
     const ctx = c.getContext('2d');
-    ctx.fillStyle = '#131820';
-    ctx.fillRect(0, 0, PUZZLE_W, PUZZLE_H);
+    ctx.fillStyle = T.bgColor || '#131820';
+    ctx.fillRect(0, 0, T.W, T.H);
   });
-  if (idx >= 7) {
-    // ─── TPL 7-10 (MASCOTTE) : natif 4:5 — canevas maître 3240×4050 avec continuité pixel-perfect
-    fns[idx](_puzzleCanvases, d);
-  } else {
-    // ─── TPL 0-6 : dessin legacy sur buffers carrés 1080×1080, puis blit centré verticalement
-    //    dans les canvases finaux 1080×1350 (padding 135px haut + 135px bas, fond #131820)
-    const buffers = Array.from({length:9}, () => {
-      const c = document.createElement('canvas');
-      c.width = PUZZLE_SIZE; c.height = PUZZLE_SIZE;
-      return c;
-    });
-    fns[idx](buffers, d);
-    const padY = (PUZZLE_H - PUZZLE_SIZE) / 2; // = 135
-    _puzzleCanvases.forEach((canvas, i) => {
-      const ctx = canvas.getContext('2d');
-      // Blit du buffer carré 1080×1080 à l'exact position (0, 135) sur canvas 1080×1350
-      ctx.drawImage(buffers[i], 0, padY, PUZZLE_W, PUZZLE_SIZE);
-    });
-  }
-  // ─── Validation auto-dimensions (zero crop Instagram) ──
-  // Chaque tuile DOIT être exactement 1080×1350 (ratio 0.8 = Instagram portrait natif)
-  for (let i = 0; i < 9; i++) {
+
+  // 2. Dispatch selon le mode déclaré par la config
+  //    (TPL 0-6 : mode='legacy' → carré 1080×1080 d'origine)
+  //    (TPL 7-10 : mode='mascotte' → portrait 1080×1350 avec canevas maître)
+  //    puzzleDrawMascotte lit lui-même sa config via _puzzleTemplate global.
+  fns[idx](_puzzleCanvases, d);
+
+  // 3. Validation PROPRE À CE TEMPLATE (chaque template a ses contraintes)
+  for (let i = 0; i < nCells; i++) {
     const c = _puzzleCanvases[i];
-    if (c.width !== PUZZLE_W || c.height !== PUZZLE_H) {
-      console.error('[Puzzle] Tuile '+(i+1)+' hors format : '+c.width+'×'+c.height+' (attendu '+PUZZLE_W+'×'+PUZZLE_H+')');
+    if (c.width !== T.W || c.height !== T.H) {
+      console.error('[Puzzle TPL '+idx+' '+T.name+'] Tuile '+(i+1)+' hors format : '+c.width+'×'+c.height+' (attendu '+T.W+'×'+T.H+')');
     }
   }
   // mise à jour aperçu
@@ -17840,8 +17867,10 @@ function puzzleSelectTemplate(idx, btn) {
 }
 
 function openPuzzleModal() {
-  // Créer les 9 canvases offscreen 1080×1350 (portrait Instagram 4:5 natif, zero crop)
-  _puzzleCanvases = Array.from({length:9},()=>{ const c=document.createElement('canvas'); c.width=PUZZLE_W; c.height=PUZZLE_H; return c; });
+  // Créer les 9 canvases offscreen — leurs DIMENSIONS SONT ADAPTÉES à chaque render
+  // selon la config indépendante du template actif (puzzleRender → T.W × T.H).
+  // Taille d'init par défaut : carré 1080 (format TPL 0-6).
+  _puzzleCanvases = Array.from({length:9},()=>{ const c=document.createElement('canvas'); c.width=PUZZLE_SIZE; c.height=PUZZLE_SIZE; return c; });
   // Charger coach.jpg
   if(!_puzzleCoachImg) {
     const img=new Image(); img.crossOrigin='anonymous';
