@@ -17526,21 +17526,23 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
     }
   }
   // ─── Overlays de branding (zones ne gênant pas la mascotte centrale) ───
+  // FIX IG v2 : overlays uniformes mid-grey rgba(42,52,72,...) au lieu de rgba(19,24,32,...)
+  // → luminance totale ~140 au lieu de ~80 : visible sur IG + équilibre les cases avec mascotte
   // Case 6 (haut gauche) : TITLE grand
   const c6 = canvases[6].getContext('2d');
-  c6.fillStyle = 'rgba(10,13,24,.6)'; c6.fillRect(0, 0, S, S);
+  c6.fillStyle = 'rgba(42,52,72,.70)'; c6.fillRect(0, 0, S, S);
   pF(c6, cfg.titleLine1, 60, 300, 160, '#f5c518', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   pF(c6, cfg.titleLine2, 60, 460, 160, '#fff', 'left', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   pF(c6, '🥋', 60, 650, 180, '#f5c518', 'left');
-  // Case 8 (haut droite) : TAG + emoji
+  // Case 8 (haut droite) : TAG + emoji — FIX bug args : color '#f5c518' au lieu de 'center'
   const c8 = canvases[8].getContext('2d');
-  c8.fillStyle = 'rgba(10,13,24,.6)'; c8.fillRect(0, 0, S, S);
-  pF(c8, cfg.emoji, S-80, 400, 400, 'center', 'right');
+  c8.fillStyle = 'rgba(42,52,72,.70)'; c8.fillRect(0, 0, S, S);
+  pF(c8, cfg.emoji, S-80, 400, 400, '#f5c518', 'right');
   pF(c8, '#'+cfg.hashtag, S-60, 850, 48, 'rgba(245,197,24,.9)', 'right', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   pF(c8, en?'FOLLOW':'SUIS-MOI', S-60, 920, 36, 'rgba(255,255,255,.6)', 'right');
   // Case 0 (bas gauche) : QUOTE
   const c0 = canvases[0].getContext('2d');
-  c0.fillStyle = 'rgba(10,13,24,.72)'; c0.fillRect(0, 0, S, S);
+  c0.fillStyle = 'rgba(42,52,72,.80)'; c0.fillRect(0, 0, S, S);
   pF(c0, '"', 60, 400, 400, 'rgba(245,197,24,.15)', 'left', '900', 'serif');
   pF(c0, cfg.quote1, 60, 550, 52, '#fff', 'left', '700');
   pF(c0, cfg.quote2, 60, 630, 52, '#fff', 'left', '700');
@@ -17548,7 +17550,7 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   pF(c0, '— SENSEI', 60, 820, 36, 'rgba(245,197,24,.6)', 'left');
   // Case 2 (bas droite) : CTA
   const c2 = canvases[2].getContext('2d');
-  c2.fillStyle = 'rgba(10,13,24,.72)'; c2.fillRect(0, 0, S, S);
+  c2.fillStyle = 'rgba(42,52,72,.80)'; c2.fillRect(0, 0, S, S);
   pRect(c2, S-500, S/2-80, 420, 160, 80, '#f5c518');
   pF(c2, en?'JOIN →':'REJOINS →', S-290, S/2+15, 56, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   pF(c2, 'senseiblackbelt.com', S-80, S-60, 32, 'rgba(245,197,24,.6)', 'right');
@@ -17558,7 +17560,7 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
 }
 function puzzleDrawTemplate7(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['arms-crossed'], {
-    bgTop:'rgba(13,17,23,1)', bgBot:'rgba(50,30,10,1)',
+    bgTop:'rgba(38,45,58,1)', bgBot:'rgba(75,55,30,1)', // FIX IG v2 : uniforme + lift
     titleLine1:'THE', titleLine2:'SENSEI',
     emoji:'🥋', hashtag:'SenseiBlackBelt',
     quote1:d.en?'Discipline is the':'La discipline est',
@@ -17568,7 +17570,7 @@ function puzzleDrawTemplate7(canvases, d) {
 }
 function puzzleDrawTemplate8(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['dribble'], {
-    bgTop:'rgba(5,12,25,1)', bgBot:'rgba(30,10,50,1)',
+    bgTop:'rgba(38,45,58,1)', bgBot:'rgba(65,40,85,1)', // FIX IG v2 : uniforme + lift
     titleLine1:'BALL', titleLine2:'HANDLING',
     emoji:'🏀', hashtag:'BallHandling',
     quote1:d.en?'10 000 reps':'10 000 reps',
@@ -17578,7 +17580,7 @@ function puzzleDrawTemplate8(canvases, d) {
 }
 function puzzleDrawTemplate9(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['coach'], {
-    bgTop:'rgba(13,17,23,1)', bgBot:'rgba(10,30,20,1)',
+    bgTop:'rgba(38,45,58,1)', bgBot:'rgba(35,65,50,1)', // FIX IG v2 : uniforme + lift
     titleLine1:'SENSEI', titleLine2:'IA',
     emoji:'✨', hashtag:'SenseiAI',
     quote1:d.en?'Your training,':'Ton training,',
@@ -17588,7 +17590,7 @@ function puzzleDrawTemplate9(canvases, d) {
 }
 function puzzleDrawTemplate10(canvases, d) {
   puzzleDrawMascotte(canvases, d, window._puzzleMascotteImgs['back-ball'], {
-    bgTop:'rgba(20,8,5,1)', bgBot:'rgba(40,15,10,1)',
+    bgTop:'rgba(50,32,28,1)', bgBot:'rgba(80,40,30,1)', // FIX IG v2 : uniforme + lift (red-warm conservé)
     titleLine1:'HARD', titleLine2:'WORK',
     emoji:'💪', hashtag:'NoDaysOff',
     quote1:d.en?'The grind':'Le travail',
