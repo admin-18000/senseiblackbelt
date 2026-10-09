@@ -44602,10 +44602,54 @@ window._calendar_open = function(){
     nbapro:    en?'NBA PRO DRILL':'NBA PRO DRILL'
   };
   // ═══════════════════════════════════════════════════════════════════
-  //  PLANNING : 14 slots répartis sur 7 jours · 7 types × 2 sessions
-  //  Pour chaque slot : pool = clé dans SECTION_VIDEOS · idx = offset dans la rotation
-  //  → chaque semaine (WEEK_NUM change), on pioche AUTOMATIQUEMENT une nouvelle
-  //    vidéo du pool avec son TITRE ORIGINAL (zéro invention descriptive)
+  //  ÉTAPE 1 : CALCUL DYNAMIQUE DE LA SEMAINE COURANTE (AVANT la rotation)
+  //  → monday = lundi de la semaine courante (ISO 8601)
+  //  → WEEK_NUM = numéro ISO
+  //  → DAY_DATES / DAY_MONTHS / TODAY_IDX / WEEK_LABEL
+  // ═══════════════════════════════════════════════════════════════════
+  var DAYS_FR = ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE'];
+  var DAYS_EN = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
+  var MONTHS_FR = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var days = en?DAYS_EN:DAYS_FR;
+  var months = en?MONTHS_EN:MONTHS_FR;
+
+  var now = new Date();
+  var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var dayOfWeek = monday.getDay();                          // 0=dim, 1=lun ... 6=sam
+  var daysToMonday = (dayOfWeek === 0) ? -6 : (1 - dayOfWeek);
+  monday.setDate(monday.getDate() + daysToMonday);
+  var DAY_DATES = [], DAY_MONTHS = [];
+  for (var di = 0; di < 7; di++) {
+    var dt = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + di);
+    DAY_DATES.push(dt.getDate());
+    DAY_MONTHS.push(dt.getMonth());
+  }
+  var MONTH_IDX  = DAY_MONTHS[0];
+  var YEAR       = monday.getFullYear();
+  var TODAY_IDX  = (dayOfWeek === 0) ? 6 : (dayOfWeek - 1); // 0-6 (lundi=0 ... dimanche=6)
+  function _isoWeek(d){
+    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    var day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    var yearStart = new Date(Date.UTC(t.getUTCFullYear(),0,1));
+    return Math.ceil((((t - yearStart) / 86400000) + 1)/7);
+  }
+  var WEEK_NUM = _isoWeek(monday);
+  var firstMonth = months[DAY_MONTHS[0]];
+  var lastMonth  = months[DAY_MONTHS[6]];
+  var WEEK_LABEL;
+  if (DAY_MONTHS[0] === DAY_MONTHS[6]) {
+    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+'–'+DAY_DATES[6]+' '+firstMonth+' '+YEAR;
+  } else {
+    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+' '+firstMonth+' – '+DAY_DATES[6]+' '+lastMonth+' '+YEAR;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  ÉTAPE 2 : PLANNING + ROTATION AUTO des vidéos (après WEEK_NUM calculé)
+  //  → chaque slot pioche dans SECTION_VIDEOS[pool] à l'index
+  //    ((WEEK_NUM × 2) + idx) % pool.length
+  //  → titres GÉNÉRIQUES issus de SECTION_VIDEOS (zéro invention)
   // ═══════════════════════════════════════════════════════════════════
   var SCHEDULE = [
     {day:1, time:'07:00', type:L.shooting,   pool:'shooting',   idx:0},
@@ -44623,68 +44667,13 @@ window._calendar_open = function(){
     {day:7, time:'10:00', type:L.nbapro,     pool:'nbapro',     idx:1},
     {day:7, time:'16:00', type:L.sc,         pool:'sc',         idx:1}
   ];
-  // Rotation auto : pour chaque slot, pioche dans SECTION_VIDEOS[pool] à l'index
-  //   (WEEK_NUM × 2 + idx) % pool.length
-  //   → chaque semaine, 2 vidéos consécutives du pool par type (zéro répétition
-  //     possible dans la même semaine, rotation complète en pool.length/2 semaines)
   var _SV = (typeof SECTION_VIDEOS !== 'undefined') ? SECTION_VIDEOS : {};
   var EVENTS = SCHEDULE.map(function(s){
     var pool = _SV[s.pool] || [];
-    var vid  = pool.length ? pool[((WEEK_NUM * 2) + s.idx) % pool.length] : {id:'', title:s.type};
-    return { day:s.day, time:s.time, type:s.type, title:vid.title, yt:vid.id };
+    if (!pool.length) return { day:s.day, time:s.time, type:s.type, title:s.type, yt:'' };
+    var vid = pool[((WEEK_NUM * 2) + s.idx) % pool.length];
+    return { day:s.day, time:s.time, type:s.type, title:(vid && vid.title) || s.type, yt:(vid && vid.id) || '' };
   });
-
-  var DAYS_FR = ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE'];
-  var DAYS_EN = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
-  var MONTHS_FR = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-  var MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var days = en?DAYS_EN:DAYS_FR;
-  var months = en?MONTHS_EN:MONTHS_FR;
-
-  // ═══════════════════════════════════════════════════════════════════
-  //  CALCUL DYNAMIQUE DE LA SEMAINE COURANTE (auto-update chaque semaine)
-  //  → lundi = début de semaine (ISO 8601)
-  //  → DAY_DATES = [lundi, mardi, ... dimanche] de la semaine en cours
-  //  → MONTH_IDX = mois du lundi (si semaine à cheval, on affiche mois+année si besoin)
-  //  → TODAY_IDX = index 0-6 du jour courant dans la semaine (surlignage auto)
-  //  → WEEK_NUM = numéro de semaine ISO 8601
-  //  → YEAR = année courante
-  // ═══════════════════════════════════════════════════════════════════
-  var now = new Date();
-  // Trouver le lundi de la semaine courante (ISO : lundi = premier jour)
-  var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  var dayOfWeek = monday.getDay(); // 0=dim, 1=lun ... 6=sam
-  var daysToMonday = (dayOfWeek === 0) ? -6 : (1 - dayOfWeek);
-  monday.setDate(monday.getDate() + daysToMonday);
-  // Construire les 7 dates de la semaine (date + mois pour gérer les semaines à cheval)
-  var DAY_DATES = [], DAY_MONTHS = [];
-  for (var di = 0; di < 7; di++) {
-    var dt = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + di);
-    DAY_DATES.push(dt.getDate());
-    DAY_MONTHS.push(dt.getMonth());
-  }
-  var MONTH_IDX = DAY_MONTHS[0]; // mois du lundi (fallback d'affichage)
-  var YEAR = monday.getFullYear();
-  // Jour courant : index 0-6 (lundi=0 ... dimanche=6)
-  var TODAY_IDX = (dayOfWeek === 0) ? 6 : (dayOfWeek - 1);
-  // Numéro de semaine ISO 8601
-  function _isoWeek(d){
-    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    var day = t.getUTCDay() || 7;
-    t.setUTCDate(t.getUTCDate() + 4 - day);
-    var yearStart = new Date(Date.UTC(t.getUTCFullYear(),0,1));
-    return Math.ceil((((t - yearStart) / 86400000) + 1)/7);
-  }
-  var WEEK_NUM = _isoWeek(monday);
-  // Label semaine : "Semaine X · 6–12 oct. 2026" (avec gestion mois à cheval)
-  var firstMonth = months[DAY_MONTHS[0]];
-  var lastMonth  = months[DAY_MONTHS[6]];
-  var WEEK_LABEL;
-  if (DAY_MONTHS[0] === DAY_MONTHS[6]) {
-    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+'–'+DAY_DATES[6]+' '+firstMonth+' '+YEAR;
-  } else {
-    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+' '+firstMonth+' – '+DAY_DATES[6]+' '+lastMonth+' '+YEAR;
-  }
 
   // ─── Modal shell ───
   var html = ''
