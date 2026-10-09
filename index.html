@@ -44601,22 +44601,38 @@ window._calendar_open = function(){
     sc:        en?'STRENGTH & CONDITIONING':'STRENGTH & CONDITIONING',
     nbapro:    en?'NBA PRO DRILL':'NBA PRO DRILL'
   };
-  var EVENTS = [
-    {day:1, time:'07:00', type:L.shooting,   title:'Shooting Form · Coach Sensei',  yt:'dbusjNVrMgA'},
-    {day:1, time:'18:30', type:L.defense,    title:'Defense #1 · stance & slide',   yt:'0ZXELMe3VIU'},
-    {day:2, time:'07:00', type:L.finishing,  title:'Finishing #1 · attack the rim', yt:'s2Gs3GcfLAY'},
-    {day:2, time:'18:30', type:L.hec,        title:'Hand-Eye #1 · reaction speed',  yt:'xV0XuRGHsxo'},
-    {day:3, time:'07:00', type:L.rebounding, title:'Rebounding #1 · positioning',   yt:'O2TDPnLiwOM'},
-    {day:3, time:'18:30', type:L.nbapro,     title:'NBA Pro #1 · elite footwork',   yt:'G-N1gH5U0jg'},
-    {day:4, time:'07:00', type:L.shooting,   title:'Shooting #1 · catch & shoot',   yt:'RvyX7fXgqiM'},
-    {day:4, time:'18:00', type:L.sc,         title:'S&C #1 · explosive power',       yt:'5v6kVdAqbOc'},
-    {day:5, time:'07:00', type:L.finishing,  title:'Finishing #2 · contact finish',  yt:'JuqylTSDesU'},
-    {day:5, time:'18:30', type:L.defense,    title:'Defense #2 · close-out',         yt:'xXYCtNwFRHs'},
-    {day:6, time:'10:00', type:L.rebounding, title:'Rebounding #2 · boxout',         yt:'HVCjzaIEju4'},
-    {day:6, time:'16:00', type:L.hec,        title:'Hand-Eye #2 · dual tracking',    yt:'KWmdHJ2A8pg'},
-    {day:7, time:'10:00', type:L.nbapro,     title:'NBA Pro #2 · pro finishing',     yt:'xxCj_BlKZsI'},
-    {day:7, time:'16:00', type:L.sc,         title:'S&C #2 · lower body power',      yt:'P4_hDNmsrgs'}
+  // ═══════════════════════════════════════════════════════════════════
+  //  PLANNING : 14 slots répartis sur 7 jours · 7 types × 2 sessions
+  //  Pour chaque slot : pool = clé dans SECTION_VIDEOS · idx = offset dans la rotation
+  //  → chaque semaine (WEEK_NUM change), on pioche AUTOMATIQUEMENT une nouvelle
+  //    vidéo du pool avec son TITRE ORIGINAL (zéro invention descriptive)
+  // ═══════════════════════════════════════════════════════════════════
+  var SCHEDULE = [
+    {day:1, time:'07:00', type:L.shooting,   pool:'shooting',   idx:0},
+    {day:1, time:'18:30', type:L.defense,    pool:'defense',    idx:0},
+    {day:2, time:'07:00', type:L.finishing,  pool:'finishing',  idx:0},
+    {day:2, time:'18:30', type:L.hec,        pool:'hec',        idx:0},
+    {day:3, time:'07:00', type:L.rebounding, pool:'rebounding', idx:0},
+    {day:3, time:'18:30', type:L.nbapro,     pool:'nbapro',     idx:0},
+    {day:4, time:'07:00', type:L.shooting,   pool:'shooting',   idx:1},
+    {day:4, time:'18:00', type:L.sc,         pool:'sc',         idx:0},
+    {day:5, time:'07:00', type:L.finishing,  pool:'finishing',  idx:1},
+    {day:5, time:'18:30', type:L.defense,    pool:'defense',    idx:1},
+    {day:6, time:'10:00', type:L.rebounding, pool:'rebounding', idx:1},
+    {day:6, time:'16:00', type:L.hec,        pool:'hec',        idx:1},
+    {day:7, time:'10:00', type:L.nbapro,     pool:'nbapro',     idx:1},
+    {day:7, time:'16:00', type:L.sc,         pool:'sc',         idx:1}
   ];
+  // Rotation auto : pour chaque slot, pioche dans SECTION_VIDEOS[pool] à l'index
+  //   (WEEK_NUM × 2 + idx) % pool.length
+  //   → chaque semaine, 2 vidéos consécutives du pool par type (zéro répétition
+  //     possible dans la même semaine, rotation complète en pool.length/2 semaines)
+  var _SV = (typeof SECTION_VIDEOS !== 'undefined') ? SECTION_VIDEOS : {};
+  var EVENTS = SCHEDULE.map(function(s){
+    var pool = _SV[s.pool] || [];
+    var vid  = pool.length ? pool[((WEEK_NUM * 2) + s.idx) % pool.length] : {id:'', title:s.type};
+    return { day:s.day, time:s.time, type:s.type, title:vid.title, yt:vid.id };
+  });
 
   var DAYS_FR = ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE'];
   var DAYS_EN = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
@@ -44624,14 +44640,50 @@ window._calendar_open = function(){
   var MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var days = en?DAYS_EN:DAYS_FR;
   var months = en?MONTHS_EN:MONTHS_FR;
-  var DAY_DATES = [6,7,8,9,10,11,12];
-  var MONTH_IDX = 9; // oct = 9
 
-  // Jour courant (surlignage neutre, pas de couleur agressive)
+  // ═══════════════════════════════════════════════════════════════════
+  //  CALCUL DYNAMIQUE DE LA SEMAINE COURANTE (auto-update chaque semaine)
+  //  → lundi = début de semaine (ISO 8601)
+  //  → DAY_DATES = [lundi, mardi, ... dimanche] de la semaine en cours
+  //  → MONTH_IDX = mois du lundi (si semaine à cheval, on affiche mois+année si besoin)
+  //  → TODAY_IDX = index 0-6 du jour courant dans la semaine (surlignage auto)
+  //  → WEEK_NUM = numéro de semaine ISO 8601
+  //  → YEAR = année courante
+  // ═══════════════════════════════════════════════════════════════════
   var now = new Date();
-  var TODAY_IDX = -1;
-  if (now.getFullYear()===2026 && now.getMonth()===MONTH_IDX) {
-    var dd = now.getDate(); if (dd>=6 && dd<=12) TODAY_IDX = (dd-6);
+  // Trouver le lundi de la semaine courante (ISO : lundi = premier jour)
+  var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var dayOfWeek = monday.getDay(); // 0=dim, 1=lun ... 6=sam
+  var daysToMonday = (dayOfWeek === 0) ? -6 : (1 - dayOfWeek);
+  monday.setDate(monday.getDate() + daysToMonday);
+  // Construire les 7 dates de la semaine (date + mois pour gérer les semaines à cheval)
+  var DAY_DATES = [], DAY_MONTHS = [];
+  for (var di = 0; di < 7; di++) {
+    var dt = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + di);
+    DAY_DATES.push(dt.getDate());
+    DAY_MONTHS.push(dt.getMonth());
+  }
+  var MONTH_IDX = DAY_MONTHS[0]; // mois du lundi (fallback d'affichage)
+  var YEAR = monday.getFullYear();
+  // Jour courant : index 0-6 (lundi=0 ... dimanche=6)
+  var TODAY_IDX = (dayOfWeek === 0) ? 6 : (dayOfWeek - 1);
+  // Numéro de semaine ISO 8601
+  function _isoWeek(d){
+    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    var day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    var yearStart = new Date(Date.UTC(t.getUTCFullYear(),0,1));
+    return Math.ceil((((t - yearStart) / 86400000) + 1)/7);
+  }
+  var WEEK_NUM = _isoWeek(monday);
+  // Label semaine : "Semaine X · 6–12 oct. 2026" (avec gestion mois à cheval)
+  var firstMonth = months[DAY_MONTHS[0]];
+  var lastMonth  = months[DAY_MONTHS[6]];
+  var WEEK_LABEL;
+  if (DAY_MONTHS[0] === DAY_MONTHS[6]) {
+    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+'–'+DAY_DATES[6]+' '+firstMonth+' '+YEAR;
+  } else {
+    WEEK_LABEL = (en?'Week ':'Semaine ')+WEEK_NUM+' · '+DAY_DATES[0]+' '+firstMonth+' – '+DAY_DATES[6]+' '+lastMonth+' '+YEAR;
   }
 
   // ─── Modal shell ───
@@ -44641,7 +44693,7 @@ window._calendar_open = function(){
     + '<div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(10,13,20,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px 0;z-index:5;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:20px">'
     + '  <div>'
     + '    <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:22px;letter-spacing:2.5px;color:#f0f2f8">'+(en?'TRAINING WEEK':'SEMAINE D\'ENTRAÎNEMENT')+'</div>'
-    + '    <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1.5px;font-weight:600;margin-top:2px">'+(en?'Week 41 · Oct 06–12, 2026':'Semaine 41 · 06–12 oct. 2026')+'</div>'
+    + '    <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1.5px;font-weight:600;margin-top:2px">'+WEEK_LABEL+'</div>'
     + '  </div>'
     + '  <button id="cal-close" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:#f0f2f8;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
     + '</div>'
@@ -44665,7 +44717,7 @@ window._calendar_open = function(){
     head.innerHTML = ''
       + '<div style="display:flex;align-items:baseline;gap:14px">'
       + '  <div style="font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:'+(isToday?'22px':'18px')+';letter-spacing:2px;color:'+(isToday?'#f5c518':'#f0f2f8')+'">'+days[d]+'</div>'
-      + '  <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:#7a8299;letter-spacing:1px;font-weight:600">'+DAY_DATES[d]+' '+months[MONTH_IDX]+'</div>'
+      + '  <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:#7a8299;letter-spacing:1px;font-weight:600">'+DAY_DATES[d]+' '+months[DAY_MONTHS[d]]+'</div>'
       + (isToday ? '  <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#f5c518;letter-spacing:2px;font-weight:700;padding:3px 8px;background:rgba(245,197,24,.1);border-radius:5px">'+(en?'TODAY':'AUJOURD\'HUI')+'</div>' : '')
       + '</div>'
       + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1px;font-weight:600">'+dayEvents.length+' '+(dayEvents.length>1?(en?'sessions':'sessions'):(en?'session':'session'))+'</div>';
