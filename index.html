@@ -44712,97 +44712,65 @@ window._calendar_open = function(){
       + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#7a8299;letter-spacing:1px;font-weight:600">'+dayEvents.length+' '+(dayEvents.length>1?(en?'sessions':'sessions'):(en?'session':'session'))+'</div>';
     section.appendChild(head);
 
-    // Sessions : une carte par session, thumb YouTube EN GRAND (16:9)
+    // ═══════════════════════════════════════════════════════════════════
+    //  OPTION E : LAYOUT HORIZONTAL (Spotify / Netflix style)
+    //  → thumb 9:16 portrait à GAUCHE (vraie thumbnail Short native via oar2.jpg)
+    //  → infos à DROITE (heure, type, titre) + bouton play à l'extrémité
+    //  → au clic : la carte s'expand en vertical, iframe 9:16 plein, infos en bas
+    //  → zéro bande YouTube visible, format reconnu comme Short au 1er coup d'œil
+    // ═══════════════════════════════════════════════════════════════════
     dayEvents.forEach(function(e){
       var card = document.createElement('div');
-      card.style.cssText = 'background:#131820;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;cursor:pointer;margin-bottom:12px;transition:border-color .15s,transform .15s';
+      card.className = 'cal-card';
+      // État NORMAL : flex row (horizontal compact)
+      card.style.cssText = 'background:#131820;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;cursor:pointer;margin-bottom:12px;transition:border-color .15s,transform .15s;display:flex;flex-direction:row;align-items:stretch;min-height:140px';
       card.addEventListener('mouseover', function(){ card.style.borderColor='rgba(245,197,24,.5)'; card.style.transform='translateY(-2px)'; });
       card.addEventListener('mouseout',  function(){ card.style.borderColor='rgba(255,255,255,.06)'; card.style.transform=''; });
 
-      // ── Thumb preview YouTube EN GRAND (16:9) + overlay play button + heure en overlay ──
+      // ── Thumb preview YouTube PORTRAIT 9:16 (natif Short) à gauche ──
       var thumbWrap = document.createElement('div');
       thumbWrap.className = 'cal-thumb';
-      thumbWrap.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;background:#000;overflow:hidden;transition:padding-bottom .25s';
-      // HTML initial de la thumb (stocké pour pouvoir restaurer après lecture)
+      // État NORMAL : largeur fixe 90px, aspect 9:16 → hauteur ~160px
+      thumbWrap.style.cssText = 'position:relative;flex:0 0 90px;aspect-ratio:9/16;background:#000;overflow:hidden;transition:all .25s';
+      // Fallback cascade : oar2 (shorts natif) → hqdefault → placeholder
       var thumbHTML = ''
-        + '<img src="https://img.youtube.com/vi/'+e.yt+'/hqdefault.jpg" '
+        + '<img src="https://i.ytimg.com/vi/'+e.yt+'/oar2.jpg" '
         +      'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover" '
         +      'loading="lazy" alt="'+e.title+'" '
-        +      'data-yt-id="'+e.yt+'" data-fb="0" '
-        +      (typeof _ytThumbCheck==='function'?'onload="_ytThumbCheck(this)" ':'')
-        +      (typeof _ytThumbFallback==='function'?'onerror="_ytThumbFallback(this)"':'')
-        + '>'
-        // Play overlay central
-        + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 40%,transparent 60%,rgba(0,0,0,.3));pointer-events:none">'
-        +   '<div style="width:56px;height:56px;border-radius:50%;background:rgba(245,197,24,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">'
-        +     '<div style="width:0;height:0;border-left:16px solid #0a0d14;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px"></div>'
-        +   '</div>'
-        + '</div>'
-        // Heure en overlay top-left
-        + '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);color:#fff;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:16px;letter-spacing:1.5px;padding:4px 10px;border-radius:6px">'+e.time+'</div>';
+        +      'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+e.yt+'/hqdefault.jpg\'">'
+        // Overlay play SVG + heure
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 50%);pointer-events:none"></div>'
+        + '<div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.8);color:#fff;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:12px;letter-spacing:1px;padding:2px 6px;border-radius:4px">'+e.time+'</div>';
       thumbWrap.innerHTML = thumbHTML;
       thumbWrap.dataset.originalHtml = thumbHTML;
       card.appendChild(thumbWrap);
 
-      // ── Infos sous la thumb : type (petit label) + titre (gros, lisible) ──
+      // ── Infos à droite : type + titre + bouton play ──
       var info = document.createElement('div');
-      info.style.cssText = 'padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px';
+      info.className = 'cal-info';
+      info.style.cssText = 'flex:1;min-width:0;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px';
       info.innerHTML = ''
         + '<div style="min-width:0;flex:1">'
-        +   '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:4px">'+e.type+'</div>'
-        +   '<div style="font-family:\'Inter\',system-ui,sans-serif;font-size:14px;color:#f0f2f8;font-weight:600;line-height:1.3">'+e.title+'</div>'
+        +   '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:5px;text-transform:uppercase">'+e.type+'</div>'
+        +   '<div style="font-family:\'Inter\',system-ui,sans-serif;font-size:14px;color:#f0f2f8;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+e.title+'</div>'
         + '</div>'
-        // Bouton STOP (apparaît quand la vidéo est en lecture, masqué par défaut)
-        + '<button class="cal-stop-btn" style="display:none;background:transparent;border:1px solid rgba(255,255,255,.2);color:#f0f2f8;width:32px;height:32px;border-radius:50%;font-size:12px;cursor:pointer;flex-shrink:0" aria-label="Stop">⏹</button>';
+        // Bouton play — ouvre le player standard de l'app (openVideoModal)
+        + '<button class="cal-play-btn" aria-label="Play" style="flex-shrink:0;background:rgba(245,197,24,.95);border:none;color:#0a0d14;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:transform .15s">'
+        +   '<div style="width:0;height:0;border-left:12px solid #0a0d14;border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:3px"></div>'
+        + '</button>';
       card.appendChild(info);
-      var stopBtn = info.querySelector('.cal-stop-btn');
 
-      // ─── Helpers lecture inline ───
-      function stopThisCard(){
-        thumbWrap.style.paddingBottom = '56.25%';
-        thumbWrap.innerHTML = thumbWrap.dataset.originalHtml;
-        card.dataset.playing = '0';
-        stopBtn.style.display = 'none';
-      }
-      function playThisCard(){
-        // Arrêter toutes les autres vidéos en lecture dans ce modal
-        m.querySelectorAll('[data-playing="1"]').forEach(function(otherCard){
-          if (otherCard !== card) {
-            var otherThumb = otherCard.querySelector('.cal-thumb');
-            var otherStop  = otherCard.querySelector('.cal-stop-btn');
-            if (otherThumb && otherThumb.dataset.originalHtml) {
-              otherThumb.style.paddingBottom = '56.25%';
-              otherThumb.innerHTML = otherThumb.dataset.originalHtml;
-            }
-            otherCard.dataset.playing = '0';
-            if (otherStop) otherStop.style.display = 'none';
-          }
-        });
-        // Passer en ratio portrait 9:16 (vidéos verticales type Shorts)
-        thumbWrap.style.paddingBottom = '177.78%';
-        // Injecter l'iframe YouTube avec autoplay
-        thumbWrap.innerHTML = ''
-          + '<iframe src="https://www.youtube.com/embed/'+e.yt+'?autoplay=1&playsinline=1&rel=0&modestbranding=1" '
-          +         'style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" '
-          +         'allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" '
-          +         'allowfullscreen loading="lazy" title="'+e.title+'"></iframe>'
-          // Heure et bouton stop restent accessibles en overlay
-          + '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);color:#fff;font-family:\'Bebas Neue\',\'Impact\',sans-serif;font-size:16px;letter-spacing:1.5px;padding:4px 10px;border-radius:6px;pointer-events:none">'+e.time+'</div>';
-        card.dataset.playing = '1';
-        stopBtn.style.display = '';
-        // Scroll la carte dans la vue (centre) pour que l'user voit la vidéo quand elle démarre
-        setTimeout(function(){ card.scrollIntoView({behavior:'smooth',block:'center'}); }, 50);
-      }
-
-      // ── Clic sur thumb : lance la vidéo INLINE dans la carte ──
-      thumbWrap.addEventListener('click', function(ev){
+      // ── Clic sur n'importe où dans la carte → ouvre le PLAYER STANDARD de l'app ──
+      //    = openVideoModal(id, title, vertical=true) → même rendu Short que les rubriques
+      //      SHOOTING / REBOUNDING / FINISHING etc. (9:16 mobile, 16:9 desktop)
+      card.addEventListener('click', function(ev){
         ev.stopPropagation();
-        if (card.dataset.playing !== '1') playThisCard();
-      });
-      // ── Clic bouton stop : restaure la thumb ──
-      stopBtn.addEventListener('click', function(ev){
-        ev.stopPropagation();
-        stopThisCard();
+        if (!e.yt) return;
+        if (typeof openVideoModal === 'function') {
+          openVideoModal(e.yt, e.title, true);
+        } else {
+          window.open('https://www.youtube.com/watch?v='+e.yt, '_blank');
+        }
       });
 
       section.appendChild(card);
@@ -44812,17 +44780,6 @@ window._calendar_open = function(){
   }
 
   m.querySelector('#cal-close').addEventListener('click', function(){
-    // Arrêter toutes les vidéos en lecture avant de fermer le modal
-    m.querySelectorAll('[data-playing="1"]').forEach(function(c){
-      var tw = c.querySelector('.cal-thumb');
-      var sb = c.querySelector('.cal-stop-btn');
-      if (tw && tw.dataset.originalHtml) {
-        tw.style.paddingBottom = '56.25%';
-        tw.innerHTML = tw.dataset.originalHtml;
-      }
-      c.dataset.playing = '0';
-      if (sb) sb.style.display = 'none';
-    });
     m.style.display='none'; document.body.style.overflow='';
   });
   m.style.display='block'; document.body.style.overflow='hidden';
