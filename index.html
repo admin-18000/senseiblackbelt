@@ -29798,10 +29798,17 @@ function _tdr_startRec(){
     return;
   }
   if(typeof MediaRecorder==='undefined'){_tdr_recError(_t('Non supporté','Not supported'));return;}
+  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck" (fermeture caméra sans stop)
+  if (_tdr_recorder && _tdr_recorder.state && _tdr_recorder.state !== 'inactive') {
+    try { _tdr_recorder.stop(); } catch(e) {}
+  }
+  _tdr_recorder = null; _tdr_recChunks = [];
   var cv=document.getElementById('sensei-cam-canvas')||document.getElementById('tdr_canvas');if(!cv)return;
   var stream=null;
   try{stream=cv.captureStream?cv.captureStream(25):cv.mozCaptureStream?cv.mozCaptureStream(25):null;}catch(e){}
-  if(!stream){_tdr_recError(_t('Capture impossible','Capture failed'));return;}
+  if(!stream || !stream.getTracks || stream.getTracks().length === 0){
+    _tdr_recError(_t('Capture impossible — relance la caméra','Capture failed — restart camera'));return;
+  }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime=_tsym_getBestMime();
@@ -29861,9 +29868,11 @@ function _tdr_startRec(){
     catch(eStartT) { _tdr_recError('start failed'); return; }
     _tdr_recTimer=setInterval(function(){
       _tdr_recSec++;var rem=180-_tdr_recSec;
-      var btn=document.getElementById('tdr_btnRec');
-      if(btn){var mm=Math.floor(_tdr_recSec/60),ss=_tdr_recSec%60;
-        btn.textContent='⏹ '+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+(rem<=30?' (⚠️ '+rem+'s)':'');}
+      // Fix bug "1988:25:26" : modulo partout + STOP REC visible sur les 2 boutons (panneau + overlay)
+      var mm=Math.floor(_tdr_recSec/60)%60,ss=_tdr_recSec%60,hh=Math.floor(_tdr_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      var label='&#9632; STOP REC · '+t+(rem<=30?' <span style="color:#ffd400">⚠'+rem+'s</span>':'');
+      _syncRecBtns(true, label, '#e63946');
       if(_tdr_recSec>=180)_tdr_stopRec();
     },1000);
     _tdr_updateRecBtn();
@@ -29872,17 +29881,25 @@ function _tdr_startRec(){
   }, 200);
 }
 function _tdr_stopRec(){if(_tdr_recorder&&_tdr_recActive){clearInterval(_tdr_recTimer);try{_tdr_recorder.stop();}catch(e){}}}
+// Helper global : met à jour les 2 boutons REC (panneau ET overlay plein écran)
+function _syncRecBtns(active, html, bgIdle){
+  var ids = ['tdr_btnRec','tsym_btnRec','dcog_btnRec','sensei-cam-rec-btn'];
+  ids.forEach(function(id){
+    var b = document.getElementById(id);
+    if (!b || b.style.display === 'none') return;
+    if (active){
+      b.innerHTML = html;
+      b.style.background = '#7a0000';
+      b.style.animation = 'ssRecBlink 1s ease-in-out infinite';
+    } else {
+      b.innerHTML = '&#9679; REC';
+      b.style.background = bgIdle || '#e63946';
+      b.style.animation = '';
+    }
+  });
+}
 function _tdr_updateRecBtn(){
-  var btn=document.getElementById('tdr_btnRec');if(!btn)return;
-  if(_tdr_recActive){
-    btn.innerHTML='&#9632; STOP REC';
-    btn.style.background='#7a0000';
-    btn.style.animation='ssRecBlink 1s ease-in-out infinite';
-  } else {
-    btn.innerHTML='&#9679; REC';
-    btn.style.background='#e63946';
-    btn.style.animation='';
-  }
+  _syncRecBtns(_tdr_recActive, '&#9632; STOP REC', '#e63946');
 }
 function _tdr_dlBlob(blob,fn,st){
   try{var url=URL.createObjectURL(blob);
@@ -29981,16 +29998,21 @@ function _tsym_startRec() {
   // Cela couvre les 2 cas : caméra embarquée (tsym_canvas) OU overlay DOJO (sensei-cam-canvas)
   var cv = (typeof _tsym_canvas !== 'undefined' && _tsym_canvas) ? _tsym_canvas : document.getElementById('tsym_canvas');
   if (!cv) return;
+  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
+  if (_tsym_recorder && _tsym_recorder.state && _tsym_recorder.state !== 'inactive') {
+    try { _tsym_recorder.stop(); } catch(e) {}
+  }
+  _tsym_recorder = null;
   // Capturer le canvas (vidéo + squelette fusionnés)
   var stream = null;
   try {
     stream = cv.captureStream ? cv.captureStream(25) :
              cv.mozCaptureStream ? cv.mozCaptureStream(25) : null;
   } catch(e) { stream = null; }
-  if (!stream) {
+  if (!stream || !stream.getTracks || stream.getTracks().length === 0) {
     _tsym_recError(_t(
-      'Capture du canvas non supportée sur cet appareil',
-      'Canvas capture not supported on this device'
+      'Capture impossible — relance la caméra',
+      'Capture failed — restart camera'
     )); return;
   }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
@@ -30047,12 +30069,12 @@ function _tsym_startRec() {
     _tsym_recTimer = setInterval(function() {
       _tsym_recSec++;
       var remaining = _tsym_REC_LIMIT - _tsym_recSec;
-      var btn = document.getElementById('tsym_btnRec');
-      if (btn) {
-        var mm = Math.floor(_tsym_recSec/60), ss = _tsym_recSec%60;
-        btn.textContent = '⏹ ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
-          (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
-      }
+      // Fix bug "1988:25:26" : modulo partout + STOP REC visible sur les 2 boutons (panneau + overlay)
+      var mm = Math.floor(_tsym_recSec/60)%60, ss = _tsym_recSec%60, hh = Math.floor(_tsym_recSec/3600);
+      var t = (hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      var label = '&#9632; STOP REC · ' + t +
+        (remaining <= 30 ? ' <span style="color:#ffd400">⚠'+remaining+'s</span>' : '');
+      _syncRecBtns(true, label, '#e63946');
       if (_tsym_recSec >= _tsym_REC_LIMIT) {
         _tsym_stopRec();
       }
@@ -30071,17 +30093,7 @@ function _tsym_stopRec() {
 }
 
 function _tsym_updateRecBtn() {
-  var btn = document.getElementById('tsym_btnRec');
-  if (!btn) return;
-  if (_tsym_recActive) {
-    btn.innerHTML = '&#9632; ' + _t('STOP REC','STOP REC');
-    btn.style.background = '#7a0000';
-    btn.style.animation = 'ssRecBlink 1s ease-in-out infinite';
-  } else {
-    btn.innerHTML = '&#9679; REC';
-    btn.style.background = '#e63946';
-    btn.style.animation = '';
-  }
+  _syncRecBtns(_tsym_recActive, '&#9632; STOP REC', '#e63946');
 }
 
 function _tsym_saveBlob(blob) {
@@ -34438,10 +34450,17 @@ function _dcog_startRec() {
   if (typeof MediaRecorder === 'undefined') {
     _dcog_recError(_t('Non supporté','Not supported')); return;
   }
+  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
+  if (_dcog_recorder && _dcog_recorder.state && _dcog_recorder.state !== 'inactive') {
+    try { _dcog_recorder.stop(); } catch(e) {}
+  }
+  _dcog_recorder = null; _dcog_recChunks = [];
   var cv = document.getElementById('sensei-cam-canvas') || document.getElementById('dcog_canvas'); if (!cv) return;
   var stream = null;
   try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
-  if (!stream) { _dcog_recError(_t('Capture impossible','Capture failed')); return; }
+  if (!stream || !stream.getTracks || stream.getTracks().length === 0) {
+    _dcog_recError(_t('Capture impossible — relance la caméra','Capture failed — restart camera')); return;
+  }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   var mime = _tsym_getBestMime();
@@ -34507,9 +34526,11 @@ function _dcog_startRec() {
     _dcog_recTimer = setInterval(function() {
       _dcog_recSec++;
       var rem = 180 - _dcog_recSec;
-      var btn = document.getElementById('dcog_btnRec');
-      if (btn) { var mm=Math.floor(_dcog_recSec/60),ss=_dcog_recSec%60;
-        btn.textContent = '⏹ '+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+(rem<=30?' (⚠️ '+rem+'s)':''); }
+      // Fix bug "1988:25:26" : modulo partout + STOP REC visible sur les 2 boutons (panneau + overlay)
+      var mm=Math.floor(_dcog_recSec/60)%60,ss=_dcog_recSec%60,hh=Math.floor(_dcog_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      var label = '&#9632; STOP REC · '+t+(rem<=30?' <span style="color:#ffd400">⚠'+rem+'s</span>':'');
+      _syncRecBtns(true, label, '#e63946');
       if (_dcog_recSec >= 180) _dcog_stopRec();
     }, 1000);
     _dcog_updateRecBtn();
@@ -34523,16 +34544,7 @@ function _dcog_stopRec() {
 }
 
 function _dcog_updateRecBtn() {
-  var btn = document.getElementById('dcog_btnRec'); if (!btn) return;
-  if (_dcog_recActive) {
-    btn.innerHTML = '&#9632; STOP REC';
-    btn.style.background = '#7a0000';
-    btn.style.animation = 'ssRecBlink 1s ease-in-out infinite';
-  } else {
-    btn.innerHTML = '&#9679; REC';
-    btn.style.background = '#e63946';
-    btn.style.animation = '';
-  }
+  _syncRecBtns(_dcog_recActive, '&#9632; STOP REC', '#e63946');
 }
 
 function _dcog_dlBlob(blob, fn, st) {
@@ -51418,8 +51430,8 @@ body.si-banner-on { padding-top: 52px; }
   // ═══ Détection tir améliorée (anti-faux-positifs : bras levés statiques, défense, célébration) ═══
   var _ss_wristYHist = [];       // historique [{y, t}] pour détecter la vélocité ascendante
   var _ss_WRIST_HIST_MAX = 10;   // ~2.5s à 250ms d'échantillonnage
-  var _ss_RISE_MIN_PX = 30;      // montée min du poignet (release gesture)
-  var _ss_RISE_WINDOW_MS = 500;  // fenêtre pour détecter la montée
+  var _ss_RISE_MIN_PX = 18;      // montée min du poignet — baissé 30→18 pour +sensible
+  var _ss_RISE_WINDOW_MS = 700;  // fenêtre élargie 500→700ms pour capter releases lents
   var _ss_shotsCount = 0;        // compteur local persistant jusqu'au résumé
 
   // ═══ Compte à rebours visuel 10s avant démarrage de l'analyse (cohérence BT / Training Mode) ═══
@@ -51821,7 +51833,7 @@ body.si-banner-on { padding-top: 52px; }
           // Poignets: kp[9] gauche, kp[10] droit · Épaules: kp[5] gauche, kp[6] droit · Nez: kp[0]
           try {
             var lw = kp[9], rw = kp[10], ls = kp[5], rs = kp[6], nose = kp[0];
-            if (lw && rw && ls && rs && lw.score > 0.35 && rw.score > 0.35 && ls.score > 0.3 && rs.score > 0.3) {
+            if (lw && rw && ls && rs && lw.score > 0.25 && rw.score > 0.25 && ls.score > 0.25 && rs.score > 0.25) {
               var wristY = Math.min(lw.y, rw.y);   // le plus haut des 2 (Y petit = haut)
               var shoulderY = Math.min(ls.y, rs.y);
               var now = Date.now();
@@ -51830,8 +51842,8 @@ body.si-banner-on { padding-top: 52px; }
               _ss_wristYHist.push({y: wristY, t: now});
               if (_ss_wristYHist.length > _ss_WRIST_HIST_MAX) _ss_wristYHist.shift();
 
-              // (1) Check de base : poignet au-dessus des épaules
-              var aboveShoulder = (wristY < shoulderY - 40);
+              // (1) Check de base : poignet au-dessus des épaules — tolérance 40→20 (+sensible)
+              var aboveShoulder = (wristY < shoulderY - 20);
 
               // (2) Check vélocité : poignet a monté d'au moins RISE_MIN_PX dans la fenêtre RISE_WINDOW_MS
               var hadRise = false;
@@ -51972,13 +51984,18 @@ body.si-banner-on { padding-top: 52px; }
       return false;
     }
     if (!_ss_canvas) return false;
+    // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
+    if (_ss_recorder && _ss_recorder.state && _ss_recorder.state !== 'inactive') {
+      try { _ss_recorder.stop(); } catch(e) {}
+    }
+    _ss_recorder = null;
     var stream = null;
     try {
       stream = _ss_canvas.captureStream ? _ss_canvas.captureStream(25) :
                _ss_canvas.mozCaptureStream ? _ss_canvas.mozCaptureStream(25) : null;
     } catch(e) { stream = null; }
-    if (!stream) {
-      alert((window._lang === 'en') ? 'Canvas capture not supported' : 'Capture du canvas non supportée sur cet appareil');
+    if (!stream || !stream.getTracks || stream.getTracks().length === 0) {
+      alert((window._lang === 'en') ? 'Capture failed — restart camera' : 'Capture impossible — relance la caméra');
       return false;
     }
     var mime = _ss_getBestMime();
@@ -52040,9 +52057,11 @@ body.si-banner-on { padding-top: 52px; }
         var remaining = _ss_REC_LIMIT - _ss_recSec;
         var btn = document.getElementById('sensei-cam-rec-btn');
         if (btn) {
-          var mm = Math.floor(_ss_recSec/60), ss = _ss_recSec%60;
-          btn.innerHTML = '&#9632; ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
-            (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+          // Fix bug "1988:25:26" : modulo partout + STOP REC visible pendant REC
+          var mm = Math.floor(_ss_recSec/60)%60, ss = _ss_recSec%60, hh = Math.floor(_ss_recSec/3600);
+          var t = (hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+          btn.innerHTML = '&#9632; STOP REC \u00b7 ' + t +
+            (remaining <= 30 ? ' <span style="color:#ffd400">\u26a0'+remaining+'s</span>' : '');
         }
         if (_ss_recSec >= _ss_REC_LIMIT) { _ss_stopRec(); }
       }, 1000);
@@ -52938,12 +52957,20 @@ body.si-banner-on { padding-top: 52px; }
   function _bt_startRec() {
     if (typeof MediaRecorder === 'undefined') { alert('Recording not supported.'); return false; }
     if (!_bt_canvas) return false;
+    // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
+    if (_bt_recorder && _bt_recorder.state && _bt_recorder.state !== 'inactive') {
+      try { _bt_recorder.stop(); } catch(e) {}
+    }
+    _bt_recorder = null;
     var stream = null;
     try {
       stream = _bt_canvas.captureStream ? _bt_canvas.captureStream(25) :
                _bt_canvas.mozCaptureStream ? _bt_canvas.mozCaptureStream(25) : null;
     } catch(e) { stream = null; }
-    if (!stream) { alert('Canvas capture not supported.'); return false; }
+    if (!stream || !stream.getTracks || stream.getTracks().length === 0) {
+      alert((window._lang === 'en') ? 'Capture failed — restart camera' : 'Capture impossible — relance la caméra');
+      return false;
+    }
     var mime = _bt_getBestMime();
     try {
       _bt_recorder = mime
@@ -53020,9 +53047,11 @@ body.si-banner-on { padding-top: 52px; }
         var remaining = _bt_REC_LIMIT - _bt_recSec;
         var btn = document.getElementById('sensei-cam-rec-btn');
         if (btn) {
-          var mm = Math.floor(_bt_recSec/60), ss = _bt_recSec%60;
-          btn.innerHTML = '&#9632; ' + (mm<10?'0':'')+mm + ':' + (ss<10?'0':'')+ss +
-            (remaining <= 30 ? ' (\u26a0\ufe0f '+remaining+'s)' : '');
+          // Fix bug "1988:25:26" : modulo partout + STOP REC visible pendant REC
+          var mm = Math.floor(_bt_recSec/60)%60, ss = _bt_recSec%60, hh = Math.floor(_bt_recSec/3600);
+          var t = (hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+          btn.innerHTML = '&#9632; STOP REC \u00b7 ' + t +
+            (remaining <= 30 ? ' <span style="color:#ffd400">\u26a0'+remaining+'s</span>' : '');
         }
         if (_bt_recSec >= _bt_REC_LIMIT) _bt_stopRec();
       }, 1000);
