@@ -29798,11 +29798,13 @@ function _tdr_startRec(){
     return;
   }
   if(typeof MediaRecorder==='undefined'){_tdr_recError(_t('Non supporté','Not supported'));return;}
-  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck" (fermeture caméra sans stop)
-  if (_tdr_recorder && _tdr_recorder.state && _tdr_recorder.state !== 'inactive') {
-    try { _tdr_recorder.stop(); } catch(e) {}
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+  clearInterval(_tdr_recTimer); _tdr_recTimer = null;
+  if (_tdr_recorder) {
+    try { _tdr_recorder.ondataavailable = null; _tdr_recorder.onstop = null; _tdr_recorder.onerror = null; } catch(e){}
+    try { if (_tdr_recorder.state && _tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e){}
   }
-  _tdr_recorder = null; _tdr_recChunks = [];
+  _tdr_recorder = null; _tdr_recChunks = []; _tdr_recSec = 0; _tdr_recActive = false; if (typeof _tdr_recPending !== 'undefined') _tdr_recPending = false;
   var cv=document.getElementById('sensei-cam-canvas')||document.getElementById('tdr_canvas');if(!cv)return;
   var stream=null;
   try{stream=cv.captureStream?cv.captureStream(25):cv.mozCaptureStream?cv.mozCaptureStream(25):null;}catch(e){}
@@ -29880,7 +29882,12 @@ function _tdr_startRec(){
     if(st2)st2.textContent='🔴 '+_t('Enregistrement...','Recording...');
   }, 200);
 }
-function _tdr_stopRec(){if(_tdr_recorder&&_tdr_recActive){clearInterval(_tdr_recTimer);try{_tdr_recorder.stop();}catch(e){}}}
+function _tdr_stopRec(){
+  // _recActive à false IMMÉDIATEMENT pour autoriser un nouveau startRec sans attendre onstop
+  _tdr_recActive = false; clearInterval(_tdr_recTimer); _tdr_recTimer = null;
+  if (_tdr_recorder) { try { if (_tdr_recorder.state && _tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e) {} }
+  _tdr_updateRecBtn();
+}
 // Helper global : met à jour les 2 boutons REC (panneau ET overlay plein écran)
 function _syncRecBtns(active, html, bgIdle){
   var ids = ['tdr_btnRec','tsym_btnRec','dcog_btnRec','sensei-cam-rec-btn'];
@@ -29998,11 +30005,13 @@ function _tsym_startRec() {
   // Cela couvre les 2 cas : caméra embarquée (tsym_canvas) OU overlay DOJO (sensei-cam-canvas)
   var cv = (typeof _tsym_canvas !== 'undefined' && _tsym_canvas) ? _tsym_canvas : document.getElementById('tsym_canvas');
   if (!cv) return;
-  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
-  if (_tsym_recorder && _tsym_recorder.state && _tsym_recorder.state !== 'inactive') {
-    try { _tsym_recorder.stop(); } catch(e) {}
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+  clearInterval(_tsym_recTimer); _tsym_recTimer = null;
+  if (_tsym_recorder) {
+    try { _tsym_recorder.ondataavailable = null; _tsym_recorder.onstop = null; _tsym_recorder.onerror = null; } catch(e){}
+    try { if (_tsym_recorder.state && _tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e){}
   }
-  _tsym_recorder = null;
+  _tsym_recorder = null; _tsym_recChunks = []; _tsym_recSec = 0; _tsym_recActive = false;
   // Capturer le canvas (vidéo + squelette fusionnés)
   var stream = null;
   try {
@@ -30086,10 +30095,9 @@ function _tsym_startRec() {
 }
 
 function _tsym_stopRec() {
-  if (_tsym_recorder && _tsym_recActive) {
-    clearInterval(_tsym_recTimer);
-    try { _tsym_recorder.stop(); } catch(e) {}
-  }
+  _tsym_recActive = false; clearInterval(_tsym_recTimer); _tsym_recTimer = null;
+  if (_tsym_recorder) { try { if (_tsym_recorder.state && _tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e){} }
+  _tsym_updateRecBtn();
 }
 
 function _tsym_updateRecBtn() {
@@ -34440,7 +34448,6 @@ function _dcog_toggleRec() {
 
 function _dcog_startRec() {
   // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
-  // (évite un fichier vidéo corrompu / durée aberrante 1988:xx:xx)
   if (_dcog_countdownActive) {
     _dcog_recPending = true;
     var btnP = document.getElementById('dcog_btnRec');
@@ -34450,11 +34457,14 @@ function _dcog_startRec() {
   if (typeof MediaRecorder === 'undefined') {
     _dcog_recError(_t('Non supporté','Not supported')); return;
   }
-  // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
-  if (_dcog_recorder && _dcog_recorder.state && _dcog_recorder.state !== 'inactive') {
-    try { _dcog_recorder.stop(); } catch(e) {}
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+  // Timer, chunks, state, listeners de l'ancien recorder → tout wipé
+  clearInterval(_dcog_recTimer); _dcog_recTimer = null;
+  if (_dcog_recorder) {
+    try { _dcog_recorder.ondataavailable = null; _dcog_recorder.onstop = null; _dcog_recorder.onerror = null; } catch(e){}
+    try { if (_dcog_recorder.state && _dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e){}
   }
-  _dcog_recorder = null; _dcog_recChunks = [];
+  _dcog_recorder = null; _dcog_recChunks = []; _dcog_recSec = 0; _dcog_recActive = false; _dcog_recPending = false;
   var cv = document.getElementById('sensei-cam-canvas') || document.getElementById('dcog_canvas'); if (!cv) return;
   var stream = null;
   try { stream = cv.captureStream ? cv.captureStream(25) : cv.mozCaptureStream ? cv.mozCaptureStream(25) : null; } catch(e) {}
@@ -34540,7 +34550,9 @@ function _dcog_startRec() {
 }
 
 function _dcog_stopRec() {
-  if (_dcog_recorder && _dcog_recActive) { clearInterval(_dcog_recTimer); try { _dcog_recorder.stop(); } catch(e) {} }
+  _dcog_recActive = false; clearInterval(_dcog_recTimer); _dcog_recTimer = null;
+  if (_dcog_recorder) { try { if (_dcog_recorder.state && _dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e){} }
+  _dcog_updateRecBtn();
 }
 
 function _dcog_updateRecBtn() {
@@ -51984,11 +51996,13 @@ body.si-banner-on { padding-top: 52px; }
       return false;
     }
     if (!_ss_canvas) return false;
-    // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
-    if (_ss_recorder && _ss_recorder.state && _ss_recorder.state !== 'inactive') {
-      try { _ss_recorder.stop(); } catch(e) {}
+    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+    clearInterval(_ss_recTimer); _ss_recTimer = null;
+    if (_ss_recorder) {
+      try { _ss_recorder.ondataavailable = null; _ss_recorder.onstop = null; _ss_recorder.onerror = null; } catch(e){}
+      try { if (_ss_recorder.state && _ss_recorder.state !== 'inactive') _ss_recorder.stop(); } catch(e){}
     }
-    _ss_recorder = null;
+    _ss_recorder = null; _ss_recChunks = []; _ss_recSec = 0; _ss_recActive = false;
     var stream = null;
     try {
       stream = _ss_canvas.captureStream ? _ss_canvas.captureStream(25) :
@@ -52071,10 +52085,10 @@ body.si-banner-on { padding-top: 52px; }
   }
 
   function _ss_stopRec() {
-    if (_ss_recorder && _ss_recActive) {
-      if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
-      try { _ss_recorder.stop(); } catch(e) {}
-    }
+    _ss_recActive = false;
+    if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+    if (_ss_recorder) { try { if (_ss_recorder.state && _ss_recorder.state !== 'inactive') _ss_recorder.stop(); } catch(e){} }
+    if (typeof _ss_updateRecBtnUI === 'function') _ss_updateRecBtnUI();
   }
 
   function _ss_saveBlob(blob) {
@@ -52957,11 +52971,13 @@ body.si-banner-on { padding-top: 52px; }
   function _bt_startRec() {
     if (typeof MediaRecorder === 'undefined') { alert('Recording not supported.'); return false; }
     if (!_bt_canvas) return false;
-    // Fix enregistrement intermittent : cleanup previous recorder resté "stuck"
-    if (_bt_recorder && _bt_recorder.state && _bt_recorder.state !== 'inactive') {
-      try { _bt_recorder.stop(); } catch(e) {}
+    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+    clearInterval(_bt_recTimer); _bt_recTimer = null;
+    if (_bt_recorder) {
+      try { _bt_recorder.ondataavailable = null; _bt_recorder.onstop = null; _bt_recorder.onerror = null; } catch(e){}
+      try { if (_bt_recorder.state && _bt_recorder.state !== 'inactive') _bt_recorder.stop(); } catch(e){}
     }
-    _bt_recorder = null;
+    _bt_recorder = null; _bt_recChunks = []; _bt_recSec = 0; _bt_recActive = false;
     var stream = null;
     try {
       stream = _bt_canvas.captureStream ? _bt_canvas.captureStream(25) :
@@ -53060,10 +53076,10 @@ body.si-banner-on { padding-top: 52px; }
   }
 
   function _bt_stopRec() {
-    if (_bt_recorder && _bt_recActive) {
-      if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
-      try { _bt_recorder.stop(); } catch(e) {}
-    }
+    _bt_recActive = false;
+    if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+    if (_bt_recorder) { try { if (_bt_recorder.state && _bt_recorder.state !== 'inactive') _bt_recorder.stop(); } catch(e){} }
+    if (typeof _bt_updateRecBtnUI === 'function') _bt_updateRecBtnUI();
   }
 
   function _bt_saveBlob(blob) {
