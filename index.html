@@ -16640,23 +16640,21 @@ const PUZZLE_TEMPLATES_CONFIG = {
   //    Zone de sécurité : visage@y=540 (case 02), mains@y=1620 (case 05), pieds@y=2700 (case 08)
   //    Lignes de jonction y=1080 et y=2160 doivent passer dans des zones "vides" (cou/taille/cuisses)
   //    → Universellement affichable sans crop ni bande sur Instagram
-  // focalY MESURÉS depuis les PNG sources (centre visage / hauteur image)
-  //   arms-crossed 314×500 → visage ~y=50 → focalY=0.10
-  //   dribble      303×500 → visage ~y=40 → focalY=0.08
-  //   coach        217×500 → visage ~y=40 → focalY=0.08
-  //   back-ball    204×500 → visage ~y=40 → focalY=0.08
-  // Avec drawH=3240 (fit contain), visage tombe à y = focalY × 3240 (dans case 02 safe zone)
+  // 4 mascottes avec SCALE PERSO pour remplir le canvas (élimine cases vides)
+  // scale = facteur multiplicateur de drawH par rapport à contain pur (1.0 = contain, 1.6 = +60%)
+  // Mascottes étroites (coach 0.43, back-ball 0.41) → scale +60% pour occuper mieux
+  // Mascottes modérées (arms-crossed 0.63, dribble 0.61) → scale +30%
   7: { id:7,  name:'THE SENSEI',            W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:3240, fit:'contain', focalY:0.10, targetY:540, bgColor:'#000000',
+        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:3240, fit:'contain', scale:1.30, focalY:0.10, targetY:540, bgColor:'#000000',
                    text:{ safeTop:100, safeBot:980 } } },
   8: { id:8,  name:'BALL HANDLING',         W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:3240, fit:'contain', focalY:0.08, targetY:540, bgColor:'#000000',
+        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:3240, fit:'contain', scale:1.35, focalY:0.08, targetY:540, bgColor:'#000000',
                    text:{ safeTop:100, safeBot:980 } } },
   9: { id:9,  name:'SENSEI IA',             W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:3240, fit:'contain', focalY:0.08, targetY:540, bgColor:'#000000',
+        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:3240, fit:'contain', scale:1.60, focalY:0.08, targetY:540, bgColor:'#000000',
                    text:{ safeTop:100, safeBot:980 } } },
   10:{ id:10, name:'HARD WORK',             W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:3240, fit:'contain', focalY:0.08, targetY:540, bgColor:'#000000',
+        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:3240, fit:'contain', scale:1.60, focalY:0.08, targetY:540, bgColor:'#000000',
                    text:{ safeTop:100, safeBot:980 } } },
 };
 // Helper : lire la config du template actuel (avec fallback safe)
@@ -17606,6 +17604,12 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
       else if (imgRatio < masterRatio) { drawH = TOTAL_H; drawW = drawH * imgRatio; }
       else { drawW = TOTAL_W; drawH = TOTAL_H; }
     }
+
+    // SCALE PERSO : agrandissement de la mascotte pour remplir les cases vides
+    // (défaut 1.0 = pas de scale, 1.6 = +60% pour mascottes étroites)
+    const scaleFactor = (typeof mcfg.scale === 'number' && mcfg.scale > 0) ? mcfg.scale : 1.0;
+    drawW = drawW * scaleFactor;
+    drawH = drawH * scaleFactor;
 
     const offsetX = (TOTAL_W - drawW) / 2;
     const focalY  = (typeof mcfg.focalY  === 'number') ? mcfg.focalY  : 0.18;
