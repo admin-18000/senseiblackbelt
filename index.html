@@ -7658,6 +7658,12 @@ const SECTION_VIDEOS = {
     {id:'epH0-akEeiI', title:'Ball Handling — Sensei #3', vertical:false},
     {id:'QF2sOa4hwzI', title:'Ball Handling — Sensei #4', vertical:false},
     {id:'U0ZlcorVY5c', title:'Ball Handling — Sensei #5', vertical:false},
+    {id:'Pe-7CPmIvpg', title:'Ball Handling Drill #32', vertical:false},
+    {id:'gi6y538Sg9c', title:'Ball Handling Drill #33', vertical:false},
+    {id:'igcxBm9dYdA', title:'Ball Handling Drill #34', vertical:false},
+    {id:'B174AgV-oYg', title:'Ball Handling Drill #35', vertical:false},
+    {id:'hxZQhHlWdX4', title:'Ball Handling Drill #36', vertical:false},
+    {id:'shn5sm7pKXY', title:'Ball Handling Drill #37', vertical:false},
   ],
   hec: [
     {id:'xV0XuRGHsxo', title:'Hand-Eye Drill #1', vertical:true},
@@ -7758,6 +7764,8 @@ const SECTION_VIDEOS = {
     {id:'PxSAvnMi0fc', title:'Finishing #12', vertical:true},
     {id:'sYU8aBj_QtU', title:'Finishing #13', vertical:true},
     {id:'ILrtHtna0Iw', title:'Finishing #14', vertical:true},
+    {id:'xf7lUoBtSB0', title:'Finishing #15', vertical:true},
+    {id:'KmU577GgUig', title:'Finishing #16', vertical:true},
   ],
   defense: [
     {id:'0ZXELMe3VIU', title:'Defense #1', vertical:true},
@@ -8632,22 +8640,26 @@ var _budo_VIDS = [
   {id:'AGm_upGWeH8', title:'BUDŌ #8'}
 ];
 
-// Grande rubrique BUDŌ — 14 vidéos (3 nouvelles en tête + 8 anciennes + 3 nouvelles en fin)
+// Grande rubrique BUDŌ — 18 vidéos (nouvelle BNdNnarz8BU en pos 4, puis 3 nouvelles en pos 15-16-17)
 var _budo_page_VIDS = [
   {id:'ZwFX9N2CM2k', title:'BUDŌ #1'},
   {id:'QSfJP9ETvA4', title:'BUDŌ #2'},
   {id:'EVJkjt_1W7w', title:'BUDŌ #3'},
-  {id:'5brOMSdIfpg', title:'BUDŌ #4'},
-  {id:'f9Awmk_52z8', title:'BUDŌ #5'},
-  {id:'dy2_W7SG4FQ', title:'BUDŌ #6'},
-  {id:'V01cjnjFxns', title:'BUDŌ #7'},
-  {id:'doOaEFdud5M', title:'BUDŌ #8'},
-  {id:'FBP7pfAENgs', title:'BUDŌ #9'},
-  {id:'dHqfYVxqmbY', title:'BUDŌ #10'},
-  {id:'AGm_upGWeH8', title:'BUDŌ #11'},
-  {id:'kTdfWkdQnJ8', title:'BUDŌ #12'},
-  {id:'ZnsLs1ByG-U', title:'BUDŌ #13'},
-  {id:'JXda0GVyJc4', title:'BUDŌ #14'}
+  {id:'BNdNnarz8BU', title:'BUDŌ #4'},
+  {id:'5brOMSdIfpg', title:'BUDŌ #5'},
+  {id:'f9Awmk_52z8', title:'BUDŌ #6'},
+  {id:'dy2_W7SG4FQ', title:'BUDŌ #7'},
+  {id:'V01cjnjFxns', title:'BUDŌ #8'},
+  {id:'doOaEFdud5M', title:'BUDŌ #9'},
+  {id:'FBP7pfAENgs', title:'BUDŌ #10'},
+  {id:'dHqfYVxqmbY', title:'BUDŌ #11'},
+  {id:'AGm_upGWeH8', title:'BUDŌ #12'},
+  {id:'kTdfWkdQnJ8', title:'BUDŌ #13'},
+  {id:'ZnsLs1ByG-U', title:'BUDŌ #14'},
+  {id:'FVTpxs43ITU', title:'BUDŌ #15'},
+  {id:'_PEzy18JbYk', title:'BUDŌ #16'},
+  {id:'v6PehlFQHDo', title:'BUDŌ #17'},
+  {id:'JXda0GVyJc4', title:'BUDŌ #18'}
 ];
 var _budo_selVid = null;
 
@@ -16621,25 +16633,25 @@ const PUZZLE_TEMPLATES_CONFIG = {
   4: { id:4,  name:'BEFORE / AFTER',        W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   5: { id:5,  name:'DRILL OF THE WEEK',     W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
   6: { id:6,  name:'JOURNAL / RADAR',       W:1080, H:1080, cols:3, rows:3, mode:'legacy',   bgColor:'#131820', filePrefix:'sensei-puzzle' },
-  // ─── TPL 7-10 : mascottes SENSEI
-  //    canevas MAÎTRE 4:5 natif (3240×4050) + mode CONTAIN → mascotte INTÉGRALE (zéro crop)
-  //    bgColor = '#000000' (NOIR PUR) = exactement le fond Instagram dark mode
-  //    → les bandes de padding deviennent INVISIBLES sur IG (se fondent avec le feed)
-  //    → zéro zoom manuel nécessaire, mascotte intégrale, lignes de découpe épargnent le visage
-  //    focalY = position relative du visage dans l'image source (0=haut, 1=bas)
-  //    targetY=675 = centre vertical de la case 02 dans maître 4:5 (zone optimale)
-  7: { id:7,  name:'THE SENSEI',            W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:4050, fit:'contain', focalY:0.18, targetY:675, bgColor:'#000000',
-                   text:{ safeTop:150, safeBot:1200 } } },
-  8: { id:8,  name:'BALL HANDLING',         W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:4050, fit:'contain', focalY:0.20, targetY:675, bgColor:'#000000',
-                   text:{ safeTop:150, safeBot:1200 } } },
-  9: { id:9,  name:'SENSEI IA',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:4050, fit:'contain', focalY:0.18, targetY:675, bgColor:'#000000',
-                   text:{ safeTop:150, safeBot:1200 } } },
-  10:{ id:10, name:'HARD WORK',             W:1080, H:1350, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
-        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:4050, fit:'contain', focalY:0.22, targetY:675, bgColor:'#000000',
-                   text:{ safeTop:150, safeBot:1200 } } },
+  // ─── TPL 7-10 : mascottes SENSEI — FORMAT 1:1 STRICT (standard puzzle grid pro)
+  //    Canvas maître 3240×3240 → tuiles 1080×1080 chacune
+  //    bgColor = '#000000' pour fondu invisible avec feed IG dark mode
+  //    fit = 'contain' pour mascotte intégrale
+  //    Zone de sécurité : visage@y=540 (case 02), mains@y=1620 (case 05), pieds@y=2700 (case 08)
+  //    Lignes de jonction y=1080 et y=2160 doivent passer dans des zones "vides" (cou/taille/cuisses)
+  //    → Universellement affichable sans crop ni bande sur Instagram
+  7: { id:7,  name:'THE SENSEI',            W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'arms-crossed', canvasW:3240, canvasH:3240, fit:'contain', focalY:0.18, targetY:540, bgColor:'#000000',
+                   text:{ safeTop:100, safeBot:980 } } },
+  8: { id:8,  name:'BALL HANDLING',         W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'dribble',      canvasW:3240, canvasH:3240, fit:'contain', focalY:0.20, targetY:540, bgColor:'#000000',
+                   text:{ safeTop:100, safeBot:980 } } },
+  9: { id:9,  name:'SENSEI IA',             W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'coach',        canvasW:3240, canvasH:3240, fit:'contain', focalY:0.18, targetY:540, bgColor:'#000000',
+                   text:{ safeTop:100, safeBot:980 } } },
+  10:{ id:10, name:'HARD WORK',             W:1080, H:1080, cols:3, rows:3, mode:'mascotte', bgColor:'#000000', filePrefix:'sensei-puzzle',
+        mascotte:{ imgKey:'back-ball',    canvasW:3240, canvasH:3240, fit:'contain', focalY:0.22, targetY:540, bgColor:'#000000',
+                   text:{ safeTop:100, safeBot:980 } } },
 };
 // Helper : lire la config du template actuel (avec fallback safe)
 function puzzleCfg(idx){ return PUZZLE_TEMPLATES_CONFIG[idx] || PUZZLE_TEMPLATES_CONFIG[0]; }
@@ -17640,8 +17652,9 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   //  Marge 150px en haut et en bas de chaque tuile 1080×1350
   //  → textes jamais sur les lignes de découpe, jamais rognés par IG
   // ═══════════════════════════════════════════════════════════════════
-  const SAFE_TOP = 150;
-  const SAFE_BOT = H - 150;   // = 1200
+  // Zone de sécurité INSTAGRAM (standard pro) : 100px bord + 80px autour jonctions (y=1080/2160 global)
+  const SAFE_TOP = Math.round(H * 0.09);  // ~100px pour H=1080
+  const SAFE_BOT = H - SAFE_TOP;          // ~980px pour H=1080
 
   // ─── CASE 1 (c0 top-left) : 🥋 géant + mini-tagline ───────────
   const c0 = canvases[0].getContext('2d');
@@ -17652,7 +17665,7 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   c0.font = '460px serif';
   c0.textAlign = 'center';
   c0.textBaseline = 'middle';
-  c0.fillText('🥋', W/2, H/2 - 100);
+  c0.fillText('🥋', W/2, H/2 - Math.round(H*0.09));
   c0.restore();
   // Tagline sous le gi (perso par template via cfg.subtitle, fallback générique)
   const subtitleTxt = cfg.subtitle || 'SENSEI BLACKBELT';
@@ -17660,7 +17673,7 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   c0.shadowColor = 'rgba(0,0,0,0.95)';
   c0.shadowBlur = 10;
   c0.shadowOffsetY = 2;
-  pF(c0, subtitleTxt, W/2, H/2 + 290, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c0, subtitleTxt, W/2, H - Math.round(H*0.14), 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   c0.restore();
 
   // ─── CASE 2 (c1 top-center) : handle @ en zone sûre haute ──
@@ -17681,29 +17694,32 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   c7.shadowColor = 'rgba(0,0,0,0.95)';
   c7.shadowBlur = 10;
   c7.shadowOffsetY = 2;
-  pF(c7, '— SENSEI BLACKBELT —', W/2, SAFE_BOT + 80, 26, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
+  pF(c7, '— SENSEI BLACKBELT —', W/2, H - Math.round(H*0.05), 26, 'rgba(245,197,24,.75)', 'center', '700', '"Bebas Neue",Arial Narrow,sans-serif');
   c7.restore();
 
   // ─── CASE 3 (c2 top-right) : TITLE en 2 lignes GOLD avec shadow ──
   const c2 = canvases[2].getContext('2d');
   txtWithShadow(c2, function(){
-    pF(c2, cfg.titleLine1, W/2, H/2 - 170, 150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c2, cfg.titleLine2, W/2, H/2 - 10,  150, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    // Titles proportionnels : taille 13% H, offsets 15% et 1%
+    var titleSz = Math.round(H * 0.13);
+    pF(c2, cfg.titleLine1, W/2, H/2 - Math.round(H*0.15), titleSz, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c2, cfg.titleLine2, W/2, H/2,                      titleSz, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
   // ─── CASE 7 (c6 bottom-left) : QUOTE en 3 lignes GOLD ──
   const c6 = canvases[6].getContext('2d');
   txtWithShadow(c6, function(){
-    pF(c6, cfg.quote1, W/2, H/2 - 150, 48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.quote2, W/2, H/2 - 70,  48, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c6, cfg.quote3, W/2, H/2 + 30,  56, '#fff',    'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    var qSz = Math.round(H * 0.045);
+    pF(c6, cfg.quote1, W/2, H/2 - Math.round(H*0.13), qSz, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote2, W/2, H/2 - Math.round(H*0.05), qSz, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c6, cfg.quote3, W/2, H/2 + Math.round(H*0.04), Math.round(qSz*1.15), '#fff', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
 
   // ─── CASE 9 (c8 bottom-right) : HASHTAG + CTA button + URL ──
   const c8 = canvases[8].getContext('2d');
-  // Hashtag en haut (zone sûre)
+  // Hashtag en haut (zone sûre, 18% H sous le top)
   txtWithShadow(c8, function(){
-    pF(c8, '#'+cfg.hashtag, W/2, H/2 - 200, 54, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, '#'+cfg.hashtag, W/2, Math.round(H*0.18), 50, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
   });
   // Bouton CTA au centre vertical
   const btnW = 540, btnH = 150;
@@ -17716,10 +17732,10 @@ function puzzleDrawMascotte(canvases, d, img, cfg) {
   pRect(c8, btnX, btnY, btnW, btnH, 75, '#f5c518');
   c8.restore();
   pF(c8, en?'JOIN →':'REJOINS →', W/2, btnY + btnH/2 + 20, 60, '#080a0f', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-  // URL + follow (zone sûre basse)
+  // URL + follow (zone sûre basse, proportionnelle)
   txtWithShadow(c8, function(){
-    pF(c8, 'senseiblackbelt.com', W/2, H - 220, 36, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
-    pF(c8, en?'FOLLOW':'SUIS-MOI', W/2, H - 165, 30, '#fff', 'center', '700');
+    pF(c8, 'senseiblackbelt.com', W/2, H - Math.round(H*0.15), 34, '#f5c518', 'center', '900', '"Bebas Neue",Arial Narrow,sans-serif');
+    pF(c8, en?'FOLLOW':'SUIS-MOI', W/2, H - Math.round(H*0.10), 28, '#fff', 'center', '700');
   });
   // Case 5 user (c4 center) : PAS de watermark — mascotte reste intacte
 }
@@ -29785,7 +29801,7 @@ function _tsym_updateInsight() {
 }
 
 /* ── REC DRIBBLE RÉACTION ─────────────────────────────────────────── */
-var _tdr_recorder=null,_tdr_recChunks=[],_tdr_recActive=false,_tdr_recTimer=null,_tdr_recSec=0;
+var _tdr_recorder=null,_tdr_recChunks=[],_tdr_recActive=false,_tdr_recTimer=null,_tdr_recSec=0,_tdr_recStream=null;
 function _tdr_toggleRec(){if(_tdr_recActive)_tdr_stopRec();else _tdr_startRec();}
 function _tdr_startRec(){
   // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
@@ -29798,11 +29814,15 @@ function _tdr_startRec(){
     return;
   }
   if(typeof MediaRecorder==='undefined'){_tdr_recError(_t('Non supporté','Not supported'));return;}
-  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh (critique mobile iOS/Android) ═══════
   clearInterval(_tdr_recTimer); _tdr_recTimer = null;
   if (_tdr_recorder) {
     try { _tdr_recorder.ondataavailable = null; _tdr_recorder.onstop = null; _tdr_recorder.onerror = null; } catch(e){}
     try { if (_tdr_recorder.state && _tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e){}
+  }
+  if (_tdr_recStream) {
+    try { _tdr_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){}
+    _tdr_recStream = null;
   }
   _tdr_recorder = null; _tdr_recChunks = []; _tdr_recSec = 0; _tdr_recActive = false; if (typeof _tdr_recPending !== 'undefined') _tdr_recPending = false;
   var cv=document.getElementById('sensei-cam-canvas')||document.getElementById('tdr_canvas');if(!cv)return;
@@ -29813,6 +29833,7 @@ function _tdr_startRec(){
   }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _tdr_recStream = stream; // ref pour stop tracks à l'arrêt (critique mobile)
   var mime=_tsym_getBestMime();
   try{_tdr_recorder=mime?new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}):new MediaRecorder(stream,{videoBitsPerSecond:3500000,audioBitsPerSecond:128000});}
   catch(e){try{_tdr_recorder=new MediaRecorder(stream);}catch(e2){_tdr_recError('start failed');return;}}
@@ -29820,8 +29841,16 @@ function _tdr_startRec(){
   _tdr_recorder.ondataavailable=function(e){if(e.data&&e.data.size>0)_tdr_recChunks.push(e.data);};
   _tdr_recorder.onstop=function(){
     clearInterval(_tdr_recTimer);
-    var blob=new Blob(_tdr_recChunks,{type:_tdr_recorder.mimeType||'video/webm'});
+    var mimeFinal = (_tdr_recorder && _tdr_recorder.mimeType) || 'video/webm';
+    var blob=new Blob(_tdr_recChunks,{type:mimeFinal});
+    // Stop tracks APRÈS blob (critique mobile)
+    if (_tdr_recStream) { try { _tdr_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _tdr_recStream = null; }
     _tdr_recActive=false;_tdr_recChunks=[];_tdr_updateRecBtn();
+    if (!blob || blob.size < 1024) {
+      var stErr=document.getElementById('tdr_status');
+      if (stErr) { stErr.textContent = _t('⚠ Enregistrement vide — réessaie','⚠ Empty recording — retry'); stErr.style.color = '#e63946'; }
+      return;
+    }
     var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn='SENSEI_dribble_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st=document.getElementById('tdr_status');
@@ -29883,8 +29912,8 @@ function _tdr_startRec(){
   }, 200);
 }
 function _tdr_stopRec(){
-  // _recActive à false IMMÉDIATEMENT pour autoriser un nouveau startRec sans attendre onstop
   _tdr_recActive = false; clearInterval(_tdr_recTimer); _tdr_recTimer = null;
+  // Stop recorder seulement — tracks stoppées dans onstop (après drainage chunks)
   if (_tdr_recorder) { try { if (_tdr_recorder.state && _tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e) {} }
   _tdr_updateRecBtn();
 }
@@ -29943,6 +29972,7 @@ function _tsym_expandCanvas() {
 var _tsym_recorder   = null;
 var _tsym_recChunks  = [];
 var _tsym_recActive  = false;
+var _tsym_recStream  = null;  // Stream capturé pour stop tracks (critique mobile)
 var _tsym_recBlob    = null;
 var _tsym_recTimer   = null;
 var _tsym_sessTimer  = null;
@@ -30005,12 +30035,13 @@ function _tsym_startRec() {
   // Cela couvre les 2 cas : caméra embarquée (tsym_canvas) OU overlay DOJO (sensei-cam-canvas)
   var cv = (typeof _tsym_canvas !== 'undefined' && _tsym_canvas) ? _tsym_canvas : document.getElementById('tsym_canvas');
   if (!cv) return;
-  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh (critique mobile) ═══════
   clearInterval(_tsym_recTimer); _tsym_recTimer = null;
   if (_tsym_recorder) {
     try { _tsym_recorder.ondataavailable = null; _tsym_recorder.onstop = null; _tsym_recorder.onerror = null; } catch(e){}
     try { if (_tsym_recorder.state && _tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e){}
   }
+  if (_tsym_recStream) { try { _tsym_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _tsym_recStream = null; }
   _tsym_recorder = null; _tsym_recChunks = []; _tsym_recSec = 0; _tsym_recActive = false;
   // Capturer le canvas (vidéo + squelette fusionnés)
   var stream = null;
@@ -30026,6 +30057,7 @@ function _tsym_startRec() {
   }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _tsym_recStream = stream; // ref pour stop tracks à l'arrêt (critique mobile)
   var mimeType = _tsym_getBestMime();
   try {
     _tsym_recorder = mimeType
@@ -30048,12 +30080,18 @@ function _tsym_startRec() {
   };
   _tsym_recorder.onstop = function() {
     clearInterval(_tsym_recTimer);
-    _tsym_recBlob = new Blob(_tsym_recChunks, {
-      type: _tsym_recorder.mimeType || 'video/webm'
-    });
+    var mimeFinal = (_tsym_recorder && _tsym_recorder.mimeType) || 'video/webm';
+    _tsym_recBlob = new Blob(_tsym_recChunks, {type: mimeFinal});
+    // Stop tracks APRÈS blob (critique mobile)
+    if (_tsym_recStream) { try { _tsym_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _tsym_recStream = null; }
     _tsym_recActive = false;
     _tsym_recChunks = [];
     _tsym_updateRecBtn();
+    if (!_tsym_recBlob || _tsym_recBlob.size < 1024) {
+      var stErr = document.getElementById('tsym_status');
+      if (stErr) { stErr.textContent = _t('⚠ Enregistrement vide — réessaie','⚠ Empty recording — retry'); stErr.style.color = '#e63946'; }
+      return;
+    }
     _tsym_saveBlob(_tsym_recBlob);
   };
   _tsym_recorder.onerror = function(e) {
@@ -30096,6 +30134,7 @@ function _tsym_startRec() {
 
 function _tsym_stopRec() {
   _tsym_recActive = false; clearInterval(_tsym_recTimer); _tsym_recTimer = null;
+  // Stop recorder — tracks stoppées dans onstop (après drainage chunks)
   if (_tsym_recorder) { try { if (_tsym_recorder.state && _tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e){} }
   _tsym_updateRecBtn();
 }
@@ -31277,7 +31316,8 @@ var _dcog_VIDEOS = [
   {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS'},
   {id:'UHNUSFHSrOo', title:'Dribble Height HAUT'},
   {id:'5Fgt7txZEQc', title:'Burnout'},
-  {id:'eFXJ32fp54Q', title:'Burnout (alt)'}
+  {id:'eFXJ32fp54Q', title:'Burnout (alt)'},
+  {id:'pibR0Ri47PM', title:'Visual Math'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -31501,7 +31541,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
     // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
     if (!_dcog_initing) {
-      var _dcogVidMap = { math:0, sprint:1, twoball:2, height:3, tboard:4, burnout:7 };
+      var _dcogVidMap = { math:0, sprint:1, twoball:2, height:3, tboard:4, burnout:7, vcmath:9 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -31643,6 +31683,8 @@ function _dcog_stop() {
   clearInterval(_dcog_mathTimer); _dcog_mathTimer = null;
   var disp = document.getElementById('dcog_timerDisplay');
   if(disp) disp.style.display = 'none';
+  // CRITIQUE : stop REC AVANT de couper la caméra (sinon derniers chunks perdus = replay cassé)
+  if (typeof _dcog_recActive !== 'undefined' && _dcog_recActive) _dcog_stopRec();
   if (_dcog_rafId) { cancelAnimationFrame(_dcog_rafId); _dcog_rafId = null; }
   if (_dcog_stream) { _dcog_stream.getTracks().forEach(function(t){t.stop();}); _dcog_stream = null; }
   if (_dcog_video) _dcog_video.srcObject = null;
@@ -31655,8 +31697,6 @@ function _dcog_stop() {
   ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  // Stop recording if active
-  if (typeof _dcog_recActive !== 'undefined' && _dcog_recActive) _dcog_stopRec();
   var bRec2 = document.getElementById('dcog_btnRec');
   if (bRec2) bRec2.style.display = 'none';
   var btnS = document.getElementById('dcog_btnStart');
@@ -33119,10 +33159,13 @@ function _dcog_startSprintTimer() {
     if (countEl) countEl.textContent = _dcog_sprintCount;
     // Clock
     var elapsed = Date.now() - _dcog_sprintStart;
-    var mm = Math.floor(elapsed/60000);
+    // Fix bug "7953:38:5" : modulo + HH si > 1h
+    var mm = Math.floor(elapsed/60000) % 60;
     var ss = Math.floor((elapsed%60000)/1000);
+    var hh = Math.floor(elapsed/3600000);
+    var clockStr = (hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
     var clockEl = document.getElementById('dcog_sprintClock');
-    if (clockEl) clockEl.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    if (clockEl) clockEl.textContent = clockStr;
     // Progress bar
     var pct = Math.min(100, Math.round(_dcog_sprintCount/_dcog_sprintTarget*100));
     var bar2 = document.getElementById('dcog_sprintBar');
@@ -33131,7 +33174,7 @@ function _dcog_startSprintTimer() {
     var sC = document.getElementById('dcog_sCorrect'); if(sC) sC.textContent = _dcog_sprintCount;
     var sW = document.getElementById('dcog_sWrong');  if(sW) sW.textContent = _dcog_sprintTarget;
     var sT = document.getElementById('dcog_sTime');
-    if(sT) sT.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    if(sT) sT.textContent = clockStr;
     // Goal reached
     if (_dcog_sprintCount >= _dcog_sprintTarget) {
       clearInterval(_dcog_sprintInt);
@@ -34441,6 +34484,7 @@ var _dcog_recChunks = [];
 var _dcog_recActive = false;
 var _dcog_recTimer  = null;
 var _dcog_recSec    = 0;
+var _dcog_recStream = null;  // Stream capturé — stop tracks pour autoriser re-start iOS/Android
 
 function _dcog_toggleRec() {
   if (_dcog_recActive) _dcog_stopRec(); else _dcog_startRec();
@@ -34457,12 +34501,16 @@ function _dcog_startRec() {
   if (typeof MediaRecorder === 'undefined') {
     _dcog_recError(_t('Non supporté','Not supported')); return;
   }
-  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
-  // Timer, chunks, state, listeners de l'ancien recorder → tout wipé
+  // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh (critique mobile iOS/Android) ═══════
   clearInterval(_dcog_recTimer); _dcog_recTimer = null;
   if (_dcog_recorder) {
     try { _dcog_recorder.ondataavailable = null; _dcog_recorder.onstop = null; _dcog_recorder.onerror = null; } catch(e){}
     try { if (_dcog_recorder.state && _dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e){}
+  }
+  // CRITIQUE : stop les tracks du stream capturé précédent (sinon iOS garde le stream "live" et bloque le re-start)
+  if (_dcog_recStream) {
+    try { _dcog_recStream.getTracks().forEach(function(t){ try { t.stop(); } catch(e){} }); } catch(e){}
+    _dcog_recStream = null;
   }
   _dcog_recorder = null; _dcog_recChunks = []; _dcog_recSec = 0; _dcog_recActive = false; _dcog_recPending = false;
   var cv = document.getElementById('sensei-cam-canvas') || document.getElementById('dcog_canvas'); if (!cv) return;
@@ -34473,6 +34521,7 @@ function _dcog_startRec() {
   }
   // Combiner avec l'audio synthétisé (musique + bips + sons feedback)
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dcog_recStream = stream; // ref pour pouvoir stopper les tracks à l'arrêt
   var mime = _tsym_getBestMime();
   try { _dcog_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream,{videoBitsPerSecond:3500000,audioBitsPerSecond:128000}); }
   catch(e) { try { _dcog_recorder = new MediaRecorder(stream); } catch(e2) { _dcog_recError('start failed'); return; } }
@@ -34480,8 +34529,21 @@ function _dcog_startRec() {
   _dcog_recorder.ondataavailable = function(e) { if(e.data && e.data.size>0) _dcog_recChunks.push(e.data); };
   _dcog_recorder.onstop = function() {
     clearInterval(_dcog_recTimer);
-    var blob = new Blob(_dcog_recChunks, {type: _dcog_recorder.mimeType||'video/webm'});
+    // Blob construit AVANT de stopper les tracks (sinon chunks finaux perdus)
+    var mimeFinal = (_dcog_recorder && _dcog_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dcog_recChunks, {type: mimeFinal});
+    // Stop tracks APRÈS le blob (critique mobile : garantit le drainage des derniers chunks)
+    if (_dcog_recStream) {
+      try { _dcog_recStream.getTracks().forEach(function(t){ try { t.stop(); } catch(e){} }); } catch(e){}
+      _dcog_recStream = null;
+    }
     _dcog_recActive = false; _dcog_recChunks = []; _dcog_updateRecBtn();
+    // Si blob vide → afficher erreur au lieu de preview vide
+    if (!blob || blob.size < 1024) {
+      var stErr = document.getElementById('dcog_status');
+      if (stErr) { stErr.textContent = _t('⚠ Enregistrement vide — réessaie','⚠ Empty recording — retry'); stErr.style.color = '#e63946'; }
+      return;
+    }
     var ext = /webm/i.test(blob.type) ? 'webm' : /mp4/i.test(blob.type) ? 'mp4' : 'webm';
     var fn  = 'SENSEI_cognitive_'+new Date().toISOString().slice(0,10)+'.'+ext;
     var st  = document.getElementById('dcog_status');
@@ -34551,6 +34613,7 @@ function _dcog_startRec() {
 
 function _dcog_stopRec() {
   _dcog_recActive = false; clearInterval(_dcog_recTimer); _dcog_recTimer = null;
+  // IMPORTANT : juste stopper le recorder — les tracks sont stoppées DANS onstop (après drainage des chunks)
   if (_dcog_recorder) { try { if (_dcog_recorder.state && _dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e){} }
   _dcog_updateRecBtn();
 }
@@ -51436,6 +51499,7 @@ body.si-banner-on { padding-top: 52px; }
   var _ss_recChunks = [];
   var _ss_recTimer = null;
   var _ss_recSec = 0;
+  var _ss_recStream = null;  // Stream capturé pour stop tracks (critique mobile)
   var _ss_REC_LIMIT = 600; // 10 min max pour une session de shoot (fichier ~150-200 Mo max)
   var MOVEMENT_THRESHOLD = 12;
 
@@ -51996,12 +52060,13 @@ body.si-banner-on { padding-top: 52px; }
       return false;
     }
     if (!_ss_canvas) return false;
-    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh (critique mobile) ═══════
     clearInterval(_ss_recTimer); _ss_recTimer = null;
     if (_ss_recorder) {
       try { _ss_recorder.ondataavailable = null; _ss_recorder.onstop = null; _ss_recorder.onerror = null; } catch(e){}
       try { if (_ss_recorder.state && _ss_recorder.state !== 'inactive') _ss_recorder.stop(); } catch(e){}
     }
+    if (_ss_recStream) { try { _ss_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _ss_recStream = null; }
     _ss_recorder = null; _ss_recChunks = []; _ss_recSec = 0; _ss_recActive = false;
     var stream = null;
     try {
@@ -52012,6 +52077,7 @@ body.si-banner-on { padding-top: 52px; }
       alert((window._lang === 'en') ? 'Capture failed — restart camera' : 'Capture impossible — relance la caméra');
       return false;
     }
+    _ss_recStream = stream; // ref pour stop tracks à l'arrêt (critique mobile)
     var mime = _ss_getBestMime();
     try {
       _ss_recorder = mime
@@ -52031,9 +52097,15 @@ body.si-banner-on { padding-top: 52px; }
       if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
       var mimeUsed = (_ss_recorder && _ss_recorder.mimeType) || mime || 'video/webm';
       var blob = new Blob(_ss_recChunks, {type: mimeUsed});
-      _ss_saveBlob(blob);
+      // Stop tracks APRÈS blob (critique mobile)
+      if (_ss_recStream) { try { _ss_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _ss_recStream = null; }
       _ss_recActive = false;
       _ss_updateRecBtnUI();
+      if (!blob || blob.size < 1024) {
+        alert((window._lang==='en') ? '⚠ Empty recording — retry' : '⚠ Enregistrement vide — réessaie');
+        return;
+      }
+      _ss_saveBlob(blob);
       if (window._speak) window._speak.say({fr:'Enregistrement sauvegardé. Vérifie ta galerie !', en:'Recording saved. Check your gallery!'});
     };
     _ss_recorder.onerror = function(e) {
@@ -52087,6 +52159,7 @@ body.si-banner-on { padding-top: 52px; }
   function _ss_stopRec() {
     _ss_recActive = false;
     if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
+    // Stop recorder — tracks stoppées dans onstop (après drainage chunks)
     if (_ss_recorder) { try { if (_ss_recorder.state && _ss_recorder.state !== 'inactive') _ss_recorder.stop(); } catch(e){} }
     if (typeof _ss_updateRecBtnUI === 'function') _ss_updateRecBtnUI();
   }
@@ -52358,6 +52431,7 @@ body.si-banner-on { padding-top: 52px; }
   var _bt_recorder = null;
   var _bt_recActive = false;
   var _bt_recChunks = [];
+  var _bt_recStream = null;  // Stream capturé pour stop tracks (critique mobile)
   var _bt_recTimer = null;
   var _bt_recWatchdog = null;
   var _bt_recSec = 0;
@@ -52387,6 +52461,10 @@ body.si-banner-on { padding-top: 52px; }
       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa3bf;margin-top:4px">' + L('Compteur de dribbles par IA · MoveNet', 'AI-powered dribble counter · MoveNet') + '</div>' +
       '</div>' +
       '<button onclick="_bt_close_select()" style="background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.4);color:#e63946;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:8px;cursor:pointer">✕</button>' +
+      '</div>' +
+      // 🎬 Vidéo démo Ball Tracker (sous le header BALL TRACKER, au-dessus de l'encadré BALL POUNDS)
+      '<div style="border-radius:12px;overflow:hidden;margin-bottom:20px;border:1px solid rgba(255,255,255,0.08);background:#000">' +
+      '<iframe src="https://www.youtube-nocookie.com/embed/kLdZXTHhQ28?rel=0&modestbranding=1&playsinline=1" style="width:100%;aspect-ratio:16/9;border:0;display:block" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>' +
       '</div>' +
       // Section : description du drill (informatif, pas de sélection)
       '<div style="margin-bottom:24px;background:linear-gradient(160deg,rgba(245,197,24,0.10),rgba(245,197,24,0.02));border:1.5px solid rgba(245,197,24,0.4);border-radius:14px;padding:20px">' +
@@ -52971,12 +53049,13 @@ body.si-banner-on { padding-top: 52px; }
   function _bt_startRec() {
     if (typeof MediaRecorder === 'undefined') { alert('Recording not supported.'); return false; }
     if (!_bt_canvas) return false;
-    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh ═══════
+    // ═══════ FULL RESET pour enchaîner plusieurs sessions sans refresh (critique mobile) ═══════
     clearInterval(_bt_recTimer); _bt_recTimer = null;
     if (_bt_recorder) {
       try { _bt_recorder.ondataavailable = null; _bt_recorder.onstop = null; _bt_recorder.onerror = null; } catch(e){}
       try { if (_bt_recorder.state && _bt_recorder.state !== 'inactive') _bt_recorder.stop(); } catch(e){}
     }
+    if (_bt_recStream) { try { _bt_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _bt_recStream = null; }
     _bt_recorder = null; _bt_recChunks = []; _bt_recSec = 0; _bt_recActive = false;
     var stream = null;
     try {
@@ -52987,6 +53066,7 @@ body.si-banner-on { padding-top: 52px; }
       alert((window._lang === 'en') ? 'Capture failed — restart camera' : 'Capture impossible — relance la caméra');
       return false;
     }
+    _bt_recStream = stream; // ref pour stop tracks à l'arrêt (critique mobile)
     var mime = _bt_getBestMime();
     try {
       _bt_recorder = mime
@@ -53011,11 +53091,15 @@ body.si-banner-on { padding-top: 52px; }
       try {
         var mimeUsed = (_bt_recorder && _bt_recorder.mimeType) || mime || 'video/webm';
         if (!_bt_recChunks || _bt_recChunks.length === 0) {
+          // Stop tracks aussi quand vide (pour autoriser re-start)
+          if (_bt_recStream) { try { _bt_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _bt_recStream = null; }
           alert(_t('Vidéo vide ou corrompue. Réessaie.', 'Empty or corrupted video. Try again.'));
           _bt_recActive = false; _bt_updateRecBtnUI();
           return;
         }
         var blob = new Blob(_bt_recChunks, {type: mimeUsed});
+        // Stop tracks APRÈS blob (critique mobile)
+        if (_bt_recStream) { try { _bt_recStream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); } catch(e){} _bt_recStream = null; }
         if (blob.size < 1000) {  // Blob trop petit = probablement corrompu
           alert(_t('Vidéo trop courte ou corrompue. Réessaie.', 'Video too short or corrupted. Try again.'));
           _bt_recActive = false; _bt_updateRecBtnUI();
@@ -53078,6 +53162,7 @@ body.si-banner-on { padding-top: 52px; }
   function _bt_stopRec() {
     _bt_recActive = false;
     if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
+    // Stop recorder — tracks stoppées dans onstop (après drainage chunks)
     if (_bt_recorder) { try { if (_bt_recorder.state && _bt_recorder.state !== 'inactive') _bt_recorder.stop(); } catch(e){} }
     if (typeof _bt_updateRecBtnUI === 'function') _bt_updateRecBtnUI();
   }
