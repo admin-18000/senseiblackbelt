@@ -14238,6 +14238,7 @@ function applyLangTracker(lang) {
     rules_cv_tuto:"Tu vois le terrain d\u2019en haut avec 5 joueurs bleus (ton \u00e9quipe) et 5 joueurs rouges (adversaires). Un bleu a le ballon \ud83c\udfc0. <b>Trouve le co\u00e9quipier bleu qui n\u2019a PAS de joueur rouge coll\u00e9 \u00e0 lui</b> (le \"d\u00e9marqu\u00e9\") et tape dessus. Tu n\u2019as que 2 secondes par round.",
     // \u2550\u2550\u2550 SENSEI REFLEX RUSH \u2014 drill cam\u00e9ra DCOG \u2550\u2550\u2550
     arcade_reflex_rush_lbl:"SENSEI REFLEX RUSH",
+    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Attrape \u00e0 la cam\u00e9ra \u00b7 Rank D\u2192SENSEI",
     rules_reflex_rush_pitch:"Mode arcade cam\u00e9ra \u00b7 Attrape les bons items avec tes mains \u00b7 Combos & rank D\u2192SENSEI",
     rules_reflex_rush_how:"Pose ton t\u00e9l\u00e9phone \u00e0 2m. 4 types d\u2019objets tombent du haut \u00b7 Attrape avec ta main : \ud83d\udfe6 b\u00e2ton (+10), \ud83c\udfc0 ballon (+20), \u2b50 \u00e9toile dor\u00e9e (+100 et bonus \u00d72 pendant 5s) \u00b7 \u00c9VITE la \ud83d\udca3 bombe (\u221250 pts et reset du combo)",
     rules_reflex_rush_score:"\ud83c\udfc6 Combos : \u00d72 \u00e0 4 catches, \u00d73 \u00e0 8, \u00d75 \u00e0 15 \u00b7 Rank live : D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Leaderboard top 10 par dur\u00e9e (30\/60\/90\/120s)",
@@ -14613,6 +14614,7 @@ function applyLangTracker(lang) {
     rules_tp_tuto:"5 ball racks are placed on the court. <b>Tap a rack</b> to pick a ball \u2192 it arrives at the center bottom. Then same gesture as SHOOT ARENA (drag and release). You have 60 seconds to shoot all 25 balls. The <b>last ball of each rack is gold</b> (money ball) and worth 2 points.",
     rules_cv_tuto:"You see the court from above with 5 blue players (your team) and 5 red players (opponents). A blue player has the ball \ud83c\udfc0. <b>Find the blue teammate who has NO red player stuck to him</b> (the \"open man\") and tap him. You only have 2 seconds per round.",
     arcade_reflex_rush_lbl:"SENSEI REFLEX RUSH",
+    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Catch with your camera \u00b7 Rank D\u2192SENSEI",
     rules_reflex_rush_pitch:"Camera arcade mode \u00b7 Catch good items with your hands \u00b7 Combos & rank D\u2192SENSEI",
     rules_reflex_rush_how:"Place your phone at 2m. 4 types of objects fall from the top \u00b7 Catch with your hand: \ud83d\udfe6 stick (+10), \ud83c\udfc0 ball (+20), \u2b50 gold star (+100 and \u00d72 bonus for 5s) \u00b7 AVOID the \ud83d\udca3 bomb (\u221250 pts and combo reset)",
     rules_reflex_rush_score:"\ud83c\udfc6 Combos: \u00d72 at 4 catches, \u00d73 at 8, \u00d75 at 15 \u00b7 Live rank: D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Top 10 leaderboard per duration (30\/60\/90\/120s)",
@@ -41392,6 +41394,17 @@ window._QI_DATA['pnr_05'] = {
         <div style="font-size:11px;color:#cfd3e0;letter-spacing:.5px;font-weight:600;margin-bottom:10px" data-i18n="arcade_memory_sub">🧠 Répète la séquence · Simon basket</div>
         <div id="arcade-best-memory" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
       </button>
+
+      <!-- Card SENSEI REFLEX RUSH (10e jeu — drill caméra DCOG, badge CAM 📸) -->
+      <!-- Lance le drill rush dans TRAIN → Cognitif plutôt qu'un jeu arcade on-screen -->
+      <button onclick="_arcade_launchReflexRush()" ontouchstart="" class="arcade-card"
+        style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.22),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(245,197,24,.25);font-family:inherit;overflow:hidden">
+        <div style="position:absolute;top:10px;right:10px;background:#f5c518;color:#0a0d18;font-size:9px;font-weight:900;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">CAM 📸</div>
+        <div style="font-size:44px;line-height:1;margin-bottom:12px">🎮⚡</div>
+        <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:6px" data-i18n="arcade_reflex_rush_lbl">SENSEI REFLEX RUSH</div>
+        <div style="font-size:11px;color:#cfd3e0;letter-spacing:.5px;font-weight:600;margin-bottom:10px" data-i18n="arcade_reflex_rush_sub">🎮⚡ Attrape à la caméra · Rank D→SENSEI</div>
+        <div id="arcade-best-reflex-rush" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
+      </button>
     </div>
 
     <!-- Footer stats globales -->
@@ -41430,6 +41443,44 @@ window._QI_DATA['pnr_05'] = {
     var m = document.getElementById('arcade-hub');
     if (m) m.style.display = 'none';
     document.body.style.overflow = '';
+  };
+
+  // 10e jeu : SENSEI REFLEX RUSH est un drill caméra DCOG (pas un jeu arcade on-screen)
+  // → ferme le hub arcade et route vers TRAIN → Cognitif → drill `rush`
+  window._arcade_launchReflexRush = function(){
+    try { window._arcade_close(); } catch(e){}
+    // Haptic feedback
+    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
+    // Petit délai pour laisser l'arcade se fermer visuellement avant de naviguer
+    setTimeout(function(){
+      // 1) Ouvrir la section TRAIN si elle existe
+      if (typeof window._showSection === 'function') {
+        try { window._showSection('train'); } catch(e){}
+      } else if (typeof window.showSection === 'function') {
+        try { window.showSection('train'); } catch(e){}
+      } else {
+        // Fallback : trigger un click sur l'onglet TRAIN
+        var trainBtn = document.querySelector('[onclick*="train"]');
+        if (trainBtn) trainBtn.click();
+      }
+      // 2) Ouvrir l'onglet DCOG (Cognitif)
+      setTimeout(function(){
+        if (typeof openTrainingTab === 'function') {
+          var dcogTab = document.querySelector('[onclick*="openTrainingTab(\'dcog\'"]');
+          try { openTrainingTab('dcog', dcogTab); } catch(e){}
+        }
+        // 3) Sélectionner le drill `rush` puis scroller vers lui
+        setTimeout(function(){
+          if (typeof _dcog_selectDrill === 'function') {
+            try { _dcog_selectDrill('rush'); } catch(e){}
+          }
+          var rushBtn = document.getElementById('dcog_btn_rush');
+          if (rushBtn && rushBtn.scrollIntoView) {
+            try { rushBtn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
+          }
+        }, 220);
+      }, 180);
+    }, 120);
   };
 
   // Lance un jeu depuis le hub (le hub reste ouvert en fond)
