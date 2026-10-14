@@ -44238,9 +44238,18 @@ if (G.imgBall) {
     items:[], particles:[],
     spawnTimer:null, rafId:null, lastT:0, sessionEndTs:0,
     itemId:0,
-    stats:{caught:0, missed:0, bombs:0, stars:0}
+    stats:{caught:0, missed:0, bombs:0, stars:0},
+    imgCourt:null   // fond terrain de basket (court.jpg) — identique aux autres jeux arcade
   };
   var LB_KEY_PREFIX = 'sensei_rr_lb_';
+
+  // Preload du court.jpg une seule fois au chargement (asset partagé avec les 9 autres jeux)
+  (function _rr_preloadCourt(){
+    var ci = new Image();
+    ci.onload = function(){ G.imgCourt = ci; };
+    ci.onerror = function(){ G.imgCourt = null; };
+    ci.src = 'court.jpg';
+  })();
 
   function _rr_setupCanvas(){
     G.canvas = document.getElementById('rr-canvas');
@@ -44616,12 +44625,26 @@ if (G.imgBall) {
   function _rr_draw(nowTs){
     var ctx = G.ctx; if (!ctx) return;
     var W = G.W, H = G.H;
-    // Fond gradient subtil
-    var grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#131820');
-    grad.addColorStop(1, '#0a0d14');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H);
+    // ═══ FOND : TERRAIN DE BASKET (court.jpg) — identique aux 9 autres jeux arcade ═══
+    if (G.imgCourt) {
+      var imgAR = G.imgCourt.naturalWidth / G.imgCourt.naturalHeight;
+      var canvasAR = W / H;
+      var dw, dh, dx, dy;
+      if (imgAR > canvasAR) { dh = H; dw = H * imgAR; dx = (W - dw) / 2; dy = 0; }
+      else                  { dw = W; dh = W / imgAR; dx = 0; dy = (H - dh) / 2; }
+      ctx.drawImage(G.imgCourt, dx, dy, dw, dh);
+      // Overlay sombre pour lisibilité du HUD + mise en valeur des items qui tombent
+      ctx.fillStyle = 'rgba(0,0,0,.3)';
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      // Fallback : dégradé sobre si court.jpg pas encore chargé
+      var grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#131820');
+      grad.addColorStop(1, '#0a0d14');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
 
     // Items
     for (var i = 0; i < G.items.length; i++) {
