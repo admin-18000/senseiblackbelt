@@ -2273,6 +2273,12 @@ window._dojoBackHome = function(){
         <div style="font-size:22px;margin-bottom:4px">🎾🎾🎾</div>
         <div id="dcog_lbl_viscoord">VISUOMOTOR COORDINATION</div>
       </button>
+      <!-- REACTION CATCHING STICK — 2ème drill coordination (bâtons qui tombent) -->
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('rcs')" id="dcog_btn_rcs"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">🟦🟦🟦</div>
+        <div id="dcog_lbl_rcs">REACTION CATCHING STICK</div>
+      </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
         style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
         <div style="font-size:22px;margin-bottom:4px">🧮</div>
@@ -2352,6 +2358,26 @@ window._dojoBackHome = function(){
       <!-- Hint setup terrain basket -->
       <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_vc_setupHint">
         📱 Pose ton téléphone contre un sac à 2m · 3 balles de tennis · 2 mains dans le cadre
+      </div>
+    </div>
+    <!-- ═══ REACTION CATCHING STICK — niveau de difficulté (intervalle entre drops) ═══ -->
+    <div id="dcog_optRcs" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_rcs_lvlLbl">⚡ NIVEAU</div>
+        <div style="display:flex;gap:8px">
+          <button class="dcog-rcs-lvl-btn" data-ms="3000" onclick="_dcog_rcs_setLevel(3000)" style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
+            🟢 <span id="dcog_rcs_lvlEasy">FACILE</span><br><span style="font-size:9px;opacity:.7">3,0s</span>
+          </button>
+          <button class="dcog-rcs-lvl-btn" data-ms="2500" onclick="_dcog_rcs_setLevel(2500)" style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
+            🟡 <span id="dcog_rcs_lvlNormal">NORMAL</span><br><span style="font-size:9px;opacity:.7">2,5s</span>
+          </button>
+          <button class="dcog-rcs-lvl-btn" data-ms="2000" onclick="_dcog_rcs_setLevel(2000)" style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
+            🔥 <span id="dcog_rcs_lvlHard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">2,0s</span>
+          </button>
+        </div>
+      </div>
+      <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rcs_setupHint">
+        📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu'ils touchent le sol
       </div>
     </div>
     <div id="dcog_optMath" style="display:none;gap:8px;flex-wrap:wrap">
@@ -2491,6 +2517,16 @@ window._dojoBackHome = function(){
         <div id="dcog_vcmHint" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px;text-align:center">
           Touche VRAI ou FAUX avec ta main
         </div>
+      </div>
+      <!-- ═══ REACTION CATCHING STICK overlay ═══
+           Les 6 bâtons + barre + stats sont dessinés dans le canvas via
+           _dcog_rcs_drawCanvasHud → gravés dans la vidéo exportée.
+           Les 2 flashs CSS (catch doré / miss rouge) restent en DOM. -->
+      <div id="dcog_rcsOverlay"
+        style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;background:transparent;pointer-events:none">
+        <div id="dcog_rcs_catchFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(245,197,24,.35) 0%,rgba(245,197,24,0) 60%);opacity:0;transition:opacity .25s;pointer-events:none"></div>
+        <div id="dcog_rcs_missFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(230,57,70,.3) 0%,rgba(230,57,70,0) 60%);opacity:0;transition:opacity .25s;pointer-events:none"></div>
+        <div id="dcog_rcs_bigMsg" style="position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:clamp(30px,8vw,56px);letter-spacing:4px;text-shadow:0 4px 24px rgba(0,0,0,.95);opacity:0;transition:opacity .3s;font-weight:900">✓ CATCH</div>
       </div>
       <!-- ═══ VISUOMOTOR COORDINATION overlay ═══
            Tout le HUD visuel (chrono circulaire, paliers, métronome, branding)
@@ -29937,22 +29973,28 @@ var _dcog_inited      = false;
    math=0, sprint=1, twoball=2, height=3, tboard=4
    Sous-modes: Height BAS=3, Height HAUT=6, TBoard 1 BALLON=4, TBoard 2 BALLONS=5 */
 var _dcog_VIDEOS = [
-  // ═══ VISUOMOTOR COORDINATION — 4 drills jonglage ═══
-  {id:'tLthFdKJu9k', title:'Visuomotor 1'},
-  {id:'m1gctvzz6nc', title:'Visuomotor 2'},
-  {id:'Em-ga58-bhY', title:'Visuomotor 3'},
-  {id:'l5xJnrnOEvk', title:'Visuomotor 4'},
-  // ═══ Drills DCOG existants (indices +4 vs ancienne version) ═══
-  {id:'gJe63xj-c6w', title:'Dribble Math'},
-  {id:'d2M3gWQyA6s', title:'300 / 600'},
-  {id:'aNeIFfhsy-0', title:'Two-Ball'},
-  {id:'ar6OA2wxwzw', title:'Dribble Height BAS'},
-  {id:'M7DtIYt1he8', title:'TBoard UN BALLON'},
-  {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS'},
-  {id:'UHNUSFHSrOo', title:'Dribble Height HAUT'},
-  {id:'5Fgt7txZEQc', title:'Burnout'},
-  {id:'eFXJ32fp54Q', title:'Burnout (alt)'},
-  {id:'pibR0Ri47PM', title:'Visual Math'}
+  // Chaque vidéo est taguée par son drill → le carrousel filtre dynamiquement
+  // selon _dcog_drill courant (dans _dcog_renderVids ci-dessous).
+  // ═══ VISUOMOTOR COORDINATION — 4 vidéos jonglage ═══
+  {id:'tLthFdKJu9k', title:'Visuomotor 1',       drill:'viscoord'},
+  {id:'m1gctvzz6nc', title:'Visuomotor 2',       drill:'viscoord'},
+  {id:'Em-ga58-bhY', title:'Visuomotor 3',       drill:'viscoord'},
+  {id:'l5xJnrnOEvk', title:'Visuomotor 4',       drill:'viscoord'},
+  // ═══ REACTION CATCHING STICK — 3 vidéos bâtons ═══
+  {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs'},
+  {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs'},
+  {id:'y5NsQVSRVB4', title:'Reaction Stick 3',   drill:'rcs'},
+  // ═══ Drills DCOG existants (1 vidéo chacun) ═══
+  {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
+  {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
+  {id:'aNeIFfhsy-0', title:'Two-Ball',           drill:'twoball'},
+  {id:'ar6OA2wxwzw', title:'Dribble Height BAS', drill:'height'},
+  {id:'M7DtIYt1he8', title:'TBoard UN BALLON',   drill:'tboard'},
+  {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS', drill:'tboard'},
+  {id:'UHNUSFHSrOo', title:'Dribble Height HAUT',drill:'height'},
+  {id:'5Fgt7txZEQc', title:'Burnout',            drill:'burnout'},
+  {id:'eFXJ32fp54Q', title:'Burnout (alt)',      drill:'burnout'},
+  {id:'pibR0Ri47PM', title:'Visual Math',        drill:'vcmath'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -29960,7 +30002,15 @@ var _dcog_initing = false; // supprime auto-open vidéo pendant init
 function _dcog_renderVids() {
   var el = document.getElementById('dcog_vidScroll');
   if (!el) return;
-  el.innerHTML = _dcog_VIDEOS.map(function(v,i) {
+  // Filtrer les vidéos du drill courant (avec fallback défensif : si rien ne match,
+  // on affiche tout plutôt qu'un carrousel vide — ex : drill sans tag)
+  var current = _dcog_drill;
+  var filtered = _dcog_VIDEOS.filter(function(v){ return v.drill === current; });
+  if (!filtered.length) filtered = _dcog_VIDEOS;
+  el.innerHTML = filtered.map(function(v) {
+    // On garde l'index GLOBAL dans _dcog_VIDEOS pour que _dcog_selectVid(i) et
+    // _dcogVidMap continuent de pointer sur les bons objets
+    var i = _dcog_VIDEOS.indexOf(v);
     var sel = _dcog_selVid === i;
     return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_dcog_selectVid('+i+')">'
       +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
@@ -30097,6 +30147,13 @@ function _dcog_applyLang(en) {
     'dcog_vc_setupHint': en?'📱 Place your phone against a bag at 2m · 3 tennis balls · both hands in frame':'📱 Pose ton téléphone contre un sac à 2m · 3 balles de tennis · 2 mains dans le cadre',
     'dcog_vc_skelOn':  en?'ON':'ON',
     'dcog_vc_skelOff': en?'OFF':'OFF',
+    // ═══ REACTION CATCHING STICK ═══
+    'dcog_lbl_rcs':      en?'REACTION CATCHING STICK':'REACTION CATCHING STICK',
+    'dcog_rcs_lvlLbl':   en?'⚡ LEVEL':'⚡ NIVEAU',
+    'dcog_rcs_lvlEasy':  en?'EASY':'FACILE',
+    'dcog_rcs_lvlNormal':en?'NORMAL':'NORMAL',
+    'dcog_rcs_lvlHard':  en?'HARD':'DIFFICILE',
+    'dcog_rcs_setupHint':en?'📱 Phone at 2m · full body in frame · 6 sticks drop in random order — catch each with your hand before it hits the floor':'📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu\'ils touchent le sol',
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id); if (el) el.textContent = map[id];
@@ -30123,11 +30180,19 @@ function _dcog_selectDrill(drill, langOnly) {
       typeof _dcog_vc_stopRun === 'function') {
     _dcog_vc_stopRun();
   }
+  // Idem pour rcs : stopper la boucle de jeu si l'utilisateur switch mid-session
+  if (!langOnly && _dcog_drill === 'rcs' && drill !== 'rcs' &&
+      typeof _dcog_rcs_running !== 'undefined' && _dcog_rcs_running &&
+      typeof _dcog_rcs_stopRun === 'function') {
+    _dcog_rcs_stopRun();
+  }
   _dcog_drill = drill;
   var en = window._lang === 'en';
   var descs = {
     viscoord: en ? '3-ball tennis juggling — streak, rhythm, visuomotor coordination'
                 : 'Jonglage 3 balles de tennis — streak, rythme, coordination visuomotrice',
+    rcs:     en ? '6 sticks drop one by one — catch each with your hand before it hits the floor. Reaction & reflex training.'
+                : '6 bâtons tombent un par un — attrape chacun avec ta main avant qu\'il touche le sol. Réaction & réflexes.',
     math:    en ? 'Solve math problems while dribbling — dual-task cognitive training'
                : 'Résous des opérations en dribblant — entraînement cognitif-moteur',
     sprint:  en ? 'Dribble as fast as possible — reach your target before time runs out'
@@ -30148,7 +30213,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -30157,18 +30222,19 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord utilise flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' ? '12px' : '8px');
+        // viscoord et rcs utilisent flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' ? '12px' : '8px');
       }
     });
     // Update opt title
     var optTitles = {
       viscoord:en ? '🎾🎾🎾 CHALLENGE' : '🎾🎾🎾 CHALLENGE',
+      rcs:     en ? '🟦 LEVEL'          : '🟦 NIVEAU',
       math:    en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       sprint:  en ? '⏱ TARGET'          : '⏱ OBJECTIF',
       height:  en ? '📏 HEIGHT ZONE'    : '📏 ZONE DE HAUTEUR',
@@ -30182,6 +30248,7 @@ function _dcog_selectDrill(drill, langOnly) {
     // Score labels
     var scoreLabels = {
       viscoord:[en?'BEST STREAK':'STREAK MAX', en?'PALIER':'PALIER',   en?'TIME':'TEMPS'],
+      rcs:     [en?'CATCHES':'CATCHES',  en?'MISSED':'RATÉS',       en?'AVG REACT':'RÉACTION MOY.'],
       math:    [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
       sprint:  [en?'DRIBBLES':'DRIBBLES', en?'TARGET':'OBJECTIF',   en?'TIME':'TEMPS'],
       height:  [en?'IN ZONE %':'% EN ZONE', en?'FRAMES':'FRAMES',   en?'TIME':'TEMPS'],
@@ -30198,10 +30265,14 @@ function _dcog_selectDrill(drill, langOnly) {
     var db = document.getElementById('dcog_dualTaskBar');
     if (db) db.style.display = (drill === 'math' || drill === 'vcmath') ? 'block' : 'none';
 
-    // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
+    // 🎬 Re-render du carrousel filtré sur le drill courant
+    if (typeof _dcog_renderVids === 'function') _dcog_renderVids();
+    // Auto-open vidéo démo correspondante (sauf pendant l'init auto)
     if (!_dcog_initing) {
-      // viscoord ouvre par défaut sa 1ère vidéo (idx 0) ; les 3 autres (1,2,3) sont accessibles manuellement
-      var _dcogVidMap = { viscoord:0, math:4, sprint:5, twoball:6, height:7, tboard:8, burnout:11, vcmath:13 };
+      // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
+      // rcs : idx 4 (2 autres accessibles manuellement 5,6)
+      // Autres drills DCOG : indices +7 vs tout premier état
+      var _dcogVidMap = { viscoord:0, rcs:4, math:7, sprint:8, twoball:9, height:10, tboard:11, burnout:14, vcmath:16 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -30213,7 +30284,7 @@ function _dcog_selectDrill(drill, langOnly) {
 /* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   // tr-tab : onglets Training
-  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn,.dcog-vc-obj-btn,.dcog-vc-metro-btn,.dcog-vc-skel-btn').forEach(function(btn) {
+  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn,.dcog-vc-obj-btn,.dcog-vc-metro-btn,.dcog-vc-skel-btn,.dcog-rcs-lvl-btn').forEach(function(btn) {
     btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
   });
   // tr-btn : boutons START/STOP/SAVE
@@ -30268,11 +30339,11 @@ function _dcog_setHeightZone(zone) {
     b.style.color = active?'#f5c518':'#7a8299';
   });
   // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
-  // Indices +4 depuis l'ajout des 4 videos VISUOMOTOR en tête
-  // BAS (low) → index 7 (Dribble Height BAS = ar6OA2wxwzw)
-  // HAUT (high) → index 10 (Dribble Height HAUT = UHNUSFHSrOo)
+  // Indices +7 depuis l'ajout des 4 videos VISUOMOTOR + 3 RCS en tête
+  // BAS (low) → index 10 (Dribble Height BAS = ar6OA2wxwzw)
+  // HAUT (high) → index 13 (Dribble Height HAUT = UHNUSFHSrOo)
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (zone === 'high') ? 10 : (zone === 'low') ? 7 : null;
+    var idx = (zone === 'high') ? 13 : (zone === 'low') ? 10 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
@@ -30355,11 +30426,13 @@ function _dcog_stop() {
   if (typeof _dcog_tbd_cleanup === 'function') _dcog_tbd_cleanup();
   // overlay géré par senseiCamStop()
   // Hide all overlays
-  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay','dcog_vcmOverlay','dcog_viscoordOverlay'].forEach(function(id){
+  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay','dcog_vcmOverlay','dcog_viscoordOverlay','dcog_rcsOverlay'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   // Stop viscoord run (timer, métronome, MediaPipe) si actif
   if (typeof _dcog_vc_stopRun === 'function') _dcog_vc_stopRun();
+  // Stop rcs run (séquence drops) si actif
+  if (typeof _dcog_rcs_stopRun === 'function') _dcog_rcs_stopRun();
   var bRec2 = document.getElementById('dcog_btnRec');
   if (bRec2) bRec2.style.display = 'none';
   var btnS = document.getElementById('dcog_btnStart');
@@ -30381,7 +30454,13 @@ function _dcog_stop() {
 function _dcog_recordToProgression() {
   if (typeof _sb_recordSession !== 'function') return;
   var dcogPct = 0;
-  if (_dcog_drill === 'viscoord') {
+  if (_dcog_drill === 'rcs') {
+    // Score = % de catches réussis sur 6 drops
+    var cR = _dcog_rcs_catches || 0;
+    var tR = (_dcog_rcs_catches || 0) + (_dcog_rcs_misses || 0);
+    dcogPct = tR > 0 ? Math.round(cR / tR * 100) : 0;
+    _sb_recordSession('rcs', dcogPct);
+  } else if (_dcog_drill === 'viscoord') {
     // Score basé sur le palier atteint (0=10%, 15s=25%, 30s=40%, 1min=55%, 2min=70%, 3min=85%, 5min=100%)
     dcogPct = _dcog_vc_curPalier >= 300 ? 100 : _dcog_vc_curPalier >= 180 ? 85 : _dcog_vc_curPalier >= 120 ? 70 : _dcog_vc_curPalier >= 60 ? 55 : _dcog_vc_curPalier >= 30 ? 40 : _dcog_vc_curPalier >= 15 ? 25 : 10;
     _sb_recordSession('viscoord', dcogPct);
@@ -30517,7 +30596,8 @@ function _dcog_launchDrill() {
     math:'dcog_mathOverlay', sprint:'dcog_sprintOverlay',
     height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay',
     vcmath:'dcog_vcmOverlay',
-    viscoord:'dcog_viscoordOverlay'
+    viscoord:'dcog_viscoordOverlay',
+    rcs:'dcog_rcsOverlay'
   };
   Object.keys(overlays).forEach(function(d){
     var el = document.getElementById(overlays[d]);
@@ -30533,9 +30613,9 @@ function _dcog_launchDrill() {
   // VISUOMOTOR COORDINATION : NE PAS démarrer _dcog_vc_startRun ici
   // → il sera lancé APRÈS le countdown de 10s (branche n<=0) pour que
   //   le chrono parte vraiment de 0:00 quand le user commence à jongler
-  // Timer session pour les drills non-math/vcmath/viscoord (sprint/height/twoball/tboard/burnout)
-  // viscoord a son propre timer dédié (durée + ∞ gérés dans _dcog_vc_startRun)
-  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath' && _dcog_drill !== 'viscoord') {
+  // Timer session pour les drills non-math/vcmath/viscoord/rcs
+  // viscoord ET rcs ont leur propre timer dédié (durée gérée dans leur startRun)
+  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath' && _dcog_drill !== 'viscoord' && _dcog_drill !== 'rcs') {
     _dcog_sessSec = 0;
     if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
     _dcog_sessTimer = setInterval(function(){
@@ -30600,6 +30680,10 @@ function _dcog_launchDrill() {
       if (_dcog_drill === 'viscoord' && typeof _dcog_vc_startRun === 'function') {
         _dcog_vc_startRun();
       }
+      // REACTION CATCHING STICK : démarrer la séquence de 6 drops après le countdown
+      if (_dcog_drill === 'rcs' && typeof _dcog_rcs_startRun === 'function') {
+        _dcog_rcs_startRun();
+      }
       setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50);
       return;
     }
@@ -30616,8 +30700,8 @@ function _dcog_launchDrill() {
     ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillStyle='#fff';
     ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
-    // Branding "SENSEI VISUOMOTOR" top-right pendant le countdown (viscoord uniquement)
-    if (_dcog_drill === 'viscoord') {
+    // Branding "SENSEI VISUOMOTOR" / "SENSEI REACTION STICK" top-right pendant le countdown
+    if (_dcog_drill === 'viscoord' || _dcog_drill === 'rcs') {
       ctx.textAlign='right';
       ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,0.95)';
       ctx.fillStyle='#f5c518';
@@ -30625,7 +30709,8 @@ function _dcog_launchDrill() {
       ctx.fillText('SENSEI', W-W*0.025, H*0.065);
       ctx.fillStyle='rgba(255,255,255,0.85)';
       ctx.font='bold '+Math.round(H*0.027)+'px "Barlow Condensed",sans-serif';
-      ctx.fillText('VISUOMOTOR 🎾🎾🎾', W-W*0.025, H*0.105);
+      var brandSub = (_dcog_drill === 'viscoord') ? 'VISUOMOTOR 🎾🎾🎾' : 'REACTION STICK 🟦';
+      ctx.fillText(brandSub, W-W*0.025, H*0.105);
     }
     ctx.restore();
     // Logo SENSEI + "Powered by SENSEI AI" dès le countdown (branding présent du START jusqu'à l'enregistrement)
@@ -30651,6 +30736,7 @@ function _dcog_detect() {
     if (_dcog_drill === 'twoball') _dcog_analyzeTwoBall(poses);
     if (_dcog_drill === 'sprint')  _dcog_analyzeSprintWrist(poses);
     if (_dcog_drill === 'tboard' && typeof _dcog_tbd_analyzePose === 'function') _dcog_tbd_analyzePose(poses);
+    if (_dcog_drill === 'rcs' && typeof _dcog_rcs_analyzePose === 'function') _dcog_rcs_analyzePose(poses);
     _dcog_detectWristBpm(poses);  // BPM MoveNet — tous les drills
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
   }).catch(function() {
@@ -30671,6 +30757,10 @@ function _dcog_drawFrame(poses) {
   // ═══ VISUOMOTOR COORDINATION — dessin HUD gravé dans le canvas pour export vidéo ═══
   if (_dcog_drill === 'viscoord' && _dcog_running && typeof _dcog_vc_drawCanvasHud === 'function') {
     _dcog_vc_drawCanvasHud(ctx, W, H);
+  }
+  // ═══ REACTION CATCHING STICK — bâtons + stats gravés dans la vidéo ═══
+  if (_dcog_drill === 'rcs' && _dcog_running && typeof _dcog_rcs_drawCanvasHud === 'function') {
+    _dcog_rcs_drawCanvasHud(ctx, W, H);
   }
   // Draw two ball height lines on canvas
   if (_dcog_drill === 'twoball' && _dcog_running &&
@@ -32418,6 +32508,19 @@ function _dcog_showResults() {
     html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsH+'">'+pctH+'%</span></div><div class="tr-score-lbl">'+(en?'IN ZONE':'EN ZONE')+'</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_heightFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+(_dcog_heightZone==='low'?(en?'LOW':'BAS'):(en?'HIGH':'HAUT'))+'</div><div class="tr-score-lbl">'+(en?'ZONE':'ZONE')+'</div></div>';
+  } else if (_dcog_drill === 'rcs') {
+    // REACTION CATCHING STICK : catches / miss / temps de réaction moyen
+    var catches = _dcog_rcs_catches || 0;
+    var misses  = _dcog_rcs_misses || 0;
+    var totalRcs = catches + misses;
+    var pctRcs = totalRcs > 0 ? Math.round(catches / totalRcs * 100) : 0;
+    var avgReact = (_dcog_rcs_reactTimes && _dcog_rcs_reactTimes.length > 0)
+      ? Math.round(_dcog_rcs_reactTimes.reduce(function(a,b){return a+b;},0) / _dcog_rcs_reactTimes.length)
+      : 0;
+    var clsRcs = pctRcs >= 80 ? 'tr-hl' : pctRcs >= 50 ? 'tr-warn' : 'tr-bad';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+catches+'/'+totalRcs+'</div><div class="tr-score-lbl">'+(en?'CATCHES':'CATCHES')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsRcs+'">'+pctRcs+'%</span></div><div class="tr-score-lbl">'+(en?'ACCURACY':'PRÉCISION')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num">'+(avgReact>0?avgReact+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION MOY.')+'</div></div>';
   } else if (_dcog_drill === 'viscoord') {
     // VISUOMOTOR : best streak + palier débloqué + durée totale
     var bestSec = Math.floor(_dcog_vc_bestElap || 0);
@@ -32458,9 +32561,18 @@ function _dcog_saveSession() {
   var en  = window._lang === 'en';
   var now = new Date();
   var d   = now.toLocaleDateString(en?'en-US':'fr-FR',{day:'numeric',month:'short'});
-  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD',viscoord:en?'Visuomotor':'Visuomoteur'};
+  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD',viscoord:en?'Visuomotor':'Visuomoteur',rcs:en?'Reaction Stick':'Bâtons Réaction'};
   var score = 0, detail = '';
-  if (_dcog_drill==='viscoord') {
+  if (_dcog_drill==='rcs') {
+    var catchesS = _dcog_rcs_catches || 0;
+    var missesS  = _dcog_rcs_misses || 0;
+    var totS = catchesS + missesS;
+    score  = totS > 0 ? Math.round(catchesS / totS * 100) : 0;
+    var avgR = (_dcog_rcs_reactTimes && _dcog_rcs_reactTimes.length > 0)
+      ? Math.round(_dcog_rcs_reactTimes.reduce(function(a,b){return a+b;},0) / _dcog_rcs_reactTimes.length)
+      : 0;
+    detail = catchesS+'/'+totS+' · '+(avgR>0?avgR+'ms':(en?'no react':'sans réaction'));
+  } else if (_dcog_drill==='viscoord') {
     var secTot = Math.floor(_dcog_vc_bestElap || 0);
     var tmm = Math.floor(secTot/60), tss = secTot%60;
     score  = _dcog_vc_curPalier >= 300 ? 100 : _dcog_vc_curPalier >= 180 ? 85 : _dcog_vc_curPalier >= 120 ? 70 : _dcog_vc_curPalier >= 60 ? 55 : _dcog_vc_curPalier >= 30 ? 40 : _dcog_vc_curPalier >= 15 ? 25 : 10;
@@ -32635,11 +32747,11 @@ function _dcog_setTboardMode(mode) {
     b.style.color      = active ? '#f5c518' : '#7a8299';
   }
   // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
-  // Indices +4 depuis l'ajout des 4 videos VISUOMOTOR en tête
-  // 'one' (1 BALLON) → index 8 (TBoard UN BALLON = M7DtIYt1he8)
-  // 'two' (2 BALLONS) → index 9 (TBoard - 2 BALLONS = DJHKF-LCaKE)
+  // Indices +7 depuis l'ajout des 4 videos VISUOMOTOR + 3 RCS en tête
+  // 'one' (1 BALLON) → index 11 (TBoard UN BALLON = M7DtIYt1he8)
+  // 'two' (2 BALLONS) → index 12 (TBoard - 2 BALLONS = DJHKF-LCaKE)
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (mode === 'two') ? 9 : (mode === 'one') ? 8 : null;
+    var idx = (mode === 'two') ? 12 : (mode === 'one') ? 11 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
@@ -33184,6 +33296,427 @@ function _dcog_tbd_cleanup() {
   _dcog_tbd_prevRWr = null;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   REACTION CATCHING STICK 🟦🟦🟦
+   ─────────────────────────────────────────────────────────────────
+   Réplique virtuelle de l'objet réel : 6 bâtons bleus suspendus sous
+   une barre jaune. Toutes les N ms (3000/2500/2000 selon niveau),
+   un bâton random se détache et tombe par gravité. L'utilisateur
+   doit amener sa main (poignet détecté par MoveNet) dans la zone du
+   bâton AVANT qu'il sorte de l'écran.
+   → même pattern que TDR : collision poignet / bounding box objet
+   → session = 6 drops × 2.5s = ~15s par run
+═══════════════════════════════════════════════════════════════════ */
+var _dcog_rcs_running   = false;
+var _dcog_rcs_intervalMs = 2500;    // niveau NORMAL par défaut
+var _dcog_rcs_sticks    = [];       // 6 objets {idx, state, dropStartTs, catchTs, y, vy}
+var _dcog_rcs_dropOrder = [];       // ordre random des 6 drops
+var _dcog_rcs_curDropIdx = 0;       // combien de bâtons ont déjà commencé à tomber
+var _dcog_rcs_catches   = 0;
+var _dcog_rcs_misses    = 0;
+var _dcog_rcs_reactTimes = [];
+var _dcog_rcs_dropTimer = null;
+var _dcog_rcs_rafId     = null;
+var _dcog_rcs_lastFrameTs = 0;
+var _dcog_rcs_particles = [];       // burst de particules sur catch
+var _dcog_rcs_gravity   = 1600;     // px/s² sur canvas 480h (ajusté par H dynamique)
+var _dcog_rcs_sessionEndTs = 0;
+
+/* ── Setter niveau de difficulté ─────────────────────────────── */
+function _dcog_rcs_setLevel(ms) {
+  _dcog_rcs_intervalMs = ms;
+  document.querySelectorAll('.dcog-rcs-lvl-btn').forEach(function(b){
+    var active = parseInt(b.dataset.ms,10) === ms;
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+
+/* ── Démarrage d'une session (après countdown) ───────────────── */
+function _dcog_rcs_startRun() {
+  _dcog_rcs_running = true;
+  _dcog_rcs_catches = 0;
+  _dcog_rcs_misses = 0;
+  _dcog_rcs_reactTimes = [];
+  _dcog_rcs_particles = [];
+  _dcog_rcs_curDropIdx = 0;
+  _dcog_rcs_lastFrameTs = 0;
+  // Init 6 bâtons dans l'état "hanging" (accrochés en haut)
+  _dcog_rcs_sticks = [];
+  for (var i = 0; i < 6; i++) {
+    _dcog_rcs_sticks.push({
+      idx: i,
+      state: 'hanging',   // 'hanging' | 'falling' | 'caught' | 'missed'
+      dropStartTs: 0,
+      catchTs: 0,
+      y: 0,               // décalage vertical depuis la position accrochée
+      vy: 0,
+      landedY: 0          // Y de chute finale (si missed)
+    });
+  }
+  // Ordre random des 6 drops (Fisher-Yates shuffle)
+  _dcog_rcs_dropOrder = [0,1,2,3,4,5];
+  for (var j = _dcog_rcs_dropOrder.length - 1; j > 0; j--) {
+    var r = Math.floor(Math.random() * (j + 1));
+    var tmp = _dcog_rcs_dropOrder[j];
+    _dcog_rcs_dropOrder[j] = _dcog_rcs_dropOrder[r];
+    _dcog_rcs_dropOrder[r] = tmp;
+  }
+  // 1er drop immédiat, puis setInterval
+  _dcog_rcs_dropNext();
+  _dcog_rcs_dropTimer = setInterval(_dcog_rcs_dropNext, _dcog_rcs_intervalMs);
+  // rAF pour physique de chute + animations particules
+  _dcog_rcs_rafId = requestAnimationFrame(_dcog_rcs_physicsLoop);
+}
+
+function _dcog_rcs_dropNext() {
+  if (!_dcog_rcs_running) return;
+  if (_dcog_rcs_curDropIdx >= 6) {
+    // Tous les bâtons sont tombés → laisser 2s puis fin de session
+    clearInterval(_dcog_rcs_dropTimer); _dcog_rcs_dropTimer = null;
+    _dcog_rcs_sessionEndTs = Date.now() + 2000;
+    return;
+  }
+  // ⚠ Anti-superposition : si un bâton est encore en chute, on repousse le drop
+  //    de 300ms et on retente — garantit qu'un seul bâton tombe à la fois
+  //    (comme dans la vraie vie, le coach attend que le bâton précédent soit
+  //     attrapé ou tombé avant de lâcher le suivant).
+  var anyFalling = false;
+  for (var k = 0; k < _dcog_rcs_sticks.length; k++) {
+    if (_dcog_rcs_sticks[k].state === 'falling') { anyFalling = true; break; }
+  }
+  if (anyFalling) {
+    setTimeout(_dcog_rcs_dropNext, 300);
+    return;
+  }
+  var stickIdx = _dcog_rcs_dropOrder[_dcog_rcs_curDropIdx];
+  var stk = _dcog_rcs_sticks[stickIdx];
+  if (stk && stk.state === 'hanging') {
+    stk.state = 'falling';
+    stk.dropStartTs = Date.now();
+    stk.y = 0; stk.vy = 0;
+    // Beep de signal au drop (dans le stream REC via _td_destNode)
+    try { _td_beep(660, 0.08, 0.2); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+  _dcog_rcs_curDropIdx++;
+}
+
+function _dcog_rcs_physicsLoop() {
+  if (!_dcog_rcs_running) return;
+  var nowTs = Date.now();
+  var dt = _dcog_rcs_lastFrameTs ? (nowTs - _dcog_rcs_lastFrameTs) / 1000 : 0.016;
+  _dcog_rcs_lastFrameTs = nowTs;
+  if (dt > 0.1) dt = 0.1; // cap pour éviter saut si tab background
+  // Hauteur de référence pour la gravité (dynamique selon canvas)
+  var cv = _dcog_canvas;
+  var Href = cv ? cv.height : 480;
+  var gravScale = Href / 480;
+  // Update bâtons en chute
+  for (var i = 0; i < _dcog_rcs_sticks.length; i++) {
+    var s = _dcog_rcs_sticks[i];
+    if (s.state === 'falling') {
+      s.vy += _dcog_rcs_gravity * gravScale * dt;
+      s.y += s.vy * dt;
+      // Si bâton sort du bas de l'écran → miss
+      // Le bâton part accroché à y=0 (haut), tombe jusqu'à y=Href→ miss
+      if (s.y > Href * 0.85) {
+        s.state = 'missed';
+        s.landedY = Href * 0.85;
+        _dcog_rcs_misses++;
+        _dcog_rcs_onMiss();
+      }
+    }
+  }
+  // Update particules (fade out + physique simple)
+  var kept = [];
+  for (var p = 0; p < _dcog_rcs_particles.length; p++) {
+    var pt = _dcog_rcs_particles[p];
+    pt.life -= dt;
+    if (pt.life > 0) {
+      pt.x += pt.vx * dt;
+      pt.y += pt.vy * dt;
+      pt.vy += 300 * gravScale * dt;
+      kept.push(pt);
+    }
+  }
+  _dcog_rcs_particles = kept;
+  // Vérifier fin de session (tous les bâtons posés + 2s de grâce)
+  if (_dcog_rcs_sessionEndTs > 0 && nowTs > _dcog_rcs_sessionEndTs) {
+    _dcog_rcs_sessionEndTs = 0;
+    var en = window._lang === 'en';
+    try { _td_beep(440, 0.3, 0.3); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    _sensei_speak(en ? 'Session done!' : 'Session terminée !', 0);
+    _dcog_stop();
+    _dcog_showResults();
+    _dcog_recordToProgression();
+    var btnSv = document.getElementById('dcog_btnSave');
+    if (btnSv) btnSv.style.display = 'flex';
+    _senseiEndSession(4000);
+    return;
+  }
+  if (_dcog_rcs_running) _dcog_rcs_rafId = requestAnimationFrame(_dcog_rcs_physicsLoop);
+}
+
+function _dcog_rcs_stopRun() {
+  _dcog_rcs_running = false;
+  if (_dcog_rcs_dropTimer) { clearInterval(_dcog_rcs_dropTimer); _dcog_rcs_dropTimer = null; }
+  if (_dcog_rcs_rafId) { cancelAnimationFrame(_dcog_rcs_rafId); _dcog_rcs_rafId = null; }
+  _dcog_rcs_sessionEndTs = 0;
+}
+
+/* ── Analyse pose : détection catch — PIPELINE IDENTIQUE À TDR / DCOG MATH ──
+   → Utilise _tsym_kp_hand qui prolonge le vecteur coude→poignet de +25%
+     pour simuler la vraie position de la main (bout des doigts).
+   → Applique le même scale video→canvas et le même flip mirror.
+   → Zéro régression vs TDR targets : exactement la même logique de détection
+     (seul le "quoi tester" change : bounding box de bâton tombant au lieu de
+      cible circulaire fixe).                                                 */
+function _dcog_rcs_analyzePose(poses) {
+  if (!_dcog_rcs_running || !poses || !poses[0]) return;
+  if (!_dcog_canvas || !_dcog_video) return;
+  var W = _dcog_canvas.width, H = _dcog_canvas.height;
+  // Scale video→canvas (si capture 1920×1080 ou 1280×720, remettre à 640×480)
+  var sx = W / (_dcog_video.videoWidth  || 640);
+  var sy = H / (_dcog_video.videoHeight || 480);
+  // 2 "mains" : helper partagé _tsym_kp_hand (coude + extrapolation +25%)
+  var hands = [];
+  ['left','right'].forEach(function(side){
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    hands.push({ x: W - kp.x * sx, y: kp.y * sy }); // mirror horizontal (vidéo miroir)
+  });
+  if (!hands.length) return;
+  // Pour chaque bâton EN CHUTE, check collision avec une main
+  for (var i = 0; i < _dcog_rcs_sticks.length; i++) {
+    var s = _dcog_rcs_sticks[i];
+    if (s.state !== 'falling') continue;
+    var bb = _dcog_rcs_getStickBBox(i, s, W, H);
+    // Tolérance : zone catch élargie pour compenser latence MoveNet (~2 frames)
+    var tolX = W * 0.035;
+    var tolY = H * 0.045;
+    for (var h = 0; h < hands.length; h++) {
+      var hd = hands[h];
+      if (hd.x >= bb.x - tolX && hd.x <= bb.x + bb.w + tolX &&
+          hd.y >= bb.y - tolY && hd.y <= bb.y + bb.h + tolY) {
+        _dcog_rcs_onCatch(i, s, bb);
+        break;
+      }
+    }
+  }
+}
+
+/* ── Catch réussi ─────────────────────────────────────────────── */
+function _dcog_rcs_onCatch(stickIdx, stk, bb) {
+  stk.state = 'caught';
+  stk.catchTs = Date.now();
+  var reactMs = stk.catchTs - stk.dropStartTs;
+  _dcog_rcs_reactTimes.push(reactMs);
+  _dcog_rcs_catches++;
+  // Burst de particules dorées
+  for (var i = 0; i < 18; i++) {
+    var ang = Math.random() * Math.PI * 2;
+    var spd = 100 + Math.random() * 180;
+    _dcog_rcs_particles.push({
+      x: bb.x + bb.w/2, y: bb.y + bb.h/2,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 50,
+      life: 0.6 + Math.random() * 0.4,
+      color: Math.random() < 0.3 ? '#fff' : '#f5c518'
+    });
+  }
+  try { _td_beep(1200, 0.1, 0.3); } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([25, 15, 40]);
+  // Flash doré CSS
+  var flash = document.getElementById('dcog_rcs_catchFlash');
+  if (flash) { flash.style.opacity = '1'; setTimeout(function(){ if(flash) flash.style.opacity = '0'; }, 280); }
+  var msg = document.getElementById('dcog_rcs_bigMsg');
+  if (msg) {
+    var en = window._lang === 'en';
+    msg.textContent = '✓ ' + reactMs + 'ms';
+    msg.style.color = '#f5c518';
+    msg.style.opacity = '1';
+    setTimeout(function(){ if(msg) msg.style.opacity = '0'; }, 900);
+  }
+  // Si c'est le dernier bâton ET aucun autre encore en chute → fin anticipée
+  if (_dcog_rcs_curDropIdx >= 6) {
+    var allDone = true;
+    for (var k = 0; k < _dcog_rcs_sticks.length; k++) {
+      if (_dcog_rcs_sticks[k].state === 'falling' || _dcog_rcs_sticks[k].state === 'hanging') {
+        allDone = false; break;
+      }
+    }
+    if (allDone && _dcog_rcs_sessionEndTs === 0) _dcog_rcs_sessionEndTs = Date.now() + 1500;
+  }
+}
+
+/* ── Miss (bâton touche le sol) ───────────────────────────────── */
+function _dcog_rcs_onMiss() {
+  try { _td_beep(220, 0.15, 0.25); } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([80]);
+  var flash = document.getElementById('dcog_rcs_missFlash');
+  if (flash) { flash.style.opacity = '1'; setTimeout(function(){ if(flash) flash.style.opacity = '0'; }, 280); }
+  var msg = document.getElementById('dcog_rcs_bigMsg');
+  if (msg) {
+    var en = window._lang === 'en';
+    msg.textContent = en ? '✗ MISS' : '✗ RATÉ';
+    msg.style.color = '#e63946';
+    msg.style.opacity = '1';
+    setTimeout(function(){ if(msg) msg.style.opacity = '0'; }, 900);
+  }
+  // Si tous les bâtons sont tombés → fin anticipée
+  if (_dcog_rcs_curDropIdx >= 6) {
+    var allDone = true;
+    for (var k = 0; k < _dcog_rcs_sticks.length; k++) {
+      if (_dcog_rcs_sticks[k].state === 'falling' || _dcog_rcs_sticks[k].state === 'hanging') {
+        allDone = false; break;
+      }
+    }
+    if (allDone && _dcog_rcs_sessionEndTs === 0) _dcog_rcs_sessionEndTs = Date.now() + 1500;
+  }
+}
+
+/* ── Géométrie d'un bâton (bounding box) ──────────────────────── */
+function _dcog_rcs_getStickBBox(idx, stk, W, H) {
+  // 6 bâtons fins et élégants, répartis horizontalement avec gaps larges
+  // → look mobile = look PC (toutes les dimensions sont proportionnelles au canvas)
+  var marginX = W * 0.06;
+  var usableW = W - 2 * marginX;
+  var gapRatio = 0.6;               // gap large entre bâtons = plus fin visuellement
+  // 6 bâtons + 5 gaps : stickW × (6 + 5 × gapRatio) = usableW
+  var stickW = usableW / (6 + 5 * gapRatio);
+  var gap = stickW * gapRatio;
+  var xStart = marginX + idx * (stickW + gap);
+  var stickH = H * 0.32;            // bâton plus court = moins envahissant (était 0.42)
+  var yTopHanging = H * 0.095;      // sous la barre jaune
+  var yTop = yTopHanging + stk.y;
+  return { x: xStart, y: yTop, w: stickW, h: stickH };
+}
+
+/* ── Dessin HUD RCS (gravé dans la vidéo exportée) ──────────── */
+function _dcog_rcs_drawCanvasHud(ctx, W, H) {
+  ctx.save();
+  var en = window._lang === 'en';
+
+  // ═══ BARRE JAUNE EN HAUT (support des bâtons) ═══
+  var barY = H * 0.02, barH = H * 0.06;
+  ctx.fillStyle = '#f5c518';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 10;
+  _dcog_vc_roundRect(ctx, W * 0.03, barY, W * 0.94, barH, barH / 3);
+  ctx.fill();
+  // 3 petits trous noirs au centre (détail fidèle à l'objet réel)
+  ctx.fillStyle = '#000';
+  ctx.shadowBlur = 0;
+  var hCy = barY + barH / 2;
+  var hR = barH * 0.12;
+  for (var hi = -1; hi <= 1; hi++) {
+    ctx.beginPath();
+    ctx.arc(W/2 + hi * W * 0.025, hCy, hR, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ═══ 6 BÂTONS (design épuré, fin, mobile-first) ═══
+  for (var i = 0; i < _dcog_rcs_sticks.length; i++) {
+    var s = _dcog_rcs_sticks[i];
+    var bb = _dcog_rcs_getStickBBox(i, s, W, H);
+    // Couleur selon état
+    var bodyColor, capColor, glowColor;
+    if (s.state === 'caught') {
+      bodyColor = '#f5c518'; capColor = '#2a2200'; glowColor = 'rgba(245,197,24,0.9)';
+    } else if (s.state === 'missed') {
+      bodyColor = '#e63946'; capColor = '#2a0000'; glowColor = 'rgba(230,57,70,0.7)';
+    } else if (s.state === 'falling') {
+      bodyColor = '#4cc9f0'; capColor = '#f5c518'; glowColor = 'rgba(76,201,240,0.95)';
+    } else {
+      bodyColor = '#1d7fb5'; capColor = '#d4a700'; glowColor = 'rgba(0,0,0,0.4)';
+    }
+    ctx.save();
+    if (s.state === 'falling') { ctx.shadowBlur = 16; ctx.shadowColor = glowColor; }
+    else if (s.state === 'caught') { ctx.shadowBlur = 20; ctx.shadowColor = glowColor; }
+    else { ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(0,0,0,0.55)'; }
+    // Corps principal : rectangle très arrondi (quasi-pilule), plus mince
+    ctx.fillStyle = bodyColor;
+    var bodyR = bb.w * 0.42;        // arrondis = quasi pilule
+    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.09, bb.w, bb.h * 0.82, bodyR);
+    ctx.fill();
+    // Highlight vertical sur la gauche (effet cylindre 3D)
+    ctx.shadowBlur = 0;
+    var hlGrad = ctx.createLinearGradient(bb.x, 0, bb.x + bb.w, 0);
+    hlGrad.addColorStop(0,    'rgba(255,255,255,0.25)');
+    hlGrad.addColorStop(0.3,  'rgba(255,255,255,0.08)');
+    hlGrad.addColorStop(0.65, 'rgba(0,0,0,0)');
+    hlGrad.addColorStop(1,    'rgba(0,0,0,0.25)');
+    ctx.fillStyle = hlGrad;
+    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.09, bb.w, bb.h * 0.82, bodyR);
+    ctx.fill();
+    // Bouchons haut/bas (jaunes, plus discrets — plus petits et sans débord)
+    ctx.fillStyle = (s.state === 'caught' || s.state === 'missed') ? capColor : '#f5c518';
+    _dcog_vc_roundRect(ctx, bb.x, bb.y, bb.w, bb.h * 0.11, bb.w * 0.4);
+    ctx.fill();
+    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.89, bb.w, bb.h * 0.11, bb.w * 0.4);
+    ctx.fill();
+    ctx.restore();
+    // Numéro du bâton (petit, discret, au centre quand accroché)
+    if (s.state === 'hanging') {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = 'bold ' + Math.round(bb.w * 0.5) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowBlur = 3; ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.fillText(String(i+1), bb.x + bb.w/2, bb.y + bb.h * 0.5);
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  // ═══ PARTICULES catch (dessinées par-dessus) ═══
+  for (var p = 0; p < _dcog_rcs_particles.length; p++) {
+    var pt = _dcog_rcs_particles[p];
+    var alpha = Math.max(0, pt.life);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = pt.color;
+    ctx.shadowBlur = 8; ctx.shadowColor = pt.color;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, Math.max(2, H * 0.006), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+
+  // ═══ SCORE EN BAS GAUCHE (opposé au logo bas-droit) ═══
+  var scoreY = H * 0.88;
+  var scoreX = W * 0.04;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.fillStyle = '#f5c518';
+  ctx.font = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_dcog_rcs_catches + '/' + 6, scoreX, scoreY);
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = 'bold ' + Math.round(H*0.022) + 'px "Barlow Condensed",sans-serif';
+  ctx.fillText(en ? 'CATCHES' : 'CATCHES', scoreX, scoreY - H*0.065);
+  // Dernière réaction (si existe)
+  if (_dcog_rcs_reactTimes.length > 0) {
+    var lastReact = _dcog_rcs_reactTimes[_dcog_rcs_reactTimes.length - 1];
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = 'bold ' + Math.round(H*0.025) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillText((en ? 'Last: ' : 'Dernière : ') + lastReact + 'ms', scoreX, scoreY + H*0.025);
+  }
+
+  // ═══ BRANDING "SENSEI REACTION STICK" top-right ═══
+  ctx.textAlign = 'right';
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.fillStyle = '#f5c518';
+  ctx.font = 'bold ' + Math.round(H*0.038) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W - W*0.025, H*0.168);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = 'bold ' + Math.round(H*0.027) + 'px "Barlow Condensed",sans-serif';
+  ctx.fillText('REACTION STICK 🟦', W - W*0.025, H*0.208);
+
+  ctx.restore();
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    VISUOMOTOR COORDINATION 🎾🎾🎾
@@ -33733,6 +34266,22 @@ function _dcog_updateInsight() {
   var msg = '';
   if (_dcog_drill === 'tboard') {
     el.textContent = (typeof _dcog_tbd_insight === 'function') ? _dcog_tbd_insight() : '';
+    return;
+  }
+  if (_dcog_drill === 'rcs') {
+    var totI = (_dcog_rcs_catches || 0) + (_dcog_rcs_misses || 0);
+    if (totI === 0) { el.textContent = en ? 'Start a run to see the analysis...' : 'Lance un run pour voir l\'analyse...'; return; }
+    var pctI = Math.round((_dcog_rcs_catches || 0) / totI * 100);
+    var avgI = (_dcog_rcs_reactTimes && _dcog_rcs_reactTimes.length > 0)
+      ? Math.round(_dcog_rcs_reactTimes.reduce(function(a,b){return a+b;},0) / _dcog_rcs_reactTimes.length)
+      : 0;
+    if (pctI === 100 && avgI > 0 && avgI < 400) msg = en ? '🏆 Perfect & lightning fast! Elite reaction time.' : '🏆 Parfait & ultra-rapide ! Temps de réaction d\'élite.';
+    else if (pctI === 100) msg = en ? '✅ 6/6 catches! Try a harder level for faster drops.' : '✅ 6/6 catches ! Passe en niveau supérieur pour accélérer.';
+    else if (pctI >= 66) msg = en ? '💪 Good reflexes. Focus on anticipating the random stick.' : '💪 Bons réflexes. Focus sur l\'anticipation du bâton aléatoire.';
+    else if (pctI >= 33) msg = en ? '🎯 Keep training — stay centered, hands ready at chest height.' : '🎯 Continue — reste centré, mains prêtes à hauteur de poitrine.';
+    else msg = en ? '📚 Try EASY level first (3s intervals) to build the reaction loop.' : '📚 Commence en FACILE (3s) pour construire la boucle de réaction.';
+    if (avgI > 0) msg += ' ' + (en ? 'Avg reaction: '+avgI+'ms.' : 'Réaction moy: '+avgI+'ms.');
+    el.textContent = msg;
     return;
   }
   if (_dcog_drill === 'viscoord') {
