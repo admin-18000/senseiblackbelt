@@ -11,9 +11,11 @@
 //  ✅ Fonctionne hors-ligne (cache offline stylé si pas de réseau).
 // ═══════════════════════════════════════════════════════════
 
-const CACHE_NAME     = 'sensei-cache';    // Cache principal (auto-géré)
-const CDN_CACHE_NAME = 'sensei-cdn';      // Cache CDN (TF.js + Fonts)
-const MEDIA_CACHE    = 'sensei-media';    // Cache media lourd (hero.mp4)
+// 🔄 BUMP CACHE NAME → force tous les users à vider leur cache et re-fetch
+// Chaque fois qu'on fait un fix critique visible dans la grille puzzle, bump le suffixe.
+const CACHE_NAME     = 'sensei-cache-v3';    // Cache principal (auto-géré)
+const CDN_CACHE_NAME = 'sensei-cdn-v3';      // Cache CDN (TF.js + Fonts + MediaPipe)
+const MEDIA_CACHE    = 'sensei-media-v3';    // Cache media lourd (hero.mp4)
 
 const NETWORK_TIMEOUT_MS = 3000;          // Timeout Network-First (3s)
 const CACHE_MAX_AGE_MS   = 30 * 24 * 60 * 60 * 1000; // Purge auto > 30 jours
