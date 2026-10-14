@@ -29975,15 +29975,16 @@ var _dcog_inited      = false;
 var _dcog_VIDEOS = [
   // Chaque vidéo est taguée par son drill → le carrousel filtre dynamiquement
   // selon _dcog_drill courant (dans _dcog_renderVids ci-dessous).
-  // ═══ VISUOMOTOR COORDINATION — 4 vidéos jonglage ═══
-  {id:'tLthFdKJu9k', title:'Visuomotor 1',       drill:'viscoord'},
-  {id:'m1gctvzz6nc', title:'Visuomotor 2',       drill:'viscoord'},
-  {id:'Em-ga58-bhY', title:'Visuomotor 3',       drill:'viscoord'},
-  {id:'l5xJnrnOEvk', title:'Visuomotor 4',       drill:'viscoord'},
-  // ═══ REACTION CATCHING STICK — 3 vidéos bâtons ═══
-  {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs'},
-  {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs'},
-  {id:'y5NsQVSRVB4', title:'Reaction Stick 3',   drill:'rcs'},
+  // Flag `vertical:true` → thumb 9:16 + player iframe en 9:16 (pattern STRENGTH)
+  // ═══ VISUOMOTOR COORDINATION — 4 vidéos jonglage (Shorts) ═══
+  {id:'tLthFdKJu9k', title:'Visuomotor 1',       drill:'viscoord', vertical:true},
+  {id:'m1gctvzz6nc', title:'Visuomotor 2',       drill:'viscoord', vertical:true},
+  {id:'Em-ga58-bhY', title:'Visuomotor 3',       drill:'viscoord', vertical:true},
+  {id:'l5xJnrnOEvk', title:'Visuomotor 4',       drill:'viscoord', vertical:true},
+  // ═══ REACTION CATCHING STICK — 3 vidéos bâtons (Shorts) ═══
+  {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs', vertical:true},
+  {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs', vertical:true},
+  {id:'y5NsQVSRVB4', title:'Reaction Stick 3',   drill:'rcs', vertical:true},
   // ═══ Drills DCOG existants (1 vidéo chacun) ═══
   {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
   {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
@@ -30002,7 +30003,7 @@ var _dcog_initing = false; // supprime auto-open vidéo pendant init
 function _dcog_renderVids() {
   var el = document.getElementById('dcog_vidScroll');
   if (!el) return;
-  // Filtrer les vidéos du drill courant (avec fallback défensif : si rien ne match,
+  // Filtrer les vidéos du drill courant (fallback défensif : si rien ne match,
   // on affiche tout plutôt qu'un carrousel vide — ex : drill sans tag)
   var current = _dcog_drill;
   var filtered = _dcog_VIDEOS.filter(function(v){ return v.drill === current; });
@@ -30012,8 +30013,23 @@ function _dcog_renderVids() {
     // _dcogVidMap continuent de pointer sur les bons objets
     var i = _dcog_VIDEOS.indexOf(v);
     var sel = _dcog_selVid === i;
-    return '<div class="vid-thumb'+(sel?' selected':'')+'" onclick="_dcog_selectVid('+i+')">'
-      +'<img src="https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg" data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" onerror="_ytThumbFallback(this)" loading="lazy" alt="'+v.title+'">'
+    // Shorts → thumb portrait (9:16) + source oar2.jpg (natif Short sans bandes YouTube)
+    // Pattern identique à ce que STRENGTH & CONDITIONING fait pour ses Shorts
+    var vertical = v.vertical === true;
+    var thumbStyle = vertical
+      ? 'style="padding-bottom:0;height:auto;aspect-ratio:9/16"'
+      : '';
+    var thumbSrc = vertical
+      ? 'https://i.ytimg.com/vi/'+v.id+'/oar2.jpg'
+      : 'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg';
+    var imgFit = vertical
+      ? 'style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"'
+      : '';
+    var onerr = vertical
+      ? 'onerror="this.onerror=null;this.src=\'https://img.youtube.com/vi/'+v.id+'/hqdefault.jpg\'"'
+      : 'onerror="_ytThumbFallback(this)"';
+    return '<div class="vid-thumb'+(sel?' selected':'')+'" '+thumbStyle+' onclick="_dcog_selectVid('+i+')">'
+      +'<img src="'+thumbSrc+'" '+imgFit+' data-yt-id="'+v.id+'" data-fb="0" onload="_ytThumbCheck(this)" '+onerr+' loading="lazy" alt="'+v.title+'">'
       +'<div class="vid-thumb-title">'+v.title+'</div></div>';
   }).join('');
 }
@@ -30025,6 +30041,9 @@ function _dcog_selectVid(i) {
   var fr = document.getElementById('dcog_ytFrame');
   if (!p || !fr) return;
   p.style.display = 'block';
+  // Iframe aspect-ratio : 9:16 pour les Shorts (RCS, Visuomotor), 16:9 pour les
+  // vidéos landscape (math, sprint, etc.) — pattern identique à STRENGTH & CONDITIONING
+  fr.style.aspectRatio = (v.vertical === true) ? '9/16' : '16/9';
   fr.src = 'https://www.youtube-nocookie.com/embed/'+v.id+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
   var lbl = document.getElementById('dcog_vidLabel');
   if (lbl) lbl.textContent = v.title;
@@ -30784,23 +30803,28 @@ function _dcog_drawFrame(poses) {
     ctx.save();
 
     // ── Ligne 1 : Timer principal au CENTRE (entre REC et STOP) ──
-    // math et vcmath partagent le même timer global (_dcog_mathDuration/_dcog_mathSec)
-    var _ds = (_dcog_drill === 'math' || _dcog_drill === 'vcmath')
-      ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
-      : Math.max(0, _dcog_sessDur - _dcog_sessSec);
-    var _dm=Math.floor(_ds/60),_dss=_ds%60;
-    var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
-    var tx = Math.round(W*0.50), ty = Math.round(H*0.07);
-    var tw = Math.round(Math.max(110, W*0.10));
-    var th = Math.round(Math.max(50, H*0.09));
-    ctx.fillStyle='rgba(0,0,0,0.7)';
-    ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
-    ctx.fillStyle="#fff";
-    ctx.font='bold '+_sf(H,0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
-    ctx.fillText(_dtStr, tx, ty);
-    ctx.shadowBlur=0;
+    // → Skippé pour viscoord (chrono circulaire dédié à gauche) et rcs
+    //   (événementiel sur 6 drops, pas de temps à décompter + éviter la
+    //   collision avec la barre jaune des bâtons).
+    if (_dcog_drill !== 'viscoord' && _dcog_drill !== 'rcs') {
+      // math et vcmath partagent le même timer global (_dcog_mathDuration/_dcog_mathSec)
+      var _ds = (_dcog_drill === 'math' || _dcog_drill === 'vcmath')
+        ? Math.max(0, _dcog_mathDuration - _dcog_mathSec)
+        : Math.max(0, _dcog_sessDur - _dcog_sessSec);
+      var _dm=Math.floor(_ds/60),_dss=_ds%60;
+      var _dtStr=_dm+':'+(_dss<10?'0':'')+_dss;
+      var tx = Math.round(W*0.50), ty = Math.round(H*0.07);
+      var tw = Math.round(Math.max(110, W*0.10));
+      var th = Math.round(Math.max(50, H*0.09));
+      ctx.fillStyle='rgba(0,0,0,0.7)';
+      ctx.beginPath();ctx.roundRect(tx-tw/2, ty-th/2, tw, th, 8);ctx.fill();
+      ctx.fillStyle="#fff";
+      ctx.font='bold '+_sf(H,0.06)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
+      ctx.fillText(_dtStr, tx, ty);
+      ctx.shadowBlur=0;
+    }
 
     // ── Ligne 2 : scores math/vcmath (✓ gauche, ✗ droite) — sous REC/STOP ──
     if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
@@ -33578,21 +33602,32 @@ function _dcog_rcs_onMiss() {
   }
 }
 
-/* ── Géométrie d'un bâton (bounding box) ──────────────────────── */
+/* ── Géométrie HITBOX d'un bâton (pour collision — jamais dessinée) ────
+   La hitbox est volontairement plus large que le visuel (× 2 en largeur) :
+   le user voit un bâton fin fidèle à la photo réelle, mais la zone de
+   catch reste généreuse pour matcher la précision MoveNet (±3% W).
+   → même qualité de détection que TDR targets · zéro perte fonctionnelle */
 function _dcog_rcs_getStickBBox(idx, stk, W, H) {
-  // 6 bâtons fins et élégants, répartis horizontalement avec gaps larges
-  // → look mobile = look PC (toutes les dimensions sont proportionnelles au canvas)
   var marginX = W * 0.06;
   var usableW = W - 2 * marginX;
-  var gapRatio = 0.6;               // gap large entre bâtons = plus fin visuellement
-  // 6 bâtons + 5 gaps : stickW × (6 + 5 × gapRatio) = usableW
-  var stickW = usableW / (6 + 5 * gapRatio);
-  var gap = stickW * gapRatio;
-  var xStart = marginX + idx * (stickW + gap);
-  var stickH = H * 0.32;            // bâton plus court = moins envahissant (était 0.42)
-  var yTopHanging = H * 0.095;      // sous la barre jaune
+  var gapRatio = 0.6;
+  var hitboxW = usableW / (6 + 5 * gapRatio);  // ≈ 10% W — ZONE DE CATCH
+  var gap = hitboxW * gapRatio;
+  var xStart = marginX + idx * (hitboxW + gap);
+  var stickH = H * 0.32;
+  var yTopHanging = H * 0.095;
   var yTop = yTopHanging + stk.y;
-  return { x: xStart, y: yTop, w: stickW, h: stickH };
+  return { x: xStart, y: yTop, w: hitboxW, h: stickH };
+}
+
+/* ── Géométrie VISUEL d'un bâton (ce qui est dessiné à l'écran) ────────
+   Visuel ~50% de la hitbox, centré horizontalement dans celle-ci.
+   Rend un bâton fin et élégant, fidèle à l'objet physique de la photo.    */
+function _dcog_rcs_getStickVisual(idx, stk, W, H) {
+  var hb = _dcog_rcs_getStickBBox(idx, stk, W, H);
+  var visW = hb.w * 0.5;                       // ≈ 5% W — visuel FIN
+  var visX = hb.x + (hb.w - visW) / 2;         // centré dans la hitbox
+  return { x: visX, y: hb.y, w: visW, h: hb.h };
 }
 
 /* ── Dessin HUD RCS (gravé dans la vidéo exportée) ──────────── */
@@ -33618,10 +33653,12 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
     ctx.fill();
   }
 
-  // ═══ 6 BÂTONS (design épuré, fin, mobile-first) ═══
+  // ═══ 6 BÂTONS (visuel FIN et élégant, fidèle à l'objet physique) ═══
+  //    Le dessin utilise getStickVisual (fin). La collision utilise getStickBBox
+  //    (hitbox 2× plus large, invisible) — même qualité catch que TDR targets.
   for (var i = 0; i < _dcog_rcs_sticks.length; i++) {
     var s = _dcog_rcs_sticks[i];
-    var bb = _dcog_rcs_getStickBBox(i, s, W, H);
+    var vb = _dcog_rcs_getStickVisual(i, s, W, H);
     // Couleur selon état
     var bodyColor, capColor, glowColor;
     if (s.state === 'caught') {
@@ -33634,39 +33671,42 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
       bodyColor = '#1d7fb5'; capColor = '#d4a700'; glowColor = 'rgba(0,0,0,0.4)';
     }
     ctx.save();
-    if (s.state === 'falling') { ctx.shadowBlur = 16; ctx.shadowColor = glowColor; }
-    else if (s.state === 'caught') { ctx.shadowBlur = 20; ctx.shadowColor = glowColor; }
-    else { ctx.shadowBlur = 5; ctx.shadowColor = 'rgba(0,0,0,0.55)'; }
-    // Corps principal : rectangle très arrondi (quasi-pilule), plus mince
+    if (s.state === 'falling') { ctx.shadowBlur = 18; ctx.shadowColor = glowColor; }
+    else if (s.state === 'caught') { ctx.shadowBlur = 22; ctx.shadowColor = glowColor; }
+    else { ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.6)'; }
+    // Corps principal : pilule très élancée fidèle à l'objet physique
     ctx.fillStyle = bodyColor;
-    var bodyR = bb.w * 0.42;        // arrondis = quasi pilule
-    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.09, bb.w, bb.h * 0.82, bodyR);
+    var bodyR = vb.w * 0.5;         // arrondis = pilule parfaite
+    _dcog_vc_roundRect(ctx, vb.x, vb.y + vb.h * 0.08, vb.w, vb.h * 0.84, bodyR);
     ctx.fill();
-    // Highlight vertical sur la gauche (effet cylindre 3D)
+    // Highlight vertical gauche + ombre droite (effet cylindre 3D)
     ctx.shadowBlur = 0;
-    var hlGrad = ctx.createLinearGradient(bb.x, 0, bb.x + bb.w, 0);
-    hlGrad.addColorStop(0,    'rgba(255,255,255,0.25)');
-    hlGrad.addColorStop(0.3,  'rgba(255,255,255,0.08)');
+    var hlGrad = ctx.createLinearGradient(vb.x, 0, vb.x + vb.w, 0);
+    hlGrad.addColorStop(0,    'rgba(255,255,255,0.3)');
+    hlGrad.addColorStop(0.3,  'rgba(255,255,255,0.1)');
     hlGrad.addColorStop(0.65, 'rgba(0,0,0,0)');
-    hlGrad.addColorStop(1,    'rgba(0,0,0,0.25)');
+    hlGrad.addColorStop(1,    'rgba(0,0,0,0.3)');
     ctx.fillStyle = hlGrad;
-    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.09, bb.w, bb.h * 0.82, bodyR);
+    _dcog_vc_roundRect(ctx, vb.x, vb.y + vb.h * 0.08, vb.w, vb.h * 0.84, bodyR);
     ctx.fill();
-    // Bouchons haut/bas (jaunes, plus discrets — plus petits et sans débord)
+    // Bouchons jaunes haut/bas — légèrement plus larges que le corps pour effet "cap"
     ctx.fillStyle = (s.state === 'caught' || s.state === 'missed') ? capColor : '#f5c518';
-    _dcog_vc_roundRect(ctx, bb.x, bb.y, bb.w, bb.h * 0.11, bb.w * 0.4);
+    var capW = vb.w * 1.15;
+    var capX = vb.x - vb.w * 0.075;
+    _dcog_vc_roundRect(ctx, capX, vb.y, capW, vb.h * 0.1, capW * 0.3);
     ctx.fill();
-    _dcog_vc_roundRect(ctx, bb.x, bb.y + bb.h * 0.89, bb.w, bb.h * 0.11, bb.w * 0.4);
+    _dcog_vc_roundRect(ctx, capX, vb.y + vb.h * 0.9, capW, vb.h * 0.1, capW * 0.3);
     ctx.fill();
     ctx.restore();
-    // Numéro du bâton (petit, discret, au centre quand accroché)
+    // Numéro du bâton (micro, discret, posé sur la hitbox pour meilleure lisibilité)
     if (s.state === 'hanging') {
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = 'bold ' + Math.round(bb.w * 0.5) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      var hb = _dcog_rcs_getStickBBox(i, s, W, H);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = 'bold ' + Math.round(hb.w * 0.35) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowBlur = 3; ctx.shadowColor = 'rgba(0,0,0,0.9)';
-      ctx.fillText(String(i+1), bb.x + bb.w/2, bb.y + bb.h * 0.5);
+      ctx.fillText(String(i+1), hb.x + hb.w/2, hb.y + hb.h * 0.5);
       ctx.shadowBlur = 0;
     }
   }
