@@ -2267,8 +2267,14 @@ window._dojoBackHome = function(){
   <div class="tr-card">
     <div class="tr-card-title" id="dcog_cardTitle">🧠 COGNITIVE DRIBBLE TRAINING</div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
-      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
+      <!-- VISUOMOTOR COORDINATION — placé en premier (sélectionné par défaut) -->
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('viscoord')" id="dcog_btn_viscoord"
         style="padding:14px 10px;border-radius:10px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
+        <div style="font-size:22px;margin-bottom:4px">🎾🎾🎾</div>
+        <div id="dcog_lbl_viscoord">VISUOMOTOR COORDINATION</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
+        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
         <div style="font-size:22px;margin-bottom:4px">🧮</div>
         <div id="dcog_lbl_math">DRIBBLE MATH</div>
       </button>
@@ -2309,7 +2315,46 @@ window._dojoBackHome = function(){
   <div class="tr-card" id="dcog_optCard">
     <div class="tr-card-title" id="dcog_optTitle">🎚 DIFFICULTÉ</div>
     <!-- Math levels -->
-    <div id="dcog_optMath" style="display:flex;gap:8px;flex-wrap:wrap">
+    <!-- ═══ VISUOMOTOR COORDINATION — 3 rangées : objectif · métronome · squelette ═══ -->
+    <div id="dcog_optViscoord" style="display:flex;flex-direction:column;gap:12px">
+      <!-- Rangée OBJECTIF (durée timer) -->
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_vc_objLbl">⏱ OBJECTIF</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="dcog-vc-obj-btn" data-sec="15"   onclick="_dcog_vc_setObj(15)"   style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">15s</button>
+          <button class="dcog-vc-obj-btn" data-sec="30"   onclick="_dcog_vc_setObj(30)"   style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">30s</button>
+          <button class="dcog-vc-obj-btn" data-sec="60"   onclick="_dcog_vc_setObj(60)"   style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">1min</button>
+          <button class="dcog-vc-obj-btn" data-sec="120"  onclick="_dcog_vc_setObj(120)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">2min</button>
+          <button class="dcog-vc-obj-btn" data-sec="180"  onclick="_dcog_vc_setObj(180)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">3min</button>
+          <button class="dcog-vc-obj-btn" data-sec="300"  onclick="_dcog_vc_setObj(300)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">5min</button>
+          <button class="dcog-vc-obj-btn" data-sec="0"    onclick="_dcog_vc_setObj(0)"    style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">∞</button>
+        </div>
+      </div>
+      <!-- Rangée MÉTRONOME (BPM) -->
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_vc_metroLbl">🔊 MÉTRONOME</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="dcog-vc-metro-btn" data-bpm="0"    onclick="_dcog_vc_setMetro(0)"    style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">OFF</button>
+          <button class="dcog-vc-metro-btn" data-bpm="160"  onclick="_dcog_vc_setMetro(160)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">160</button>
+          <button class="dcog-vc-metro-btn" data-bpm="180"  onclick="_dcog_vc_setMetro(180)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">180</button>
+          <button class="dcog-vc-metro-btn" data-bpm="200"  onclick="_dcog_vc_setMetro(200)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">200</button>
+          <button class="dcog-vc-metro-btn" data-bpm="220"  onclick="_dcog_vc_setMetro(220)"  style="flex:1;min-width:62px;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">220</button>
+        </div>
+      </div>
+      <!-- Rangée SQUELETTE (MediaPipe Hands overlay décoratif) -->
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_vc_skelLbl">✋ SQUELETTE MAINS</div>
+        <div style="display:flex;gap:6px">
+          <button class="dcog-vc-skel-btn" data-skel="1" onclick="_dcog_vc_setSkel(1)"  style="flex:1;padding:8px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s" id="dcog_vc_skelOn">ON</button>
+          <button class="dcog-vc-skel-btn" data-skel="0" onclick="_dcog_vc_setSkel(0)"  style="flex:1;padding:8px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s" id="dcog_vc_skelOff">OFF</button>
+        </div>
+      </div>
+      <!-- Hint setup terrain basket -->
+      <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_vc_setupHint">
+        📱 Pose ton téléphone contre un sac à 2m · 3 balles de tennis · 2 mains dans le cadre
+      </div>
+    </div>
+    <div id="dcog_optMath" style="display:none;gap:8px;flex-wrap:wrap">
       <button class="dcog-lvl-btn" onclick="_dcog_setMathLevel('easy')" data-level="easy"
         style="flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.5px;transition:all .2s">
         ➕ <span id="dcog_lbl_easy">FACILE</span><br><span style="font-size:9px;opacity:.7">+ −</span>
@@ -2446,6 +2491,20 @@ window._dojoBackHome = function(){
         <div id="dcog_vcmHint" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px;text-align:center">
           Touche VRAI ou FAUX avec ta main
         </div>
+      </div>
+      <!-- ═══ VISUOMOTOR COORDINATION overlay ═══
+           Tout le HUD visuel (chrono circulaire, paliers, métronome, branding)
+           est dessiné DIRECTEMENT dans le canvas via _dcog_vc_drawCanvasHud
+           → affiché à l'écran ET gravé dans la vidéo exportée (seul le canvas
+             est capturé par captureStream → MediaRecorder).
+           Les 2 flashs d'animation CSS (gradient radial + message palier)
+           restent en DOM pour profiter des transitions opacity natives.      -->
+      <div id="dcog_viscoordOverlay"
+        style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;background:transparent;pointer-events:none">
+        <!-- Flash doré radial au palier atteint (purement visuel sur écran) -->
+        <div id="dcog_vc_palFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(245,197,24,.35) 0%,rgba(245,197,24,0) 60%);opacity:0;transition:opacity .25s;pointer-events:none"></div>
+        <!-- Flash message "✓ 30s" quand un palier tombe (écran uniquement) -->
+        <div id="dcog_vc_palAchieved" style="position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:clamp(28px,8vw,54px);color:#f5c518;letter-spacing:4px;text-shadow:0 4px 24px rgba(0,0,0,.95);opacity:0;transition:opacity .3s;font-weight:900">✓ 30s</div>
       </div>
       <!-- Sprint overlay -->
       <div id="dcog_sprintOverlay"
@@ -29878,6 +29937,12 @@ var _dcog_inited      = false;
    math=0, sprint=1, twoball=2, height=3, tboard=4
    Sous-modes: Height BAS=3, Height HAUT=6, TBoard 1 BALLON=4, TBoard 2 BALLONS=5 */
 var _dcog_VIDEOS = [
+  // ═══ VISUOMOTOR COORDINATION — 4 drills jonglage ═══
+  {id:'tLthFdKJu9k', title:'Visuomotor 1'},
+  {id:'m1gctvzz6nc', title:'Visuomotor 2'},
+  {id:'Em-ga58-bhY', title:'Visuomotor 3'},
+  {id:'l5xJnrnOEvk', title:'Visuomotor 4'},
+  // ═══ Drills DCOG existants (indices +4 vs ancienne version) ═══
   {id:'gJe63xj-c6w', title:'Dribble Math'},
   {id:'d2M3gWQyA6s', title:'300 / 600'},
   {id:'aNeIFfhsy-0', title:'Two-Ball'},
@@ -29950,7 +30015,8 @@ function initTraining_dcog() {
     var saved = localStorage.getItem('sensei_dcog_sessions');
     if (saved) _dcog_sessions = JSON.parse(saved);
   } catch(e) {}
-  _dcog_selectDrill('math');
+  // VISUOMOTOR COORDINATION sélectionné par défaut (nouvelle feature en tête)
+  _dcog_selectDrill('viscoord');
   _dcog_renderVids();
   _dcog_renderHistory();
   _dcog_updateInsight();
@@ -30023,6 +30089,14 @@ function _dcog_applyLang(en) {
     'dcog_lbl_vcmEasy': en?'EASY':'FACILE',
     'dcog_lbl_vcmMedium': en?'MEDIUM':'MOYEN',
     'dcog_lbl_vcmHard': en?'HARD':'DIFFICILE',
+    // ═══ VISUOMOTOR COORDINATION ═══
+    'dcog_lbl_viscoord': en?'VISUOMOTOR COORDINATION':'VISUOMOTOR COORDINATION',
+    'dcog_vc_objLbl':   en?'⏱ OBJECTIVE':'⏱ OBJECTIF',
+    'dcog_vc_metroLbl': en?'🔊 METRONOME':'🔊 MÉTRONOME',
+    'dcog_vc_skelLbl':  en?'✋ HAND SKELETON':'✋ SQUELETTE MAINS',
+    'dcog_vc_setupHint': en?'📱 Place your phone against a bag at 2m · 3 tennis balls · both hands in frame':'📱 Pose ton téléphone contre un sac à 2m · 3 balles de tennis · 2 mains dans le cadre',
+    'dcog_vc_skelOn':  en?'ON':'ON',
+    'dcog_vc_skelOff': en?'OFF':'OFF',
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id); if (el) el.textContent = map[id];
@@ -30042,9 +30116,18 @@ function _dcog_applyLang(en) {
 
 /* ── Sélection drill ─────────────────────────────────────────── */
 function _dcog_selectDrill(drill, langOnly) {
+  // Si on quitte viscoord en cours de run → stopper proprement le métronome/timer
+  // (évite que setInterval métronome fuite quand user switch drill mid-session)
+  if (!langOnly && _dcog_drill === 'viscoord' && drill !== 'viscoord' &&
+      typeof _dcog_vc_running !== 'undefined' && _dcog_vc_running &&
+      typeof _dcog_vc_stopRun === 'function') {
+    _dcog_vc_stopRun();
+  }
   _dcog_drill = drill;
   var en = window._lang === 'en';
   var descs = {
+    viscoord: en ? '3-ball tennis juggling — streak, rhythm, visuomotor coordination'
+                : 'Jonglage 3 balles de tennis — streak, rythme, coordination visuomotrice',
     math:    en ? 'Solve math problems while dribbling — dual-task cognitive training'
                : 'Résous des opérations en dribblant — entraînement cognitif-moteur',
     sprint:  en ? 'Dribble as fast as possible — reach your target before time runs out'
@@ -30065,7 +30148,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
+    ['viscoord','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -30074,13 +30157,18 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
+    var optIds = {viscoord:'dcog_optViscoord', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
-      if (el2) { el2.style.display = d === drill ? 'flex' : 'none'; if (d === drill) el2.style.gap = '8px'; }
+      if (el2) {
+        el2.style.display = d === drill ? 'flex' : 'none';
+        // viscoord utilise flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' ? '12px' : '8px');
+      }
     });
     // Update opt title
     var optTitles = {
+      viscoord:en ? '🎾🎾🎾 CHALLENGE' : '🎾🎾🎾 CHALLENGE',
       math:    en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       sprint:  en ? '⏱ TARGET'          : '⏱ OBJECTIF',
       height:  en ? '📏 HEIGHT ZONE'    : '📏 ZONE DE HAUTEUR',
@@ -30093,6 +30181,7 @@ function _dcog_selectDrill(drill, langOnly) {
     if (ot) ot.textContent = optTitles[drill] || '';
     // Score labels
     var scoreLabels = {
+      viscoord:[en?'BEST STREAK':'STREAK MAX', en?'PALIER':'PALIER',   en?'TIME':'TEMPS'],
       math:    [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
       sprint:  [en?'DRIBBLES':'DRIBBLES', en?'TARGET':'OBJECTIF',   en?'TIME':'TEMPS'],
       height:  [en?'IN ZONE %':'% EN ZONE', en?'FRAMES':'FRAMES',   en?'TIME':'TEMPS'],
@@ -30111,7 +30200,8 @@ function _dcog_selectDrill(drill, langOnly) {
 
     // 🎬 Auto-open vidéo démo correspondante (sauf pendant l'init auto)
     if (!_dcog_initing) {
-      var _dcogVidMap = { math:0, sprint:1, twoball:2, height:3, tboard:4, burnout:7, vcmath:9 };
+      // viscoord ouvre par défaut sa 1ère vidéo (idx 0) ; les 3 autres (1,2,3) sont accessibles manuellement
+      var _dcogVidMap = { viscoord:0, math:4, sprint:5, twoball:6, height:7, tboard:8, burnout:11, vcmath:13 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -30123,7 +30213,7 @@ function _dcog_selectDrill(drill, langOnly) {
 /* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   // tr-tab : onglets Training
-  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn').forEach(function(btn) {
+  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn,.dcog-vc-obj-btn,.dcog-vc-metro-btn,.dcog-vc-skel-btn').forEach(function(btn) {
     btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
   });
   // tr-btn : boutons START/STOP/SAVE
@@ -30178,10 +30268,11 @@ function _dcog_setHeightZone(zone) {
     b.style.color = active?'#f5c518':'#7a8299';
   });
   // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
-  // BAS (low) → index 3 (Dribble Height BAS = ar6OA2wxwzw)
-  // HAUT (high) → index 6 (Dribble Height HAUT = UHNUSFHSrOo)
+  // Indices +4 depuis l'ajout des 4 videos VISUOMOTOR en tête
+  // BAS (low) → index 7 (Dribble Height BAS = ar6OA2wxwzw)
+  // HAUT (high) → index 10 (Dribble Height HAUT = UHNUSFHSrOo)
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (zone === 'high') ? 6 : (zone === 'low') ? 3 : null;
+    var idx = (zone === 'high') ? 10 : (zone === 'low') ? 7 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
@@ -30264,9 +30355,11 @@ function _dcog_stop() {
   if (typeof _dcog_tbd_cleanup === 'function') _dcog_tbd_cleanup();
   // overlay géré par senseiCamStop()
   // Hide all overlays
-  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay'].forEach(function(id){
+  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay','dcog_vcmOverlay','dcog_viscoordOverlay'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none';
   });
+  // Stop viscoord run (timer, métronome, MediaPipe) si actif
+  if (typeof _dcog_vc_stopRun === 'function') _dcog_vc_stopRun();
   var bRec2 = document.getElementById('dcog_btnRec');
   if (bRec2) bRec2.style.display = 'none';
   var btnS = document.getElementById('dcog_btnStart');
@@ -30284,11 +30377,15 @@ function _dcog_stop() {
 
 /* ── Enregistre la séance DCOG dans le module de progression ────
    Appelée par les 3 chemins de fin de drill (manuel + 2 timers auto).
-   Couvre math / tboard / sprint / height / twoball. */
+   Couvre math / tboard / sprint / height / twoball / viscoord. */
 function _dcog_recordToProgression() {
   if (typeof _sb_recordSession !== 'function') return;
   var dcogPct = 0;
-  if (_dcog_drill === 'math') {
+  if (_dcog_drill === 'viscoord') {
+    // Score basé sur le palier atteint (0=10%, 15s=25%, 30s=40%, 1min=55%, 2min=70%, 3min=85%, 5min=100%)
+    dcogPct = _dcog_vc_curPalier >= 300 ? 100 : _dcog_vc_curPalier >= 180 ? 85 : _dcog_vc_curPalier >= 120 ? 70 : _dcog_vc_curPalier >= 60 ? 55 : _dcog_vc_curPalier >= 30 ? 40 : _dcog_vc_curPalier >= 15 ? 25 : 10;
+    _sb_recordSession('viscoord', dcogPct);
+  } else if (_dcog_drill === 'math') {
     var totMath = _dcog_correct + _dcog_wrong;
     dcogPct = totMath > 0 ? Math.round(_dcog_correct / totMath * 100) : 0;
     _sb_recordSession('math', dcogPct);
@@ -30419,7 +30516,8 @@ function _dcog_launchDrill() {
   var overlays = {
     math:'dcog_mathOverlay', sprint:'dcog_sprintOverlay',
     height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay',
-    vcmath:'dcog_vcmOverlay'
+    vcmath:'dcog_vcmOverlay',
+    viscoord:'dcog_viscoordOverlay'
   };
   Object.keys(overlays).forEach(function(d){
     var el = document.getElementById(overlays[d]);
@@ -30432,8 +30530,12 @@ function _dcog_launchDrill() {
   // Note : pour math, _dcog_nextQuestion() est différé à la fin du countdown 10s
   //        (évite d'afficher une opération pendant le "PRÊT ?")
   if (_dcog_drill === 'sprint')  _dcog_startSprintTimer();
-  // Timer session pour les drills non-math/vcmath (sprint/height/twoball/tboard/burnout)
-  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath') {
+  // VISUOMOTOR COORDINATION : NE PAS démarrer _dcog_vc_startRun ici
+  // → il sera lancé APRÈS le countdown de 10s (branche n<=0) pour que
+  //   le chrono parte vraiment de 0:00 quand le user commence à jongler
+  // Timer session pour les drills non-math/vcmath/viscoord (sprint/height/twoball/tboard/burnout)
+  // viscoord a son propre timer dédié (durée + ∞ gérés dans _dcog_vc_startRun)
+  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath' && _dcog_drill !== 'viscoord') {
     _dcog_sessSec = 0;
     if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
     _dcog_sessTimer = setInterval(function(){
@@ -30493,6 +30595,11 @@ function _dcog_launchDrill() {
           typeof _dcog_tbScheduleChaos === 'function') {
         _dcog_tbScheduleChaos();
       }
+      // VISUOMOTOR COORDINATION : démarrer timer + métronome À LA FIN du countdown
+      // → le chrono gravé dans la vidéo démarre vraiment à 0:00 au GO
+      if (_dcog_drill === 'viscoord' && typeof _dcog_vc_startRun === 'function') {
+        _dcog_vc_startRun();
+      }
       setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50);
       return;
     }
@@ -30509,7 +30616,20 @@ function _dcog_launchDrill() {
     ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillStyle='#fff';
     ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
+    // Branding "SENSEI VISUOMOTOR" top-right pendant le countdown (viscoord uniquement)
+    if (_dcog_drill === 'viscoord') {
+      ctx.textAlign='right';
+      ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,0.95)';
+      ctx.fillStyle='#f5c518';
+      ctx.font='bold '+Math.round(H*0.038)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText('SENSEI', W-W*0.025, H*0.065);
+      ctx.fillStyle='rgba(255,255,255,0.85)';
+      ctx.font='bold '+Math.round(H*0.027)+'px "Barlow Condensed",sans-serif';
+      ctx.fillText('VISUOMOTOR 🎾🎾🎾', W-W*0.025, H*0.105);
+    }
     ctx.restore();
+    // Logo SENSEI + "Powered by SENSEI AI" dès le countdown (branding présent du START jusqu'à l'enregistrement)
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
     _td_beep(n<=3?880:440, 0.08, 0.12);
     if(navigator.vibrate) navigator.vibrate(n<=3?30:15);
     setTimeout(function(){ dcogCountdown(n-1); }, 1000);
@@ -30548,6 +30668,10 @@ function _dcog_drawFrame(poses) {
   // Pas de squelette dans Cognitif — inutile et visuellement gênant
   // Particules explosion toujours dessinées (persistent après hit)
   if (_dcog_particles.length > 0) _dcog_drawParticles(ctx);
+  // ═══ VISUOMOTOR COORDINATION — dessin HUD gravé dans le canvas pour export vidéo ═══
+  if (_dcog_drill === 'viscoord' && _dcog_running && typeof _dcog_vc_drawCanvasHud === 'function') {
+    _dcog_vc_drawCanvasHud(ctx, W, H);
+  }
   // Draw two ball height lines on canvas
   if (_dcog_drill === 'twoball' && _dcog_running &&
       (_dcog_tbMode === 'sameheight' || _dcog_tbMode === 'diffheight')) {
@@ -32294,6 +32418,17 @@ function _dcog_showResults() {
     html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsH+'">'+pctH+'%</span></div><div class="tr-score-lbl">'+(en?'IN ZONE':'EN ZONE')+'</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_heightFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+(_dcog_heightZone==='low'?(en?'LOW':'BAS'):(en?'HIGH':'HAUT'))+'</div><div class="tr-score-lbl">'+(en?'ZONE':'ZONE')+'</div></div>';
+  } else if (_dcog_drill === 'viscoord') {
+    // VISUOMOTOR : best streak + palier débloqué + durée totale
+    var bestSec = Math.floor(_dcog_vc_bestElap || 0);
+    var bhh = Math.floor(bestSec/3600), bmm = Math.floor(bestSec/60)%60, bss = bestSec%60;
+    var bestFmt = (bhh>0?(bhh<10?'0':'')+bhh+':':'') + (bmm<10?'0':'')+bmm+':'+(bss<10?'0':'')+bss;
+    var palTxt = _dcog_vc_curPalier > 0 ? _dcog_vc_fmtTarget(_dcog_vc_curPalier) : '--';
+    var palColor = _dcog_vc_curPalier >= 300 ? '#2dc653' : _dcog_vc_curPalier >= 60 ? '#f5c518' : '#9aa3b3';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+bestFmt+'</div><div class="tr-score-lbl">'+(en?'TIMER MAX':'TIMER MAX')+'</div></div>';
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:'+palColor+'">'+palTxt+'</div><div class="tr-score-lbl">'+(en?'TIER':'PALIER')+'</div></div>';
+    var metroLbl = _dcog_vc_metroBpm > 0 ? (_dcog_vc_metroBpm+' BPM') : (en?'FREE':'LIBRE');
+    html += '<div class="tr-score-box"><div class="tr-score-num" style="font-size:22px;color:#9aa3b3">'+metroLbl+'</div><div class="tr-score-lbl">'+(en?'METRONOME':'MÉTRONOME')+'</div></div>';
   } else if (_dcog_drill === 'twoball') {
     if (_dcog_tbMode === 'burnout') {
       html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#e63946">'+_dcog_burnoutBpm+'</div><div class="tr-score-lbl">BPM MAX</div></div>';
@@ -32323,9 +32458,14 @@ function _dcog_saveSession() {
   var en  = window._lang === 'en';
   var now = new Date();
   var d   = now.toLocaleDateString(en?'en-US':'fr-FR',{day:'numeric',month:'short'});
-  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD'};
+  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD',viscoord:en?'Visuomotor':'Visuomoteur'};
   var score = 0, detail = '';
-  if (_dcog_drill==='math') {
+  if (_dcog_drill==='viscoord') {
+    var secTot = Math.floor(_dcog_vc_bestElap || 0);
+    var tmm = Math.floor(secTot/60), tss = secTot%60;
+    score  = _dcog_vc_curPalier >= 300 ? 100 : _dcog_vc_curPalier >= 180 ? 85 : _dcog_vc_curPalier >= 120 ? 70 : _dcog_vc_curPalier >= 60 ? 55 : _dcog_vc_curPalier >= 30 ? 40 : _dcog_vc_curPalier >= 15 ? 25 : 10;
+    detail = tmm+':'+(tss<10?'0':'')+tss+' · '+ (en?'tier ':'palier ') + (_dcog_vc_curPalier > 0 ? _dcog_vc_fmtTarget(_dcog_vc_curPalier) : '0');
+  } else if (_dcog_drill==='math') {
     var t=_dcog_correct+_dcog_wrong;
     score = t>0?Math.round(_dcog_correct/t*100):0;
     detail = _dcog_correct+'/'+(t)+' — '+(score)+'%';
@@ -32495,10 +32635,11 @@ function _dcog_setTboardMode(mode) {
     b.style.color      = active ? '#f5c518' : '#7a8299';
   }
   // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
-  // 'one' (1 BALLON) → index 4 (TBoard UN BALLON = M7DtIYt1he8)
-  // 'two' (2 BALLONS) → index 5 (TBoard - 2 BALLONS = DJHKF-LCaKE)
+  // Indices +4 depuis l'ajout des 4 videos VISUOMOTOR en tête
+  // 'one' (1 BALLON) → index 8 (TBoard UN BALLON = M7DtIYt1he8)
+  // 'two' (2 BALLONS) → index 9 (TBoard - 2 BALLONS = DJHKF-LCaKE)
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (mode === 'two') ? 5 : (mode === 'one') ? 4 : null;
+    var idx = (mode === 'two') ? 9 : (mode === 'one') ? 8 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
@@ -33044,6 +33185,376 @@ function _dcog_tbd_cleanup() {
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════
+   VISUOMOTOR COORDINATION 🎾🎾🎾
+   ─────────────────────────────────────────────────────────────────
+   Feature caméra sans détection métrique fragile :
+   → Timer qui monte + paliers 15/30/60/120/180/300s (flash doré)
+   → Métronome audio synthétisé (160/180/200/220 BPM) mixé au stream REC
+   → Overlay HTML (DOM) + HUD canvas (gravé dans la vidéo exportée)
+   → Squelette mains optionnel via MediaPipe Hands (lazy loaded, décoratif)
+   → Zéro détection métrique = zéro faux positif sur le rendu final
+═══════════════════════════════════════════════════════════════════ */
+var _dcog_vc_objSec    = 60;    // Durée objectif (0 = infini)
+var _dcog_vc_metroBpm  = 0;     // 0 = OFF
+var _dcog_vc_skelOn    = 1;     // 1 = ON par défaut
+var _dcog_vc_running   = false;
+var _dcog_vc_startTs   = 0;
+var _dcog_vc_elapsed   = 0;     // secondes écoulées
+var _dcog_vc_bestElap  = 0;     // meilleur temps sur session (= timer-max)
+var _dcog_vc_curPalier = 0;     // palier atteint le plus haut (secondes)
+var _dcog_vc_rafId     = null;
+var _dcog_vc_metroInt  = null;
+var _dcog_vc_metroPhase = 0;    // pour animation du pulse
+var _dcog_vc_palTargets = [15, 30, 60, 120, 180, 300];
+var _dcog_vc_hands      = null; // MediaPipe HandLandmarker (lazy)
+var _dcog_vc_handsLoading = false;
+var _dcog_vc_handsResult = null; // dernier résultat landmarks
+var _dcog_vc_handsLastTs = 0;
+
+/* ── Setters UI (bouton actif + state) ──────────────────────── */
+function _dcog_vc_setObj(sec) {
+  _dcog_vc_objSec = sec;
+  document.querySelectorAll('.dcog-vc-obj-btn').forEach(function(b){
+    var active = parseInt(b.dataset.sec,10) === sec;
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+function _dcog_vc_setMetro(bpm) {
+  _dcog_vc_metroBpm = bpm;
+  document.querySelectorAll('.dcog-vc-metro-btn').forEach(function(b){
+    var active = parseInt(b.dataset.bpm,10) === bpm;
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+function _dcog_vc_setSkel(on) {
+  _dcog_vc_skelOn = on ? 1 : 0;
+  document.querySelectorAll('.dcog-vc-skel-btn').forEach(function(b){
+    var active = parseInt(b.dataset.skel,10) === _dcog_vc_skelOn;
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+
+/* ── MediaPipe HandLandmarker — lazy load ──────────────────────
+   Modèle hand_landmarker.task (~5 Mo) chargé une seule fois depuis
+   CDN jsdelivr (Google-hosted mediapipe-models), caché par le SW.
+   Si le user coupe le squelette (OFF), aucun chargement n'a lieu. */
+function _dcog_vc_loadHands() {
+  if (_dcog_vc_hands || _dcog_vc_handsLoading) return;
+  _dcog_vc_handsLoading = true;
+  // Charger dynamiquement le module JS Mediapipe Tasks Vision
+  // (ESM via import() — fallback silencieux si navigateur trop vieux)
+  import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs')
+    .then(function(mod){
+      return mod.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm')
+        .then(function(fileset){
+          return mod.HandLandmarker.createFromOptions(fileset, {
+            baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task' },
+            runningMode: 'VIDEO',
+            numHands: 2,
+            minHandDetectionConfidence: 0.5,
+            minHandPresenceConfidence: 0.5,
+            minTrackingConfidence: 0.5
+          });
+        });
+    })
+    .then(function(hl){ _dcog_vc_hands = hl; _dcog_vc_handsLoading = false; })
+    .catch(function(err){ _dcog_vc_handsLoading = false; _dcog_vc_hands = null; /* silencieux : feat marche sans squelette */ });
+}
+
+/* ── Démarrage d'un run ──────────────────────────────────────── */
+function _dcog_vc_startRun() {
+  _dcog_vc_running = true;
+  _dcog_vc_startTs = Date.now();
+  _dcog_vc_elapsed = 0;
+  _dcog_vc_curPalier = 0;
+  // Lazy load MediaPipe si squelette ON
+  if (_dcog_vc_skelOn) _dcog_vc_loadHands();
+  // Métronome : setInterval appelle _td_beep qui passe par _td_destNode
+  // → mixé automatiquement au stream REC via _td_combineStreamWithAudio
+  if (_dcog_vc_metroBpm > 0) {
+    var intervalMs = 60000 / _dcog_vc_metroBpm;
+    _dcog_vc_metroInt = setInterval(function(){
+      try { _td_beep(880, 0.06, 0.22); } catch(e){}
+    }, intervalMs);
+  }
+  // Tick 10× par seconde pour timer fluide + check paliers
+  _dcog_vc_rafId = setInterval(_dcog_vc_tick, 100);
+}
+
+function _dcog_vc_tick() {
+  if (!_dcog_vc_running) return;
+  var now = Date.now();
+  _dcog_vc_elapsed = (now - _dcog_vc_startTs) / 1000;
+  _dcog_vc_bestElap = Math.max(_dcog_vc_bestElap, _dcog_vc_elapsed);
+  var en = window._lang === 'en';
+  // Check paliers (le HUD canvas est redessiné via _dcog_drawFrame à chaque frame)
+  var reached = 0;
+  for (var i = 0; i < _dcog_vc_palTargets.length; i++) {
+    if (_dcog_vc_elapsed >= _dcog_vc_palTargets[i]) {
+      reached = _dcog_vc_palTargets[i];
+    }
+  }
+  if (reached > _dcog_vc_curPalier) {
+    _dcog_vc_curPalier = reached;
+    _dcog_vc_onPalier(reached);
+  }
+  // Si objectif défini et atteint → auto-stop
+  if (_dcog_vc_objSec > 0 && _dcog_vc_elapsed >= _dcog_vc_objSec) {
+    try { _td_beep(440, 0.3, 0.3); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    _sensei_speak(en ? 'Objective reached!' : 'Objectif atteint !', 0);
+    _dcog_stop();
+    _dcog_showResults();
+    _dcog_recordToProgression();
+    var btnSv = document.getElementById('dcog_btnSave');
+    if (btnSv) btnSv.style.display = 'flex';
+    _senseiEndSession(4000);
+  }
+}
+
+function _dcog_vc_fmtTarget(s) {
+  if (s < 60) return s + 's';
+  if (s < 3600) return (s / 60) + 'min';
+  return (s / 3600) + 'h';
+}
+
+function _dcog_vc_onPalier(sec) {
+  // Flash radial doré sur l'overlay (écran uniquement, CSS transition)
+  var flash = document.getElementById('dcog_vc_palFlash');
+  if (flash) {
+    flash.style.opacity = '1';
+    setTimeout(function(){ if(flash) flash.style.opacity = '0'; }, 350);
+  }
+  // Message "✓ 30s" en gros au centre (CSS transition)
+  var msg = document.getElementById('dcog_vc_palAchieved');
+  if (msg) {
+    msg.textContent = '✓ ' + _dcog_vc_fmtTarget(sec);
+    msg.style.opacity = '1';
+    setTimeout(function(){ if(msg) msg.style.opacity = '0'; }, 1200);
+  }
+  // Beep + vibration
+  try { _td_beep(1200, 0.12, 0.3); } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([30, 20, 50]);
+}
+
+function _dcog_vc_stopRun() {
+  _dcog_vc_running = false;
+  if (_dcog_vc_rafId)    { clearInterval(_dcog_vc_rafId);    _dcog_vc_rafId = null; }
+  if (_dcog_vc_metroInt) { clearInterval(_dcog_vc_metroInt); _dcog_vc_metroInt = null; }
+}
+
+/* ── Dessin HUD gravé dans le canvas (pour export vidéo) ─────── */
+function _dcog_vc_drawCanvasHud(ctx, W, H) {
+  // Squelette mains (si ON + MediaPipe chargé)
+  if (_dcog_vc_skelOn && _dcog_vc_hands && _dcog_video && _dcog_video.readyState >= 2) {
+    try {
+      var nowMs = performance.now();
+      // Throttle : 20 fps max pour MediaPipe (économie CPU)
+      if (nowMs - _dcog_vc_handsLastTs > 50) {
+        _dcog_vc_handsResult = _dcog_vc_hands.detectForVideo(_dcog_video, nowMs);
+        _dcog_vc_handsLastTs = nowMs;
+      }
+      if (_dcog_vc_handsResult && _dcog_vc_handsResult.landmarks) {
+        _dcog_vc_drawSkeleton(ctx, W, H, _dcog_vc_handsResult.landmarks);
+      }
+    } catch(e) { /* silencieux */ }
+  }
+  ctx.save();
+  var en = window._lang === 'en';
+  var sec = _dcog_vc_elapsed;
+  var hh = Math.floor(sec / 3600);
+  var mm = Math.floor(sec / 60) % 60;
+  var ss = Math.floor(sec) % 60;
+  var fmt = (hh > 0 ? (hh < 10 ? '0' : '') + hh + ':' : '') +
+            (mm < 10 ? '0' : '') + mm + ':' +
+            (ss < 10 ? '0' : '') + ss;
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CHRONO CIRCULAIRE — côté GAUCHE, opposé au logo (bas-droit)
+  //  Zone centrale (W 0.35–0.65) totalement libre pour le jonglage
+  // ═══════════════════════════════════════════════════════════════
+  var cx = W * 0.17;
+  var cy = H * 0.52;
+  var radius = Math.min(W * 0.14, H * 0.24);
+
+  // Trouver palier précédent + prochain pour calculer la progression
+  var prevPalier = 0, nextPalier = null;
+  for (var k = 0; k < _dcog_vc_palTargets.length; k++) {
+    if (_dcog_vc_elapsed < _dcog_vc_palTargets[k]) { nextPalier = _dcog_vc_palTargets[k]; break; }
+    prevPalier = _dcog_vc_palTargets[k];
+  }
+  var progress = (nextPalier === null) ? 1 : Math.min(1, (sec - prevPalier) / (nextPalier - prevPalier));
+
+  // Fond disque semi-transparent (laisse voir le jonglage derrière)
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(10,13,20,0.42)';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 20;
+  ctx.fill();
+
+  // Anneau de fond fin (traceur)
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(245,197,24,0.18)';
+  ctx.lineWidth = Math.max(3, H * 0.008);
+  ctx.shadowBlur = 0;
+  ctx.stroke();
+
+  // Arc de progression doré (va vers le prochain palier) — part du haut, sens horaire
+  if (progress > 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius - 2, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress);
+    ctx.strokeStyle = '#f5c518';
+    ctx.lineWidth = Math.max(3, H * 0.008);
+    ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(245,197,24,0.75)';
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+  }
+
+  // Timer centré dans le disque
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.fillStyle = '#f5c518';
+  ctx.font = 'bold ' + Math.round(radius * 0.55) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(fmt, cx, cy - radius * 0.05);
+  // Label "CHRONO" en micro au-dessus
+  ctx.font = 'bold ' + Math.round(radius * 0.14) + 'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(en ? 'CHRONO' : 'CHRONO', cx, cy - radius * 0.55);
+  // Label "PROCHAIN xx" sous le timer, à l'intérieur du cercle
+  ctx.font = 'bold ' + Math.round(radius * 0.17) + 'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  var palInner = (nextPalier === null)
+    ? (en ? '👑 MAX' : '👑 MAX')
+    : ((en?'→ ':'→ ') + _dcog_vc_fmtTarget(nextPalier));
+  ctx.fillText(palInner, cx, cy + radius * 0.45);
+
+  // ═══════════════════════════════════════════════════════════════
+  //  BARRE DE PALIERS — bas du canvas (full width, discrète)
+  // ═══════════════════════════════════════════════════════════════
+  var barY = H * 0.93, barH = H * 0.012;
+  var marginX = W * 0.03;
+  var segGap = W * 0.004;
+  var totalGap = segGap * (_dcog_vc_palTargets.length - 1);
+  var segW = (W - 2 * marginX - totalGap) / _dcog_vc_palTargets.length;
+  for (var p = 0; p < _dcog_vc_palTargets.length; p++) {
+    var segX = marginX + p * (segW + segGap);
+    var isDone = _dcog_vc_curPalier >= _dcog_vc_palTargets[p];
+    ctx.fillStyle = isDone ? '#f5c518' : 'rgba(255,255,255,.25)';
+    if (isDone) { ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(245,197,24,.7)'; }
+    else ctx.shadowBlur = 0;
+    _dcog_vc_roundRect(ctx, segX, barY, segW, barH, barH/2);
+    ctx.fill();
+    // Label palier au-dessus
+    ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.font = 'bold ' + Math.round(H*0.018) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillStyle = isDone ? '#f5c518' : 'rgba(255,255,255,.5)';
+    ctx.textAlign = 'left';
+    ctx.fillText(_dcog_vc_fmtTarget(_dcog_vc_palTargets[p]), segX, barY - H*0.012);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  MÉTRONOME PULSE — top-left (hors zone jonglage, hors chrono)
+  // ═══════════════════════════════════════════════════════════════
+  if (_dcog_vc_metroBpm > 0) {
+    var pxDot = W * 0.045, pyDot = H * 0.08;
+    var pulseT = (Date.now() / (60000 / _dcog_vc_metroBpm)) % 1;
+    var scale = 1 + Math.max(0, 0.6 - pulseT * 2) * 0.8;
+    ctx.beginPath();
+    ctx.arc(pxDot, pyDot, H * 0.018 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = '#f5c518';
+    ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(245,197,24,.9)';
+    ctx.fill();
+    ctx.font = 'bold ' + Math.round(H*0.03) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#f5c518';
+    ctx.textAlign = 'left';
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.fillText(_dcog_vc_metroBpm + ' BPM', pxDot + H*0.03, pyDot + H*0.012);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  BRANDING "SENSEI VISUOMOTOR" — top-right (zone libre, pas de
+  //  collision avec métronome top-left ni logo bas-droit)
+  // ═══════════════════════════════════════════════════════════════
+  ctx.textAlign = 'right';
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.fillStyle = '#f5c518';
+  ctx.font = 'bold ' + Math.round(H*0.038) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W - W*0.025, H*0.065);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = 'bold ' + Math.round(H*0.027) + 'px "Barlow Condensed",sans-serif';
+  ctx.fillText('VISUOMOTOR 🎾🎾🎾', W - W*0.025, H*0.105);
+
+  // Note : window._camDrawLogo (appelé à la fin de _dcog_drawFrame)
+  //        dessine le logo officiel + "Powered by SENSEI AI" en bas-droit
+  //        → zone bas-droit RÉSERVÉE à cette infrastructure partagée
+  ctx.restore();
+}
+
+function _dcog_vc_roundRect(ctx, x, y, w, h, r) {
+  if (w < 2*r) r = w/2;
+  if (h < 2*r) r = h/2;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y,   x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x,   y+h, r);
+  ctx.arcTo(x,   y+h, x,   y,   r);
+  ctx.arcTo(x,   y,   x+w, y,   r);
+  ctx.closePath();
+}
+
+/* ── Dessin squelette MediaPipe (décoratif, pas métrique) ───── */
+var _dcog_vc_handConnections = [
+  [0,1],[1,2],[2,3],[3,4],         // pouce
+  [0,5],[5,6],[6,7],[7,8],         // index
+  [5,9],[9,10],[10,11],[11,12],    // majeur
+  [9,13],[13,14],[14,15],[15,16],  // annulaire
+  [13,17],[17,18],[18,19],[19,20], // auriculaire
+  [0,17]                           // base
+];
+function _dcog_vc_drawSkeleton(ctx, W, H, landmarksList) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(245,197,24,.85)';
+  ctx.lineWidth = Math.max(1.5, H * 0.004);
+  ctx.lineCap = 'round';
+  ctx.shadowColor = 'rgba(245,197,24,.5)';
+  ctx.shadowBlur = 6;
+  for (var h = 0; h < landmarksList.length; h++) {
+    var lm = landmarksList[h];
+    if (!lm || !lm.length) continue;
+    // Lignes
+    for (var c = 0; c < _dcog_vc_handConnections.length; c++) {
+      var a = _dcog_vc_handConnections[c][0], b = _dcog_vc_handConnections[c][1];
+      if (!lm[a] || !lm[b]) continue;
+      // Mirror horizontal (vidéo miroir)
+      ctx.beginPath();
+      ctx.moveTo((1 - lm[a].x) * W, lm[a].y * H);
+      ctx.lineTo((1 - lm[b].x) * W, lm[b].y * H);
+      ctx.stroke();
+    }
+    // Points
+    ctx.fillStyle = '#f5c518';
+    for (var p = 0; p < lm.length; p++) {
+      ctx.beginPath();
+      ctx.arc((1 - lm[p].x) * W, lm[p].y * H, Math.max(2, H * 0.005), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
 /* ═══════════════════════════════════════════
    RECORDING — même pattern que _tdr_ et _tsym_
    Canvas captureStream → MediaRecorder → blob
@@ -33165,15 +33676,21 @@ function _dcog_startRec() {
     if (!_dcog_recorder) return;
     try { _dcog_recorder.start(1000); _dcog_recActive = true; }
     catch(eStart) { _dcog_recError('start failed'); return; }
+    // Cap REC : par défaut 180s (3min) pour math/sprint/height/twoball/tboard/vcmath
+    // Pour viscoord : cap = objectif choisi + 15s buffer (ou 600s si objectif ∞)
+    var _recCapSec = 180;
+    if (_dcog_drill === 'viscoord' && typeof _dcog_vc_objSec === 'number') {
+      _recCapSec = (_dcog_vc_objSec > 0) ? (_dcog_vc_objSec + 15) : 600;
+    }
     _dcog_recTimer = setInterval(function() {
       _dcog_recSec++;
-      var rem = 180 - _dcog_recSec;
+      var rem = _recCapSec - _dcog_recSec;
       // Fix bug "1988:25:26" : modulo partout + STOP REC visible sur les 2 boutons (panneau + overlay)
       var mm=Math.floor(_dcog_recSec/60)%60,ss=_dcog_recSec%60,hh=Math.floor(_dcog_recSec/3600);
       var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
       var label = '&#9632; STOP REC · '+t+(rem<=30?' <span style="color:#ffd400">⚠'+rem+'s</span>':'');
       _syncRecBtns(true, label, '#e63946');
-      if (_dcog_recSec >= 180) _dcog_stopRec();
+      if (_dcog_recSec >= _recCapSec) _dcog_stopRec();
     }, 1000);
     _dcog_updateRecBtn();
     var st2 = document.getElementById('dcog_status');
@@ -33216,6 +33733,19 @@ function _dcog_updateInsight() {
   var msg = '';
   if (_dcog_drill === 'tboard') {
     el.textContent = (typeof _dcog_tbd_insight === 'function') ? _dcog_tbd_insight() : '';
+    return;
+  }
+  if (_dcog_drill === 'viscoord') {
+    if (_dcog_vc_bestElap < 1) { el.textContent = en ? 'Start a run to see the analysis...' : 'Lance un run pour voir l\'analyse...'; return; }
+    var p = _dcog_vc_curPalier;
+    if (p >= 300) msg = en ? '👑 Legendary! 5min streak — world-class visuomotor coordination.' : '👑 Légendaire ! 5min de streak — coordination visuomotrice de haut niveau.';
+    else if (p >= 180) msg = en ? '🥇 Excellent! 3min streak reached. Keep pushing to 5min.' : '🥇 Excellent ! Palier 3min atteint. Continue vers 5min.';
+    else if (p >= 120) msg = en ? '🥈 Solid! 2min streak. Target the 3min tier next.' : '🥈 Solide ! Palier 2min. Vise le 3min au prochain run.';
+    else if (p >= 60)  msg = en ? '🥉 Nice! 1min clean. Breathe, relax your shoulders, aim for 2min.' : '🥉 Bien ! 1min propre. Respire, relâche les épaules, vise 2min.';
+    else if (p >= 30)  msg = en ? '✅ Good start, 30s streak. Focus on steady rhythm.' : '✅ Bon départ, 30s de streak. Focus sur un rythme régulier.';
+    else if (p >= 15)  msg = en ? '💪 15s unlocked. Keep going — your eye-hand loop is warming up.' : '💪 15s débloqués. Continue — ta boucle œil-main chauffe.';
+    else msg = en ? '🎯 Try again — small, controlled throws, elbows close to body.' : '🎯 Recommence — petits lancers contrôlés, coudes près du corps.';
+    el.textContent = msg;
     return;
   }
   if (_dcog_drill === 'math' || _dcog_drill === 'vcmath') {
