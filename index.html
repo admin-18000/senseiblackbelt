@@ -2279,12 +2279,6 @@ window._dojoBackHome = function(){
         <div style="font-size:22px;margin-bottom:4px">🟦🟦🟦</div>
         <div id="dcog_lbl_rcs">REACTION CATCHING STICK</div>
       </button>
-      <!-- SENSEI REFLEX RUSH — mode arcade dérivé de RCS (flux continu, combos, bombes, rank) -->
-      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('rush')" id="dcog_btn_rush"
-        style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
-        <div style="font-size:22px;margin-bottom:4px">🎮⚡</div>
-        <div id="dcog_lbl_rush">SENSEI REFLEX RUSH</div>
-      </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
         style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
         <div style="font-size:22px;margin-bottom:4px">🧮</div>
@@ -2384,35 +2378,6 @@ window._dojoBackHome = function(){
       </div>
       <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rcs_setupHint">
         📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu'ils touchent le sol
-      </div>
-    </div>
-    <!-- ═══ SENSEI REFLEX RUSH — durée + niveau de départ ═══ -->
-    <div id="dcog_optRush" style="display:none;flex-direction:column;gap:12px">
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_rush_durLbl">⏱ DURÉE</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="dcog-rush-dur-btn" data-sec="30"  onclick="_dcog_rush_setDur(30)"  style="flex:1;min-width:62px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">30s</button>
-          <button class="dcog-rush-dur-btn" data-sec="60"  onclick="_dcog_rush_setDur(60)"  style="flex:1;min-width:62px;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">60s</button>
-          <button class="dcog-rush-dur-btn" data-sec="90"  onclick="_dcog_rush_setDur(90)"  style="flex:1;min-width:62px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">90s</button>
-          <button class="dcog-rush-dur-btn" data-sec="120" onclick="_dcog_rush_setDur(120)" style="flex:1;min-width:62px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">2min</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_rush_lvlLbl">⚡ TEMPO DE DÉPART</div>
-        <div style="display:flex;gap:6px">
-          <button class="dcog-rush-lvl-btn" data-ms="1800" onclick="_dcog_rush_setLvl(1800)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
-            🟢 <span id="dcog_rush_lvlChill">CHILL</span><br><span style="font-size:9px;opacity:.7">1,8s/spawn</span>
-          </button>
-          <button class="dcog-rush-lvl-btn" data-ms="1300" onclick="_dcog_rush_setLvl(1300)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
-            🟡 <span id="dcog_rush_lvlNorm">NORMAL</span><br><span style="font-size:9px;opacity:.7">1,3s/spawn</span>
-          </button>
-          <button class="dcog-rush-lvl-btn" data-ms="900"  onclick="_dcog_rush_setLvl(900)"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
-            🔥 <span id="dcog_rush_lvlBeast">BEAST</span><br><span style="font-size:9px;opacity:.7">0,9s/spawn</span>
-          </button>
-        </div>
-      </div>
-      <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rush_setupHint">
-        🎮 Attrape 🟦 (+10) · 🏀 (+20) · ⭐ (+100 ×2) · ÉVITE 💣 (−50). Combos ×2/×3/×5. Rank D → SENSEI
       </div>
     </div>
     <div id="dcog_optMath" style="display:none;gap:8px;flex-wrap:wrap">
@@ -2552,16 +2517,6 @@ window._dojoBackHome = function(){
         <div id="dcog_vcmHint" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font-cond);letter-spacing:.5px;text-align:center">
           Touche VRAI ou FAUX avec ta main
         </div>
-      </div>
-      <!-- ═══ SENSEI REFLEX RUSH overlay ═══
-           HUD complet (score, combo, timer, items, rank) dessiné dans le canvas
-           via _dcog_rush_drawCanvasHud. En DOM : juste les flashs CSS. -->
-      <div id="dcog_rushOverlay"
-        style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;background:transparent;pointer-events:none">
-        <div id="dcog_rush_catchFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(245,197,24,.3) 0%,rgba(245,197,24,0) 60%);opacity:0;transition:opacity .2s;pointer-events:none"></div>
-        <div id="dcog_rush_bombFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(230,57,70,.45) 0%,rgba(230,57,70,0) 60%);opacity:0;transition:opacity .3s;pointer-events:none"></div>
-        <div id="dcog_rush_starFlash" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,255,255,.5) 0%,rgba(245,197,24,.3) 30%,rgba(245,197,24,0) 70%);opacity:0;transition:opacity .4s;pointer-events:none"></div>
-        <div id="dcog_rush_bigMsg" style="position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:clamp(28px,8vw,54px);letter-spacing:3px;text-shadow:0 4px 24px rgba(0,0,0,.95);opacity:0;transition:opacity .25s;font-weight:900;white-space:nowrap">+10</div>
       </div>
       <!-- ═══ REACTION CATCHING STICK overlay ═══
            Les 6 bâtons + barre + stats sont dessinés dans le canvas via
@@ -14238,11 +14193,11 @@ function applyLangTracker(lang) {
     rules_cv_tuto:"Tu vois le terrain d\u2019en haut avec 5 joueurs bleus (ton \u00e9quipe) et 5 joueurs rouges (adversaires). Un bleu a le ballon \ud83c\udfc0. <b>Trouve le co\u00e9quipier bleu qui n\u2019a PAS de joueur rouge coll\u00e9 \u00e0 lui</b> (le \"d\u00e9marqu\u00e9\") et tape dessus. Tu n\u2019as que 2 secondes par round.",
     // \u2550\u2550\u2550 SENSEI REFLEX RUSH \u2014 drill cam\u00e9ra DCOG \u2550\u2550\u2550
     arcade_reflex_rush_lbl:"SENSEI REFLEX RUSH",
-    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Attrape \u00e0 la cam\u00e9ra \u00b7 Rank D\u2192SENSEI",
-    rules_reflex_rush_pitch:"Mode arcade cam\u00e9ra \u00b7 Attrape les bons items avec tes mains \u00b7 Combos & rank D\u2192SENSEI",
-    rules_reflex_rush_how:"Pose ton t\u00e9l\u00e9phone \u00e0 2m. 4 types d\u2019objets tombent du haut \u00b7 Attrape avec ta main : \ud83d\udfe6 b\u00e2ton (+10), \ud83c\udfc0 ballon (+20), \u2b50 \u00e9toile dor\u00e9e (+100 et bonus \u00d72 pendant 5s) \u00b7 \u00c9VITE la \ud83d\udca3 bombe (\u221250 pts et reset du combo)",
-    rules_reflex_rush_score:"\ud83c\udfc6 Combos : \u00d72 \u00e0 4 catches, \u00d73 \u00e0 8, \u00d75 \u00e0 15 \u00b7 Rank live : D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Leaderboard top 10 par dur\u00e9e (30\/60\/90\/120s)",
-    rules_reflex_rush_tuto:"R\u00e9glages : choisis la dur\u00e9e et le tempo de d\u00e9part (CHILL 1,8s \u00b7 NORMAL 1,3s \u00b7 BEAST 0,9s entre spawns). Le jeu acc\u00e9l\u00e8re progressivement. Mains \u00e0 hauteur de poitrine, pr\u00eates \u00e0 bouger lat\u00e9ralement. Priorise les \u2b50 (gros points + bonus), reste calme face aux \ud83d\udca3 (laisse-les tomber).",
+    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Tape pour attraper \u00b7 Rank D\u2192SENSEI",
+    rules_reflex_rush_pitch:"Mode arcade pur r\u00e9flexes \u00b7 Tape les bons items au doigt \u00b7 Combos & rank D\u2192SENSEI",
+    rules_reflex_rush_how:"4 types d\u2019objets tombent du haut de l\u2019\u00e9cran \u00b7 Tape avec ton doigt pour les attraper : \ud83d\udfe6 b\u00e2ton (+10), \ud83c\udfc0 ballon (+20), \u2b50 \u00e9toile dor\u00e9e (+100 et bonus \u00d72 pendant 5s) \u00b7 \u00c9VITE la \ud83d\udca3 bombe (\u221250 pts et reset du combo \u2014 ne la touche surtout pas, laisse-la tomber)",
+    rules_reflex_rush_score:"\ud83c\udfc6 Combos sur catches cons\u00e9cutifs : \u00d72 \u00e0 4, \u00d73 \u00e0 8, \u00d75 \u00e0 15 (le combo reset si tu rates un bon item ou tapes une bombe) \u00b7 Rank live : D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Leaderboard top 10 par dur\u00e9e (30\/60\/90\/120s)",
+    rules_reflex_rush_tuto:"R\u00e9glages : choisis la dur\u00e9e et le tempo de d\u00e9part (CHILL 1,7s \u00b7 NORMAL 1,2s \u00b7 BEAST 0,8s entre spawns). Le jeu acc\u00e9l\u00e8re progressivement vers la fin. Tiens le phone \u00e0 l\u2019horizontal, pouces libres pour taper partout sur l\u2019\u00e9cran. Priorise les \u2b50 (gros points + bonus x2 pendant 5s), reste discipline face aux \ud83d\udca3 (laisse-les simplement tomber).",
     dojo_gate_title:"\ud83e\udd4b ENTRE LE MOT DE PASSE DU D\u014cJ\u014c",
     dojo_gate_sub:"Acc\u00e8s activ\u00e9 uniquement par le Sensei \u00b7 En pr\u00e9sentiel",
     dojo_gate_btn:"VALIDER",
@@ -14614,11 +14569,11 @@ function applyLangTracker(lang) {
     rules_tp_tuto:"5 ball racks are placed on the court. <b>Tap a rack</b> to pick a ball \u2192 it arrives at the center bottom. Then same gesture as SHOOT ARENA (drag and release). You have 60 seconds to shoot all 25 balls. The <b>last ball of each rack is gold</b> (money ball) and worth 2 points.",
     rules_cv_tuto:"You see the court from above with 5 blue players (your team) and 5 red players (opponents). A blue player has the ball \ud83c\udfc0. <b>Find the blue teammate who has NO red player stuck to him</b> (the \"open man\") and tap him. You only have 2 seconds per round.",
     arcade_reflex_rush_lbl:"SENSEI REFLEX RUSH",
-    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Catch with your camera \u00b7 Rank D\u2192SENSEI",
-    rules_reflex_rush_pitch:"Camera arcade mode \u00b7 Catch good items with your hands \u00b7 Combos & rank D\u2192SENSEI",
-    rules_reflex_rush_how:"Place your phone at 2m. 4 types of objects fall from the top \u00b7 Catch with your hand: \ud83d\udfe6 stick (+10), \ud83c\udfc0 ball (+20), \u2b50 gold star (+100 and \u00d72 bonus for 5s) \u00b7 AVOID the \ud83d\udca3 bomb (\u221250 pts and combo reset)",
-    rules_reflex_rush_score:"\ud83c\udfc6 Combos: \u00d72 at 4 catches, \u00d73 at 8, \u00d75 at 15 \u00b7 Live rank: D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Top 10 leaderboard per duration (30\/60\/90\/120s)",
-    rules_reflex_rush_tuto:"Settings: pick your duration and starting tempo (CHILL 1.8s \u00b7 NORMAL 1.3s \u00b7 BEAST 0.9s between spawns). The game speeds up progressively. Hands at chest height, ready to move sideways. Prioritize \u2b50 (big points + bonus), stay calm with \ud83d\udca3 (just let them fall).",
+    arcade_reflex_rush_sub:"\ud83c\udfae\u26a1 Tap to catch \u00b7 Rank D\u2192SENSEI",
+    rules_reflex_rush_pitch:"Pure reflex arcade mode \u00b7 Tap good items with your finger \u00b7 Combos & rank D\u2192SENSEI",
+    rules_reflex_rush_how:"4 types of items fall from the top of the screen \u00b7 Tap them with your finger to catch: \ud83d\udfe6 stick (+10), \ud83c\udfc0 ball (+20), \u2b50 gold star (+100 and \u00d72 bonus for 5s) \u00b7 AVOID the \ud83d\udca3 bomb (\u221250 pts and combo reset \u2014 do NOT tap it, just let it fall)",
+    rules_reflex_rush_score:"\ud83c\udfc6 Combos on consecutive catches: \u00d72 at 4, \u00d73 at 8, \u00d75 at 15 (combo resets if you miss a good item or tap a bomb) \u00b7 Live rank: D \u2192 C \u2192 B \u2192 A \u2192 S \u2192 SS \u2192 SENSEI \u00b7 Top 10 leaderboard per duration (30\/60\/90\/120s)",
+    rules_reflex_rush_tuto:"Settings: pick your duration and starting tempo (CHILL 1.7s \u00b7 NORMAL 1.2s \u00b7 BEAST 0.8s between spawns). The game speeds up near the end. Hold the phone horizontally, thumbs free to tap anywhere on the screen. Prioritize \u2b50 (big points + x2 bonus for 5s), stay disciplined with \ud83d\udca3 (just let them fall).",
     dojo_gate_title:"\ud83e\udd4b ENTER THE D\u014cJ\u014c PASSWORD",
     dojo_gate_sub:"Access enabled by the Sensei only \u00b7 In-person",
     dojo_gate_btn:"UNLOCK",
@@ -30222,13 +30177,6 @@ function _dcog_applyLang(en) {
     'dcog_rcs_lvlHard':  en?'HARD':'DIFFICILE',
     'dcog_rcs_setupHint':en?'📱 Phone at 2m · full body in frame · 6 sticks drop in random order — catch each with your hand before it hits the floor':'📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu\'ils touchent le sol',
     // ═══ SENSEI REFLEX RUSH ═══
-    'dcog_lbl_rush':     en?'SENSEI REFLEX RUSH':'SENSEI REFLEX RUSH',
-    'dcog_rush_durLbl':  en?'⏱ DURATION':'⏱ DURÉE',
-    'dcog_rush_lvlLbl':  en?'⚡ STARTING TEMPO':'⚡ TEMPO DE DÉPART',
-    'dcog_rush_lvlChill':en?'CHILL':'CHILL',
-    'dcog_rush_lvlNorm': en?'NORMAL':'NORMAL',
-    'dcog_rush_lvlBeast':en?'BEAST':'BEAST',
-    'dcog_rush_setupHint':en?'🎮 Catch 🟦 (+10) · 🏀 (+20) · ⭐ (+100 ×2) · AVOID 💣 (−50). Combos ×2/×3/×5. Rank D → SENSEI':'🎮 Attrape 🟦 (+10) · 🏀 (+20) · ⭐ (+100 ×2) · ÉVITE 💣 (−50). Combos ×2/×3/×5. Rank D → SENSEI',
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id); if (el) el.textContent = map[id];
@@ -30261,12 +30209,6 @@ function _dcog_selectDrill(drill, langOnly) {
       typeof _dcog_rcs_stopRun === 'function') {
     _dcog_rcs_stopRun();
   }
-  // Idem pour rush : stopper le flux de spawn + physique
-  if (!langOnly && _dcog_drill === 'rush' && drill !== 'rush' &&
-      typeof _dcog_rush_running !== 'undefined' && _dcog_rush_running &&
-      typeof _dcog_rush_stopRun === 'function') {
-    _dcog_rush_stopRun();
-  }
   _dcog_drill = drill;
   var en = window._lang === 'en';
   var descs = {
@@ -30296,7 +30238,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','rush','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -30305,20 +30247,19 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', rush:'dcog_optRush', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
         // viscoord/rcs/rush utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'rush' ? '12px' : '8px');
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' ? '12px' : '8px');
       }
     });
     // Update opt title
     var optTitles = {
       viscoord:en ? '🎾🎾🎾 CHALLENGE' : '🎾🎾🎾 CHALLENGE',
       rcs:     en ? '🟦 LEVEL'          : '🟦 NIVEAU',
-      rush:    en ? '🎮 ARCADE SETUP'   : '🎮 SETUP ARCADE',
       math:    en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       sprint:  en ? '⏱ TARGET'          : '⏱ OBJECTIF',
       height:  en ? '📏 HEIGHT ZONE'    : '📏 ZONE DE HAUTEUR',
@@ -30333,7 +30274,6 @@ function _dcog_selectDrill(drill, langOnly) {
     var scoreLabels = {
       viscoord:[en?'BEST STREAK':'STREAK MAX', en?'PALIER':'PALIER',   en?'TIME':'TEMPS'],
       rcs:     [en?'CATCHES':'CATCHES',  en?'MISSED':'RATÉS',       en?'AVG REACT':'RÉACTION MOY.'],
-      rush:    [en?'SCORE':'SCORE',      en?'MAX COMBO':'COMBO MAX', en?'RANK':'RANK'],
       math:    [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
       sprint:  [en?'DRIBBLES':'DRIBBLES', en?'TARGET':'OBJECTIF',   en?'TIME':'TEMPS'],
       height:  [en?'IN ZONE %':'% EN ZONE', en?'FRAMES':'FRAMES',   en?'TIME':'TEMPS'],
@@ -30369,7 +30309,7 @@ function _dcog_selectDrill(drill, langOnly) {
 /* ── Haptique sur tr-tab et dcog-drill-btn ──────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   // tr-tab : onglets Training
-  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn,.dcog-vc-obj-btn,.dcog-vc-metro-btn,.dcog-vc-skel-btn,.dcog-rcs-lvl-btn,.dcog-rush-dur-btn,.dcog-rush-lvl-btn').forEach(function(btn) {
+  document.querySelectorAll('.tr-tab,.dcog-drill-btn,.dcog-lvl-btn,.dcog-spr-btn,.dcog-ht-btn,.dcog-tb-btn,.dcog-vcm-btn,.dcog-vc-obj-btn,.dcog-vc-metro-btn,.dcog-vc-skel-btn,.dcog-rcs-lvl-btn').forEach(function(btn) {
     btn.addEventListener('touchstart', function(){ _vibe(8); }, {passive:true});
   });
   // tr-btn : boutons START/STOP/SAVE
@@ -30511,15 +30451,13 @@ function _dcog_stop() {
   if (typeof _dcog_tbd_cleanup === 'function') _dcog_tbd_cleanup();
   // overlay géré par senseiCamStop()
   // Hide all overlays
-  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay','dcog_vcmOverlay','dcog_viscoordOverlay','dcog_rcsOverlay','dcog_rushOverlay'].forEach(function(id){
+  ['dcog_mathOverlay','dcog_sprintOverlay','dcog_heightOverlay','dcog_twoballOverlay','dcog_vcmOverlay','dcog_viscoordOverlay','dcog_rcsOverlay'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   // Stop viscoord run (timer, métronome, MediaPipe) si actif
   if (typeof _dcog_vc_stopRun === 'function') _dcog_vc_stopRun();
   // Stop rcs run (séquence drops) si actif
   if (typeof _dcog_rcs_stopRun === 'function') _dcog_rcs_stopRun();
-  // Stop rush run (spawn + physique arcade) si actif
-  if (typeof _dcog_rush_stopRun === 'function') _dcog_rush_stopRun();
   var bRec2 = document.getElementById('dcog_btnRec');
   if (bRec2) bRec2.style.display = 'none';
   var btnS = document.getElementById('dcog_btnStart');
@@ -30541,12 +30479,7 @@ function _dcog_stop() {
 function _dcog_recordToProgression() {
   if (typeof _sb_recordSession !== 'function') return;
   var dcogPct = 0;
-  if (_dcog_drill === 'rush') {
-    var sr = _dcog_rush_score || 0;
-    var tgt2 = (_dcog_rush_duration || 60) * (500 / 60);
-    dcogPct = Math.min(100, Math.round(sr / tgt2 * 100));
-    _sb_recordSession('rush', dcogPct);
-  } else if (_dcog_drill === 'rcs') {
+  if (_dcog_drill === 'rcs') {
     // Score = % de catches réussis sur 6 drops
     var cR = _dcog_rcs_catches || 0;
     var tR = (_dcog_rcs_catches || 0) + (_dcog_rcs_misses || 0);
@@ -30689,8 +30622,7 @@ function _dcog_launchDrill() {
     height:'dcog_heightOverlay', twoball:'dcog_twoballOverlay',
     vcmath:'dcog_vcmOverlay',
     viscoord:'dcog_viscoordOverlay',
-    rcs:'dcog_rcsOverlay',
-    rush:'dcog_rushOverlay'
+    rcs:'dcog_rcsOverlay'
   };
   Object.keys(overlays).forEach(function(d){
     var el = document.getElementById(overlays[d]);
@@ -30708,7 +30640,7 @@ function _dcog_launchDrill() {
   //   le chrono parte vraiment de 0:00 quand le user commence à jongler
   // Timer session pour les drills non-math/vcmath/viscoord/rcs/rush
   // viscoord/rcs/rush ont leur propre timer dédié (durée gérée dans leur startRun)
-  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath' && _dcog_drill !== 'viscoord' && _dcog_drill !== 'rcs' && _dcog_drill !== 'rush') {
+  if (_dcog_drill !== 'math' && _dcog_drill !== 'vcmath' && _dcog_drill !== 'viscoord' && _dcog_drill !== 'rcs') {
     _dcog_sessSec = 0;
     if (_dcog_sessTimer) clearInterval(_dcog_sessTimer);
     _dcog_sessTimer = setInterval(function(){
@@ -30777,10 +30709,6 @@ function _dcog_launchDrill() {
       if (_dcog_drill === 'rcs' && typeof _dcog_rcs_startRun === 'function') {
         _dcog_rcs_startRun();
       }
-      // SENSEI REFLEX RUSH : démarrer le flux arcade après le countdown
-      if (_dcog_drill === 'rush' && typeof _dcog_rush_startRun === 'function') {
-        _dcog_rush_startRun();
-      }
       setTimeout(function(){ if(_dcog_running) _dcog_detect(); },50);
       return;
     }
@@ -30798,7 +30726,7 @@ function _dcog_launchDrill() {
     ctx.fillStyle='#fff';
     ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H/2 + Math.round(H*0.32));
     // Branding top-right pendant le countdown (viscoord / rcs / rush)
-    if (_dcog_drill === 'viscoord' || _dcog_drill === 'rcs' || _dcog_drill === 'rush') {
+    if (_dcog_drill === 'viscoord' || _dcog_drill === 'rcs') {
       ctx.textAlign='right';
       ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,0.95)';
       ctx.fillStyle='#f5c518';
@@ -30806,9 +30734,7 @@ function _dcog_launchDrill() {
       ctx.fillText('SENSEI', W-W*0.025, H*0.065);
       ctx.fillStyle='rgba(255,255,255,0.85)';
       ctx.font='bold '+Math.round(H*0.027)+'px "Barlow Condensed",sans-serif';
-      var brandSub = (_dcog_drill === 'viscoord') ? 'VISUOMOTOR 🎾🎾🎾'
-                   : (_dcog_drill === 'rcs')      ? 'REACTION STICK 🟦'
-                   :                                'REFLEX RUSH 🎮⚡';
+      var brandSub = (_dcog_drill === 'viscoord') ? 'VISUOMOTOR 🎾🎾🎾' : 'REACTION STICK 🟦';
       ctx.fillText(brandSub, W-W*0.025, H*0.105);
     }
     ctx.restore();
@@ -30822,7 +30748,14 @@ function _dcog_launchDrill() {
 
 /* ── Detection loop (MoveNet) ────────────────────────────────── */
 function _dcog_detect() {
-  if (!_dcog_running || !_tsym_detector || !_dcog_video) {
+  if (!_dcog_running || !_dcog_video) {
+    if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
+    return;
+  }
+  // Si MoveNet n'est pas encore prêt, on continue à redessiner le canvas (vidéo + HUD)
+  // sans pose detection → évite l'écran noir pour les drills HUD-driven (viscoord/rcs/rush)
+  if (!_tsym_detector) {
+    try { _dcog_drawFrame([]); } catch(eDraw){}
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
     return;
   }
@@ -30836,7 +30769,6 @@ function _dcog_detect() {
     if (_dcog_drill === 'sprint')  _dcog_analyzeSprintWrist(poses);
     if (_dcog_drill === 'tboard' && typeof _dcog_tbd_analyzePose === 'function') _dcog_tbd_analyzePose(poses);
     if (_dcog_drill === 'rcs' && typeof _dcog_rcs_analyzePose === 'function') _dcog_rcs_analyzePose(poses);
-    if (_dcog_drill === 'rush' && typeof _dcog_rush_analyzePose === 'function') _dcog_rush_analyzePose(poses);
     _dcog_detectWristBpm(poses);  // BPM MoveNet — tous les drills
     if (_dcog_running) _dcog_rafId = requestAnimationFrame(_dcog_detect);
   }).catch(function() {
@@ -30861,10 +30793,6 @@ function _dcog_drawFrame(poses) {
   // ═══ REACTION CATCHING STICK — bâtons + stats gravés dans la vidéo ═══
   if (_dcog_drill === 'rcs' && _dcog_running && typeof _dcog_rcs_drawCanvasHud === 'function') {
     _dcog_rcs_drawCanvasHud(ctx, W, H);
-  }
-  // ═══ SENSEI REFLEX RUSH — items + score + combo + timer + rank gravés dans la vidéo ═══
-  if (_dcog_drill === 'rush' && _dcog_running && typeof _dcog_rush_drawCanvasHud === 'function') {
-    _dcog_rush_drawCanvasHud(ctx, W, H);
   }
   // Draw two ball height lines on canvas
   if (_dcog_drill === 'twoball' && _dcog_running &&
@@ -32617,45 +32545,6 @@ function _dcog_showResults() {
     html += '<div class="tr-score-box"><div class="tr-score-num"><span class="'+clsH+'">'+pctH+'%</span></div><div class="tr-score-lbl">'+(en?'IN ZONE':'EN ZONE')+'</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num">'+_dcog_heightFrames+'</div><div class="tr-score-lbl">FRAMES</div></div>';
     html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+(_dcog_heightZone==='low'?(en?'LOW':'BAS'):(en?'HIGH':'HAUT'))+'</div><div class="tr-score-lbl">'+(en?'ZONE':'ZONE')+'</div></div>';
-  } else if (_dcog_drill === 'rush') {
-    // SENSEI REFLEX RUSH : score final / combo max / rank + best score persistant
-    var scoreR = _dcog_rush_score || 0;
-    var comboMx = _dcog_rush_bestCombo || 0;
-    var rankR = _dcog_rush_computeRank(scoreR, _dcog_rush_duration);
-    var bestR = _dcog_rush_getBest();
-    var isNewBest = scoreR > 0 && scoreR >= bestR;
-    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+scoreR+'</div><div class="tr-score-lbl">'+(en?'SCORE':'SCORE')+'</div></div>';
-    html += '<div class="tr-score-box"><div class="tr-score-num">×'+comboMx+'</div><div class="tr-score-lbl">'+(en?'MAX COMBO':'COMBO MAX')+'</div></div>';
-    html += '<div class="tr-score-box"><div class="tr-score-num" style="color:'+_dcog_rush_rankColor(rankR)+'">'+rankR+'</div><div class="tr-score-lbl">RANK</div></div>';
-    html += '</div>';
-    // Ligne best score + new best flash
-    html += '<div style="margin-top:12px;padding:10px;background:'+(isNewBest?'rgba(245,197,24,.12)':'rgba(255,255,255,.03)')+';border-left:3px solid '+(isNewBest?'#f5c518':'rgba(255,255,255,.15)')+';border-radius:6px;font-family:var(--font-cond);font-size:12px;letter-spacing:1px;text-align:center">';
-    if (isNewBest) {
-      html += '<span style="color:#f5c518;font-weight:900">🏆 '+(en?'NEW BEST!':'NOUVEAU RECORD !')+'</span> '+scoreR+' pts';
-    } else {
-      html += '<span style="color:#7a8299">'+(en?'YOUR BEST':'TON RECORD')+'</span> <span style="color:#f5c518;font-weight:900">'+bestR+' pts</span>';
-    }
-    html += '</div>';
-    // Leaderboard top 5 pour cette durée
-    var lb = _dcog_rush_getLeaderboard(_dcog_rush_duration);
-    if (lb.length > 0) {
-      html += '<div style="margin-top:12px;padding:10px;background:rgba(255,255,255,.03);border-radius:6px">';
-      html += '<div style="font-family:var(--font-cond);font-size:10px;color:#7a8299;letter-spacing:1.5px;margin-bottom:6px">'+(en?'TOP 5 — ':'TOP 5 — ')+_dcog_rush_duration+'s</div>';
-      lb.slice(0,5).forEach(function(entry, idx){
-        var medal = idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':(idx+1)+'.';
-        html += '<div style="display:flex;justify-content:space-between;padding:2px 4px;font-family:var(--font-cond);font-size:11px">'
-             + '<span>'+medal+' '+entry.rank+'</span>'
-             + '<span style="color:#f5c518;font-weight:700">'+entry.score+' pts</span>'
-             + '</div>';
-      });
-      html += '</div>';
-    }
-    // Sauver dans localStorage si c'est un score valide
-    if (scoreR > 0) _dcog_rush_saveScore(scoreR, rankR, _dcog_rush_duration);
-    // Return early car on a déjà ajouté </div> et le reste
-    res.innerHTML = html;
-    _dcog_updateInsight();
-    return;
   } else if (_dcog_drill === 'rcs') {
     // REACTION CATCHING STICK : catches / miss / temps de réaction moyen
     var catches = _dcog_rcs_catches || 0;
@@ -32709,16 +32598,9 @@ function _dcog_saveSession() {
   var en  = window._lang === 'en';
   var now = new Date();
   var d   = now.toLocaleDateString(en?'en-US':'fr-FR',{day:'numeric',month:'short'});
-  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD',viscoord:en?'Visuomotor':'Visuomoteur',rcs:en?'Reaction Stick':'Bâtons Réaction',rush:'Reflex Rush'};
+  var drillLabel = {math:'Math',sprint:'300/600',height:en?'Height':'Hauteur',twoball:en?'Two Ball':'Deux Ballons',tboard:'TBOARD',viscoord:en?'Visuomotor':'Visuomoteur',rcs:en?'Reaction Stick':'Bâtons Réaction'};
   var score = 0, detail = '';
-  if (_dcog_drill==='rush') {
-    var scR = _dcog_rush_score || 0;
-    var rk  = _dcog_rush_computeRank(scR, _dcog_rush_duration);
-    // Normalisation sur 100 : pour une durée de 60s, 500 pts = 100%
-    var tgt = (_dcog_rush_duration || 60) * (500 / 60);
-    score  = Math.min(100, Math.round(scR / tgt * 100));
-    detail = scR+' pts · '+rk+' · ×'+(_dcog_rush_bestCombo||0);
-  } else if (_dcog_drill==='rcs') {
+  if (_dcog_drill==='rcs') {
     var catchesS = _dcog_rcs_catches || 0;
     var missesS  = _dcog_rcs_misses || 0;
     var totS = catchesS + missesS;
@@ -33451,524 +33333,6 @@ function _dcog_tbd_cleanup() {
   _dcog_tbd_prevRWr = null;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════════
-   SENSEI REFLEX RUSH 🎮⚡
-   ─────────────────────────────────────────────────────────────────
-   Mode arcade dérivé de RCS : flux continu d'items qui tombent,
-   le joueur attrape les bons (🟦 +10, 🏀 +20, ⭐ +100 ×2) et évite
-   les 💣 (−50). Combo x2/x3/x5 sur enchaînements. Rank D → SENSEI.
-   Leaderboard local par durée. Pattern 100% hérité de RCS/viscoord
-   pour REC/HUD/branding/détection pose MoveNet.
-═══════════════════════════════════════════════════════════════════ */
-var _dcog_rush_running   = false;
-var _dcog_rush_duration  = 60;      // secondes (30/60/90/120)
-var _dcog_rush_startLvl  = 1300;    // ms entre spawns au départ (CHILL/NORMAL/BEAST)
-var _dcog_rush_startTs   = 0;
-var _dcog_rush_elapsed   = 0;
-var _dcog_rush_score     = 0;
-var _dcog_rush_combo     = 0;       // streak catches de bons items
-var _dcog_rush_bestCombo = 0;
-var _dcog_rush_bonusUntil = 0;      // timestamp fin du bonus ×2 étoile dorée
-var _dcog_rush_items     = [];      // {type, x, y, vy, state, spawnTs, catchTs, id}
-var _dcog_rush_particles = [];
-var _dcog_rush_spawnTimer = null;
-var _dcog_rush_rafId     = null;
-var _dcog_rush_lastFrameTs = 0;
-var _dcog_rush_sessionEndTs = 0;
-var _dcog_rush_gravity   = 1200;    // + lent que RCS pour laisser le temps de réagir
-var _dcog_rush_itemId    = 0;
-var _dcog_rush_stats     = {caught:0, missed:0, bombs:0, stars:0};
-
-/* ── Setters UI ──────────────────────────────────────────────── */
-function _dcog_rush_setDur(sec) {
-  _dcog_rush_duration = sec;
-  document.querySelectorAll('.dcog-rush-dur-btn').forEach(function(b){
-    var active = parseInt(b.dataset.sec,10) === sec;
-    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
-    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
-    b.style.color      = active ? '#f5c518' : '#7a8299';
-  });
-}
-function _dcog_rush_setLvl(ms) {
-  _dcog_rush_startLvl = ms;
-  document.querySelectorAll('.dcog-rush-lvl-btn').forEach(function(b){
-    var active = parseInt(b.dataset.ms,10) === ms;
-    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
-    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
-    b.style.color      = active ? '#f5c518' : '#7a8299';
-  });
-}
-
-/* ── Rank + couleur rank + leaderboard localStorage ─────────── */
-function _dcog_rush_computeRank(score, dur) {
-  // Normalisé pour 60s. Barème : 500=S, 350=A, 220=B, 120=C, 50=D, 800=SS, 1200=SENSEI
-  var norm = score / (dur || 60) * 60;
-  if (norm >= 1200) return 'SENSEI';
-  if (norm >= 800)  return 'SS';
-  if (norm >= 500)  return 'S';
-  if (norm >= 350)  return 'A';
-  if (norm >= 220)  return 'B';
-  if (norm >= 120)  return 'C';
-  return 'D';
-}
-function _dcog_rush_rankColor(rank) {
-  return rank === 'SENSEI' ? '#f5c518'
-       : rank === 'SS'     ? '#ff6b35'
-       : rank === 'S'      ? '#e63946'
-       : rank === 'A'      ? '#2dc653'
-       : rank === 'B'      ? '#4cc9f0'
-       : rank === 'C'      ? '#9aa3b3'
-       :                     '#7a8299';
-}
-function _dcog_rush_lbKey(dur) { return 'sensei_rush_lb_' + dur; }
-function _dcog_rush_getLeaderboard(dur) {
-  try {
-    var raw = localStorage.getItem(_dcog_rush_lbKey(dur));
-    if (!raw) return [];
-    var arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  } catch(e) { return []; }
-}
-function _dcog_rush_saveScore(score, rank, dur) {
-  try {
-    var lb = _dcog_rush_getLeaderboard(dur);
-    lb.push({ score:score, rank:rank, date:Date.now() });
-    lb.sort(function(a,b){ return b.score - a.score; });
-    lb = lb.slice(0, 10);
-    localStorage.setItem(_dcog_rush_lbKey(dur), JSON.stringify(lb));
-  } catch(e) {}
-}
-function _dcog_rush_getBest() {
-  var lb = _dcog_rush_getLeaderboard(_dcog_rush_duration);
-  return lb.length > 0 ? lb[0].score : 0;
-}
-
-/* ── Démarrage d'un run ──────────────────────────────────────── */
-function _dcog_rush_startRun() {
-  _dcog_rush_running = true;
-  _dcog_rush_startTs = Date.now();
-  _dcog_rush_elapsed = 0;
-  _dcog_rush_score = 0;
-  _dcog_rush_combo = 0;
-  _dcog_rush_bestCombo = 0;
-  _dcog_rush_bonusUntil = 0;
-  _dcog_rush_items = [];
-  _dcog_rush_particles = [];
-  _dcog_rush_lastFrameTs = 0;
-  _dcog_rush_sessionEndTs = 0;
-  _dcog_rush_itemId = 0;
-  _dcog_rush_stats = {caught:0, missed:0, bombs:0, stars:0};
-  // 1er spawn immédiat, puis boucle qui recalcule l'intervalle à chaque appel
-  // (intervalle décroît avec le temps écoulé pour accélérer la vitesse)
-  _dcog_rush_scheduleNextSpawn(0);
-  // rAF pour physique de chute + particules
-  _dcog_rush_rafId = requestAnimationFrame(_dcog_rush_physicsLoop);
-}
-
-function _dcog_rush_scheduleNextSpawn(immediate) {
-  if (!_dcog_rush_running) return;
-  var tick = function() {
-    if (!_dcog_rush_running) return;
-    _dcog_rush_spawnItem();
-    // Intervalle courant : part de startLvl, descend progressivement jusqu'à un plancher
-    // Durée totale → fin de game, pas besoin d'accélérer après 90% du temps
-    var pct = Math.min(1, _dcog_rush_elapsed / _dcog_rush_duration);
-    var floorMs = Math.max(500, _dcog_rush_startLvl * 0.5);
-    var interval = _dcog_rush_startLvl - (_dcog_rush_startLvl - floorMs) * pct;
-    _dcog_rush_spawnTimer = setTimeout(tick, interval);
-  };
-  if (immediate === 0) tick();
-  else _dcog_rush_spawnTimer = setTimeout(tick, immediate);
-}
-
-/* ── Spawn d'un item ─────────────────────────────────────────── */
-function _dcog_rush_spawnItem() {
-  if (!_dcog_rush_running) return;
-  var cv = _dcog_canvas; if (!cv) return;
-  var W = cv.width, H = cv.height;
-  // Type pondéré : 50% bâton, 25% ballon, 15% bombe, 10% étoile
-  var r = Math.random();
-  var type = r < 0.5 ? 'stick'
-           : r < 0.75 ? 'ball'
-           : r < 0.90 ? 'bomb'
-           :            'star';
-  // Position X aléatoire dans 6 colonnes
-  var marginX = W * 0.08;
-  var usableW = W - 2 * marginX;
-  var col = Math.floor(Math.random() * 6);
-  var colW = usableW / 6;
-  var cx = marginX + col * colW + colW / 2;
-  _dcog_rush_items.push({
-    id: ++_dcog_rush_itemId,
-    type: type,
-    x: cx,
-    y: H * 0.05,         // part du haut
-    vy: 0,
-    state: 'falling',
-    spawnTs: Date.now(),
-    catchTs: 0
-  });
-  // Son de spawn — frequence différente par type
-  var freq = type === 'star' ? 1400 : type === 'bomb' ? 300 : type === 'ball' ? 800 : 600;
-  var vol  = type === 'star' ? 0.25 : type === 'bomb' ? 0.3  : 0.15;
-  try { _td_beep(freq, 0.05, vol); } catch(e){}
-}
-
-/* ── Physics loop (gravité + particules + fin de session) ──── */
-function _dcog_rush_physicsLoop() {
-  if (!_dcog_rush_running) return;
-  var nowTs = Date.now();
-  var dt = _dcog_rush_lastFrameTs ? (nowTs - _dcog_rush_lastFrameTs) / 1000 : 0.016;
-  _dcog_rush_lastFrameTs = nowTs;
-  if (dt > 0.1) dt = 0.1;
-  _dcog_rush_elapsed = (nowTs - _dcog_rush_startTs) / 1000;
-  var cv = _dcog_canvas;
-  var Href = cv ? cv.height : 480;
-  var gravScale = Href / 480;
-  // Update items en chute
-  for (var i = 0; i < _dcog_rush_items.length; i++) {
-    var it = _dcog_rush_items[i];
-    if (it.state === 'falling') {
-      it.vy += _dcog_rush_gravity * gravScale * dt;
-      it.y += it.vy * dt;
-      if (it.y > Href * 0.92) {
-        // Item sort de l'écran → missed (sauf si bombe : miss d'une bombe = OK)
-        if (it.type === 'bomb') {
-          it.state = 'avoided'; // bombe évitée, c'est bien
-        } else {
-          it.state = 'missed';
-          if (_dcog_rush_combo > 0) _dcog_rush_combo = 0; // reset combo
-          _dcog_rush_stats.missed++;
-        }
-      }
-    }
-  }
-  // Nettoyer items sortis (gagne mémoire)
-  _dcog_rush_items = _dcog_rush_items.filter(function(it){
-    return !(it.y > Href * 1.1 || (it.state !== 'falling' && nowTs - (it.catchTs || it.spawnTs) > 600));
-  });
-  // Particules
-  var kept = [];
-  for (var p = 0; p < _dcog_rush_particles.length; p++) {
-    var pt = _dcog_rush_particles[p];
-    pt.life -= dt;
-    if (pt.life > 0) {
-      pt.x += pt.vx * dt;
-      pt.y += pt.vy * dt;
-      pt.vy += 400 * gravScale * dt;
-      kept.push(pt);
-    }
-  }
-  _dcog_rush_particles = kept;
-  // Fin de session ?
-  if (_dcog_rush_elapsed >= _dcog_rush_duration && _dcog_rush_sessionEndTs === 0) {
-    _dcog_rush_sessionEndTs = nowTs + 500; // 0.5s de grâce pour voir dernières particules
-    if (_dcog_rush_spawnTimer) { clearTimeout(_dcog_rush_spawnTimer); _dcog_rush_spawnTimer = null; }
-  }
-  if (_dcog_rush_sessionEndTs > 0 && nowTs > _dcog_rush_sessionEndTs) {
-    _dcog_rush_sessionEndTs = 0;
-    var en = window._lang === 'en';
-    try { _td_beep(440, 0.3, 0.3); } catch(e){}
-    if (navigator.vibrate) navigator.vibrate([100,50,100]);
-    _sensei_speak(en ? 'Game over!' : 'Fin de partie !', 0);
-    _dcog_stop();
-    _dcog_showResults();
-    _dcog_recordToProgression();
-    var btnSv = document.getElementById('dcog_btnSave');
-    if (btnSv) btnSv.style.display = 'flex';
-    _senseiEndSession(4000);
-    return;
-  }
-  if (_dcog_rush_running) _dcog_rush_rafId = requestAnimationFrame(_dcog_rush_physicsLoop);
-}
-
-function _dcog_rush_stopRun() {
-  _dcog_rush_running = false;
-  if (_dcog_rush_spawnTimer) { clearTimeout(_dcog_rush_spawnTimer); _dcog_rush_spawnTimer = null; }
-  if (_dcog_rush_rafId) { cancelAnimationFrame(_dcog_rush_rafId); _dcog_rush_rafId = null; }
-  _dcog_rush_sessionEndTs = 0;
-}
-
-/* ── Analyse pose : détection catch (poignet sur item en chute) ──
-   Même infra que TDR / RCS : _tsym_kp_hand avec extrapolation coude→main. */
-function _dcog_rush_analyzePose(poses) {
-  if (!_dcog_rush_running || !poses || !poses[0]) return;
-  if (!_dcog_canvas || !_dcog_video) return;
-  var W = _dcog_canvas.width, H = _dcog_canvas.height;
-  var sx = W / (_dcog_video.videoWidth  || 640);
-  var sy = H / (_dcog_video.videoHeight || 480);
-  var hands = [];
-  ['left','right'].forEach(function(side){
-    var kp = _tsym_kp_hand(poses, side);
-    if (!kp) return;
-    hands.push({ x: W - kp.x * sx, y: kp.y * sy });
-  });
-  if (!hands.length) return;
-  // Zone de catch autour de chaque item (généreuse comme RCS)
-  var catchR = Math.max(28, Math.min(W, H) * 0.055);
-  for (var i = 0; i < _dcog_rush_items.length; i++) {
-    var it = _dcog_rush_items[i];
-    if (it.state !== 'falling') continue;
-    for (var h = 0; h < hands.length; h++) {
-      var hd = hands[h];
-      var dx = hd.x - it.x, dy = hd.y - it.y;
-      if (dx*dx + dy*dy < catchR * catchR) {
-        _dcog_rush_onCatch(it);
-        break;
-      }
-    }
-  }
-}
-
-/* ── Catch logic ─────────────────────────────────────────────── */
-function _dcog_rush_onCatch(it) {
-  it.state = 'caught';
-  it.catchTs = Date.now();
-  var nowBonus = (Date.now() < _dcog_rush_bonusUntil);
-  var en = window._lang === 'en';
-  var pts = 0;
-  var color = '#f5c518';
-  var msg = '';
-  if (it.type === 'bomb') {
-    pts = -50;
-    color = '#e63946';
-    msg = '−50 💣';
-    _dcog_rush_combo = 0;
-    _dcog_rush_stats.bombs++;
-    try { _td_beep(180, 0.3, 0.35); } catch(e){}
-    if (navigator.vibrate) navigator.vibrate([80, 30, 80]);
-    _dcog_rush_flashBomb();
-  } else {
-    _dcog_rush_combo++;
-    _dcog_rush_bestCombo = Math.max(_dcog_rush_bestCombo, _dcog_rush_combo);
-    _dcog_rush_stats.caught++;
-    var base = it.type === 'star' ? 100 : it.type === 'ball' ? 20 : 10;
-    var mult = _dcog_rush_combo >= 15 ? 5 : _dcog_rush_combo >= 8 ? 3 : _dcog_rush_combo >= 4 ? 2 : 1;
-    if (nowBonus) mult *= 2;
-    pts = base * mult;
-    msg = '+' + pts;
-    if (it.type === 'star') {
-      _dcog_rush_bonusUntil = Date.now() + 5000;
-      _dcog_rush_stats.stars++;
-      msg += ' ⭐ ×2 BONUS!';
-      _dcog_rush_flashStar();
-      try { _td_beep(1800, 0.15, 0.35); } catch(e){}
-    } else {
-      _dcog_rush_flashCatch();
-      try { _td_beep(it.type === 'ball' ? 1000 : 800, 0.08, 0.25); } catch(e){}
-    }
-    if (mult >= 2) msg += ' ×' + mult;
-    if (navigator.vibrate) navigator.vibrate(it.type === 'star' ? [25, 10, 25, 10, 50] : [20]);
-    // Burst de particules
-    var pColor = it.type === 'star' ? '#ffd84a' : it.type === 'ball' ? '#ff8c42' : '#4cc9f0';
-    for (var pi = 0; pi < (it.type === 'star' ? 24 : 12); pi++) {
-      var ang = Math.random() * Math.PI * 2;
-      var spd = 80 + Math.random() * 160;
-      _dcog_rush_particles.push({
-        x: it.x, y: it.y,
-        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 60,
-        life: 0.5 + Math.random() * 0.4,
-        color: Math.random() < 0.3 ? '#fff' : pColor
-      });
-    }
-  }
-  _dcog_rush_score = Math.max(0, _dcog_rush_score + pts);
-  // Message au centre
-  var m = document.getElementById('dcog_rush_bigMsg');
-  if (m) {
-    m.textContent = msg;
-    m.style.color = color;
-    m.style.opacity = '1';
-    setTimeout(function(){ if(m) m.style.opacity = '0'; }, 700);
-  }
-}
-
-function _dcog_rush_flashCatch() {
-  var f = document.getElementById('dcog_rush_catchFlash');
-  if (f) { f.style.opacity = '1'; setTimeout(function(){ if(f) f.style.opacity = '0'; }, 180); }
-}
-function _dcog_rush_flashBomb() {
-  var f = document.getElementById('dcog_rush_bombFlash');
-  if (f) { f.style.opacity = '1'; setTimeout(function(){ if(f) f.style.opacity = '0'; }, 300); }
-}
-function _dcog_rush_flashStar() {
-  var f = document.getElementById('dcog_rush_starFlash');
-  if (f) { f.style.opacity = '1'; setTimeout(function(){ if(f) f.style.opacity = '0'; }, 400); }
-}
-
-/* ── Dessin HUD RCS Rush — tout gravé dans la vidéo ──────────── */
-function _dcog_rush_drawCanvasHud(ctx, W, H) {
-  ctx.save();
-  var en = window._lang === 'en';
-  var nowTs = Date.now();
-  var inBonus = nowTs < _dcog_rush_bonusUntil;
-
-  // ═══ ITEMS QUI TOMBENT ═══
-  for (var i = 0; i < _dcog_rush_items.length; i++) {
-    var it = _dcog_rush_items[i];
-    var sz = Math.min(W, H) * 0.045;
-    ctx.save();
-    if (it.state === 'caught') {
-      ctx.globalAlpha = Math.max(0, 1 - (nowTs - it.catchTs) / 500);
-    }
-    if (it.type === 'stick') {
-      // Bâton bleu mini (vertical, pilule)
-      ctx.shadowBlur = it.state === 'falling' ? 12 : 0;
-      ctx.shadowColor = 'rgba(76,201,240,0.9)';
-      ctx.fillStyle = it.state === 'caught' ? '#f5c518' : '#4cc9f0';
-      _dcog_vc_roundRect(ctx, it.x - sz*0.3, it.y - sz, sz*0.6, sz*2, sz*0.3);
-      ctx.fill();
-      // Bouchons jaunes
-      ctx.fillStyle = '#f5c518';
-      _dcog_vc_roundRect(ctx, it.x - sz*0.35, it.y - sz, sz*0.7, sz*0.25, sz*0.1);
-      ctx.fill();
-      _dcog_vc_roundRect(ctx, it.x - sz*0.35, it.y + sz*0.75, sz*0.7, sz*0.25, sz*0.1);
-      ctx.fill();
-    } else if (it.type === 'ball') {
-      // Ballon orange avec lignes
-      ctx.shadowBlur = it.state === 'falling' ? 14 : 0;
-      ctx.shadowColor = 'rgba(255,140,66,0.9)';
-      ctx.fillStyle = it.state === 'caught' ? '#f5c518' : '#ff8c42';
-      ctx.beginPath();
-      ctx.arc(it.x, it.y, sz, 0, Math.PI * 2);
-      ctx.fill();
-      // Lignes basket
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-      ctx.lineWidth = Math.max(1, sz*0.08);
-      ctx.beginPath(); ctx.moveTo(it.x - sz, it.y); ctx.lineTo(it.x + sz, it.y); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(it.x, it.y - sz); ctx.lineTo(it.x, it.y + sz); ctx.stroke();
-    } else if (it.type === 'star') {
-      // Étoile dorée brillante
-      ctx.shadowBlur = 22;
-      ctx.shadowColor = 'rgba(245,197,24,1)';
-      ctx.fillStyle = it.state === 'caught' ? '#fff' : '#ffd84a';
-      ctx.beginPath();
-      for (var sp = 0; sp < 10; sp++) {
-        var ang = (sp * Math.PI) / 5 - Math.PI / 2;
-        var rad = sp % 2 === 0 ? sz*1.2 : sz*0.5;
-        var sx = it.x + Math.cos(ang) * rad;
-        var sy = it.y + Math.sin(ang) * rad;
-        if (sp === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
-      }
-      ctx.closePath();
-      ctx.fill();
-    } else if (it.type === 'bomb') {
-      // Bombe noire avec mèche rouge
-      ctx.shadowBlur = it.state === 'falling' ? 16 : 0;
-      ctx.shadowColor = 'rgba(230,57,70,0.95)';
-      ctx.fillStyle = '#1a1a1a';
-      ctx.beginPath();
-      ctx.arc(it.x, it.y, sz, 0, Math.PI * 2);
-      ctx.fill();
-      // Highlight
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(255,255,255,0.2)';
-      ctx.beginPath();
-      ctx.arc(it.x - sz*0.3, it.y - sz*0.3, sz*0.3, 0, Math.PI * 2);
-      ctx.fill();
-      // Mèche
-      ctx.strokeStyle = '#f5c518';
-      ctx.lineWidth = Math.max(1.5, sz*0.1);
-      ctx.beginPath();
-      ctx.moveTo(it.x, it.y - sz);
-      ctx.quadraticCurveTo(it.x + sz*0.3, it.y - sz*1.3, it.x + sz*0.5, it.y - sz*1.5);
-      ctx.stroke();
-      // Flamme pulsante
-      var flameSc = 1 + Math.sin(nowTs / 100) * 0.3;
-      ctx.fillStyle = '#ff6b35';
-      ctx.beginPath();
-      ctx.arc(it.x + sz*0.5, it.y - sz*1.5, sz*0.18 * flameSc, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  // ═══ PARTICULES ═══
-  for (var p = 0; p < _dcog_rush_particles.length; p++) {
-    var pt = _dcog_rush_particles[p];
-    ctx.globalAlpha = Math.max(0, pt.life);
-    ctx.fillStyle = pt.color;
-    ctx.shadowBlur = 6; ctx.shadowColor = pt.color;
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, Math.max(2, H*0.005), 0, Math.PI*2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-
-  // ═══ HUD TOP-LEFT : SCORE + COMBO ═══
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,0.95)';
-  ctx.fillStyle = '#f5c518';
-  ctx.font = 'bold ' + Math.round(H*0.085) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(_dcog_rush_score, W*0.04, H*0.11);
-  ctx.font = 'bold ' + Math.round(H*0.022) + 'px "Barlow Condensed",sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.fillText('SCORE', W*0.04, H*0.04);
-  // Combo juste en dessous
-  if (_dcog_rush_combo > 0) {
-    var mult = _dcog_rush_combo >= 15 ? 5 : _dcog_rush_combo >= 8 ? 3 : _dcog_rush_combo >= 4 ? 2 : 1;
-    var comboColor = mult >= 5 ? '#e63946' : mult >= 3 ? '#ff6b35' : mult >= 2 ? '#f5c518' : '#fff';
-    ctx.fillStyle = comboColor;
-    ctx.font = 'bold ' + Math.round(H*0.035) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillText('×' + mult + ' COMBO ' + _dcog_rush_combo, W*0.04, H*0.16);
-  }
-
-  // ═══ HUD TOP-CENTER : TIMER décompte ═══
-  var timeLeft = Math.max(0, _dcog_rush_duration - _dcog_rush_elapsed);
-  var tmm = Math.floor(timeLeft / 60);
-  var tss = Math.ceil(timeLeft) % 60;
-  if (tmm === 0 && tss === 60) { tss = 0; tmm = 1; }
-  var tStr = tmm > 0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss + 's');
-  var tColor = timeLeft < 10 ? '#e63946' : '#fff';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(0,0,0,0.65)';
-  ctx.beginPath();
-  var tw = W*0.14, th = H*0.09;
-  ctx.roundRect(W/2 - tw/2, H*0.025, tw, th, 8);
-  ctx.fill();
-  ctx.fillStyle = tColor;
-  ctx.font = 'bold ' + Math.round(H*0.055) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.shadowBlur = 4;
-  ctx.fillText(tStr, W/2, H*0.09);
-
-  // ═══ HUD TOP-RIGHT : BRANDING + BONUS indicator ═══
-  ctx.textAlign = 'right';
-  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.95)';
-  ctx.fillStyle = '#f5c518';
-  ctx.font = 'bold ' + Math.round(H*0.038) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText('SENSEI', W - W*0.025, H*0.055);
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.font = 'bold ' + Math.round(H*0.027) + 'px "Barlow Condensed",sans-serif';
-  ctx.fillText('REFLEX RUSH 🎮⚡', W - W*0.025, H*0.09);
-  // Bonus ×2 actif ?
-  if (inBonus) {
-    var bonusLeft = (_dcog_rush_bonusUntil - nowTs) / 1000;
-    ctx.fillStyle = '#f5c518';
-    ctx.font = 'bold ' + Math.round(H*0.03) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(245,197,24,0.9)';
-    ctx.fillText('⭐ ×2 BONUS ' + bonusLeft.toFixed(1) + 's', W - W*0.025, H*0.13);
-  }
-
-  // ═══ HUD BOTTOM-LEFT : RANK LIVE ═══
-  var liveRank = _dcog_rush_computeRank(_dcog_rush_score, _dcog_rush_duration);
-  var rColor = _dcog_rush_rankColor(liveRank);
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,0.95)';
-  ctx.fillStyle = rColor;
-  ctx.font = 'bold ' + Math.round(H*0.08) + 'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(liveRank, W*0.04, H*0.9);
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.font = 'bold ' + Math.round(H*0.022) + 'px "Barlow Condensed",sans-serif';
-  ctx.fillText('LIVE RANK', W*0.04, H*0.835);
-
-  // Note : window._camDrawLogo dessine le logo SENSEI AI bas-droit
-  ctx.restore();
-}
 
 /* ═══════════════════════════════════════════════════════════════════
    REACTION CATCHING STICK 🟦🟦🟦
@@ -34955,22 +34319,6 @@ function _dcog_updateInsight() {
   var msg = '';
   if (_dcog_drill === 'tboard') {
     el.textContent = (typeof _dcog_tbd_insight === 'function') ? _dcog_tbd_insight() : '';
-    return;
-  }
-  if (_dcog_drill === 'rush') {
-    var sc = _dcog_rush_score || 0;
-    if (sc === 0) { el.textContent = en ? 'Start a run — catch good items, dodge bombs. Combos = x2 x3 x5 points.' : 'Lance un run — attrape les bons items, évite les bombes. Combos = x2 x3 x5 pts.'; return; }
-    var rk = _dcog_rush_computeRank(sc, _dcog_rush_duration);
-    var cmbo = _dcog_rush_bestCombo || 0;
-    if (rk === 'SENSEI') msg = en ? '🧘 SENSEI rank. Flow state unlocked — read the chaos, catch everything.' : '🧘 Rank SENSEI. État de flow — tu lis le chaos et attrapes tout.';
-    else if (rk === 'SS') msg = en ? '🏆 SS rank! Elite reflexes. Try BEAST tempo for the SENSEI tier.' : '🏆 Rank SS ! Réflexes d\'élite. Essaie BEAST pour viser SENSEI.';
-    else if (rk === 'S')  msg = en ? '🥇 S rank. Strong focus & reaction. Chain more combos for SS.' : '🥇 Rank S. Focus et réaction solides. Enchaîne plus de combos pour SS.';
-    else if (rk === 'A')  msg = en ? '🥈 A rank. Good game sense. Avoid bombs more carefully.' : '🥈 Rank A. Bonne lecture de jeu. Évite mieux les bombes.';
-    else if (rk === 'B')  msg = en ? '🥉 B rank. Decent reflexes. Prioritize gold stars (+100 ×2).' : '🥉 Rank B. Réflexes corrects. Priorise les étoiles dorées (+100 ×2).';
-    else if (rk === 'C')  msg = en ? '💪 C rank. Keep training — stay centered, read the top.' : '💪 Rank C. Continue — reste centré, regarde le haut du cadre.';
-    else msg = en ? '🎯 D rank. Try CHILL tempo first (1.8s/spawn) to build the catching rhythm.' : '🎯 Rank D. Essaie le tempo CHILL (1,8s/spawn) pour construire ton rythme.';
-    if (cmbo > 0) msg += ' ' + (en ? 'Best combo: ×' : 'Combo max : ×') + cmbo + '.';
-    el.textContent = msg;
     return;
   }
   if (_dcog_drill === 'rcs') {
@@ -41397,7 +40745,7 @@ window._QI_DATA['pnr_05'] = {
 
       <!-- Card SENSEI REFLEX RUSH (10e jeu — drill caméra DCOG, badge CAM 📸) -->
       <!-- Lance le drill rush dans TRAIN → Cognitif plutôt qu'un jeu arcade on-screen -->
-      <button onclick="_arcade_launchReflexRush()" ontouchstart="" class="arcade-card"
+      <button onclick="_arcade_launch('reflex_rush')" ontouchstart="" class="arcade-card"
         style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.22),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(245,197,24,.25);font-family:inherit;overflow:hidden">
         <div style="position:absolute;top:10px;right:10px;background:#f5c518;color:#0a0d18;font-size:9px;font-weight:900;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">CAM 📸</div>
         <div style="font-size:44px;line-height:1;margin-bottom:12px">🎮⚡</div>
@@ -41445,49 +40793,12 @@ window._QI_DATA['pnr_05'] = {
     document.body.style.overflow = '';
   };
 
-  // 10e jeu : SENSEI REFLEX RUSH est un drill caméra DCOG (pas un jeu arcade on-screen)
-  // → ferme le hub arcade et route vers TRAIN → Cognitif → drill `rush`
-  window._arcade_launchReflexRush = function(){
-    try { window._arcade_close(); } catch(e){}
-    // Haptic feedback
-    if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
-    // Petit délai pour laisser l'arcade se fermer visuellement avant de naviguer
-    setTimeout(function(){
-      // 1) Ouvrir la section TRAIN si elle existe
-      if (typeof window._showSection === 'function') {
-        try { window._showSection('train'); } catch(e){}
-      } else if (typeof window.showSection === 'function') {
-        try { window.showSection('train'); } catch(e){}
-      } else {
-        // Fallback : trigger un click sur l'onglet TRAIN
-        var trainBtn = document.querySelector('[onclick*="train"]');
-        if (trainBtn) trainBtn.click();
-      }
-      // 2) Ouvrir l'onglet DCOG (Cognitif)
-      setTimeout(function(){
-        if (typeof openTrainingTab === 'function') {
-          var dcogTab = document.querySelector('[onclick*="openTrainingTab(\'dcog\'"]');
-          try { openTrainingTab('dcog', dcogTab); } catch(e){}
-        }
-        // 3) Sélectionner le drill `rush` puis scroller vers lui
-        setTimeout(function(){
-          if (typeof _dcog_selectDrill === 'function') {
-            try { _dcog_selectDrill('rush'); } catch(e){}
-          }
-          var rushBtn = document.getElementById('dcog_btn_rush');
-          if (rushBtn && rushBtn.scrollIntoView) {
-            try { rushBtn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
-          }
-        }, 220);
-      }, 180);
-    }, 120);
-  };
-
   // Lance un jeu depuis le hub (le hub reste ouvert en fond)
   window._arcade_launch = function(gameId){
     // Avant de lancer le jeu : demander le pseudo si c'est la 1ère fois
     var launch = function(){
       if (gameId === 'rush' && typeof _sr_open === 'function') _sr_open();
+      else if (gameId === 'reflex_rush' && typeof _rr_open === 'function') _rr_open();
       else if (gameId === 'shoot' && typeof _sa_open === 'function') _sa_open();
       else if (gameId === 'buzzer' && typeof _bb_open === 'function') _bb_open();
       else if (gameId === 'dribble' && typeof _dm_open === 'function') _dm_open();
@@ -44834,6 +44145,600 @@ if (G.imgBall) {
     ctx.fillText(phase, G.W-44, 20);
     ctx.font="9px 'Barlow',sans-serif"; ctx.fillStyle='#f5c518'; ctx.fillText('PHASE', G.W-44, 44);
       ctx.restore();
+  }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     🎮⚡ SENSEI REFLEX RUSH — 10e jeu arcade (tap-on-screen, 0 caméra)
+     Items qui tombent (🟦🏀⭐💣) · tap avec doigt · combos · rank · leaderboard
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="rr-modal" style="display:none;position:fixed;inset:0;z-index:100068;background:#0a0d18;overflow:hidden">
+  <canvas id="rr-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;background:linear-gradient(180deg,#131820 0%,#0a0d14 100%);touch-action:none"></canvas>
+
+  <!-- Rotation prompt (si phone en portrait étroit) -->
+  <div id="rr-rotate" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.92);z-index:5;align-items:center;justify-content:center;flex-direction:column;color:#f5c518;text-align:center;padding:30px;font-family:'Bebas Neue','Impact',sans-serif">
+    <div style="font-size:68px;animation:rrSpin 1.6s ease-in-out infinite">📱↺</div>
+    <div style="font-size:22px;letter-spacing:3px;margin-top:20px">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:1px;margin-top:10px;font-weight:400">Mets-le à l'horizontal pour jouer</div>
+  </div>
+
+  <!-- Title screen -->
+  <div id="rr-title-screen" style="position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;background:radial-gradient(ellipse at center,rgba(245,197,24,.15) 0%,rgba(10,13,24,.95) 60%)">
+    <div style="font-size:64px;line-height:1;margin-bottom:12px">🎮⚡</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(32px,8vw,54px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 24px rgba(245,197,24,.5);line-height:1;margin-bottom:8px">SENSEI REFLEX RUSH</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:2px;margin-bottom:30px;font-weight:600">⚡ ATTRAPE AVANT QU'ILS TOUCHENT LE SOL</div>
+
+    <!-- Setup grid -->
+    <div style="display:flex;flex-direction:column;gap:14px;max-width:480px;width:100%;margin-bottom:22px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:7px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="rr-dur-btn" data-sec="30"  onclick="_rr_setDur(30)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="rr-dur-btn" data-sec="60"  onclick="_rr_setDur(60)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="rr-dur-btn" data-sec="90"  onclick="_rr_setDur(90)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="rr-dur-btn" data-sec="120" onclick="_rr_setDur(120)" style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:7px">⚡ TEMPO</div>
+        <div style="display:flex;gap:6px">
+          <button class="rr-lvl-btn" data-ms="1700" onclick="_rr_setLvl(1700)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🟢 CHILL</button>
+          <button class="rr-lvl-btn" data-ms="1200" onclick="_rr_setLvl(1200)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🟡 NORMAL</button>
+          <button class="rr-lvl-btn" data-ms="800"  onclick="_rr_setLvl(800)"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🔥 BEAST</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules reminder -->
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#cfd3e0;letter-spacing:1px;margin-bottom:22px;line-height:1.8;max-width:460px">
+      🟦 bâton <b style="color:#4cc9f0">+10</b> &nbsp;·&nbsp; 🏀 ballon <b style="color:#ff8c42">+20</b> &nbsp;·&nbsp; ⭐ étoile <b style="color:#f5c518">+100 ×2</b> &nbsp;·&nbsp; 💣 <b style="color:#e63946">ÉVITE −50</b>
+    </div>
+
+    <button id="rr-start-btn" onclick="_rr_startGame()" ontouchstart=""
+      style="background:linear-gradient(135deg,#f5c518,#ffd84a);border:none;color:#0a0d18;font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;padding:16px 44px;border-radius:12px;cursor:pointer;box-shadow:0 6px 24px rgba(245,197,24,.5);transition:transform .15s">▶ DÉMARRER</button>
+
+    <div id="rr-best-line" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;color:#f5c518;letter-spacing:2px;margin-top:20px"></div>
+  </div>
+
+  <!-- Results screen -->
+  <div id="rr-results" style="display:none;position:absolute;inset:0;z-index:4;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;background:radial-gradient(ellipse at center,rgba(245,197,24,.18) 0%,rgba(10,13,24,.96) 60%)">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;color:#9aa3b3;letter-spacing:4px;margin-bottom:8px">GAME OVER</div>
+    <div id="rr-results-rank" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(72px,16vw,110px);letter-spacing:6px;line-height:1;margin-bottom:4px;color:#f5c518;text-shadow:0 4px 32px rgba(245,197,24,.6)">S</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#7a8299;letter-spacing:3px;margin-bottom:20px">RANK</div>
+    <div id="rr-results-score" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(44px,10vw,66px);color:#fff;letter-spacing:3px;line-height:1">0</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#9aa3b3;letter-spacing:2px;margin-bottom:14px">POINTS</div>
+    <div id="rr-results-stats" style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:.5px;margin-bottom:22px;line-height:1.7"></div>
+    <div id="rr-results-lb" style="font-family:'Barlow',sans-serif;font-size:12px;color:#9aa3b3;margin-bottom:22px;max-width:340px;width:100%"></div>
+    <div style="display:flex;gap:12px">
+      <button onclick="_rr_showTitle()" ontouchstart="" style="background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;padding:12px 24px;border-radius:10px;cursor:pointer">↺ RETOUR</button>
+      <button onclick="_rr_startGame()" ontouchstart="" style="background:linear-gradient(135deg,#f5c518,#ffd84a);border:none;color:#0a0d18;font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:900;letter-spacing:2px;padding:12px 28px;border-radius:10px;cursor:pointer;box-shadow:0 4px 18px rgba(245,197,24,.4)">▶ REJOUER</button>
+    </div>
+  </div>
+
+  <!-- Close button -->
+  <button onclick="_rr_close()" aria-label="Fermer"
+    style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:18px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
+</div>
+
+<style>
+@keyframes rrSpin { 0%,100% { transform:rotate(-10deg); } 50% { transform:rotate(10deg); } }
+#rr-start-btn:active { transform:scale(.96); }
+.rr-dur-btn:active, .rr-lvl-btn:active { transform:scale(.95); }
+</style>
+
+<script>
+// ═══ SENSEI REFLEX RUSH — jeu arcade tap-on-screen autonome ═══════════
+(function(){
+  var G = {
+    canvas:null, ctx:null, W:0, H:0, dpr:1,
+    duration:60, startLvl:1200,
+    running:false, startTs:0, elapsed:0,
+    score:0, combo:0, bestCombo:0, bonusUntil:0,
+    items:[], particles:[],
+    spawnTimer:null, rafId:null, lastT:0, sessionEndTs:0,
+    itemId:0,
+    stats:{caught:0, missed:0, bombs:0, stars:0}
+  };
+  var LB_KEY_PREFIX = 'sensei_rr_lb_';
+
+  function _rr_setupCanvas(){
+    G.canvas = document.getElementById('rr-canvas');
+    if (!G.canvas) return;
+    G.ctx = G.canvas.getContext('2d');
+    G.dpr = window.devicePixelRatio || 1;
+    var w = G.canvas.clientWidth, h = G.canvas.clientHeight;
+    G.canvas.width = Math.floor(w * G.dpr);
+    G.canvas.height = Math.floor(h * G.dpr);
+    G.ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
+    G.W = w; G.H = h;
+  }
+
+  function _rr_checkOrient(){
+    var rot = document.getElementById('rr-rotate');
+    if (!rot) return;
+    var isPortrait = window.innerHeight > window.innerWidth;
+    var isSmall = window.innerWidth < 750;
+    rot.style.display = (isPortrait && isSmall) ? 'flex' : 'none';
+    _rr_setupCanvas();
+  }
+
+  // ─── Setters UI (highlight actif) ───
+  window._rr_setDur = function(sec){
+    G.duration = sec;
+    document.querySelectorAll('.rr-dur-btn').forEach(function(b){
+      var active = parseInt(b.dataset.sec,10) === sec;
+      b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+      b.style.background = active ? 'rgba(245,197,24,.18)' : '#1a2130';
+      b.style.color      = active ? '#f5c518' : '#7a8299';
+    });
+    _rr_updateBestLine();
+  };
+  window._rr_setLvl = function(ms){
+    G.startLvl = ms;
+    document.querySelectorAll('.rr-lvl-btn').forEach(function(b){
+      var active = parseInt(b.dataset.ms,10) === ms;
+      b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+      b.style.background = active ? 'rgba(245,197,24,.18)' : '#1a2130';
+      b.style.color      = active ? '#f5c518' : '#7a8299';
+    });
+  };
+
+  function _rr_lbKey(dur){ return LB_KEY_PREFIX + dur; }
+  function _rr_getLB(dur){
+    try { var r = localStorage.getItem(_rr_lbKey(dur)); if (!r) return []; var a = JSON.parse(r); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
+  }
+  function _rr_saveScore(score, rank, dur){
+    try {
+      var lb = _rr_getLB(dur);
+      lb.push({ score:score, rank:rank, date:Date.now() });
+      lb.sort(function(a,b){ return b.score - a.score; });
+      lb = lb.slice(0, 10);
+      localStorage.setItem(_rr_lbKey(dur), JSON.stringify(lb));
+    } catch(e){}
+  }
+  function _rr_getBest(dur){ var lb = _rr_getLB(dur); return lb.length > 0 ? lb[0].score : 0; }
+
+  function _rr_updateBestLine(){
+    var el = document.getElementById('rr-best-line');
+    if (!el) return;
+    var best = _rr_getBest(G.duration);
+    el.textContent = best > 0 ? ('🏆 TON RECORD ' + G.duration + 's : ' + best + ' PTS') : '';
+    // Record best score sur la carte arcade
+    try {
+      var bestAny = Math.max(_rr_getBest(30), _rr_getBest(60), _rr_getBest(90), _rr_getBest(120));
+      var card = document.getElementById('arcade-best-reflex-rush');
+      if (card) card.textContent = bestAny > 0 ? ('🏆 ' + bestAny + ' pts') : '🏆 —';
+    } catch(e){}
+  }
+
+  function _rr_computeRank(score, dur){
+    var norm = score / (dur || 60) * 60;
+    if (norm >= 1200) return 'SENSEI';
+    if (norm >= 800)  return 'SS';
+    if (norm >= 500)  return 'S';
+    if (norm >= 350)  return 'A';
+    if (norm >= 220)  return 'B';
+    if (norm >= 120)  return 'C';
+    return 'D';
+  }
+  function _rr_rankColor(r){
+    return r === 'SENSEI' ? '#f5c518' : r === 'SS' ? '#ff6b35' : r === 'S' ? '#e63946'
+         : r === 'A' ? '#2dc653' : r === 'B' ? '#4cc9f0' : r === 'C' ? '#9aa3b3' : '#7a8299';
+  }
+
+  // ─── OPEN / CLOSE ───
+  window._rr_open = function(){
+    var m = document.getElementById('rr-modal');
+    if (!m) return;
+    m.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    _rr_setupCanvas();
+    _rr_checkOrient();
+    window.addEventListener('resize', _rr_checkOrient);
+    window.addEventListener('orientationchange', _rr_checkOrient);
+    _rr_bindInput();
+    _rr_updateBestLine();
+    _rr_showTitle();
+  };
+  window._rr_close = function(){
+    _rr_stop();
+    _rr_unbindInput();
+    window.removeEventListener('resize', _rr_checkOrient);
+    window.removeEventListener('orientationchange', _rr_checkOrient);
+    var m = document.getElementById('rr-modal');
+    if (m) m.style.display = 'none';
+    var hub = document.getElementById('arcade-hub');
+    if (hub && hub.style.display === 'block') { if (typeof _arcade_refreshBests === 'function') _arcade_refreshBests(); }
+    else { document.body.style.overflow = ''; }
+  };
+  window._rr_showTitle = function(){
+    document.getElementById('rr-title-screen').style.display = 'flex';
+    document.getElementById('rr-results').style.display = 'none';
+    _rr_stop();
+    _rr_setupCanvas();
+    // Dessiner un fond statique en attendant
+    if (G.ctx) {
+      G.ctx.clearRect(0, 0, G.W, G.H);
+    }
+    _rr_updateBestLine();
+  };
+
+  // ─── INPUT handling (tap/click → hit test items) ───
+  var _rrTapHandler = null;
+  function _rr_bindInput(){
+    if (!G.canvas) return;
+    _rrTapHandler = function(e){
+      if (!G.running) return;
+      e.preventDefault();
+      var rect = G.canvas.getBoundingClientRect();
+      var touches = e.touches ? e.touches : (e.changedTouches ? e.changedTouches : [e]);
+      // Pour touchstart on utilise e.touches (actifs). Pour mousedown e seul.
+      var points = [];
+      if (e.touches && e.touches.length > 0) {
+        for (var ti = 0; ti < e.touches.length; ti++) {
+          points.push({ x: e.touches[ti].clientX - rect.left, y: e.touches[ti].clientY - rect.top });
+        }
+      } else if (e.changedTouches && e.changedTouches.length > 0) {
+        for (var ci = 0; ci < e.changedTouches.length; ci++) {
+          points.push({ x: e.changedTouches[ci].clientX - rect.left, y: e.changedTouches[ci].clientY - rect.top });
+        }
+      } else {
+        points.push({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+      }
+      points.forEach(function(p){ _rr_hitTest(p.x, p.y); });
+    };
+    G.canvas.addEventListener('touchstart', _rrTapHandler, {passive:false});
+    G.canvas.addEventListener('mousedown', _rrTapHandler);
+  }
+  function _rr_unbindInput(){
+    if (!G.canvas || !_rrTapHandler) return;
+    G.canvas.removeEventListener('touchstart', _rrTapHandler);
+    G.canvas.removeEventListener('mousedown', _rrTapHandler);
+    _rrTapHandler = null;
+  }
+
+  function _rr_hitTest(x, y){
+    // Rayon de tap généreux pour les doigts (14% min dimension)
+    var tapR = Math.max(28, Math.min(G.W, G.H) * 0.055);
+    // Tester items dans l'ordre inverse (ceux dessinés en dernier = devant)
+    for (var i = G.items.length - 1; i >= 0; i--) {
+      var it = G.items[i];
+      if (it.state !== 'falling') continue;
+      var dx = x - it.x, dy = y - it.y;
+      if (dx*dx + dy*dy < tapR * tapR) {
+        _rr_onTap(it);
+        return;
+      }
+    }
+  }
+
+  // ─── START GAME ───
+  window._rr_startGame = function(){
+    document.getElementById('rr-title-screen').style.display = 'none';
+    document.getElementById('rr-results').style.display = 'none';
+    G.running = true;
+    G.startTs = Date.now();
+    G.elapsed = 0;
+    G.score = 0;
+    G.combo = 0;
+    G.bestCombo = 0;
+    G.bonusUntil = 0;
+    G.items = [];
+    G.particles = [];
+    G.lastT = 0;
+    G.sessionEndTs = 0;
+    G.itemId = 0;
+    G.stats = {caught:0, missed:0, bombs:0, stars:0};
+    _rr_setupCanvas();
+    _rr_scheduleNextSpawn(0);
+    G.rafId = requestAnimationFrame(_rr_loop);
+  };
+
+  function _rr_scheduleNextSpawn(immediate){
+    if (!G.running) return;
+    var tick = function(){
+      if (!G.running) return;
+      _rr_spawnItem();
+      var pct = Math.min(1, G.elapsed / G.duration);
+      var floorMs = Math.max(400, G.startLvl * 0.45);
+      var interval = G.startLvl - (G.startLvl - floorMs) * pct;
+      G.spawnTimer = setTimeout(tick, interval);
+    };
+    if (immediate === 0) tick();
+    else G.spawnTimer = setTimeout(tick, immediate);
+  }
+
+  function _rr_spawnItem(){
+    if (!G.running) return;
+    var r = Math.random();
+    var type = r < 0.5 ? 'stick' : r < 0.75 ? 'ball' : r < 0.90 ? 'bomb' : 'star';
+    var marginX = G.W * 0.08;
+    var usableW = G.W - 2 * marginX;
+    // Position aléatoire continue (pas sur colonne discrète) pour éviter patterns
+    var cx = marginX + Math.random() * usableW;
+    G.items.push({
+      id: ++G.itemId, type: type,
+      x: cx, y: -40, vy: 0, state: 'falling',
+      spawnTs: Date.now(), catchTs: 0
+    });
+    try {
+      var freq = type === 'star' ? 1400 : type === 'bomb' ? 300 : type === 'ball' ? 800 : 600;
+      var vol  = type === 'star' ? 0.22 : type === 'bomb' ? 0.25 : 0.14;
+      if (typeof _td_beep === 'function') _td_beep(freq, 0.04, vol);
+    } catch(e){}
+  }
+
+  // ─── MAIN LOOP (physique + draw) ───
+  function _rr_loop(ts){
+    if (!G.running) return;
+    var dt = G.lastT ? (ts - G.lastT) / 1000 : 0.016;
+    G.lastT = ts;
+    if (dt > 0.1) dt = 0.1;
+    var nowTs = Date.now();
+    G.elapsed = (nowTs - G.startTs) / 1000;
+
+    // Physique de chute
+    var gravity = Math.max(600, G.H * 1.8);  // adapte à la taille écran
+    for (var i = 0; i < G.items.length; i++) {
+      var it = G.items[i];
+      if (it.state === 'falling') {
+        it.vy += gravity * dt;
+        it.y += it.vy * dt;
+        if (it.y > G.H + 40) {
+          if (it.type === 'bomb') {
+            it.state = 'avoided'; // bombe esquivée = OK
+          } else {
+            it.state = 'missed';
+            if (G.combo > 0) G.combo = 0;
+            G.stats.missed++;
+          }
+        }
+      }
+    }
+    // Nettoyage
+    G.items = G.items.filter(function(it){
+      return !(it.y > G.H + 60 || (it.state !== 'falling' && nowTs - (it.catchTs || it.spawnTs) > 500));
+    });
+
+    // Particules
+    var kept = [];
+    for (var p = 0; p < G.particles.length; p++) {
+      var pt = G.particles[p];
+      pt.life -= dt;
+      if (pt.life > 0) {
+        pt.x += pt.vx * dt; pt.y += pt.vy * dt; pt.vy += 400 * dt;
+        kept.push(pt);
+      }
+    }
+    G.particles = kept;
+
+    // Fin de session
+    if (G.elapsed >= G.duration && G.sessionEndTs === 0) {
+      G.sessionEndTs = nowTs + 400;
+      if (G.spawnTimer) { clearTimeout(G.spawnTimer); G.spawnTimer = null; }
+    }
+    if (G.sessionEndTs > 0 && nowTs > G.sessionEndTs) {
+      G.sessionEndTs = 0;
+      _rr_endGame();
+      return;
+    }
+
+    _rr_draw(nowTs);
+    if (G.running) G.rafId = requestAnimationFrame(_rr_loop);
+  }
+
+  function _rr_stop(){
+    G.running = false;
+    if (G.spawnTimer) { clearTimeout(G.spawnTimer); G.spawnTimer = null; }
+    if (G.rafId) { cancelAnimationFrame(G.rafId); G.rafId = null; }
+  }
+
+  function _rr_endGame(){
+    _rr_stop();
+    var rank = _rr_computeRank(G.score, G.duration);
+    var isBest = G.score > _rr_getBest(G.duration);
+    if (G.score > 0) _rr_saveScore(G.score, rank, G.duration);
+    document.getElementById('rr-results-rank').textContent = rank;
+    document.getElementById('rr-results-rank').style.color = _rr_rankColor(rank);
+    document.getElementById('rr-results-score').textContent = G.score;
+    document.getElementById('rr-results-stats').innerHTML =
+      '⚡ Combo max : <b style="color:#f5c518">×' + G.bestCombo + '</b><br>'
+      + '🎯 ' + G.stats.caught + ' catches · ' + G.stats.stars + ' étoiles · ' + G.stats.bombs + ' bombes'
+      + (isBest ? '<br><b style="color:#f5c518">🏆 NOUVEAU RECORD</b>' : '');
+    // Leaderboard
+    var lb = _rr_getLB(G.duration);
+    var lbHtml = '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:12px;color:#f5c518;letter-spacing:2px;margin-bottom:6px">TOP 5 — ' + G.duration + 's</div>';
+    lb.slice(0, 5).forEach(function(e, i){
+      var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1) + '.';
+      lbHtml += '<div style="display:flex;justify-content:space-between;padding:2px 4px"><span>' + medal + ' ' + e.rank + '</span><span style="color:#f5c518;font-weight:700">' + e.score + ' pts</span></div>';
+    });
+    document.getElementById('rr-results-lb').innerHTML = lbHtml;
+    document.getElementById('rr-results').style.display = 'flex';
+    try { if (typeof _td_beep === 'function') _td_beep(440, 0.25, 0.3); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+  }
+
+  // ─── TAP sur un item ───
+  function _rr_onTap(it){
+    it.state = 'caught';
+    it.catchTs = Date.now();
+    var nowBonus = (Date.now() < G.bonusUntil);
+    var pts = 0;
+    if (it.type === 'bomb') {
+      pts = -50;
+      G.combo = 0;
+      G.stats.bombs++;
+      try { if (typeof _td_beep === 'function') _td_beep(180, 0.3, 0.3); } catch(e){}
+      if (navigator.vibrate) navigator.vibrate([80, 30, 80]);
+    } else {
+      G.combo++;
+      G.bestCombo = Math.max(G.bestCombo, G.combo);
+      G.stats.caught++;
+      var base = it.type === 'star' ? 100 : it.type === 'ball' ? 20 : 10;
+      var mult = G.combo >= 15 ? 5 : G.combo >= 8 ? 3 : G.combo >= 4 ? 2 : 1;
+      if (nowBonus) mult *= 2;
+      pts = base * mult;
+      if (it.type === 'star') {
+        G.bonusUntil = Date.now() + 5000;
+        G.stats.stars++;
+        try { if (typeof _td_beep === 'function') _td_beep(1800, 0.12, 0.3); } catch(e){}
+      } else {
+        try { if (typeof _td_beep === 'function') _td_beep(it.type === 'ball' ? 1000 : 800, 0.06, 0.22); } catch(e){}
+      }
+      if (navigator.vibrate) navigator.vibrate(it.type === 'star' ? [20, 10, 25, 10, 40] : [15]);
+      // Burst particules
+      var pColor = it.type === 'star' ? '#ffd84a' : it.type === 'ball' ? '#ff8c42' : '#4cc9f0';
+      var N = it.type === 'star' ? 22 : 10;
+      for (var pi = 0; pi < N; pi++) {
+        var ang = Math.random() * Math.PI * 2;
+        var spd = 100 + Math.random() * 180;
+        G.particles.push({ x: it.x, y: it.y, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 50, life: 0.5 + Math.random()*0.4, color: Math.random() < 0.3 ? '#fff' : pColor });
+      }
+    }
+    G.score = Math.max(0, G.score + pts);
+  }
+
+  // ─── DRAW ───
+  function _rr_rrect(ctx, x, y, w, h, r){
+    if (w < 2*r) r = w/2;
+    if (h < 2*r) r = h/2;
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y,   x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x,   y+h, r);
+    ctx.arcTo(x,   y+h, x,   y,   r);
+    ctx.arcTo(x,   y,   x+w, y,   r);
+    ctx.closePath();
+  }
+
+  function _rr_draw(nowTs){
+    var ctx = G.ctx; if (!ctx) return;
+    var W = G.W, H = G.H;
+    // Fond gradient subtil
+    var grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#131820');
+    grad.addColorStop(1, '#0a0d14');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Items
+    for (var i = 0; i < G.items.length; i++) {
+      var it = G.items[i];
+      var sz = Math.min(W, H) * 0.05;
+      ctx.save();
+      if (it.state === 'caught') ctx.globalAlpha = Math.max(0, 1 - (nowTs - it.catchTs) / 400);
+      if (it.type === 'stick') {
+        ctx.shadowBlur = it.state === 'falling' ? 14 : 0; ctx.shadowColor = 'rgba(76,201,240,.9)';
+        ctx.fillStyle = it.state === 'caught' ? '#f5c518' : '#4cc9f0';
+        _rr_rrect(ctx, it.x - sz*0.3, it.y - sz, sz*0.6, sz*2, sz*0.3); ctx.fill();
+        ctx.shadowBlur = 0; ctx.fillStyle = '#f5c518';
+        _rr_rrect(ctx, it.x - sz*0.35, it.y - sz, sz*0.7, sz*0.25, sz*0.1); ctx.fill();
+        _rr_rrect(ctx, it.x - sz*0.35, it.y + sz*0.75, sz*0.7, sz*0.25, sz*0.1); ctx.fill();
+      } else if (it.type === 'ball') {
+        ctx.shadowBlur = it.state === 'falling' ? 14 : 0; ctx.shadowColor = 'rgba(255,140,66,.9)';
+        ctx.fillStyle = it.state === 'caught' ? '#f5c518' : '#ff8c42';
+        ctx.beginPath(); ctx.arc(it.x, it.y, sz, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = Math.max(1, sz*0.09);
+        ctx.beginPath(); ctx.moveTo(it.x - sz, it.y); ctx.lineTo(it.x + sz, it.y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(it.x, it.y - sz); ctx.lineTo(it.x, it.y + sz); ctx.stroke();
+      } else if (it.type === 'star') {
+        ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(245,197,24,1)';
+        ctx.fillStyle = it.state === 'caught' ? '#fff' : '#ffd84a';
+        ctx.beginPath();
+        for (var sp = 0; sp < 10; sp++) {
+          var ang = (sp * Math.PI) / 5 - Math.PI / 2;
+          var rad = sp % 2 === 0 ? sz*1.3 : sz*0.55;
+          var ssx = it.x + Math.cos(ang) * rad, ssy = it.y + Math.sin(ang) * rad;
+          if (sp === 0) ctx.moveTo(ssx, ssy); else ctx.lineTo(ssx, ssy);
+        }
+        ctx.closePath(); ctx.fill();
+      } else if (it.type === 'bomb') {
+        ctx.shadowBlur = it.state === 'falling' ? 16 : 0; ctx.shadowColor = 'rgba(230,57,70,.95)';
+        ctx.fillStyle = '#1a1a1a';
+        ctx.beginPath(); ctx.arc(it.x, it.y, sz, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(255,255,255,.2)';
+        ctx.beginPath(); ctx.arc(it.x - sz*0.3, it.y - sz*0.3, sz*0.3, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#f5c518'; ctx.lineWidth = Math.max(1.5, sz*0.1);
+        ctx.beginPath(); ctx.moveTo(it.x, it.y - sz);
+        ctx.quadraticCurveTo(it.x + sz*0.3, it.y - sz*1.3, it.x + sz*0.5, it.y - sz*1.5); ctx.stroke();
+        var flameSc = 1 + Math.sin(nowTs / 90) * 0.3;
+        ctx.fillStyle = '#ff6b35';
+        ctx.beginPath(); ctx.arc(it.x + sz*0.5, it.y - sz*1.5, sz*0.2 * flameSc, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Particules
+    for (var pi = 0; pi < G.particles.length; pi++) {
+      var pt = G.particles[pi];
+      ctx.globalAlpha = Math.max(0, pt.life);
+      ctx.fillStyle = pt.color;
+      ctx.shadowBlur = 6; ctx.shadowColor = pt.color;
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, Math.max(2.5, H*0.006), 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+
+    // ═══ HUD TOP-LEFT : SCORE + COMBO ═══
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold ' + Math.round(H*0.1) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(G.score, W*0.04, H*0.12);
+    ctx.font = 'bold ' + Math.round(H*0.025) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText('SCORE', W*0.04, H*0.045);
+    if (G.combo > 0) {
+      var mult = G.combo >= 15 ? 5 : G.combo >= 8 ? 3 : G.combo >= 4 ? 2 : 1;
+      var cColor = mult >= 5 ? '#e63946' : mult >= 3 ? '#ff6b35' : mult >= 2 ? '#f5c518' : '#fff';
+      ctx.fillStyle = cColor;
+      ctx.font = 'bold ' + Math.round(H*0.038) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText('×' + mult + ' COMBO ' + G.combo, W*0.04, H*0.17);
+    }
+
+    // ═══ HUD TOP-CENTER : TIMER ═══
+    var timeLeft = Math.max(0, G.duration - G.elapsed);
+    var tmm = Math.floor(timeLeft / 60), tss = Math.ceil(timeLeft) % 60;
+    if (tmm === 0 && tss === 60) { tss = 0; tmm = 1; }
+    var tStr = tmm > 0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss + 's');
+    var tColor = timeLeft < 10 ? '#e63946' : '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    _rr_rrect(ctx, W/2 - W*0.09, H*0.025, W*0.18, H*0.09, 10);
+    ctx.fill();
+    ctx.fillStyle = tColor;
+    ctx.font = 'bold ' + Math.round(H*0.06) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.shadowBlur = 4;
+    ctx.fillText(tStr, W/2, H*0.09);
+
+    // ═══ HUD TOP-RIGHT : BRANDING + BONUS ═══
+    ctx.textAlign = 'right';
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold ' + Math.round(H*0.04) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('SENSEI', W - W*0.03, H*0.055);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = 'bold ' + Math.round(H*0.028) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillText('REFLEX RUSH 🎮⚡', W - W*0.03, H*0.095);
+    if (nowTs < G.bonusUntil) {
+      var bl = ((G.bonusUntil - nowTs) / 1000).toFixed(1);
+      ctx.fillStyle = '#f5c518';
+      ctx.font = 'bold ' + Math.round(H*0.03) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(245,197,24,0.9)';
+      ctx.fillText('⭐ ×2 BONUS ' + bl + 's', W - W*0.03, H*0.14);
+    }
+
+    // ═══ HUD BOTTOM-LEFT : RANK LIVE ═══
+    var liveRank = _rr_computeRank(G.score, G.duration);
+    ctx.textAlign = 'left';
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.fillStyle = _rr_rankColor(liveRank);
+    ctx.font = 'bold ' + Math.round(H*0.09) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(liveRank, W*0.04, H*0.92);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = 'bold ' + Math.round(H*0.025) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillText('LIVE RANK', W*0.04, H*0.85);
   }
 })();
 </script>
