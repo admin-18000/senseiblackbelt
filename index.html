@@ -11593,7 +11593,7 @@ body.app-rotating [style*="drop-shadow"] {
 
 /* Overlays rotation portrait des jeux arcade : scrollables + safe-area iPhone */
 #sr-rotate, #sa-rotate, #bb-rotate, #dm-rotate, #hr-rotate,
-#rc-rotate, #mc-rotate, #tp-rotate, #cv-rotate {
+#rc-rotate, #mc-rotate, #tp-rotate, #cv-rotate, #rr-rotate {
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   padding-top: max(28px, env(safe-area-inset-top, 20px)) !important;
@@ -11612,7 +11612,7 @@ body.app-rotating [style*="drop-shadow"] {
 /* Mascotte DRIBBLE sur écrans titre - coin droit, derrière le contenu */
 #sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
 #dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
-#mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after {
+#mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after, #rr-title-screen::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -11629,7 +11629,7 @@ body.app-rotating [style*="drop-shadow"] {
 /* Mascotte DOS+BALLON sur écrans résultats - plus discrète (icône de récompense) */
 #sr-results::after, #sa-results::after, #bb-results::after,
 #dm-results::after, #hr-results::after, #rc-results::after,
-#mc-results::after, #tp-results::after, #cv-results::after {
+#mc-results::after, #tp-results::after, #cv-results::after, #rr-results::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -11647,9 +11647,11 @@ body.app-rotating [style*="drop-shadow"] {
 #sr-title-screen > *, #sa-title-screen > *, #bb-title-screen > *,
 #dm-title-screen > *, #hr-title-screen > *, #rc-title-screen > *,
 #mc-title-screen > *, #tp-title-screen > *, #cv-title-screen > *,
+  #rr-title-screen > *,
 #sr-results > *, #sa-results > *, #bb-results > *,
 #dm-results > *, #hr-results > *, #rc-results > *,
-#mc-results > *, #tp-results > *, #cv-results > * {
+#mc-results > *, #tp-results > *, #cv-results > *,
+  #rr-results > * {
   position: relative;
   z-index: 2;
 }
@@ -11657,10 +11659,10 @@ body.app-rotating [style*="drop-shadow"] {
 @media (max-height: 500px) {
   #sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
   #dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
-  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after,
+  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after, #rr-title-screen::after,
   #sr-results::after, #sa-results::after, #bb-results::after,
   #dm-results::after, #hr-results::after, #rc-results::after,
-  #mc-results::after, #tp-results::after, #cv-results::after {
+  #mc-results::after, #tp-results::after, #cv-results::after, #rr-results::after {
     opacity: 0.4;
     width: 22%;
     max-width: 110px;
@@ -11670,10 +11672,10 @@ body.app-rotating [style*="drop-shadow"] {
 @media (max-height: 400px) {
   #sr-title-screen::after, #sa-title-screen::after, #bb-title-screen::after,
   #dm-title-screen::after, #hr-title-screen::after, #rc-title-screen::after,
-  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after,
+  #mc-title-screen::after, #tp-title-screen::after, #cv-title-screen::after, #rr-title-screen::after,
   #sr-results::after, #sa-results::after, #bb-results::after,
   #dm-results::after, #hr-results::after, #rc-results::after,
-  #mc-results::after, #tp-results::after, #cv-results::after {
+  #mc-results::after, #tp-results::after, #cv-results::after, #rr-results::after {
     opacity: 0.25;
     width: 18%;
   }
@@ -11682,8 +11684,10 @@ body.app-rotating [style*="drop-shadow"] {
 /* Safe-area iPhone (notch) sur tous les title/results screens */
 #sr-title-screen, #sa-title-screen, #bb-title-screen, #dm-title-screen,
 #hr-title-screen, #rc-title-screen, #mc-title-screen, #tp-title-screen, #cv-title-screen,
+#rr-title-screen,
 #sr-results, #sa-results, #bb-results, #dm-results,
-#hr-results, #rc-results, #mc-results, #tp-results, #cv-results {
+#hr-results, #rc-results, #mc-results, #tp-results, #cv-results,
+#rr-results {
   padding-left: max(16px, env(safe-area-inset-left, 16px)) !important;
   padding-right: max(16px, env(safe-area-inset-right, 16px)) !important;
   padding-top: max(14px, env(safe-area-inset-top, 14px)) !important;
@@ -11708,11 +11712,13 @@ body.app-rotating [style*="drop-shadow"] {
   #hr-title-screen > div[style*="Bebas Neue"], #rc-title-screen > div[style*="Bebas Neue"],
   #mc-title-screen > div[style*="Bebas Neue"], #tp-title-screen > div[style*="Bebas Neue"],
   #cv-title-screen > div[style*="Bebas Neue"],
+  #rr-title-screen > div[style*="Bebas Neue"], #rr-results > div[style*="Bebas Neue"],
   #sr-results > div[style*="Bebas Neue"], #sa-results > div[style*="Bebas Neue"],
   #bb-results > div[style*="Bebas Neue"], #dm-results > div[style*="Bebas Neue"],
   #hr-results > div[style*="Bebas Neue"], #rc-results > div[style*="Bebas Neue"],
   #mc-results > div[style*="Bebas Neue"], #tp-results > div[style*="Bebas Neue"],
-  #cv-results > div[style*="Bebas Neue"] {
+  #cv-results > div[style*="Bebas Neue"],
+  #rr-title-screen > div[style*="font-size:clamp(32px"], #rr-results > div[style*="font-size:clamp(72px"] {
     font-size: 28px !important;
     letter-spacing: 2.5px !important;
     margin-bottom: 4px !important;
@@ -11724,6 +11730,7 @@ body.app-rotating [style*="drop-shadow"] {
   #hr-title-screen > div[style*="Barlow"], #rc-title-screen > div[style*="Barlow"],
   #mc-title-screen > div[style*="Barlow"], #tp-title-screen > div[style*="Barlow"],
   #cv-title-screen > div[style*="Barlow"],
+  #rr-title-screen > div[style*="Barlow"], #rr-results > div[style*="Barlow"],
   #sr-results > div[style*="Barlow"], #sa-results > div[style*="Barlow"],
   #bb-results > div[style*="Barlow"], #dm-results > div[style*="Barlow"],
   #hr-results > div[style*="Barlow"], #rc-results > div[style*="Barlow"],
@@ -44156,63 +44163,55 @@ if (G.imgBall) {
 <div id="rr-modal" style="display:none;position:fixed;inset:0;z-index:100068;background:#0a0d18;overflow:hidden">
   <canvas id="rr-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;background:linear-gradient(180deg,#131820 0%,#0a0d14 100%);touch-action:none"></canvas>
 
-  <!-- Rotation prompt (si phone en portrait étroit) -->
-  <div id="rr-rotate" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.92);z-index:5;align-items:center;justify-content:center;flex-direction:column;color:#f5c518;text-align:center;padding:30px;font-family:'Bebas Neue','Impact',sans-serif">
-    <div style="font-size:68px;animation:rrSpin 1.6s ease-in-out infinite">📱↺</div>
-    <div style="font-size:22px;letter-spacing:3px;margin-top:20px">TOURNE TON TÉLÉPHONE</div>
-    <div style="font-family:'Barlow',sans-serif;font-size:14px;color:#cfd3e0;letter-spacing:1px;margin-top:10px;font-weight:400">Mets-le à l'horizontal pour jouer</div>
+  <!-- Rotation prompt — structure IDENTIQUE à rc-rotate / mc-rotate / etc. -->
+  <div id="rr-rotate" style="display:none;position:absolute;inset:0;z-index:20;background:rgba(10,13,24,.96);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+    <div style="font-size:64px;margin-bottom:20px;animation:srRotatePulse 1.5s ease-in-out infinite">📱</div>
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;letter-spacing:2px;color:#f5c518;margin-bottom:10px" data-i18n="sr_rotate_title">TOURNE TON TÉLÉPHONE</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:1px;line-height:1.5;max-width:280px" data-i18n="sr_rotate_msg">Le jeu se joue en mode paysage · Bascule ton écran à l'horizontale</div>
   </div>
 
-  <!-- Title screen -->
-  <div id="rr-title-screen" style="position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;background:radial-gradient(ellipse at center,rgba(245,197,24,.15) 0%,rgba(10,13,24,.95) 60%)">
-    <div style="font-size:64px;line-height:1;margin-bottom:12px">🎮⚡</div>
-    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(32px,8vw,54px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 24px rgba(245,197,24,.5);line-height:1;margin-bottom:8px">SENSEI REFLEX RUSH</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:2px;margin-bottom:30px;font-weight:600">⚡ ATTRAPE AVANT QU'ILS TOUCHENT LE SOL</div>
+  <!-- Title screen — structure IDENTIQUE à rc-title-screen / mc-title-screen / etc. -->
+  <div id="rr-title-screen" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
+    <img src="logo.png" alt="SENSEI" style="width:clamp(80px,15vw,120px);height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(38px,9vw,66px);letter-spacing:4px;color:#f5c518;text-shadow:0 4px 20px rgba(245,197,24,.4),0 2px 8px #000;line-height:1;margin-bottom:6px">SENSEI REFLEX RUSH</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:clamp(11px,2.3vw,14px);color:#cfd3e0;letter-spacing:2px;margin-bottom:16px;text-shadow:0 1px 4px #000">⚡ Attrape les bons items au doigt · Évite les bombes</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:11px;color:#cfd3e0;letter-spacing:1px;line-height:1.6;max-width:500px;margin-bottom:14px;text-shadow:0 1px 3px #000">🟦 bâton <b style="color:#4cc9f0">+10</b> · 🏀 ballon <b style="color:#ff8c42">+20</b> · ⭐ étoile <b style="color:#f5c518">+100 ×2</b> · 💣 <b style="color:#e63946">ÉVITE −50</b></div>
 
-    <!-- Setup grid -->
-    <div style="display:flex;flex-direction:column;gap:14px;max-width:480px;width:100%;margin-bottom:22px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:7px">⏱ DURÉE</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="rr-dur-btn" data-sec="30"  onclick="_rr_setDur(30)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
-          <button class="rr-dur-btn" data-sec="60"  onclick="_rr_setDur(60)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
-          <button class="rr-dur-btn" data-sec="90"  onclick="_rr_setDur(90)"  style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
-          <button class="rr-dur-btn" data-sec="120" onclick="_rr_setDur(120)" style="flex:1;min-width:60px;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
-        </div>
+    <!-- Setup grid compact (durée + tempo) -->
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:460px;width:100%;margin-bottom:14px">
+      <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-right:4px;text-shadow:0 1px 3px #000">⏱</span>
+        <button class="rr-dur-btn" data-sec="30"  onclick="_rr_setDur(30)"  style="flex:1;min-width:52px;padding:7px 4px;border-radius:6px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+        <button class="rr-dur-btn" data-sec="60"  onclick="_rr_setDur(60)"  style="flex:1;min-width:52px;padding:7px 4px;border-radius:6px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+        <button class="rr-dur-btn" data-sec="90"  onclick="_rr_setDur(90)"  style="flex:1;min-width:52px;padding:7px 4px;border-radius:6px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+        <button class="rr-dur-btn" data-sec="120" onclick="_rr_setDur(120)" style="flex:1;min-width:52px;padding:7px 4px;border-radius:6px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
       </div>
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#7a8299;letter-spacing:2px;font-weight:700;margin-bottom:7px">⚡ TEMPO</div>
-        <div style="display:flex;gap:6px">
-          <button class="rr-lvl-btn" data-ms="1700" onclick="_rr_setLvl(1700)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🟢 CHILL</button>
-          <button class="rr-lvl-btn" data-ms="1200" onclick="_rr_setLvl(1200)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🟡 NORMAL</button>
-          <button class="rr-lvl-btn" data-ms="800"  onclick="_rr_setLvl(800)"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">🔥 BEAST</button>
-        </div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-right:4px;text-shadow:0 1px 3px #000">⚡</span>
+        <button class="rr-lvl-btn" data-ms="1700" onclick="_rr_setLvl(1700)" style="flex:1;padding:7px 4px;border-radius:6px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 CHILL</button>
+        <button class="rr-lvl-btn" data-ms="1200" onclick="_rr_setLvl(1200)" style="flex:1;padding:7px 4px;border-radius:6px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.18);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 NORMAL</button>
+        <button class="rr-lvl-btn" data-ms="800"  onclick="_rr_setLvl(800)"  style="flex:1;padding:7px 4px;border-radius:6px;border:1px solid #1e2535;background:#1a2130;color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 BEAST</button>
       </div>
     </div>
 
-    <!-- Rules reminder -->
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#cfd3e0;letter-spacing:1px;margin-bottom:22px;line-height:1.8;max-width:460px">
-      🟦 bâton <b style="color:#4cc9f0">+10</b> &nbsp;·&nbsp; 🏀 ballon <b style="color:#ff8c42">+20</b> &nbsp;·&nbsp; ⭐ étoile <b style="color:#f5c518">+100 ×2</b> &nbsp;·&nbsp; 💣 <b style="color:#e63946">ÉVITE −50</b>
-    </div>
+    <button id="rr-start-btn" onclick="_rr_startGame()" ontouchstart="" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;letter-spacing:3px;padding:14px 40px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 6px 20px rgba(245,197,24,.45);margin-bottom:14px">▶ COMMENCER</button>
 
-    <button id="rr-start-btn" onclick="_rr_startGame()" ontouchstart=""
-      style="background:linear-gradient(135deg,#f5c518,#ffd84a);border:none;color:#0a0d18;font-family:'Bebas Neue','Impact',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;padding:16px 44px;border-radius:12px;cursor:pointer;box-shadow:0 6px 24px rgba(245,197,24,.5);transition:transform .15s">▶ DÉMARRER</button>
-
-    <div id="rr-best-line" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;color:#f5c518;letter-spacing:2px;margin-top:20px"></div>
+    <div id="rr-best-line" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:13px;color:#f5c518;letter-spacing:2px"></div>
   </div>
 
-  <!-- Results screen -->
-  <div id="rr-results" style="display:none;position:absolute;inset:0;z-index:4;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;background:radial-gradient(ellipse at center,rgba(245,197,24,.18) 0%,rgba(10,13,24,.96) 60%)">
-    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:16px;color:#9aa3b3;letter-spacing:4px;margin-bottom:8px">GAME OVER</div>
-    <div id="rr-results-rank" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(72px,16vw,110px);letter-spacing:6px;line-height:1;margin-bottom:4px;color:#f5c518;text-shadow:0 4px 32px rgba(245,197,24,.6)">S</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#7a8299;letter-spacing:3px;margin-bottom:20px">RANK</div>
-    <div id="rr-results-score" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(44px,10vw,66px);color:#fff;letter-spacing:3px;line-height:1">0</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#9aa3b3;letter-spacing:2px;margin-bottom:14px">POINTS</div>
-    <div id="rr-results-stats" style="font-family:'Barlow',sans-serif;font-size:13px;color:#cfd3e0;letter-spacing:.5px;margin-bottom:22px;line-height:1.7"></div>
-    <div id="rr-results-lb" style="font-family:'Barlow',sans-serif;font-size:12px;color:#9aa3b3;margin-bottom:22px;max-width:340px;width:100%"></div>
-    <div style="display:flex;gap:12px">
-      <button onclick="_rr_showTitle()" ontouchstart="" style="background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;padding:12px 24px;border-radius:10px;cursor:pointer">↺ RETOUR</button>
-      <button onclick="_rr_startGame()" ontouchstart="" style="background:linear-gradient(135deg,#f5c518,#ffd84a);border:none;color:#0a0d18;font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:900;letter-spacing:2px;padding:12px 28px;border-radius:10px;cursor:pointer;box-shadow:0 4px 18px rgba(245,197,24,.4)">▶ REJOUER</button>
+  <!-- Results screen — structure IDENTIQUE à rc-results / mc-results / etc. -->
+  <div id="rr-results" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;background:rgba(10,13,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
+    <img src="logo.png" alt="SENSEI" style="width:clamp(60px,12vw,90px);height:auto;margin-bottom:10px;filter:drop-shadow(0 6px 20px rgba(245,197,24,.55))" onerror="this.style.display='none'">
+    <div style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(16px,3vw,20px);color:#9aa3b3;letter-spacing:4px;margin-bottom:4px;text-shadow:0 2px 8px #000">GAME OVER</div>
+    <div id="rr-results-rank" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(60px,14vw,100px);letter-spacing:6px;line-height:1;margin-bottom:2px;color:#f5c518;text-shadow:0 4px 32px rgba(245,197,24,.6),0 2px 8px #000">S</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:clamp(10px,2vw,12px);color:#7a8299;letter-spacing:3px;margin-bottom:14px;text-shadow:0 1px 3px #000">RANK</div>
+    <div id="rr-results-score" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:clamp(38px,8vw,54px);color:#fff;letter-spacing:3px;line-height:1;text-shadow:0 2px 8px #000">0</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:clamp(10px,2vw,12px);color:#9aa3b3;letter-spacing:2px;margin-bottom:12px;text-shadow:0 1px 3px #000">POINTS</div>
+    <div id="rr-results-stats" style="font-family:'Barlow',sans-serif;font-size:12px;color:#cfd3e0;letter-spacing:.5px;margin-bottom:14px;line-height:1.6;text-shadow:0 1px 3px #000"></div>
+    <div id="rr-results-lb" style="font-family:'Barlow',sans-serif;font-size:11px;color:#9aa3b3;margin-bottom:16px;max-width:340px;width:100%"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="_rr_showTitle()" ontouchstart="" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:12px 26px;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-weight:700">↺ RETOUR</button>
+      <button onclick="_rr_startGame()" ontouchstart="" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:14px;letter-spacing:2px;padding:12px 30px;border:none;border-radius:10px;background:#f5c518;color:#0a0d18;cursor:pointer;font-weight:900;box-shadow:0 4px 18px rgba(245,197,24,.4)">▶ REJOUER</button>
     </div>
   </div>
 
@@ -44222,7 +44221,8 @@ if (G.imgBall) {
 </div>
 
 <style>
-@keyframes rrSpin { 0%,100% { transform:rotate(-10deg); } 50% { transform:rotate(10deg); } }
+/* Micro-interactions tactiles (le reste du style est hérité des sélecteurs globaux
+   #rr-rotate, #rr-title-screen, #rr-results — voir CSS top of file) */
 #rr-start-btn:active { transform:scale(.96); }
 .rr-dur-btn:active, .rr-lvl-btn:active { transform:scale(.95); }
 </style>
