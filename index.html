@@ -2837,8 +2837,8 @@ window._dojoBackHome = function(){
   <div class="tr-card" id="tdr_card">
     <div class="tr-card-title" id="tdr_cardTitle">🎯 DRIBBLE RÉACTION</div>
 
-    <!-- Sélection mode -->
-    <div style="display:flex;gap:8px;margin-bottom:12px">
+    <!-- Sélection mode : 3 drills historiques + 2 nouveaux (COLOR + HEIGHT) -->
+    <div style="display:flex;gap:8px;margin-bottom:8px">
       <button class="tdr-mode-btn" data-mode="reaction" onclick="_tdr_setMode('reaction')"
         style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(245,197,24,.5);
                background:rgba(245,197,24,.15);color:#f5c518;cursor:pointer;
@@ -2859,6 +2859,24 @@ window._dojoBackHome = function(){
                font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
         <div style="font-size:18px;margin-bottom:3px">🥋</div>
         <div id="tdr_lblSensei">SENSEI</div>
+      </button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;position:relative">
+      <button class="tdr-mode-btn" data-mode="color" onclick="_tdr_setMode('color')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;position:relative;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <span style="position:absolute;top:4px;right:4px;background:#e63946;color:#fff;font-size:7px;font-weight:800;padding:1px 4px;border-radius:4px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</span>
+        <div style="font-size:18px;margin-bottom:3px">🔴🔵🟡</div>
+        <div id="tdr_lblColor">COLOR REACTOR</div>
+      </button>
+      <button class="tdr-mode-btn" data-mode="heightrefl" onclick="_tdr_setMode('heightrefl')"
+        style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;
+               background:var(--dark3);color:#7a8299;cursor:pointer;position:relative;
+               font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.5px">
+        <span style="position:absolute;top:4px;right:4px;background:#e63946;color:#fff;font-size:7px;font-weight:800;padding:1px 4px;border-radius:4px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</span>
+        <div style="font-size:18px;margin-bottom:3px">⬆️⏸️⬇️</div>
+        <div id="tdr_lblHeight">HEIGHT REFLEX</div>
       </button>
     </div>
 
@@ -2939,6 +2957,77 @@ window._dojoBackHome = function(){
       <div id="tdr_senseiDots" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:10px"></div>
     </div>
 
+    <!-- Panel Color Reactor : 6e drill (après RANDOM) ─────────────── -->
+    <div id="tdr_panelColor" style="display:none">
+      <!-- Vidéo tuto YouTube -->
+      <div style="border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000">
+        <iframe width="100%" style="aspect-ratio:16/9;border:none;display:block" src="https://www.youtube-nocookie.com/embed/IrW2OCRd5n0?rel=0&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <!-- Setup : Forme + Mode + Durée -->
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔺 FORME</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrc-shape-btn" data-shape="y"     onclick="_tdrc_setShape('y')"     style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔺 Y · 3 COULEURS</button>
+        <button class="tdrc-shape-btn" data-shape="cross" onclick="_tdrc_setShape('cross')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">✚ CROIX · 4 COULEURS</button>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 MODE</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrc-mode-btn" data-mode="easy"   onclick="_tdrc_setMode('easy')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 EASY</button>
+        <button class="tdrc-mode-btn" data-mode="medium" onclick="_tdrc_setMode('medium')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 MEDIUM</button>
+        <button class="tdrc-mode-btn" data-mode="hard"   onclick="_tdrc_setMode('hard')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 HARD</button>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrc-dur-btn" data-sec="30"  onclick="_tdrc_setDur(30)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+        <button class="tdrc-dur-btn" data-sec="60"  onclick="_tdrc_setDur(60)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+        <button class="tdrc-dur-btn" data-sec="90"  onclick="_tdrc_setDur(90)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+        <button class="tdrc-dur-btn" data-sec="120" onclick="_tdrc_setDur(120)" style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+      </div>
+      <!-- Setup hint -->
+      <div style="margin-bottom:12px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#9aa3b3;line-height:1.5">
+        📱 Pose téléphone à 2m · 2 mains visibles dans le cadre · voix annonce une couleur → mets la main dessus avant 1,5s
+      </div>
+      <!-- Status + boutons dédiés -->
+      <div id="tdrc_status" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="tdrc_btnStart" onclick="_tdrc_start()" ontouchstart="" style="width:100%">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-save" id="tdrc_btnSave" onclick="_tdrc_save()" ontouchstart="" style="width:100%;margin-top:8px;display:none">💾 SAUVEGARDER</button>
+      <!-- Résultats -->
+      <div id="tdrc_results" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Panel Height Reflex : 7e drill (après RANDOM) ─────────────── -->
+    <div id="tdr_panelHeight" style="display:none">
+      <!-- Vidéo tuto YouTube -->
+      <div style="border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000">
+        <iframe width="100%" style="aspect-ratio:16/9;border:none;display:block" src="https://www.youtube-nocookie.com/embed/0BNsq4FwS6s?rel=0&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <!-- Setup : Mode + Durée -->
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 MODE</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrh-mode-btn" data-mode="easy"   onclick="_tdrh_setMode('easy')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 EASY</button>
+        <button class="tdrh-mode-btn" data-mode="medium" onclick="_tdrh_setMode('medium')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 MEDIUM</button>
+        <button class="tdrh-mode-btn" data-mode="hard"   onclick="_tdrh_setMode('hard')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 HARD</button>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrh-dur-btn" data-sec="30"  onclick="_tdrh_setDur(30)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+        <button class="tdrh-dur-btn" data-sec="60"  onclick="_tdrh_setDur(60)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+        <button class="tdrh-dur-btn" data-sec="90"  onclick="_tdrh_setDur(90)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+        <button class="tdrh-dur-btn" data-sec="120" onclick="_tdrh_setDur(120)" style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+      </div>
+      <!-- Setup hint -->
+      <div style="margin-bottom:12px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:#9aa3b3;line-height:1.5">
+        📱 Pose téléphone à 2m · corps entier dans le cadre · voix annonce HAUT / MILIEU / BAS → lève la main au bon niveau avant 1,5s
+      </div>
+      <!-- Status + boutons dédiés -->
+      <div id="tdrh_status" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="tdrh_btnStart" onclick="_tdrh_start()" ontouchstart="" style="width:100%">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-save" id="tdrh_btnSave" onclick="_tdrh_save()" ontouchstart="" style="width:100%;margin-top:8px;display:none">💾 SAUVEGARDER</button>
+      <!-- Résultats -->
+      <div id="tdrh_results" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Bloc commun (visible SEULEMENT pour reaction/rhythm/sensei) -->
+    <div id="tdr_commonBottom">
     <!-- Guide placement -->
     <div style="background:#0d1117;border:1px solid #1e2535;border-radius:8px;padding:10px;margin-bottom:10px;font-size:9px;color:#7a8299;line-height:1.6">
       📱 <span id="tdr_guide1">Pose le téléphone à 2-3m face à toi</span><br>
@@ -2985,7 +3074,10 @@ window._dojoBackHome = function(){
 
     <!-- Historique -->
     <div id="tdr_histList"><div class="tr-empty">Aucune session</div></div>
+    </div><!-- /tdr_commonBottom -->
   </div>
+
+  <!-- COLOR REACTOR + HEIGHT REFLEX : désormais intégrés dans tdr_card (modes 6 et 7 après RANDOM) -->
 
   <div class="tr-card">
     <div class="tr-card-title">⏱ SESSION</div>
@@ -7756,6 +7848,12 @@ const SECTION_VIDEOS = {
     {id:'B174AgV-oYg', title:'Ball Handling Drill #35', vertical:false},
     {id:'hxZQhHlWdX4', title:'Ball Handling Drill #36', vertical:false},
     {id:'shn5sm7pKXY', title:'Ball Handling Drill #37', vertical:false},
+    {id:'KG8MUKRr0DA', title:'Ball Handling Drill #38', vertical:false},
+    {id:'3FMVpAolxmw', title:'Ball Handling Drill #39', vertical:false},
+    {id:'PuTLuVkL84E', title:'Ball Handling Drill #40', vertical:false},
+    {id:'cNFb5KMT1U4', title:'Ball Handling Drill #41', vertical:false},
+    {id:'F4VVBe31GzM', title:'Ball Handling Drill #42', vertical:false},
+    {id:'IrW2OCRd5n0', title:'Ball Handling Drill #43', vertical:false}, // doublon assumé avec SENSEI COLOR REACTOR (TDR)
   ],
   hec: [
     {id:'xV0XuRGHsxo', title:'Hand-Eye Drill #1', vertical:true},
@@ -28636,6 +28734,989 @@ function _tdr_recError(msg){
   if(st){st.textContent='❌ '+msg;st.style.color='#e63946';}
   _tdr_recActive=false;clearInterval(_tdr_recTimer);_tdr_updateRecBtn();
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SENSEI COLOR REACTOR 🔴🔵🟡  &  SENSEI HEIGHT REFLEX ⬆️⏸️⬇️
+   ─────────────────────────────────────────────────────────────────
+   2 nouveaux drills caméra TDR — modules isolés _tdrc_* et _tdrh_*
+   • Camera + canvas propres (tdrc_video/tdrc_canvas, tdrh_*)
+   • Pipeline REC calqué sur _tdr_ (STOP REC défilant, MP4 iPhone,
+     blob guard, enchaînable, replay x0.5-x2 via window._replay)
+   • Détection pose via _tsym_detector + _tsym_kp_hand (SAME QUALITÉ
+     que TDR reaction target, zéro régression)
+   • Voix synthétique via speechSynthesis natif (FR/EN)
+   • Fullscreen overlay via senseiCamShow (overlay officiel SENSEI)
+   • Branding + logo + Powered by via _camDrawLogo (infra partagée)
+═══════════════════════════════════════════════════════════════════ */
+
+/* ─── État + setters COLOR REACTOR ─────────────────────────────── */
+var _tdrc_shape = 'y';          // 'y' (3 couleurs) | 'cross' (4 couleurs)
+var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
+var _tdrc_dur   = 60;
+var _tdrc_running = false;
+var _tdrc_stream = null;
+var _tdrc_video  = null;
+var _tdrc_canvas = null;
+var _tdrc_ctx    = null;
+var _tdrc_startTs = 0, _tdrc_elapsed = 0;
+var _tdrc_score = 0, _tdrc_correct = 0, _tdrc_wrong = 0;
+var _tdrc_reactTimes = [];
+var _tdrc_combo = 0, _tdrc_bestCombo = 0;
+var _tdrc_rafId = null, _tdrc_cmdTimer = null;
+var _tdrc_cmd = null;           // { color, hand, cmd2 } — commande en cours
+var _tdrc_cmdStartTs = 0;
+var _tdrc_particles = [];
+var _tdrc_recorder = null, _tdrc_recChunks = [], _tdrc_recActive = false;
+var _tdrc_recTimer = null, _tdrc_recSec = 0, _tdrc_recStream = null;
+
+var _TDRC_COLORS_Y    = [
+  {k:'J', name:'JAUNE', nameEn:'YELLOW', hex:'#f5c518'},
+  {k:'R', name:'ROUGE', nameEn:'RED',    hex:'#e63946'},
+  {k:'B', name:'BLEU',  nameEn:'BLUE',   hex:'#4cc9f0'}
+];
+var _TDRC_COLORS_CROSS = [
+  {k:'V', name:'VERT',  nameEn:'GREEN',  hex:'#2dc653'},
+  {k:'R', name:'ROUGE', nameEn:'RED',    hex:'#e63946'},
+  {k:'J', name:'JAUNE', nameEn:'YELLOW', hex:'#f5c518'},
+  {k:'B', name:'BLEU',  nameEn:'BLUE',   hex:'#4cc9f0'}
+];
+
+function _tdrc_setShape(s){ _tdrc_shape = s; _tdrc_highlight('.tdrc-shape-btn','data-shape',s); }
+function _tdrc_setMode(m){ _tdrc_mode = m;  _tdrc_highlight('.tdrc-mode-btn','data-mode',m); }
+function _tdrc_setDur(d){ _tdrc_dur = d;    _tdrc_highlight('.tdrc-dur-btn','data-sec',d); }
+function _tdrc_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+function _tdrc_status(msg, color){
+  var st = document.getElementById('tdrc_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+
+/* ─── Démarrage caméra ─────────────────────────────────────────── */
+function _tdrc_start(){
+  if (!navigator.mediaDevices){ _tdrc_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _tdrc_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
+  var btn = document.getElementById('tdrc_btnStart');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _tdrc_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _tdrc_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      // Utilise l'overlay officiel SENSEI avec un prefix 'tdrc'
+      _tdrc_showCam(stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+
+/* ─── Monte un overlay fullscreen caméra + canvas (pattern senseiCamShow light) ─── */
+function _tdrc_showCam(stream){
+  var ov = document.getElementById('tdrc-cam-overlay');
+  if (!ov){
+    ov = document.createElement('div');
+    ov.id = 'tdrc-cam-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100085;background:#000;display:flex;align-items:center;justify-content:center';
+    ov.innerHTML = ''
+      + '<video id="tdrc_video" playsinline muted style="display:none"></video>'
+      + '<canvas id="tdrc_canvas" width="640" height="480" style="width:100%;height:100%;object-fit:contain;background:#000"></canvas>'
+      + '<button id="tdrc_closeBtn" onclick="_tdrc_stop()" style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:18px;cursor:pointer;font-weight:700">✕</button>'
+      + '<button id="tdrc_recBtn" onclick="_tdrc_toggleRec()" style="position:absolute;top:14px;left:14px;z-index:10;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:14px;padding:9px 20px;border-radius:28px;border:none;cursor:pointer;letter-spacing:1px">● REC</button>';
+    document.body.appendChild(ov);
+  }
+  ov.style.display = 'flex';
+  _tdrc_video = document.getElementById('tdrc_video');
+  _tdrc_canvas = document.getElementById('tdrc_canvas');
+  _tdrc_ctx = _tdrc_canvas.getContext('2d');
+  _tdrc_video.srcObject = stream;
+  _tdrc_video.onloadedmetadata = function(){
+    _tdrc_video.play();
+    _tdrc_canvas.width = _tdrc_video.videoWidth || 640;
+    _tdrc_canvas.height = _tdrc_video.videoHeight || 480;
+    _tdrc_runCountdown(10);
+  };
+}
+
+/* ─── Countdown 10s puis démarrage ─────────────────────────────── */
+function _tdrc_runCountdown(n){
+  var cv = _tdrc_canvas, ctx = _tdrc_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _tdrc_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle='#f5c518';
+    ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle='#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _tdrc_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _tdrc_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _tdrc_startGame();
+  }
+}
+
+function _tdrc_drawBrand(ctx, W, H){
+  ctx.textAlign='right'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,0.95)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.038)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-W*0.025, H*0.065);
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.font='bold '+Math.round(H*0.027)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('COLOR REACTOR 🔴🔵🟡', W-W*0.025, H*0.105);
+  ctx.shadowBlur=0;
+}
+
+/* ─── Démarrage du jeu après countdown ─────────────────────────── */
+function _tdrc_startGame(){
+  _tdrc_running = true;
+  _tdrc_startTs = Date.now();
+  _tdrc_elapsed = 0;
+  _tdrc_score = 0; _tdrc_correct = 0; _tdrc_wrong = 0;
+  _tdrc_combo = 0; _tdrc_bestCombo = 0;
+  _tdrc_reactTimes = [];
+  _tdrc_particles = [];
+  _tdrc_nextCommand();
+  _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
+}
+
+function _tdrc_nextCommand(){
+  if (!_tdrc_running) return;
+  var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
+  var en = window._lang === 'en';
+  // Choisit une couleur random
+  var c1 = colors[Math.floor(Math.random() * colors.length)];
+  var hand1 = null, c2 = null, hand2 = null;
+  if (_tdrc_mode === 'medium'){
+    hand1 = Math.random() < 0.5 ? 'left' : 'right';
+  } else if (_tdrc_mode === 'hard'){
+    // Antiphase : 2 couleurs simultanées, une par main
+    var others = colors.filter(function(c){ return c.k !== c1.k; });
+    c2 = others[Math.floor(Math.random() * others.length)];
+    hand1 = 'left'; hand2 = 'right';
+  }
+  _tdrc_cmd = { c1:c1, hand1:hand1, c2:c2, hand2:hand2, hit1:false, hit2:false };
+  _tdrc_cmdStartTs = Date.now();
+  // Voix synthétique
+  var txt = (en ? c1.nameEn : c1.name);
+  if (hand1) txt = (en?(hand1==='left'?'LEFT ':'RIGHT ')+ c1.nameEn : (hand1==='left'?'GAUCHE ':'DROITE ')+c1.name);
+  if (c2) txt += (en?' + '+(hand2==='left'?'LEFT ':'RIGHT ')+c2.nameEn : ' + '+(hand2==='left'?'GAUCHE ':'DROITE ')+c2.name);
+  try {
+    if (window.speechSynthesis){
+      var u = new SpeechSynthesisUtterance(txt);
+      u.lang = en ? 'en-US' : 'fr-FR';
+      u.rate = 1.2;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }
+  } catch(e){}
+  // Timeout 1.5s pour réagir
+  if (_tdrc_cmdTimer) clearTimeout(_tdrc_cmdTimer);
+  _tdrc_cmdTimer = setTimeout(function(){
+    if (_tdrc_cmd && !(_tdrc_cmd.hit1 && (!_tdrc_cmd.c2 || _tdrc_cmd.hit2))){
+      _tdrc_wrong++;
+      _tdrc_combo = 0;
+      _tdrc_cmd = null;
+    }
+    if (_tdrc_running) _tdrc_nextCommand();
+  }, 1500);
+}
+
+/* ─── Loop principal : vidéo + shape + HUD + détection ─────────── */
+function _tdrc_loop(){
+  if (!_tdrc_running) return;
+  var cv = _tdrc_canvas, ctx = _tdrc_ctx, W = cv.width, H = cv.height;
+  var nowTs = Date.now();
+  _tdrc_elapsed = (nowTs - _tdrc_startTs) / 1000;
+  // 1. Vidéo caméra mirror
+  _drawVideoMirror(ctx, _tdrc_video, W, H);
+  // 2. Détection pose
+  if (window._tsym_detector){
+    try {
+      _tsym_detector.estimatePoses(_tdrc_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){
+        _tdrc_analyzePose(poses);
+      }).catch(function(){});
+    } catch(e){}
+  }
+  // 3. Dessin shape (Y ou Croix)
+  _tdrc_drawShape(ctx, W, H);
+  // 4. Particules
+  for (var p = _tdrc_particles.length-1; p >= 0; p--){
+    var pt = _tdrc_particles[p];
+    pt.life -= 0.016;
+    if (pt.life <= 0){ _tdrc_particles.splice(p,1); continue; }
+    pt.x += pt.vx * 0.016; pt.y += pt.vy * 0.016; pt.vy += 400 * 0.016;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, pt.life);
+    ctx.fillStyle = pt.color;
+    ctx.shadowBlur = 8; ctx.shadowColor = pt.color;
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, Math.max(2.5, H*0.006), 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  // 5. HUD
+  _tdrc_drawHud(ctx, W, H);
+  // 6. Commande affichée
+  _tdrc_drawCommand(ctx, W, H);
+  // 7. Brand + logo
+  _tdrc_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  // Fin session ?
+  if (_tdrc_elapsed >= _tdrc_dur){
+    _tdrc_endGame();
+    return;
+  }
+  _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
+}
+
+/* ─── Dessin de la shape Y ou Croix (gros au centre) ───────────── */
+function _tdrc_drawShape(ctx, W, H){
+  var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
+  var cx = W / 2, cy = H / 2;
+  var armLen = Math.min(W, H) * 0.3;
+  var armW = armLen * 0.3;
+  var hubR = armW * 0.6;
+  var n = colors.length;
+  ctx.save();
+  for (var i = 0; i < n; i++){
+    var ang = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
+    var ex = cx + Math.cos(ang) * armLen;
+    var ey = cy + Math.sin(ang) * armLen;
+    // Branche
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(ang + Math.PI/2);
+    ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
+    ctx.fillStyle = colors[i].hex;
+    // Pilule
+    var r = armW / 2;
+    ctx.beginPath();
+    ctx.moveTo(-r, 0);
+    ctx.lineTo(-r, armLen);
+    ctx.arc(0, armLen, r, Math.PI, 0, true);
+    ctx.lineTo(r, 0);
+    ctx.closePath();
+    ctx.fill();
+    // Ball end
+    ctx.beginPath(); ctx.arc(0, armLen, armW * 0.75, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    // Store le centre de la branche (ball end) pour collision
+    colors[i]._cx = ex;
+    colors[i]._cy = ey;
+    colors[i]._r  = armW * 0.75;
+  }
+  // Hub central noir
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+}
+
+/* ─── Analyse pose : collision poignet → branche ───────────────── */
+function _tdrc_analyzePose(poses){
+  if (!_tdrc_running || !_tdrc_cmd || !poses || !poses[0]) return;
+  var cv = _tdrc_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_tdrc_video.videoWidth || 640);
+  var sy = H / (_tdrc_video.videoHeight || 480);
+  var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
+  // Zone de catch autour de chaque branche
+  var catchR = Math.max(28, Math.min(W, H) * 0.07);
+  ['left','right'].forEach(function(side){
+    if (!_tdrc_cmd) return;
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var hx = W - kp.x * sx, hy = kp.y * sy;
+    // Quelle branche touchée ?
+    var hitBranch = null;
+    for (var i = 0; i < colors.length; i++){
+      var c = colors[i];
+      if (c._cx == null) continue;
+      var dx = hx - c._cx, dy = hy - c._cy;
+      if (dx*dx + dy*dy < (catchR + c._r) * (catchR + c._r)){
+        hitBranch = c; break;
+      }
+    }
+    if (!hitBranch) return;
+    // Match avec la commande ?
+    var cmd = _tdrc_cmd;
+    var expectedForSide = null;
+    if (cmd.c2){
+      // HARD : 2 commandes simultanées, chaque main a sa cible
+      if (side === cmd.hand1 && !cmd.hit1) expectedForSide = cmd.c1;
+      else if (side === cmd.hand2 && !cmd.hit2) expectedForSide = cmd.c2;
+    } else if (cmd.hand1){
+      // MEDIUM : main imposée
+      if (side === cmd.hand1 && !cmd.hit1) expectedForSide = cmd.c1;
+    } else {
+      // EASY : n'importe quelle main
+      if (!cmd.hit1) expectedForSide = cmd.c1;
+    }
+    if (!expectedForSide) return;
+    if (hitBranch.k === expectedForSide.k){
+      // Bonne branche
+      if (side === cmd.hand1 || !cmd.c2) cmd.hit1 = true;
+      if (cmd.c2 && side === cmd.hand2) cmd.hit2 = true;
+      // Particules
+      for (var pi = 0; pi < 16; pi++){
+        var ang = Math.random() * Math.PI * 2;
+        var spd = 100 + Math.random() * 180;
+        _tdrc_particles.push({ x: hitBranch._cx, y: hitBranch._cy, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 60, life: 0.5 + Math.random()*0.4, color: hitBranch.hex });
+      }
+      try { if (typeof _td_beep === 'function') _td_beep(880, 0.08, 0.25); } catch(e){}
+      if (navigator.vibrate) navigator.vibrate(20);
+      // Toutes les sous-commandes validées ?
+      if (cmd.hit1 && (!cmd.c2 || cmd.hit2)){
+        _tdrc_correct++;
+        _tdrc_combo++;
+        _tdrc_bestCombo = Math.max(_tdrc_bestCombo, _tdrc_combo);
+        _tdrc_reactTimes.push(Date.now() - _tdrc_cmdStartTs);
+        var base = cmd.c2 ? 150 : 100;
+        var mult = _tdrc_combo >= 10 ? 3 : _tdrc_combo >= 5 ? 2 : 1;
+        _tdrc_score += base * mult;
+        _tdrc_cmd = null;
+        if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
+        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 350);
+      }
+    }
+  });
+}
+
+/* ─── HUD : score + combo + timer + rank live ──────────────────── */
+function _tdrc_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,0.95)';
+  // Score top-left
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_tdrc_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  // Combo
+  if (_tdrc_combo > 0){
+    var mult = _tdrc_combo >= 10 ? 3 : _tdrc_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_tdrc_combo, W*0.04, H*0.17);
+  }
+  // Timer top-center
+  var timeLeft = Math.max(0, _tdrc_dur - _tdrc_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.6)';
+  _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
+  ctx.fill();
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, W/2, H*0.088);
+  // Rank live bottom-left
+  var rank = _tdrc_rank();
+  ctx.textAlign='left';
+  ctx.fillStyle=_tdrc_rankColor(rank);
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(rank, W*0.04, H*0.9);
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('LIVE RANK', W*0.04, H*0.83);
+  ctx.restore();
+}
+
+function _tdrc_rank(){
+  var norm = _tdrc_score / (_tdrc_dur || 60) * 60;
+  if (norm >= 1500) return 'SENSEI';
+  if (norm >= 1000) return 'SS';
+  if (norm >= 700)  return 'S';
+  if (norm >= 450)  return 'A';
+  if (norm >= 280)  return 'B';
+  if (norm >= 150)  return 'C';
+  return 'D';
+}
+function _tdrc_rankColor(r){
+  return r==='SENSEI'?'#f5c518':r==='SS'?'#ff6b35':r==='S'?'#e63946':r==='A'?'#2dc653':r==='B'?'#4cc9f0':r==='C'?'#9aa3b3':'#7a8299';
+}
+
+/* ─── Dessin de la commande vocale au centre ───────────────────── */
+function _tdrc_drawCommand(ctx, W, H){
+  if (!_tdrc_cmd) return;
+  var c = _tdrc_cmd.c1;
+  var en = window._lang === 'en';
+  var txt = en ? c.nameEn : c.name;
+  if (_tdrc_cmd.hand1) txt = (en?(_tdrc_cmd.hand1==='left'?'LEFT ':'RIGHT ')+c.nameEn : (_tdrc_cmd.hand1==='left'?'G ':'D ')+c.name);
+  if (_tdrc_cmd.c2){
+    var c2 = _tdrc_cmd.c2;
+    txt += (en?' + '+(_tdrc_cmd.hand2==='left'?'L ':'R ')+c2.nameEn : ' + '+(_tdrc_cmd.hand2==='left'?'G ':'D ')+c2.name);
+  }
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur=12; ctx.shadowColor='rgba(0,0,0,.95)';
+  // Encadré transparent avec bordure couleur
+  var bgY = H*0.3, bgH = H*0.1, bgW = W*0.4;
+  ctx.fillStyle='rgba(0,0,0,.65)';
+  _dcog_vc_roundRect(ctx, W/2-bgW/2, bgY, bgW, bgH, 10);
+  ctx.fill();
+  ctx.strokeStyle = c.hex;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = c.hex;
+  ctx.font='bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, bgY + bgH/2);
+  ctx.restore();
+}
+
+/* ─── Toggle REC + pipeline simplifié ──────────────────────────── */
+function _tdrc_toggleRec(){ if (_tdrc_recActive) _tdrc_stopRec(); else _tdrc_startRec(); }
+function _tdrc_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_tdrc_recTimer); _tdrc_recTimer = null;
+  if (_tdrc_recorder){
+    try{ _tdrc_recorder.ondataavailable=null;_tdrc_recorder.onstop=null;_tdrc_recorder.onerror=null; if(_tdrc_recorder.state!=='inactive')_tdrc_recorder.stop(); }catch(e){}
+  }
+  if (_tdrc_recStream){ try{_tdrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _tdrc_recStream=null; }
+  _tdrc_recorder=null; _tdrc_recChunks=[]; _tdrc_recSec=0; _tdrc_recActive=false;
+  var cv = _tdrc_canvas; if (!cv) return;
+  var stream;
+  try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _tdrc_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _tdrc_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _tdrc_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _tdrc_recChunks = []; _tdrc_recSec = 0;
+  _tdrc_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _tdrc_recChunks.push(e.data); };
+  _tdrc_recorder.onstop = function(){
+    clearInterval(_tdrc_recTimer);
+    var mimeFinal = (_tdrc_recorder && _tdrc_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_tdrc_recChunks, {type: mimeFinal});
+    if (_tdrc_recStream){ try{_tdrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _tdrc_recStream=null; }
+    _tdrc_recActive=false; _tdrc_recChunks=[]; _tdrc_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_color_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, {
+        title: 'SENSEI COLOR REACTOR',
+        filename: fn,
+        onSave: function(b, filename){ _tdrc_dlBlob(b, filename); }
+      });
+    } else { _tdrc_dlBlob(blob, fn); }
+  };
+  _tdrc_recorder.onerror = function(){ clearInterval(_tdrc_recTimer); };
+  setTimeout(function(){
+    if (!_tdrc_recorder) return;
+    try { _tdrc_recorder.start(1000); _tdrc_recActive = true; } catch(e){ return; }
+    _tdrc_recTimer = setInterval(function(){
+      _tdrc_recSec++;
+      var mm=Math.floor(_tdrc_recSec/60)%60,ss=_tdrc_recSec%60,hh=Math.floor(_tdrc_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      var label = '&#9632; STOP REC · '+t;
+      var btn = document.getElementById('tdrc_recBtn');
+      if (btn){ btn.innerHTML = label; btn.style.background = '#7a0000'; btn.style.animation = 'ssRecBlink 1s ease-in-out infinite'; }
+      if (_tdrc_recSec >= 180) _tdrc_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _tdrc_stopRec(){
+  _tdrc_recActive=false; clearInterval(_tdrc_recTimer); _tdrc_recTimer=null;
+  if (_tdrc_recorder){ try{ if(_tdrc_recorder.state!=='inactive')_tdrc_recorder.stop(); }catch(e){} }
+  _tdrc_updateRecBtn();
+}
+function _tdrc_updateRecBtn(){
+  var btn = document.getElementById('tdrc_recBtn');
+  if (!btn) return;
+  if (_tdrc_recActive){ btn.innerHTML='&#9632; STOP REC'; btn.style.background='#7a0000'; }
+  else { btn.innerHTML='&#9679; REC'; btn.style.background='rgba(230,57,70,.92)'; btn.style.animation=''; }
+}
+function _tdrc_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+
+/* ─── Fin game + stop + results ────────────────────────────────── */
+function _tdrc_endGame(){
+  _tdrc_stop(true);
+  _tdrc_renderResults();
+}
+function _tdrc_stop(fromEnd){
+  _tdrc_running = false;
+  if (_tdrc_rafId){ cancelAnimationFrame(_tdrc_rafId); _tdrc_rafId = null; }
+  if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
+  if (_tdrc_recActive) _tdrc_stopRec();
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  if (_tdrc_stream){ _tdrc_stream.getTracks().forEach(function(t){t.stop();}); _tdrc_stream=null; }
+  var ov = document.getElementById('tdrc-cam-overlay');
+  if (ov) ov.style.display = 'none';
+  var btn = document.getElementById('tdrc_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('tdrc_btnSave');
+  if (sv && fromEnd && (_tdrc_correct+_tdrc_wrong)>0) sv.style.display = 'flex';
+}
+function _tdrc_renderResults(){
+  var res = document.getElementById('tdrc_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _tdrc_correct + _tdrc_wrong;
+  var pct = total > 0 ? Math.round(_tdrc_correct / total * 100) : 0;
+  var avg = _tdrc_reactTimes.length > 0 ? Math.round(_tdrc_reactTimes.reduce(function(a,b){return a+b;},0) / _tdrc_reactTimes.length) : 0;
+  var rank = _tdrc_rank();
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_tdrc_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:'+_tdrc_rankColor(rank)+'">'+rank+'</div><div class="tr-score-lbl">RANK</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+_tdrc_correct+'/'+total+' · '+pct+'% · '+(en?'best combo':'combo max')+' ×'+_tdrc_bestCombo+'</div>';
+  res.innerHTML = html;
+  _tdrc_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _tdrc_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var tgt = (_tdrc_dur || 60) * (500 / 60);
+    var pct = Math.min(100, Math.round(_tdrc_score / tgt * 100));
+    _sb_recordSession('color', pct);
+  }
+  _tdrc_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('tdrc_btnSave'); if (sv) sv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SENSEI HEIGHT REFLEX ⬆️⏸️⬇️ — même pattern que COLOR REACTOR
+   ═══════════════════════════════════════════════════════════════════ */
+var _tdrh_mode  = 'easy', _tdrh_dur = 60;
+var _tdrh_running = false, _tdrh_stream = null;
+var _tdrh_video = null, _tdrh_canvas = null, _tdrh_ctx = null;
+var _tdrh_startTs = 0, _tdrh_elapsed = 0;
+var _tdrh_score = 0, _tdrh_correct = 0, _tdrh_wrong = 0;
+var _tdrh_reactTimes = [], _tdrh_combo = 0, _tdrh_bestCombo = 0;
+var _tdrh_rafId = null, _tdrh_cmdTimer = null;
+var _tdrh_cmd = null, _tdrh_cmdStartTs = 0;
+var _tdrh_recorder = null, _tdrh_recChunks = [], _tdrh_recActive = false;
+var _tdrh_recTimer = null, _tdrh_recSec = 0, _tdrh_recStream = null;
+
+var _TDRH_LEVELS = [
+  {k:'H', name:'HAUT',   nameEn:'HIGH',   emoji:'⬆️', y:0.25},
+  {k:'M', name:'MILIEU', nameEn:'MIDDLE', emoji:'⏸️', y:0.50},
+  {k:'B', name:'BAS',    nameEn:'LOW',    emoji:'⬇️', y:0.75}
+];
+
+function _tdrh_setMode(m){ _tdrh_mode = m; _tdrh_highlight('.tdrh-mode-btn','data-mode',m); }
+function _tdrh_setDur(d){ _tdrh_dur = d;   _tdrh_highlight('.tdrh-dur-btn','data-sec',d); }
+function _tdrh_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+function _tdrh_status(msg, color){
+  var st = document.getElementById('tdrh_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+
+function _tdrh_start(){
+  if (!navigator.mediaDevices){ _tdrh_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _tdrh_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
+  var btn = document.getElementById('tdrh_btnStart');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _tdrh_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _tdrh_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      _tdrh_showCam(stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+
+function _tdrh_showCam(stream){
+  var ov = document.getElementById('tdrh-cam-overlay');
+  if (!ov){
+    ov = document.createElement('div');
+    ov.id = 'tdrh-cam-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100085;background:#000;display:flex;align-items:center;justify-content:center';
+    ov.innerHTML = ''
+      + '<video id="tdrh_video" playsinline muted style="display:none"></video>'
+      + '<canvas id="tdrh_canvas" width="640" height="480" style="width:100%;height:100%;object-fit:contain;background:#000"></canvas>'
+      + '<button id="tdrh_closeBtn" onclick="_tdrh_stop()" style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:18px;cursor:pointer;font-weight:700">✕</button>'
+      + '<button id="tdrh_recBtn" onclick="_tdrh_toggleRec()" style="position:absolute;top:14px;left:14px;z-index:10;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:14px;padding:9px 20px;border-radius:28px;border:none;cursor:pointer;letter-spacing:1px">● REC</button>';
+    document.body.appendChild(ov);
+  }
+  ov.style.display = 'flex';
+  _tdrh_video = document.getElementById('tdrh_video');
+  _tdrh_canvas = document.getElementById('tdrh_canvas');
+  _tdrh_ctx = _tdrh_canvas.getContext('2d');
+  _tdrh_video.srcObject = stream;
+  _tdrh_video.onloadedmetadata = function(){
+    _tdrh_video.play();
+    _tdrh_canvas.width = _tdrh_video.videoWidth || 640;
+    _tdrh_canvas.height = _tdrh_video.videoHeight || 480;
+    _tdrh_runCountdown(10);
+  };
+}
+function _tdrh_runCountdown(n){
+  var cv = _tdrh_canvas, ctx = _tdrh_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _tdrh_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle='#f5c518';
+    ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle='#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _tdrh_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _tdrh_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _tdrh_startGame();
+  }
+}
+function _tdrh_drawBrand(ctx, W, H){
+  ctx.textAlign='right'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,0.95)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.038)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-W*0.025, H*0.065);
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.font='bold '+Math.round(H*0.027)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('HEIGHT REFLEX ⬆️⏸️⬇️', W-W*0.025, H*0.105);
+  ctx.shadowBlur=0;
+}
+
+function _tdrh_startGame(){
+  _tdrh_running = true;
+  _tdrh_startTs = Date.now(); _tdrh_elapsed = 0;
+  _tdrh_score = 0; _tdrh_correct = 0; _tdrh_wrong = 0;
+  _tdrh_combo = 0; _tdrh_bestCombo = 0;
+  _tdrh_reactTimes = [];
+  _tdrh_nextCommand();
+  _tdrh_rafId = requestAnimationFrame(_tdrh_loop);
+}
+function _tdrh_nextCommand(){
+  if (!_tdrh_running) return;
+  var en = window._lang === 'en';
+  if (_tdrh_mode === 'hard'){
+    // Antiphase 2 mains : 2 niveaux différents
+    var i1 = Math.floor(Math.random() * _TDRH_LEVELS.length);
+    var i2;
+    do { i2 = Math.floor(Math.random() * _TDRH_LEVELS.length); } while (i2 === i1);
+    _tdrh_cmd = { l1:_TDRH_LEVELS[i1], hand1:'left', l2:_TDRH_LEVELS[i2], hand2:'right', hit1:false, hit2:false };
+    var txt = (en?'LEFT ':'GAUCHE ')+(en?_TDRH_LEVELS[i1].nameEn:_TDRH_LEVELS[i1].name)+' + '+(en?'RIGHT ':'DROITE ')+(en?_TDRH_LEVELS[i2].nameEn:_TDRH_LEVELS[i2].name);
+    _tdrh_speak(txt);
+  } else {
+    var l = _TDRH_LEVELS[Math.floor(Math.random() * _TDRH_LEVELS.length)];
+    _tdrh_cmd = { l1:l, hand1:null, l2:null, hand2:null, hit1:false, hit2:false };
+    _tdrh_speak(en?l.nameEn:l.name);
+  }
+  _tdrh_cmdStartTs = Date.now();
+  if (_tdrh_cmdTimer) clearTimeout(_tdrh_cmdTimer);
+  _tdrh_cmdTimer = setTimeout(function(){
+    if (_tdrh_cmd && !(_tdrh_cmd.hit1 && (!_tdrh_cmd.l2 || _tdrh_cmd.hit2))){
+      _tdrh_wrong++; _tdrh_combo = 0; _tdrh_cmd = null;
+    }
+    if (_tdrh_running) _tdrh_nextCommand();
+  }, 1500);
+}
+function _tdrh_speak(txt){
+  try { if (window.speechSynthesis){
+    var u = new SpeechSynthesisUtterance(txt);
+    u.lang = (window._lang === 'en') ? 'en-US' : 'fr-FR';
+    u.rate = 1.2;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  } } catch(e){}
+}
+
+function _tdrh_loop(){
+  if (!_tdrh_running) return;
+  var cv = _tdrh_canvas, ctx = _tdrh_ctx, W = cv.width, H = cv.height;
+  _tdrh_elapsed = (Date.now() - _tdrh_startTs) / 1000;
+  _drawVideoMirror(ctx, _tdrh_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_tdrh_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _tdrh_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  _tdrh_drawLines(ctx, W, H);
+  _tdrh_drawHud(ctx, W, H);
+  _tdrh_drawCommand(ctx, W, H);
+  _tdrh_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_tdrh_elapsed >= _tdrh_dur){ _tdrh_endGame(); return; }
+  _tdrh_rafId = requestAnimationFrame(_tdrh_loop);
+}
+function _tdrh_drawLines(ctx, W, H){
+  ctx.save();
+  _TDRH_LEVELS.forEach(function(l){
+    var active = _tdrh_cmd && (_tdrh_cmd.l1.k === l.k || (_tdrh_cmd.l2 && _tdrh_cmd.l2.k === l.k));
+    var color = active ? '#f5c518' : 'rgba(255,255,255,.25)';
+    var y = H * l.y;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = active ? 4 : 2;
+    if (active){ ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(245,197,24,.8)'; }
+    else ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.moveTo(W*0.1, y); ctx.lineTo(W*0.9, y); ctx.stroke();
+    // Label
+    ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.fillStyle = active ? '#f5c518' : 'rgba(255,255,255,.5)';
+    ctx.font = 'bold '+Math.round(H*0.028)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(l.name, W*0.09, y + H*0.01);
+  });
+  ctx.restore();
+}
+function _tdrh_analyzePose(poses){
+  if (!_tdrh_running || !_tdrh_cmd || !poses || !poses[0]) return;
+  var cv = _tdrh_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_tdrh_video.videoWidth || 640);
+  var sy = H / (_tdrh_video.videoHeight || 480);
+  var tolY = H * 0.07;
+  ['left','right'].forEach(function(side){
+    if (!_tdrh_cmd) return;
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var hy = kp.y * sy;
+    var cmd = _tdrh_cmd;
+    var expectedForSide = null;
+    if (cmd.l2){
+      if (side === cmd.hand1 && !cmd.hit1) expectedForSide = cmd.l1;
+      else if (side === cmd.hand2 && !cmd.hit2) expectedForSide = cmd.l2;
+    } else {
+      if (!cmd.hit1) expectedForSide = cmd.l1;
+    }
+    if (!expectedForSide) return;
+    var expectedY = H * expectedForSide.y;
+    if (Math.abs(hy - expectedY) < tolY){
+      if (side === cmd.hand1 || !cmd.l2) cmd.hit1 = true;
+      if (cmd.l2 && side === cmd.hand2) cmd.hit2 = true;
+      try { if (typeof _td_beep === 'function') _td_beep(880, 0.08, 0.25); } catch(e){}
+      if (navigator.vibrate) navigator.vibrate(20);
+      if (cmd.hit1 && (!cmd.l2 || cmd.hit2)){
+        _tdrh_correct++;
+        _tdrh_combo++;
+        _tdrh_bestCombo = Math.max(_tdrh_bestCombo, _tdrh_combo);
+        _tdrh_reactTimes.push(Date.now() - _tdrh_cmdStartTs);
+        var base = cmd.l2 ? 150 : 100;
+        var mult = _tdrh_combo >= 10 ? 3 : _tdrh_combo >= 5 ? 2 : 1;
+        _tdrh_score += base * mult;
+        _tdrh_cmd = null;
+        if (_tdrh_cmdTimer){ clearTimeout(_tdrh_cmdTimer); _tdrh_cmdTimer = null; }
+        setTimeout(function(){ if (_tdrh_running) _tdrh_nextCommand(); }, 350);
+      }
+    }
+  });
+}
+function _tdrh_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,0.95)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_tdrh_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_tdrh_combo > 0){
+    var mult = _tdrh_combo >= 10 ? 3 : _tdrh_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_tdrh_combo, W*0.04, H*0.17);
+  }
+  var timeLeft = Math.max(0, _tdrh_dur - _tdrh_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.6)';
+  _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
+  ctx.fill();
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, W/2, H*0.088);
+  var rank = _tdrh_rank();
+  ctx.textAlign='left';
+  ctx.fillStyle=_tdrh_rankColor(rank);
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(rank, W*0.04, H*0.9);
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('LIVE RANK', W*0.04, H*0.83);
+  ctx.restore();
+}
+function _tdrh_rank(){
+  var norm = _tdrh_score / (_tdrh_dur || 60) * 60;
+  if (norm >= 1500) return 'SENSEI';
+  if (norm >= 1000) return 'SS';
+  if (norm >= 700)  return 'S';
+  if (norm >= 450)  return 'A';
+  if (norm >= 280)  return 'B';
+  if (norm >= 150)  return 'C';
+  return 'D';
+}
+function _tdrh_rankColor(r){
+  return r==='SENSEI'?'#f5c518':r==='SS'?'#ff6b35':r==='S'?'#e63946':r==='A'?'#2dc653':r==='B'?'#4cc9f0':r==='C'?'#9aa3b3':'#7a8299';
+}
+function _tdrh_drawCommand(ctx, W, H){
+  if (!_tdrh_cmd) return;
+  var en = window._lang === 'en';
+  var l = _tdrh_cmd.l1;
+  var txt = (en?l.nameEn:l.name) + ' ' + l.emoji;
+  if (_tdrh_cmd.l2){
+    txt = (en?'L ':'G ')+(en?l.nameEn:l.name)+' + '+(en?'R ':'D ')+(en?_tdrh_cmd.l2.nameEn:_tdrh_cmd.l2.name);
+  }
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur=12; ctx.shadowColor='rgba(0,0,0,.95)';
+  var bgY = H*0.4, bgH = H*0.1, bgW = W*0.5;
+  ctx.fillStyle='rgba(0,0,0,.65)';
+  _dcog_vc_roundRect(ctx, W/2-bgW/2, bgY, bgW, bgH, 10);
+  ctx.fill();
+  ctx.strokeStyle = '#f5c518';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = '#f5c518';
+  ctx.font='bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, bgY + bgH/2);
+  ctx.restore();
+}
+
+/* ─── REC pipeline (identique à _tdrc_) ───────────────────────── */
+function _tdrh_toggleRec(){ if (_tdrh_recActive) _tdrh_stopRec(); else _tdrh_startRec(); }
+function _tdrh_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_tdrh_recTimer); _tdrh_recTimer = null;
+  if (_tdrh_recorder){
+    try{ _tdrh_recorder.ondataavailable=null;_tdrh_recorder.onstop=null;_tdrh_recorder.onerror=null; if(_tdrh_recorder.state!=='inactive')_tdrh_recorder.stop(); }catch(e){}
+  }
+  if (_tdrh_recStream){ try{_tdrh_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _tdrh_recStream=null; }
+  _tdrh_recorder=null; _tdrh_recChunks=[]; _tdrh_recSec=0; _tdrh_recActive=false;
+  var cv = _tdrh_canvas; if (!cv) return;
+  var stream;
+  try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _tdrh_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _tdrh_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _tdrh_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _tdrh_recChunks = []; _tdrh_recSec = 0;
+  _tdrh_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _tdrh_recChunks.push(e.data); };
+  _tdrh_recorder.onstop = function(){
+    clearInterval(_tdrh_recTimer);
+    var mimeFinal = (_tdrh_recorder && _tdrh_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_tdrh_recChunks, {type: mimeFinal});
+    if (_tdrh_recStream){ try{_tdrh_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _tdrh_recStream=null; }
+    _tdrh_recActive=false; _tdrh_recChunks=[]; _tdrh_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_height_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI HEIGHT REFLEX', filename:fn, onSave:function(b,filename){ _tdrh_dlBlob(b, filename); } });
+    } else _tdrh_dlBlob(blob, fn);
+  };
+  _tdrh_recorder.onerror = function(){ clearInterval(_tdrh_recTimer); };
+  setTimeout(function(){
+    if (!_tdrh_recorder) return;
+    try { _tdrh_recorder.start(1000); _tdrh_recActive = true; } catch(e){ return; }
+    _tdrh_recTimer = setInterval(function(){
+      _tdrh_recSec++;
+      var mm=Math.floor(_tdrh_recSec/60)%60,ss=_tdrh_recSec%60,hh=Math.floor(_tdrh_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      var btn = document.getElementById('tdrh_recBtn');
+      if (btn){ btn.innerHTML = '&#9632; STOP REC · '+t; btn.style.background='#7a0000'; btn.style.animation='ssRecBlink 1s ease-in-out infinite'; }
+      if (_tdrh_recSec >= 180) _tdrh_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _tdrh_stopRec(){
+  _tdrh_recActive=false; clearInterval(_tdrh_recTimer); _tdrh_recTimer=null;
+  if (_tdrh_recorder){ try{ if(_tdrh_recorder.state!=='inactive')_tdrh_recorder.stop(); }catch(e){} }
+  _tdrh_updateRecBtn();
+}
+function _tdrh_updateRecBtn(){
+  var btn = document.getElementById('tdrh_recBtn');
+  if (!btn) return;
+  if (_tdrh_recActive){ btn.innerHTML='&#9632; STOP REC'; btn.style.background='#7a0000'; }
+  else { btn.innerHTML='&#9679; REC'; btn.style.background='rgba(230,57,70,.92)'; btn.style.animation=''; }
+}
+function _tdrh_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _tdrh_endGame(){ _tdrh_stop(true); _tdrh_renderResults(); }
+function _tdrh_stop(fromEnd){
+  _tdrh_running = false;
+  if (_tdrh_rafId){ cancelAnimationFrame(_tdrh_rafId); _tdrh_rafId = null; }
+  if (_tdrh_cmdTimer){ clearTimeout(_tdrh_cmdTimer); _tdrh_cmdTimer = null; }
+  if (_tdrh_recActive) _tdrh_stopRec();
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  if (_tdrh_stream){ _tdrh_stream.getTracks().forEach(function(t){t.stop();}); _tdrh_stream=null; }
+  var ov = document.getElementById('tdrh-cam-overlay');
+  if (ov) ov.style.display = 'none';
+  var btn = document.getElementById('tdrh_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('tdrh_btnSave');
+  if (sv && fromEnd && (_tdrh_correct+_tdrh_wrong)>0) sv.style.display = 'flex';
+}
+function _tdrh_renderResults(){
+  var res = document.getElementById('tdrh_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _tdrh_correct + _tdrh_wrong;
+  var pct = total > 0 ? Math.round(_tdrh_correct / total * 100) : 0;
+  var avg = _tdrh_reactTimes.length > 0 ? Math.round(_tdrh_reactTimes.reduce(function(a,b){return a+b;},0) / _tdrh_reactTimes.length) : 0;
+  var rank = _tdrh_rank();
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_tdrh_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:'+_tdrh_rankColor(rank)+'">'+rank+'</div><div class="tr-score-lbl">RANK</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+_tdrh_correct+'/'+total+' · '+pct+'% · '+(en?'best combo':'combo max')+' ×'+_tdrh_bestCombo+'</div>';
+  res.innerHTML = html;
+  _tdrh_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _tdrh_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var tgt = (_tdrh_dur || 60) * (500 / 60);
+    var pct = Math.min(100, Math.round(_tdrh_score / tgt * 100));
+    _sb_recordSession('heightrefl', pct);
+  }
+  _tdrh_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('tdrh_btnSave'); if (sv) sv.style.display = 'none';
+}
+
 function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
@@ -29014,15 +30095,24 @@ function _dojoLaunch(kind) {
 
 function _tdr_setMode(m) {
   _tdr_mode = m;
-  var r  = document.getElementById('tdr_panelReaction');
-  var rh = document.getElementById('tdr_panelRhythm');
-  var se = document.getElementById('tdr_panelSensei');
-  if (r)  r.style.display  = m === 'reaction' ? 'block' : 'none';
-  if (rh) rh.style.display = m === 'rhythm'   ? 'block' : 'none';
-  if (se) se.style.display = m === 'sensei'   ? 'block' : 'none';
-  // La vieille carte "Choisis ton drill" est redondante en mode Sensei
+  var r   = document.getElementById('tdr_panelReaction');
+  var rh  = document.getElementById('tdr_panelRhythm');
+  var se  = document.getElementById('tdr_panelSensei');
+  var cp  = document.getElementById('tdr_panelColor');
+  var hp  = document.getElementById('tdr_panelHeight');
+  var cb  = document.getElementById('tdr_commonBottom');
+  if (r)  r.style.display  = m === 'reaction'   ? 'block' : 'none';
+  if (rh) rh.style.display = m === 'rhythm'     ? 'block' : 'none';
+  if (se) se.style.display = m === 'sensei'     ? 'block' : 'none';
+  if (cp) cp.style.display = m === 'color'      ? 'block' : 'none';
+  if (hp) hp.style.display = m === 'heightrefl' ? 'block' : 'none';
+  // Les 2 nouveaux drills (color/heightrefl) ont leurs propres boutons DÉMARRER/SAVE
+  // → on cache le bloc commun (guide, cam, TV, status, boutons, résultats, historique)
+  var isNewDrill = (m === 'color' || m === 'heightrefl');
+  if (cb) cb.style.display = isNewDrill ? 'none' : 'block';
+  // La vieille carte "Choisis ton drill" est redondante en mode Sensei et aussi pour les nouveaux
   var chooseCard = document.getElementById('td_chooseDrillCard');
-  if (chooseCard) chooseCard.style.display = m === 'sensei' ? 'none' : 'block';
+  if (chooseCard) chooseCard.style.display = (m === 'sensei' || isNewDrill) ? 'none' : 'block';
   document.querySelectorAll('.tdr-mode-btn').forEach(function(b) {
     b.style.background = b.dataset.mode === m ? 'rgba(245,197,24,.2)' : 'var(--dark3)';
     b.style.color      = b.dataset.mode === m ? '#f5c518' : '#7a8299';
@@ -29031,8 +30121,8 @@ function _tdr_setMode(m) {
   // Mode Sensei : init du carrousel à la première sélection
   if (m === 'sensei' && typeof _tdr_senseiInit === 'function') _tdr_senseiInit();
 
-  // 🎬 Auto-open vidéo démo du bloc td2 (sauf pendant init)
-  if (!_td2_initing && typeof _td2_openForCurrent === 'function') {
+  // 🎬 Auto-open vidéo démo du bloc td2 (sauf pendant init, et pas pour les nouveaux drills qui ont leur propre iframe)
+  if (!_td2_initing && !isNewDrill && typeof _td2_openForCurrent === 'function') {
     _td2_openForCurrent();
   }
 }
@@ -33539,12 +34629,25 @@ function _dcog_rcs_analyzePose(poses) {
     var s = _dcog_rcs_sticks[i];
     if (s.state !== 'falling') continue;
     var bb = _dcog_rcs_getStickBBox(i, s, W, H);
-    // Tolérance : zone catch élargie pour compenser latence MoveNet (~2 frames)
+    // Tolérance standard (zone catch élargie pour compenser latence MoveNet ~2 frames)
     var tolX = W * 0.035;
     var tolY = H * 0.045;
+    // ═══ EDGE GRAVITY ═══
+    // Les bâtons extrémités (idx 0 à gauche, idx 5 à droite) sont visuellement
+    // placés à ~11% et ~89% de W. En posture naturelle corps centré, un bras
+    // étendu latéralement atteint max ~25-30% / 70-75% du cadre. Pour que ces
+    // bâtons soient atteignables SANS modifier leur position visuelle ni le
+    // calcul géométrique, la hitbox s'étend asymétriquement vers l'EXTÉRIEUR
+    // du cadre : toute la bande latérale (bord écran → centre bâton) absorbe
+    // les hits sur le bâton d'extrémité. Zéro ambiguïté car aucun autre bâton
+    // n'occupe cette zone.
+    var leftX  = bb.x - tolX;
+    var rightX = bb.x + bb.w + tolX;
+    if (i === 0) leftX  = 0;      // bâton 0 : hitbox étendue jusqu'au bord gauche
+    if (i === 5) rightX = W;      // bâton 5 : hitbox étendue jusqu'au bord droit
     for (var h = 0; h < hands.length; h++) {
       var hd = hands[h];
-      if (hd.x >= bb.x - tolX && hd.x <= bb.x + bb.w + tolX &&
+      if (hd.x >= leftX && hd.x <= rightX &&
           hd.y >= bb.y - tolY && hd.y <= bb.y + bb.h + tolY) {
         _dcog_rcs_onCatch(i, s, bb);
         break;
