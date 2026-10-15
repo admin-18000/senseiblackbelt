@@ -29068,44 +29068,33 @@ function _tdrc_drawShape(ctx, W, H){
 }
 
 /* ─── Analyse pose : collision poignet → branche ───────────────── */
-/*     ★ Détection CALQUÉE sur _tdr_checkHits (TDR targets) :         */
-/*       • _tsym_kp_hand (coude→poignet +25%)                         */
-/*       • miroir : wx = W - kp.x * sx                                */
-/*       • seuil de vélocité : main doit bouger entre 2 frames        */
-/*       • check directionnel : main doit se diriger VERS la branche  */
-/*       • rayon généreux (branche._r × 2.3) pour compenser rotation  */
+/*     ★ Détection PURE PROXIMITÉ (plus adaptée que TARGETS ici) :    */
+/*       • _tsym_kp_hand (coude→poignet +25%, moteur = TARGETS)       */
+/*       • miroir : wx = W - kp.x * sx (idem TARGETS)                 */
+/*       • rayon TRÈS généreux : branche._r × 2.8                     */
+/*       • PAS de check vélocité (le dribbleur peut POSER la main)    */
+/*       • PAS de check directionnel (compense bien la rotation)      */
 function _tdrc_analyzePose(poses){
   if (!_tdrc_running || !_tdrc_cmd || !poses || !poses[0]) return;
   var cv = _tdrc_canvas, W = cv.width, H = cv.height;
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  var moveThresh = Math.max(8, Math.round(W * 0.02)); // seuil geste intentionnel (idem TARGETS)
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var hx = W - kp.x * sx, hy = kp.y * sy;
-    // Vélocité (idem TARGETS) : main doit bouger
-    var name = side + 'Wrist';
-    var prev = _tdrc_prevWrist[name];
-    var moved = prev ? Math.sqrt((hx-prev.x)*(hx-prev.x) + (hy-prev.y)*(hy-prev.y)) : 0;
-    _tdrc_prevWrist[name] = { x: hx, y: hy };
-    if (moved < moveThresh) return;
-    var vx = prev ? hx - prev.x : 0;
-    var vy = prev ? hy - prev.y : 0;
-    // Quelle branche touchée ? Rayon généreux + check directionnel comme TARGETS
+    // Pure proximité : main dans un rayon généreux autour du ballon de la branche
     var hitBranch = null;
     for (var i = 0; i < colors.length; i++){
       var c = colors[i];
       if (c._cx == null) continue;
       var dx = hx - c._cx, dy = hy - c._cy;
-      var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= c._r * 2.5) continue;
-      // Main doit se diriger VERS la branche (idem TARGETS) — compense léger la rotation
-      var dot = (-dx) * vx + (-dy) * vy;
-      if (dot <= 0) continue;
-      hitBranch = c; break;
+      var reach = c._r * 2.8;
+      if (dx*dx + dy*dy < reach*reach){
+        hitBranch = c; break;
+      }
     }
     if (!hitBranch) return;
     // Match avec la commande ?
