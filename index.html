@@ -28901,6 +28901,9 @@ function _tdrc_startGame(){
   _tdrc_lastFrameTs = 0;
   _tdrc_prevWrist = {};
   _tdrc_flash = null;
+  // Reset du timestamp de hit sur chaque branche (évite checkmark fantôme au redémarrage)
+  _TDRC_COLORS_Y.forEach(function(c){ c._hitTs = 0; });
+  _TDRC_COLORS_CROSS.forEach(function(c){ c._hitTs = 0; });
   _tdrc_nextCommand();
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
@@ -28955,18 +28958,6 @@ function _tdrc_loop(){
   _tdrc_elapsed = (nowTs - _tdrc_startTs) / 1000;
   // 1. Vidéo caméra mirror
   _drawVideoMirror(ctx, _tdrc_video, W, H);
-  // 1b. Flash plein écran si on vient de hit juste (couleur cible)
-  if (_tdrc_flash && Date.now() < _tdrc_flash.until){
-    var flashT = (_tdrc_flash.until - Date.now()) / 350; // 1 → 0
-    ctx.save();
-    ctx.globalAlpha = flashT * 0.45;
-    ctx.fillStyle = _tdrc_flash.color;
-    ctx.fillRect(0, 0, W, H);
-    // Grand anneau expansif centré sur la branche touchée (effet "GOT IT!")
-    ctx.restore();
-  } else if (_tdrc_flash) {
-    _tdrc_flash = null;
-  }
   // 2. Détection pose
   if (window._tsym_detector){
     try {
@@ -28975,21 +28966,48 @@ function _tdrc_loop(){
       }).catch(function(){});
     } catch(e){}
   }
-  // 3. Dessin shape (Y ou Croix)
+  // 3. Dessin shape (Y ou Croix) + checkmark sur boule touchée récemment
   _tdrc_drawShape(ctx, W, H);
-  // 4. Particules
-  for (var p = _tdrc_particles.length-1; p >= 0; p--){
-    var pt = _tdrc_particles[p];
-    pt.life -= 0.016;
-    if (pt.life <= 0){ _tdrc_particles.splice(p,1); continue; }
-    pt.x += pt.vx * 0.016; pt.y += pt.vy * 0.016; pt.vy += 400 * 0.016;
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, pt.life);
-    ctx.fillStyle = pt.color;
-    ctx.shadowBlur = 8; ctx.shadowColor = pt.color;
-    ctx.beginPath(); ctx.arc(pt.x, pt.y, Math.max(2.5, H*0.006), 0, Math.PI*2); ctx.fill();
-    ctx.restore();
-  }
+  // 4. Particules — rendu CALQUÉ sur _tdr_drawParticles (TDR TARGETS)
+  (function(){
+    var now = Date.now();
+    _tdrc_particles = _tdrc_particles.filter(function(p){
+      var age = now - p.born;
+      if (age > p.life) return false;
+      var progress = age / p.life;
+      var alpha = 1 - progress;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (p.ring){
+        // Anneau expansif (idem TARGETS)
+        var curR = p.r + (p.maxR - p.r) * progress;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 3 * (1 - progress);
+        ctx.stroke();
+      } else if (p.floatText){
+        // Score flottant "+N" qui monte en fondu
+        var yOff = -progress * (H * 0.08);
+        ctx.font = 'bold ' + Math.round(H * 0.055) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
+        ctx.fillStyle = p.color;
+        ctx.fillText(p.floatText, p.x, p.y + yOff);
+      } else {
+        // Particule classique (idem TARGETS)
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= 0.92; p.vy *= 0.92;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * (1 - progress * 0.5), 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+      ctx.restore();
+      return true;
+    });
+  })();
   // 5. HUD
   _tdrc_drawHud(ctx, W, H);
   // 6. Commande affichée
@@ -29069,6 +29087,7 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.fill();
     // BOULE COLORÉE au bout (taille TARGETS)
     ctx.shadowBlur = 16; ctx.shadowColor = colors[i].hex;
+    ctx.fillStyle = colors[i].hex;
     ctx.beginPath();
     ctx.arc(0, armLen, ballR, 0, Math.PI * 2);
     ctx.fill();
@@ -29079,6 +29098,29 @@ function _tdrc_drawShape(ctx, W, H){
     grad.addColorStop(0.6, 'rgba(255,255,255,0)');
     ctx.fillStyle = grad;
     ctx.beginPath(); ctx.arc(0, armLen, ballR, 0, Math.PI * 2); ctx.fill();
+    // ✓ CHECKMARK si la boule a été touchée récemment (<400ms) → preuve visuelle du HIT dans le rond
+    var _hitTs = colors[i]._hitTs || 0;
+    var _hitAge = Date.now() - _hitTs;
+    if (_hitAge >= 0 && _hitAge < 400){
+      var cProg = _hitAge / 400;        // 0 → 1
+      var cAlpha = 1 - cProg * 0.4;      // reste bien visible
+      var cScale = 0.4 + cProg * 0.4;    // pop-in anim
+      ctx.save();
+      ctx.globalAlpha = cAlpha;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(3, ballR * 0.14);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.7)';
+      // Checkmark positionné pile dans le rond — proportions correctes
+      var cs = ballR * 0.5 * cScale;
+      ctx.beginPath();
+      ctx.moveTo(-cs * 0.9, armLen + cs * 0.05);
+      ctx.lineTo(-cs * 0.2, armLen + cs * 0.55);
+      ctx.lineTo( cs * 0.95, armLen - cs * 0.55);
+      ctx.stroke();
+      ctx.restore();
+    }
     ctx.restore();
     // Store la position courante (après rotation) de la BOULE pour collision — on cible UNIQUEMENT la boule, comme TARGETS
     colors[i]._cx = ex;
@@ -29157,51 +29199,63 @@ function _tdrc_analyzePose(poses){
     }
     if (!expectedForSide) return;
 
-    // ★ FEEDBACK VISUEL IMMÉDIAT dans la couleur de la boule RÉELLEMENT touchée (correct OU incorrect)
-    //   → l'utilisateur voit TOUJOURS la vraie couleur de ce qu'il a touché, aucune ambiguïté
-    //   → les flammes sortent au point d'impact de la main (pas du centre de la boule) pour correspondance 1:1
-    var hitX = hitBranch._cx, hitY = hitBranch._cy;
-    for (var pi = 0; pi < 24; pi++){
-      var ang = Math.random() * Math.PI * 2;
-      var spd = 140 + Math.random() * 220;
-      _tdrc_particles.push({
-        x: hitX, y: hitY,
-        vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 60,
-        life: 0.6 + Math.random()*0.5,
-        color: hitBranch.hex   // ← TOUJOURS la couleur de ce qui vient d'être touché
-      });
-    }
-
     if (hitBranch.k === expectedForSide.k){
-      // ✅ BONNE couleur : on valide la commande + flash plein écran + score
+      // ✅ BONNE couleur — EXACTEMENT le feedback TARGETS :
       if (side === cmd.hand1 || !cmd.c2) cmd.hit1 = true;
       if (cmd.c2 && side === cmd.hand2) cmd.hit2 = true;
-      // Flash plein écran couleur touchée (= couleur cible puisque c'est un correct)
-      _tdrc_flash = { color: hitBranch.hex, until: Date.now() + 350 };
-      // Burst de particules XXL supplémentaires pour renforcer la réussite
-      for (var pi2 = 0; pi2 < 16; pi2++){
-        var ang2 = Math.random() * Math.PI * 2;
-        var spd2 = 200 + Math.random() * 260;
-        _tdrc_particles.push({ x: hitX, y: hitY, vx: Math.cos(ang2)*spd2, vy: Math.sin(ang2)*spd2 - 80, life: 0.8 + Math.random()*0.5, color: hitBranch.hex });
+      // 1) 12 particules (formule identique _tdr_flashHit)
+      var n = 12;
+      for (var pi = 0; pi < n; pi++){
+        var angle = (pi/n) * Math.PI * 2;
+        var speed = 2.5 + Math.random()*3;
+        _tdrc_particles.push({
+          x: hitBranch._cx, y: hitBranch._cy,
+          vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+          r: 3 + Math.random()*4,
+          color: hitBranch.hex,
+          born: Date.now(), life: 500 + Math.random()*200
+        });
       }
-      try { if (typeof _td_beep === 'function') _td_beep(880, 0.08, 0.25); } catch(e){}
+      // 2) Ring expansif (idem TARGETS)
+      _tdrc_particles.push({
+        x: hitBranch._cx, y: hitBranch._cy, vx: 0, vy: 0,
+        r: hitBranch._r, color: hitBranch.hex,
+        born: Date.now(), life: 400,
+        ring: true, maxR: hitBranch._r * 3
+      });
+      // 3) Checkmark ✓ sur la boule touchée pendant 400ms (visuel validé sur le rond)
+      hitBranch._hitTs = Date.now();
+      // 4) Son hit aigu + vibration (idem TARGETS)
+      try {
+        if (typeof _td_soundOK === 'function') _td_soundOK();
+        if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12);
+      } catch(e){}
       if (navigator.vibrate) navigator.vibrate(20);
-      // Toutes les sous-commandes validées ?
+      // 5) Score + combo + "+N" floating (NB : on compte UNIQUEMENT quand toutes les sous-commandes sont validées)
       if (cmd.hit1 && (!cmd.c2 || cmd.hit2)){
         _tdrc_correct++;
         _tdrc_combo++;
         _tdrc_bestCombo = Math.max(_tdrc_bestCombo, _tdrc_combo);
-        _tdrc_reactTimes.push(Date.now() - _tdrc_cmdStartTs);
-        var base = cmd.c2 ? 150 : 100;
-        var mult = _tdrc_combo >= 10 ? 3 : _tdrc_combo >= 5 ? 2 : 1;
-        _tdrc_score += base * mult;
+        var rt = Date.now() - _tdrc_cmdStartTs;
+        _tdrc_reactTimes.push(rt);
+        // Score inspiré TARGETS : 10 base + bonus vitesse + bonus streak
+        var speedBonus  = Math.max(0, Math.round((2500 - rt) / 200));
+        var streakBonus = _tdrc_combo >= 5 ? 5 : 0;
+        var gain = 10 + speedBonus + streakBonus;
+        if (cmd.c2) gain += 10; // HARD : 2 cibles simultanées
+        _tdrc_score += gain;
+        // Float "+N" visible dans la vidéo
+        _tdrc_particles.push({
+          x: hitBranch._cx, y: hitBranch._cy - hitBranch._r * 1.6,
+          floatText: '+' + gain, color: hitBranch.hex,
+          born: Date.now(), life: 900
+        });
         _tdrc_cmd = null;
         if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
         setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 350);
       }
     } else {
-      // ❌ MAUVAISE couleur : particules déjà envoyées dans la bonne couleur (celle touchée)
-      //    → tu vois clairement QUELLE couleur tu as frappée vs ce qui était demandé
+      // ❌ MAUVAISE couleur : petit beep grave, aucun score, pas de ring (évite la pollution visuelle)
       try { if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15); } catch(e){}
     }
   });
@@ -29283,6 +29337,9 @@ function _tdrc_drawCommand(ctx, W, H){
   var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
   var remain  = Math.max(0, 2.5 - elapsed);
   var frac    = remain / 2.5;
+  // ★ État SUCCESS : si la commande vient d'être validée, cercle rempli en couleur + ✓
+  //   → synchronise visuellement avec les flammes/checkmark sur le bâton
+  var isSuccess = _tdrc_cmd.hit1 && (!_tdrc_cmd.c2 || _tdrc_cmd.hit2);
   // Position & taille HARMONISÉES avec la boule du bâton (même rayon que les cibles TARGETS)
   // Cercle = taille boule × 1.3 pour permettre d'inscrire chrono + mot de la couleur
   var ballR_match = Math.round(Math.min(W * 0.075, H * 0.13));
@@ -29292,7 +29349,25 @@ function _tdrc_drawCommand(ctx, W, H){
   if (cx - R < 10) cx = R + 10;
   if (cy + R > H - 10) cy = H - R - 10;
   ctx.save();
-  // Cercle de fond transparent
+  if (isSuccess) {
+    // ✅ Cercle REMPLI en couleur + checkmark blanc centré (sync avec le bâton)
+    ctx.shadowBlur = 18; ctx.shadowColor = c.hex;
+    ctx.fillStyle = c.hex;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = Math.max(4, R * 0.11);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    var cs = R * 0.55;
+    ctx.beginPath();
+    ctx.moveTo(cx - cs*0.9, cy + cs*0.05);
+    ctx.lineTo(cx - cs*0.2, cy + cs*0.55);
+    ctx.lineTo(cx + cs*0.95, cy - cs*0.55);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+  // Cercle de fond transparent (état normal : countdown)
   ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
   ctx.fillStyle = 'rgba(13,17,23,.42)';
   ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
