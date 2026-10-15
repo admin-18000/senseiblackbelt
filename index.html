@@ -28775,6 +28775,7 @@ var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
 var _tdrc_dur   = 60;
 var _tdrc_rotation = 0;         // angle de rotation continu (radians) — le bâton tourne comme IRL
 var _tdrc_lastFrameTs = 0;      // pour un delta temps indépendant du framerate
+var _tdrc_prevWrist = {};       // dernière position de chaque main pour vélocité (comme TARGETS)
 var _tdrc_running = false;
 var _tdrc_stream = null;
 var _tdrc_video  = null;
@@ -28916,6 +28917,7 @@ function _tdrc_startGame(){
   _tdrc_particles = [];
   _tdrc_rotation = 0;
   _tdrc_lastFrameTs = 0;
+  _tdrc_prevWrist = {};
   _tdrc_nextCommand();
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
@@ -29016,8 +29018,12 @@ function _tdrc_drawShape(ctx, W, H){
   var armW = armLen * 0.3;
   var hubR = armW * 0.6;
   var n = colors.length;
-  // Décalage par mode : EASY lent, MEDIUM moyen, HARD rapide
-  var rotSpeed = _tdrc_mode === 'hard' ? 0.6 : _tdrc_mode === 'medium' ? 0.4 : 0.25;
+  // Rotation NATURELLE (comme un vrai bâton de réaction qui tourne lentement en main)
+  // Vitesse angulaire optimisée pour que le poignet puisse encore atteindre la cible :
+  //   EASY  0.35 rad/s ≈ 20°/s  (une rotation complète en 18s)
+  //   MED   0.55 rad/s ≈ 32°/s  (une rotation complète en 11s)
+  //   HARD  0.80 rad/s ≈ 46°/s  (une rotation complète en  8s)
+  var rotSpeed = _tdrc_mode === 'hard' ? 0.80 : _tdrc_mode === 'medium' ? 0.55 : 0.35;
   var nowT = performance.now();
   var dt = _tdrc_lastFrameTs ? (nowT - _tdrc_lastFrameTs) / 1000 : 0;
   _tdrc_lastFrameTs = nowT;
@@ -29062,28 +29068,44 @@ function _tdrc_drawShape(ctx, W, H){
 }
 
 /* ─── Analyse pose : collision poignet → branche ───────────────── */
+/*     ★ Détection CALQUÉE sur _tdr_checkHits (TDR targets) :         */
+/*       • _tsym_kp_hand (coude→poignet +25%)                         */
+/*       • miroir : wx = W - kp.x * sx                                */
+/*       • seuil de vélocité : main doit bouger entre 2 frames        */
+/*       • check directionnel : main doit se diriger VERS la branche  */
+/*       • rayon généreux (branche._r × 2.3) pour compenser rotation  */
 function _tdrc_analyzePose(poses){
   if (!_tdrc_running || !_tdrc_cmd || !poses || !poses[0]) return;
   var cv = _tdrc_canvas, W = cv.width, H = cv.height;
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // Zone de catch autour de chaque branche
-  var catchR = Math.max(28, Math.min(W, H) * 0.07);
+  var moveThresh = Math.max(8, Math.round(W * 0.02)); // seuil geste intentionnel (idem TARGETS)
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var hx = W - kp.x * sx, hy = kp.y * sy;
-    // Quelle branche touchée ?
+    // Vélocité (idem TARGETS) : main doit bouger
+    var name = side + 'Wrist';
+    var prev = _tdrc_prevWrist[name];
+    var moved = prev ? Math.sqrt((hx-prev.x)*(hx-prev.x) + (hy-prev.y)*(hy-prev.y)) : 0;
+    _tdrc_prevWrist[name] = { x: hx, y: hy };
+    if (moved < moveThresh) return;
+    var vx = prev ? hx - prev.x : 0;
+    var vy = prev ? hy - prev.y : 0;
+    // Quelle branche touchée ? Rayon généreux + check directionnel comme TARGETS
     var hitBranch = null;
     for (var i = 0; i < colors.length; i++){
       var c = colors[i];
       if (c._cx == null) continue;
       var dx = hx - c._cx, dy = hy - c._cy;
-      if (dx*dx + dy*dy < (catchR + c._r) * (catchR + c._r)){
-        hitBranch = c; break;
-      }
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= c._r * 2.5) continue;
+      // Main doit se diriger VERS la branche (idem TARGETS) — compense léger la rotation
+      var dot = (-dx) * vx + (-dy) * vy;
+      if (dot <= 0) continue;
+      hitBranch = c; break;
     }
     if (!hitBranch) return;
     // Match avec la commande ?
@@ -29396,6 +29418,7 @@ var _tdrh_rafId = null, _tdrh_cmdTimer = null;
 var _tdrh_cmd = null, _tdrh_cmdStartTs = 0;
 var _tdrh_recorder = null, _tdrh_recChunks = [], _tdrh_recActive = false;
 var _tdrh_recTimer = null, _tdrh_recSec = 0, _tdrh_recStream = null;
+var _tdrh_prevWristY = {};  // dernière position Y de chaque main pour filtre mouvement (idem DCOG height)
 
 var _TDRH_LEVELS = [
   {k:'H', name:'HAUT',   nameEn:'HIGH',   emoji:'⬆️', y:0.25},
@@ -29504,6 +29527,7 @@ function _tdrh_startGame(){
   _tdrh_score = 0; _tdrh_correct = 0; _tdrh_wrong = 0;
   _tdrh_combo = 0; _tdrh_bestCombo = 0;
   _tdrh_reactTimes = [];
+  _tdrh_prevWristY = {};
   _tdrh_nextCommand();
   _tdrh_rafId = requestAnimationFrame(_tdrh_loop);
 }
@@ -29603,12 +29627,23 @@ function _tdrh_analyzePose(poses){
   var cv = _tdrh_canvas, W = cv.width, H = cv.height;
   var sx = W / (_tdrh_video.videoWidth || 640);
   var sy = H / (_tdrh_video.videoHeight || 480);
-  var tolY = H * 0.07;
+  // Tolérance Y dépendante du mode (homogène avec DCOG height) :
+  //   EASY   ±10% H  (bande catch = 20% H ≈ 96px sur 480h) → facile à atteindre
+  //   MEDIUM ±8%  H  (bande catch = 16% H ≈ 77px)          → précision moyenne
+  //   HARD   ±6%  H  (bande catch = 12% H ≈ 58px)          → placement rigoureux
+  var tolY = _tdrh_mode === 'hard' ? H * 0.06 : _tdrh_mode === 'medium' ? H * 0.08 : H * 0.10;
+  // Seuil de mouvement (idem DCOG DRIBBLE HEIGHT) : évite les faux-triggers quand la main est immobile en bonne zone
+  var moveThresh = Math.max(8, Math.round(H * 0.012));
   ['left','right'].forEach(function(side){
     if (!_tdrh_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var hy = kp.y * sy;
+    // Filtre mouvement (comme _dcog_analyzeHeight) : la main doit bouger
+    var name = side + 'Wrist';
+    var prevY = _tdrh_prevWristY[name];
+    _tdrh_prevWristY[name] = hy;
+    if (prevY != null && Math.abs(hy - prevY) < moveThresh) return;
     var cmd = _tdrh_cmd;
     var expectedForSide = null;
     if (cmd.l2){
