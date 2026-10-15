@@ -53376,6 +53376,7 @@ body.si-banner-on { padding-top: 52px; }
     _ss_ctx = ctx;
     _ss_running = true;
     _ss_startTime = Date.now();
+    window._ss_startTime = _ss_startTime; // expose au module _senseiOverlays pour le timer sur canvas
     _ss_poseHistory = [];
     _ss_wristYHist = [];
     _ss_shotsCount = 0;
@@ -53397,6 +53398,7 @@ body.si-banner-on { padding-top: 52px; }
       if (_ss_countdownValue <= 0) {
         _ss_countdownActive = false;
         _ss_startTime = Date.now(); // Reset timer après countdown pour chrono propre
+        window._ss_startTime = _ss_startTime; // sync au module overlay (timer canvas)
         return;
       }
       setTimeout(function(){
@@ -53422,7 +53424,9 @@ body.si-banner-on { padding-top: 52px; }
       if (oldCh) oldCh.remove();
       _ss_chronoEl = document.createElement('div');
       _ss_chronoEl.id = 'ss-chrono-live';
-      _ss_chronoEl.style.cssText = 'position:absolute;top:70px;right:14px;z-index:10002;background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid #fff;border-radius:12px;padding:8px 16px;font-family:\'Bebas Neue\',\'Impact\',sans-serif;color:#fff;font-size:28px;letter-spacing:3px;text-shadow:0 2px 6px rgba(0,0,0,0.9);font-variant-numeric:tabular-nums;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,0.4)';
+      // Masqué visuellement : le timer est désormais rendu DIRECTEMENT sur le canvas
+      // (visible à la fois live ET dans la vidéo enregistrée)
+      _ss_chronoEl.style.cssText = 'display:none';
       _ss_chronoEl.textContent = '00:00';
       ov.appendChild(_ss_chronoEl);
     }
@@ -55049,79 +55053,107 @@ body.si-banner-on { padding-top: 52px; }
         ctx.save();
         ctx.textBaseline = 'top';
 
-        // ═══ SCORE (haut-droite, décalé sous chrono SS pour éviter collision) ═══
-        // Position pixel absolue matchant le CSS HTML (top:130) — clamp pour très petits/grands écrans
+        // Variables de positionnement (toujours calculées pour l'ancrage de la consigne plus bas)
         var scoreY = Math.max(100, Math.min(H * 0.32, 160));
         var scoreX = W - 14;
-        // Tailles maxi pour lisibilité mobile depuis le trépied
         var scoreSize = Math.round(Math.max(42, Math.min(H * 0.10, 72)));
         var lblSize = Math.round(Math.max(15, Math.min(H * 0.032, 22)));
-        // Points
-        ctx.textAlign = 'right';
-        ctx.fillStyle = '#f5c518';
-        ctx.font = '700 ' + scoreSize + 'px ' + fontStack;
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetY = 2;
-        var ptsTxt = (function(){ try { return _points.toLocaleString(window._lang==='en'?'en-US':'fr-FR'); } catch(e){ return String(_points); } })();
-        ctx.fillText(ptsTxt, scoreX, scoreY);
-        // Label "POINTS" / "POINTS"
-        ctx.font = '600 ' + lblSize + 'px ' + fontStack;
-        ctx.fillStyle = 'rgba(255,255,255,0.75)';
-        ctx.shadowBlur = 3;
-        var lblTxt = (window._lang === 'en') ? 'POINTS' : 'POINTS';
-        ctx.fillText(lblTxt, scoreX, scoreY + scoreSize + 2);
+        var comboBottomY = scoreY + scoreSize + lblSize + 10;
 
-        // ═══ COMBO (badge rouge sous label) ═══
-        var comboBottomY = scoreY + scoreSize + lblSize + 10; // Y de reference pour empiler sous
-        if (_multiplier > 1) {
-          var comboSize = Math.round(Math.max(26, Math.min(H * 0.06, 38)));
-          var comboText = '\u00d7' + _multiplier;
-          ctx.font = '700 ' + comboSize + 'px ' + fontStack;
-          var comboW = ctx.measureText(comboText).width + 24;
-          var comboH = comboSize + 8;
-          var comboX = scoreX - comboW;
-          var comboY = comboBottomY;
-          // Fond rouge arrondi
-          ctx.shadowColor = 'rgba(230,57,70,0.6)';
-          ctx.shadowBlur = 12;
-          ctx.fillStyle = '#e63946';
-          if (typeof ctx.roundRect === 'function') {
-            ctx.beginPath();
-            ctx.roundRect(comboX, comboY, comboW, comboH, 8);
-            ctx.fill();
-          } else {
-            ctx.fillRect(comboX, comboY, comboW, comboH);
-          }
-          // Texte combo
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = '#fff';
-          ctx.textAlign = 'right';
-          ctx.fillText(comboText, scoreX - 12, comboY + 4);
-          comboBottomY = comboY + comboH + 8;
-        }
-
-        // ═══ COMPTEUR TIRS (SS uniquement, sous le combo/score) ═══
-        // Rendu via la valeur stockee par setCounter (API _senseiOverlays)
-        if (_mode === 'ss' && this._counterCurrent > 0) {
-          var shotLbl = this._counterLabel || ((window._lang === 'en') ? 'SHOTS' : 'TIRS');
-          var shotNum = String(this._counterCurrent);
-          var shotNumSize = Math.round(Math.max(22, Math.min(H * 0.055, 36)));
-          var shotLblSize = Math.round(Math.max(10, Math.min(H * 0.022, 14)));
-          var shotY = comboBottomY;
-          ctx.textAlign = 'right';
-          ctx.shadowColor = 'rgba(0,0,0,0.9)';
-          ctx.shadowBlur = 6;
+        if (_mode === 'ss') {
+          // ═══ SHOT CHART (SS) — pas de vrai AI tracker : on retire score/combo/compteur tirs ═══
+          // À LEUR PLACE : un timer arrondi TRÈS transparent, visible dès le lancement + dans la vidéo
+          var startTs = window._ss_startTime || 0;
+          var elapsed = startTs > 0 ? Math.max(0, Math.floor((Date.now() - startTs) / 1000)) : 0;
+          var tmm = Math.floor(elapsed / 60), tss = elapsed % 60;
+          var thh = Math.floor(elapsed / 3600);
+          var tStr;
+          if (thh > 0) tStr = thh + ':' + ((tmm%60)<10?'0':'') + (tmm%60) + ':' + (tss<10?'0':'') + tss;
+          else         tStr = (tmm<10?'0':'') + tmm + ':' + (tss<10?'0':'') + tss;
+          var tTxtSize = Math.round(Math.max(32, Math.min(H * 0.075, 56)));
+          var tLblSize = Math.round(Math.max(10, Math.min(H * 0.022, 14)));
+          ctx.font = '700 ' + tTxtSize + 'px ' + fontStack;
+          var tTxtW = ctx.measureText(tStr).width;
+          var padX = Math.max(14, H*0.022);
+          var padY = Math.max(8,  H*0.012);
+          var bgW = tTxtW + padX*2;
+          var bgH = tTxtSize + tLblSize + padY*2 + 4;
+          var bgX = scoreX - bgW;
+          var bgY = scoreY - padY;
+          // Fond TRÈS transparent
+          ctx.shadowColor = 'rgba(0,0,0,0.55)';
+          ctx.shadowBlur = 14;
           ctx.shadowOffsetY = 2;
-          // Label TIRS (petit, blanc translucide)
+          ctx.fillStyle = 'rgba(13,17,23,0.28)';
+          if (typeof ctx.roundRect === 'function') {
+            ctx.beginPath(); ctx.roundRect(bgX, bgY, bgW, bgH, 14); ctx.fill();
+          } else { ctx.fillRect(bgX, bgY, bgW, bgH); }
+          // Liseré fin blanc translucide
+          ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+          ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+          ctx.lineWidth = 1.5;
+          if (typeof ctx.roundRect === 'function') {
+            ctx.beginPath(); ctx.roundRect(bgX, bgY, bgW, bgH, 14); ctx.stroke();
+          } else { ctx.strokeRect(bgX, bgY, bgW, bgH); }
+          // Label TIMER / CHRONO (petit, en haut)
+          ctx.textAlign = 'right';
+          ctx.font = '600 ' + tLblSize + 'px ' + fontStack;
           ctx.fillStyle = 'rgba(255,255,255,0.78)';
-          ctx.font = '600 ' + shotLblSize + 'px ' + fontStack;
-          ctx.fillText(shotLbl, scoreX, shotY);
-          // Nombre (gros, blanc)
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 4;
+          var tLbl = (window._lang === 'en') ? 'TIMER' : 'CHRONO';
+          ctx.fillText(tLbl, scoreX - padX, bgY + padY);
+          // Chiffres (gros, blanc avec ombre portée)
+          ctx.font = '700 ' + tTxtSize + 'px ' + fontStack;
           ctx.fillStyle = '#ffffff';
-          ctx.font = '700 ' + shotNumSize + 'px ' + fontStack;
-          ctx.fillText(shotNum, scoreX, shotY + shotLblSize + 2);
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 8;
+          ctx.shadowOffsetY = 2;
+          ctx.fillText(tStr, scoreX - padX, bgY + padY + tLblSize + 4);
           ctx.shadowOffsetY = 0;
+          // Décale pour que la consigne se positionne proprement en dessous
+          comboBottomY = bgY + bgH + 10;
+        } else {
+          // ═══ BT (ball tracker) + autres modes — AI tracker : on garde score + combo ═══
+          // Points
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#f5c518';
+          ctx.font = '700 ' + scoreSize + 'px ' + fontStack;
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 8;
+          ctx.shadowOffsetY = 2;
+          var ptsTxt = (function(){ try { return _points.toLocaleString(window._lang==='en'?'en-US':'fr-FR'); } catch(e){ return String(_points); } })();
+          ctx.fillText(ptsTxt, scoreX, scoreY);
+          ctx.font = '600 ' + lblSize + 'px ' + fontStack;
+          ctx.fillStyle = 'rgba(255,255,255,0.75)';
+          ctx.shadowBlur = 3;
+          var lblTxt = (window._lang === 'en') ? 'POINTS' : 'POINTS';
+          ctx.fillText(lblTxt, scoreX, scoreY + scoreSize + 2);
+          // Combo
+          if (_multiplier > 1) {
+            var comboSize = Math.round(Math.max(26, Math.min(H * 0.06, 38)));
+            var comboText = '\u00d7' + _multiplier;
+            ctx.font = '700 ' + comboSize + 'px ' + fontStack;
+            var comboW = ctx.measureText(comboText).width + 24;
+            var comboH = comboSize + 8;
+            var comboX = scoreX - comboW;
+            var comboY = comboBottomY;
+            ctx.shadowColor = 'rgba(230,57,70,0.6)';
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = '#e63946';
+            if (typeof ctx.roundRect === 'function') {
+              ctx.beginPath();
+              ctx.roundRect(comboX, comboY, comboW, comboH, 8);
+              ctx.fill();
+            } else {
+              ctx.fillRect(comboX, comboY, comboW, comboH);
+            }
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'right';
+            ctx.fillText(comboText, scoreX - 12, comboY + 4);
+            comboBottomY = comboY + comboH + 8;
+          }
         }
 
         // ═══ MICRO-CONSIGNE (cartouche noir sous score+combo) ═══
@@ -55191,7 +55223,8 @@ body.si-banner-on { padding-top: 52px; }
         }
 
         // ═══ Animation "+X" flottante à côté du score ═══
-        if (_floats.length > 0) {
+        // Désactivée pour SS (SHOT CHART) — pas de vrai AI tracker, pas de gains de points réels
+        if (_mode !== 'ss' && _floats.length > 0) {
           var nowFl = Date.now();
           var floatSize = Math.round(Math.max(28, Math.min(H * 0.078, 44)));
           ctx.font = '700 ' + floatSize + 'px ' + fontStack;
