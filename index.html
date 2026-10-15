@@ -28961,7 +28961,7 @@ function _tdrc_nextCommand(){
       _tdrc_cmd = null;
     }
     if (_tdrc_running) _tdrc_nextCommand();
-  }, 2500);  // 2.5s au lieu de 1.5s — temps confortable pour viser une couleur qui tourne
+  }, 3500);  // 3.5s pour laisser le temps de réagir, viser et toucher — pas de rush
 }
 
 /* ─── Loop principal : vidéo + shape + HUD + détection ─────────── */
@@ -29044,9 +29044,11 @@ function _tdrc_loop(){
 /*     ★ Bâton (pilule) FIN et élégant — comme un vrai SKLZ Y                        */
 function _tdrc_drawShape(ctx, W, H){
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  var cx = W / 2, cy = H / 2;
-  // Bras compact : 0.37 × min(W,H) → bâton bien dans le cadre, centre visuel stable même en rotation
-  var armLen = Math.min(W, H) * 0.37;
+  // Origine shiftée vers le HAUT (cy = H*0.42) → le ballon du bas tombe à ~H*0.75 au lieu de H*0.87
+  //   → atteignable sans se pencher pour un dribbleur debout
+  var cx = W / 2, cy = H * 0.42;
+  // Bras plus compact : 0.33 × min(W,H) → bâton bien dans le cadre, boules à portée
+  var armLen = Math.min(W, H) * 0.33;
   // Centrage : forme dessinée depuis l'origine canvas (W/2, H/2) — pas d'offset artificiel
   // BOULE = TAILLE TARGETS (formule identique)
   var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
@@ -29179,8 +29181,18 @@ function _tdrc_analyzePose(poses){
   var nowMs      = Date.now();
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
+    // ★ Détection ROBUSTE : essaie main extrapolée (coude→poignet+25%), fallback poignet brut avec seuil 0.20
+    //   → évite que la boule du BAS ne se détecte pas quand la main descend près du corps (confidence MoveNet qui tombe)
     var kp = _tsym_kp_hand(poses, side);
-    if (!kp) return;
+    if (!kp){
+      // Fallback 1 : poignet brut (sans extrapolation) avec seuil 0.20 au lieu de 0.30
+      var wristName = side + 'Wrist';
+      var kps = (poses[0] && poses[0].keypoints) || [];
+      var idx = (typeof _TSYM_KP !== 'undefined') ? _TSYM_KP[wristName] : undefined;
+      var kRaw = (idx !== undefined) ? kps[idx] : null;
+      if (!kRaw || kRaw.score < 0.20) return; // confidence trop faible même en lax
+      kp = kRaw;
+    }
     var wx = W - kp.x * sx, wy = kp.y * sy;
     var name = side + 'Wrist';
     // Cooldown global anti chain-click
@@ -29254,7 +29266,7 @@ function _tdrc_analyzePose(poses){
         var rt = Date.now() - _tdrc_cmdStartTs;
         _tdrc_reactTimes.push(rt);
         // Score inspiré TARGETS : 10 base + bonus vitesse + bonus streak
-        var speedBonus  = Math.max(0, Math.round((2500 - rt) / 200));
+        var speedBonus  = Math.max(0, Math.round((3500 - rt) / 300));
         var streakBonus = _tdrc_combo >= 5 ? 5 : 0;
         var gain = 10 + speedBonus + streakBonus;
         if (cmd.c2) gain += 10; // HARD : 2 cibles simultanées
@@ -29267,7 +29279,7 @@ function _tdrc_analyzePose(poses){
         });
         _tdrc_cmd = null;
         if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
-        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 350);
+        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 700);  // 700 ms de pause entre 2 commandes (respiration)
       }
     } else {
       // ❌ MAUVAISE couleur : petit beep grave, aucun score, pas de ring (évite la pollution visuelle)
@@ -29348,10 +29360,10 @@ function _tdrc_drawCommand(ctx, W, H){
   var txt = en ? c.nameEn : c.name;
   var side = '';
   if (_tdrc_cmd.hand1) side = (en ? (_tdrc_cmd.hand1==='left'?'L':'R') : (_tdrc_cmd.hand1==='left'?'G':'D'));
-  // Timer : temps restant pour cette commande avant miss (2.5s)
+  // Timer : temps restant pour cette commande avant miss (3.5s)
   var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
-  var remain  = Math.max(0, 2.5 - elapsed);
-  var frac    = remain / 2.5;
+  var remain  = Math.max(0, 3.5 - elapsed);
+  var frac    = remain / 3.5;
   // ★ État SUCCESS : si la commande vient d'être validée, cercle rempli en couleur + ✓
   //   → synchronise visuellement avec les flammes/checkmark sur le bâton
   var isSuccess = _tdrc_cmd.hit1 && (!_tdrc_cmd.c2 || _tdrc_cmd.hit2);
