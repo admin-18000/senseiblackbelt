@@ -29045,8 +29045,8 @@ function _tdrc_loop(){
 function _tdrc_drawShape(ctx, W, H){
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = W / 2, cy = H / 2;
-  // Bras assez long pour que les boules atteignent les zones où les mains dribblent
-  var armLen = Math.min(W, H) * 0.42;
+  // Bras compact : 0.37 × min(W,H) → bâton bien dans le cadre, centre visuel stable même en rotation
+  var armLen = Math.min(W, H) * 0.37;
   // Centrage : forme dessinée depuis l'origine canvas (W/2, H/2) — pas d'offset artificiel
   // BOULE = TAILLE TARGETS (formule identique)
   var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
@@ -29056,10 +29056,14 @@ function _tdrc_drawShape(ctx, W, H){
   var n = colors.length;
   // Rotation CONDITIONNELLE :
   //   • mode 'static' : bâton figé → détection TARGETS EXACTE (velocity + directional) → sensibilité pure TDR
-  //   • mode 'rotate' : bâton tourne (vitesse selon difficulté) → pure proximité pour rester touchable
+  //   • mode 'rotate' : bâton tourne lentement → pure proximité + rayon généreux pour rester touchable
   var rot = 0;
   if (_tdrc_rot === 'rotate'){
-    var rotSpeed = _tdrc_mode === 'hard' ? 0.80 : _tdrc_mode === 'medium' ? 0.55 : 0.35;
+    // Vitesses ralenties pour compenser la latence de pose detection (~150ms) :
+    //   EASY 0.25 rad/s → 14°/s (tour en 25 s)
+    //   MED  0.40 rad/s → 23°/s (tour en 16 s)
+    //   HARD 0.55 rad/s → 31°/s (tour en 11 s)
+    var rotSpeed = _tdrc_mode === 'hard' ? 0.55 : _tdrc_mode === 'medium' ? 0.40 : 0.25;
     var nowT = performance.now();
     var dt = _tdrc_lastFrameTs ? (nowT - _tdrc_lastFrameTs) / 1000 : 0;
     _tdrc_lastFrameTs = nowT;
@@ -29205,13 +29209,14 @@ function _tdrc_analyzePose(poses){
         if (dist < hitDist) { hitDist = dist; hitBranch = c; }
       }
     } else {
-      // === MODE ROTATE = pure proximité ===
+      // === MODE ROTATE = pure proximité + rayon ÉLARGI à × 2.8 ===
+      // Compense la dérive due à la rotation + latence pose detection
       for (var j = 0; j < colors.length; j++){
         var c2 = colors[j];
         if (c2._cx == null) continue;
         var dx2 = wx - c2._cx, dy2 = wy - c2._cy;
         var dist2 = Math.sqrt(dx2*dx2 + dy2*dy2);
-        if (dist2 >= c2._r * 2.0) continue;
+        if (dist2 >= c2._r * 2.8) continue;
         if (dist2 < hitDist) { hitDist = dist2; hitBranch = c2; }
       }
     }
