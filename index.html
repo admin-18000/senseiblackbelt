@@ -28931,20 +28931,10 @@ function _tdrc_nextCommand(){
   }
   _tdrc_cmd = { c1:c1, hand1:hand1, c2:c2, hand2:hand2, hit1:false, hit2:false };
   _tdrc_cmdStartTs = Date.now();
-  // ★ Spawn aléatoire du bâton à chaque nouvelle commande (comme TARGETS)
-  //   margin = armLen+ballR pour que toutes les boules restent dans le cadre
+  // ★ Bâton TOUJOURS AU CENTRE (comme TDR Réaction où les cibles apparaissent et disparaissent) :
+  //   la position de spawn est fixe = (W/2, H/2) pour chaque commande
   if (_tdrc_canvas){
-    var _spW = _tdrc_canvas.width, _spH = _tdrc_canvas.height;
-    var _spMinWH = Math.min(_spW, _spH);
-    var _spArm = _spMinWH * 0.37;
-    var _spBall = Math.round(Math.min(_spW * 0.075, _spH * 0.13));
-    var _spMargin = _spArm + _spBall + 10;
-    var _spRange = Math.max(1, _spW - 2*_spMargin);
-    var _spRangeY = Math.max(1, _spH - 2*_spMargin);
-    _tdrc_batonPos = {
-      x: _spMargin + Math.random() * _spRange,
-      y: _spMargin + Math.random() * _spRangeY
-    };
+    _tdrc_batonPos = { x: _tdrc_canvas.width / 2, y: _tdrc_canvas.height / 2 };
   }
   // Voix synthétique
   var txt = (en ? c1.nameEn : c1.name);
