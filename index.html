@@ -29044,31 +29044,38 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.rotate(ang + Math.PI/2);
     ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
-    // Pilule FINE — stick métallique élégant (couleur sombre, pas la couleur de la boule)
+    // Pilule style SKLZ réel : moitié NOIRE côté hub (0 → armLen*0.45), moitié COULEUR côté boule (armLen*0.45 → armLen-ballR)
     var halfW = armW / 2;
-    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.5)';
-    ctx.fillStyle = '#1a1f2e'; // acier anthracite — rend le stick discret, la boule attire l'œil
+    var midStick = armLen * 0.45;  // transition noir → couleur
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.55)';
+    // Partie NOIRE côté hub
+    ctx.fillStyle = '#15181f';
     ctx.beginPath();
-    ctx.moveTo(-halfW*0.6, 0);
-    ctx.lineTo(-halfW*0.6, armLen - ballR);
-    ctx.lineTo( halfW*0.6, armLen - ballR);
-    ctx.lineTo( halfW*0.6, 0);
+    ctx.moveTo(-halfW*0.65, 0);
+    ctx.lineTo(-halfW*0.65, midStick);
+    ctx.lineTo( halfW*0.65, midStick);
+    ctx.lineTo( halfW*0.65, 0);
     ctx.closePath();
     ctx.fill();
-    // Liseré métallique
-    ctx.strokeStyle = 'rgba(255,255,255,.08)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    // BOULE COLORÉE au bout (taille TARGETS)
-    ctx.shadowBlur = 14; ctx.shadowColor = colors[i].hex;
+    // Partie COULEUR côté boule
+    ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
+    ctx.beginPath();
+    ctx.moveTo(-halfW*0.65, midStick);
+    ctx.lineTo(-halfW*0.65, armLen - ballR*0.3);
+    ctx.lineTo( halfW*0.65, armLen - ballR*0.3);
+    ctx.lineTo( halfW*0.65, midStick);
+    ctx.closePath();
+    ctx.fill();
+    // BOULE COLORÉE au bout (taille TARGETS)
+    ctx.shadowBlur = 16; ctx.shadowColor = colors[i].hex;
     ctx.beginPath();
     ctx.arc(0, armLen, ballR, 0, Math.PI * 2);
     ctx.fill();
-    // Highlight brillant (effet 3D sur la boule)
+    // Highlight 3D sur la boule
     ctx.shadowBlur = 0;
-    var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.9);
-    grad.addColorStop(0, 'rgba(255,255,255,.55)');
+    var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.95);
+    grad.addColorStop(0, 'rgba(255,255,255,.5)');
     grad.addColorStop(0.6, 'rgba(255,255,255,0)');
     ctx.fillStyle = grad;
     ctx.beginPath(); ctx.arc(0, armLen, ballR, 0, Math.PI * 2); ctx.fill();
@@ -29118,9 +29125,11 @@ function _tdrc_analyzePose(poses){
     if (moved < moveThresh) return;
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
-    // On cible UNIQUEMENT LA BOULE (comme une cible TARGETS), rayon catch = r × 2.0
+    // On cible UNIQUEMENT LA BOULE (comme TARGETS), rayon catch = r × 2.0
+    // ★ Sélectionne la boule LA PLUS PROCHE (évite le bug : si 2 boules sont dans le rayon à cause de la rotation,
+    //   on prend la bonne — celle que l'utilisateur a réellement touchée, pas la première de l'array)
     var hx = wx, hy = wy;
-    var hitBranch = null;
+    var hitBranch = null, hitDist = Infinity;
     for (var i = 0; i < colors.length; i++){
       var c = colors[i];
       if (c._cx == null) continue;
@@ -29129,7 +29138,7 @@ function _tdrc_analyzePose(poses){
       if (dist >= c._r * 2.0) continue;                     // idem TARGETS : t.r * 2.0
       var dot = (-dx) * vx + (-dy) * vy;                     // idem TARGETS : main se dirige vers la cible
       if (dot <= 0) continue;
-      hitBranch = c; break;
+      if (dist < hitDist) { hitDist = dist; hitBranch = c; }
     }
     if (!hitBranch) return;
     // Match avec la commande ?
@@ -29147,17 +29156,33 @@ function _tdrc_analyzePose(poses){
       if (!cmd.hit1) expectedForSide = cmd.c1;
     }
     if (!expectedForSide) return;
+
+    // ★ FEEDBACK VISUEL IMMÉDIAT dans la couleur de la boule RÉELLEMENT touchée (correct OU incorrect)
+    //   → l'utilisateur voit TOUJOURS la vraie couleur de ce qu'il a touché, aucune ambiguïté
+    //   → les flammes sortent au point d'impact de la main (pas du centre de la boule) pour correspondance 1:1
+    var hitX = hitBranch._cx, hitY = hitBranch._cy;
+    for (var pi = 0; pi < 24; pi++){
+      var ang = Math.random() * Math.PI * 2;
+      var spd = 140 + Math.random() * 220;
+      _tdrc_particles.push({
+        x: hitX, y: hitY,
+        vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 60,
+        life: 0.6 + Math.random()*0.5,
+        color: hitBranch.hex   // ← TOUJOURS la couleur de ce qui vient d'être touché
+      });
+    }
+
     if (hitBranch.k === expectedForSide.k){
-      // Bonne branche
+      // ✅ BONNE couleur : on valide la commande + flash plein écran + score
       if (side === cmd.hand1 || !cmd.c2) cmd.hit1 = true;
       if (cmd.c2 && side === cmd.hand2) cmd.hit2 = true;
-      // 🎉 FLASH PLEIN ÉCRAN couleur cible (signale la réussite de façon évidente)
+      // Flash plein écran couleur touchée (= couleur cible puisque c'est un correct)
       _tdrc_flash = { color: hitBranch.hex, until: Date.now() + 350 };
-      // Particules XXL (32 au lieu de 16, vie plus longue, taille plus grosse)
-      for (var pi = 0; pi < 32; pi++){
-        var ang = Math.random() * Math.PI * 2;
-        var spd = 160 + Math.random() * 260;
-        _tdrc_particles.push({ x: hitBranch._cx, y: hitBranch._cy, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 80, life: 0.7 + Math.random()*0.5, color: hitBranch.hex });
+      // Burst de particules XXL supplémentaires pour renforcer la réussite
+      for (var pi2 = 0; pi2 < 16; pi2++){
+        var ang2 = Math.random() * Math.PI * 2;
+        var spd2 = 200 + Math.random() * 260;
+        _tdrc_particles.push({ x: hitX, y: hitY, vx: Math.cos(ang2)*spd2, vy: Math.sin(ang2)*spd2 - 80, life: 0.8 + Math.random()*0.5, color: hitBranch.hex });
       }
       try { if (typeof _td_beep === 'function') _td_beep(880, 0.08, 0.25); } catch(e){}
       if (navigator.vibrate) navigator.vibrate(20);
@@ -29174,6 +29199,10 @@ function _tdrc_analyzePose(poses){
         if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
         setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 350);
       }
+    } else {
+      // ❌ MAUVAISE couleur : particules déjà envoyées dans la bonne couleur (celle touchée)
+      //    → tu vois clairement QUELLE couleur tu as frappée vs ce qui était demandé
+      try { if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15); } catch(e){}
     }
   });
 }
