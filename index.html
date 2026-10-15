@@ -29169,12 +29169,13 @@ function _tdrc_analyzePose(poses){
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // ★ DÉTECTION CONDITIONNELLE SELON LE MODE :
-  //   • STATIC → code TARGETS EXACT (velocity + directional) → sensibilité strictement identique à TDR Réaction
-  //   • ROTATE → pure proximité (sinon velocity ≈ 0 et dot ≤ 0 bloquent les vrais hits quand la boule tourne)
-  //   ★ COOLDOWN UNIFIÉ 180 ms par main (bon OU mauvais hit) → tue le chain-click audio
-  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  // ★ DÉTECTION UNIFIÉE : PURE PROXIMITÉ dans les 2 modes
+  //   • Le dribbleur POSE la main sur la boule (il ne swipe pas comme vers une cible TARGETS)
+  //   • Donc : NI vélocité (hand immobile posée = hit), NI directional (direction de la main non pertinente)
+  //   • Cooldown 200 ms par main pour éviter 10 hits/sec quand la main stationne
+  //   • Catch radius généreux : STATIC × 2.5 | ROTATE × 3.0 (compense dérive rotation)
   var isStatic   = (_tdrc_rot === 'static');
+  var catchMult  = isStatic ? 2.5 : 3.0;
   var nowMs      = Date.now();
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
@@ -29182,46 +29183,20 @@ function _tdrc_analyzePose(poses){
     if (!kp) return;
     var wx = W - kp.x * sx, wy = kp.y * sy;
     var name = side + 'Wrist';
-    // ★ Cooldown GLOBAL par main (évite chain-click sur bonne OU mauvaise couleur)
+    // Cooldown global anti chain-click
     var lastHit = _tdrc_prevWrist[name + '_lastHitTs'] || 0;
-    if (nowMs - lastHit < 180) {
-      // on met quand même à jour la position (sinon la vélocité se fausse à la reprise)
-      _tdrc_prevWrist[name] = { x: wx, y: wy };
-      return;
-    }
-    var prev = _tdrc_prevWrist[name];
-    _tdrc_prevWrist[name] = { x: wx, y: wy };
-    var vx = prev ? wx - prev.x : 0;
-    var vy = prev ? wy - prev.y : 0;
+    if (nowMs - lastHit < 200) return;
+    // Boule la plus proche dans le rayon de catch
     var hitBranch = null, hitDist = Infinity;
-    if (isStatic){
-      // === MODE STATIC = code TARGETS strict (velocity + directional) ===
-      var moved = prev ? Math.sqrt(vx*vx + vy*vy) : 0;
-      if (moved < moveThresh) return;
-      for (var i = 0; i < colors.length; i++){
-        var c = colors[i];
-        if (c._cx == null) continue;
-        var dx = wx - c._cx, dy = wy - c._cy;
-        var dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist >= c._r * 2.0) continue;
-        var dot = (-dx) * vx + (-dy) * vy;
-        if (dot <= 0) continue;
-        if (dist < hitDist) { hitDist = dist; hitBranch = c; }
-      }
-    } else {
-      // === MODE ROTATE = pure proximité + rayon ÉLARGI à × 2.8 ===
-      // Compense la dérive due à la rotation + latence pose detection
-      for (var j = 0; j < colors.length; j++){
-        var c2 = colors[j];
-        if (c2._cx == null) continue;
-        var dx2 = wx - c2._cx, dy2 = wy - c2._cy;
-        var dist2 = Math.sqrt(dx2*dx2 + dy2*dy2);
-        if (dist2 >= c2._r * 2.8) continue;
-        if (dist2 < hitDist) { hitDist = dist2; hitBranch = c2; }
-      }
+    for (var i = 0; i < colors.length; i++){
+      var c = colors[i];
+      if (c._cx == null) continue;
+      var dx = wx - c._cx, dy = wy - c._cy;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= c._r * catchMult) continue;
+      if (dist < hitDist) { hitDist = dist; hitBranch = c; }
     }
     if (!hitBranch) return;
-    // ★ Enregistre le cooldown : tout hit (bon ou mauvais) bloque les suivants 180 ms
     _tdrc_prevWrist[name + '_lastHitTs'] = nowMs;
     // Match avec la commande ?
     var cmd = _tdrc_cmd;
