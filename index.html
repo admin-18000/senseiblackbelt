@@ -2311,6 +2311,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         👁<div id="dcog_lbl_vcmath">VISUAL MATH</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('colorreact')" id="dcog_btn_colorreact"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🌈<div id="dcog_lbl_colorreact">COLOR REACT</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2468,6 +2472,40 @@ window._dojoBackHome = function(){
         style="padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:10px;font-weight:700;cursor:pointer;flex:1;text-align:center;transition:all .2s">
         🏀🏀 <span id="dcog_lbl_tbdtwo">2 BALLONS</span><br><span id="dcog_sub_tbdtwo" style="font-size:9px;opacity:.7">coordination</span>
       </button>
+    </div>
+    <!-- COLOR REACT : pool · difficulté · durée + START/REC/SAVE -->
+    <div id="dcog_optColorreact" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎨 POOL</div>
+        <div style="display:flex;gap:6px">
+          <button class="dcrc-pool-btn" data-pool="3" onclick="_dcrc_setPool(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3 COULEURS</button>
+          <button class="dcrc-pool-btn" data-pool="4" onclick="_dcrc_setPool(4)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">4 COULEURS</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⚡ VITESSE</div>
+        <div style="display:flex;gap:6px">
+          <button class="dcrc-mode-btn" data-mode="easy"   onclick="_dcrc_setMode('easy')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 EASY</button>
+          <button class="dcrc-mode-btn" data-mode="medium" onclick="_dcrc_setMode('medium')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 MEDIUM</button>
+          <button class="dcrc-mode-btn" data-mode="hard"   onclick="_dcrc_setMode('hard')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 HARD</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dcrc-dur-btn" data-sec="30"  onclick="_dcrc_setDur(30)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="dcrc-dur-btn" data-sec="60"  onclick="_dcrc_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="dcrc-dur-btn" data-sec="90"  onclick="_dcrc_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="dcrc-dur-btn" data-sec="120" onclick="_dcrc_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(76,201,240,.06);border-left:2px solid rgba(76,201,240,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🌈 Toutes les couleurs apparaissent — touche uniquement celle annoncée à la voix et affichée en bas. Reproduction cognitive-motrice type « Visual Math ».
+      </div>
+      <div id="dcrc_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dcrc_btnStart" onclick="_dcrc_start()" ontouchstart="" style="width:100%;background:#4cc9f0;color:#0d1117">▶ DÉMARRER COLOR REACT</button>
+      <button class="tr-btn tr-btn-save" id="dcrc_btnSave" onclick="_dcrc_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="dcrc_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -28773,10 +28811,8 @@ function _liteYT_play(el){
 var _tdrc_shape = 'y';          // 'y' (3 couleurs) | 'cross' (4 couleurs)
 var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
 var _tdrc_dur   = 60;
-// ★ NOUVEAU MODÈLE "TARGETS-style" : le bâton APPARAÎT à une position aléatoire pour chaque commande,
-//   reste STATIQUE le temps que l'utilisateur touche la bonne couleur. Comme une cible TDR Réaction,
-//   mais sous forme de bâton 3 ou 4 couleurs → détection = code `_tdr_checkHits` strict (velocity + directional + × 2.0).
-var _tdrc_batonPos = null;      // {x, y} position aléatoire du centre du bâton pour la commande en cours
+// ★ MODÈLE BÂTON SKLZ LIGHT-UP : bâton toujours visible au centre, boule(s) active(s) pulsent
+var _tdrc_batonPos = null;      // {x, y} position du centre du bâton (W/2, H/2)
 var _tdrc_prevWrist = {};       // dernière position de chaque main (vélocité pour TARGETS)
 var _tdrc_countdownActive = false; // ★ flag anti chain-click : coupe le countdown si STOP ou re-start
 var _tdrc_running = false;
@@ -28906,38 +28942,63 @@ function _tdrc_startGame(){
   _tdrc_reactTimes = [];
   _tdrc_particles = [];
   _tdrc_prevWrist = {};
-  _tdrc_batonPos = null; // sera rempli par _tdrc_nextCommand (spawn aléatoire)
-  // Reset du timestamp de hit sur chaque branche (évite checkmark fantôme au redémarrage)
+  _tdrc_batonPos = null;
+  _tdrc_targets = []; // ★ reset cibles pour éviter état fantôme
+  // Reset du timestamp de hit sur chaque branche
   _TDRC_COLORS_Y.forEach(function(c){ c._hitTs = 0; });
   _TDRC_COLORS_CROSS.forEach(function(c){ c._hitTs = 0; });
   _tdrc_nextCommand();
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
 
+/* ★ Nouvelle commande : choisit la ou les boules actives du bâton */
+/* ★ Spawn des cibles ANCRÉES sur les branches du bâton (ta proposition) :
+      les ronds du bâton apparaissent/disparaissent comme les TARGETS de TDR Réaction */
 function _tdrc_nextCommand(){
-  if (!_tdrc_running) return;
+  if (!_tdrc_running || !_tdrc_canvas) return;
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var en = window._lang === 'en';
-  // Choisit une couleur random
-  var c1 = colors[Math.floor(Math.random() * colors.length)];
-  var hand1 = null, c2 = null, hand2 = null;
-  if (_tdrc_mode === 'medium'){
-    hand1 = Math.random() < 0.5 ? 'left' : 'right';
-  } else if (_tdrc_mode === 'hard'){
-    // Antiphase : 2 couleurs simultanées, une par main
-    var others = colors.filter(function(c){ return c.k !== c1.k; });
-    c2 = others[Math.floor(Math.random() * others.length)];
-    hand1 = 'left'; hand2 = 'right';
+  var W = _tdrc_canvas.width, H = _tdrc_canvas.height;
+  var cx = W / 2, cy = H / 2;
+  var armLen = Math.min(W, H) * 0.33;
+  var r = Math.round(Math.min(W * 0.075, H * 0.13));
+  var n = colors.length;
+  // Choix couleur random
+  var ci = Math.floor(Math.random() * n);
+  var c1 = colors[ci];
+  var hand1 = null;
+  if (_tdrc_mode === 'medium') hand1 = Math.random() < 0.5 ? 'left' : 'right';
+  var now = Date.now();
+  // Reset des cibles (une nouvelle commande = fresh)
+  _tdrc_targets = [];
+  // Position de la cible n°1 ancrée sur la branche ci
+  var ang1 = (_tdrc_shape === 'cross' ? ci * Math.PI / 2 : ci * (Math.PI * 2) / 3) - Math.PI / 2;
+  _tdrc_targets.push({
+    x: cx + Math.cos(ang1) * armLen,
+    y: cy + Math.sin(ang1) * armLen,
+    r: r, color: c1.hex, k: c1.k, hand: hand1,
+    branchIdx: ci, born: now, ttl: 3500, hit: false
+  });
+  // Mode HARD : 2 cibles simultanées sur 2 branches différentes
+  var c2 = null, hand2 = null;
+  if (_tdrc_mode === 'hard'){
+    var otherIdx = (ci + 1 + Math.floor(Math.random() * (n - 1))) % n;
+    c2 = colors[otherIdx]; hand1 = 'left'; hand2 = 'right';
+    _tdrc_targets[0].hand = 'left';
+    var ang2 = (_tdrc_shape === 'cross' ? otherIdx * Math.PI / 2 : otherIdx * (Math.PI * 2) / 3) - Math.PI / 2;
+    _tdrc_targets.push({
+      x: cx + Math.cos(ang2) * armLen,
+      y: cy + Math.sin(ang2) * armLen,
+      r: r, color: c2.hex, k: c2.k, hand: 'right',
+      branchIdx: otherIdx, born: now, ttl: 3500, hit: false
+    });
   }
   _tdrc_cmd = { c1:c1, hand1:hand1, c2:c2, hand2:hand2, hit1:false, hit2:false };
-  _tdrc_cmdStartTs = Date.now();
-  // ★ Bâton TOUJOURS AU CENTRE, TOUJOURS VISIBLE (plus de disparition)
-  if (_tdrc_canvas){
-    _tdrc_batonPos = { x: _tdrc_canvas.width / 2, y: _tdrc_canvas.height / 2 };
-  }
-  // Voix (optionnelle — en bonus, mais le driver = l'animation pulse sur la boule active)
+  _tdrc_cmdStartTs = now;
+  if (_tdrc_canvas) _tdrc_batonPos = { x: cx, y: cy };
+  // Voix
   var txt = (en ? c1.nameEn : c1.name);
-  if (hand1) txt = (en?(hand1==='left'?'LEFT ':'RIGHT ')+ c1.nameEn : (hand1==='left'?'GAUCHE ':'DROITE ')+c1.name);
+  if (hand1) txt = (en?(hand1==='left'?'LEFT ':'RIGHT ')+c1.nameEn : (hand1==='left'?'GAUCHE ':'DROITE ')+c1.name);
   if (c2) txt += (en?' + '+(hand2==='left'?'LEFT ':'RIGHT ')+c2.nameEn : ' + '+(hand2==='left'?'GAUCHE ':'DROITE ')+c2.name);
   try {
     if (window.speechSynthesis){
@@ -28948,16 +29009,14 @@ function _tdrc_nextCommand(){
       window.speechSynthesis.speak(u);
     }
   } catch(e){}
-  // Timeout généreux : 5s par activation (si tu rates, miss + nouvelle activation immédiate)
+  // Timeout : si pas touché à temps → nouvelle commande
   if (_tdrc_cmdTimer) clearTimeout(_tdrc_cmdTimer);
   _tdrc_cmdTimer = setTimeout(function(){
-    if (_tdrc_cmd && !(_tdrc_cmd.hit1 && (!_tdrc_cmd.c2 || _tdrc_cmd.hit2))){
-      _tdrc_wrong++;
-      _tdrc_combo = 0;
-      _tdrc_cmd = null;
-    }
+    var allHit = _tdrc_targets.every(function(t){ return t.hit; });
+    if (!allHit){ _tdrc_wrong++; _tdrc_combo = 0; }
+    _tdrc_cmd = null;
     if (_tdrc_running) _tdrc_nextCommand();
-  }, 5000);
+  }, 3500);
 }
 
 /* ─── Loop principal : vidéo + shape + HUD + détection ─────────── */
@@ -29038,262 +29097,213 @@ function _tdrc_loop(){
 /*       radius = Math.round(Math.min(W*0.075, H*0.13))                              */
 /*       → sur mobile paysage ≈ 50-93 px, pile la taille des cibles TDR targets      */
 /*     ★ Bâton (pilule) FIN et élégant — comme un vrai SKLZ Y                        */
+/* ★ Dessin bâton SKLZ Light-up : boule(s) active(s) pulsent, autres ternies */
+/* ★ Dessin bâton = beau visuel SKLZ :
+      • TOUTES les branches dessinées avec boule colorée au bout (dim si pas active)
+      • Les boules ACTIVES (dans _tdrc_targets) brillent + pulsent + ring expansif → style SKLZ "lumineux"
+      • Boules inactives = visibles à ~30% opacité (le bâton reste reconnaissable) */
 function _tdrc_drawShape(ctx, W, H){
-  // ★ MODÈLE SKLZ LIGHT-UP : bâton TOUJOURS visible, UNE (ou 2 en HARD) boule(s) ACTIVE(S) pulsent
-  //   → les boules inactives restent visibles mais ternies ; seule la boule active brille
   if (!_tdrc_batonPos) return;
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = _tdrc_batonPos.x, cy = _tdrc_batonPos.y;
   var armLen = Math.min(W, H) * 0.33;
-  // BOULE = TAILLE TARGETS (formule identique)
-  var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
-  var armW   = Math.round(ballR * 1.0);
-  var hubR   = Math.round(armW * 0.85);
+  var ballR = Math.round(Math.min(W * 0.075, H * 0.13));
+  var armW = Math.round(ballR * 0.9);
+  var hubR = Math.round(armW * 0.85);
   var n = colors.length;
-  var rot = 0; // bâton STATIQUE
-  var nowAnim = Date.now();
+  var now = Date.now();
+  // Pour chaque branche, est-elle active (sa boule est dans _tdrc_targets non-hit) ?
+  function _branchActive(idx){
+    var found = null;
+    _tdrc_targets.forEach(function(t){
+      if (t.branchIdx === idx && !t.hit) found = t;
+    });
+    return found;
+  }
   ctx.save();
   for (var i = 0; i < n; i++){
     var baseAng = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
-    var ang = baseAng + rot;
-    var ex = cx + Math.cos(ang) * armLen;
-    var ey = cy + Math.sin(ang) * armLen;
-    // ★ Est-ce la boule ACTIVE ? (celle que le joueur doit toucher)
-    var isActive = _tdrc_cmd && (
-      (_tdrc_cmd.c1 && _tdrc_cmd.c1.k === colors[i].k && !_tdrc_cmd.hit1) ||
-      (_tdrc_cmd.c2 && _tdrc_cmd.c2.k === colors[i].k && !_tdrc_cmd.hit2)
-    );
-    // Branche
+    var ex = cx + Math.cos(baseAng) * armLen;
+    var ey = cy + Math.sin(baseAng) * armLen;
+    var active = _branchActive(i);
+    var dim = active ? 1 : 0.3;      // branches inactives à 30%
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(ang + Math.PI/2);
+    ctx.rotate(baseAng + Math.PI/2);
+    ctx.globalAlpha = dim;
     var halfW = armW / 2;
     var midStick = armLen * 0.45;
-    // Pilule — plein éclat si active, ternie sinon
-    var dim = isActive ? 1 : 0.35;
-    ctx.globalAlpha = dim;
+    // STICK : moitié noire côté hub + moitié couleur côté boule (visuel SKLZ)
     ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.55)';
     ctx.fillStyle = '#15181f';
     ctx.beginPath();
-    ctx.moveTo(-halfW*0.65, 0);
-    ctx.lineTo(-halfW*0.65, midStick);
-    ctx.lineTo( halfW*0.65, midStick);
-    ctx.lineTo( halfW*0.65, 0);
-    ctx.closePath();
-    ctx.fill();
-    // Partie colorée côté boule
-    ctx.shadowBlur = isActive ? 14 : 4; ctx.shadowColor = colors[i].hex;
+    ctx.moveTo(-halfW*0.65, 0); ctx.lineTo(-halfW*0.65, midStick);
+    ctx.lineTo(halfW*0.65, midStick); ctx.lineTo(halfW*0.65, 0);
+    ctx.closePath(); ctx.fill();
+    // Moitié colorée (plus de glow si active)
+    ctx.shadowBlur = active ? 14 : 2; ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
     ctx.beginPath();
-    ctx.moveTo(-halfW*0.65, midStick);
-    ctx.lineTo(-halfW*0.65, armLen - ballR*0.3);
-    ctx.lineTo( halfW*0.65, armLen - ballR*0.3);
-    ctx.lineTo( halfW*0.65, midStick);
-    ctx.closePath();
-    ctx.fill();
-    // ★ BOULE : si active → PULSE + GLOW + anneau de progression (pattern TARGETS exact)
-    //           si inactive → version ternie
-    var pulseScale = 1;
-    if (isActive){
-      pulseScale = 1 + 0.12 * Math.sin(nowAnim / 110); // pulse rapide (comme TARGETS)
-      // Anneau pulsant extérieur style TARGETS
-      ctx.globalAlpha = 0.85;
+    ctx.moveTo(-halfW*0.65, midStick); ctx.lineTo(-halfW*0.65, armLen - ballR*0.3);
+    ctx.lineTo(halfW*0.65, armLen - ballR*0.3); ctx.lineTo(halfW*0.65, midStick);
+    ctx.closePath(); ctx.fill();
+    // RING pulsant AUTOUR de la boule si active (effet "cible appearing")
+    if (active){
+      var age = (now - active.born) / active.ttl;
+      var ringAlpha = Math.max(0, 1 - age);
+      var spawnRamp = Math.min(1, (now - active.born) / 250);
+      var pulse = 1 + 0.12 * spawnRamp * Math.sin(now / 120);
+      ctx.save();
+      ctx.globalAlpha = ringAlpha * 0.9;
       ctx.beginPath();
-      ctx.arc(0, armLen, ballR * 1.6 * pulseScale, 0, Math.PI * 2);
+      ctx.arc(0, armLen, ballR * pulse * 1.5, 0, Math.PI * 2);
       ctx.strokeStyle = colors[i].hex;
       ctx.lineWidth = 3;
-      ctx.shadowBlur = 18; ctx.shadowColor = colors[i].hex;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-    // Boule principale
-    ctx.shadowBlur = isActive ? 22 : 6;
-    ctx.shadowColor = colors[i].hex;
-    ctx.fillStyle = colors[i].hex;
-    ctx.beginPath();
-    ctx.arc(0, armLen, ballR * pulseScale, 0, Math.PI * 2);
-    ctx.fill();
-    // Highlight 3D
-    ctx.shadowBlur = 0;
-    var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.95);
-    grad.addColorStop(0, 'rgba(255,255,255,'+(isActive?.6:.3)+')');
-    grad.addColorStop(0.6, 'rgba(255,255,255,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.arc(0, armLen, ballR * pulseScale, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1;
-    // ✓ CHECKMARK si la boule a été touchée récemment (<400ms) → preuve visuelle du HIT dans le rond
-    var _hitTs = colors[i]._hitTs || 0;
-    var _hitAge = Date.now() - _hitTs;
-    if (_hitAge >= 0 && _hitAge < 400){
-      var cProg = _hitAge / 400;        // 0 → 1
-      var cAlpha = 1 - cProg * 0.4;      // reste bien visible
-      var cScale = 0.4 + cProg * 0.4;    // pop-in anim
-      ctx.save();
-      ctx.globalAlpha = cAlpha;
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = Math.max(3, ballR * 0.14);
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.7)';
-      // Checkmark positionné pile dans le rond — proportions correctes
-      var cs = ballR * 0.5 * cScale;
-      ctx.beginPath();
-      ctx.moveTo(-cs * 0.9, armLen + cs * 0.05);
-      ctx.lineTo(-cs * 0.2, armLen + cs * 0.55);
-      ctx.lineTo( cs * 0.95, armLen - cs * 0.55);
+      ctx.shadowBlur = 20; ctx.shadowColor = colors[i].hex;
       ctx.stroke();
       ctx.restore();
     }
+    // BOULE colorée au bout (toujours dessinée, dim si inactive)
+    ctx.shadowBlur = active ? 24 : 4;
+    ctx.shadowColor = colors[i].hex;
+    ctx.fillStyle = colors[i].hex;
+    ctx.beginPath();
+    ctx.arc(0, armLen, ballR, 0, Math.PI * 2);
+    ctx.fill();
+    // Highlight 3D (plus marqué si active)
+    ctx.shadowBlur = 0;
+    var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.95);
+    grad.addColorStop(0, 'rgba(255,255,255,'+(active?.55:.3)+')');
+    grad.addColorStop(0.6, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(0, armLen, ballR, 0, Math.PI * 2); ctx.fill();
+    // Indicateur G/D sous la boule active en MEDIUM/HARD
+    if (active && active.hand){
+      ctx.save();
+      ctx.rotate(-(baseAng + Math.PI/2)); // dérotate pour que le texte reste droit
+      var en = window._lang === 'en';
+      var lbl = en ? (active.hand==='left'?'L':'R') : (active.hand==='left'?'G':'D');
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold ' + Math.round(ballR*0.55) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.9)';
+      // offset dans le repère monde : on recalcule la position écran du label
+      var lblX = Math.cos(baseAng) * armLen;
+      var lblY = Math.sin(baseAng) * armLen;
+      ctx.fillText(lbl, lblX, lblY + ballR + 6);
+      ctx.restore();
+    }
     ctx.restore();
-    // Store la position courante (après rotation) de la BOULE pour collision — on cible UNIQUEMENT la boule, comme TARGETS
+    // Stocke position pour la collision (identique _tdrc_targets.x/y mais utile pour debug)
     colors[i]._cx = ex;
     colors[i]._cy = ey;
-    colors[i]._r  = ballR;
+    colors[i]._r = ballR;
   }
-  // Hub central noir
+  // Hub central noir avec liseré
   ctx.shadowBlur = 0;
   ctx.fillStyle = '#1a1a1a';
   ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
+  // Expire les cibles touchées après 300ms
+  _tdrc_targets = _tdrc_targets.filter(function(t){
+    return !t.hit || (now - (t.hitTime||0) < 300);
+  });
 }
 
-/* ─── Analyse pose : collision poignet → branche ───────────────── */
-/*     ★ Détection PURE PROXIMITÉ (plus adaptée que TARGETS ici) :    */
-/*       • _tsym_kp_hand (coude→poignet +25%, moteur = TARGETS)       */
-/*       • miroir : wx = W - kp.x * sx (idem TARGETS)                 */
-/*       • rayon TRÈS généreux : branche._r × 2.8                     */
-/*       • PAS de check vélocité (le dribbleur peut POSER la main)    */
-/*       • PAS de check directionnel (compense bien la rotation)      */
+/* ─── Analyse pose : fork direct de _tdr_checkHits (TDR TARGETS strict) ─── */
 function _tdrc_analyzePose(poses){
-  if (!_tdrc_running || !_tdrc_cmd || !poses || !poses[0]) return;
+  // ★ DÉTECTION CALQUÉE 1:1 SUR _tdr_checkHits (TDR TARGETS strict) :
+  //   - _tsym_kp_hand (coude→poignet +25%) UNIQUEMENT, PAS de fallback raw
+  //   - mirror horizontal : wx = W - kp.x * sx
+  //   - seuil vélocité  : max(8, W*0.02)
+  //   - rayon catch     : t.r × 2.0
+  //   - directional dot = (-dx)*vx + (-dy)*vy > 0 (main se dirige VERS la cible)
+  //   Le visuel bâton n'est QUE visuel — la détection = TDR réaction stricte.
+  if (!_tdrc_running || !poses || !poses[0] || !_tdrc_canvas) return;
+  _tdrc_lastPoses = poses; // pour le feedback proximité dans drawShape
   var cv = _tdrc_canvas, W = cv.width, H = cv.height;
-  var sx = W / (_tdrc_video.videoWidth || 640);
-  var sy = H / (_tdrc_video.videoHeight || 480);
-  var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // ★ DÉTECTION CALQUÉE SUR _tdr_checkHits (TARGETS strict) :
-  //   Le bâton apparaît STATIQUE à une position aléatoire → le joueur TEND la main vers la bonne couleur
-  //   → velocity + directional ont tout leur sens (idem TARGETS)
-  //   • seuil vélocité  : max(8, W*0.02)      (idem TARGETS)
-  //   • rayon catch     : t.r × 2.0            (idem TARGETS)
-  //   • check directionnel : dot > 0           (idem TARGETS)
-  //   • Fallback poignet brut seuil 0.20 pour détecter la main en zone basse si confidence tombe
+  var sx = W / (_tdrc_video ? _tdrc_video.videoWidth : W);
+  var sy = H / (_tdrc_video ? _tdrc_video.videoHeight : H);
   var moveThresh = Math.max(8, Math.round(W * 0.02));
   var nowMs = Date.now();
   ['left','right'].forEach(function(side){
-    if (!_tdrc_cmd) return;
-    var kp = _tsym_kp_hand(poses, side);
-    if (!kp){
-      var wristName = side + 'Wrist';
-      var kps = (poses[0] && poses[0].keypoints) || [];
-      var idx = (typeof _TSYM_KP !== 'undefined') ? _TSYM_KP[wristName] : undefined;
-      var kRaw = (idx !== undefined) ? kps[idx] : null;
-      if (!kRaw || kRaw.score < 0.20) return;
-      kp = kRaw;
-    }
-    var wx = W - kp.x * sx, wy = kp.y * sy;
     var name = side + 'Wrist';
-    // Vélocité (idem TARGETS)
+    // Extrapoler la position de la main (coude→poignet +25%) — même helper que TDR
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    // Vélocité : hit uniquement si main en mouvement intentionnel
     var prev = _tdrc_prevWrist[name];
-    var moved = prev ? Math.sqrt((wx-prev.x)*(wx-prev.x) + (wy-prev.y)*(wy-prev.y)) : 0;
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdrc_prevWrist[name] = { x: wx, y: wy };
     if (moved < moveThresh) return;
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
-    // Cooldown anti double-hit entre 2 commandes
-    var lastHit = _tdrc_prevWrist[name + '_lastHitTs'] || 0;
-    if (nowMs - lastHit < 200) return;
-    // Boule la plus proche dans r × 2.0 + check directionnel (idem TARGETS)
-    var hitBranch = null, hitDist = Infinity;
-    for (var i = 0; i < colors.length; i++){
-      var c = colors[i];
-      if (c._cx == null) continue;
-      var dx = wx - c._cx, dy = wy - c._cy;
+    // Chaque cible active : check hit (TARGETS strict)
+    _tdrc_targets.forEach(function(t){
+      if (t.hit) return;
+      // Si cible a une main imposée (MEDIUM/HARD), skip si pas la bonne main
+      if (t.hand && t.hand !== side) return;
+      var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= c._r * 2.0) continue;             // IDEM TARGETS
-      var dot = (-dx) * vx + (-dy) * vy;             // IDEM TARGETS : main se dirige vers la boule
-      if (dot <= 0) continue;
-      if (dist < hitDist) { hitDist = dist; hitBranch = c; }
-    }
-    if (!hitBranch) return;
-    _tdrc_prevWrist[name + '_lastHitTs'] = nowMs;
-    // Match avec la commande ?
-    var cmd = _tdrc_cmd;
-    var expectedForSide = null;
-    if (cmd.c2){
-      // HARD : 2 commandes simultanées, chaque main a sa cible
-      if (side === cmd.hand1 && !cmd.hit1) expectedForSide = cmd.c1;
-      else if (side === cmd.hand2 && !cmd.hit2) expectedForSide = cmd.c2;
-    } else if (cmd.hand1){
-      // MEDIUM : main imposée
-      if (side === cmd.hand1 && !cmd.hit1) expectedForSide = cmd.c1;
-    } else {
-      // EASY : n'importe quelle main
-      if (!cmd.hit1) expectedForSide = cmd.c1;
-    }
-    if (!expectedForSide) return;
-
-    if (hitBranch.k === expectedForSide.k){
-      // ✅ BONNE couleur — EXACTEMENT le feedback TARGETS :
-      if (side === cmd.hand1 || !cmd.c2) cmd.hit1 = true;
-      if (cmd.c2 && side === cmd.hand2) cmd.hit2 = true;
-      // 1) 12 particules (formule identique _tdr_flashHit)
-      var n = 12;
-      for (var pi = 0; pi < n; pi++){
-        var angle = (pi/n) * Math.PI * 2;
+      if (dist >= t.r * 2.0) return;
+      var dot = (-dx) * vx + (-dy) * vy;
+      if (dot <= 0) return;
+      // ✅ HIT ! Marquer la cible, feedback TARGETS exact
+      t.hit = true; t.hitTime = Date.now();
+      // 12 particules (identique _tdr_flashHit)
+      var nP = 12;
+      for (var pi = 0; pi < nP; pi++){
+        var angle = (pi/nP) * Math.PI * 2;
         var speed = 2.5 + Math.random()*3;
         _tdrc_particles.push({
-          x: hitBranch._cx, y: hitBranch._cy,
+          x: t.x, y: t.y,
           vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
           r: 3 + Math.random()*4,
-          color: hitBranch.hex,
+          color: t.color,
           born: Date.now(), life: 500 + Math.random()*200
         });
       }
-      // 2) Ring expansif (idem TARGETS)
+      // Ring expansif
       _tdrc_particles.push({
-        x: hitBranch._cx, y: hitBranch._cy, vx: 0, vy: 0,
-        r: hitBranch._r, color: hitBranch.hex,
+        x: t.x, y: t.y, vx: 0, vy: 0,
+        r: t.r, color: t.color,
         born: Date.now(), life: 400,
-        ring: true, maxR: hitBranch._r * 3
+        ring: true, maxR: t.r * 3
       });
-      // 3) Checkmark ✓ sur la boule touchée pendant 400ms (visuel validé sur le rond)
-      hitBranch._hitTs = Date.now();
-      // 4) Son hit aigu + vibration (idem TARGETS)
+      // Son + vibration
       try {
         if (typeof _td_soundOK === 'function') _td_soundOK();
         if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12);
       } catch(e){}
       if (navigator.vibrate) navigator.vibrate(20);
-      // 5) Score + combo + "+N" floating (NB : on compte UNIQUEMENT quand toutes les sous-commandes sont validées)
-      if (cmd.hit1 && (!cmd.c2 || cmd.hit2)){
-        _tdrc_correct++;
-        _tdrc_combo++;
-        _tdrc_bestCombo = Math.max(_tdrc_bestCombo, _tdrc_combo);
-        var rt = Date.now() - _tdrc_cmdStartTs;
-        _tdrc_reactTimes.push(rt);
-        // Score inspiré TARGETS : 10 base + bonus vitesse + bonus streak
-        var speedBonus  = Math.max(0, Math.round((3500 - rt) / 300));
-        var streakBonus = _tdrc_combo >= 5 ? 5 : 0;
-        var gain = 10 + speedBonus + streakBonus;
-        if (cmd.c2) gain += 10; // HARD : 2 cibles simultanées
-        _tdrc_score += gain;
-        // Float "+N" visible dans la vidéo
-        _tdrc_particles.push({
-          x: hitBranch._cx, y: hitBranch._cy - hitBranch._r * 1.6,
-          floatText: '+' + gain, color: hitBranch.hex,
-          born: Date.now(), life: 900
-        });
+      // Score (bonus vitesse + streak idem TARGETS)
+      _tdrc_correct++;
+      _tdrc_combo++;
+      _tdrc_bestCombo = Math.max(_tdrc_bestCombo, _tdrc_combo);
+      var rt = Date.now() - t.born;
+      _tdrc_reactTimes.push(rt);
+      var speedBonus  = Math.max(0, Math.round((2000 - rt) / 200));
+      var streakBonus = _tdrc_combo >= 5 ? 5 : 0;
+      var gain = 10 + speedBonus + streakBonus;
+      _tdrc_score += gain;
+      // "+N" floating
+      _tdrc_particles.push({
+        x: t.x, y: t.y - t.r * 1.6,
+        floatText: '+' + gain, color: t.color,
+        born: Date.now(), life: 900
+      });
+      // Toutes les cibles de la commande sont-elles touchées ?
+      var allHit = _tdrc_targets.every(function(tt){ return tt.hit; });
+      if (allHit){
         _tdrc_cmd = null;
         if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
-        // ★ Enchaînement IMMÉDIAT (150 ms pour que les particules partent, sinon fluide comme TARGETS)
-        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 150);
+        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 150); // enchaînement immédiat
       }
-    } else {
-      // ❌ MAUVAISE couleur : petit beep grave, aucun score, pas de ring (évite la pollution visuelle)
-      try { if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15); } catch(e){}
-    }
+    });
   });
 }
 
@@ -30036,6 +30046,544 @@ function _tdrh_save(){
   }
   _tdrh_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
   var sv = document.getElementById('tdrh_btnSave'); if (sv) sv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   🌈 DCOG COLOR REACT (_dcrc_*) — Phase 2
+   Cibles colorées à positions aléatoires (pur TARGETS fork, pas d'ancrage sur bâton)
+   Pool 3 ou 4 couleurs, EASY/MED/HARD, détection _tdr_checkHits stricte
+   ═══════════════════════════════════════════════════════════════════ */
+var _DCRC_COLORS_3 = [
+  {k:'R', name:'ROUGE', nameEn:'RED',    hex:'#e63946'},
+  {k:'B', name:'BLEU',  nameEn:'BLUE',   hex:'#4cc9f0'},
+  {k:'J', name:'JAUNE', nameEn:'YELLOW', hex:'#f5c518'}
+];
+var _DCRC_COLORS_4 = [
+  {k:'R', name:'ROUGE', nameEn:'RED',    hex:'#e63946'},
+  {k:'B', name:'BLEU',  nameEn:'BLUE',   hex:'#4cc9f0'},
+  {k:'J', name:'JAUNE', nameEn:'YELLOW', hex:'#f5c518'},
+  {k:'V', name:'VERT',  nameEn:'GREEN',  hex:'#2dc653'}
+];
+var _dcrc_pool = 3;        // 3 ou 4 couleurs dans le pool
+var _dcrc_mode = 'easy';
+var _dcrc_dur  = 60;
+var _dcrc_running = false, _dcrc_stream = null;
+var _dcrc_video = null, _dcrc_canvas = null, _dcrc_ctx = null;
+var _dcrc_startTs = 0, _dcrc_elapsed = 0;
+var _dcrc_score = 0, _dcrc_correct = 0, _dcrc_wrong = 0;
+var _dcrc_reactTimes = [], _dcrc_combo = 0, _dcrc_bestCombo = 0;
+var _dcrc_rafId = null, _dcrc_cmdTimer = null;
+var _dcrc_cmd = null, _dcrc_cmdStartTs = 0;
+var _dcrc_targets = [];
+var _dcrc_particles = [];
+var _dcrc_prevWrist = {};
+var _dcrc_lastPoses = null;
+var _dcrc_countdownActive = false;
+var _dcrc_recorder = null, _dcrc_recChunks = [], _dcrc_recActive = false;
+var _dcrc_recTimer = null, _dcrc_recSec = 0, _dcrc_recStream = null;
+
+function _dcrc_setPool(p){ _dcrc_pool = p; _dcrc_highlight('.dcrc-pool-btn','data-pool',p); }
+function _dcrc_setMode(m){ _dcrc_mode = m; _dcrc_highlight('.dcrc-mode-btn','data-mode',m); }
+function _dcrc_setDur(d){  _dcrc_dur = d;  _dcrc_highlight('.dcrc-dur-btn','data-sec',d); }
+function _dcrc_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(76,201,240,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(76,201,240,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#4cc9f0' : '#7a8299';
+  });
+}
+function _dcrc_status(msg, color){
+  var st = document.getElementById('dcrc_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+function _dcrc_start(){
+  if (!navigator.mediaDevices){ _dcrc_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _dcrc_status(_t('Accès caméra...','Accessing camera...'), '#4cc9f0');
+  var btn = document.getElementById('dcrc_btnStart');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _dcrc_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _dcrc_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('dcrc', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _dcrc_onCamReady(video, canvas, ctx){
+  _dcrc_video = video; _dcrc_canvas = canvas; _dcrc_ctx = ctx;
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  _dcrc_countdownActive = true;
+  _dcrc_runCountdown(10);
+}
+function _dcrc_runCountdown(n){
+  if (!_dcrc_countdownActive) return;
+  var cv = _dcrc_canvas, ctx = _dcrc_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _dcrc_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#4cc9f0';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _dcrc_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _dcrc_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _dcrc_countdownActive = false;
+    _dcrc_startGame();
+  }
+}
+function _dcrc_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillStyle='#4cc9f0';
+  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-10, 10);
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('COLOR REACT', W-10, 10 + Math.round(H*0.035));
+  ctx.restore();
+}
+function _dcrc_startGame(){
+  _dcrc_running = true;
+  _dcrc_startTs = Date.now(); _dcrc_elapsed = 0;
+  _dcrc_score = 0; _dcrc_correct = 0; _dcrc_wrong = 0;
+  _dcrc_combo = 0; _dcrc_bestCombo = 0;
+  _dcrc_reactTimes = [];
+  _dcrc_particles = [];
+  _dcrc_targets = [];
+  _dcrc_prevWrist = {};
+  _dcrc_nextCommand();
+  _dcrc_rafId = requestAnimationFrame(_dcrc_loop);
+}
+function _dcrc_nextCommand(){
+  if (!_dcrc_running || !_dcrc_canvas) return;
+  var pool = _dcrc_pool === 4 ? _DCRC_COLORS_4 : _DCRC_COLORS_3;
+  var en = window._lang === 'en';
+  var W = _dcrc_canvas.width, H = _dcrc_canvas.height;
+  // Rayon des cibles — on en affiche 3 ou 4 simultanément, donc un peu plus petit qu'avant
+  var r = Math.round(Math.min(W * 0.065, H * 0.11));
+  var mx = r + 20, my = r + 20;
+  var rangeX = Math.max(1, W - 2*mx);
+  // Zone verticale centrée : évite HUD haut et chrono bas-gauche
+  var yTop = H * 0.22;
+  var yBot = H * 0.78;
+  var rangeY = Math.max(1, yBot - yTop - 2*r);
+  var now = Date.now();
+  // TTL selon mode (plus court = plus difficile)
+  var ttl = _dcrc_mode === 'hard' ? 2200 : (_dcrc_mode === 'medium' ? 3000 : 4000);
+  // Pick ONE correct color
+  var ci = Math.floor(Math.random() * pool.length);
+  var answer = pool[ci];
+  // Spawn ALL colors from pool, each at a random non-overlapping position
+  _dcrc_targets = [];
+  var placed = [];
+  function _place(c, isAnswer){
+    var tries = 0, x, y, ok = false;
+    while (tries++ < 60){
+      x = mx + Math.random() * rangeX;
+      y = yTop + r + Math.random() * rangeY;
+      ok = true;
+      for (var j = 0; j < placed.length; j++){
+        var dx = x - placed[j].x, dy = y - placed[j].y;
+        if (dx*dx + dy*dy < (r * 2.6) * (r * 2.6)){ ok = false; break; }
+      }
+      if (ok) break;
+    }
+    placed.push({x:x, y:y});
+    _dcrc_targets.push({
+      x: x, y: y, r: r,
+      color: c.hex, k: c.k, name: c.name, nameEn: c.nameEn,
+      isAnswer: !!isAnswer,
+      born: now, ttl: ttl,
+      hit: false, wrongHit: false
+    });
+  }
+  // Place answer first so it has priority on positioning
+  _place(answer, true);
+  pool.forEach(function(c){ if (c.k !== answer.k) _place(c, false); });
+  _dcrc_cmd = { answer: answer, startTs: now, ttl: ttl, resolved: false };
+  _dcrc_cmdStartTs = now;
+  // Voix FR/EN
+  var txt = en ? answer.nameEn : answer.name;
+  try {
+    if (window.speechSynthesis){
+      var u = new SpeechSynthesisUtterance(txt);
+      u.lang = en ? 'en-US' : 'fr-FR'; u.rate = 1.2; u.volume = 1;
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    }
+  } catch(e){}
+  try { if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.09); } catch(e){}
+  if (_dcrc_cmdTimer) clearTimeout(_dcrc_cmdTimer);
+  _dcrc_cmdTimer = setTimeout(function(){
+    if (!_dcrc_running) return;
+    if (_dcrc_cmd && !_dcrc_cmd.resolved){
+      // Timeout sans hit sur la bonne couleur → wrong
+      _dcrc_wrong++; _dcrc_combo = 0;
+      _dcrc_cmd.resolved = true;
+    }
+    _dcrc_cmd = null;
+    _dcrc_nextCommand();
+  }, ttl + 200);
+}
+function _dcrc_loop(){
+  if (!_dcrc_running) return;
+  var cv = _dcrc_canvas, ctx = _dcrc_ctx, W = cv.width, H = cv.height;
+  _dcrc_elapsed = (Date.now() - _dcrc_startTs) / 1000;
+  _drawVideoMirror(ctx, _dcrc_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dcrc_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dcrc_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  _dcrc_drawTargets(ctx, W, H);
+  // Particules
+  var now = Date.now();
+  _dcrc_particles = _dcrc_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life, alpha = 1 - progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring){
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 3 * (1-progress); ctx.stroke();
+    } else if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    } else {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
+  _dcrc_drawCmdBanner(ctx, W, H);
+  _dcrc_drawHud(ctx, W, H);
+  _dcrc_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_dcrc_elapsed >= _dcrc_dur){ _dcrc_endGame(); return; }
+  _dcrc_rafId = requestAnimationFrame(_dcrc_loop);
+}
+function _dcrc_drawTargets(ctx, W, H){
+  var now = Date.now();
+  _dcrc_targets.forEach(function(t){
+    if (t.hit || t.wrongHit) return;
+    var age = (now - t.born) / t.ttl;
+    var alpha = Math.max(0.4, 1 - age);
+    var spawnRamp = Math.min(1, (now - t.born) / 250);
+    // 🔑 TOUTES les cibles ont le MÊME style — pas d'indice visuel sur la bonne.
+    // Le joueur identifie la bonne UNIQUEMENT via la consigne (voix + texte).
+    var pulse = 1 + 0.10 * spawnRamp * Math.sin(now / 140 + t.k.charCodeAt(0));
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    // Ring extérieur
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r * pulse * 1.42, 0, Math.PI*2);
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = t.color;
+    ctx.stroke();
+    // Boule pleine
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r, 0, Math.PI*2);
+    ctx.fillStyle = t.color; ctx.fill();
+    // Highlight 3D (lumière en haut à gauche)
+    var g = ctx.createRadialGradient(t.x - t.r*0.35, t.y - t.r*0.35, t.r*0.1, t.x, t.y, t.r);
+    g.addColorStop(0, 'rgba(255,255,255,.6)');
+    g.addColorStop(0.6, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+  // Expire les cibles hit (vertes OK ou rouges KO) après 300ms
+  _dcrc_targets = _dcrc_targets.filter(function(t){
+    if (t.hit || t.wrongHit) return (now - (t.hitTime||0) < 300);
+    return (now - t.born) < t.ttl + 100;
+  });
+}
+function _dcrc_drawCmdBanner(ctx, W, H){
+  if (!_dcrc_cmd || _dcrc_cmd.resolved) return;
+  var en = window._lang === 'en';
+  var txt = en ? _dcrc_cmd.answer.nameEn : _dcrc_cmd.answer.name;
+  var hex = _dcrc_cmd.answer.hex;
+  var elapsed = Date.now() - _dcrc_cmd.startTs;
+  var pct = Math.min(1, elapsed / _dcrc_cmd.ttl);
+  // ═══ 1) FLASH consigne en HAUT (gros, type équation Visual Math) ═══
+  //    Visible fort pendant 1200ms, puis estompé en permanence tant que la cmd est active
+  var flashT = Math.min(1, elapsed / 1200);
+  var flashAlpha = 1 - flashT * 0.55;    // 1 → 0.45
+  var flashScale = 1 + (1 - flashT) * 0.08; // léger zoom à l'arrivée
+  ctx.save();
+  ctx.globalAlpha = flashAlpha;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  // Label "TOUCHE / HIT"
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.font = 'bold '+Math.round(H*0.035 * flashScale)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText(en ? 'HIT' : 'TOUCHE', W/2, H*0.085);
+  // Nom de la couleur en TRÈS GROS, de SA couleur
+  ctx.fillStyle = hex;
+  ctx.shadowBlur = 22; ctx.shadowColor = hex;
+  ctx.font = 'bold '+Math.round(H*0.14 * flashScale)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, H*0.16);
+  ctx.restore();
+  // ═══ 2) Pastille + barre temps en bas-centre (persiste tout le round) ═══
+  var bw = W * 0.38, bh = H * 0.095;
+  var bx = W/2 - bw/2, by = H - bh - H*0.025;
+  ctx.save();
+  ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.fillStyle = 'rgba(13,17,23,.6)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
+  ctx.shadowBlur = 0;
+  // Barre de temps
+  ctx.fillStyle = hex;
+  ctx.fillRect(bx, by + bh - 3, bw * (1 - pct), 3);
+  // Pastille
+  var dotR = bh * 0.32;
+  ctx.beginPath(); ctx.arc(bx + dotR + 10, by + bh/2, dotR, 0, Math.PI*2);
+  ctx.fillStyle = hex;
+  ctx.shadowBlur = 14; ctx.shadowColor = hex; ctx.fill();
+  ctx.shadowBlur = 0;
+  // Texte
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,255,255,.65)';
+  ctx.font = 'bold '+Math.round(bh*0.26)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText(en ? 'HIT →' : 'TOUCHE →', bx + dotR*2 + 22, by + bh*0.35);
+  ctx.fillStyle = hex;
+  ctx.font = 'bold '+Math.round(bh*0.52)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.9)';
+  ctx.fillText(txt, bx + dotR*2 + 22, by + bh*0.68);
+  ctx.restore();
+}
+function _dcrc_analyzePose(poses){
+  // ★ DÉTECTION CALQUÉE 1:1 SUR _tdr_checkHits (TDR TARGETS strict) :
+  //   - _tsym_kp_hand (coude→poignet +25%) UNIQUEMENT, pas de fallback raw
+  //   - mirror horizontal : wx = W - kp.x * sx
+  //   - vélocité min = max(8, W*0.02)
+  //   - rayon de hit = t.r * 2.0
+  //   - directional dot = (-dx)*vx + (-dy)*vy > 0  (main se dirige VERS la cible)
+  //   Le visuel seul est spécifique à Color React — la détection = TDR réaction.
+  if (!_dcrc_running || !poses || !poses[0] || !_dcrc_canvas) return;
+  _dcrc_lastPoses = poses;
+  var cv = _dcrc_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_dcrc_video ? _dcrc_video.videoWidth : W);
+  var sy = H / (_dcrc_video ? _dcrc_video.videoHeight : H);
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var nowMs = Date.now();
+  ['left','right'].forEach(function(side){
+    var name = side + 'Wrist';
+    // Extrapoler la position de la main (coude→poignet +25%) — même helper que TDR
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    // Vélocité : hit uniquement si main en mouvement intentionnel
+    var prev = _dcrc_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dcrc_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    _dcrc_targets.forEach(function(t){
+      if (t.hit || t.wrongHit) return;
+      if (_dcrc_cmd && _dcrc_cmd.resolved) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 2.0) return;
+      // Détection directionnelle : la main doit se diriger VERS la cible
+      var dot = (-dx)*vx + (-dy)*vy;
+      if (dot <= 0) return;
+      if (t.isAnswer){
+        // ✓ Bonne couleur
+        t.hit = true; t.hitTime = nowMs;
+        var nP = 14;
+        for (var pi = 0; pi < nP; pi++){
+          var angle = (pi/nP) * Math.PI * 2;
+          var speed = 2.5 + Math.random()*3;
+          _dcrc_particles.push({ x: t.x, y: t.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, r: 3 + Math.random()*4, color: t.color, born: nowMs, life: 500 + Math.random()*200 });
+        }
+        _dcrc_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: t.color, born: nowMs, life: 400, ring: true, maxR: t.r*3 });
+        try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate(20);
+        _dcrc_correct++; _dcrc_combo++;
+        _dcrc_bestCombo = Math.max(_dcrc_bestCombo, _dcrc_combo);
+        var rt = nowMs - t.born;
+        _dcrc_reactTimes.push(rt);
+        var speedBonus  = Math.max(0, Math.round((2000 - rt) / 200));
+        var streakBonus = _dcrc_combo >= 5 ? 5 : 0;
+        var gain = 10 + speedBonus + streakBonus;
+        _dcrc_score += gain;
+        _dcrc_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText: '+'+gain, color: '#2dc653', born: nowMs, life: 900 });
+        if (_dcrc_cmd) _dcrc_cmd.resolved = true;
+        if (_dcrc_cmdTimer){ clearTimeout(_dcrc_cmdTimer); _dcrc_cmdTimer = null; }
+        setTimeout(function(){ if (_dcrc_running) _dcrc_nextCommand(); }, 250);
+      } else {
+        // ✗ Mauvaise couleur
+        t.wrongHit = true; t.hitTime = nowMs;
+        // X rouge animé
+        _dcrc_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: '#e63946', born: nowMs, life: 400, ring: true, maxR: t.r*2.4 });
+        _dcrc_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText: '✗ -5', color: '#e63946', born: nowMs, life: 900 });
+        try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate([40,30,40]);
+        _dcrc_wrong++; _dcrc_combo = 0;
+        _dcrc_score = Math.max(0, _dcrc_score - 5);
+        if (_dcrc_cmd) _dcrc_cmd.resolved = true;
+        if (_dcrc_cmdTimer){ clearTimeout(_dcrc_cmdTimer); _dcrc_cmdTimer = null; }
+        setTimeout(function(){ if (_dcrc_running) _dcrc_nextCommand(); }, 300);
+      }
+    });
+  });
+}
+function _dcrc_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#4cc9f0';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_dcrc_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_dcrc_combo > 0){
+    var mult = _dcrc_combo >= 10 ? 3 : _dcrc_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_dcrc_combo, W*0.04, H*0.17);
+  }
+  var timeLeft = Math.max(0, _dcrc_dur - _dcrc_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  // Chrono BAS-GAUCHE (évite collision avec la consigne FLASH en haut-centre)
+  var chW = W*0.16, chH = H*0.08;
+  var chX = W*0.04, chY = H - chH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  ctx.restore();
+}
+function _dcrc_toggleRec(){ if (_dcrc_recActive) _dcrc_stopRec(); else _dcrc_startRec(); }
+function _dcrc_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_dcrc_recTimer); _dcrc_recTimer = null;
+  if (_dcrc_recorder){ try{ _dcrc_recorder.ondataavailable=null; _dcrc_recorder.onstop=null; _dcrc_recorder.onerror=null; if(_dcrc_recorder.state!=='inactive')_dcrc_recorder.stop(); }catch(e){} }
+  if (_dcrc_recStream){ try{_dcrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dcrc_recStream=null; }
+  _dcrc_recorder=null; _dcrc_recChunks=[]; _dcrc_recSec=0; _dcrc_recActive=false;
+  var cv = _dcrc_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dcrc_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _dcrc_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _dcrc_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _dcrc_recChunks = []; _dcrc_recSec = 0;
+  _dcrc_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dcrc_recChunks.push(e.data); };
+  _dcrc_recorder.onstop = function(){
+    clearInterval(_dcrc_recTimer);
+    var mimeFinal = (_dcrc_recorder && _dcrc_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dcrc_recChunks, {type: mimeFinal});
+    if (_dcrc_recStream){ try{_dcrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dcrc_recStream=null; }
+    _dcrc_recActive=false; _dcrc_recChunks=[]; _dcrc_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_colorreact_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI COLOR REACT', filename:fn, onSave:function(b,filename){ _dcrc_dlBlob(b, filename); } });
+    } else _dcrc_dlBlob(blob, fn);
+  };
+  _dcrc_recorder.onerror = function(){ clearInterval(_dcrc_recTimer); };
+  setTimeout(function(){
+    if (!_dcrc_recorder) return;
+    try { _dcrc_recorder.start(1000); _dcrc_recActive = true; } catch(e){ return; }
+    _dcrc_recTimer = setInterval(function(){
+      _dcrc_recSec++;
+      var mm=Math.floor(_dcrc_recSec/60)%60,ss=_dcrc_recSec%60,hh=Math.floor(_dcrc_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_dcrc_recSec >= 180) _dcrc_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _dcrc_stopRec(){
+  _dcrc_recActive=false; clearInterval(_dcrc_recTimer); _dcrc_recTimer=null;
+  if (_dcrc_recorder){ try{ if(_dcrc_recorder.state!=='inactive')_dcrc_recorder.stop(); }catch(e){} }
+  _dcrc_updateRecBtn();
+}
+function _dcrc_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dcrc_recActive, '&#9632; STOP REC', '#e63946'); }
+function _dcrc_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _dcrc_endGame(){ _dcrc_stop(true); _dcrc_renderResults(); }
+function _dcrc_stop(fromEnd){
+  _dcrc_running = false;
+  _dcrc_countdownActive = false;
+  if (_dcrc_rafId){ cancelAnimationFrame(_dcrc_rafId); _dcrc_rafId = null; }
+  if (_dcrc_cmdTimer){ clearTimeout(_dcrc_cmdTimer); _dcrc_cmdTimer = null; }
+  if (_dcrc_recActive) _dcrc_stopRec();
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  if (_dcrc_stream){ _dcrc_stream.getTracks().forEach(function(t){t.stop();}); _dcrc_stream=null; }
+  if (typeof senseiCamStop === 'function') senseiCamStop();
+  var btn = document.getElementById('dcrc_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('dcrc_btnSave');
+  if (sv && fromEnd && (_dcrc_correct+_dcrc_wrong)>0) sv.style.display = 'flex';
+}
+function _dcrc_renderResults(){
+  var res = document.getElementById('dcrc_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _dcrc_correct + _dcrc_wrong;
+  var pct = total > 0 ? Math.round(_dcrc_correct / total * 100) : 0;
+  var avg = _dcrc_reactTimes.length > 0 ? Math.round(_dcrc_reactTimes.reduce(function(a,b){return a+b;},0) / _dcrc_reactTimes.length) : 0;
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#4cc9f0">'+_dcrc_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dcrc_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'HITS':'HITS')+'</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · '+(en?'best combo':'combo max')+' ×'+_dcrc_bestCombo+'</div>';
+  res.innerHTML = html;
+  _dcrc_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _dcrc_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _dcrc_correct + _dcrc_wrong;
+    var pct = total > 0 ? Math.round(_dcrc_correct / total * 100) : 0;
+    _sb_recordSession('colorreact', pct);
+  }
+  _dcrc_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('dcrc_btnSave'); if (sv) sv.style.display = 'none';
 }
 
 function _tsym_onError(msg) {
@@ -31649,14 +32197,16 @@ function _dcog_selectDrill(drill, langOnly) {
     burnout: en ? 'Push to your limit — max intensity dribble under fatigue'
                : 'Pousse à ta limite — dribble à intensité maximale sous fatigue',
     vcmath:  en ? 'Visual equation challenge — touch TRUE or FALSE while dribbling'
-               : 'Défi visuel d\'équations — touche VRAI ou FAUX en dribblant'
+               : 'Défi visuel d\'équations — touche VRAI ou FAUX en dribblant',
+    colorreact: en ? 'All colors appear — hit the one the voice calls out. Reaction + color recognition.'
+                   : 'Toutes les couleurs apparaissent — touche uniquement celle annoncée. Réaction + reconnaissance couleur.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -31665,13 +32215,13 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/rush utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' ? '12px' : '8px');
+        // viscoord/rcs/colorreact utilisent flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -31684,7 +32234,8 @@ function _dcog_selectDrill(drill, langOnly) {
       twoball: en ? '🔄 MODE'           : '🔄 MODE',
       tboard:  en ? '🥋 BOARD MODE'     : '🥋 MODE TABLEAU',
       burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ',
-      vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ'
+      vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
+      colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -31707,6 +32258,30 @@ function _dcog_selectDrill(drill, langOnly) {
     // dual task bar: show for math and vcmath (both ont scores correct/wrong)
     var db = document.getElementById('dcog_dualTaskBar');
     if (db) db.style.display = (drill === 'math' || drill === 'vcmath') ? 'block' : 'none';
+
+    // COLOR REACT a son propre pipeline caméra/REC → masquer le bloc caméra DCOG principal
+    var mainStart = document.getElementById('dcog_btnStart');
+    var mainStop  = document.getElementById('dcog_btnStop');
+    var mainSave  = document.getElementById('dcog_btnSave');
+    var mainRec   = document.getElementById('dcog_btnRec');
+    var mainStatus= document.getElementById('dcog_status');
+    var durLbl    = document.getElementById('dcog_durLbl');
+    var scoreLive = document.getElementById('dcog_scoreLive');
+    var camCard   = document.getElementById('dcog_camContainer');
+    var isCR = drill === 'colorreact';
+    if (mainStart)  mainStart.style.display  = isCR ? 'none' : 'flex';
+    if (mainStop && mainStop.style.display  !== 'none' && isCR) mainStop.style.display  = 'none';
+    if (mainSave && mainSave.style.display  !== 'none' && isCR) mainSave.style.display  = 'none';
+    if (mainRec && mainRec.style.display   !== 'none' && isCR) mainRec.style.display   = 'none';
+    // Masquer les 3 contrôles ancillaires (DURÉE/status/score pts) de la rangée principale pour éviter double UI
+    var row1 = durLbl && durLbl.parentNode;
+    var row2 = mainStatus && mainStatus.parentNode;
+    if (row1) row1.style.display = isCR ? 'none' : 'flex';
+    if (row2) row2.style.display = isCR ? 'none' : 'flex';
+    // Durée presets (60/90/120/inf)
+    ['dcog_dur60','dcog_dur90','dcog_dur120','dcog_durInf'].forEach(function(id){
+      var e3 = document.getElementById(id); if (e3) e3.style.display = isCR ? 'none' : '';
+    });
 
     // 🎬 Re-render du carrousel filtré sur le drill courant
     if (typeof _dcog_renderVids === 'function') _dcog_renderVids();
@@ -36279,6 +36854,7 @@ function senseiCamShow(mod,stream){
     if(mod==='bt'&&typeof _bt_onCamReady==='function')_bt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tdrc'&&typeof _tdrc_onCamReady==='function')_tdrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tdrh'&&typeof _tdrh_onCamReady==='function')_tdrh_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dcrc'&&typeof _dcrc_onCamReady==='function')_dcrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -36346,6 +36922,7 @@ function senseiCamToggleRec(){
   else if(m==='bt' && typeof _bt_toggleRec==='function') _bt_toggleRec();
   else if(m==='tdrc' && typeof _tdrc_toggleRec==='function') _tdrc_toggleRec();
   else if(m==='tdrh' && typeof _tdrh_toggleRec==='function') _tdrh_toggleRec();
+  else if(m==='dcrc' && typeof _dcrc_toggleRec==='function') _dcrc_toggleRec();
 }
 // i18n portrait warning
 (function(){
