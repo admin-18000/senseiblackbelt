@@ -2980,6 +2980,11 @@ window._dojoBackHome = function(){
         <button class="tdrc-mode-btn" data-mode="medium" onclick="_tdrc_setMode('medium')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 MEDIUM</button>
         <button class="tdrc-mode-btn" data-mode="hard"   onclick="_tdrc_setMode('hard')"   style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 HARD</button>
       </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🌀 BÂTON</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tdrc-rot-btn" data-rot="static" onclick="_tdrc_setRot('static')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">⏸️ STATIQUE</button>
+        <button class="tdrc-rot-btn" data-rot="rotate" onclick="_tdrc_setRot('rotate')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🌀 ROTATION</button>
+      </div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <button class="tdrc-dur-btn" data-sec="30"  onclick="_tdrc_setDur(30)"  style="flex:1;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
@@ -28773,10 +28778,11 @@ function _liteYT_play(el){
 var _tdrc_shape = 'y';          // 'y' (3 couleurs) | 'cross' (4 couleurs)
 var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
 var _tdrc_dur   = 60;
-var _tdrc_rotation = 0;         // angle de rotation continu (radians) — le bâton tourne comme IRL
+var _tdrc_rot   = 'static';     // 'static' (bâton figé → détection TARGETS exacte) | 'rotate' (bâton tourne → pure proximité)
+var _tdrc_rotation = 0;         // angle de rotation continu (radians) — utilisé uniquement en mode 'rotate'
 var _tdrc_lastFrameTs = 0;      // pour un delta temps indépendant du framerate
-var _tdrc_prevWrist = {};       // dernière position de chaque main (réservé — plus utilisé pour l'instant)
-var _tdrc_flash = null;         // {color, until} — flash plein écran couleur cible sur hit
+var _tdrc_prevWrist = {};       // dernière position de chaque main (vélocité pour mode STATIC = TARGETS)
+var _tdrc_flash = null;         // {color, until} — réservé
 var _tdrc_running = false;
 var _tdrc_stream = null;
 var _tdrc_video  = null;
@@ -28806,6 +28812,7 @@ var _TDRC_COLORS_CROSS = [
 ];
 
 function _tdrc_setShape(s){ _tdrc_shape = s; _tdrc_highlight('.tdrc-shape-btn','data-shape',s); }
+function _tdrc_setRot(r){   _tdrc_rot   = r; _tdrc_highlight('.tdrc-rot-btn',  'data-rot',  r); }
 function _tdrc_setMode(m){ _tdrc_mode = m;  _tdrc_highlight('.tdrc-mode-btn','data-mode',m); }
 function _tdrc_setDur(d){ _tdrc_dur = d;    _tdrc_highlight('.tdrc-dur-btn','data-sec',d); }
 function _tdrc_highlight(sel, attr, val){
@@ -29039,17 +29046,18 @@ function _tdrc_drawShape(ctx, W, H){
   var armW   = Math.round(ballR * 1.0); // armW/2 = ballR*0.5 => pilule fine
   var hubR   = Math.round(armW * 0.85);
   var n = colors.length;
-  // Rotation NATURELLE (comme un vrai bâton de réaction qui tourne lentement en main)
-  // Vitesse angulaire optimisée pour que le poignet puisse encore atteindre la cible :
-  //   EASY  0.35 rad/s ≈ 20°/s  (une rotation complète en 18s)
-  //   MED   0.55 rad/s ≈ 32°/s  (une rotation complète en 11s)
-  //   HARD  0.80 rad/s ≈ 46°/s  (une rotation complète en  8s)
-  var rotSpeed = _tdrc_mode === 'hard' ? 0.80 : _tdrc_mode === 'medium' ? 0.55 : 0.35;
-  var nowT = performance.now();
-  var dt = _tdrc_lastFrameTs ? (nowT - _tdrc_lastFrameTs) / 1000 : 0;
-  _tdrc_lastFrameTs = nowT;
-  _tdrc_rotation += rotSpeed * dt; // radians/s * s
-  var rot = _tdrc_rotation;
+  // Rotation CONDITIONNELLE :
+  //   • mode 'static' : bâton figé → détection TARGETS EXACTE (velocity + directional) → sensibilité pure TDR
+  //   • mode 'rotate' : bâton tourne (vitesse selon difficulté) → pure proximité pour rester touchable
+  var rot = 0;
+  if (_tdrc_rot === 'rotate'){
+    var rotSpeed = _tdrc_mode === 'hard' ? 0.80 : _tdrc_mode === 'medium' ? 0.55 : 0.35;
+    var nowT = performance.now();
+    var dt = _tdrc_lastFrameTs ? (nowT - _tdrc_lastFrameTs) / 1000 : 0;
+    _tdrc_lastFrameTs = nowT;
+    _tdrc_rotation += rotSpeed * dt;
+    rot = _tdrc_rotation;
+  }
   ctx.save();
   for (var i = 0; i < n; i++){
     var baseAng = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
@@ -29149,38 +29157,49 @@ function _tdrc_analyzePose(poses){
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // ★ DÉTECTION 100% CALQUÉE SUR _tdr_checkHits (TDR targets) — zéro ajustement :
-  //   • seuil vélocité  : max(8, W*0.02)
-  //   • rayon catch     : t.r × 2.0
-  //   • check directionnel : dot > 0 (main doit se diriger VERS la boule)
+  // ★ DÉTECTION CONDITIONNELLE SELON LE MODE :
+  //   • STATIC → code TARGETS EXACT (velocity + directional) → sensibilité strictement identique à TDR Réaction
+  //   • ROTATE → pure proximité (sinon velocity ≈ 0 et dot ≤ 0 bloquent les vrais hits quand la boule tourne)
   var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var isStatic   = (_tdrc_rot === 'static');
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var wx = W - kp.x * sx, wy = kp.y * sy;
-    // Vélocité (idem TARGETS)
     var name = side + 'Wrist';
     var prev = _tdrc_prevWrist[name];
-    var moved = prev ? Math.sqrt((wx-prev.x)*(wx-prev.x) + (wy-prev.y)*(wy-prev.y)) : 0;
     _tdrc_prevWrist[name] = { x: wx, y: wy };
-    if (moved < moveThresh) return;
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
-    // On cible UNIQUEMENT LA BOULE (comme TARGETS), rayon catch = r × 2.0
-    // ★ Sélectionne la boule LA PLUS PROCHE (évite le bug : si 2 boules sont dans le rayon à cause de la rotation,
-    //   on prend la bonne — celle que l'utilisateur a réellement touchée, pas la première de l'array)
-    var hx = wx, hy = wy;
     var hitBranch = null, hitDist = Infinity;
-    for (var i = 0; i < colors.length; i++){
-      var c = colors[i];
-      if (c._cx == null) continue;
-      var dx = hx - c._cx, dy = hy - c._cy;
-      var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= c._r * 2.0) continue;                     // idem TARGETS : t.r * 2.0
-      var dot = (-dx) * vx + (-dy) * vy;                     // idem TARGETS : main se dirige vers la cible
-      if (dot <= 0) continue;
-      if (dist < hitDist) { hitDist = dist; hitBranch = c; }
+    if (isStatic){
+      // === MODE STATIC = code TARGETS strict (velocity + directional) ===
+      var moved = prev ? Math.sqrt(vx*vx + vy*vy) : 0;
+      if (moved < moveThresh) return;
+      for (var i = 0; i < colors.length; i++){
+        var c = colors[i];
+        if (c._cx == null) continue;
+        var dx = wx - c._cx, dy = wy - c._cy;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist >= c._r * 2.0) continue;
+        var dot = (-dx) * vx + (-dy) * vy;      // check directionnel TARGETS
+        if (dot <= 0) continue;
+        if (dist < hitDist) { hitDist = dist; hitBranch = c; }
+      }
+    } else {
+      // === MODE ROTATE = pure proximité + cooldown 120ms ===
+      var lastHit = _tdrc_prevWrist[name + '_lastHitTs'] || 0;
+      if (Date.now() - lastHit < 120) return;
+      for (var j = 0; j < colors.length; j++){
+        var c2 = colors[j];
+        if (c2._cx == null) continue;
+        var dx2 = wx - c2._cx, dy2 = wy - c2._cy;
+        var dist2 = Math.sqrt(dx2*dx2 + dy2*dy2);
+        if (dist2 >= c2._r * 2.0) continue;
+        if (dist2 < hitDist) { hitDist = dist2; hitBranch = c2; }
+      }
+      if (hitBranch) _tdrc_prevWrist[name + '_lastHitTs'] = Date.now();
     }
     if (!hitBranch) return;
     // Match avec la commande ?
