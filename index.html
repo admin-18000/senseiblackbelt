@@ -29040,6 +29040,12 @@ function _tdrc_drawShape(ctx, W, H){
   var cx = W / 2, cy = H / 2;
   // Bras assez long pour que les boules atteignent les zones où les mains dribblent
   var armLen = Math.min(W, H) * 0.42;
+  // Centre VISUEL : la bounding-box du Y descend jusqu'à armLen × 0.5 et monte jusqu'à armLen
+  //   → bbox center à y = -0.25 × armLen → on compense pour centrer la forme à l'écran
+  //   La Croix est symétrique (bbox centrée sur origine) → pas de décalage
+  if (_tdrc_shape === 'y'){
+    cy = H / 2 + armLen * 0.25;
+  }
   // BOULE = TAILLE TARGETS (formule identique)
   var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
   // Bâton FIN et élégant (demi-épaisseur = 50% du rayon de boule → stick fin style SKLZ)
@@ -29160,14 +29166,23 @@ function _tdrc_analyzePose(poses){
   // ★ DÉTECTION CONDITIONNELLE SELON LE MODE :
   //   • STATIC → code TARGETS EXACT (velocity + directional) → sensibilité strictement identique à TDR Réaction
   //   • ROTATE → pure proximité (sinon velocity ≈ 0 et dot ≤ 0 bloquent les vrais hits quand la boule tourne)
+  //   ★ COOLDOWN UNIFIÉ 180 ms par main (bon OU mauvais hit) → tue le chain-click audio
   var moveThresh = Math.max(8, Math.round(W * 0.02));
   var isStatic   = (_tdrc_rot === 'static');
+  var nowMs      = Date.now();
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var wx = W - kp.x * sx, wy = kp.y * sy;
     var name = side + 'Wrist';
+    // ★ Cooldown GLOBAL par main (évite chain-click sur bonne OU mauvaise couleur)
+    var lastHit = _tdrc_prevWrist[name + '_lastHitTs'] || 0;
+    if (nowMs - lastHit < 180) {
+      // on met quand même à jour la position (sinon la vélocité se fausse à la reprise)
+      _tdrc_prevWrist[name] = { x: wx, y: wy };
+      return;
+    }
     var prev = _tdrc_prevWrist[name];
     _tdrc_prevWrist[name] = { x: wx, y: wy };
     var vx = prev ? wx - prev.x : 0;
@@ -29183,14 +29198,12 @@ function _tdrc_analyzePose(poses){
         var dx = wx - c._cx, dy = wy - c._cy;
         var dist = Math.sqrt(dx*dx + dy*dy);
         if (dist >= c._r * 2.0) continue;
-        var dot = (-dx) * vx + (-dy) * vy;      // check directionnel TARGETS
+        var dot = (-dx) * vx + (-dy) * vy;
         if (dot <= 0) continue;
         if (dist < hitDist) { hitDist = dist; hitBranch = c; }
       }
     } else {
-      // === MODE ROTATE = pure proximité + cooldown 120ms ===
-      var lastHit = _tdrc_prevWrist[name + '_lastHitTs'] || 0;
-      if (Date.now() - lastHit < 120) return;
+      // === MODE ROTATE = pure proximité ===
       for (var j = 0; j < colors.length; j++){
         var c2 = colors[j];
         if (c2._cx == null) continue;
@@ -29199,9 +29212,10 @@ function _tdrc_analyzePose(poses){
         if (dist2 >= c2._r * 2.0) continue;
         if (dist2 < hitDist) { hitDist = dist2; hitBranch = c2; }
       }
-      if (hitBranch) _tdrc_prevWrist[name + '_lastHitTs'] = Date.now();
     }
     if (!hitBranch) return;
+    // ★ Enregistre le cooldown : tout hit (bon ou mauvais) bloque les suivants 180 ms
+    _tdrc_prevWrist[name + '_lastHitTs'] = nowMs;
     // Match avec la commande ?
     var cmd = _tdrc_cmd;
     var expectedForSide = null;
