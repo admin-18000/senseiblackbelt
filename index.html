@@ -29009,8 +29009,11 @@ function _tdrc_loop(){
 function _tdrc_drawShape(ctx, W, H){
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = W / 2, cy = H / 2;
-  var armLen = Math.min(W, H) * 0.3;
+  // BRAS +40% (0.3 → 0.42) → boules proches des bords où sont naturellement les mains du dribbleur
+  var armLen = Math.min(W, H) * 0.42;
   var armW = armLen * 0.3;
+  // BOULES 1.7× plus grosses (0.75 → 1.3) → cibles bien plus visibles
+  var ballR_mult = 1.3;
   var hubR = armW * 0.6;
   var n = colors.length;
   // Rotation NATURELLE (comme un vrai bâton de réaction qui tourne lentement en main)
@@ -29045,13 +29048,16 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.lineTo(r, 0);
     ctx.closePath();
     ctx.fill();
-    // Ball end
-    ctx.beginPath(); ctx.arc(0, armLen, armW * 0.75, 0, Math.PI * 2); ctx.fill();
+    // Ball end (XXL)
+    ctx.beginPath(); ctx.arc(0, armLen, armW * ballR_mult, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-    // Store le centre courant (après rotation) de la branche pour collision
-    colors[i]._cx = ex;
-    colors[i]._cy = ey;
-    colors[i]._r  = armW * 0.75;
+    // Store les paramètres COURANTS (après rotation) de la branche pour collision segment+boule
+    colors[i]._cx    = ex;              // position courante du centre de la boule
+    colors[i]._cy    = ey;
+    colors[i]._r     = armW * ballR_mult; // rayon visuel de la boule
+    colors[i]._halfW = armW / 2;        // demi-épaisseur de la pilule
+    colors[i]._bx    = cx;              // base de la pilule (hub central)
+    colors[i]._by    = cy;
   }
   // Hub central noir
   ctx.shadowBlur = 0;
@@ -29075,20 +29081,32 @@ function _tdrc_analyzePose(poses){
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
+  // Point-vs-segment : distance d'un point (px,py) au segment (x1,y1)-(x2,y2), clampée aux extrémités
+  function _p2seg(px, py, x1, y1, x2, y2){
+    var dx = x2 - x1, dy = y2 - y1;
+    var len2 = dx*dx + dy*dy;
+    if (len2 < 1e-6) { var ddx = px-x1, ddy = py-y1; return Math.sqrt(ddx*ddx+ddy*ddy); }
+    var t = ((px-x1)*dx + (py-y1)*dy) / len2;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    var qx = x1 + t*dx, qy = y1 + t*dy;
+    var qdx = px-qx, qdy = py-qy;
+    return Math.sqrt(qdx*qdx + qdy*qdy);
+  }
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var hx = W - kp.x * sx, hy = kp.y * sy;
-    // Pure proximité : main dans un rayon généreux autour du ballon de la branche
-    var hitBranch = null;
+    // Nouvelle hit-zone : toute la PILULE (segment base→tip) + boule élargie, prend la branche LA PLUS PROCHE
+    var hitBranch = null, minDist = Infinity;
     for (var i = 0; i < colors.length; i++){
       var c = colors[i];
       if (c._cx == null) continue;
-      var dx = hx - c._cx, dy = hy - c._cy;
-      var reach = c._r * 2.8;
-      if (dx*dx + dy*dy < reach*reach){
-        hitBranch = c; break;
+      var distSeg = _p2seg(hx, hy, c._bx, c._by, c._cx, c._cy);
+      var halo    = Math.max(c._halfW, c._r) + 20; // halo généreux (demi-épaisseur pilule ou rayon boule + 20px)
+      if (distSeg < halo && distSeg < minDist){
+        minDist   = distSeg;
+        hitBranch = c;
       }
     }
     if (!hitBranch) return;
@@ -29214,9 +29232,11 @@ function _tdrc_drawCommand(ctx, W, H){
   var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
   var remain  = Math.max(0, 2.5 - elapsed);
   var frac    = remain / 2.5;
-  // Position : bas-gauche, hors de la zone du bâton (bâton centré à W/2, ~armLen=0.3*min)
-  var cx = W * 0.14, cy = H * 0.78;
-  var R  = Math.min(W, H) * 0.11;
+  // Position OPTIMISÉE : coin bas-gauche hors de portée des nouvelles branches longues (0.42 × min)
+  // Y shape : branches basses à y=H/2 + 0.21*min → max 71% H. Chrono à 86% H, zone propre.
+  // Cross : branche basse pleine, mais côté bas-GAUCHE libre (branche gauche à x = 0.5W - 0.42*min)
+  var cx = W * 0.08, cy = H * 0.86;
+  var R  = Math.min(W, H) * 0.095;
   ctx.save();
   // Cercle de fond transparent
   ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
