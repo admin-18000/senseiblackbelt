@@ -28775,7 +28775,8 @@ var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
 var _tdrc_dur   = 60;
 var _tdrc_rotation = 0;         // angle de rotation continu (radians) — le bâton tourne comme IRL
 var _tdrc_lastFrameTs = 0;      // pour un delta temps indépendant du framerate
-var _tdrc_prevWrist = {};       // dernière position de chaque main pour vélocité (comme TARGETS)
+var _tdrc_prevWrist = {};       // dernière position de chaque main (réservé — plus utilisé pour l'instant)
+var _tdrc_flash = null;         // {color, until} — flash plein écran couleur cible sur hit
 var _tdrc_running = false;
 var _tdrc_stream = null;
 var _tdrc_video  = null;
@@ -28820,7 +28821,7 @@ function _tdrc_status(msg, color){
   if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
 }
 
-/* ─── Démarrage caméra ─────────────────────────────────────────── */
+/* ─── Démarrage caméra : utilise senseiCamShow (MÊME INFRA que TARGETS) ─ */
 function _tdrc_start(){
   if (!navigator.mediaDevices){ _tdrc_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
   if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
@@ -28833,38 +28834,19 @@ function _tdrc_start(){
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
       _tdrc_stream = stream;
       if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
-      // Utilise l'overlay officiel SENSEI avec un prefix 'tdrc'
-      _tdrc_showCam(stream);
+      // Overlay officiel SENSEI (force-landscape iOS, canvas plein-écran) — comme TARGETS
+      senseiCamShow('tdrc', stream);
     }).catch(function(){ tryC(i+1); });
   }
   tryC(0);
 }
 
-/* ─── Monte un overlay fullscreen caméra + canvas (pattern senseiCamShow light) ─── */
-function _tdrc_showCam(stream){
-  var ov = document.getElementById('tdrc-cam-overlay');
-  if (!ov){
-    ov = document.createElement('div');
-    ov.id = 'tdrc-cam-overlay';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:100085;background:#000;display:flex;align-items:center;justify-content:center';
-    ov.innerHTML = ''
-      + '<video id="tdrc_video" playsinline muted style="display:none"></video>'
-      + '<canvas id="tdrc_canvas" width="640" height="480" style="width:100%;height:100%;object-fit:contain;background:#000"></canvas>'
-      + '<button id="tdrc_closeBtn" onclick="_tdrc_stop()" style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:18px;cursor:pointer;font-weight:700">✕</button>'
-      + '<button id="tdrc_recBtn" onclick="_tdrc_toggleRec()" style="position:absolute;top:14px;left:14px;z-index:10;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:14px;padding:9px 20px;border-radius:28px;border:none;cursor:pointer;letter-spacing:1px">● REC</button>';
-    document.body.appendChild(ov);
-  }
-  ov.style.display = 'flex';
-  _tdrc_video = document.getElementById('tdrc_video');
-  _tdrc_canvas = document.getElementById('tdrc_canvas');
-  _tdrc_ctx = _tdrc_canvas.getContext('2d');
-  _tdrc_video.srcObject = stream;
-  _tdrc_video.onloadedmetadata = function(){
-    _tdrc_video.play();
-    _tdrc_canvas.width = _tdrc_video.videoWidth || 640;
-    _tdrc_canvas.height = _tdrc_video.videoHeight || 480;
-    _tdrc_runCountdown(10);
-  };
+/* ─── Callback invoqué par senseiCamShow quand la vidéo est prête ──── */
+function _tdrc_onCamReady(video, canvas, ctx){
+  _tdrc_video  = video;
+  _tdrc_canvas = canvas;
+  _tdrc_ctx    = ctx;
+  _tdrc_runCountdown(10);
 }
 
 /* ─── Countdown 10s puis démarrage ─────────────────────────────── */
@@ -28918,6 +28900,7 @@ function _tdrc_startGame(){
   _tdrc_rotation = 0;
   _tdrc_lastFrameTs = 0;
   _tdrc_prevWrist = {};
+  _tdrc_flash = null;
   _tdrc_nextCommand();
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
@@ -28961,7 +28944,7 @@ function _tdrc_nextCommand(){
       _tdrc_cmd = null;
     }
     if (_tdrc_running) _tdrc_nextCommand();
-  }, 1500);
+  }, 2500);  // 2.5s au lieu de 1.5s — temps confortable pour viser une couleur qui tourne
 }
 
 /* ─── Loop principal : vidéo + shape + HUD + détection ─────────── */
@@ -28972,6 +28955,18 @@ function _tdrc_loop(){
   _tdrc_elapsed = (nowTs - _tdrc_startTs) / 1000;
   // 1. Vidéo caméra mirror
   _drawVideoMirror(ctx, _tdrc_video, W, H);
+  // 1b. Flash plein écran si on vient de hit juste (couleur cible)
+  if (_tdrc_flash && Date.now() < _tdrc_flash.until){
+    var flashT = (_tdrc_flash.until - Date.now()) / 350; // 1 → 0
+    ctx.save();
+    ctx.globalAlpha = flashT * 0.45;
+    ctx.fillStyle = _tdrc_flash.color;
+    ctx.fillRect(0, 0, W, H);
+    // Grand anneau expansif centré sur la branche touchée (effet "GOT IT!")
+    ctx.restore();
+  } else if (_tdrc_flash) {
+    _tdrc_flash = null;
+  }
   // 2. Détection pose
   if (window._tsym_detector){
     try {
@@ -29116,11 +29111,13 @@ function _tdrc_analyzePose(poses){
       // Bonne branche
       if (side === cmd.hand1 || !cmd.c2) cmd.hit1 = true;
       if (cmd.c2 && side === cmd.hand2) cmd.hit2 = true;
-      // Particules
-      for (var pi = 0; pi < 16; pi++){
+      // 🎉 FLASH PLEIN ÉCRAN couleur cible (signale la réussite de façon évidente)
+      _tdrc_flash = { color: hitBranch.hex, until: Date.now() + 350 };
+      // Particules XXL (32 au lieu de 16, vie plus longue, taille plus grosse)
+      for (var pi = 0; pi < 32; pi++){
         var ang = Math.random() * Math.PI * 2;
-        var spd = 100 + Math.random() * 180;
-        _tdrc_particles.push({ x: hitBranch._cx, y: hitBranch._cy, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 60, life: 0.5 + Math.random()*0.4, color: hitBranch.hex });
+        var spd = 160 + Math.random() * 260;
+        _tdrc_particles.push({ x: hitBranch._cx, y: hitBranch._cy, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 80, life: 0.7 + Math.random()*0.5, color: hitBranch.hex });
       }
       try { if (typeof _td_beep === 'function') _td_beep(880, 0.08, 0.25); } catch(e){}
       if (navigator.vibrate) navigator.vibrate(20);
@@ -29213,10 +29210,10 @@ function _tdrc_drawCommand(ctx, W, H){
   var txt = en ? c.nameEn : c.name;
   var side = '';
   if (_tdrc_cmd.hand1) side = (en ? (_tdrc_cmd.hand1==='left'?'L':'R') : (_tdrc_cmd.hand1==='left'?'G':'D'));
-  // Timer barre du bas (temps restant pour cette commande avant miss) : 1.5s
+  // Timer : temps restant pour cette commande avant miss (2.5s)
   var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
-  var remain  = Math.max(0, 1.5 - elapsed);
-  var frac    = remain / 1.5;
+  var remain  = Math.max(0, 2.5 - elapsed);
+  var frac    = remain / 2.5;
   // Position : bas-gauche, hors de la zone du bâton (bâton centré à W/2, ~armLen=0.3*min)
   var cx = W * 0.14, cy = H * 0.78;
   var R  = Math.min(W, H) * 0.11;
@@ -29336,10 +29333,10 @@ function _tdrc_stopRec(){
   _tdrc_updateRecBtn();
 }
 function _tdrc_updateRecBtn(){
-  var btn = document.getElementById('tdrc_recBtn');
-  if (!btn) return;
-  if (_tdrc_recActive){ btn.innerHTML='&#9632; STOP REC'; btn.style.background='#7a0000'; }
-  else { btn.innerHTML='&#9679; REC'; btn.style.background='rgba(230,57,70,.92)'; btn.style.animation=''; }
+  // Utilise le bouton REC partagé (sensei-cam-rec-btn) via _syncRecBtns — idem TARGETS
+  if (typeof _syncRecBtns === 'function'){
+    _syncRecBtns(_tdrc_recActive, '&#9632; STOP REC', '#e63946');
+  }
 }
 function _tdrc_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -29360,8 +29357,8 @@ function _tdrc_stop(fromEnd){
   if (_tdrc_recActive) _tdrc_stopRec();
   try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
   if (_tdrc_stream){ _tdrc_stream.getTracks().forEach(function(t){t.stop();}); _tdrc_stream=null; }
-  var ov = document.getElementById('tdrc-cam-overlay');
-  if (ov) ov.style.display = 'none';
+  // Overlay partagée gérée par senseiCamStop (idem TARGETS)
+  if (typeof senseiCamStop === 'function') senseiCamStop();
   var btn = document.getElementById('tdrc_btnStart');
   if (btn) btn.style.display = 'flex';
   var sv = document.getElementById('tdrc_btnSave');
@@ -29442,36 +29439,19 @@ function _tdrh_start(){
     navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
       _tdrh_stream = stream;
       if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
-      _tdrh_showCam(stream);
+      // Overlay officiel SENSEI (force-landscape iOS, canvas plein-écran) — idem TARGETS
+      senseiCamShow('tdrh', stream);
     }).catch(function(){ tryC(i+1); });
   }
   tryC(0);
 }
 
-function _tdrh_showCam(stream){
-  var ov = document.getElementById('tdrh-cam-overlay');
-  if (!ov){
-    ov = document.createElement('div');
-    ov.id = 'tdrh-cam-overlay';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:100085;background:#000;display:flex;align-items:center;justify-content:center';
-    ov.innerHTML = ''
-      + '<video id="tdrh_video" playsinline muted style="display:none"></video>'
-      + '<canvas id="tdrh_canvas" width="640" height="480" style="width:100%;height:100%;object-fit:contain;background:#000"></canvas>'
-      + '<button id="tdrh_closeBtn" onclick="_tdrh_stop()" style="position:absolute;top:14px;right:14px;z-index:10;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(245,197,24,.5);color:#f5c518;font-size:18px;cursor:pointer;font-weight:700">✕</button>'
-      + '<button id="tdrh_recBtn" onclick="_tdrh_toggleRec()" style="position:absolute;top:14px;left:14px;z-index:10;background:rgba(230,57,70,.92);color:#fff;font-weight:900;font-size:14px;padding:9px 20px;border-radius:28px;border:none;cursor:pointer;letter-spacing:1px">● REC</button>';
-    document.body.appendChild(ov);
-  }
-  ov.style.display = 'flex';
-  _tdrh_video = document.getElementById('tdrh_video');
-  _tdrh_canvas = document.getElementById('tdrh_canvas');
-  _tdrh_ctx = _tdrh_canvas.getContext('2d');
-  _tdrh_video.srcObject = stream;
-  _tdrh_video.onloadedmetadata = function(){
-    _tdrh_video.play();
-    _tdrh_canvas.width = _tdrh_video.videoWidth || 640;
-    _tdrh_canvas.height = _tdrh_video.videoHeight || 480;
-    _tdrh_runCountdown(10);
-  };
+/* ─── Callback invoqué par senseiCamShow quand la vidéo est prête ──── */
+function _tdrh_onCamReady(video, canvas, ctx){
+  _tdrh_video  = video;
+  _tdrh_canvas = canvas;
+  _tdrh_ctx    = ctx;
+  _tdrh_runCountdown(10);
 }
 function _tdrh_runCountdown(n){
   var cv = _tdrh_canvas, ctx = _tdrh_ctx;
@@ -29543,7 +29523,7 @@ function _tdrh_nextCommand(){
       _tdrh_wrong++; _tdrh_combo = 0; _tdrh_cmd = null;
     }
     if (_tdrh_running) _tdrh_nextCommand();
-  }, 1500);
+  }, 2500);  // 2.5s pour avoir le temps de bouger la main au bon niveau
 }
 function _tdrh_speak(txt){
   try { if (window.speechSynthesis){
@@ -29728,10 +29708,10 @@ function _tdrh_drawCommand(ctx, W, H){
   if (_tdrh_cmd.l2){
     txt = (en?'L ':'G ')+(en?l.nameEn:l.name)+' + '+(en?'R ':'D ')+(en?_tdrh_cmd.l2.nameEn:_tdrh_cmd.l2.name);
   }
-  // Timer barre : 1.5s pour cette commande
+  // Timer barre : 2.5s pour cette commande
   var elapsed = (Date.now() - _tdrh_cmdStartTs) / 1000;
-  var remain  = Math.max(0, 1.5 - elapsed);
-  var frac    = remain / 1.5;
+  var remain  = Math.max(0, 2.5 - elapsed);
+  var frac    = remain / 2.5;
   // Encadré en HAUT à droite — ZÉRO recouvrement avec le chrono central (chrono: W*0.42 → W*0.58)
   // Commande : centre W*0.80, width W*0.26 → de W*0.67 à W*0.93 → gap propre de 9% d'écran
   ctx.save();
@@ -29813,10 +29793,10 @@ function _tdrh_stopRec(){
   _tdrh_updateRecBtn();
 }
 function _tdrh_updateRecBtn(){
-  var btn = document.getElementById('tdrh_recBtn');
-  if (!btn) return;
-  if (_tdrh_recActive){ btn.innerHTML='&#9632; STOP REC'; btn.style.background='#7a0000'; }
-  else { btn.innerHTML='&#9679; REC'; btn.style.background='rgba(230,57,70,.92)'; btn.style.animation=''; }
+  // Utilise le bouton REC partagé (sensei-cam-rec-btn) via _syncRecBtns — idem TARGETS
+  if (typeof _syncRecBtns === 'function'){
+    _syncRecBtns(_tdrh_recActive, '&#9632; STOP REC', '#e63946');
+  }
 }
 function _tdrh_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -29832,8 +29812,8 @@ function _tdrh_stop(fromEnd){
   if (_tdrh_recActive) _tdrh_stopRec();
   try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
   if (_tdrh_stream){ _tdrh_stream.getTracks().forEach(function(t){t.stop();}); _tdrh_stream=null; }
-  var ov = document.getElementById('tdrh-cam-overlay');
-  if (ov) ov.style.display = 'none';
+  // Overlay partagée gérée par senseiCamStop (idem TARGETS)
+  if (typeof senseiCamStop === 'function') senseiCamStop();
   var btn = document.getElementById('tdrh_btnStart');
   if (btn) btn.style.display = 'flex';
   var sv = document.getElementById('tdrh_btnSave');
@@ -36105,6 +36085,8 @@ function senseiCamShow(mod,stream){
     if(mod==='tsym'&&typeof _tsym_onCamReady==='function')_tsym_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='ss'&&typeof _ss_onCamReady==='function')_ss_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='bt'&&typeof _bt_onCamReady==='function')_bt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='tdrc'&&typeof _tdrc_onCamReady==='function')_tdrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='tdrh'&&typeof _tdrh_onCamReady==='function')_tdrh_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -36170,6 +36152,8 @@ function senseiCamToggleRec(){
   else if(m==='dcog' && typeof _dcog_toggleRec==='function') _dcog_toggleRec();
   else if(m==='ss' && typeof _ss_toggleRec==='function') _ss_toggleRec();
   else if(m==='bt' && typeof _bt_toggleRec==='function') _bt_toggleRec();
+  else if(m==='tdrc' && typeof _tdrc_toggleRec==='function') _tdrc_toggleRec();
+  else if(m==='tdrh' && typeof _tdrh_toggleRec==='function') _tdrh_toggleRec();
 }
 // i18n portrait warning
 (function(){
