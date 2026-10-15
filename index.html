@@ -28783,6 +28783,7 @@ var _tdrc_rotation = 0;         // angle de rotation continu (radians) — utili
 var _tdrc_lastFrameTs = 0;      // pour un delta temps indépendant du framerate
 var _tdrc_prevWrist = {};       // dernière position de chaque main (vélocité pour mode STATIC = TARGETS)
 var _tdrc_flash = null;         // {color, until} — réservé
+var _tdrc_countdownActive = false; // ★ flag anti chain-click : coupe le countdown si STOP ou re-start
 var _tdrc_running = false;
 var _tdrc_stream = null;
 var _tdrc_video  = null;
@@ -28853,11 +28854,16 @@ function _tdrc_onCamReady(video, canvas, ctx){
   _tdrc_video  = video;
   _tdrc_canvas = canvas;
   _tdrc_ctx    = ctx;
+  // Toujours annuler toute parole en cours (évite voix fantôme d'une session passée)
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  _tdrc_countdownActive = true;
   _tdrc_runCountdown(10);
 }
 
 /* ─── Countdown 10s puis démarrage ─────────────────────────────── */
 function _tdrc_runCountdown(n){
+  // ★ Si le countdown a été annulé (STOP ou re-start), on sort IMMÉDIATEMENT sans bip ni setTimeout
+  if (!_tdrc_countdownActive) return;
   var cv = _tdrc_canvas, ctx = _tdrc_ctx;
   if (!cv || !ctx) return;
   var W = cv.width, H = cv.height;
@@ -28879,6 +28885,7 @@ function _tdrc_runCountdown(n){
     setTimeout(function(){ _tdrc_runCountdown(n-1); }, 1000);
   } else {
     ctx.restore();
+    _tdrc_countdownActive = false;
     _tdrc_startGame();
   }
 }
@@ -29040,12 +29047,7 @@ function _tdrc_drawShape(ctx, W, H){
   var cx = W / 2, cy = H / 2;
   // Bras assez long pour que les boules atteignent les zones où les mains dribblent
   var armLen = Math.min(W, H) * 0.42;
-  // Centre VISUEL : la bounding-box du Y descend jusqu'à armLen × 0.5 et monte jusqu'à armLen
-  //   → bbox center à y = -0.25 × armLen → on compense pour centrer la forme à l'écran
-  //   La Croix est symétrique (bbox centrée sur origine) → pas de décalage
-  if (_tdrc_shape === 'y'){
-    cy = H / 2 + armLen * 0.25;
-  }
+  // Centrage : forme dessinée depuis l'origine canvas (W/2, H/2) — pas d'offset artificiel
   // BOULE = TAILLE TARGETS (formule identique)
   var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
   // Bâton FIN et élégant (demi-épaisseur = 50% du rayon de boule → stick fin style SKLZ)
@@ -29533,6 +29535,7 @@ function _tdrc_endGame(){
 }
 function _tdrc_stop(fromEnd){
   _tdrc_running = false;
+  _tdrc_countdownActive = false; // ★ coupe les beeps de countdown restants (fini le chain-click)
   if (_tdrc_rafId){ cancelAnimationFrame(_tdrc_rafId); _tdrc_rafId = null; }
   if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
   if (_tdrc_recActive) _tdrc_stopRec();
@@ -29586,6 +29589,7 @@ var _tdrh_cmd = null, _tdrh_cmdStartTs = 0;
 var _tdrh_recorder = null, _tdrh_recChunks = [], _tdrh_recActive = false;
 var _tdrh_recTimer = null, _tdrh_recSec = 0, _tdrh_recStream = null;
 var _tdrh_prevWristY = {};  // dernière position Y de chaque main pour filtre mouvement (idem DCOG height)
+var _tdrh_countdownActive = false; // ★ flag anti chain-click : coupe le countdown si STOP ou re-start
 
 var _TDRH_LEVELS = [
   {k:'H', name:'HAUT',   nameEn:'HIGH',   emoji:'⬆️', y:0.25},
@@ -29632,9 +29636,13 @@ function _tdrh_onCamReady(video, canvas, ctx){
   _tdrh_video  = video;
   _tdrh_canvas = canvas;
   _tdrh_ctx    = ctx;
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  _tdrh_countdownActive = true;
   _tdrh_runCountdown(10);
 }
 function _tdrh_runCountdown(n){
+  // ★ Si le countdown a été annulé (STOP ou re-start), on sort IMMÉDIATEMENT sans bip ni setTimeout
+  if (!_tdrh_countdownActive) return;
   var cv = _tdrh_canvas, ctx = _tdrh_ctx;
   if (!cv || !ctx) return;
   var W = cv.width, H = cv.height;
@@ -29656,6 +29664,7 @@ function _tdrh_runCountdown(n){
     setTimeout(function(){ _tdrh_runCountdown(n-1); }, 1000);
   } else {
     ctx.restore();
+    _tdrh_countdownActive = false;
     _tdrh_startGame();
   }
 }
@@ -29988,6 +29997,7 @@ function _tdrh_dlBlob(blob, fn){
 function _tdrh_endGame(){ _tdrh_stop(true); _tdrh_renderResults(); }
 function _tdrh_stop(fromEnd){
   _tdrh_running = false;
+  _tdrh_countdownActive = false; // ★ coupe les beeps de countdown restants (fini le chain-click)
   if (_tdrh_rafId){ cancelAnimationFrame(_tdrh_rafId); _tdrh_rafId = null; }
   if (_tdrh_cmdTimer){ clearTimeout(_tdrh_cmdTimer); _tdrh_cmdTimer = null; }
   if (_tdrh_recActive) _tdrh_stopRec();
