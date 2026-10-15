@@ -28931,12 +28931,11 @@ function _tdrc_nextCommand(){
   }
   _tdrc_cmd = { c1:c1, hand1:hand1, c2:c2, hand2:hand2, hit1:false, hit2:false };
   _tdrc_cmdStartTs = Date.now();
-  // ★ Bâton TOUJOURS AU CENTRE (comme TDR Réaction où les cibles apparaissent et disparaissent) :
-  //   la position de spawn est fixe = (W/2, H/2) pour chaque commande
+  // ★ Bâton TOUJOURS AU CENTRE, TOUJOURS VISIBLE (plus de disparition)
   if (_tdrc_canvas){
     _tdrc_batonPos = { x: _tdrc_canvas.width / 2, y: _tdrc_canvas.height / 2 };
   }
-  // Voix synthétique
+  // Voix (optionnelle — en bonus, mais le driver = l'animation pulse sur la boule active)
   var txt = (en ? c1.nameEn : c1.name);
   if (hand1) txt = (en?(hand1==='left'?'LEFT ':'RIGHT ')+ c1.nameEn : (hand1==='left'?'GAUCHE ':'DROITE ')+c1.name);
   if (c2) txt += (en?' + '+(hand2==='left'?'LEFT ':'RIGHT ')+c2.nameEn : ' + '+(hand2==='left'?'GAUCHE ':'DROITE ')+c2.name);
@@ -28944,12 +28943,12 @@ function _tdrc_nextCommand(){
     if (window.speechSynthesis){
       var u = new SpeechSynthesisUtterance(txt);
       u.lang = en ? 'en-US' : 'fr-FR';
-      u.rate = 1.2;
+      u.rate = 1.3;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     }
   } catch(e){}
-  // Timeout 1.5s pour réagir
+  // Timeout généreux : 5s par activation (si tu rates, miss + nouvelle activation immédiate)
   if (_tdrc_cmdTimer) clearTimeout(_tdrc_cmdTimer);
   _tdrc_cmdTimer = setTimeout(function(){
     if (_tdrc_cmd && !(_tdrc_cmd.hit1 && (!_tdrc_cmd.c2 || _tdrc_cmd.hit2))){
@@ -28958,7 +28957,7 @@ function _tdrc_nextCommand(){
       _tdrc_cmd = null;
     }
     if (_tdrc_running) _tdrc_nextCommand();
-  }, 3500);  // 3.5s pour laisser le temps de réagir, viser et toucher — pas de rush
+  }, 5000);
 }
 
 /* ─── Loop principal : vidéo + shape + HUD + détection ─────────── */
@@ -29040,10 +29039,10 @@ function _tdrc_loop(){
 /*       → sur mobile paysage ≈ 50-93 px, pile la taille des cibles TDR targets      */
 /*     ★ Bâton (pilule) FIN et élégant — comme un vrai SKLZ Y                        */
 function _tdrc_drawShape(ctx, W, H){
-  // ★ MODÈLE TARGETS : si pas de commande active ou pas de position de spawn → on ne dessine rien
-  if (!_tdrc_batonPos || !_tdrc_cmd) return;
+  // ★ MODÈLE SKLZ LIGHT-UP : bâton TOUJOURS visible, UNE (ou 2 en HARD) boule(s) ACTIVE(S) pulsent
+  //   → les boules inactives restent visibles mais ternies ; seule la boule active brille
+  if (!_tdrc_batonPos) return;
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // Position aléatoire définie dans _tdrc_nextCommand pour chaque nouvelle commande
   var cx = _tdrc_batonPos.x, cy = _tdrc_batonPos.y;
   var armLen = Math.min(W, H) * 0.33;
   // BOULE = TAILLE TARGETS (formule identique)
@@ -29051,24 +29050,29 @@ function _tdrc_drawShape(ctx, W, H){
   var armW   = Math.round(ballR * 1.0);
   var hubR   = Math.round(armW * 0.85);
   var n = colors.length;
-  var rot = 0; // bâton STATIQUE pendant toute la durée de la commande (= modèle TARGETS)
+  var rot = 0; // bâton STATIQUE
+  var nowAnim = Date.now();
   ctx.save();
   for (var i = 0; i < n; i++){
     var baseAng = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
     var ang = baseAng + rot;
     var ex = cx + Math.cos(ang) * armLen;
     var ey = cy + Math.sin(ang) * armLen;
+    // ★ Est-ce la boule ACTIVE ? (celle que le joueur doit toucher)
+    var isActive = _tdrc_cmd && (
+      (_tdrc_cmd.c1 && _tdrc_cmd.c1.k === colors[i].k && !_tdrc_cmd.hit1) ||
+      (_tdrc_cmd.c2 && _tdrc_cmd.c2.k === colors[i].k && !_tdrc_cmd.hit2)
+    );
     // Branche
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(ang + Math.PI/2);
-    ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
-    ctx.fillStyle = colors[i].hex;
-    // Pilule style SKLZ réel : moitié NOIRE côté hub (0 → armLen*0.45), moitié COULEUR côté boule (armLen*0.45 → armLen-ballR)
     var halfW = armW / 2;
-    var midStick = armLen * 0.45;  // transition noir → couleur
+    var midStick = armLen * 0.45;
+    // Pilule — plein éclat si active, ternie sinon
+    var dim = isActive ? 1 : 0.35;
+    ctx.globalAlpha = dim;
     ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.55)';
-    // Partie NOIRE côté hub
     ctx.fillStyle = '#15181f';
     ctx.beginPath();
     ctx.moveTo(-halfW*0.65, 0);
@@ -29077,8 +29081,8 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.lineTo( halfW*0.65, 0);
     ctx.closePath();
     ctx.fill();
-    // Partie COULEUR côté boule
-    ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
+    // Partie colorée côté boule
+    ctx.shadowBlur = isActive ? 14 : 4; ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
     ctx.beginPath();
     ctx.moveTo(-halfW*0.65, midStick);
@@ -29087,19 +29091,36 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.lineTo( halfW*0.65, midStick);
     ctx.closePath();
     ctx.fill();
-    // BOULE COLORÉE au bout (taille TARGETS)
-    ctx.shadowBlur = 16; ctx.shadowColor = colors[i].hex;
+    // ★ BOULE : si active → PULSE + GLOW + anneau de progression (pattern TARGETS exact)
+    //           si inactive → version ternie
+    var pulseScale = 1;
+    if (isActive){
+      pulseScale = 1 + 0.12 * Math.sin(nowAnim / 110); // pulse rapide (comme TARGETS)
+      // Anneau pulsant extérieur style TARGETS
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.arc(0, armLen, ballR * 1.6 * pulseScale, 0, Math.PI * 2);
+      ctx.strokeStyle = colors[i].hex;
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 18; ctx.shadowColor = colors[i].hex;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    // Boule principale
+    ctx.shadowBlur = isActive ? 22 : 6;
+    ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
     ctx.beginPath();
-    ctx.arc(0, armLen, ballR, 0, Math.PI * 2);
+    ctx.arc(0, armLen, ballR * pulseScale, 0, Math.PI * 2);
     ctx.fill();
-    // Highlight 3D sur la boule
+    // Highlight 3D
     ctx.shadowBlur = 0;
     var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.95);
-    grad.addColorStop(0, 'rgba(255,255,255,.5)');
+    grad.addColorStop(0, 'rgba(255,255,255,'+(isActive?.6:.3)+')');
     grad.addColorStop(0.6, 'rgba(255,255,255,0)');
     ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.arc(0, armLen, ballR, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, armLen, ballR * pulseScale, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
     // ✓ CHECKMARK si la boule a été touchée récemment (<400ms) → preuve visuelle du HIT dans le rond
     var _hitTs = colors[i]._hitTs || 0;
     var _hitAge = Date.now() - _hitTs;
@@ -29266,7 +29287,8 @@ function _tdrc_analyzePose(poses){
         });
         _tdrc_cmd = null;
         if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
-        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 700);  // 700 ms de pause entre 2 commandes (respiration)
+        // ★ Enchaînement IMMÉDIAT (150 ms pour que les particules partent, sinon fluide comme TARGETS)
+        setTimeout(function(){ if (_tdrc_running) _tdrc_nextCommand(); }, 150);
       }
     } else {
       // ❌ MAUVAISE couleur : petit beep grave, aucun score, pas de ring (évite la pollution visuelle)
