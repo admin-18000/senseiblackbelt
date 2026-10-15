@@ -2959,9 +2959,14 @@ window._dojoBackHome = function(){
 
     <!-- Panel Color Reactor : 6e drill (après RANDOM) ─────────────── -->
     <div id="tdr_panelColor" style="display:none">
-      <!-- Vidéo tuto YouTube -->
-      <div style="border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000">
-        <iframe width="100%" style="aspect-ratio:16/9;border:none;display:block" src="https://www.youtube-nocookie.com/embed/IrW2OCRd5n0?rel=0&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <!-- Vidéo tuto YouTube — lite embed avec poster maxresdefault -->
+      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/IrW2OCRd5n0/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/maxresdefault.jpg';this.addEventListener('error',function(){this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/hqdefault.jpg';});" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
       </div>
       <!-- Setup : Forme + Mode + Durée -->
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔺 FORME</div>
@@ -2996,9 +3001,14 @@ window._dojoBackHome = function(){
 
     <!-- Panel Height Reflex : 7e drill (après RANDOM) ─────────────── -->
     <div id="tdr_panelHeight" style="display:none">
-      <!-- Vidéo tuto YouTube -->
-      <div style="border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000">
-        <iframe width="100%" style="aspect-ratio:16/9;border:none;display:block" src="https://www.youtube-nocookie.com/embed/0BNsq4FwS6s?rel=0&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <!-- Vidéo tuto YouTube — lite embed avec poster maxresdefault -->
+      <div class="lite-yt" data-vid="0BNsq4FwS6s" style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/0BNsq4FwS6s/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/0BNsq4FwS6s/maxresdefault.jpg';this.addEventListener('error',function(){this.onerror=null;this.src='https://i.ytimg.com/vi/0BNsq4FwS6s/hqdefault.jpg';});" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
       </div>
       <!-- Setup : Mode + Durée -->
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 MODE</div>
@@ -28749,10 +28759,22 @@ function _tdr_recError(msg){
    • Branding + logo + Powered by via _camDrawLogo (infra partagée)
 ═══════════════════════════════════════════════════════════════════ */
 
+/* ─── Lite YouTube : poster maxresdefault + swap vers iframe au clic ── */
+function _liteYT_play(el){
+  if (!el || el._loaded) return;
+  var vid = el.getAttribute('data-vid');
+  if (!vid) return;
+  el._loaded = true;
+  el.innerHTML = '<iframe width="100%" height="100%" style="border:none;display:block;position:absolute;inset:0" src="https://www.youtube-nocookie.com/embed/'+vid+'?rel=0&modestbranding=1&playsinline=1&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+  el.style.cursor = 'default';
+}
+
 /* ─── État + setters COLOR REACTOR ─────────────────────────────── */
 var _tdrc_shape = 'y';          // 'y' (3 couleurs) | 'cross' (4 couleurs)
 var _tdrc_mode  = 'easy';       // 'easy' | 'medium' | 'hard'
 var _tdrc_dur   = 60;
+var _tdrc_rotation = 0;         // angle de rotation continu (radians) — le bâton tourne comme IRL
+var _tdrc_lastFrameTs = 0;      // pour un delta temps indépendant du framerate
 var _tdrc_running = false;
 var _tdrc_stream = null;
 var _tdrc_video  = null;
@@ -28892,6 +28914,8 @@ function _tdrc_startGame(){
   _tdrc_combo = 0; _tdrc_bestCombo = 0;
   _tdrc_reactTimes = [];
   _tdrc_particles = [];
+  _tdrc_rotation = 0;
+  _tdrc_lastFrameTs = 0;
   _tdrc_nextCommand();
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
@@ -28984,7 +29008,7 @@ function _tdrc_loop(){
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
 
-/* ─── Dessin de la shape Y ou Croix (gros au centre) ───────────── */
+/* ─── Dessin de la shape Y ou Croix (ROTATION continue comme un bâton de réaction IRL) ─ */
 function _tdrc_drawShape(ctx, W, H){
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = W / 2, cy = H / 2;
@@ -28992,9 +29016,17 @@ function _tdrc_drawShape(ctx, W, H){
   var armW = armLen * 0.3;
   var hubR = armW * 0.6;
   var n = colors.length;
+  // Décalage par mode : EASY lent, MEDIUM moyen, HARD rapide
+  var rotSpeed = _tdrc_mode === 'hard' ? 0.6 : _tdrc_mode === 'medium' ? 0.4 : 0.25;
+  var nowT = performance.now();
+  var dt = _tdrc_lastFrameTs ? (nowT - _tdrc_lastFrameTs) / 1000 : 0;
+  _tdrc_lastFrameTs = nowT;
+  _tdrc_rotation += rotSpeed * dt; // radians/s * s
+  var rot = _tdrc_rotation;
   ctx.save();
   for (var i = 0; i < n; i++){
-    var ang = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
+    var baseAng = (_tdrc_shape === 'cross' ? i * Math.PI / 2 : i * (Math.PI * 2) / 3) - Math.PI / 2;
+    var ang = baseAng + rot;
     var ex = cx + Math.cos(ang) * armLen;
     var ey = cy + Math.sin(ang) * armLen;
     // Branche
@@ -29015,7 +29047,7 @@ function _tdrc_drawShape(ctx, W, H){
     // Ball end
     ctx.beginPath(); ctx.arc(0, armLen, armW * 0.75, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-    // Store le centre de la branche (ball end) pour collision
+    // Store le centre courant (après rotation) de la branche pour collision
     colors[i]._cx = ex;
     colors[i]._cy = ey;
     colors[i]._r  = armW * 0.75;
@@ -29117,15 +29149,22 @@ function _tdrc_drawHud(ctx, W, H){
     ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillText('×'+mult+' COMBO '+_tdrc_combo, W*0.04, H*0.17);
   }
-  // Timer top-center
+  // Timer top-center — fond transparent homogène
   var timeLeft = Math.max(0, _tdrc_dur - _tdrc_elapsed);
   var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
   if (tmm===0 && tss===60){ tss=0; tmm=1; }
   var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
   ctx.textAlign='center';
-  ctx.fillStyle='rgba(0,0,0,.6)';
+  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
   _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
   ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth = 1.5;
+  _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
+  ctx.stroke();
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
   ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
   ctx.fillText(tStr, W/2, H*0.088);
@@ -29155,31 +29194,75 @@ function _tdrc_rankColor(r){
   return r==='SENSEI'?'#f5c518':r==='SS'?'#ff6b35':r==='S'?'#e63946':r==='A'?'#2dc653':r==='B'?'#4cc9f0':r==='C'?'#9aa3b3':'#7a8299';
 }
 
-/* ─── Dessin de la commande vocale au centre ───────────────────── */
+/* ─── Commande en cercle transparent BAS-GAUCHE (hors de la zone du bâton rotatif) ─── */
 function _tdrc_drawCommand(ctx, W, H){
   if (!_tdrc_cmd) return;
   var c = _tdrc_cmd.c1;
   var en = window._lang === 'en';
   var txt = en ? c.nameEn : c.name;
-  if (_tdrc_cmd.hand1) txt = (en?(_tdrc_cmd.hand1==='left'?'LEFT ':'RIGHT ')+c.nameEn : (_tdrc_cmd.hand1==='left'?'G ':'D ')+c.name);
+  var side = '';
+  if (_tdrc_cmd.hand1) side = (en ? (_tdrc_cmd.hand1==='left'?'L':'R') : (_tdrc_cmd.hand1==='left'?'G':'D'));
+  // Timer barre du bas (temps restant pour cette commande avant miss) : 1.5s
+  var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
+  var remain  = Math.max(0, 1.5 - elapsed);
+  var frac    = remain / 1.5;
+  // Position : bas-gauche, hors de la zone du bâton (bâton centré à W/2, ~armLen=0.3*min)
+  var cx = W * 0.14, cy = H * 0.78;
+  var R  = Math.min(W, H) * 0.11;
+  ctx.save();
+  // Cercle de fond transparent
+  ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.fillStyle = 'rgba(13,17,23,.42)';
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
+  // Anneau de progression (chrono visuel)
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(255,255,255,.12)';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(cx, cy, R-2, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = c.hex;
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(cx, cy, R-2, -Math.PI/2, -Math.PI/2 + Math.PI*2*frac); ctx.stroke();
+  // Chrono numérique au-dessus
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.fillStyle = frac < 0.33 ? '#e63946' : '#fff';
+  ctx.font = 'bold ' + Math.round(R*0.42) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(remain.toFixed(1) + 's', cx, cy - R*0.35);
+  // Mot de la couleur en GROS en-dessous
+  ctx.fillStyle = c.hex;
+  ctx.font = 'bold ' + Math.round(R*0.58) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, cx, cy + R*0.18);
+  // Main imposée (medium/hard) en petit sous le mot
+  if (side){
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.font = 'bold ' + Math.round(R*0.26) + 'px "Barlow Condensed",sans-serif';
+    ctx.fillText('MAIN ' + side, cx, cy + R*0.58);
+  }
+  // Mode HARD : afficher la 2e commande à droite du cercle
   if (_tdrc_cmd.c2){
     var c2 = _tdrc_cmd.c2;
-    txt += (en?' + '+(_tdrc_cmd.hand2==='left'?'L ':'R ')+c2.nameEn : ' + '+(_tdrc_cmd.hand2==='left'?'G ':'D ')+c2.name);
+    var txt2 = en ? c2.nameEn : c2.name;
+    var side2 = _tdrc_cmd.hand2 ? (en?(_tdrc_cmd.hand2==='left'?'L':'R'):(_tdrc_cmd.hand2==='left'?'G':'D')) : '';
+    var cx2 = cx + R*2.3;
+    ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.fillStyle = 'rgba(13,17,23,.42)';
+    ctx.beginPath(); ctx.arc(cx2, cy, R, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(cx2, cy, R-2, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = c2.hex;
+    ctx.beginPath(); ctx.arc(cx2, cy, R-2, -Math.PI/2, -Math.PI/2 + Math.PI*2*frac); ctx.stroke();
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.fillStyle = c2.hex;
+    ctx.font = 'bold ' + Math.round(R*0.58) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(txt2, cx2, cy + R*0.08);
+    if (side2){
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      ctx.font = 'bold ' + Math.round(R*0.26) + 'px "Barlow Condensed",sans-serif';
+      ctx.fillText('MAIN ' + side2, cx2, cy + R*0.48);
+    }
   }
-  ctx.save();
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.shadowBlur=12; ctx.shadowColor='rgba(0,0,0,.95)';
-  // Encadré transparent avec bordure couleur
-  var bgY = H*0.3, bgH = H*0.1, bgW = W*0.4;
-  ctx.fillStyle='rgba(0,0,0,.65)';
-  _dcog_vc_roundRect(ctx, W/2-bgW/2, bgY, bgW, bgH, 10);
-  ctx.fill();
-  ctx.strokeStyle = c.hex;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  ctx.fillStyle = c.hex;
-  ctx.font='bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(txt, W/2, bgY + bgH/2);
   ctx.restore();
 }
 
@@ -29479,19 +29562,39 @@ function _tdrh_drawLines(ctx, W, H){
   ctx.save();
   _TDRH_LEVELS.forEach(function(l){
     var active = _tdrh_cmd && (_tdrh_cmd.l1.k === l.k || (_tdrh_cmd.l2 && _tdrh_cmd.l2.k === l.k));
-    var color = active ? '#f5c518' : 'rgba(255,255,255,.25)';
+    var color = active ? '#f5c518' : 'rgba(255,255,255,.28)';
     var y = H * l.y;
+    // Zone de catch (bande d'épaisseur H*0.07 autour de la ligne) : discrète halo quand active
+    if (active){
+      ctx.fillStyle = 'rgba(245,197,24,.08)';
+      ctx.fillRect(W*0.1, y - H*0.07, W*0.8, H*0.14);
+    }
     ctx.strokeStyle = color;
-    ctx.lineWidth = active ? 4 : 2;
-    if (active){ ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(245,197,24,.8)'; }
+    ctx.lineWidth = active ? 5 : 2.5;
+    if (active){ ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(245,197,24,.85)'; }
     else ctx.shadowBlur = 0;
     ctx.beginPath(); ctx.moveTo(W*0.1, y); ctx.lineTo(W*0.9, y); ctx.stroke();
-    // Label
+    // Label à GAUCHE (comme TBOARD) : badge arrondi transparent
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    var en = window._lang === 'en';
+    var lbl = en ? l.nameEn : l.name;
+    var labelFont = 'bold '+Math.round(H*0.038)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.font = labelFont;
+    var tw = ctx.measureText(lbl).width;
+    var padX = H*0.012, padY = H*0.008;
+    var bx = W*0.012, by = y - (H*0.028);
+    var bw = tw + padX*2, bh = H*0.056;
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = active ? 'rgba(245,197,24,.18)' : 'rgba(13,17,23,.42)';
+    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 8);
+    ctx.fill();
+    ctx.strokeStyle = active ? '#f5c518' : 'rgba(255,255,255,.25)';
+    ctx.lineWidth = active ? 2 : 1;
+    ctx.stroke();
+    ctx.fillStyle = active ? '#f5c518' : 'rgba(255,255,255,.75)';
     ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.9)';
-    ctx.fillStyle = active ? '#f5c518' : 'rgba(255,255,255,.5)';
-    ctx.font = 'bold '+Math.round(H*0.028)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText(l.name, W*0.09, y + H*0.01);
+    ctx.fillText(lbl, bx + padX, y);
   });
   ctx.restore();
 }
@@ -29557,9 +29660,16 @@ function _tdrh_drawHud(ctx, W, H){
   if (tmm===0 && tss===60){ tss=0; tmm=1; }
   var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
   ctx.textAlign='center';
-  ctx.fillStyle='rgba(0,0,0,.6)';
+  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
   _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
   ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth = 1.5;
+  _dcog_vc_roundRect(ctx, W/2-W*0.08, H*0.025, W*0.16, H*0.08, 8);
+  ctx.stroke();
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
   ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
   ctx.fillText(tStr, W/2, H*0.088);
@@ -29594,19 +29704,34 @@ function _tdrh_drawCommand(ctx, W, H){
   if (_tdrh_cmd.l2){
     txt = (en?'L ':'G ')+(en?l.nameEn:l.name)+' + '+(en?'R ':'D ')+(en?_tdrh_cmd.l2.nameEn:_tdrh_cmd.l2.name);
   }
+  // Timer barre : 1.5s pour cette commande
+  var elapsed = (Date.now() - _tdrh_cmdStartTs) / 1000;
+  var remain  = Math.max(0, 1.5 - elapsed);
+  var frac    = remain / 1.5;
+  // Encadré en HAUT à droite — ZÉRO recouvrement avec le chrono central (chrono: W*0.42 → W*0.58)
+  // Commande : centre W*0.80, width W*0.26 → de W*0.67 à W*0.93 → gap propre de 9% d'écran
   ctx.save();
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.shadowBlur=12; ctx.shadowColor='rgba(0,0,0,.95)';
-  var bgY = H*0.4, bgH = H*0.1, bgW = W*0.5;
-  ctx.fillStyle='rgba(0,0,0,.65)';
-  _dcog_vc_roundRect(ctx, W/2-bgW/2, bgY, bgW, bgH, 10);
+  var bgY = H*0.025, bgH = H*0.08, bgW = W*0.26;
+  var bgX = W*0.80 - bgW/2;
+  // Fond très transparent (comme TBOARD)
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.38)';
+  _dcog_vc_roundRect(ctx, bgX, bgY, bgW, bgH, 10);
   ctx.fill();
-  ctx.strokeStyle = '#f5c518';
-  ctx.lineWidth = 3;
+  // Bordure jaune fine
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = frac < 0.33 ? '#e63946' : 'rgba(245,197,24,.75)';
+  ctx.lineWidth = 2;
   ctx.stroke();
+  // Barre de progression du temps en bas du badge
+  ctx.fillStyle = frac < 0.33 ? '#e63946' : '#f5c518';
+  ctx.fillRect(bgX+2, bgY+bgH-3, (bgW-4)*frac, 2);
+  // Texte principal très lisible
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
   ctx.fillStyle = '#f5c518';
-  ctx.font='bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(txt, W/2, bgY + bgH/2);
+  ctx.font='bold '+Math.round(H*0.045)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, bgX + bgW/2, bgY + bgH/2);
   ctx.restore();
 }
 
