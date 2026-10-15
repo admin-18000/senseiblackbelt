@@ -29005,16 +29005,21 @@ function _tdrc_loop(){
   _tdrc_rafId = requestAnimationFrame(_tdrc_loop);
 }
 
-/* ─── Dessin de la shape Y ou Croix (ROTATION continue comme un bâton de réaction IRL) ─ */
+/* ─── Dessin de la shape Y ou Croix (bâton de réaction IRL — rotation continue) ─ */
+/*     ★ BOULE = MÊME TAILLE QUE LES CIBLES TARGETS :                                */
+/*       radius = Math.round(Math.min(W*0.075, H*0.13))                              */
+/*       → sur mobile paysage ≈ 50-93 px, pile la taille des cibles TDR targets      */
+/*     ★ Bâton (pilule) FIN et élégant — comme un vrai SKLZ Y                        */
 function _tdrc_drawShape(ctx, W, H){
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = W / 2, cy = H / 2;
-  // BRAS +40% (0.3 → 0.42) → boules proches des bords où sont naturellement les mains du dribbleur
+  // Bras assez long pour que les boules atteignent les zones où les mains dribblent
   var armLen = Math.min(W, H) * 0.42;
-  var armW = armLen * 0.3;
-  // BOULES 1.7× plus grosses (0.75 → 1.3) → cibles bien plus visibles
-  var ballR_mult = 1.3;
-  var hubR = armW * 0.6;
+  // BOULE = TAILLE TARGETS (formule identique)
+  var ballR  = Math.round(Math.min(W * 0.075, H * 0.13));
+  // Bâton FIN et élégant (demi-épaisseur = 50% du rayon de boule → stick fin style SKLZ)
+  var armW   = Math.round(ballR * 1.0); // armW/2 = ballR*0.5 => pilule fine
+  var hubR   = Math.round(armW * 0.85);
   var n = colors.length;
   // Rotation NATURELLE (comme un vrai bâton de réaction qui tourne lentement en main)
   // Vitesse angulaire optimisée pour que le poignet puisse encore atteindre la cible :
@@ -29039,25 +29044,39 @@ function _tdrc_drawShape(ctx, W, H){
     ctx.rotate(ang + Math.PI/2);
     ctx.shadowBlur = 10; ctx.shadowColor = colors[i].hex;
     ctx.fillStyle = colors[i].hex;
-    // Pilule
-    var r = armW / 2;
+    // Pilule FINE — stick métallique élégant (couleur sombre, pas la couleur de la boule)
+    var halfW = armW / 2;
+    ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.5)';
+    ctx.fillStyle = '#1a1f2e'; // acier anthracite — rend le stick discret, la boule attire l'œil
     ctx.beginPath();
-    ctx.moveTo(-r, 0);
-    ctx.lineTo(-r, armLen);
-    ctx.arc(0, armLen, r, Math.PI, 0, true);
-    ctx.lineTo(r, 0);
+    ctx.moveTo(-halfW*0.6, 0);
+    ctx.lineTo(-halfW*0.6, armLen - ballR);
+    ctx.lineTo( halfW*0.6, armLen - ballR);
+    ctx.lineTo( halfW*0.6, 0);
     ctx.closePath();
     ctx.fill();
-    // Ball end (XXL)
-    ctx.beginPath(); ctx.arc(0, armLen, armW * ballR_mult, 0, Math.PI * 2); ctx.fill();
+    // Liseré métallique
+    ctx.strokeStyle = 'rgba(255,255,255,.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // BOULE COLORÉE au bout (taille TARGETS)
+    ctx.shadowBlur = 14; ctx.shadowColor = colors[i].hex;
+    ctx.fillStyle = colors[i].hex;
+    ctx.beginPath();
+    ctx.arc(0, armLen, ballR, 0, Math.PI * 2);
+    ctx.fill();
+    // Highlight brillant (effet 3D sur la boule)
+    ctx.shadowBlur = 0;
+    var grad = ctx.createRadialGradient(0, armLen - ballR*0.35, ballR*0.1, 0, armLen - ballR*0.1, ballR*0.9);
+    grad.addColorStop(0, 'rgba(255,255,255,.55)');
+    grad.addColorStop(0.6, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(0, armLen, ballR, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-    // Store les paramètres COURANTS (après rotation) de la branche pour collision segment+boule
-    colors[i]._cx    = ex;              // position courante du centre de la boule
-    colors[i]._cy    = ey;
-    colors[i]._r     = armW * ballR_mult; // rayon visuel de la boule
-    colors[i]._halfW = armW / 2;        // demi-épaisseur de la pilule
-    colors[i]._bx    = cx;              // base de la pilule (hub central)
-    colors[i]._by    = cy;
+    // Store la position courante (après rotation) de la BOULE pour collision — on cible UNIQUEMENT la boule, comme TARGETS
+    colors[i]._cx = ex;
+    colors[i]._cy = ey;
+    colors[i]._r  = ballR;
   }
   // Hub central noir
   ctx.shadowBlur = 0;
@@ -29081,33 +29100,36 @@ function _tdrc_analyzePose(poses){
   var sx = W / (_tdrc_video.videoWidth || 640);
   var sy = H / (_tdrc_video.videoHeight || 480);
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
-  // Point-vs-segment : distance d'un point (px,py) au segment (x1,y1)-(x2,y2), clampée aux extrémités
-  function _p2seg(px, py, x1, y1, x2, y2){
-    var dx = x2 - x1, dy = y2 - y1;
-    var len2 = dx*dx + dy*dy;
-    if (len2 < 1e-6) { var ddx = px-x1, ddy = py-y1; return Math.sqrt(ddx*ddx+ddy*ddy); }
-    var t = ((px-x1)*dx + (py-y1)*dy) / len2;
-    if (t < 0) t = 0; else if (t > 1) t = 1;
-    var qx = x1 + t*dx, qy = y1 + t*dy;
-    var qdx = px-qx, qdy = py-qy;
-    return Math.sqrt(qdx*qdx + qdy*qdy);
-  }
+  // ★ DÉTECTION 100% CALQUÉE SUR _tdr_checkHits (TDR targets) — zéro ajustement :
+  //   • seuil vélocité  : max(8, W*0.02)
+  //   • rayon catch     : t.r × 2.0
+  //   • check directionnel : dot > 0 (main doit se diriger VERS la boule)
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
   ['left','right'].forEach(function(side){
     if (!_tdrc_cmd) return;
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
-    var hx = W - kp.x * sx, hy = kp.y * sy;
-    // Nouvelle hit-zone : toute la PILULE (segment base→tip) + boule élargie, prend la branche LA PLUS PROCHE
-    var hitBranch = null, minDist = Infinity;
+    var wx = W - kp.x * sx, wy = kp.y * sy;
+    // Vélocité (idem TARGETS)
+    var name = side + 'Wrist';
+    var prev = _tdrc_prevWrist[name];
+    var moved = prev ? Math.sqrt((wx-prev.x)*(wx-prev.x) + (wy-prev.y)*(wy-prev.y)) : 0;
+    _tdrc_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    // On cible UNIQUEMENT LA BOULE (comme une cible TARGETS), rayon catch = r × 2.0
+    var hx = wx, hy = wy;
+    var hitBranch = null;
     for (var i = 0; i < colors.length; i++){
       var c = colors[i];
       if (c._cx == null) continue;
-      var distSeg = _p2seg(hx, hy, c._bx, c._by, c._cx, c._cy);
-      var halo    = Math.max(c._halfW, c._r) + 20; // halo généreux (demi-épaisseur pilule ou rayon boule + 20px)
-      if (distSeg < halo && distSeg < minDist){
-        minDist   = distSeg;
-        hitBranch = c;
-      }
+      var dx = hx - c._cx, dy = hy - c._cy;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= c._r * 2.0) continue;                     // idem TARGETS : t.r * 2.0
+      var dot = (-dx) * vx + (-dy) * vy;                     // idem TARGETS : main se dirige vers la cible
+      if (dot <= 0) continue;
+      hitBranch = c; break;
     }
     if (!hitBranch) return;
     // Match avec la commande ?
@@ -29232,11 +29254,14 @@ function _tdrc_drawCommand(ctx, W, H){
   var elapsed = (Date.now() - _tdrc_cmdStartTs) / 1000;
   var remain  = Math.max(0, 2.5 - elapsed);
   var frac    = remain / 2.5;
-  // Position OPTIMISÉE : coin bas-gauche hors de portée des nouvelles branches longues (0.42 × min)
-  // Y shape : branches basses à y=H/2 + 0.21*min → max 71% H. Chrono à 86% H, zone propre.
-  // Cross : branche basse pleine, mais côté bas-GAUCHE libre (branche gauche à x = 0.5W - 0.42*min)
-  var cx = W * 0.08, cy = H * 0.86;
-  var R  = Math.min(W, H) * 0.095;
+  // Position & taille HARMONISÉES avec la boule du bâton (même rayon que les cibles TARGETS)
+  // Cercle = taille boule × 1.3 pour permettre d'inscrire chrono + mot de la couleur
+  var ballR_match = Math.round(Math.min(W * 0.075, H * 0.13));
+  var R  = Math.round(ballR_match * 1.35);
+  var cx = W * 0.08 + R, cy = H * 0.86;
+  // Clamp pour que le cercle ne sorte pas de l'écran
+  if (cx - R < 10) cx = R + 10;
+  if (cy + R > H - 10) cy = H - R - 10;
   ctx.save();
   // Cercle de fond transparent
   ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.85)';
@@ -29340,9 +29365,8 @@ function _tdrc_startRec(){
       _tdrc_recSec++;
       var mm=Math.floor(_tdrc_recSec/60)%60,ss=_tdrc_recSec%60,hh=Math.floor(_tdrc_recSec/3600);
       var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
-      var label = '&#9632; STOP REC · '+t;
-      var btn = document.getElementById('tdrc_recBtn');
-      if (btn){ btn.innerHTML = label; btn.style.background = '#7a0000'; btn.style.animation = 'ssRecBlink 1s ease-in-out infinite'; }
+      // Bouton REC partagé (sensei-cam-rec-btn) — timer défilant visible, comme TARGETS
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
       if (_tdrc_recSec >= 180) _tdrc_stopRec();
     }, 1000);
   }, 200);
@@ -29801,8 +29825,8 @@ function _tdrh_startRec(){
       _tdrh_recSec++;
       var mm=Math.floor(_tdrh_recSec/60)%60,ss=_tdrh_recSec%60,hh=Math.floor(_tdrh_recSec/3600);
       var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
-      var btn = document.getElementById('tdrh_recBtn');
-      if (btn){ btn.innerHTML = '&#9632; STOP REC · '+t; btn.style.background='#7a0000'; btn.style.animation='ssRecBlink 1s ease-in-out infinite'; }
+      // Bouton REC partagé (sensei-cam-rec-btn) — timer défilant visible, idem TARGETS
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
       if (_tdrh_recSec >= 180) _tdrh_stopRec();
     }, 1000);
   }, 200);
