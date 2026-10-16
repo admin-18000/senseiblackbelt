@@ -2315,6 +2315,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🌈<div id="dcog_lbl_colorreact">COLOR REACT</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('memory')" id="dcog_btn_memory"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🧠<div id="dcog_lbl_memory">MEMORY DRILL</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2506,6 +2510,40 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="dcrc_btnStart" onclick="_dcrc_start()" ontouchstart="" style="width:100%;background:#4cc9f0;color:#0d1117">▶ DÉMARRER COLOR REACT</button>
       <button class="tr-btn tr-btn-save" id="dcrc_btnSave" onclick="_dcrc_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dcrc_results" style="margin-top:4px"></div>
+    </div>
+    <!-- MEMORY DRILL : mode · taille séquence · durée + START/SAVE -->
+    <div id="dcog_optMemory" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔤 MODE</div>
+        <div style="display:flex;gap:6px">
+          <button class="dmem-mode-btn" data-mode="num" onclick="_dmem_setMode('num')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔢 CHIFFRES</button>
+          <button class="dmem-mode-btn" data-mode="let" onclick="_dmem_setMode('let')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔤 LETTRES</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 SÉQUENCE</div>
+        <div style="display:flex;gap:6px">
+          <button class="dmem-seq-btn" data-seq="3" onclick="_dmem_setSeq(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 3 · EASY</button>
+          <button class="dmem-seq-btn" data-seq="4" onclick="_dmem_setSeq(4)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 4 · MED</button>
+          <button class="dmem-seq-btn" data-seq="5" onclick="_dmem_setSeq(5)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 5 · HARD</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dmem-dur-btn" data-sec="60"  onclick="_dmem_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="dmem-dur-btn" data-sec="90"  onclick="_dmem_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="dmem-dur-btn" data-sec="120" onclick="_dmem_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+          <button class="dmem-dur-btn" data-sec="180" onclick="_dmem_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🧠 Une séquence de chiffres/lettres s'affiche brièvement — mémorise-la puis touche les cibles dans l'ordre. Entraînement mémoire de travail × motricité.
+      </div>
+      <div id="dmem_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dmem_btnStart" onclick="_dmem_start()" ontouchstart="" style="width:100%;background:#a78bfa;color:#0d1117">▶ DÉMARRER MEMORY</button>
+      <button class="tr-btn tr-btn-save" id="dmem_btnSave" onclick="_dmem_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="dmem_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -28923,8 +28961,12 @@ function _tdrc_nextCommand(){
   var en = window._lang === 'en';
   var W = _tdrc_canvas.width, H = _tdrc_canvas.height;
   var cx = W / 2, cy = H / 2;
-  var armLen = Math.min(W, H) * 0.33;
-  var r = Math.round(Math.min(W * 0.075, H * 0.13));
+  // ★ CALIBRATION DÉTECTION (aligné sur DCRC qui fonctionne bien) :
+  //   • rayon réduit à W×0.065 / H×0.11 (idem DCRC pool 3) — hitbox = r×2 plus serrée
+  //   • CROSS : armLen agrandi 0.38 pour éviter chevauchement hitboxes (4 branches à 90°)
+  //   • Y : armLen conservé à 0.33 (3 branches à 120°, pas de chevauchement)
+  var armLen = Math.min(W, H) * (_tdrc_shape === 'cross' ? 0.38 : 0.33);
+  var r = Math.round(Math.min(W * 0.065, H * 0.11));
   var n = colors.length;
   var now = Date.now();
   // Choix de la ou des couleurs à toucher (answer)
@@ -29091,8 +29133,9 @@ function _tdrc_drawShape(ctx, W, H){
   if (!_tdrc_batonPos) return;
   var colors = _tdrc_shape === 'cross' ? _TDRC_COLORS_CROSS : _TDRC_COLORS_Y;
   var cx = _tdrc_batonPos.x, cy = _tdrc_batonPos.y;
-  var armLen = Math.min(W, H) * 0.33;
-  var ballR = Math.round(Math.min(W * 0.075, H * 0.13));
+  // ★ Même géométrie que _tdrc_nextCommand (sinon décalage visuel vs hitbox)
+  var armLen = Math.min(W, H) * (_tdrc_shape === 'cross' ? 0.38 : 0.33);
+  var ballR = Math.round(Math.min(W * 0.065, H * 0.11));
   var armW = Math.round(ballR * 0.9);
   var hubR = Math.round(armW * 0.85);
   var n = colors.length;
@@ -30134,6 +30177,572 @@ function _dcrc_save(){
   }
   _dcrc_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
   var sv = document.getElementById('dcrc_btnSave'); if (sv) sv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   🧠 DCOG MEMORY DRILL (_dmem_*) — inspiré SportReact LED Memory
+   • 6 cibles LED octogonales affichent chiffres/lettres
+   • Séquence de 3/4/5 flashe au centre pendant 2.5s
+   • Puis cache séquence → joueur touche les cibles dans l'ordre mémorisé
+   • Hit bon = +N points · hit mauvais = -5 + round failed · tout dans l'ordre = bonus
+   • Détection calquée 1:1 sur _tdr_checkHits (TARGETS strict)
+   ═══════════════════════════════════════════════════════════════════ */
+var _DMEM_PALETTE = ['#e63946','#4cc9f0','#a78bfa','#f5c518','#2dc653','#ff6b35']; // R, B, V(iolet), J, Vert, Orange
+var _DMEM_LETTERS = ['A','B','C','D','E','F','G','H','K','L','M','N','P','R','S','T','V','X','Y','Z'];
+var _dmem_mode   = 'num';   // 'num' | 'let'
+var _dmem_seqLen = 3;        // 3 | 4 | 5
+var _dmem_dur    = 60;
+var _dmem_running = false, _dmem_stream = null;
+var _dmem_video = null, _dmem_canvas = null, _dmem_ctx = null;
+var _dmem_startTs = 0, _dmem_elapsed = 0;
+var _dmem_score = 0, _dmem_correct = 0, _dmem_wrong = 0;
+var _dmem_reactTimes = [], _dmem_combo = 0, _dmem_bestCombo = 0;
+var _dmem_rafId = null;
+var _dmem_targets = [];      // 6 cibles LED {x, y, r, label, color, idx, state, recentHitTs}
+var _dmem_sequence = [];     // [idx1, idx2, idx3] indices dans _dmem_targets à toucher dans l'ordre
+var _dmem_curStep = 0;        // position courante dans _dmem_sequence
+var _dmem_phase = 'show';    // 'show' (affiche séquence) | 'play' (joueur touche) | 'done' (round résolu)
+var _dmem_phaseTs = 0;        // timestamp de début de phase
+var _dmem_showMs = 2500;      // ms d'affichage de la séquence
+var _dmem_particles = [];
+var _dmem_prevWrist = {};
+var _dmem_countdownActive = false;
+var _dmem_recorder = null, _dmem_recChunks = [], _dmem_recActive = false;
+var _dmem_recTimer = null, _dmem_recSec = 0, _dmem_recStream = null;
+
+function _dmem_setMode(m){ _dmem_mode = m; _dmem_highlight('.dmem-mode-btn','data-mode',m); }
+function _dmem_setSeq(n){  _dmem_seqLen = n; _dmem_highlight('.dmem-seq-btn','data-seq',n); }
+function _dmem_setDur(d){  _dmem_dur = d;   _dmem_highlight('.dmem-dur-btn','data-sec',d); }
+function _dmem_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(167,139,250,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(167,139,250,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#a78bfa' : '#7a8299';
+  });
+}
+function _dmem_status(msg, color){
+  var st = document.getElementById('dmem_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+function _dmem_start(){
+  if (!navigator.mediaDevices){ _dmem_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _dmem_status(_t('Accès caméra...','Accessing camera...'), '#a78bfa');
+  var btn = document.getElementById('dmem_btnStart');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _dmem_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _dmem_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('dmem', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _dmem_onCamReady(video, canvas, ctx){
+  _dmem_video = video; _dmem_canvas = canvas; _dmem_ctx = ctx;
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  _dmem_countdownActive = true;
+  _dmem_runCountdown(10);
+}
+function _dmem_runCountdown(n){
+  if (!_dmem_countdownActive) return;
+  var cv = _dmem_canvas, ctx = _dmem_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _dmem_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#a78bfa';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _dmem_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _dmem_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _dmem_countdownActive = false;
+    _dmem_startGame();
+  }
+}
+function _dmem_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillStyle='#a78bfa';
+  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-10, 10);
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('MEMORY DRILL', W-10, 10 + Math.round(H*0.035));
+  ctx.restore();
+}
+function _dmem_startGame(){
+  _dmem_running = true;
+  _dmem_startTs = Date.now(); _dmem_elapsed = 0;
+  _dmem_score = 0; _dmem_correct = 0; _dmem_wrong = 0;
+  _dmem_combo = 0; _dmem_bestCombo = 0;
+  _dmem_reactTimes = [];
+  _dmem_particles = [];
+  _dmem_prevWrist = {};
+  _dmem_setupTargets();
+  _dmem_newRound();
+  _dmem_rafId = requestAnimationFrame(_dmem_loop);
+}
+/* ─── Setup des 6 cibles LED en grille 3×2 responsive ─── */
+function _dmem_setupTargets(){
+  if (!_dmem_canvas) return;
+  var W = _dmem_canvas.width, H = _dmem_canvas.height;
+  var cols = 3, rows = 2;
+  var r = Math.round(Math.min(W * 0.078, H * 0.14));
+  // Grille 3×2 centrée verticalement, zone horizontale pleine largeur
+  var mx = r + 24;
+  var my = H * 0.22;
+  var usableW = W - 2*mx;
+  var usableH = H - my - r - 20; // place sous HUD top et chrono bas-gauche
+  var cellW = usableW / cols;
+  var cellH = usableH / rows;
+  _dmem_targets = [];
+  for (var row = 0; row < rows; row++){
+    for (var col = 0; col < cols; col++){
+      var cx = mx + cellW * (col + 0.5);
+      var cy = my + cellH * (row + 0.5);
+      _dmem_targets.push({
+        x: cx, y: cy, r: r,
+        label: '', color: _DMEM_PALETTE[(row*cols+col) % _DMEM_PALETTE.length],
+        idx: row*cols+col,
+        state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
+        recentHitTs: 0,
+        flashTs: 0
+      });
+    }
+  }
+}
+/* ─── Nouveau round : génère labels + séquence + phase 'show' ─── */
+function _dmem_newRound(){
+  if (!_dmem_running) return;
+  // Génère labels aléatoires sans doublons sur les 6 cibles
+  var pool = (_dmem_mode === 'let') ? _DMEM_LETTERS.slice() : ['0','1','2','3','4','5','6','7','8','9'];
+  // Mélange
+  for (var i = pool.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  // Assigne aux cibles (toutes labels uniques)
+  _dmem_targets.forEach(function(t, i){
+    t.label = pool[i % pool.length];
+    t.state = 'idle';
+    t.recentHitTs = 0;
+    t.flashTs = Date.now();
+  });
+  // Pick seqLen cibles au hasard (indices distincts) pour la séquence
+  var tgtIdx = [];
+  for (var k = 0; k < _dmem_targets.length; k++) tgtIdx.push(k);
+  for (var m = tgtIdx.length - 1; m > 0; m--){
+    var n = Math.floor(Math.random() * (m + 1));
+    var swap = tgtIdx[m]; tgtIdx[m] = tgtIdx[n]; tgtIdx[n] = swap;
+  }
+  _dmem_sequence = tgtIdx.slice(0, _dmem_seqLen);
+  _dmem_curStep = 0;
+  _dmem_phase = 'show';
+  _dmem_phaseTs = Date.now();
+}
+function _dmem_loop(){
+  if (!_dmem_running) return;
+  var cv = _dmem_canvas, ctx = _dmem_ctx, W = cv.width, H = cv.height;
+  _dmem_elapsed = (Date.now() - _dmem_startTs) / 1000;
+  _drawVideoMirror(ctx, _dmem_video, W, H);
+  // Transition de phase show → play
+  if (_dmem_phase === 'show' && Date.now() - _dmem_phaseTs >= _dmem_showMs){
+    _dmem_phase = 'play';
+    _dmem_phaseTs = Date.now();
+    try { if (typeof _td_beep === 'function') _td_beep(1200, 0.06, 0.14); } catch(e){}
+  }
+  // Détection pose uniquement en phase play
+  if (_dmem_phase === 'play' && window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dmem_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dmem_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  _dmem_drawTargets(ctx, W, H);
+  _dmem_drawSequencePanel(ctx, W, H);
+  // Particules (identique DCRC/TDR)
+  var now = Date.now();
+  _dmem_particles = _dmem_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life, alpha = 1 - progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring){
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 3 * (1-progress); ctx.stroke();
+    } else if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    } else {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
+  _dmem_drawHud(ctx, W, H);
+  _dmem_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_dmem_elapsed >= _dmem_dur){ _dmem_endGame(); return; }
+  _dmem_rafId = requestAnimationFrame(_dmem_loop);
+}
+/* ─── Dessine les 6 cibles LED octogonales façon SportReact ─── */
+function _dmem_drawTargets(ctx, W, H){
+  var now = Date.now();
+  _dmem_targets.forEach(function(t, i){
+    var spawnRamp = Math.min(1, (now - t.flashTs) / 300);
+    var isInSeq = (_dmem_phase === 'show' && _dmem_sequence.indexOf(i) >= 0);
+    var seqOrder = isInSeq ? _dmem_sequence.indexOf(i) + 1 : 0;
+    // Pulse si c'est la prochaine à toucher en phase play
+    var isNext = (_dmem_phase === 'play' && _dmem_sequence[_dmem_curStep] === i);
+    var pulse = 1 + (isNext ? 0.14 : 0.07) * Math.sin(now / 160 + i);
+    // Dim en phase show si pas dans la séquence
+    var dim = (_dmem_phase === 'show' && !isInSeq) ? 0.35 : 1.0;
+    ctx.save();
+    ctx.globalAlpha = dim * spawnRamp;
+    // Fond octogonal façon LED (polygone 8 côtés)
+    var R = t.r * pulse;
+    ctx.beginPath();
+    for (var k = 0; k < 8; k++){
+      var ang = Math.PI / 8 + k * Math.PI / 4;
+      var px = t.x + R * Math.cos(ang);
+      var py = t.y + R * Math.sin(ang);
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    // Couleur selon état
+    var fillCol = t.color;
+    var strokeCol = t.color;
+    if (t.state === 'hit_correct'){ fillCol = '#2dc653'; strokeCol = '#2dc653'; }
+    else if (t.state === 'hit_error'){ fillCol = '#e63946'; strokeCol = '#e63946'; }
+    ctx.fillStyle = 'rgba(13,17,23,.82)';
+    ctx.fill();
+    ctx.lineWidth = isNext ? 4 : 2.5;
+    ctx.strokeStyle = strokeCol;
+    ctx.shadowBlur = isNext ? 24 : 14;
+    ctx.shadowColor = strokeCol;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Grille de LED dots inside (style SportReact LED matrix)
+    var dotR = Math.max(1.2, R * 0.055);
+    var dotStep = R * 0.18;
+    ctx.fillStyle = fillCol;
+    ctx.globalAlpha = (dim * spawnRamp) * 0.85;
+    for (var dy = -2; dy <= 2; dy++){
+      for (var dx = -2; dx <= 2; dx++){
+        var ddx = t.x + dx * dotStep;
+        var ddy = t.y + dy * dotStep;
+        var distFromCenter = Math.sqrt(dx*dx + dy*dy);
+        if (distFromCenter > 2.3) continue;
+        ctx.beginPath();
+        ctx.arc(ddx, ddy, dotR, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = dim * spawnRamp;
+    // Label (chiffre ou lettre) au centre
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold '+Math.round(R*0.72)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(t.label, t.x, t.y + R*0.05);
+    ctx.shadowBlur = 0;
+    // Badge numéro d'ordre en phase show
+    if (isInSeq){
+      ctx.fillStyle = '#a78bfa';
+      ctx.beginPath();
+      ctx.arc(t.x + R*0.75, t.y - R*0.75, R*0.3, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#0d1117';
+      ctx.font = 'bold '+Math.round(R*0.35)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText(String(seqOrder), t.x + R*0.75, t.y - R*0.72);
+    }
+    ctx.restore();
+  });
+}
+/* ─── Panneau central avec la séquence durant phase 'show' + progression en 'play' ─── */
+function _dmem_drawSequencePanel(ctx, W, H){
+  if (_dmem_phase !== 'show' && _dmem_phase !== 'play') return;
+  var en = window._lang === 'en';
+  if (_dmem_phase === 'show'){
+    var elapsed = Date.now() - _dmem_phaseTs;
+    var zoomT = Math.min(1, elapsed / 300);
+    var scale = 1 + (1 - zoomT) * 0.08;
+    var bannerW = Math.min(W * 0.56, H * 1.0);
+    var bannerH = H * 0.14;
+    var bx = W/2 - bannerW/2, by = H * 0.02;
+    ctx.save();
+    ctx.fillStyle = 'rgba(13,17,23,.82)';
+    _dcog_vc_roundRect(ctx, bx, by, bannerW, bannerH, 12); ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#a78bfa';
+    _dcog_vc_roundRect(ctx, bx, by, bannerW, bannerH, 12); ctx.stroke();
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.font = 'bold '+Math.round(bannerH*0.26 * scale)+'px "Barlow Condensed",sans-serif';
+    ctx.fillText(en ? 'MEMORIZE' : 'MÉMORISE', W/2, by + bannerH*0.28);
+    // Labels de la séquence côte à côte
+    var seqTxt = _dmem_sequence.map(function(idx){ return _dmem_targets[idx].label; }).join(' · ');
+    ctx.fillStyle = '#a78bfa';
+    ctx.font = 'bold '+Math.round(bannerH*0.52 * scale)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(seqTxt, W/2, by + bannerH*0.68);
+    // Timer visuel
+    var pctLeft = 1 - Math.min(1, elapsed / _dmem_showMs);
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillRect(bx, by + bannerH - 3, bannerW * pctLeft, 3);
+    ctx.restore();
+  } else {
+    // Phase play : affiche la progression (Pos X/Y) + prochaine cible à toucher
+    var bw = W * 0.34, bh = H * 0.095;
+    var bx2 = W/2 - bw/2, by2 = H - bh - H*0.025;
+    ctx.save();
+    ctx.fillStyle = 'rgba(13,17,23,.65)';
+    _dcog_vc_roundRect(ctx, bx2, by2, bw, bh, 10); ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#a78bfa';
+    _dcog_vc_roundRect(ctx, bx2, by2, bw, bh, 10); ctx.stroke();
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.font = 'bold '+Math.round(bh*0.26)+'px "Barlow Condensed",sans-serif';
+    ctx.fillText((window._lang==='en'?'STEP ':'ÉTAPE ') + (_dmem_curStep+1) + '/' + _dmem_sequence.length, W/2, by2 + bh*0.32);
+    ctx.fillStyle = '#a78bfa';
+    ctx.font = 'bold '+Math.round(bh*0.5)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    var nextTgt = _dmem_targets[_dmem_sequence[_dmem_curStep]];
+    ctx.fillText(nextTgt ? nextTgt.label : '', W/2, by2 + bh*0.72);
+    ctx.restore();
+  }
+}
+/* ─── Analyse pose : fork direct de _tdr_checkHits (TARGETS strict) + debounce ─── */
+function _dmem_analyzePose(poses){
+  if (!_dmem_running || _dmem_phase !== 'play' || !poses || !poses[0] || !_dmem_canvas) return;
+  var cv = _dmem_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_dmem_video ? _dmem_video.videoWidth : W);
+  var sy = H / (_dmem_video ? _dmem_video.videoHeight : H);
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var nowMs = Date.now();
+  ['left','right'].forEach(function(side){
+    var name = side + 'Wrist';
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    var prev = _dmem_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dmem_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    _dmem_targets.forEach(function(t, i){
+      // Debounce : évite les validations multiples sur un seul coup (500ms)
+      if (nowMs - t.recentHitTs < 500) return;
+      if (t.state === 'hit_correct') return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 2.0) return;
+      var dot = (-dx) * vx + (-dy) * vy;
+      if (dot <= 0) return;
+      // HIT confirmé — vérifier si c'est la bonne cible dans la séquence
+      t.recentHitTs = nowMs;
+      var expected = _dmem_sequence[_dmem_curStep];
+      if (i === expected){
+        _dmem_hitCorrect(t, nowMs);
+      } else {
+        _dmem_hitError(t, nowMs);
+      }
+    });
+  });
+}
+function _dmem_hitCorrect(t, nowMs){
+  t.state = 'hit_correct';
+  // Pattern _tdr_flashHit : 12 particules + ring expansif
+  var nP = 12;
+  for (var pi = 0; pi < nP; pi++){
+    var angle = (pi/nP) * Math.PI * 2;
+    var speed = 2.5 + Math.random()*3;
+    _dmem_particles.push({ x: t.x, y: t.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, r: 3+Math.random()*4, color: '#2dc653', born: nowMs, life: 500+Math.random()*200 });
+  }
+  _dmem_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: '#2dc653', born: nowMs, life: 400, ring: true, maxR: t.r*3 });
+  try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+  if (navigator.vibrate) navigator.vibrate(20);
+  _dmem_curStep++;
+  // Toute la séquence est faite ?
+  if (_dmem_curStep >= _dmem_sequence.length){
+    _dmem_correct++;
+    _dmem_combo++;
+    _dmem_bestCombo = Math.max(_dmem_bestCombo, _dmem_combo);
+    var rt = nowMs - _dmem_phaseTs;
+    _dmem_reactTimes.push(rt);
+    // Score : base selon seqLen × bonus vitesse × bonus combo
+    var base = 10 * _dmem_seqLen;
+    var speedBonus = Math.max(0, Math.round((_dmem_seqLen * 1200 - rt) / 300));
+    var comboBonus = _dmem_combo >= 5 ? 10 : _dmem_combo >= 3 ? 5 : 0;
+    var gain = base + speedBonus + comboBonus;
+    _dmem_score += gain;
+    _dmem_particles.push({ x: _dmem_canvas.width/2, y: _dmem_canvas.height*0.55, floatText:'+'+gain, color:'#2dc653', born: nowMs, life: 1000 });
+    _dmem_phase = 'done';
+    setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 700);
+  }
+}
+function _dmem_hitError(t, nowMs){
+  t.state = 'hit_error';
+  _dmem_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: '#e63946', born: nowMs, life: 400, ring: true, maxR: t.r*2.4 });
+  _dmem_particles.push({ x: t.x, y: t.y - t.r*1.3, floatText:'✗ -5', color:'#e63946', born: nowMs, life: 900 });
+  try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([40,30,40]);
+  _dmem_wrong++; _dmem_combo = 0;
+  _dmem_score = Math.max(0, _dmem_score - 5);
+  _dmem_phase = 'done';
+  setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 800);
+}
+function _dmem_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#a78bfa';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_dmem_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_dmem_combo > 0){
+    var mult = _dmem_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('COMBO '+_dmem_combo, W*0.04, H*0.17);
+  }
+  // Chrono bas-gauche
+  var timeLeft = Math.max(0, _dmem_dur - _dmem_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  var chW = W*0.16, chH = H*0.08;
+  var chX = W*0.04, chY = H - chH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  ctx.restore();
+}
+function _dmem_toggleRec(){ if (_dmem_recActive) _dmem_stopRec(); else _dmem_startRec(); }
+function _dmem_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_dmem_recTimer); _dmem_recTimer = null;
+  if (_dmem_recorder){ try{ _dmem_recorder.ondataavailable=null; _dmem_recorder.onstop=null; _dmem_recorder.onerror=null; if(_dmem_recorder.state!=='inactive')_dmem_recorder.stop(); }catch(e){} }
+  if (_dmem_recStream){ try{_dmem_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dmem_recStream=null; }
+  _dmem_recorder=null; _dmem_recChunks=[]; _dmem_recSec=0; _dmem_recActive=false;
+  var cv = _dmem_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dmem_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _dmem_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _dmem_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _dmem_recChunks = []; _dmem_recSec = 0;
+  _dmem_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dmem_recChunks.push(e.data); };
+  _dmem_recorder.onstop = function(){
+    clearInterval(_dmem_recTimer);
+    var mimeFinal = (_dmem_recorder && _dmem_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dmem_recChunks, {type: mimeFinal});
+    if (_dmem_recStream){ try{_dmem_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dmem_recStream=null; }
+    _dmem_recActive=false; _dmem_recChunks=[]; _dmem_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_memory_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI MEMORY DRILL', filename:fn, onSave:function(b,filename){ _dmem_dlBlob(b, filename); } });
+    } else _dmem_dlBlob(blob, fn);
+  };
+  _dmem_recorder.onerror = function(){ clearInterval(_dmem_recTimer); };
+  setTimeout(function(){
+    if (!_dmem_recorder) return;
+    try { _dmem_recorder.start(1000); _dmem_recActive = true; } catch(e){ return; }
+    _dmem_recTimer = setInterval(function(){
+      _dmem_recSec++;
+      var mm=Math.floor(_dmem_recSec/60)%60,ss=_dmem_recSec%60,hh=Math.floor(_dmem_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_dmem_recSec >= 180) _dmem_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _dmem_stopRec(){
+  _dmem_recActive=false; clearInterval(_dmem_recTimer); _dmem_recTimer=null;
+  if (_dmem_recorder){ try{ if(_dmem_recorder.state!=='inactive')_dmem_recorder.stop(); }catch(e){} }
+  _dmem_updateRecBtn();
+}
+function _dmem_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dmem_recActive, '&#9632; STOP REC', '#e63946'); }
+function _dmem_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _dmem_endGame(){ _dmem_stop(true); _dmem_renderResults(); }
+function _dmem_stop(fromEnd){
+  _dmem_running = false;
+  _dmem_countdownActive = false;
+  if (_dmem_rafId){ cancelAnimationFrame(_dmem_rafId); _dmem_rafId = null; }
+  if (_dmem_recActive) _dmem_stopRec();
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
+  if (_dmem_stream){ _dmem_stream.getTracks().forEach(function(t){t.stop();}); _dmem_stream=null; }
+  if (typeof senseiCamStop === 'function') senseiCamStop();
+  var btn = document.getElementById('dmem_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('dmem_btnSave');
+  if (sv && fromEnd && (_dmem_correct+_dmem_wrong)>0) sv.style.display = 'flex';
+}
+function _dmem_renderResults(){
+  var res = document.getElementById('dmem_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _dmem_correct + _dmem_wrong;
+  var pct = total > 0 ? Math.round(_dmem_correct / total * 100) : 0;
+  var avg = _dmem_reactTimes.length > 0 ? Math.round(_dmem_reactTimes.reduce(function(a,b){return a+b;},0) / _dmem_reactTimes.length) : 0;
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#a78bfa">'+_dmem_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dmem_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'SEQUENCES':'SÉQUENCES')+'</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?Math.round(avg/100)/10+'s':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG TIME':'TEMPS MOY.')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · '+(en?'best combo':'combo max')+' ×'+_dmem_bestCombo+'</div>';
+  res.innerHTML = html;
+  _dmem_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _dmem_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _dmem_correct + _dmem_wrong;
+    var pct = total > 0 ? Math.round(_dmem_correct / total * 100) : 0;
+    _sb_recordSession('memory', pct);
+  }
+  _dmem_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('dmem_btnSave'); if (sv) sv.style.display = 'none';
 }
 
 function _tsym_onError(msg) {
@@ -31747,14 +32356,16 @@ function _dcog_selectDrill(drill, langOnly) {
     vcmath:  en ? 'Visual equation challenge — touch TRUE or FALSE while dribbling'
                : 'Défi visuel d\'équations — touche VRAI ou FAUX en dribblant',
     colorreact: en ? 'All colors appear — hit the one the voice calls out. Reaction + color recognition.'
-                   : 'Toutes les couleurs apparaissent — touche uniquement celle annoncée. Réaction + reconnaissance couleur.'
+                   : 'Toutes les couleurs apparaissent — touche uniquement celle annoncée. Réaction + reconnaissance couleur.',
+    memory: en ? 'A sequence of digits/letters flashes — memorize it then hit the LED targets in order. Working memory × motor.'
+               : 'Une séquence de chiffres/lettres s\'affiche — mémorise-la puis touche les cibles LED dans l\'ordre. Mémoire de travail × motricité.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','memory'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -31763,13 +32374,13 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', memory:'dcog_optMemory'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/colorreact utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' ? '12px' : '8px');
+        // viscoord/rcs/colorreact/memory utilisent flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'memory' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -31783,7 +32394,8 @@ function _dcog_selectDrill(drill, langOnly) {
       tboard:  en ? '🥋 BOARD MODE'     : '🥋 MODE TABLEAU',
       burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ',
       vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
-      colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT'
+      colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT',
+      memory:   en ? '🧠 MEMORY DRILL'  : '🧠 MEMORY DRILL'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -31797,7 +32409,8 @@ function _dcog_selectDrill(drill, langOnly) {
       twoball: [en?'ANTIPHASE %':'% ANTIPHASE', en?'FRAMES':'FRAMES', en?'TIME':'TEMPS'],
       tboard:  [en?'CORRECT':'CORRECTS', en?'BEST STREAK':'STREAK MAX', en?'BEST SPEED':'VITESSE MAX'],
       burnout: [en?'REPS':'REPS', en?'MAX SPEED':'VITESSE MAX', en?'TIME':'TEMPS'],
-      vcmath:  [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.']
+      vcmath:  [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
+      memory:  [en?'SEQUENCES':'SÉQUENCES', en?'ERRORS':'ERREURS', en?'AVG REACT':'RÉACTION MOY.']
     };
     var lbls = scoreLabels[drill] || ['--','--','--'];
     ['dcog_lbl_correct','dcog_lbl_wrong','dcog_lbl_time'].forEach(function(id,i){
@@ -31807,7 +32420,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var db = document.getElementById('dcog_dualTaskBar');
     if (db) db.style.display = (drill === 'math' || drill === 'vcmath') ? 'block' : 'none';
 
-    // COLOR REACT a son propre pipeline caméra/REC → masquer le bloc caméra DCOG principal
+    // COLOR REACT & MEMORY ont leur propre pipeline caméra/REC → masquer le bloc caméra DCOG principal
     var mainStart = document.getElementById('dcog_btnStart');
     var mainStop  = document.getElementById('dcog_btnStop');
     var mainSave  = document.getElementById('dcog_btnSave');
@@ -31816,19 +32429,19 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCR = drill === 'colorreact';
-    if (mainStart)  mainStart.style.display  = isCR ? 'none' : 'flex';
-    if (mainStop && mainStop.style.display  !== 'none' && isCR) mainStop.style.display  = 'none';
-    if (mainSave && mainSave.style.display  !== 'none' && isCR) mainSave.style.display  = 'none';
-    if (mainRec && mainRec.style.display   !== 'none' && isCR) mainRec.style.display   = 'none';
+    var isCustomCam = (drill === 'colorreact' || drill === 'memory');
+    if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
+    if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
+    if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
+    if (mainRec && mainRec.style.display   !== 'none' && isCustomCam) mainRec.style.display   = 'none';
     // Masquer les 3 contrôles ancillaires (DURÉE/status/score pts) de la rangée principale pour éviter double UI
     var row1 = durLbl && durLbl.parentNode;
     var row2 = mainStatus && mainStatus.parentNode;
-    if (row1) row1.style.display = isCR ? 'none' : 'flex';
-    if (row2) row2.style.display = isCR ? 'none' : 'flex';
+    if (row1) row1.style.display = isCustomCam ? 'none' : 'flex';
+    if (row2) row2.style.display = isCustomCam ? 'none' : 'flex';
     // Durée presets (60/90/120/inf)
     ['dcog_dur60','dcog_dur90','dcog_dur120','dcog_durInf'].forEach(function(id){
-      var e3 = document.getElementById(id); if (e3) e3.style.display = isCR ? 'none' : '';
+      var e3 = document.getElementById(id); if (e3) e3.style.display = isCustomCam ? 'none' : '';
     });
 
     // 🎬 Re-render du carrousel filtré sur le drill courant
@@ -36402,6 +37015,8 @@ function senseiCamShow(mod,stream){
     if(mod==='bt'&&typeof _bt_onCamReady==='function')_bt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tdrc'&&typeof _tdrc_onCamReady==='function')_tdrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcrc'&&typeof _dcrc_onCamReady==='function')_dcrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dmem'&&typeof _dmem_onCamReady==='function')_dmem_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dmem'&&typeof _dmem_onCamReady==='function')_dmem_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -36469,6 +37084,8 @@ function senseiCamToggleRec(){
   else if(m==='bt' && typeof _bt_toggleRec==='function') _bt_toggleRec();
   else if(m==='tdrc' && typeof _tdrc_toggleRec==='function') _tdrc_toggleRec();
   else if(m==='dcrc' && typeof _dcrc_toggleRec==='function') _dcrc_toggleRec();
+  else if(m==='dmem' && typeof _dmem_toggleRec==='function') _dmem_toggleRec();
+  else if(m==='dmem' && typeof _dmem_toggleRec==='function') _dmem_toggleRec();
 }
 // i18n portrait warning
 (function(){
