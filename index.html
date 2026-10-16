@@ -29233,45 +29233,46 @@ function _tdrc_drawShape(ctx, W, H){
   });
 }
 
-/* ─── Analyse pose : fork direct de _tdr_checkHits (TDR TARGETS strict) ─── */
+/* ─── Analyse pose : TDR TARGETS strict + durcissements ANTI AUTO-HIT ─── */
 function _tdrc_analyzePose(poses){
-  // ★ DÉTECTION CALQUÉE 1:1 SUR _tdr_checkHits (TDR TARGETS strict) :
-  //   - _tsym_kp_hand (coude→poignet +25%) UNIQUEMENT, PAS de fallback raw
-  //   - mirror horizontal : wx = W - kp.x * sx
-  //   - seuil vélocité  : max(8, W*0.02)
-  //   - rayon catch     : t.r × 2.0
-  //   - directional dot = (-dx)*vx + (-dy)*vy > 0 (main se dirige VERS la cible)
-  //   Le visuel bâton n'est QUE visuel — la détection = TDR réaction stricte.
+  // ★ DÉTECTION RÉPLIQUÉE 1:1 DE _dcog_analyzeMathZone (DRIBBLE MATH) — la référence
+  //   qui ne produit PAS de faux positifs, car hitbox serrée + grace spawn :
+  //   • _tsym_kp_hand (coude→poignet +25%) strict, pas de fallback raw
+  //   • moveThresh = max(8, round(W*0.02))  ← EXACT DRIBBLE MATH
+  //   • grace spawn 500ms (Date.now()-t.born < 500 → skip)  ← EXACT DRIBBLE MATH
+  //   • hitbox t.r × 1.2  ← EXACT DRIBBLE MATH (serré, pas de faux positif)
+  //   • dot = (-dx)*vx + (-dy)*vy > 0  ← EXACT DRIBBLE MATH
   if (!_tdrc_running || !poses || !poses[0] || !_tdrc_canvas) return;
-  _tdrc_lastPoses = poses; // pour le feedback proximité dans drawShape
+  _tdrc_lastPoses = poses;
   var cv = _tdrc_canvas, W = cv.width, H = cv.height;
   var sx = W / (_tdrc_video ? _tdrc_video.videoWidth : W);
   var sy = H / (_tdrc_video ? _tdrc_video.videoHeight : H);
-  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
   var nowMs = Date.now();
   ['left','right'].forEach(function(side){
     var name = side + 'Wrist';
-    // Extrapoler la position de la main (coude→poignet +25%) — même helper que TDR
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
     var wx = W - kp.x * sx;
     var wy = kp.y * sy;
-    // Vélocité : hit uniquement si main en mouvement intentionnel
     var prev = _tdrc_prevWrist[name];
     var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
     _tdrc_prevWrist[name] = { x: wx, y: wy };
     if (moved < moveThresh) return;
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
-    // Chaque cible active : check hit (TARGETS strict)
     _tdrc_targets.forEach(function(t){
       if (t.hit || t.wrongHit) return;
       if (_tdrc_cmd && _tdrc_cmd.resolved) return;
+      // ★ Grace spawn 500ms (identique DRIBBLE MATH) — la main qui est déjà
+      //   sur une cible au moment du spawn ne déclenche PAS un faux hit
+      if (nowMs - t.born < 500) return;
       // Si cible answer a une main imposée (MEDIUM/HARD), skip si pas la bonne main
       if (t.isAnswer && t.hand && t.hand !== side) return;
       var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 2.0) return;
+      if (dist >= t.r * 1.2) return;             // ★ EXACT DRIBBLE MATH (serré)
+      // ★ Directional (identique DRIBBLE MATH) : main se dirige VERS la cible
       var dot = (-dx) * vx + (-dy) * vy;
       if (dot <= 0) return;
       var nowH = Date.now();
@@ -30203,7 +30204,7 @@ var _dmem_sequence = [];     // [idx1, idx2, idx3] indices dans _dmem_targets à
 var _dmem_curStep = 0;        // position courante dans _dmem_sequence
 var _dmem_phase = 'show';    // 'show' (affiche séquence) | 'play' (joueur touche) | 'done' (round résolu)
 var _dmem_phaseTs = 0;        // timestamp de début de phase
-var _dmem_showMs = 2500;      // ms d'affichage de la séquence
+var _dmem_showMs = 3500;      // ms d'affichage par défaut (recalculé par round selon seqLen)
 var _dmem_particles = [];
 var _dmem_prevWrist = {};
 var _dmem_countdownActive = false;
@@ -30356,6 +30357,11 @@ function _dmem_newRound(){
   _dmem_curStep = 0;
   _dmem_phase = 'show';
   _dmem_phaseTs = Date.now();
+  // ★ Phase SHOW proportionnelle au seqLen : 1200ms par élément + 800ms de marge
+  //   seqLen 3 → 4400ms · 4 → 5600ms · 5 → 6800ms (laisse le temps de lire)
+  _dmem_showMs = 800 + _dmem_seqLen * 1200;
+  // Reset vélocité pour éviter faux hit au premier frame de phase play
+  _dmem_prevWrist = {};
 }
 function _dmem_loop(){
   if (!_dmem_running) return;
@@ -30531,13 +30537,22 @@ function _dmem_drawSequencePanel(ctx, W, H){
     ctx.restore();
   }
 }
-/* ─── Analyse pose : fork direct de _tdr_checkHits (TARGETS strict) + debounce ─── */
+/* ─── Analyse pose : RÉPLIQUÉE 1:1 de _dcog_analyzeMathZone (DRIBBLE MATH) ─────
+   • _tsym_kp_hand strict, pas de fallback raw
+   • moveThresh = max(8, round(W*0.02))  ← EXACT DRIBBLE MATH
+   • grace 500ms après début phase 'play' (évite faux hit si main déjà en zone)
+   • hitbox t.r × 1.2  ← EXACT DRIBBLE MATH (serré, zéro faux positif)
+   • dot > 0  ← EXACT DRIBBLE MATH (geste intentionnel vers cible)
+   • debounce 500ms par cible (évite double-hit sur un seul coup)              */
 function _dmem_analyzePose(poses){
   if (!_dmem_running || _dmem_phase !== 'play' || !poses || !poses[0] || !_dmem_canvas) return;
+  // ★ Grace globale 500ms : laisse le temps à la main de se repositionner
+  //   après la phase 'show' avant d'autoriser la détection
+  if (Date.now() - _dmem_phaseTs < 500) return;
   var cv = _dmem_canvas, W = cv.width, H = cv.height;
   var sx = W / (_dmem_video ? _dmem_video.videoWidth : W);
   var sy = H / (_dmem_video ? _dmem_video.videoHeight : H);
-  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
   var nowMs = Date.now();
   ['left','right'].forEach(function(side){
     var name = side + 'Wrist';
@@ -30552,12 +30567,13 @@ function _dmem_analyzePose(poses){
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
     _dmem_targets.forEach(function(t, i){
-      // Debounce : évite les validations multiples sur un seul coup (500ms)
+      // Debounce par cible : évite les validations multiples sur un seul coup
       if (nowMs - t.recentHitTs < 500) return;
       if (t.state === 'hit_correct') return;
       var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 2.0) return;
+      if (dist >= t.r * 1.2) return;             // ★ EXACT DRIBBLE MATH (serré)
+      // ★ Directional (identique DRIBBLE MATH) : main se dirige VERS la cible
       var dot = (-dx) * vx + (-dy) * vy;
       if (dot <= 0) return;
       // HIT confirmé — vérifier si c'est la bonne cible dans la séquence
@@ -30599,7 +30615,8 @@ function _dmem_hitCorrect(t, nowMs){
     _dmem_score += gain;
     _dmem_particles.push({ x: _dmem_canvas.width/2, y: _dmem_canvas.height*0.55, floatText:'+'+gain, color:'#2dc653', born: nowMs, life: 1000 });
     _dmem_phase = 'done';
-    setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 700);
+    // ★ Respawn plus lent : 1500ms pour laisser respirer entre deux séquences
+    setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 1500);
   }
 }
 function _dmem_hitError(t, nowMs){
@@ -30611,7 +30628,8 @@ function _dmem_hitError(t, nowMs){
   _dmem_wrong++; _dmem_combo = 0;
   _dmem_score = Math.max(0, _dmem_score - 5);
   _dmem_phase = 'done';
-  setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 800);
+  // ★ Respawn plus lent après erreur : 1700ms pour comprendre ce qui s'est passé
+  setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 1700);
 }
 function _dmem_drawHud(ctx, W, H){
   ctx.save();
