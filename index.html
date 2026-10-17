@@ -29810,6 +29810,8 @@ function _dcrc_nextCommand(){
   pool.forEach(function(c){ if (c.k !== answer.k) _place(c, false); });
   _dcrc_cmd = { answer: answer, startTs: now, ttl: ttl, resolved: false };
   _dcrc_cmdStartTs = now;
+  // Reset vélocité pour éviter faux hit au premier frame après spawn
+  _dcrc_prevWrist = {};
   // Voix FR/EN
   var txt = en ? answer.nameEn : answer.name;
   try {
@@ -29977,19 +29979,19 @@ function _dcrc_drawCmdBanner(ctx, W, H){
   ctx.restore();
 }
 function _dcrc_analyzePose(poses){
-  // ★ DÉTECTION CALQUÉE 1:1 SUR _tdr_checkHits (TDR TARGETS strict) :
-  //   - _tsym_kp_hand (coude→poignet +25%) UNIQUEMENT, pas de fallback raw
-  //   - mirror horizontal : wx = W - kp.x * sx
-  //   - vélocité min = max(8, W*0.02)
-  //   - rayon de hit = t.r * 2.0
-  //   - directional dot = (-dx)*vx + (-dy)*vy > 0  (main se dirige VERS la cible)
-  //   Le visuel seul est spécifique à Color React — la détection = TDR réaction.
+  // ★ DÉTECTION RÉPLIQUÉE 1:1 DE _dcog_analyzeMathZone (DRIBBLE MATH) — squelette commun
+  //   famille "hit cible ronde" : zéro faux positif, zéro divergence vs les 4 autres drills.
+  //   • _tsym_kp_hand (coude→poignet +25%) strict, pas de fallback raw
+  //   • moveThresh = max(8, round(W*0.02))        ← EXACT DRIBBLE MATH
+  //   • grace spawn 500ms (Date.now()-t.born <500 → skip)  ← EXACT DRIBBLE MATH
+  //   • hitbox t.r × 1.2                           ← EXACT DRIBBLE MATH (serré)
+  //   • dot = (-dx)*vx + (-dy)*vy > 0              ← EXACT DRIBBLE MATH
   if (!_dcrc_running || !poses || !poses[0] || !_dcrc_canvas) return;
   _dcrc_lastPoses = poses;
   var cv = _dcrc_canvas, W = cv.width, H = cv.height;
   var sx = W / (_dcrc_video ? _dcrc_video.videoWidth : W);
   var sy = H / (_dcrc_video ? _dcrc_video.videoHeight : H);
-  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
   var nowMs = Date.now();
   ['left','right'].forEach(function(side){
     var name = side + 'Wrist';
@@ -30008,10 +30010,13 @@ function _dcrc_analyzePose(poses){
     _dcrc_targets.forEach(function(t){
       if (t.hit || t.wrongHit) return;
       if (_dcrc_cmd && _dcrc_cmd.resolved) return;
+      // ★ Grace spawn 500ms (identique DRIBBLE MATH) — la main qui est déjà
+      //   sur une cible au moment du spawn ne déclenche PAS un faux hit
+      if (nowMs - t.born < 500) return;
       var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 2.0) return;
-      // Détection directionnelle : la main doit se diriger VERS la cible
+      if (dist >= t.r * 1.2) return;             // ★ EXACT DRIBBLE MATH (serré)
+      // ★ Directional (identique DRIBBLE MATH) : main se dirige VERS la cible
       var dot = (-dx)*vx + (-dy)*vy;
       if (dot <= 0) return;
       if (t.isAnswer){
