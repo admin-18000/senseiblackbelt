@@ -2529,6 +2529,14 @@ window._dojoBackHome = function(){
         </div>
       </div>
       <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🏀 MAIN QUI DRIBBLE</div>
+        <div style="display:flex;gap:6px">
+          <button class="dmem-hand-btn" data-hand="right" onclick="_dmem_setDominant('right')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">✋ DROITIER</button>
+          <button class="dmem-hand-btn" data-hand="left"  onclick="_dmem_setDominant('left')"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🤚 GAUCHER</button>
+          <button class="dmem-hand-btn" data-hand="both"  onclick="_dmem_setDominant('both')"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🙌 2 MAINS</button>
+        </div>
+      </div>
+      <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="dmem-dur-btn" data-sec="60"  onclick="_dmem_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
@@ -2538,7 +2546,7 @@ window._dojoBackHome = function(){
         </div>
       </div>
       <div style="padding:8px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
-        🧠 Une séquence de chiffres/lettres s'affiche brièvement — mémorise-la puis touche les cibles dans l'ordre. Entraînement mémoire de travail × motricité.
+        🧠🏀 Dribble en continu · les cibles LED en arc en haut flashent une à une (son mélodique synchronisé) · mémorise l'ordre puis touche-les de ta main libre. Zone basse réservée au ballon → zéro collision.
       </div>
       <div id="dmem_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
       <button class="tr-btn tr-btn-start" id="dmem_btnStart" onclick="_dmem_start()" ontouchstart="" style="width:100%;background:#a78bfa;color:#0d1117">▶ DÉMARRER MEMORY</button>
@@ -30210,10 +30218,15 @@ var _dmem_prevWrist = {};
 var _dmem_countdownActive = false;
 var _dmem_recorder = null, _dmem_recChunks = [], _dmem_recActive = false;
 var _dmem_recTimer = null, _dmem_recSec = 0, _dmem_recStream = null;
+// Main dominante (dribble) : 'right' | 'left' | 'both' (défaut : both = 2 mains OK)
+var _dmem_dominant = 'both';
+// Index du dernier slot SHOW ayant déclenché un bip (évite les répétitions à chaque frame)
+var _dmem_lastShowBipSlot = -1;
 
 function _dmem_setMode(m){ _dmem_mode = m; _dmem_highlight('.dmem-mode-btn','data-mode',m); }
 function _dmem_setSeq(n){  _dmem_seqLen = n; _dmem_highlight('.dmem-seq-btn','data-seq',n); }
 function _dmem_setDur(d){  _dmem_dur = d;   _dmem_highlight('.dmem-dur-btn','data-sec',d); }
+function _dmem_setDominant(h){ _dmem_dominant = h; _dmem_highlight('.dmem-hand-btn','data-hand',h); }
 function _dmem_highlight(sel, attr, val){
   document.querySelectorAll(sel).forEach(function(b){
     var active = String(b.getAttribute(attr)) === String(val);
@@ -30300,33 +30313,40 @@ function _dmem_startGame(){
   _dmem_newRound();
   _dmem_rafId = requestAnimationFrame(_dmem_loop);
 }
-/* ─── Setup des 6 cibles LED en grille 3×2 responsive ─── */
+/* ─── Setup BASKETBALLISABLE : 6 cibles LED en ARC HAUT (couloir ballon libre en bas) ───
+     • Zone cibles = tiers supérieur (y ∈ [H*0.08, H*0.38]) → la main qui dribble
+       dans la zone basse ne traverse JAMAIS les cibles → zéro collision ballon/cible
+     • Arc concave vers le bas (hauteur ↑ aux extrémités, ↓ au centre)
+       pour imiter un wall de cibles LED SportReact en demi-cercle devant le joueur
+     • Rayon +15% (r = W×0.085, cap H×0.14) pour que la main libre (moins précise
+       car dribble simultané) puisse viser avec une marge raisonnable */
 function _dmem_setupTargets(){
   if (!_dmem_canvas) return;
   var W = _dmem_canvas.width, H = _dmem_canvas.height;
-  var cols = 3, rows = 2;
-  var r = Math.round(Math.min(W * 0.078, H * 0.14));
-  // Grille 3×2 centrée verticalement, zone horizontale pleine largeur
+  var n = 6;
+  var r = Math.round(Math.min(W * 0.085, H * 0.14));
   var mx = r + 24;
-  var my = H * 0.22;
   var usableW = W - 2*mx;
-  var usableH = H - my - r - 20; // place sous HUD top et chrono bas-gauche
-  var cellW = usableW / cols;
-  var cellH = usableH / rows;
+  // Arc : 6 cibles réparties horizontalement, Y qui courbe (parabole)
+  //   extrémités : y = H * 0.10 (en haut)
+  //   centre : y = H * 0.26 (plus bas)
+  var yEdge = H * 0.10;
+  var yMid  = H * 0.26;
   _dmem_targets = [];
-  for (var row = 0; row < rows; row++){
-    for (var col = 0; col < cols; col++){
-      var cx = mx + cellW * (col + 0.5);
-      var cy = my + cellH * (row + 0.5);
-      _dmem_targets.push({
-        x: cx, y: cy, r: r,
-        label: '', color: _DMEM_PALETTE[(row*cols+col) % _DMEM_PALETTE.length],
-        idx: row*cols+col,
-        state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
-        recentHitTs: 0,
-        flashTs: 0
-      });
-    }
+  for (var i = 0; i < n; i++){
+    var tLin = n > 1 ? i / (n - 1) : 0.5;            // 0..1
+    var cx = mx + usableW * tLin;
+    // Parabole centrée : u ∈ [-1..1], y = yEdge + (yMid-yEdge)*(1 - u²)
+    var u = 2 * tLin - 1;
+    var cy = yEdge + (yMid - yEdge) * (1 - u * u);
+    _dmem_targets.push({
+      x: cx, y: cy, r: r,
+      label: '', color: _DMEM_PALETTE[i % _DMEM_PALETTE.length],
+      idx: i,
+      state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
+      recentHitTs: 0,
+      flashTs: 0
+    });
   }
 }
 /* ─── Nouveau round : génère labels + séquence + phase 'show' ─── */
@@ -30357,9 +30377,10 @@ function _dmem_newRound(){
   _dmem_curStep = 0;
   _dmem_phase = 'show';
   _dmem_phaseTs = Date.now();
-  // ★ Phase SHOW proportionnelle au seqLen : 1200ms par élément + 800ms de marge
-  //   seqLen 3 → 4400ms · 4 → 5600ms · 5 → 6800ms (laisse le temps de lire)
-  _dmem_showMs = 800 + _dmem_seqLen * 1200;
+  // ★ Phase SHOW = flash séquentiel sur les cibles (chaque cible 450ms = 300 ON + 150 OFF)
+  //   + 600ms de temps mort final avant phase 'play' pour laisser le temps de se préparer
+  //   seqLen 3 → 1950ms · 4 → 2400ms · 5 → 2850ms (perçu plus naturel qu'un gros banner)
+  _dmem_showMs = _dmem_seqLen * 450 + 600;
   // Reset vélocité pour éviter faux hit au premier frame de phase play
   _dmem_prevWrist = {};
 }
@@ -30372,7 +30393,23 @@ function _dmem_loop(){
   if (_dmem_phase === 'show' && Date.now() - _dmem_phaseTs >= _dmem_showMs){
     _dmem_phase = 'play';
     _dmem_phaseTs = Date.now();
+    _dmem_lastShowBipSlot = -1;
     try { if (typeof _td_beep === 'function') _td_beep(1200, 0.06, 0.14); } catch(e){}
+  }
+  // ★ Bip audio synchronisé avec chaque flash de cible en phase SHOW
+  //   → le joueur peut mémoriser la séquence même en gardant les yeux sur le dribble
+  //   Chaque cible a sa fréquence (gamme pentatonique) : plus mélodique à retenir
+  if (_dmem_phase === 'show'){
+    var showElapsed = Date.now() - _dmem_phaseTs;
+    var curSlot = Math.floor(showElapsed / 450);
+    var inOn = (showElapsed - curSlot * 450) < 300;
+    if (inOn && curSlot < _dmem_sequence.length && curSlot !== _dmem_lastShowBipSlot){
+      _dmem_lastShowBipSlot = curSlot;
+      // Fréquences pentatoniques (do-ré-mi-sol-la-do+) pour les 6 cibles
+      var _DMEM_FREQS = [523, 587, 659, 784, 880, 1047];
+      var tgtIdx = _dmem_sequence[curSlot];
+      try { if (typeof _td_beep === 'function') _td_beep(_DMEM_FREQS[tgtIdx] || 660, 0.08, 0.14); } catch(e){}
+    }
   }
   // Détection pose uniquement en phase play
   if (_dmem_phase === 'play' && window._tsym_detector){
@@ -30411,18 +30448,31 @@ function _dmem_loop(){
   if (_dmem_elapsed >= _dmem_dur){ _dmem_endGame(); return; }
   _dmem_rafId = requestAnimationFrame(_dmem_loop);
 }
-/* ─── Dessine les 6 cibles LED octogonales façon SportReact ─── */
+/* ─── Dessine les 6 cibles LED octogonales façon SportReact — flash séquentiel en SHOW ─── */
 function _dmem_drawTargets(ctx, W, H){
   var now = Date.now();
+  // Index courant du flash séquentiel en phase SHOW (une cible à la fois)
+  var showIdx = (_dmem_phase === 'show') ? _dmem_showCurIdx() : -1;
+  var activeShowTarget = (showIdx >= 0) ? _dmem_sequence[showIdx] : -1;
+  // Ordre dans la séquence pour le badge
+  var seqOrderIdxs = {};
+  _dmem_sequence.forEach(function(idx, pos){ seqOrderIdxs[idx] = pos + 1; });
   _dmem_targets.forEach(function(t, i){
     var spawnRamp = Math.min(1, (now - t.flashTs) / 300);
-    var isInSeq = (_dmem_phase === 'show' && _dmem_sequence.indexOf(i) >= 0);
-    var seqOrder = isInSeq ? _dmem_sequence.indexOf(i) + 1 : 0;
-    // Pulse si c'est la prochaine à toucher en phase play
+    // Est-ce la cible qui flashe en phase SHOW ?
+    var isShowFlash = (i === activeShowTarget);
+    // Pulse si c'est la prochaine à toucher en phase play (ou si flash SHOW)
     var isNext = (_dmem_phase === 'play' && _dmem_sequence[_dmem_curStep] === i);
-    var pulse = 1 + (isNext ? 0.14 : 0.07) * Math.sin(now / 160 + i);
-    // Dim en phase show si pas dans la séquence
-    var dim = (_dmem_phase === 'show' && !isInSeq) ? 0.35 : 1.0;
+    var pulse = 1 + ((isNext || isShowFlash) ? 0.16 : 0.07) * Math.sin(now / 160 + i);
+    // Dim en phase show si pas la cible courante du flash
+    //   • Toutes les cibles restent VISIBLES (le joueur voit le layout) à 0.35
+    //   • La cible courante du flash séquentiel passe à 1.0 (allumée vivement)
+    var dim;
+    if (_dmem_phase === 'show'){
+      dim = isShowFlash ? 1.0 : 0.35;
+    } else {
+      dim = 1.0;
+    }
     ctx.save();
     ctx.globalAlpha = dim * spawnRamp;
     // Fond octogonal façon LED (polygone 8 côtés)
@@ -30472,70 +30522,82 @@ function _dmem_drawTargets(ctx, W, H){
     ctx.font = 'bold '+Math.round(R*0.72)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillText(t.label, t.x, t.y + R*0.05);
     ctx.shadowBlur = 0;
-    // Badge numéro d'ordre en phase show
-    if (isInSeq){
+    // Badge numéro d'ordre uniquement sur la cible actuellement allumée en phase SHOW
+    //   (le joueur voit "1" quand cette cible flashe, "2" sur la suivante, etc.)
+    if (isShowFlash && seqOrderIdxs[i]){
       ctx.fillStyle = '#a78bfa';
       ctx.beginPath();
       ctx.arc(t.x + R*0.75, t.y - R*0.75, R*0.3, 0, Math.PI*2);
       ctx.fill();
       ctx.fillStyle = '#0d1117';
       ctx.font = 'bold '+Math.round(R*0.35)+'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.fillText(String(seqOrder), t.x + R*0.75, t.y - R*0.72);
+      ctx.fillText(String(seqOrderIdxs[i]), t.x + R*0.75, t.y - R*0.72);
     }
     ctx.restore();
   });
 }
-/* ─── Panneau central avec la séquence durant phase 'show' + progression en 'play' ─── */
+/* ─── Panneau d'info (phase SHOW : simple hint "MÉMORISE" · phase PLAY : étape N/M + label attendu)
+     Le flash séquentiel des cibles elles-mêmes (_dmem_drawTargets) porte toute l'info de la séquence
+     en phase SHOW → pas de banner central avec les labels, on garde la vue dégagée pour dribbler */
 function _dmem_drawSequencePanel(ctx, W, H){
   if (_dmem_phase !== 'show' && _dmem_phase !== 'play') return;
   var en = window._lang === 'en';
   if (_dmem_phase === 'show'){
+    // Juste un hint "MÉMORISE · N/M" en bas-gauche discret (ne cache rien)
     var elapsed = Date.now() - _dmem_phaseTs;
-    var zoomT = Math.min(1, elapsed / 300);
-    var scale = 1 + (1 - zoomT) * 0.08;
-    var bannerW = Math.min(W * 0.56, H * 1.0);
-    var bannerH = H * 0.14;
-    var bx = W/2 - bannerW/2, by = H * 0.02;
+    var curIdx = _dmem_showCurIdx();
+    var bw = W * 0.28, bh = H * 0.085;
+    var bx = W - bw - W*0.04, by = H - bh - H*0.03;
     ctx.save();
-    ctx.fillStyle = 'rgba(13,17,23,.82)';
-    _dcog_vc_roundRect(ctx, bx, by, bannerW, bannerH, 12); ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#a78bfa';
-    _dcog_vc_roundRect(ctx, bx, by, bannerW, bannerH, 12); ctx.stroke();
+    ctx.fillStyle = 'rgba(13,17,23,.6)';
+    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#a78bfa';
+    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle = 'rgba(255,255,255,.75)';
-    ctx.font = 'bold '+Math.round(bannerH*0.26 * scale)+'px "Barlow Condensed",sans-serif';
-    ctx.fillText(en ? 'MEMORIZE' : 'MÉMORISE', W/2, by + bannerH*0.28);
-    // Labels de la séquence côte à côte
-    var seqTxt = _dmem_sequence.map(function(idx){ return _dmem_targets[idx].label; }).join(' · ');
+    ctx.font = 'bold '+Math.round(bh*0.28)+'px "Barlow Condensed",sans-serif';
+    ctx.fillText(en ? 'MEMORIZE' : 'MÉMORISE', bx + bw/2, by + bh*0.32);
     ctx.fillStyle = '#a78bfa';
-    ctx.font = 'bold '+Math.round(bannerH*0.52 * scale)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillText(seqTxt, W/2, by + bannerH*0.68);
-    // Timer visuel
+    ctx.font = 'bold '+Math.round(bh*0.48)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    var showProg = (curIdx >= 0 ? curIdx + 1 : _dmem_sequence.length);
+    ctx.fillText(showProg + ' / ' + _dmem_sequence.length, bx + bw/2, by + bh*0.72);
+    // Barre temps
     var pctLeft = 1 - Math.min(1, elapsed / _dmem_showMs);
     ctx.fillStyle = '#a78bfa';
-    ctx.fillRect(bx, by + bannerH - 3, bannerW * pctLeft, 3);
+    ctx.fillRect(bx, by + bh - 3, bw * pctLeft, 3);
     ctx.restore();
   } else {
-    // Phase play : affiche la progression (Pos X/Y) + prochaine cible à toucher
-    var bw = W * 0.34, bh = H * 0.095;
-    var bx2 = W/2 - bw/2, by2 = H - bh - H*0.025;
+    // Phase play : étape N/M + label attendu — en bas-droite (chrono est en bas-gauche)
+    var bw2 = W * 0.28, bh2 = H * 0.095;
+    var bx2 = W - bw2 - W*0.04, by2 = H - bh2 - H*0.025;
     ctx.save();
     ctx.fillStyle = 'rgba(13,17,23,.65)';
-    _dcog_vc_roundRect(ctx, bx2, by2, bw, bh, 10); ctx.fill();
+    _dcog_vc_roundRect(ctx, bx2, by2, bw2, bh2, 10); ctx.fill();
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#a78bfa';
-    _dcog_vc_roundRect(ctx, bx2, by2, bw, bh, 10); ctx.stroke();
+    _dcog_vc_roundRect(ctx, bx2, by2, bw2, bh2, 10); ctx.stroke();
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.font = 'bold '+Math.round(bh*0.26)+'px "Barlow Condensed",sans-serif';
-    ctx.fillText((window._lang==='en'?'STEP ':'ÉTAPE ') + (_dmem_curStep+1) + '/' + _dmem_sequence.length, W/2, by2 + bh*0.32);
+    ctx.font = 'bold '+Math.round(bh2*0.26)+'px "Barlow Condensed",sans-serif';
+    ctx.fillText((window._lang==='en'?'STEP ':'ÉTAPE ') + (_dmem_curStep+1) + '/' + _dmem_sequence.length, bx2 + bw2/2, by2 + bh2*0.32);
     ctx.fillStyle = '#a78bfa';
-    ctx.font = 'bold '+Math.round(bh*0.5)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.font = 'bold '+Math.round(bh2*0.5)+'px "Bebas Neue","Arial Narrow",sans-serif';
     var nextTgt = _dmem_targets[_dmem_sequence[_dmem_curStep]];
-    ctx.fillText(nextTgt ? nextTgt.label : '', W/2, by2 + bh*0.72);
+    ctx.fillText(nextTgt ? nextTgt.label : '', bx2 + bw2/2, by2 + bh2*0.72);
     ctx.restore();
   }
+}
+/* ─── Helper : index de la cible courante du flash séquentiel en phase SHOW ───
+     Chaque élément de la séquence s'allume (300ms ON + 150ms OFF entre deux)
+     Retourne l'index [0..seqLen-1] actuellement allumé, ou -1 si on est dans un gap OFF */
+function _dmem_showCurIdx(){
+  if (!_dmem_sequence.length) return -1;
+  var elapsed = Date.now() - _dmem_phaseTs;
+  var slotMs = 450;    // 300 ON + 150 OFF
+  var slot = Math.floor(elapsed / slotMs);
+  if (slot >= _dmem_sequence.length) return -1;    // fin du flash
+  var inSlot = elapsed - slot * slotMs;
+  return (inSlot < 300) ? slot : -1;    // -1 pendant le gap OFF
 }
 /* ─── Analyse pose : RÉPLIQUÉE 1:1 de _dcog_analyzeMathZone (DRIBBLE MATH) ─────
    • _tsym_kp_hand strict, pas de fallback raw
@@ -30554,7 +30616,15 @@ function _dmem_analyzePose(poses){
   var sy = H / (_dmem_video ? _dmem_video.videoHeight : H);
   var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
   var nowMs = Date.now();
-  ['left','right'].forEach(function(side){
+  // ★ Filtre MAIN DOMINANTE : si choix explicite, seule la main OPPOSÉE (libre) peut hitter.
+  //   La main dominante dribble, la main opposée touche les cibles.
+  //   Note : vue miroir → la main gauche RÉELLE du joueur apparaît comme 'right' côté canvas,
+  //   donc on filtre l'INVERSE pour que "dominant=right" (droitier) laisse l'autre main détecter.
+  var allowedSides;
+  if (_dmem_dominant === 'right')      allowedSides = ['right'];   // libre = main G réelle = 'right' canvas
+  else if (_dmem_dominant === 'left')  allowedSides = ['left'];    // libre = main D réelle = 'left' canvas
+  else                                 allowedSides = ['left','right'];
+  allowedSides.forEach(function(side){
     var name = side + 'Wrist';
     var kp = _tsym_kp_hand(poses, side);
     if (!kp) return;
