@@ -29308,21 +29308,26 @@ function _tdrc_drawShape(ctx, W, H){
   });
 }
 
-/* ─── Analyse pose : TDR TARGETS strict + durcissements ANTI AUTO-HIT ─── */
+/* ─── Analyse pose : fluide comme DCOG Color React ─────────────────
+   ★ CORRECTIONS BUG "touche bon rond mais -5 points" :
+   1) Contrainte main `t.hand && t.hand !== side` SUPPRIMÉE
+      → avant : en MEDIUM, si joueur touche la bonne couleur avec mauvaise main,
+        la cible answer était SKIP, mais sa main pouvait déclencher une AUTRE
+        cible non-answer à proximité → wrongHit injuste
+      → maintenant : les 2 mains peuvent toucher n'importe quelle cible,
+        comme DCOG Color React. La voix annonce la main (coaching) mais
+        la détection reste permissive.
+   2) "CLOSEST TARGET WINS" : si plusieurs cibles satisfont les critères
+      (dist + dot) simultanément, seule la plus proche est hit → évite
+      les hits parasites sur une cible voisine quand on vise la bonne.
+   Détection reste strict DRIBBLE MATHS : _tsym_kp_hand, moveThresh, grace 500ms, r×1.2, dot>0 */
 function _tdrc_analyzePose(poses){
-  // ★ DÉTECTION RÉPLIQUÉE 1:1 DE _dcog_analyzeMathZone (DRIBBLE MATH) — la référence
-  //   qui ne produit PAS de faux positifs, car hitbox serrée + grace spawn :
-  //   • _tsym_kp_hand (coude→poignet +25%) strict, pas de fallback raw
-  //   • moveThresh = max(8, round(W*0.02))  ← EXACT DRIBBLE MATH
-  //   • grace spawn 500ms (Date.now()-t.born < 500 → skip)  ← EXACT DRIBBLE MATH
-  //   • hitbox t.r × 1.2  ← EXACT DRIBBLE MATH (serré, pas de faux positif)
-  //   • dot = (-dx)*vx + (-dy)*vy > 0  ← EXACT DRIBBLE MATH
   if (!_tdrc_running || !poses || !poses[0] || !_tdrc_canvas) return;
   _tdrc_lastPoses = poses;
   var cv = _tdrc_canvas, W = cv.width, H = cv.height;
   var sx = W / (_tdrc_video ? _tdrc_video.videoWidth : W);
   var sy = H / (_tdrc_video ? _tdrc_video.videoHeight : H);
-  var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
   var nowMs = Date.now();
   ['left','right'].forEach(function(side){
     var name = side + 'Wrist';
@@ -29336,20 +29341,24 @@ function _tdrc_analyzePose(poses){
     if (moved < moveThresh) return;
     var vx = prev ? wx - prev.x : 0;
     var vy = prev ? wy - prev.y : 0;
+    // ★ CLOSEST TARGET WINS : trouve LA cible la plus proche qui satisfait critères,
+    //   puis traite UNIQUEMENT celle-là. Évite les hits parasites sur voisines.
+    var hitCandidate = null;
+    var hitDist = Infinity;
     _tdrc_targets.forEach(function(t){
       if (t.hit || t.wrongHit) return;
       if (_tdrc_cmd && _tdrc_cmd.resolved) return;
-      // ★ Grace spawn 500ms (identique DRIBBLE MATH) — la main qui est déjà
-      //   sur une cible au moment du spawn ne déclenche PAS un faux hit
       if (nowMs - t.born < 500) return;
-      // Si cible answer a une main imposée (MEDIUM/HARD), skip si pas la bonne main
-      if (t.isAnswer && t.hand && t.hand !== side) return;
       var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 1.2) return;             // ★ EXACT DRIBBLE MATH (serré)
-      // ★ Directional (identique DRIBBLE MATH) : main se dirige VERS la cible
+      if (dist >= t.r * 1.2) return;
       var dot = (-dx) * vx + (-dy) * vy;
       if (dot <= 0) return;
+      if (dist < hitDist){ hitDist = dist; hitCandidate = t; }
+    });
+    if (!hitCandidate) return;
+    // Traiter le hit sur la seule cible gagnante
+    (function(t){
       var nowH = Date.now();
       if (t.isAnswer){
         // ✅ HIT bonne couleur — pattern _tdr_flashHit EXACT
@@ -29420,7 +29429,7 @@ function _tdrc_analyzePose(poses){
         if (_tdrc_cmd) _tdrc_cmd.resolved = true;
         _tdrc_endRound();
       }
-    });
+    })(hitCandidate);
   });
 }
 
