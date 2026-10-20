@@ -2319,6 +2319,14 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🧠<div id="dcog_lbl_memory">MEMORY DRILL</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('ruleswitch')" id="dcog_btn_ruleswitch"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🔁<div id="dcog_lbl_ruleswitch">RULE SWITCH</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('quickchoice')" id="dcog_btn_quickchoice"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        ⚡<div id="dcog_lbl_quickchoice">QUICK CHOICE</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2523,9 +2531,9 @@ window._dojoBackHome = function(){
       <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 SÉQUENCE</div>
         <div style="display:flex;gap:6px">
-          <button class="dmem-seq-btn" data-seq="3" onclick="_dmem_setSeq(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 3 · EASY</button>
-          <button class="dmem-seq-btn" data-seq="4" onclick="_dmem_setSeq(4)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 4 · MED</button>
-          <button class="dmem-seq-btn" data-seq="5" onclick="_dmem_setSeq(5)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 5 · HARD</button>
+          <button class="dmem-seq-btn" data-seq="2" onclick="_dmem_setSeq(2)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 2 · EASY</button>
+          <button class="dmem-seq-btn" data-seq="3" onclick="_dmem_setSeq(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 3 · MED</button>
+          <button class="dmem-seq-btn" data-seq="4" onclick="_dmem_setSeq(4)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 4 · HARD</button>
         </div>
       </div>
       <div>
@@ -2546,12 +2554,85 @@ window._dojoBackHome = function(){
         </div>
       </div>
       <div style="padding:8px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
-        🧠🏀 Dribble en continu · les cibles LED en arc en haut flashent une à une (son mélodique synchronisé) · mémorise l'ordre puis touche-les de ta main libre. Zone basse réservée au ballon → zéro collision.
+        🧠🏀 Dribble en continu · 4 cibles LED à hauteur épaule/poitrine côté main libre · elles flashent une à une (son pentatonique synchronisé) · mémorise l'ordre puis touche-les. Zone basse + coins réservés → zéro collision.
       </div>
       <div id="dmem_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
       <button class="tr-btn tr-btn-start" id="dmem_btnStart" onclick="_dmem_start()" ontouchstart="" style="width:100%;background:#a78bfa;color:#0d1117">▶ DÉMARRER MEMORY</button>
       <button class="tr-btn tr-btn-save" id="dmem_btnSave" onclick="_dmem_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dmem_results" style="margin-top:4px"></div>
+    </div>
+    <!-- RULE SWITCH : mode (chiffres/lettres/mixte) · durée · fréquence switch -->
+    <div id="dcog_optRuleswitch" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔤 TYPE</div>
+        <div style="display:flex;gap:6px">
+          <button class="drsw-mode-btn" data-mode="num" onclick="_drsw_setMode('num')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔢 PAIR/IMPAIR</button>
+          <button class="drsw-mode-btn" data-mode="let" onclick="_drsw_setMode('let')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔤 VOY/CONS</button>
+          <button class="drsw-mode-btn" data-mode="mix" onclick="_drsw_setMode('mix')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔀 MIXTE</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔄 SWITCH TOUS LES</div>
+        <div style="display:flex;gap:6px">
+          <button class="drsw-sw-btn" data-sw="3" onclick="_drsw_setSw(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 3 · HARD</button>
+          <button class="drsw-sw-btn" data-sw="5" onclick="_drsw_setSw(5)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 5 · MED</button>
+          <button class="drsw-sw-btn" data-sw="8" onclick="_drsw_setSw(8)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 8 · EASY</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="drsw-dur-btn" data-sec="60"  onclick="_drsw_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(76,201,240,.5);background:rgba(76,201,240,.15);color:#4cc9f0;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="drsw-dur-btn" data-sec="90"  onclick="_drsw_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="drsw-dur-btn" data-sec="120" onclick="_drsw_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+          <button class="drsw-dur-btn" data-sec="180" onclick="_drsw_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(76,201,240,.06);border-left:2px solid rgba(76,201,240,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🔁🏀 Classifie le stimulus (chiffre ou lettre) selon la règle active · touche OUI ou NON · la règle BASCULE régulièrement (annonce visuelle "SWITCH !"). Flexibilité cognitive × dribble.
+      </div>
+      <div id="drsw_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="drsw_btnStart" onclick="_drsw_start()" ontouchstart="" style="width:100%;background:#4cc9f0;color:#0d1117">▶ DÉMARRER RULE SWITCH</button>
+      <button class="tr-btn tr-btn-save" id="drsw_btnSave" onclick="_drsw_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="drsw_results" style="margin-top:4px"></div>
+    </div>
+    <!-- QUICK CHOICE : moteur générique "stimulus + N cibles réponse" — 13 presets catalogue -->
+    <div id="dcog_optQuickchoice" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎯 DRILL</div>
+        <select id="dqa_drillSelect" onchange="_dqa_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.1);color:#ff6b35;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
+          <option value="C3">C3 · Pair / Impair (chiffres)</option>
+          <option value="C5">C5 · Plus grand / Plus petit</option>
+          <option value="C7">C7 · Voyelle / Consonne (lettres)</option>
+          <option value="C9">C9 · Arithmétique (opérateur change)</option>
+          <option value="C10">C10 · Chiffre ↔ Lettre (type bascule)</option>
+          <option value="C11">C11 · Logique conditionnelle</option>
+          <option value="D4">D4 · Task Switch (calcul ↔ lettre)</option>
+          <option value="D5">D5 · Reversal Learning</option>
+          <option value="D6">D6 · Stroop (couleur du mot)</option>
+          <option value="G1">G1 · Prédiction (suite logique)</option>
+          <option value="G5">G5 · Indice trompeur</option>
+          <option value="I2">I2 · Position défenseur</option>
+          <option value="I3">I3 · Espace libre</option>
+        </select>
+        <div id="dqa_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Classe le chiffre affiché : pair ou impair ?</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dqa-dur-btn" data-sec="60"  onclick="_dqa_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.15);color:#ff6b35;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="dqa-dur-btn" data-sec="90"  onclick="_dqa_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="dqa-dur-btn" data-sec="120" onclick="_dqa_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+          <button class="dqa-dur-btn" data-sec="180" onclick="_dqa_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(255,107,53,.06);border-left:2px solid rgba(255,107,53,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        ⚡🏀 Moteur universel "stimulus + réponse" · 13 drills du catalogue partagent la même détection stricte Dribble Maths · toujours 2 à 4 cibles bien espacées à hauteur poitrine.
+      </div>
+      <div id="dqa_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dqa_btnStart" onclick="_dqa_start()" ontouchstart="" style="width:100%;background:#ff6b35;color:#0d1117">▶ DÉMARRER</button>
+      <button class="tr-btn tr-btn-save" id="dqa_btnSave" onclick="_dqa_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="dqa_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -30204,7 +30285,7 @@ function _dcrc_save(){
 var _DMEM_PALETTE = ['#e63946','#4cc9f0','#a78bfa','#f5c518','#2dc653','#ff6b35']; // R, B, V(iolet), J, Vert, Orange
 var _DMEM_LETTERS = ['A','B','C','D','E','F','G','H','K','L','M','N','P','R','S','T','V','X','Y','Z'];
 var _dmem_mode   = 'num';   // 'num' | 'let'
-var _dmem_seqLen = 3;        // 3 | 4 | 5
+var _dmem_seqLen = 2;        // 2 | 3 | 4  (EASY = 2 cibles à mémoriser)
 var _dmem_dur    = 60;
 var _dmem_running = false, _dmem_stream = null;
 var _dmem_video = null, _dmem_canvas = null, _dmem_ctx = null;
@@ -30318,40 +30399,52 @@ function _dmem_startGame(){
   _dmem_newRound();
   _dmem_rafId = requestAnimationFrame(_dmem_loop);
 }
-/* ─── Setup BASKETBALLISABLE : 6 cibles LED en ARC HAUT (couloir ballon libre en bas) ───
-     • Zone cibles = tiers supérieur (y ∈ [H*0.08, H*0.38]) → la main qui dribble
-       dans la zone basse ne traverse JAMAIS les cibles → zéro collision ballon/cible
-     • Arc concave vers le bas (hauteur ↑ aux extrémités, ↓ au centre)
-       pour imiter un wall de cibles LED SportReact en demi-cercle devant le joueur
-     • Rayon +15% (r = W×0.085, cap H×0.14) pour que la main libre (moins précise
-       car dribble simultané) puisse viser avec une marge raisonnable */
+/* ─── Setup BASKETBALLISABLE v2 : 4 cibles LED en bloc 2×2 ───
+   PROBLÈMES CORRIGÉS :
+   • REC/STOP (coins hauts) masquaient 2 cibles → zone x réduite à [W×0.22, W×0.78]
+   • Cibles trop hautes (bras au-dessus de la tête) → zone y descendue à [H×0.32, H×0.52]
+     (hauteur épaule-poitrine, portée naturelle du bras libre)
+   • 6 cibles tangentes sans gap → 4 cibles seulement, gap visible garanti
+   • Placement adaptatif main dominante :
+       droitier → cibles côté DROIT du canvas (= côté main libre après mirror)
+       gaucher → cibles côté GAUCHE du canvas
+       2 mains → cibles pleine largeur réduite (hors zones REC/STOP)
+   • Rayon W×0.075 (un peu plus petit, cohérent avec gap entre cibles)                */
 function _dmem_setupTargets(){
   if (!_dmem_canvas) return;
   var W = _dmem_canvas.width, H = _dmem_canvas.height;
-  var n = 6;
-  var r = Math.round(Math.min(W * 0.085, H * 0.14));
-  var mx = r + 24;
-  var usableW = W - 2*mx;
-  // Arc : 6 cibles réparties horizontalement, Y qui courbe (parabole)
-  //   extrémités : y = H * 0.10 (en haut)
-  //   centre : y = H * 0.26 (plus bas)
-  var yEdge = H * 0.10;
-  var yMid  = H * 0.26;
+  var r = Math.round(Math.min(W * 0.075, H * 0.13));
+  // Zone horizontale selon main dominante (exclut toujours les coins REC/STOP)
+  //   Rappel : vidéo mirror → main gauche RÉELLE du joueur apparaît à droite du canvas
+  //   Donc droitier (dribble main droite réelle = côté gauche canvas) → cibles côté DROIT canvas
+  var xMin, xMax;
+  if (_dmem_dominant === 'right'){        // droitier : main libre = côté droit canvas
+    xMin = W * 0.44; xMax = W * 0.78;
+  } else if (_dmem_dominant === 'left'){  // gaucher : main libre = côté gauche canvas
+    xMin = W * 0.22; xMax = W * 0.56;
+  } else {                                 // 2 mains : pleine largeur réduite (hors coins REC/STOP)
+    xMin = W * 0.22; xMax = W * 0.78;
+  }
+  // Zone verticale : hauteur épaule-poitrine (portée naturelle main libre en dribblant)
+  var y1 = H * 0.32;    // ligne haute (épaule)
+  var y2 = H * 0.52;    // ligne basse (poitrine)
+  // Grille 2×2 — 4 cibles bien espacées
+  var cols = 2, rows = 2;
+  var colGapW = (xMax - xMin) / (cols - 1);
   _dmem_targets = [];
-  for (var i = 0; i < n; i++){
-    var tLin = n > 1 ? i / (n - 1) : 0.5;            // 0..1
-    var cx = mx + usableW * tLin;
-    // Parabole centrée : u ∈ [-1..1], y = yEdge + (yMid-yEdge)*(1 - u²)
-    var u = 2 * tLin - 1;
-    var cy = yEdge + (yMid - yEdge) * (1 - u * u);
-    _dmem_targets.push({
-      x: cx, y: cy, r: r,
-      label: '', color: _DMEM_PALETTE[i % _DMEM_PALETTE.length],
-      idx: i,
-      state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
-      recentHitTs: 0,
-      flashTs: 0
-    });
+  for (var row = 0; row < rows; row++){
+    for (var col = 0; col < cols; col++){
+      var cx = xMin + colGapW * col;
+      var cy = row === 0 ? y1 : y2;
+      _dmem_targets.push({
+        x: cx, y: cy, r: r,
+        label: '', color: _DMEM_PALETTE[(row*cols + col) % _DMEM_PALETTE.length],
+        idx: row*cols + col,
+        state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
+        recentHitTs: 0,
+        flashTs: 0
+      });
+    }
   }
 }
 /* ─── Nouveau round : génère labels + séquence + phase 'show' ─── */
@@ -30382,10 +30475,10 @@ function _dmem_newRound(){
   _dmem_curStep = 0;
   _dmem_phase = 'show';
   _dmem_phaseTs = Date.now();
-  // ★ Phase SHOW = flash séquentiel sur les cibles (chaque cible 450ms = 300 ON + 150 OFF)
-  //   + 600ms de temps mort final avant phase 'play' pour laisser le temps de se préparer
-  //   seqLen 3 → 1950ms · 4 → 2400ms · 5 → 2850ms (perçu plus naturel qu'un gros banner)
-  _dmem_showMs = _dmem_seqLen * 450 + 600;
+  // ★ Phase SHOW = flash séquentiel sur les cibles (chaque cible 500ms = 350 ON + 150 OFF)
+  //   + 800ms de temps mort final avant phase 'play' pour laisser le temps de se préparer
+  //   seqLen 2 → 1800ms · 3 → 2300ms · 4 → 2800ms (ralenti pour mémorisation confortable)
+  _dmem_showMs = _dmem_seqLen * 500 + 800;
   // Reset vélocité pour éviter faux hit au premier frame de phase play
   _dmem_prevWrist = {};
 }
@@ -30406,12 +30499,12 @@ function _dmem_loop(){
   //   Chaque cible a sa fréquence (gamme pentatonique) : plus mélodique à retenir
   if (_dmem_phase === 'show'){
     var showElapsed = Date.now() - _dmem_phaseTs;
-    var curSlot = Math.floor(showElapsed / 450);
-    var inOn = (showElapsed - curSlot * 450) < 300;
+    var curSlot = Math.floor(showElapsed / 500);
+    var inOn = (showElapsed - curSlot * 500) < 350;
     if (inOn && curSlot < _dmem_sequence.length && curSlot !== _dmem_lastShowBipSlot){
       _dmem_lastShowBipSlot = curSlot;
-      // Fréquences pentatoniques (do-ré-mi-sol-la-do+) pour les 6 cibles
-      var _DMEM_FREQS = [523, 587, 659, 784, 880, 1047];
+      // Fréquences pentatoniques (do-ré-mi-sol) pour les 4 cibles
+      var _DMEM_FREQS = [523, 587, 659, 784];
       var tgtIdx = _dmem_sequence[curSlot];
       try { if (typeof _td_beep === 'function') _td_beep(_DMEM_FREQS[tgtIdx] || 660, 0.08, 0.14); } catch(e){}
     }
@@ -30546,6 +30639,9 @@ function _dmem_drawTargets(ctx, W, H){
      en phase SHOW → pas de banner central avec les labels, on garde la vue dégagée pour dribbler */
 function _dmem_drawSequencePanel(ctx, W, H){
   if (_dmem_phase !== 'show' && _dmem_phase !== 'play') return;
+  // ★ Garde-fou : ne rien afficher si la séquence n'est pas encore générée
+  //   (évite le "STEP 1/0" fantôme visible au tout premier frame)
+  if (!_dmem_sequence || _dmem_sequence.length === 0) return;
   var en = window._lang === 'en';
   if (_dmem_phase === 'show'){
     // Juste un hint "MÉMORISE · N/M" en bas-gauche discret (ne cache rien)
@@ -30593,16 +30689,16 @@ function _dmem_drawSequencePanel(ctx, W, H){
   }
 }
 /* ─── Helper : index de la cible courante du flash séquentiel en phase SHOW ───
-     Chaque élément de la séquence s'allume (300ms ON + 150ms OFF entre deux)
+     Chaque élément de la séquence s'allume (350ms ON + 150ms OFF entre deux)
      Retourne l'index [0..seqLen-1] actuellement allumé, ou -1 si on est dans un gap OFF */
 function _dmem_showCurIdx(){
   if (!_dmem_sequence.length) return -1;
   var elapsed = Date.now() - _dmem_phaseTs;
-  var slotMs = 450;    // 300 ON + 150 OFF
+  var slotMs = 500;    // 350 ON + 150 OFF (ralenti pour mémorisation)
   var slot = Math.floor(elapsed / slotMs);
   if (slot >= _dmem_sequence.length) return -1;    // fin du flash
   var inSlot = elapsed - slot * slotMs;
-  return (inSlot < 300) ? slot : -1;    // -1 pendant le gap OFF
+  return (inSlot < 350) ? slot : -1;    // -1 pendant le gap OFF
 }
 /* ─── Analyse pose : RÉPLIQUÉE 1:1 de _dcog_analyzeMathZone (DRIBBLE MATH) ─────
    • _tsym_kp_hand strict, pas de fallback raw
@@ -30647,8 +30743,8 @@ function _dmem_analyzePose(poses){
       if (t.state === 'hit_correct') return;
       var dx = wx - t.x, dy = wy - t.y;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 1.2) return;             // ★ EXACT DRIBBLE MATH (serré)
-      // ★ Directional (identique DRIBBLE MATH) : main se dirige VERS la cible
+      if (dist >= t.r * 1.2) return;             // ★ STRICT DRIBBLE MATHS
+      // ★ Directional STRICT (identique DRIBBLE MATHS) : main se dirige VERS la cible
       var dot = (-dx) * vx + (-dy) * vy;
       if (dot <= 0) return;
       // HIT confirmé — vérifier si c'est la bonne cible dans la séquence
@@ -30836,6 +30932,1126 @@ function _dmem_save(){
   }
   _dmem_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
   var sv = document.getElementById('dmem_btnSave'); if (sv) sv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   🔁 DCOG RULE SWITCH (_drsw_*) — priorité #1 catalogue (flexibilité cognitive)
+   Pattern DRIBBLE MATHS strict (hitbox r×1.2 + dot>0 + moveThresh standard)
+   Flow : stimulus affiché haut-centre (chiffre OU lettre) + règle active bandeau
+          + 2 cibles OUI/NON bas → touche la bonne, règle bascule tous les N bonnes
+   Mesure clé : erreurs post-switch (coût de flexibilité cognitive)
+   ═══════════════════════════════════════════════════════════════════ */
+var _DRSW_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var _DRSW_VOWELS  = 'AEIOUY';
+var _drsw_mode   = 'num';     // 'num' | 'let' | 'mix'
+var _drsw_swFreq = 5;         // nb de bonnes réponses avant switch
+var _drsw_dur    = 60;
+var _drsw_running = false, _drsw_stream = null;
+var _drsw_video = null, _drsw_canvas = null, _drsw_ctx = null;
+var _drsw_startTs = 0, _drsw_elapsed = 0;
+var _drsw_score = 0, _drsw_correct = 0, _drsw_wrong = 0;
+var _drsw_reactTimes = [], _drsw_combo = 0, _drsw_bestCombo = 0;
+var _drsw_rafId = null;
+var _drsw_targets = [];       // 2 cibles OUI / NON
+var _drsw_stimulus = '';      // chiffre ou lettre affiché
+var _drsw_stimulusTs = 0;     // timestamp spawn stimulus (grace detection)
+var _drsw_ruleActive = '';    // 'PAIR' | 'IMPAIR' | 'VOYELLE' | 'CONSONNE'
+var _drsw_rulePool = [];      // pool de règles actives selon mode
+var _drsw_streakSinceSwitch = 0;
+var _drsw_switchFlashTs = 0;  // timestamp dernier switch (flash 800ms)
+var _drsw_switchCount = 0;    // nb de switches totaux
+var _drsw_postSwitchErrors = 0; // erreurs dans les 3 premières questions post-switch
+var _drsw_qSinceSwitch = 0;   // nb questions depuis dernier switch
+var _drsw_prevWrist = {};
+var _drsw_particles = [];
+var _drsw_countdownActive = false;
+var _drsw_recorder = null, _drsw_recChunks = [], _drsw_recActive = false;
+var _drsw_recTimer = null, _drsw_recSec = 0, _drsw_recStream = null;
+
+function _drsw_setMode(m){ _drsw_mode = m; _drsw_highlight('.drsw-mode-btn','data-mode',m); }
+function _drsw_setSw(n){   _drsw_swFreq = n; _drsw_highlight('.drsw-sw-btn','data-sw',n); }
+function _drsw_setDur(d){  _drsw_dur = d;   _drsw_highlight('.drsw-dur-btn','data-sec',d); }
+function _drsw_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(76,201,240,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(76,201,240,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#4cc9f0' : '#7a8299';
+  });
+}
+function _drsw_status(msg, color){
+  var st = document.getElementById('drsw_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+function _drsw_start(){
+  if (!navigator.mediaDevices){ _drsw_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _drsw_status(_t('Accès caméra...','Accessing camera...'), '#4cc9f0');
+  var btn = document.getElementById('drsw_btnStart');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _drsw_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _drsw_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('drsw', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _drsw_onCamReady(video, canvas, ctx){
+  _drsw_video = video; _drsw_canvas = canvas; _drsw_ctx = ctx;
+  _drsw_countdownActive = true;
+  _drsw_runCountdown(10);
+}
+function _drsw_runCountdown(n){
+  if (!_drsw_countdownActive) return;
+  var cv = _drsw_canvas, ctx = _drsw_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _drsw_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#4cc9f0';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _drsw_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _drsw_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _drsw_countdownActive = false;
+    _drsw_startGame();
+  }
+}
+function _drsw_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillStyle='#4cc9f0';
+  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-10, 10);
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('RULE SWITCH', W-10, 10 + Math.round(H*0.035));
+  ctx.restore();
+}
+/* ─── Setup des 2 cibles OUI/NON (bas-centre, bien espacées) ─── */
+function _drsw_setupTargets(){
+  if (!_drsw_canvas) return;
+  var W = _drsw_canvas.width, H = _drsw_canvas.height;
+  var r = Math.round(Math.min(W * 0.095, H * 0.16));
+  var y = H * 0.56;    // hauteur poitrine
+  var xL = W * 0.30;   // cible OUI à gauche
+  var xR = W * 0.70;   // cible NON à droite
+  _drsw_targets = [
+    { x: xL, y: y, r: r, label: 'OUI', value: true,  color: '#2dc653', state: 'idle', hitTime: 0 },
+    { x: xR, y: y, r: r, label: 'NON', value: false, color: '#e63946', state: 'idle', hitTime: 0 }
+  ];
+}
+/* ─── Génère pool de règles selon mode ─── */
+function _drsw_buildRulePool(){
+  if (_drsw_mode === 'num')      _drsw_rulePool = ['PAIR', 'IMPAIR'];
+  else if (_drsw_mode === 'let') _drsw_rulePool = ['VOYELLE', 'CONSONNE'];
+  else                           _drsw_rulePool = ['PAIR', 'IMPAIR', 'VOYELLE', 'CONSONNE'];
+  _drsw_ruleActive = _drsw_rulePool[Math.floor(Math.random() * _drsw_rulePool.length)];
+}
+/* ─── Génère un stimulus (chiffre ou lettre selon règle active) ─── */
+function _drsw_genStimulus(){
+  var isNumRule = (_drsw_ruleActive === 'PAIR' || _drsw_ruleActive === 'IMPAIR');
+  if (isNumRule){
+    _drsw_stimulus = String(Math.floor(Math.random() * 100));  // 0-99
+  } else {
+    _drsw_stimulus = _DRSW_LETTERS.charAt(Math.floor(Math.random() * _DRSW_LETTERS.length));
+  }
+  _drsw_stimulusTs = Date.now();
+  _drsw_prevWrist = {};   // reset vélocité pour éviter faux hit
+}
+/* ─── Vérifie si une cible (OUI/NON) correspond à la bonne réponse ─── */
+function _drsw_isCorrect(targetValue){
+  var s = _drsw_stimulus;
+  var actual;
+  if (_drsw_ruleActive === 'PAIR')     actual = (parseInt(s, 10) % 2 === 0);
+  else if (_drsw_ruleActive === 'IMPAIR') actual = (parseInt(s, 10) % 2 !== 0);
+  else if (_drsw_ruleActive === 'VOYELLE')  actual = (_DRSW_VOWELS.indexOf(s) >= 0);
+  else                                  actual = (_DRSW_VOWELS.indexOf(s) < 0);
+  return targetValue === actual;
+}
+function _drsw_startGame(){
+  _drsw_running = true;
+  _drsw_startTs = Date.now(); _drsw_elapsed = 0;
+  _drsw_score = 0; _drsw_correct = 0; _drsw_wrong = 0;
+  _drsw_combo = 0; _drsw_bestCombo = 0;
+  _drsw_reactTimes = [];
+  _drsw_particles = [];
+  _drsw_prevWrist = {};
+  _drsw_streakSinceSwitch = 0;
+  _drsw_qSinceSwitch = 0;
+  _drsw_switchCount = 0;
+  _drsw_postSwitchErrors = 0;
+  _drsw_switchFlashTs = 0;
+  _drsw_buildRulePool();
+  _drsw_setupTargets();
+  _drsw_genStimulus();
+  _drsw_rafId = requestAnimationFrame(_drsw_loop);
+}
+/* ─── Déclenche le SWITCH : change la règle active, flash plein écran ─── */
+function _drsw_doSwitch(){
+  var old = _drsw_ruleActive;
+  var pool = _drsw_rulePool.filter(function(r){ return r !== old; });
+  _drsw_ruleActive = pool[Math.floor(Math.random() * pool.length)];
+  _drsw_streakSinceSwitch = 0;
+  _drsw_qSinceSwitch = 0;
+  _drsw_switchCount++;
+  _drsw_switchFlashTs = Date.now();
+  try { if (typeof _td_beep === 'function'){ _td_beep(440,0.08,0.14); setTimeout(function(){_td_beep(880,0.1,0.16);},120); } } catch(e){}
+  _drsw_genStimulus();
+}
+function _drsw_loop(){
+  if (!_drsw_running) return;
+  var cv = _drsw_canvas, ctx = _drsw_ctx, W = cv.width, H = cv.height;
+  _drsw_elapsed = (Date.now() - _drsw_startTs) / 1000;
+  _drawVideoMirror(ctx, _drsw_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_drsw_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _drsw_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  _drsw_drawTargets(ctx, W, H);
+  _drsw_drawStimulus(ctx, W, H);
+  _drsw_drawRuleBanner(ctx, W, H);
+  // Particules
+  var now = Date.now();
+  _drsw_particles = _drsw_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life, alpha = 1 - progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring){
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 3 * (1-progress); ctx.stroke();
+    } else if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    } else {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
+  _drsw_drawSwitchFlash(ctx, W, H);
+  _drsw_drawHud(ctx, W, H);
+  _drsw_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_drsw_elapsed >= _drsw_dur){ _drsw_endGame(); return; }
+  _drsw_rafId = requestAnimationFrame(_drsw_loop);
+}
+/* ─── Dessine stimulus en haut-centre (gros, lisible) ─── */
+function _drsw_drawStimulus(ctx, W, H){
+  if (!_drsw_stimulus) return;
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold '+Math.round(H*0.22)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_drsw_stimulus, W/2, H*0.26);
+  ctx.restore();
+}
+/* ─── Dessine bandeau règle active sous le stimulus ─── */
+function _drsw_drawRuleBanner(ctx, W, H){
+  if (!_drsw_ruleActive) return;
+  var en = window._lang === 'en';
+  var txt;
+  if (_drsw_ruleActive === 'PAIR')         txt = en ? 'EVEN ?' : 'PAIR ?';
+  else if (_drsw_ruleActive === 'IMPAIR')  txt = en ? 'ODD ?' : 'IMPAIR ?';
+  else if (_drsw_ruleActive === 'VOYELLE') txt = en ? 'VOWEL ?' : 'VOYELLE ?';
+  else                                     txt = en ? 'CONSONANT ?' : 'CONSONNE ?';
+  var bw = W*0.34, bh = H*0.09;
+  var bx = W/2 - bw/2, by = H*0.37;
+  ctx.save();
+  ctx.fillStyle = 'rgba(76,201,240,.14)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#4cc9f0';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle = '#4cc9f0';
+  ctx.font = 'bold '+Math.round(bh*0.60)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, by + bh*0.55);
+  ctx.restore();
+}
+/* ─── Dessine les 2 cibles OUI/NON (style octogonal LED cohérent avec MEMORY) ─── */
+function _drsw_drawTargets(ctx, W, H){
+  var now = Date.now();
+  _drsw_targets.forEach(function(t){
+    var pulse = 1 + 0.08 * Math.sin(now / 160);
+    var R = t.r * pulse;
+    ctx.save();
+    // Fond octogonal LED
+    ctx.beginPath();
+    for (var k = 0; k < 8; k++){
+      var ang = Math.PI/8 + k * Math.PI/4;
+      var px = t.x + R * Math.cos(ang);
+      var py = t.y + R * Math.sin(ang);
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(13,17,23,.75)';
+    ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = t.color;
+    ctx.shadowBlur = 18; ctx.shadowColor = t.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Label (OUI / NON)
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = '#fff';
+    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.font = 'bold '+Math.round(R*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(t.label, t.x, t.y + R*0.04);
+    ctx.restore();
+  });
+}
+/* ─── Flash plein écran "SWITCH !" pendant 800ms après chaque switch ─── */
+function _drsw_drawSwitchFlash(ctx, W, H){
+  var elapsed = Date.now() - _drsw_switchFlashTs;
+  if (elapsed > 800) return;
+  var alpha = 1 - elapsed / 800;
+  ctx.save();
+  ctx.globalAlpha = alpha * 0.65;
+  ctx.fillStyle = '#4cc9f0';
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = alpha;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle = '#fff';
+  ctx.shadowBlur = 22; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.font = 'bold '+Math.round(H*0.22)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SWITCH !', W/2, H/2);
+  ctx.restore();
+}
+/* ─── Analyse pose : STRICT DRIBBLE MATHS (r × 1.2, dot > 0, grace spawn 500ms) ─── */
+function _drsw_analyzePose(poses){
+  if (!_drsw_running || !poses || !poses[0] || !_drsw_canvas) return;
+  var cv = _drsw_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_drsw_video ? _drsw_video.videoWidth : W);
+  var sy = H / (_drsw_video ? _drsw_video.videoHeight : H);
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var nowMs = Date.now();
+  ['left','right'].forEach(function(side){
+    var name = side + 'Wrist';
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    var prev = _drsw_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _drsw_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    _drsw_targets.forEach(function(t){
+      // Grace spawn 500ms après génération du stimulus
+      if (nowMs - _drsw_stimulusTs < 500) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 1.2) return;             // ★ STRICT DRIBBLE MATHS
+      var dot = (-dx) * vx + (-dy) * vy;
+      if (dot <= 0) return;                       // ★ STRICT DRIBBLE MATHS
+      // HIT confirmé — bonne ou mauvaise réponse ?
+      var isGood = _drsw_isCorrect(t.value);
+      _drsw_qSinceSwitch++;
+      if (isGood){
+        // ✓ Bonne réponse — pattern _tdr_flashHit EXACT
+        for (var pi = 0; pi < 12; pi++){
+          var angle = (pi/12) * Math.PI * 2;
+          var speed = 2.5 + Math.random()*3;
+          _drsw_particles.push({ x: t.x, y: t.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, r: 3+Math.random()*4, color: t.color, born: nowMs, life: 500+Math.random()*200 });
+        }
+        _drsw_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: t.color, born: nowMs, life: 400, ring:true, maxR: t.r*3 });
+        try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate(20);
+        _drsw_correct++; _drsw_combo++;
+        _drsw_bestCombo = Math.max(_drsw_bestCombo, _drsw_combo);
+        var rt = nowMs - _drsw_stimulusTs;
+        _drsw_reactTimes.push(rt);
+        var speedBonus = Math.max(0, Math.round((2000 - rt) / 200));
+        var streakBonus = _drsw_combo >= 5 ? 5 : 0;
+        var gain = 10 + speedBonus + streakBonus;
+        _drsw_score += gain;
+        _drsw_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText:'+'+gain, color:'#2dc653', born: nowMs, life: 900 });
+        _drsw_streakSinceSwitch++;
+        // Déclenche SWITCH tous les N bonnes réponses
+        if (_drsw_streakSinceSwitch >= _drsw_swFreq){
+          setTimeout(function(){ if (_drsw_running) _drsw_doSwitch(); }, 350);
+        } else {
+          setTimeout(function(){ if (_drsw_running) _drsw_genStimulus(); }, 300);
+        }
+      } else {
+        // ✗ Mauvaise réponse
+        _drsw_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color:'#e63946', born: nowMs, life: 400, ring:true, maxR: t.r*2.4 });
+        _drsw_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText:'✗ -5', color:'#e63946', born: nowMs, life: 900 });
+        try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate([40,30,40]);
+        _drsw_wrong++; _drsw_combo = 0;
+        _drsw_score = Math.max(0, _drsw_score - 5);
+        _drsw_streakSinceSwitch = 0;
+        // Mesure clé : erreurs post-switch (3 premières questions post-switch)
+        if (_drsw_qSinceSwitch <= 3) _drsw_postSwitchErrors++;
+        setTimeout(function(){ if (_drsw_running) _drsw_genStimulus(); }, 350);
+      }
+    });
+  });
+}
+function _drsw_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#4cc9f0';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_drsw_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_drsw_combo > 0){
+    var mult = _drsw_combo >= 10 ? 3 : _drsw_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_drsw_combo, W*0.04, H*0.17);
+  }
+  // Chrono bas-gauche
+  var timeLeft = Math.max(0, _drsw_dur - _drsw_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  var chW = W*0.16, chH = H*0.08;
+  var chX = W*0.04, chY = H - chH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  // Panel compteur switches bas-droite
+  var pW = W*0.22, pH = H*0.08;
+  var pX = W - pW - W*0.04, pY = H - pH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.4)';
+  _dcog_vc_roundRect(ctx, pX, pY, pW, pH, 8); ctx.fill();
+  ctx.lineWidth=1.5; ctx.strokeStyle='rgba(76,201,240,.4)';
+  _dcog_vc_roundRect(ctx, pX, pY, pW, pH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('SWITCHES', pX + pW/2, pY + pH*0.28);
+  ctx.fillStyle='#4cc9f0';
+  ctx.font='bold '+Math.round(H*0.045)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_drsw_switchCount, pX + pW/2, pY + pH*0.75);
+  ctx.restore();
+}
+function _drsw_toggleRec(){ if (_drsw_recActive) _drsw_stopRec(); else _drsw_startRec(); }
+function _drsw_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_drsw_recTimer); _drsw_recTimer = null;
+  if (_drsw_recorder){ try{ _drsw_recorder.ondataavailable=null; _drsw_recorder.onstop=null; _drsw_recorder.onerror=null; if(_drsw_recorder.state!=='inactive')_drsw_recorder.stop(); }catch(e){} }
+  if (_drsw_recStream){ try{_drsw_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _drsw_recStream=null; }
+  _drsw_recorder=null; _drsw_recChunks=[]; _drsw_recSec=0; _drsw_recActive=false;
+  var cv = _drsw_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _drsw_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _drsw_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _drsw_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _drsw_recChunks = []; _drsw_recSec = 0;
+  _drsw_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _drsw_recChunks.push(e.data); };
+  _drsw_recorder.onstop = function(){
+    clearInterval(_drsw_recTimer);
+    var mimeFinal = (_drsw_recorder && _drsw_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_drsw_recChunks, {type: mimeFinal});
+    if (_drsw_recStream){ try{_drsw_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _drsw_recStream=null; }
+    _drsw_recActive=false; _drsw_recChunks=[]; _drsw_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_ruleswitch_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI RULE SWITCH', filename:fn, onSave:function(b,filename){ _drsw_dlBlob(b, filename); } });
+    } else _drsw_dlBlob(blob, fn);
+  };
+  _drsw_recorder.onerror = function(){ clearInterval(_drsw_recTimer); };
+  setTimeout(function(){
+    if (!_drsw_recorder) return;
+    try { _drsw_recorder.start(1000); _drsw_recActive = true; } catch(e){ return; }
+    _drsw_recTimer = setInterval(function(){
+      _drsw_recSec++;
+      var mm=Math.floor(_drsw_recSec/60)%60,ss=_drsw_recSec%60,hh=Math.floor(_drsw_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_drsw_recSec >= 180) _drsw_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _drsw_stopRec(){
+  _drsw_recActive=false; clearInterval(_drsw_recTimer); _drsw_recTimer=null;
+  if (_drsw_recorder){ try{ if(_drsw_recorder.state!=='inactive')_drsw_recorder.stop(); }catch(e){} }
+  _drsw_updateRecBtn();
+}
+function _drsw_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_drsw_recActive, '&#9632; STOP REC', '#e63946'); }
+function _drsw_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _drsw_endGame(){ _drsw_stop(true); _drsw_renderResults(); }
+function _drsw_stop(fromEnd){
+  _drsw_running = false;
+  _drsw_countdownActive = false;
+  if (_drsw_rafId){ cancelAnimationFrame(_drsw_rafId); _drsw_rafId = null; }
+  if (_drsw_recActive) _drsw_stopRec();
+  if (_drsw_stream){ _drsw_stream.getTracks().forEach(function(t){t.stop();}); _drsw_stream=null; }
+  if (typeof senseiCamStop === 'function') senseiCamStop();
+  var btn = document.getElementById('drsw_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('drsw_btnSave');
+  if (sv && fromEnd && (_drsw_correct+_drsw_wrong)>0) sv.style.display = 'flex';
+}
+function _drsw_renderResults(){
+  var res = document.getElementById('drsw_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _drsw_correct + _drsw_wrong;
+  var pct = total > 0 ? Math.round(_drsw_correct / total * 100) : 0;
+  var avg = _drsw_reactTimes.length > 0 ? Math.round(_drsw_reactTimes.reduce(function(a,b){return a+b;},0) / _drsw_reactTimes.length) : 0;
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#4cc9f0">'+_drsw_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_drsw_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'CORRECT':'CORRECTS')+'</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · '+(en?'switches':'switches')+' '+_drsw_switchCount+' · '+(en?'post-switch errors':'erreurs post-switch')+' '+_drsw_postSwitchErrors+'</div>';
+  res.innerHTML = html;
+  _drsw_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _drsw_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _drsw_correct + _drsw_wrong;
+    var pct = total > 0 ? Math.round(_drsw_correct / total * 100) : 0;
+    _sb_recordSession('ruleswitch', pct);
+  }
+  _drsw_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('drsw_btnSave'); if (sv) sv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ⚡ DCOG QUICK CHOICE (_dqa_*) — moteur générique "stimulus + N cibles"
+   Fork minimal : chaque drill = {desc, genQuestion, labels[], check(stim,label)}
+   13 presets du catalogue partageant détection STRICT Dribble Maths + REC + HUD
+   ═══════════════════════════════════════════════════════════════════ */
+var _DQA_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var _DQA_VOWELS  = 'AEIOUY';
+var _DQA_COLORS  = [
+  {k:'ROUGE', hex:'#e63946', en:'RED'},
+  {k:'BLEU',  hex:'#4cc9f0', en:'BLUE'},
+  {k:'VERT',  hex:'#2dc653', en:'GREEN'},
+  {k:'JAUNE', hex:'#f5c518', en:'YELLOW'}
+];
+/* Chaque drill retourne {stimulus, render(ctx,W,H,q), correctLabel, labels:[2 ou 3]} */
+var _DQA_DRILLS = {
+  'C3': {
+    desc_fr:'Classe le chiffre affiché : pair ou impair ?',
+    desc_en:'Classify the number: even or odd?',
+    genQ: function(){ var n = Math.floor(Math.random()*100); return {stim: String(n), labels:['PAIR','IMPAIR'], correct: (n%2===0)?'PAIR':'IMPAIR'}; },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.22); }
+  },
+  'C5': {
+    desc_fr:'Touche le PLUS GRAND des 2 nombres.',
+    desc_en:'Touch the LARGER of the 2 numbers.',
+    genQ: function(){ var a = Math.floor(Math.random()*90)+10, b = Math.floor(Math.random()*90)+10; while(b===a) b = Math.floor(Math.random()*90)+10; return {stim: a+' vs '+b, labels:[String(a),String(b)], correct: String(Math.max(a,b))}; },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, (window._lang==='en'?'LARGER ?':'PLUS GRAND ?'), '#fff', 0.08); }
+  },
+  'C7': {
+    desc_fr:'La lettre affichée est-elle une voyelle ou une consonne ?',
+    desc_en:'Is this letter a vowel or a consonant?',
+    genQ: function(){ var L = _DQA_LETTERS.charAt(Math.floor(Math.random()*26)); return {stim: L, labels:['VOYELLE','CONSONNE'], correct: (_DQA_VOWELS.indexOf(L)>=0)?'VOYELLE':'CONSONNE'}; },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.22); }
+  },
+  'C9': {
+    desc_fr:'Résous l\'opération (opérateur peut changer).',
+    desc_en:'Solve the operation (operator may vary).',
+    genQ: function(){
+      var a = Math.floor(Math.random()*10)+1, b = Math.floor(Math.random()*10)+1;
+      var ops = ['+','-','×'], op = ops[Math.floor(Math.random()*3)];
+      var r = op==='+'?a+b:(op==='-'?a-b:a*b);
+      var wrong = r + (Math.random()<0.5?1:-1)*(1+Math.floor(Math.random()*3));
+      var choices = Math.random()<0.5?[String(r),String(wrong)]:[String(wrong),String(r)];
+      return {stim: a+' '+op+' '+b+' = ?', labels: choices, correct: String(r)};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.15); }
+  },
+  'C10': {
+    desc_fr:'Chiffre → pair/impair · Lettre → voyelle/consonne (le type bascule).',
+    desc_en:'Number → even/odd · Letter → vowel/consonant (type switches).',
+    genQ: function(){
+      if (Math.random()<0.5){
+        var n = Math.floor(Math.random()*100);
+        return {stim:String(n), labels:['PAIR','IMPAIR'], correct:(n%2===0)?'PAIR':'IMPAIR'};
+      } else {
+        var L = _DQA_LETTERS.charAt(Math.floor(Math.random()*26));
+        return {stim:L, labels:['VOYELLE','CONSONNE'], correct:(_DQA_VOWELS.indexOf(L)>=0)?'VOYELLE':'CONSONNE'};
+      }
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.22); }
+  },
+  'C11': {
+    desc_fr:'Les 2 conditions sont-elles toutes les 2 vraies ? (ET logique)',
+    desc_en:'Are both conditions true? (logical AND)',
+    genQ: function(){
+      var n = Math.floor(Math.random()*100);
+      var isEven = (n%2===0), isLarge = (n>=50);
+      var both = isEven && isLarge;
+      var txt = n + '  →  PAIR ET ≥50 ?';
+      return {stim:txt, labels:['OUI','NON'], correct: both?'OUI':'NON'};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.11); }
+  },
+  'D4': {
+    desc_fr:'Un signal au-dessus indique : calcul OU lettre.',
+    desc_en:'Signal above indicates: math OR letter task.',
+    genQ: function(){
+      var task = Math.random()<0.5?'calcul':'lettre';
+      if (task==='calcul'){
+        var a=Math.floor(Math.random()*10)+1, b=Math.floor(Math.random()*10)+1;
+        var r = a+b;
+        var w = r + (Math.random()<0.5?1:-1)*(1+Math.floor(Math.random()*3));
+        var choices = Math.random()<0.5?[String(r),String(w)]:[String(w),String(r)];
+        return {stim:'CALCUL : '+a+' + '+b+' = ?', labels:choices, correct:String(r), task:task};
+      } else {
+        var L = _DQA_LETTERS.charAt(Math.floor(Math.random()*26));
+        return {stim:'LETTRE : '+L+' = ?', labels:['VOYELLE','CONSONNE'], correct:(_DQA_VOWELS.indexOf(L)>=0)?'VOYELLE':'CONSONNE', task:task};
+      }
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, q.task==='calcul'?'#4cc9f0':'#a78bfa', 0.11); }
+  },
+  'D5': {
+    desc_fr:'Règle qui s\'INVERSE régulièrement sans prévenir.',
+    desc_en:'Rule flips periodically without warning.',
+    genQ: function(){
+      // Flag d'inversion global stocké dans _dqa_state
+      if (!_dqa_state.reversed) _dqa_state.reversed = false;
+      if (_dqa_state.qCount && _dqa_state.qCount % 7 === 0) _dqa_state.reversed = !_dqa_state.reversed;
+      var n = Math.floor(Math.random()*100);
+      var isEven = (n%2===0);
+      var correctLabel = _dqa_state.reversed ? (isEven?'IMPAIR':'PAIR') : (isEven?'PAIR':'IMPAIR');
+      return {stim:String(n), labels:['PAIR','IMPAIR'], correct:correctLabel};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.22); }
+  },
+  'D6': {
+    desc_fr:'Touche la COULEUR du mot, pas le texte (Stroop).',
+    desc_en:'Touch the COLOR of the word, not the text (Stroop).',
+    genQ: function(){
+      var wordC = _DQA_COLORS[Math.floor(Math.random()*4)];
+      var inkC;
+      do { inkC = _DQA_COLORS[Math.floor(Math.random()*4)]; } while (inkC.k === wordC.k);
+      // 2 choix : wordC et inkC — correct = inkC (couleur du mot, pas le texte)
+      var choices = Math.random()<0.5?[wordC.k, inkC.k]:[inkC.k, wordC.k];
+      return {stim: wordC.k, labels:choices, correct: inkC.k, inkHex: inkC.hex};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, q.inkHex, 0.18); }
+  },
+  'G1': {
+    desc_fr:'Trouve le suivant de la suite logique.',
+    desc_en:'Find the next in the logical sequence.',
+    genQ: function(){
+      // Suite arithmétique : a, a+d, a+2d, ? = a+3d
+      var a = Math.floor(Math.random()*5)+1, d = Math.floor(Math.random()*4)+1;
+      var next = a + 3*d;
+      var wrong = next + (Math.random()<0.5?1:-1)*(1+Math.floor(Math.random()*3));
+      var choices = Math.random()<0.5?[String(next),String(wrong)]:[String(wrong),String(next)];
+      return {stim: a+', '+(a+d)+', '+(a+2*d)+', ?', labels: choices, correct: String(next)};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#fff', 0.11); }
+  },
+  'G5': {
+    desc_fr:'2 indices · 1 trompeur · suis le FIABLE (bordure solide).',
+    desc_en:'2 cues · 1 deceptive · follow the RELIABLE one (solid border).',
+    genQ: function(){
+      // Indice fiable (encadré solide) = flèche G ou D, trompeur (encadré pointillé) = autre direction
+      var reliable = Math.random()<0.5?'GAUCHE':'DROITE';
+      var deceptive = reliable==='GAUCHE'?'DROITE':'GAUCHE';
+      return {stim: '↕ FIABLE : '+reliable+'  ✦  LEURRE : '+deceptive, labels:['GAUCHE','DROITE'], correct:reliable};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#f5c518', 0.07); }
+  },
+  'I2': {
+    desc_fr:'Défenseur à ta GAUCHE ou DROITE → contourne de l\'AUTRE côté.',
+    desc_en:'Defender on your LEFT or RIGHT → go the OTHER way.',
+    genQ: function(){
+      var def = Math.random()<0.5?'GAUCHE':'DROITE';
+      var answer = def==='GAUCHE'?'DROITE':'GAUCHE';
+      return {stim:'🛡 DÉFENSEUR : '+def, labels:['GAUCHE','DROITE'], correct:answer};
+    },
+    render: function(ctx,W,H,q){ _dqa_drawTextStim(ctx, W, H, q.stim, '#ff6b35', 0.09); }
+  },
+  'I3': {
+    desc_fr:'Mini-terrain : zone LIBRE à gauche ou droite ?',
+    desc_en:'Mini-court: FREE space left or right?',
+    genQ: function(){
+      var free = Math.random()<0.5?'GAUCHE':'DROITE';
+      return {stim:'🏀 ZONE LIBRE', labels:['GAUCHE','DROITE'], correct:free, free:free};
+    },
+    render: function(ctx,W,H,q){
+      _dqa_drawTextStim(ctx, W, H, q.stim, '#2dc653', 0.08);
+      // Mini-terrain visuel : 2 cases, 1 occupée (joueur) 1 libre
+      var tw = W*0.26, th = H*0.09;
+      var tx = W/2 - tw/2, ty = H*0.14;
+      ctx.save();
+      ctx.fillStyle = 'rgba(13,17,23,.6)';
+      ctx.fillRect(tx, ty, tw, th);
+      ctx.strokeStyle = '#2dc653'; ctx.lineWidth = 2;
+      ctx.strokeRect(tx, ty, tw, th);
+      ctx.beginPath(); ctx.moveTo(tx+tw/2, ty); ctx.lineTo(tx+tw/2, ty+th); ctx.stroke();
+      // Joueur adverse dans la zone occupée (côté opposé au free)
+      var occX = q.free==='GAUCHE' ? tx + tw*0.75 : tx + tw*0.25;
+      ctx.fillStyle = '#e63946';
+      ctx.beginPath(); ctx.arc(occX, ty + th/2, th*0.3, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
+};
+var _dqa_mode = 'C3';
+var _dqa_dur = 60;
+var _dqa_running = false, _dqa_stream = null;
+var _dqa_video = null, _dqa_canvas = null, _dqa_ctx = null;
+var _dqa_startTs = 0, _dqa_elapsed = 0;
+var _dqa_score = 0, _dqa_correct = 0, _dqa_wrong = 0;
+var _dqa_reactTimes = [], _dqa_combo = 0, _dqa_bestCombo = 0;
+var _dqa_rafId = null;
+var _dqa_targets = [];
+var _dqa_curQuestion = null;
+var _dqa_questionTs = 0;
+var _dqa_prevWrist = {};
+var _dqa_particles = [];
+var _dqa_countdownActive = false;
+var _dqa_recorder = null, _dqa_recChunks = [], _dqa_recActive = false;
+var _dqa_recTimer = null, _dqa_recSec = 0, _dqa_recStream = null;
+var _dqa_state = {};  // état interne par drill (ex: reversed flag pour D5)
+
+function _dqa_setDrill(id){
+  _dqa_mode = id;
+  _dqa_state = { qCount:0 };
+  var d = _DQA_DRILLS[id];
+  var desc = document.getElementById('dqa_drillDesc');
+  if (desc && d) desc.textContent = window._lang==='en' ? d.desc_en : d.desc_fr;
+}
+function _dqa_setDur(d){ _dqa_dur = d; _dqa_highlight('.dqa-dur-btn','data-sec',d); }
+function _dqa_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(255,107,53,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(255,107,53,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#ff6b35' : '#7a8299';
+  });
+}
+function _dqa_status(msg, color){
+  var st = document.getElementById('dqa_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+function _dqa_start(){
+  if (!navigator.mediaDevices){ _dqa_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _dqa_status(_t('Accès caméra...','Accessing camera...'), '#ff6b35');
+  var btn = document.getElementById('dqa_btnStart');
+  if (btn){ btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _dqa_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _dqa_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('dqa', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _dqa_onCamReady(video, canvas, ctx){
+  _dqa_video = video; _dqa_canvas = canvas; _dqa_ctx = ctx;
+  _dqa_countdownActive = true;
+  _dqa_runCountdown(10);
+}
+function _dqa_runCountdown(n){
+  if (!_dqa_countdownActive) return;
+  var cv = _dqa_canvas, ctx = _dqa_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _dqa_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#ff6b35';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    var en = window._lang === 'en';
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _dqa_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _dqa_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _dqa_countdownActive = false;
+    _dqa_startGame();
+  }
+}
+function _dqa_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillStyle='#ff6b35';
+  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-10, 10);
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('QUICK · '+_dqa_mode, W-10, 10 + Math.round(H*0.035));
+  ctx.restore();
+}
+function _dqa_setupTargets(labels){
+  if (!_dqa_canvas) return;
+  var W = _dqa_canvas.width, H = _dqa_canvas.height;
+  var n = labels.length;
+  var r = Math.round(Math.min(W * 0.09, H * 0.15));
+  var y = H * 0.56;
+  _dqa_targets = [];
+  if (n === 2){
+    _dqa_targets.push({ x: W*0.28, y:y, r:r, label:labels[0], color:'#2dc653', hitTime:0 });
+    _dqa_targets.push({ x: W*0.72, y:y, r:r, label:labels[1], color:'#e63946', hitTime:0 });
+  } else if (n === 3){
+    _dqa_targets.push({ x: W*0.22, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
+    _dqa_targets.push({ x: W*0.50, y:y, r:r, label:labels[1], color:'#f5c518', hitTime:0 });
+    _dqa_targets.push({ x: W*0.78, y:y, r:r, label:labels[2], color:'#a78bfa', hitTime:0 });
+  } else {  // 4 cibles
+    _dqa_targets.push({ x: W*0.18, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
+    _dqa_targets.push({ x: W*0.39, y:y, r:r, label:labels[1], color:'#2dc653', hitTime:0 });
+    _dqa_targets.push({ x: W*0.60, y:y, r:r, label:labels[2], color:'#f5c518', hitTime:0 });
+    _dqa_targets.push({ x: W*0.81, y:y, r:r, label:labels[3], color:'#e63946', hitTime:0 });
+  }
+}
+function _dqa_nextQuestion(){
+  if (!_dqa_running) return;
+  var d = _DQA_DRILLS[_dqa_mode];
+  if (!d) return;
+  _dqa_curQuestion = d.genQ();
+  _dqa_state.qCount = (_dqa_state.qCount || 0) + 1;
+  _dqa_setupTargets(_dqa_curQuestion.labels);
+  _dqa_questionTs = Date.now();
+  _dqa_prevWrist = {};
+}
+function _dqa_startGame(){
+  _dqa_running = true;
+  _dqa_startTs = Date.now(); _dqa_elapsed = 0;
+  _dqa_score = 0; _dqa_correct = 0; _dqa_wrong = 0;
+  _dqa_combo = 0; _dqa_bestCombo = 0;
+  _dqa_reactTimes = [];
+  _dqa_particles = [];
+  _dqa_prevWrist = {};
+  _dqa_state = { qCount:0 };
+  _dqa_nextQuestion();
+  _dqa_rafId = requestAnimationFrame(_dqa_loop);
+}
+function _dqa_loop(){
+  if (!_dqa_running) return;
+  var cv = _dqa_canvas, ctx = _dqa_ctx, W = cv.width, H = cv.height;
+  _dqa_elapsed = (Date.now() - _dqa_startTs) / 1000;
+  _drawVideoMirror(ctx, _dqa_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dqa_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dqa_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  // Render drill-specific stimulus
+  var d = _DQA_DRILLS[_dqa_mode];
+  if (d && _dqa_curQuestion) d.render(ctx, W, H, _dqa_curQuestion);
+  // Cibles réponse
+  _dqa_drawTargets(ctx, W, H);
+  // Particules
+  var now = Date.now();
+  _dqa_particles = _dqa_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life, alpha = 1 - progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring){
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 3*(1-progress); ctx.stroke();
+    } else if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    } else {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r*(1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
+  _dqa_drawHud(ctx, W, H);
+  _dqa_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_dqa_elapsed >= _dqa_dur){ _dqa_endGame(); return; }
+  _dqa_rafId = requestAnimationFrame(_dqa_loop);
+}
+/* Helper générique pour dessiner le stimulus texte en haut-centre */
+function _dqa_drawTextStim(ctx, W, H, txt, color, sizeRatio){
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.fillStyle = color || '#fff';
+  ctx.font = 'bold '+Math.round(H * (sizeRatio||0.14))+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, H*0.28);
+  ctx.restore();
+}
+function _dqa_drawTargets(ctx, W, H){
+  var now = Date.now();
+  _dqa_targets.forEach(function(t){
+    var pulse = 1 + 0.07 * Math.sin(now / 170);
+    var R = t.r * pulse;
+    ctx.save();
+    // Fond octogonal LED
+    ctx.beginPath();
+    for (var k = 0; k < 8; k++){
+      var ang = Math.PI/8 + k * Math.PI/4;
+      var px = t.x + R * Math.cos(ang);
+      var py = t.y + R * Math.sin(ang);
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(13,17,23,.75)';
+    ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = t.color;
+    ctx.shadowBlur = 16; ctx.shadowColor = t.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Label
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = '#fff';
+    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+    var txt = String(t.label);
+    var fsize = txt.length > 5 ? Math.round(R*0.32) : Math.round(R*0.5);
+    ctx.font = 'bold '+fsize+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText(txt, t.x, t.y + R*0.05);
+    ctx.restore();
+  });
+}
+/* Détection STRICT DRIBBLE MATHS (r × 1.2 + dot > 0 + grace 500ms) */
+function _dqa_analyzePose(poses){
+  if (!_dqa_running || !poses || !poses[0] || !_dqa_canvas || !_dqa_curQuestion) return;
+  var cv = _dqa_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_dqa_video ? _dqa_video.videoWidth : W);
+  var sy = H / (_dqa_video ? _dqa_video.videoHeight : H);
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var nowMs = Date.now();
+  ['left','right'].forEach(function(side){
+    var name = side + 'Wrist';
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    var prev = _dqa_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dqa_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    _dqa_targets.forEach(function(t){
+      if (nowMs - _dqa_questionTs < 500) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 1.2) return;
+      var dot = (-dx)*vx + (-dy)*vy;
+      if (dot <= 0) return;
+      var isGood = (t.label === _dqa_curQuestion.correct);
+      if (isGood){
+        for (var pi = 0; pi < 12; pi++){
+          var angle = (pi/12) * Math.PI * 2;
+          var speed = 2.5 + Math.random()*3;
+          _dqa_particles.push({ x: t.x, y: t.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, r: 3+Math.random()*4, color: t.color, born: nowMs, life: 500+Math.random()*200 });
+        }
+        _dqa_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: t.color, born: nowMs, life: 400, ring:true, maxR: t.r*3 });
+        try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate(20);
+        _dqa_correct++; _dqa_combo++;
+        _dqa_bestCombo = Math.max(_dqa_bestCombo, _dqa_combo);
+        var rt = nowMs - _dqa_questionTs;
+        _dqa_reactTimes.push(rt);
+        var speedBonus = Math.max(0, Math.round((2000 - rt) / 200));
+        var streakBonus = _dqa_combo >= 5 ? 5 : 0;
+        var gain = 10 + speedBonus + streakBonus;
+        _dqa_score += gain;
+        _dqa_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText:'+'+gain, color:'#2dc653', born: nowMs, life: 900 });
+        setTimeout(function(){ if (_dqa_running) _dqa_nextQuestion(); }, 300);
+      } else {
+        _dqa_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color:'#e63946', born: nowMs, life: 400, ring:true, maxR: t.r*2.4 });
+        _dqa_particles.push({ x: t.x, y: t.y - t.r*1.6, floatText:'✗ -5', color:'#e63946', born: nowMs, life: 900 });
+        try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate([40,30,40]);
+        _dqa_wrong++; _dqa_combo = 0;
+        _dqa_score = Math.max(0, _dqa_score - 5);
+        setTimeout(function(){ if (_dqa_running) _dqa_nextQuestion(); }, 350);
+      }
+    });
+  });
+}
+function _dqa_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#ff6b35';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_dqa_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_dqa_combo > 0){
+    var mult = _dqa_combo >= 10 ? 3 : _dqa_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_dqa_combo, W*0.04, H*0.17);
+  }
+  // Chrono bas-gauche
+  var timeLeft = Math.max(0, _dqa_dur - _dqa_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  var chW = W*0.16, chH = H*0.08;
+  var chX = W*0.04, chY = H - chH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  ctx.restore();
+}
+function _dqa_toggleRec(){ if (_dqa_recActive) _dqa_stopRec(); else _dqa_startRec(); }
+function _dqa_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_dqa_recTimer); _dqa_recTimer = null;
+  if (_dqa_recorder){ try{ _dqa_recorder.ondataavailable=null; _dqa_recorder.onstop=null; _dqa_recorder.onerror=null; if(_dqa_recorder.state!=='inactive')_dqa_recorder.stop(); }catch(e){} }
+  if (_dqa_recStream){ try{_dqa_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dqa_recStream=null; }
+  _dqa_recorder=null; _dqa_recChunks=[]; _dqa_recSec=0; _dqa_recActive=false;
+  var cv = _dqa_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dqa_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _dqa_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _dqa_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _dqa_recChunks = []; _dqa_recSec = 0;
+  _dqa_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dqa_recChunks.push(e.data); };
+  _dqa_recorder.onstop = function(){
+    clearInterval(_dqa_recTimer);
+    var mimeFinal = (_dqa_recorder && _dqa_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dqa_recChunks, {type: mimeFinal});
+    if (_dqa_recStream){ try{_dqa_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dqa_recStream=null; }
+    _dqa_recActive=false; _dqa_recChunks=[]; _dqa_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_'+_dqa_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI QUICK · '+_dqa_mode, filename:fn, onSave:function(b,filename){ _dqa_dlBlob(b, filename); } });
+    } else _dqa_dlBlob(blob, fn);
+  };
+  _dqa_recorder.onerror = function(){ clearInterval(_dqa_recTimer); };
+  setTimeout(function(){
+    if (!_dqa_recorder) return;
+    try { _dqa_recorder.start(1000); _dqa_recActive = true; } catch(e){ return; }
+    _dqa_recTimer = setInterval(function(){
+      _dqa_recSec++;
+      var mm=Math.floor(_dqa_recSec/60)%60,ss=_dqa_recSec%60,hh=Math.floor(_dqa_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_dqa_recSec >= 180) _dqa_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _dqa_stopRec(){
+  _dqa_recActive=false; clearInterval(_dqa_recTimer); _dqa_recTimer=null;
+  if (_dqa_recorder){ try{ if(_dqa_recorder.state!=='inactive')_dqa_recorder.stop(); }catch(e){} }
+  _dqa_updateRecBtn();
+}
+function _dqa_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dqa_recActive, '&#9632; STOP REC', '#e63946'); }
+function _dqa_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _dqa_endGame(){ _dqa_stop(true); _dqa_renderResults(); }
+function _dqa_stop(fromEnd){
+  _dqa_running = false;
+  _dqa_countdownActive = false;
+  if (_dqa_rafId){ cancelAnimationFrame(_dqa_rafId); _dqa_rafId = null; }
+  if (_dqa_recActive) _dqa_stopRec();
+  if (_dqa_stream){ _dqa_stream.getTracks().forEach(function(t){t.stop();}); _dqa_stream=null; }
+  if (typeof senseiCamStop === 'function') senseiCamStop();
+  var btn = document.getElementById('dqa_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('dqa_btnSave');
+  if (sv && fromEnd && (_dqa_correct+_dqa_wrong)>0) sv.style.display = 'flex';
+}
+function _dqa_renderResults(){
+  var res = document.getElementById('dqa_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _dqa_correct + _dqa_wrong;
+  var pct = total > 0 ? Math.round(_dqa_correct / total * 100) : 0;
+  var avg = _dqa_reactTimes.length > 0 ? Math.round(_dqa_reactTimes.reduce(function(a,b){return a+b;},0) / _dqa_reactTimes.length) : 0;
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#ff6b35">'+_dqa_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dqa_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'CORRECT':'CORRECTS')+'</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · drill '+_dqa_mode+' · combo max ×'+_dqa_bestCombo+'</div>';
+  res.innerHTML = html;
+  _dqa_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _dqa_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _dqa_correct + _dqa_wrong;
+    var pct = total > 0 ? Math.round(_dqa_correct / total * 100) : 0;
+    _sb_recordSession('qc_'+_dqa_mode, pct);
+  }
+  _dqa_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('dqa_btnSave'); if (sv) sv.style.display = 'none';
 }
 
 function _tsym_onError(msg) {
@@ -32451,14 +33667,18 @@ function _dcog_selectDrill(drill, langOnly) {
     colorreact: en ? 'All colors appear — hit the one the voice calls out. Reaction + color recognition.'
                    : 'Toutes les couleurs apparaissent — touche uniquement celle annoncée. Réaction + reconnaissance couleur.',
     memory: en ? 'A sequence of digits/letters flashes — memorize it then hit the LED targets in order. Working memory × motor.'
-               : 'Une séquence de chiffres/lettres s\'affiche — mémorise-la puis touche les cibles LED dans l\'ordre. Mémoire de travail × motricité.'
+               : 'Une séquence de chiffres/lettres s\'affiche — mémorise-la puis touche les cibles LED dans l\'ordre. Mémoire de travail × motricité.',
+    ruleswitch: en ? 'Classify the stimulus according to the active rule — rule flips periodically. Cognitive flexibility × dribble.'
+                   : 'Classifie le stimulus selon la règle active — la règle bascule régulièrement. Flexibilité cognitive × dribble.',
+    quickchoice: en ? 'Universal engine — 13 catalogue drills (classify, compare, predict, Stroop, defender read, free space…). Same Dribble Maths detection for all.'
+                    : 'Moteur universel — 13 drills catalogue (classer, comparer, prédire, Stroop, lire défenseur, espace libre…). Même détection Dribble Maths pour tous.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','memory'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','memory','ruleswitch','quickchoice'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -32467,13 +33687,13 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', memory:'dcog_optMemory'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', memory:'dcog_optMemory', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/colorreact/memory utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'memory' ? '12px' : '8px');
+        // viscoord/rcs/colorreact/memory/ruleswitch/quickchoice utilisent flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'memory' || d === 'ruleswitch' || d === 'quickchoice' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -32488,7 +33708,9 @@ function _dcog_selectDrill(drill, langOnly) {
       burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ',
       vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT',
-      memory:   en ? '🧠 MEMORY DRILL'  : '🧠 MEMORY DRILL'
+      memory:   en ? '🧠 MEMORY DRILL'  : '🧠 MEMORY DRILL',
+      ruleswitch: en ? '🔁 RULE SWITCH' : '🔁 RULE SWITCH',
+      quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -32522,7 +33744,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCustomCam = (drill === 'colorreact' || drill === 'memory');
+    var isCustomCam = (drill === 'colorreact' || drill === 'memory' || drill === 'ruleswitch' || drill === 'quickchoice');
     if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
     if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
     if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
@@ -37109,7 +38331,8 @@ function senseiCamShow(mod,stream){
     if(mod==='tdrc'&&typeof _tdrc_onCamReady==='function')_tdrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcrc'&&typeof _dcrc_onCamReady==='function')_dcrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dmem'&&typeof _dmem_onCamReady==='function')_dmem_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
-    if(mod==='dmem'&&typeof _dmem_onCamReady==='function')_dmem_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='drsw'&&typeof _drsw_onCamReady==='function')_drsw_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dqa'&&typeof _dqa_onCamReady==='function')_dqa_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -37178,7 +38401,8 @@ function senseiCamToggleRec(){
   else if(m==='tdrc' && typeof _tdrc_toggleRec==='function') _tdrc_toggleRec();
   else if(m==='dcrc' && typeof _dcrc_toggleRec==='function') _dcrc_toggleRec();
   else if(m==='dmem' && typeof _dmem_toggleRec==='function') _dmem_toggleRec();
-  else if(m==='dmem' && typeof _dmem_toggleRec==='function') _dmem_toggleRec();
+  else if(m==='drsw' && typeof _drsw_toggleRec==='function') _drsw_toggleRec();
+  else if(m==='dqa' && typeof _dqa_toggleRec==='function') _dqa_toggleRec();
 }
 // i18n portrait warning
 (function(){
