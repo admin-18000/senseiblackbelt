@@ -2315,10 +2315,6 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🌈<div id="dcog_lbl_colorreact">COLOR REACT</div>
       </button>
-      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('memory')" id="dcog_btn_memory"
-        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
-        🧠<div id="dcog_lbl_memory">MEMORY DRILL</div>
-      </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('ruleswitch')" id="dcog_btn_ruleswitch"
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🔁<div id="dcog_lbl_ruleswitch">RULE SWITCH</div>
@@ -2518,48 +2514,6 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="dcrc_btnStart" onclick="_dcrc_start()" ontouchstart="" style="width:100%;background:#4cc9f0;color:#0d1117">▶ DÉMARRER COLOR REACT</button>
       <button class="tr-btn tr-btn-save" id="dcrc_btnSave" onclick="_dcrc_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dcrc_results" style="margin-top:4px"></div>
-    </div>
-    <!-- MEMORY DRILL : mode · taille séquence · durée + START/SAVE -->
-    <div id="dcog_optMemory" style="display:none;flex-direction:column;gap:12px">
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔤 MODE</div>
-        <div style="display:flex;gap:6px">
-          <button class="dmem-mode-btn" data-mode="num" onclick="_dmem_setMode('num')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔢 CHIFFRES</button>
-          <button class="dmem-mode-btn" data-mode="let" onclick="_dmem_setMode('let')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔤 LETTRES</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎚 SÉQUENCE</div>
-        <div style="display:flex;gap:6px">
-          <button class="dmem-seq-btn" data-seq="2" onclick="_dmem_setSeq(2)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟢 2 · EASY</button>
-          <button class="dmem-seq-btn" data-seq="3" onclick="_dmem_setSeq(3)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🟡 3 · MED</button>
-          <button class="dmem-seq-btn" data-seq="4" onclick="_dmem_setSeq(4)" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🔥 4 · HARD</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🏀 MAIN QUI DRIBBLE</div>
-        <div style="display:flex;gap:6px">
-          <button class="dmem-hand-btn" data-hand="right" onclick="_dmem_setDominant('right')" style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">✋ DROITIER</button>
-          <button class="dmem-hand-btn" data-hand="left"  onclick="_dmem_setDominant('left')"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🤚 GAUCHER</button>
-          <button class="dmem-hand-btn" data-hand="both"  onclick="_dmem_setDominant('both')"  style="flex:1;padding:9px 6px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">🙌 2 MAINS</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="dmem-dur-btn" data-sec="60"  onclick="_dmem_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
-          <button class="dmem-dur-btn" data-sec="90"  onclick="_dmem_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
-          <button class="dmem-dur-btn" data-sec="120" onclick="_dmem_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
-          <button class="dmem-dur-btn" data-sec="180" onclick="_dmem_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
-        </div>
-      </div>
-      <div style="padding:8px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
-        🧠🏀 Dribble en continu · 4 cibles LED à hauteur épaule/poitrine côté main libre · elles flashent une à une (son pentatonique synchronisé) · mémorise l'ordre puis touche-les. Zone basse + coins réservés → zéro collision.
-      </div>
-      <div id="dmem_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
-      <button class="tr-btn tr-btn-start" id="dmem_btnStart" onclick="_dmem_start()" ontouchstart="" style="width:100%;background:#a78bfa;color:#0d1117">▶ DÉMARRER MEMORY</button>
-      <button class="tr-btn tr-btn-save" id="dmem_btnSave" onclick="_dmem_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
-      <div id="dmem_results" style="margin-top:4px"></div>
     </div>
     <!-- RULE SWITCH : mode (chiffres/lettres/mixte) · durée · fréquence switch -->
     <div id="dcog_optRuleswitch" style="display:none;flex-direction:column;gap:12px">
@@ -30275,666 +30229,6 @@ function _dcrc_save(){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   🧠 DCOG MEMORY DRILL (_dmem_*) — inspiré SportReact LED Memory
-   • 6 cibles LED octogonales affichent chiffres/lettres
-   • Séquence de 3/4/5 flashe au centre pendant 2.5s
-   • Puis cache séquence → joueur touche les cibles dans l'ordre mémorisé
-   • Hit bon = +N points · hit mauvais = -5 + round failed · tout dans l'ordre = bonus
-   • Détection calquée 1:1 sur _tdr_checkHits (TARGETS strict)
-   ═══════════════════════════════════════════════════════════════════ */
-var _DMEM_PALETTE = ['#e63946','#4cc9f0','#a78bfa','#f5c518','#2dc653','#ff6b35']; // R, B, V(iolet), J, Vert, Orange
-var _DMEM_LETTERS = ['A','B','C','D','E','F','G','H','K','L','M','N','P','R','S','T','V','X','Y','Z'];
-var _dmem_mode   = 'num';   // 'num' | 'let'
-var _dmem_seqLen = 2;        // 2 | 3 | 4  (EASY = 2 cibles à mémoriser)
-var _dmem_dur    = 60;
-var _dmem_running = false, _dmem_stream = null;
-var _dmem_video = null, _dmem_canvas = null, _dmem_ctx = null;
-var _dmem_startTs = 0, _dmem_elapsed = 0;
-var _dmem_score = 0, _dmem_correct = 0, _dmem_wrong = 0;
-var _dmem_reactTimes = [], _dmem_combo = 0, _dmem_bestCombo = 0;
-var _dmem_rafId = null;
-var _dmem_targets = [];      // 6 cibles LED {x, y, r, label, color, idx, state, recentHitTs}
-var _dmem_sequence = [];     // [idx1, idx2, idx3] indices dans _dmem_targets à toucher dans l'ordre
-var _dmem_curStep = 0;        // position courante dans _dmem_sequence
-var _dmem_phase = 'show';    // 'show' (affiche séquence) | 'play' (joueur touche) | 'done' (round résolu)
-var _dmem_phaseTs = 0;        // timestamp de début de phase
-var _dmem_showMs = 3500;      // ms d'affichage par défaut (recalculé par round selon seqLen)
-var _dmem_particles = [];
-var _dmem_prevWrist = {};
-var _dmem_countdownActive = false;
-var _dmem_recorder = null, _dmem_recChunks = [], _dmem_recActive = false;
-var _dmem_recTimer = null, _dmem_recSec = 0, _dmem_recStream = null;
-// Main dominante (dribble) : 'right' | 'left' | 'both' (défaut : both = 2 mains OK)
-var _dmem_dominant = 'both';
-// Index du dernier slot SHOW ayant déclenché un bip (évite les répétitions à chaque frame)
-var _dmem_lastShowBipSlot = -1;
-
-function _dmem_setMode(m){ _dmem_mode = m; _dmem_highlight('.dmem-mode-btn','data-mode',m); }
-function _dmem_setSeq(n){  _dmem_seqLen = n; _dmem_highlight('.dmem-seq-btn','data-seq',n); }
-function _dmem_setDur(d){  _dmem_dur = d;   _dmem_highlight('.dmem-dur-btn','data-sec',d); }
-function _dmem_setDominant(h){ _dmem_dominant = h; _dmem_highlight('.dmem-hand-btn','data-hand',h); }
-function _dmem_highlight(sel, attr, val){
-  document.querySelectorAll(sel).forEach(function(b){
-    var active = String(b.getAttribute(attr)) === String(val);
-    b.style.border     = active ? '1px solid rgba(167,139,250,.5)' : '1px solid #1e2535';
-    b.style.background = active ? 'rgba(167,139,250,.15)' : 'var(--dark3)';
-    b.style.color      = active ? '#a78bfa' : '#7a8299';
-  });
-}
-function _dmem_status(msg, color){
-  var st = document.getElementById('dmem_status');
-  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
-}
-function _dmem_start(){
-  if (!navigator.mediaDevices){ _dmem_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
-  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
-  _dmem_status(_t('Accès caméra...','Accessing camera...'), '#a78bfa');
-  var btn = document.getElementById('dmem_btnStart');
-  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
-  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
-  function tryC(i){
-    if (i >= constraints.length){ _dmem_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
-    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
-      _dmem_stream = stream;
-      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
-      senseiCamShow('dmem', stream);
-    }).catch(function(){ tryC(i+1); });
-  }
-  tryC(0);
-}
-function _dmem_onCamReady(video, canvas, ctx){
-  _dmem_video = video; _dmem_canvas = canvas; _dmem_ctx = ctx;
-  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
-  _dmem_countdownActive = true;
-  _dmem_runCountdown(10);
-}
-function _dmem_runCountdown(n){
-  if (!_dmem_countdownActive) return;
-  var cv = _dmem_canvas, ctx = _dmem_ctx;
-  if (!cv || !ctx) return;
-  var W = cv.width, H = cv.height;
-  _drawVideoMirror(ctx, _dmem_video, W, H);
-  ctx.save();
-  if (n > 0){
-    ctx.fillStyle = '#a78bfa';
-    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(String(n), W/2, H/2);
-    var en = window._lang === 'en';
-    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(en?'GET READY':'PRÊT ?', W/2, H*0.82);
-    _dmem_drawBrand(ctx, W, H);
-    ctx.restore();
-    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
-    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
-    setTimeout(function(){ _dmem_runCountdown(n-1); }, 1000);
-  } else {
-    ctx.restore();
-    _dmem_countdownActive = false;
-    _dmem_startGame();
-  }
-}
-function _dmem_drawBrand(ctx, W, H){
-  ctx.save();
-  ctx.textAlign='right'; ctx.textBaseline='top';
-  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
-  ctx.fillStyle='#a78bfa';
-  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText('SENSEI', W-10, 10);
-  ctx.fillStyle='rgba(255,255,255,.75)';
-  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
-  ctx.fillText('MEMORY DRILL', W-10, 10 + Math.round(H*0.035));
-  ctx.restore();
-}
-function _dmem_startGame(){
-  _dmem_running = true;
-  _dmem_startTs = Date.now(); _dmem_elapsed = 0;
-  _dmem_score = 0; _dmem_correct = 0; _dmem_wrong = 0;
-  _dmem_combo = 0; _dmem_bestCombo = 0;
-  _dmem_reactTimes = [];
-  _dmem_particles = [];
-  _dmem_prevWrist = {};
-  _dmem_setupTargets();
-  _dmem_newRound();
-  _dmem_rafId = requestAnimationFrame(_dmem_loop);
-}
-/* ─── Setup BASKETBALLISABLE v2 : 4 cibles LED en bloc 2×2 ───
-   PROBLÈMES CORRIGÉS :
-   • REC/STOP (coins hauts) masquaient 2 cibles → zone x réduite à [W×0.22, W×0.78]
-   • Cibles trop hautes (bras au-dessus de la tête) → zone y descendue à [H×0.32, H×0.52]
-     (hauteur épaule-poitrine, portée naturelle du bras libre)
-   • 6 cibles tangentes sans gap → 4 cibles seulement, gap visible garanti
-   • Placement adaptatif main dominante :
-       droitier → cibles côté DROIT du canvas (= côté main libre après mirror)
-       gaucher → cibles côté GAUCHE du canvas
-       2 mains → cibles pleine largeur réduite (hors zones REC/STOP)
-   • Rayon W×0.075 (un peu plus petit, cohérent avec gap entre cibles)                */
-function _dmem_setupTargets(){
-  if (!_dmem_canvas) return;
-  var W = _dmem_canvas.width, H = _dmem_canvas.height;
-  var r = Math.round(Math.min(W * 0.075, H * 0.13));
-  // Zone horizontale selon main dominante (exclut toujours les coins REC/STOP)
-  //   Rappel : vidéo mirror → main gauche RÉELLE du joueur apparaît à droite du canvas
-  //   Donc droitier (dribble main droite réelle = côté gauche canvas) → cibles côté DROIT canvas
-  var xMin, xMax;
-  if (_dmem_dominant === 'right'){        // droitier : main libre = côté droit canvas
-    xMin = W * 0.44; xMax = W * 0.78;
-  } else if (_dmem_dominant === 'left'){  // gaucher : main libre = côté gauche canvas
-    xMin = W * 0.22; xMax = W * 0.56;
-  } else {                                 // 2 mains : pleine largeur réduite (hors coins REC/STOP)
-    xMin = W * 0.22; xMax = W * 0.78;
-  }
-  // Zone verticale : hauteur épaule-poitrine (portée naturelle main libre en dribblant)
-  var y1 = H * 0.32;    // ligne haute (épaule)
-  var y2 = H * 0.52;    // ligne basse (poitrine)
-  // Grille 2×2 — 4 cibles bien espacées
-  var cols = 2, rows = 2;
-  var colGapW = (xMax - xMin) / (cols - 1);
-  _dmem_targets = [];
-  for (var row = 0; row < rows; row++){
-    for (var col = 0; col < cols; col++){
-      var cx = xMin + colGapW * col;
-      var cy = row === 0 ? y1 : y2;
-      _dmem_targets.push({
-        x: cx, y: cy, r: r,
-        label: '', color: _DMEM_PALETTE[(row*cols + col) % _DMEM_PALETTE.length],
-        idx: row*cols + col,
-        state: 'idle',       // 'idle' | 'active' | 'hit_correct' | 'hit_error'
-        recentHitTs: 0,
-        flashTs: 0
-      });
-    }
-  }
-}
-/* ─── Nouveau round : génère labels + séquence + phase 'show' ─── */
-function _dmem_newRound(){
-  if (!_dmem_running) return;
-  // Génère labels aléatoires sans doublons sur les 6 cibles
-  var pool = (_dmem_mode === 'let') ? _DMEM_LETTERS.slice() : ['0','1','2','3','4','5','6','7','8','9'];
-  // Mélange
-  for (var i = pool.length - 1; i > 0; i--){
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-  }
-  // Assigne aux cibles (toutes labels uniques)
-  _dmem_targets.forEach(function(t, i){
-    t.label = pool[i % pool.length];
-    t.state = 'idle';
-    t.recentHitTs = 0;
-    t.flashTs = Date.now();
-  });
-  // Pick seqLen cibles au hasard (indices distincts) pour la séquence
-  var tgtIdx = [];
-  for (var k = 0; k < _dmem_targets.length; k++) tgtIdx.push(k);
-  for (var m = tgtIdx.length - 1; m > 0; m--){
-    var n = Math.floor(Math.random() * (m + 1));
-    var swap = tgtIdx[m]; tgtIdx[m] = tgtIdx[n]; tgtIdx[n] = swap;
-  }
-  _dmem_sequence = tgtIdx.slice(0, _dmem_seqLen);
-  _dmem_curStep = 0;
-  _dmem_phase = 'show';
-  _dmem_phaseTs = Date.now();
-  // ★ Phase SHOW = flash séquentiel sur les cibles (chaque cible 500ms = 350 ON + 150 OFF)
-  //   + 800ms de temps mort final avant phase 'play' pour laisser le temps de se préparer
-  //   seqLen 2 → 1800ms · 3 → 2300ms · 4 → 2800ms (ralenti pour mémorisation confortable)
-  _dmem_showMs = _dmem_seqLen * 500 + 800;
-  // Reset vélocité pour éviter faux hit au premier frame de phase play
-  _dmem_prevWrist = {};
-}
-function _dmem_loop(){
-  if (!_dmem_running) return;
-  var cv = _dmem_canvas, ctx = _dmem_ctx, W = cv.width, H = cv.height;
-  _dmem_elapsed = (Date.now() - _dmem_startTs) / 1000;
-  _drawVideoMirror(ctx, _dmem_video, W, H);
-  // Transition de phase show → play
-  if (_dmem_phase === 'show' && Date.now() - _dmem_phaseTs >= _dmem_showMs){
-    _dmem_phase = 'play';
-    _dmem_phaseTs = Date.now();
-    _dmem_lastShowBipSlot = -1;
-    try { if (typeof _td_beep === 'function') _td_beep(1200, 0.06, 0.14); } catch(e){}
-  }
-  // ★ Bip audio synchronisé avec chaque flash de cible en phase SHOW
-  //   → le joueur peut mémoriser la séquence même en gardant les yeux sur le dribble
-  //   Chaque cible a sa fréquence (gamme pentatonique) : plus mélodique à retenir
-  if (_dmem_phase === 'show'){
-    var showElapsed = Date.now() - _dmem_phaseTs;
-    var curSlot = Math.floor(showElapsed / 500);
-    var inOn = (showElapsed - curSlot * 500) < 350;
-    if (inOn && curSlot < _dmem_sequence.length && curSlot !== _dmem_lastShowBipSlot){
-      _dmem_lastShowBipSlot = curSlot;
-      // Fréquences pentatoniques (do-ré-mi-sol) pour les 4 cibles
-      var _DMEM_FREQS = [523, 587, 659, 784];
-      var tgtIdx = _dmem_sequence[curSlot];
-      try { if (typeof _td_beep === 'function') _td_beep(_DMEM_FREQS[tgtIdx] || 660, 0.08, 0.14); } catch(e){}
-    }
-  }
-  // Détection pose uniquement en phase play
-  if (_dmem_phase === 'play' && window._tsym_detector){
-    try { _tsym_detector.estimatePoses(_dmem_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dmem_analyzePose(poses); }).catch(function(){}); } catch(e){}
-  }
-  _dmem_drawTargets(ctx, W, H);
-  _dmem_drawSequencePanel(ctx, W, H);
-  // Particules (identique DCRC/TDR)
-  var now = Date.now();
-  _dmem_particles = _dmem_particles.filter(function(p){
-    var age = now - p.born;
-    if (age > p.life) return false;
-    var progress = age / p.life, alpha = 1 - progress;
-    ctx.save(); ctx.globalAlpha = alpha;
-    if (p.ring){
-      var curR = p.r + (p.maxR - p.r) * progress;
-      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
-      ctx.strokeStyle = p.color; ctx.lineWidth = 3 * (1-progress); ctx.stroke();
-    } else if (p.floatText){
-      var yOff = -progress * (H*0.08);
-      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
-      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
-    } else {
-      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1-progress*0.5), 0, Math.PI*2);
-      ctx.fillStyle = p.color; ctx.fill();
-    }
-    ctx.restore();
-    return true;
-  });
-  _dmem_drawHud(ctx, W, H);
-  _dmem_drawBrand(ctx, W, H);
-  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
-  if (_dmem_elapsed >= _dmem_dur){ _dmem_endGame(); return; }
-  _dmem_rafId = requestAnimationFrame(_dmem_loop);
-}
-/* ─── Dessine les 6 cibles LED octogonales façon SportReact — flash séquentiel en SHOW ─── */
-function _dmem_drawTargets(ctx, W, H){
-  var now = Date.now();
-  // Index courant du flash séquentiel en phase SHOW (une cible à la fois)
-  var showIdx = (_dmem_phase === 'show') ? _dmem_showCurIdx() : -1;
-  var activeShowTarget = (showIdx >= 0) ? _dmem_sequence[showIdx] : -1;
-  // Ordre dans la séquence pour le badge
-  var seqOrderIdxs = {};
-  _dmem_sequence.forEach(function(idx, pos){ seqOrderIdxs[idx] = pos + 1; });
-  _dmem_targets.forEach(function(t, i){
-    var spawnRamp = Math.min(1, (now - t.flashTs) / 300);
-    // Est-ce la cible qui flashe en phase SHOW ?
-    var isShowFlash = (i === activeShowTarget);
-    // Pulse si c'est la prochaine à toucher en phase play (ou si flash SHOW)
-    var isNext = (_dmem_phase === 'play' && _dmem_sequence[_dmem_curStep] === i);
-    var pulse = 1 + ((isNext || isShowFlash) ? 0.16 : 0.07) * Math.sin(now / 160 + i);
-    // Dim en phase show si pas la cible courante du flash
-    //   • Toutes les cibles restent VISIBLES (le joueur voit le layout) à 0.35
-    //   • La cible courante du flash séquentiel passe à 1.0 (allumée vivement)
-    var dim;
-    if (_dmem_phase === 'show'){
-      dim = isShowFlash ? 1.0 : 0.35;
-    } else {
-      dim = 1.0;
-    }
-    ctx.save();
-    ctx.globalAlpha = dim * spawnRamp;
-    // Fond octogonal façon LED (polygone 8 côtés)
-    var R = t.r * pulse;
-    ctx.beginPath();
-    for (var k = 0; k < 8; k++){
-      var ang = Math.PI / 8 + k * Math.PI / 4;
-      var px = t.x + R * Math.cos(ang);
-      var py = t.y + R * Math.sin(ang);
-      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    // Couleur selon état
-    var fillCol = t.color;
-    var strokeCol = t.color;
-    if (t.state === 'hit_correct'){ fillCol = '#2dc653'; strokeCol = '#2dc653'; }
-    else if (t.state === 'hit_error'){ fillCol = '#e63946'; strokeCol = '#e63946'; }
-    ctx.fillStyle = 'rgba(13,17,23,.82)';
-    ctx.fill();
-    ctx.lineWidth = isNext ? 4 : 2.5;
-    ctx.strokeStyle = strokeCol;
-    ctx.shadowBlur = isNext ? 24 : 14;
-    ctx.shadowColor = strokeCol;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    // Grille de LED dots inside (style SportReact LED matrix)
-    var dotR = Math.max(1.2, R * 0.055);
-    var dotStep = R * 0.18;
-    ctx.fillStyle = fillCol;
-    ctx.globalAlpha = (dim * spawnRamp) * 0.85;
-    for (var dy = -2; dy <= 2; dy++){
-      for (var dx = -2; dx <= 2; dx++){
-        var ddx = t.x + dx * dotStep;
-        var ddy = t.y + dy * dotStep;
-        var distFromCenter = Math.sqrt(dx*dx + dy*dy);
-        if (distFromCenter > 2.3) continue;
-        ctx.beginPath();
-        ctx.arc(ddx, ddy, dotR, 0, Math.PI*2);
-        ctx.fill();
-      }
-    }
-    ctx.globalAlpha = dim * spawnRamp;
-    // Label (chiffre ou lettre) au centre
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold '+Math.round(R*0.72)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillText(t.label, t.x, t.y + R*0.05);
-    ctx.shadowBlur = 0;
-    // Badge numéro d'ordre uniquement sur la cible actuellement allumée en phase SHOW
-    //   (le joueur voit "1" quand cette cible flashe, "2" sur la suivante, etc.)
-    if (isShowFlash && seqOrderIdxs[i]){
-      ctx.fillStyle = '#a78bfa';
-      ctx.beginPath();
-      ctx.arc(t.x + R*0.75, t.y - R*0.75, R*0.3, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = '#0d1117';
-      ctx.font = 'bold '+Math.round(R*0.35)+'px "Bebas Neue","Arial Narrow",sans-serif';
-      ctx.fillText(String(seqOrderIdxs[i]), t.x + R*0.75, t.y - R*0.72);
-    }
-    ctx.restore();
-  });
-}
-/* ─── Panneau d'info (phase SHOW : simple hint "MÉMORISE" · phase PLAY : étape N/M + label attendu)
-     Le flash séquentiel des cibles elles-mêmes (_dmem_drawTargets) porte toute l'info de la séquence
-     en phase SHOW → pas de banner central avec les labels, on garde la vue dégagée pour dribbler */
-function _dmem_drawSequencePanel(ctx, W, H){
-  if (_dmem_phase !== 'show' && _dmem_phase !== 'play') return;
-  // ★ Garde-fou : ne rien afficher si la séquence n'est pas encore générée
-  //   (évite le "STEP 1/0" fantôme visible au tout premier frame)
-  if (!_dmem_sequence || _dmem_sequence.length === 0) return;
-  var en = window._lang === 'en';
-  if (_dmem_phase === 'show'){
-    // Juste un hint "MÉMORISE · N/M" en bas-gauche discret (ne cache rien)
-    var elapsed = Date.now() - _dmem_phaseTs;
-    var curIdx = _dmem_showCurIdx();
-    var bw = W * 0.28, bh = H * 0.085;
-    var bx = W - bw - W*0.04, by = H - bh - H*0.03;
-    ctx.save();
-    ctx.fillStyle = 'rgba(13,17,23,.6)';
-    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = '#a78bfa';
-    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle = 'rgba(255,255,255,.75)';
-    ctx.font = 'bold '+Math.round(bh*0.28)+'px "Barlow Condensed",sans-serif';
-    ctx.fillText(en ? 'MEMORIZE' : 'MÉMORISE', bx + bw/2, by + bh*0.32);
-    ctx.fillStyle = '#a78bfa';
-    ctx.font = 'bold '+Math.round(bh*0.48)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    var showProg = (curIdx >= 0 ? curIdx + 1 : _dmem_sequence.length);
-    ctx.fillText(showProg + ' / ' + _dmem_sequence.length, bx + bw/2, by + bh*0.72);
-    // Barre temps
-    var pctLeft = 1 - Math.min(1, elapsed / _dmem_showMs);
-    ctx.fillStyle = '#a78bfa';
-    ctx.fillRect(bx, by + bh - 3, bw * pctLeft, 3);
-    ctx.restore();
-  } else {
-    // Phase play : étape N/M + label attendu — en bas-droite (chrono est en bas-gauche)
-    var bw2 = W * 0.28, bh2 = H * 0.095;
-    var bx2 = W - bw2 - W*0.04, by2 = H - bh2 - H*0.025;
-    ctx.save();
-    ctx.fillStyle = 'rgba(13,17,23,.65)';
-    _dcog_vc_roundRect(ctx, bx2, by2, bw2, bh2, 10); ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#a78bfa';
-    _dcog_vc_roundRect(ctx, bx2, by2, bw2, bh2, 10); ctx.stroke();
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.font = 'bold '+Math.round(bh2*0.26)+'px "Barlow Condensed",sans-serif';
-    ctx.fillText((window._lang==='en'?'STEP ':'ÉTAPE ') + (_dmem_curStep+1) + '/' + _dmem_sequence.length, bx2 + bw2/2, by2 + bh2*0.32);
-    ctx.fillStyle = '#a78bfa';
-    ctx.font = 'bold '+Math.round(bh2*0.5)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    var nextTgt = _dmem_targets[_dmem_sequence[_dmem_curStep]];
-    ctx.fillText(nextTgt ? nextTgt.label : '', bx2 + bw2/2, by2 + bh2*0.72);
-    ctx.restore();
-  }
-}
-/* ─── Helper : index de la cible courante du flash séquentiel en phase SHOW ───
-     Chaque élément de la séquence s'allume (350ms ON + 150ms OFF entre deux)
-     Retourne l'index [0..seqLen-1] actuellement allumé, ou -1 si on est dans un gap OFF */
-function _dmem_showCurIdx(){
-  if (!_dmem_sequence.length) return -1;
-  var elapsed = Date.now() - _dmem_phaseTs;
-  var slotMs = 500;    // 350 ON + 150 OFF (ralenti pour mémorisation)
-  var slot = Math.floor(elapsed / slotMs);
-  if (slot >= _dmem_sequence.length) return -1;    // fin du flash
-  var inSlot = elapsed - slot * slotMs;
-  return (inSlot < 350) ? slot : -1;    // -1 pendant le gap OFF
-}
-/* ─── Analyse pose : RÉPLIQUÉE 1:1 de _dcog_analyzeMathZone (DRIBBLE MATH) ─────
-   • _tsym_kp_hand strict, pas de fallback raw
-   • moveThresh = max(8, round(W*0.02))  ← EXACT DRIBBLE MATH
-   • grace 500ms après début phase 'play' (évite faux hit si main déjà en zone)
-   • hitbox t.r × 1.2  ← EXACT DRIBBLE MATH (serré, zéro faux positif)
-   • dot > 0  ← EXACT DRIBBLE MATH (geste intentionnel vers cible)
-   • debounce 500ms par cible (évite double-hit sur un seul coup)              */
-function _dmem_analyzePose(poses){
-  if (!_dmem_running || _dmem_phase !== 'play' || !poses || !poses[0] || !_dmem_canvas) return;
-  // ★ Grace globale 500ms : laisse le temps à la main de se repositionner
-  //   après la phase 'show' avant d'autoriser la détection
-  if (Date.now() - _dmem_phaseTs < 500) return;
-  var cv = _dmem_canvas, W = cv.width, H = cv.height;
-  var sx = W / (_dmem_video ? _dmem_video.videoWidth : W);
-  var sy = H / (_dmem_video ? _dmem_video.videoHeight : H);
-  var moveThresh = Math.max(8, Math.round(W * 0.02));  // ★ EXACT DRIBBLE MATH
-  var nowMs = Date.now();
-  // ★ Filtre MAIN DOMINANTE : si choix explicite, seule la main OPPOSÉE (libre) peut hitter.
-  //   La main dominante dribble, la main opposée touche les cibles.
-  //   Note : vue miroir → la main gauche RÉELLE du joueur apparaît comme 'right' côté canvas,
-  //   donc on filtre l'INVERSE pour que "dominant=right" (droitier) laisse l'autre main détecter.
-  var allowedSides;
-  if (_dmem_dominant === 'right')      allowedSides = ['right'];   // libre = main G réelle = 'right' canvas
-  else if (_dmem_dominant === 'left')  allowedSides = ['left'];    // libre = main D réelle = 'left' canvas
-  else                                 allowedSides = ['left','right'];
-  allowedSides.forEach(function(side){
-    var name = side + 'Wrist';
-    var kp = _tsym_kp_hand(poses, side);
-    if (!kp) return;
-    var wx = W - kp.x * sx;
-    var wy = kp.y * sy;
-    var prev = _dmem_prevWrist[name];
-    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
-    _dmem_prevWrist[name] = { x: wx, y: wy };
-    if (moved < moveThresh) return;
-    var vx = prev ? wx - prev.x : 0;
-    var vy = prev ? wy - prev.y : 0;
-    _dmem_targets.forEach(function(t, i){
-      // Debounce par cible : évite les validations multiples sur un seul coup
-      if (nowMs - t.recentHitTs < 500) return;
-      if (t.state === 'hit_correct') return;
-      var dx = wx - t.x, dy = wy - t.y;
-      var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist >= t.r * 1.2) return;             // ★ STRICT DRIBBLE MATHS
-      // ★ Directional STRICT (identique DRIBBLE MATHS) : main se dirige VERS la cible
-      var dot = (-dx) * vx + (-dy) * vy;
-      if (dot <= 0) return;
-      // HIT confirmé — vérifier si c'est la bonne cible dans la séquence
-      t.recentHitTs = nowMs;
-      var expected = _dmem_sequence[_dmem_curStep];
-      if (i === expected){
-        _dmem_hitCorrect(t, nowMs);
-      } else {
-        _dmem_hitError(t, nowMs);
-      }
-    });
-  });
-}
-function _dmem_hitCorrect(t, nowMs){
-  t.state = 'hit_correct';
-  // Pattern _tdr_flashHit : 12 particules + ring expansif
-  var nP = 12;
-  for (var pi = 0; pi < nP; pi++){
-    var angle = (pi/nP) * Math.PI * 2;
-    var speed = 2.5 + Math.random()*3;
-    _dmem_particles.push({ x: t.x, y: t.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, r: 3+Math.random()*4, color: '#2dc653', born: nowMs, life: 500+Math.random()*200 });
-  }
-  _dmem_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: '#2dc653', born: nowMs, life: 400, ring: true, maxR: t.r*3 });
-  try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
-  if (navigator.vibrate) navigator.vibrate(20);
-  _dmem_curStep++;
-  // Toute la séquence est faite ?
-  if (_dmem_curStep >= _dmem_sequence.length){
-    _dmem_correct++;
-    _dmem_combo++;
-    _dmem_bestCombo = Math.max(_dmem_bestCombo, _dmem_combo);
-    var rt = nowMs - _dmem_phaseTs;
-    _dmem_reactTimes.push(rt);
-    // Score : base selon seqLen × bonus vitesse × bonus combo
-    var base = 10 * _dmem_seqLen;
-    var speedBonus = Math.max(0, Math.round((_dmem_seqLen * 1200 - rt) / 300));
-    var comboBonus = _dmem_combo >= 5 ? 10 : _dmem_combo >= 3 ? 5 : 0;
-    var gain = base + speedBonus + comboBonus;
-    _dmem_score += gain;
-    _dmem_particles.push({ x: _dmem_canvas.width/2, y: _dmem_canvas.height*0.55, floatText:'+'+gain, color:'#2dc653', born: nowMs, life: 1000 });
-    _dmem_phase = 'done';
-    // ★ Respawn plus lent : 1500ms pour laisser respirer entre deux séquences
-    setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 1500);
-  }
-}
-function _dmem_hitError(t, nowMs){
-  t.state = 'hit_error';
-  _dmem_particles.push({ x: t.x, y: t.y, vx:0, vy:0, r: t.r, color: '#e63946', born: nowMs, life: 400, ring: true, maxR: t.r*2.4 });
-  _dmem_particles.push({ x: t.x, y: t.y - t.r*1.3, floatText:'✗ -5', color:'#e63946', born: nowMs, life: 900 });
-  try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
-  if (navigator.vibrate) navigator.vibrate([40,30,40]);
-  _dmem_wrong++; _dmem_combo = 0;
-  _dmem_score = Math.max(0, _dmem_score - 5);
-  _dmem_phase = 'done';
-  // ★ Respawn plus lent après erreur : 1700ms pour comprendre ce qui s'est passé
-  setTimeout(function(){ if (_dmem_running) _dmem_newRound(); }, 1700);
-}
-function _dmem_drawHud(ctx, W, H){
-  ctx.save();
-  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
-  ctx.fillStyle='#a78bfa';
-  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(_dmem_score, W*0.04, H*0.12);
-  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
-  ctx.fillStyle='rgba(255,255,255,.7)';
-  ctx.fillText('SCORE', W*0.04, H*0.045);
-  if (_dmem_combo > 0){
-    var mult = _dmem_combo >= 5 ? 2 : 1;
-    ctx.fillStyle = mult >= 2 ? '#ff6b35' : '#fff';
-    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillText('COMBO '+_dmem_combo, W*0.04, H*0.17);
-  }
-  // Chrono bas-gauche
-  var timeLeft = Math.max(0, _dmem_dur - _dmem_elapsed);
-  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
-  if (tmm===0 && tss===60){ tss=0; tmm=1; }
-  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
-  var chW = W*0.16, chH = H*0.08;
-  var chX = W*0.04, chY = H - chH - H*0.03;
-  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
-  ctx.fillStyle='rgba(13,17,23,.35)';
-  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
-  ctx.lineWidth=1.5;
-  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
-  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
-  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
-  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
-  ctx.restore();
-}
-function _dmem_toggleRec(){ if (_dmem_recActive) _dmem_stopRec(); else _dmem_startRec(); }
-function _dmem_startRec(){
-  if (typeof MediaRecorder === 'undefined') return;
-  clearInterval(_dmem_recTimer); _dmem_recTimer = null;
-  if (_dmem_recorder){ try{ _dmem_recorder.ondataavailable=null; _dmem_recorder.onstop=null; _dmem_recorder.onerror=null; if(_dmem_recorder.state!=='inactive')_dmem_recorder.stop(); }catch(e){} }
-  if (_dmem_recStream){ try{_dmem_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dmem_recStream=null; }
-  _dmem_recorder=null; _dmem_recChunks=[]; _dmem_recSec=0; _dmem_recActive=false;
-  var cv = _dmem_canvas; if (!cv) return;
-  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
-  if (!stream) return;
-  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
-  _dmem_recStream = stream;
-  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
-  try { _dmem_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
-  catch(e){ try{ _dmem_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
-  _dmem_recChunks = []; _dmem_recSec = 0;
-  _dmem_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dmem_recChunks.push(e.data); };
-  _dmem_recorder.onstop = function(){
-    clearInterval(_dmem_recTimer);
-    var mimeFinal = (_dmem_recorder && _dmem_recorder.mimeType) || 'video/webm';
-    var blob = new Blob(_dmem_recChunks, {type: mimeFinal});
-    if (_dmem_recStream){ try{_dmem_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dmem_recStream=null; }
-    _dmem_recActive=false; _dmem_recChunks=[]; _dmem_updateRecBtn();
-    if (!blob || blob.size < 1024) return;
-    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
-    var fn = 'SENSEI_memory_'+new Date().toISOString().slice(0,10)+'.'+ext;
-    if (window._replay && window._replay.show){
-      window._replay.show(blob, { title:'SENSEI MEMORY DRILL', filename:fn, onSave:function(b,filename){ _dmem_dlBlob(b, filename); } });
-    } else _dmem_dlBlob(blob, fn);
-  };
-  _dmem_recorder.onerror = function(){ clearInterval(_dmem_recTimer); };
-  setTimeout(function(){
-    if (!_dmem_recorder) return;
-    try { _dmem_recorder.start(1000); _dmem_recActive = true; } catch(e){ return; }
-    _dmem_recTimer = setInterval(function(){
-      _dmem_recSec++;
-      var mm=Math.floor(_dmem_recSec/60)%60,ss=_dmem_recSec%60,hh=Math.floor(_dmem_recSec/3600);
-      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
-      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
-      if (_dmem_recSec >= 180) _dmem_stopRec();
-    }, 1000);
-  }, 200);
-}
-function _dmem_stopRec(){
-  _dmem_recActive=false; clearInterval(_dmem_recTimer); _dmem_recTimer=null;
-  if (_dmem_recorder){ try{ if(_dmem_recorder.state!=='inactive')_dmem_recorder.stop(); }catch(e){} }
-  _dmem_updateRecBtn();
-}
-function _dmem_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dmem_recActive, '&#9632; STOP REC', '#e63946'); }
-function _dmem_dlBlob(blob, fn){
-  try { var url=URL.createObjectURL(blob);
-    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
-    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
-  } catch(e){}
-}
-function _dmem_endGame(){ _dmem_stop(true); _dmem_renderResults(); }
-function _dmem_stop(fromEnd){
-  _dmem_running = false;
-  _dmem_countdownActive = false;
-  if (_dmem_rafId){ cancelAnimationFrame(_dmem_rafId); _dmem_rafId = null; }
-  if (_dmem_recActive) _dmem_stopRec();
-  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
-  if (_dmem_stream){ _dmem_stream.getTracks().forEach(function(t){t.stop();}); _dmem_stream=null; }
-  if (typeof senseiCamStop === 'function') senseiCamStop();
-  var btn = document.getElementById('dmem_btnStart');
-  if (btn) btn.style.display = 'flex';
-  var sv = document.getElementById('dmem_btnSave');
-  if (sv && fromEnd && (_dmem_correct+_dmem_wrong)>0) sv.style.display = 'flex';
-}
-function _dmem_renderResults(){
-  var res = document.getElementById('dmem_results');
-  if (!res) return;
-  var en = window._lang === 'en';
-  var total = _dmem_correct + _dmem_wrong;
-  var pct = total > 0 ? Math.round(_dmem_correct / total * 100) : 0;
-  var avg = _dmem_reactTimes.length > 0 ? Math.round(_dmem_reactTimes.reduce(function(a,b){return a+b;},0) / _dmem_reactTimes.length) : 0;
-  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
-  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#a78bfa">'+_dmem_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
-  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dmem_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'SEQUENCES':'SÉQUENCES')+'</div></div>';
-  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?Math.round(avg/100)/10+'s':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG TIME':'TEMPS MOY.')+'</div></div>';
-  html += '</div>';
-  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · '+(en?'best combo':'combo max')+' ×'+_dmem_bestCombo+'</div>';
-  res.innerHTML = html;
-  _dmem_status(_t('Session terminée','Session complete'), '#2dc653');
-}
-function _dmem_save(){
-  if (typeof _sb_recordSession === 'function'){
-    var total = _dmem_correct + _dmem_wrong;
-    var pct = total > 0 ? Math.round(_dmem_correct / total * 100) : 0;
-    _sb_recordSession('memory', pct);
-  }
-  _dmem_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
-  var sv = document.getElementById('dmem_btnSave'); if (sv) sv.style.display = 'none';
-}
-
-/* ═══════════════════════════════════════════════════════════════════
    🔁 DCOG RULE SWITCH (_drsw_*) — priorité #1 catalogue (flexibilité cognitive)
    Pattern DRIBBLE MATHS strict (hitbox r×1.2 + dot>0 + moveThresh standard)
    Flow : stimulus affiché haut-centre (chiffre OU lettre) + règle active bandeau
@@ -31048,10 +30342,13 @@ function _drsw_drawBrand(ctx, W, H){
 function _drsw_setupTargets(){
   if (!_drsw_canvas) return;
   var W = _drsw_canvas.width, H = _drsw_canvas.height;
-  var r = Math.round(Math.min(W * 0.095, H * 0.16));
-  var y = H * 0.56;    // hauteur poitrine
-  var xL = W * 0.30;   // cible OUI à gauche
-  var xR = W * 0.70;   // cible NON à droite
+  // ★ Allocation verticale ZÉRO COLLISION :
+  //   Stimulus [0.05-0.28] · gap 0.05 · Bandeau [0.33-0.44] · gap 0.05 · Cibles [0.49-0.85] · gap chrono
+  //   Rayon réduit à 0.10W / 0.18H pour que les cibles rentrent sans toucher le bandeau au-dessus
+  var r = Math.round(Math.min(W * 0.10, H * 0.18));
+  var y = H * 0.67;    // centre cibles → top 0.49, bas 0.85 (gap bandeau 0.05, gap chrono 0.04)
+  var xL = W * 0.26;
+  var xR = W * 0.74;
   _drsw_targets = [
     { x: xL, y: y, r: r, label: 'OUI', value: true,  color: '#2dc653', state: 'idle', hitTime: 0 },
     { x: xR, y: y, r: r, label: 'NON', value: false, color: '#e63946', state: 'idle', hitTime: 0 }
@@ -31158,18 +30455,19 @@ function _drsw_loop(){
   if (_drsw_elapsed >= _drsw_dur){ _drsw_endGame(); return; }
   _drsw_rafId = requestAnimationFrame(_drsw_loop);
 }
-/* ─── Dessine stimulus en haut-centre (gros, lisible) ─── */
+/* ─── Dessine stimulus zone [0.05-0.28] — NE CHEVAUCHE PAS le bandeau ni les cibles ─── */
 function _drsw_drawStimulus(ctx, W, H){
   if (!_drsw_stimulus) return;
   ctx.save();
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.shadowBlur = 24; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillStyle = '#fff';
+  // ★ Font 0.22H centré à y=0.17H → bbox [0.06-0.28], gap 0.05 avec bandeau (0.33)
   ctx.font = 'bold '+Math.round(H*0.22)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(_drsw_stimulus, W/2, H*0.26);
+  ctx.fillText(_drsw_stimulus, W/2, H*0.17);
   ctx.restore();
 }
-/* ─── Dessine bandeau règle active sous le stimulus ─── */
+/* ─── Dessine bandeau règle zone [0.33-0.44] — NE CHEVAUCHE NI stimulus NI cibles ─── */
 function _drsw_drawRuleBanner(ctx, W, H){
   if (!_drsw_ruleActive) return;
   var en = window._lang === 'en';
@@ -31178,20 +30476,21 @@ function _drsw_drawRuleBanner(ctx, W, H){
   else if (_drsw_ruleActive === 'IMPAIR')  txt = en ? 'ODD ?' : 'IMPAIR ?';
   else if (_drsw_ruleActive === 'VOYELLE') txt = en ? 'VOWEL ?' : 'VOYELLE ?';
   else                                     txt = en ? 'CONSONANT ?' : 'CONSONNE ?';
-  var bw = W*0.34, bh = H*0.09;
-  var bx = W/2 - bw/2, by = H*0.37;
+  // ★ Bandeau W×0.44 et hauteur 0.11H à y=0.33 → bbox [0.33-0.44]
+  var bw = W*0.44, bh = H*0.11;
+  var bx = W/2 - bw/2, by = H*0.33;
   ctx.save();
   ctx.fillStyle = 'rgba(76,201,240,.14)';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
-  ctx.lineWidth = 2; ctx.strokeStyle = '#4cc9f0';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#4cc9f0';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.stroke();
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle = '#4cc9f0';
-  ctx.font = 'bold '+Math.round(bh*0.60)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.font = 'bold '+Math.round(bh*0.70)+'px "Bebas Neue","Arial Narrow",sans-serif';
   ctx.fillText(txt, W/2, by + bh*0.55);
   ctx.restore();
 }
-/* ─── Dessine les 2 cibles OUI/NON (style octogonal LED cohérent avec MEMORY) ─── */
+/* ─── Dessine les 2 cibles OUI/NON (style octogonal LED, labels AGRANDIS) ─── */
 function _drsw_drawTargets(ctx, W, H){
   var now = Date.now();
   _drsw_targets.forEach(function(t){
@@ -31209,15 +30508,15 @@ function _drsw_drawTargets(ctx, W, H){
     ctx.closePath();
     ctx.fillStyle = 'rgba(13,17,23,.75)';
     ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = t.color;
-    ctx.shadowBlur = 18; ctx.shadowColor = t.color;
+    ctx.lineWidth = 4; ctx.strokeStyle = t.color;
+    ctx.shadowBlur = 20; ctx.shadowColor = t.color;
     ctx.stroke();
     ctx.shadowBlur = 0;
-    // Label (OUI / NON)
+    // Label (OUI / NON) — ★ taille 0.55 → 0.80 de R (×1.45 pour lisibilité trépied)
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
-    ctx.font = 'bold '+Math.round(R*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.font = 'bold '+Math.round(R*0.80)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillText(t.label, t.x, t.y + R*0.04);
     ctx.restore();
   });
@@ -31618,12 +30917,12 @@ var _DQA_DRILLS = {
       return {stim:'🏀 ZONE LIBRE', labels:['GAUCHE','DROITE'], correct:free, free:free};
     },
     render: function(ctx,W,H,q){
-      _dqa_drawTextStim(ctx, W, H, q.stim, '#2dc653', 0.08);
-      // Mini-terrain visuel : 2 cases, 1 occupée (joueur) 1 libre
-      var tw = W*0.26, th = H*0.09;
-      var tx = W/2 - tw/2, ty = H*0.14;
+      // ★ Mini-terrain d'abord en bbox [0.33-0.44] (zone bandeau libre) puis stimulus en haut
+      //   Cibles démarrent à 0.44, donc mini-terrain finit à 0.44 max, gap 0 (tangent OK car visuel)
+      var tw = W*0.26, th = H*0.11;
+      var tx = W/2 - tw/2, ty = H*0.33;
       ctx.save();
-      ctx.fillStyle = 'rgba(13,17,23,.6)';
+      ctx.fillStyle = 'rgba(13,17,23,.65)';
       ctx.fillRect(tx, ty, tw, th);
       ctx.strokeStyle = '#2dc653'; ctx.lineWidth = 2;
       ctx.strokeRect(tx, ty, tw, th);
@@ -31631,7 +30930,15 @@ var _DQA_DRILLS = {
       // Joueur adverse dans la zone occupée (côté opposé au free)
       var occX = q.free==='GAUCHE' ? tx + tw*0.75 : tx + tw*0.25;
       ctx.fillStyle = '#e63946';
-      ctx.beginPath(); ctx.arc(occX, ty + th/2, th*0.3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(occX, ty + th/2, th*0.32, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+      // Stimulus texte en haut, PLUS HAUT que pour les autres drills pour laisser place au mini-terrain
+      ctx.save();
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
+      ctx.fillStyle = '#2dc653';
+      ctx.font = 'bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText(q.stim, W/2, H*0.21);
       ctx.restore();
     }
   }
@@ -31739,21 +31046,28 @@ function _dqa_setupTargets(labels){
   if (!_dqa_canvas) return;
   var W = _dqa_canvas.width, H = _dqa_canvas.height;
   var n = labels.length;
-  var r = Math.round(Math.min(W * 0.09, H * 0.15));
-  var y = H * 0.56;
+  // ★ Rayon dimensionné pour ZÉRO COLLISION :
+  //   top cibles = y - r doit être ≥ H*0.46 (gap 0.02 avec stimulus bbox finissant à 0.44)
+  //   bas cibles = y + r doit être ≤ H*0.87 (gap 0.02 avec chrono à 0.89)
+  //   Avec y = 0.67H → r max en H = 0.21H, r max en W = 0.11W
+  var r;
+  if (n === 2)      r = Math.round(Math.min(W * 0.11, H * 0.19));
+  else if (n === 3) r = Math.round(Math.min(W * 0.095, H * 0.17));
+  else              r = Math.round(Math.min(W * 0.080, H * 0.14));
+  var y = H * 0.67;    // centre cibles → top ≥ 0.46H, bas ≤ 0.86H
   _dqa_targets = [];
   if (n === 2){
-    _dqa_targets.push({ x: W*0.28, y:y, r:r, label:labels[0], color:'#2dc653', hitTime:0 });
-    _dqa_targets.push({ x: W*0.72, y:y, r:r, label:labels[1], color:'#e63946', hitTime:0 });
+    _dqa_targets.push({ x: W*0.26, y:y, r:r, label:labels[0], color:'#2dc653', hitTime:0 });
+    _dqa_targets.push({ x: W*0.74, y:y, r:r, label:labels[1], color:'#e63946', hitTime:0 });
   } else if (n === 3){
-    _dqa_targets.push({ x: W*0.22, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
+    _dqa_targets.push({ x: W*0.20, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
     _dqa_targets.push({ x: W*0.50, y:y, r:r, label:labels[1], color:'#f5c518', hitTime:0 });
-    _dqa_targets.push({ x: W*0.78, y:y, r:r, label:labels[2], color:'#a78bfa', hitTime:0 });
+    _dqa_targets.push({ x: W*0.80, y:y, r:r, label:labels[2], color:'#a78bfa', hitTime:0 });
   } else {  // 4 cibles
-    _dqa_targets.push({ x: W*0.18, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
+    _dqa_targets.push({ x: W*0.17, y:y, r:r, label:labels[0], color:'#4cc9f0', hitTime:0 });
     _dqa_targets.push({ x: W*0.39, y:y, r:r, label:labels[1], color:'#2dc653', hitTime:0 });
-    _dqa_targets.push({ x: W*0.60, y:y, r:r, label:labels[2], color:'#f5c518', hitTime:0 });
-    _dqa_targets.push({ x: W*0.81, y:y, r:r, label:labels[3], color:'#e63946', hitTime:0 });
+    _dqa_targets.push({ x: W*0.61, y:y, r:r, label:labels[2], color:'#f5c518', hitTime:0 });
+    _dqa_targets.push({ x: W*0.83, y:y, r:r, label:labels[3], color:'#e63946', hitTime:0 });
   }
 }
 function _dqa_nextQuestion(){
@@ -31822,14 +31136,18 @@ function _dqa_loop(){
   if (_dqa_elapsed >= _dqa_dur){ _dqa_endGame(); return; }
   _dqa_rafId = requestAnimationFrame(_dqa_loop);
 }
-/* Helper générique pour dessiner le stimulus texte en haut-centre */
+/* Helper générique pour dessiner le stimulus texte en haut-centre
+   ★ ZÉRO COLLISION : font plafonnée à 0.18H max, centré à y=0.22H
+      → bbox stimulus [0.13-0.31] · cibles top 0.44 → gap 0.13 garanti */
 function _dqa_drawTextStim(ctx, W, H, txt, color, sizeRatio){
   ctx.save();
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillStyle = color || '#fff';
-  ctx.font = 'bold '+Math.round(H * (sizeRatio||0.14))+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(txt, W/2, H*0.28);
+  // Plafond 0.18H pour éviter toute collision avec les cibles en dessous
+  var finalRatio = Math.min(sizeRatio || 0.14, 0.18);
+  ctx.font = 'bold '+Math.round(H * finalRatio)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, H*0.22);
   ctx.restore();
 }
 function _dqa_drawTargets(ctx, W, H){
@@ -31853,14 +31171,23 @@ function _dqa_drawTargets(ctx, W, H){
     ctx.shadowBlur = 16; ctx.shadowColor = t.color;
     ctx.stroke();
     ctx.shadowBlur = 0;
-    // Label
+    // Label — ★ taille AGRANDIE pour lisibilité trépied à 2-3m
+    //   1-2 chars (chiffres, X)    → R*0.80 (très gros)
+    //   3-5 chars (OUI, NON, PAIR) → R*0.55
+    //   6-8 chars (IMPAIR, GAUCHE) → R*0.38
+    //   9+ chars (CONSONNE...)     → R*0.30
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.9)';
     var txt = String(t.label);
-    var fsize = txt.length > 5 ? Math.round(R*0.32) : Math.round(R*0.5);
+    var L = txt.length;
+    var fsize;
+    if (L <= 2)      fsize = Math.round(R*0.80);
+    else if (L <= 5) fsize = Math.round(R*0.55);
+    else if (L <= 8) fsize = Math.round(R*0.38);
+    else             fsize = Math.round(R*0.30);
     ctx.font = 'bold '+fsize+'px "Bebas Neue","Arial Narrow",sans-serif';
-    ctx.fillText(txt, t.x, t.y + R*0.05);
+    ctx.fillText(txt, t.x, t.y + R*0.04);
     ctx.restore();
   });
 }
@@ -33666,8 +32993,6 @@ function _dcog_selectDrill(drill, langOnly) {
                : 'Défi visuel d\'équations — touche VRAI ou FAUX en dribblant',
     colorreact: en ? 'All colors appear — hit the one the voice calls out. Reaction + color recognition.'
                    : 'Toutes les couleurs apparaissent — touche uniquement celle annoncée. Réaction + reconnaissance couleur.',
-    memory: en ? 'A sequence of digits/letters flashes — memorize it then hit the LED targets in order. Working memory × motor.'
-               : 'Une séquence de chiffres/lettres s\'affiche — mémorise-la puis touche les cibles LED dans l\'ordre. Mémoire de travail × motricité.',
     ruleswitch: en ? 'Classify the stimulus according to the active rule — rule flips periodically. Cognitive flexibility × dribble.'
                    : 'Classifie le stimulus selon la règle active — la règle bascule régulièrement. Flexibilité cognitive × dribble.',
     quickchoice: en ? 'Universal engine — 13 catalogue drills (classify, compare, predict, Stroop, defender read, free space…). Same Dribble Maths detection for all.'
@@ -33678,7 +33003,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','memory','ruleswitch','quickchoice'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -33687,13 +33012,13 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', memory:'dcog_optMemory', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/colorreact/memory/ruleswitch/quickchoice utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'memory' || d === 'ruleswitch' || d === 'quickchoice' ? '12px' : '8px');
+        // viscoord/rcs/colorreact/ruleswitch/quickchoice utilisent flex-direction:column, les autres flex row/wrap
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -33708,7 +33033,6 @@ function _dcog_selectDrill(drill, langOnly) {
       burnout: en ? '🔥 INTENSITY'      : '🔥 INTENSITÉ',
       vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT',
-      memory:   en ? '🧠 MEMORY DRILL'  : '🧠 MEMORY DRILL',
       ruleswitch: en ? '🔁 RULE SWITCH' : '🔁 RULE SWITCH',
       quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE'
     };
@@ -33744,7 +33068,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCustomCam = (drill === 'colorreact' || drill === 'memory' || drill === 'ruleswitch' || drill === 'quickchoice');
+    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice');
     if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
     if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
     if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
@@ -38330,7 +37654,6 @@ function senseiCamShow(mod,stream){
     if(mod==='bt'&&typeof _bt_onCamReady==='function')_bt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='tdrc'&&typeof _tdrc_onCamReady==='function')_tdrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dcrc'&&typeof _dcrc_onCamReady==='function')_dcrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
-    if(mod==='dmem'&&typeof _dmem_onCamReady==='function')_dmem_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='drsw'&&typeof _drsw_onCamReady==='function')_drsw_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dqa'&&typeof _dqa_onCamReady==='function')_dqa_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
@@ -38400,7 +37723,6 @@ function senseiCamToggleRec(){
   else if(m==='bt' && typeof _bt_toggleRec==='function') _bt_toggleRec();
   else if(m==='tdrc' && typeof _tdrc_toggleRec==='function') _tdrc_toggleRec();
   else if(m==='dcrc' && typeof _dcrc_toggleRec==='function') _dcrc_toggleRec();
-  else if(m==='dmem' && typeof _dmem_toggleRec==='function') _dmem_toggleRec();
   else if(m==='drsw' && typeof _drsw_toggleRec==='function') _drsw_toggleRec();
   else if(m==='dqa' && typeof _dqa_toggleRec==='function') _dqa_toggleRec();
 }
