@@ -2323,6 +2323,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         ⚡<div id="dcog_lbl_quickchoice">QUICK CHOICE</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('quicktargets')" id="dcog_btn_quicktargets"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🎯<div id="dcog_lbl_quicktargets">QUICK TARGETS</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2605,6 +2609,51 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="dqa_btnStart" onclick="_dqa_start()" ontouchstart="" style="width:100%;background:#ff6b35;color:#0d1117"><span id="dqa_lblStart">▶ DÉMARRER</span></button>
       <button class="tr-btn tr-btn-save" id="dqa_btnSave" onclick="_dqa_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dqa_results" style="margin-top:4px"></div>
+    </div>
+    <!-- QUICK TARGETS : moteur générique pattern TARGETS — 11 drills restants du catalogue -->
+    <div id="dcog_optQuicktargets" style="display:none;flex-direction:column;gap:12px">
+      <!-- Vidéo tuto placeholder -->
+      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/IrW2OCRd5n0/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/maxresdefault.jpg';" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎯 DRILL</div>
+        <select id="dqt_drillSelect" onchange="_dqt_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:#f5c518;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
+          <option value="D1">D1 · Go / No-Go (toucher vert, pas rouge)</option>
+          <option value="A6">A6 · Visual Search (trouver cible unique)</option>
+          <option value="A2">A2 · Color Inhibit (toucher sauf couleur dite)</option>
+          <option value="A5">A5 · Dual Target (2 zones · 2 règles)</option>
+          <option value="B3">B3 · Working Memory (2 derniers vus)</option>
+          <option value="B4">B4 · N-Back (= il y a 2 positions)</option>
+          <option value="G8">G8 · Pattern Violation (toucher si rupture)</option>
+          <option value="E3">E3 · Reaction Ladder (TTL raccourcit)</option>
+          <option value="A9">A9 · Flash Detection (cible brève)</option>
+          <option value="A7">A7 · Target Tracking (cible mobile → zone)</option>
+          <option value="F4">F4 · Hand-Stimulus (couleur = main dribble)</option>
+        </select>
+        <div id="dqt_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Touche les cibles vertes · ne touche PAS les rouges (inhibition).</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dqt-dur-btn" data-sec="60"  onclick="_dqt_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="dqt-dur-btn" data-sec="90"  onclick="_dqt_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="dqt-dur-btn" data-sec="120" onclick="_dqt_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+          <button class="dqt-dur-btn" data-sec="180" onclick="_dqt_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🎯🏀 Moteur TARGETS universel · 11 drills du catalogue · cibles rondes style TDR Réaction · détection stricte Dribble Maths.
+      </div>
+      <div id="dqt_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dqt_btnStart" onclick="_dqt_start()" ontouchstart="" style="width:100%;background:#f5c518;color:#0d1117"><span id="dqt_lblStart">▶ DÉMARRER</span></button>
+      <button class="tr-btn tr-btn-save" id="dqt_btnSave" onclick="_dqt_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="dqt_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -31427,6 +31476,808 @@ function _dqa_save(){
   var sv = document.getElementById('dqa_btnSave'); if (sv) sv.style.display = 'none';
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   🎯 DCOG QUICK TARGETS (_dqt_*) — moteur TARGETS pour 11 drills restants
+   D1 Go/No-Go · A6 Visual Search · A2 Color Inhibit · A5 Dual Target · B3 Working Memory
+   B4 N-Back · G8 Pattern Violation · E3 Reaction Ladder · A9 Flash · A7 Tracking · F4 Hand-Stim
+   Détection : STRICT DRIBBLE MATHS (r×1.2, dot>0, grace spawn 500ms, closest-wins)
+   Rendu cibles : rondes style TDR (ring pulsant + cercle plein + label texte)
+   ZÉRO COLLISION : zones réservées (REC/STOP coins, chrono bas-gauche, score top-left)
+   ═══════════════════════════════════════════════════════════════════ */
+var _DQT_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var _DQT_COLORS  = ['#e63946','#4cc9f0','#2dc653','#f5c518','#a78bfa','#ff6b35'];
+var _dqt_mode = 'D1';
+var _dqt_dur = 60;
+var _dqt_running = false, _dqt_stream = null;
+var _dqt_video = null, _dqt_canvas = null, _dqt_ctx = null;
+var _dqt_startTs = 0, _dqt_elapsed = 0;
+var _dqt_score = 0, _dqt_correct = 0, _dqt_wrong = 0;
+var _dqt_reactTimes = [], _dqt_combo = 0, _dqt_bestCombo = 0;
+var _dqt_rafId = null;
+var _dqt_targets = [];       // cibles actives
+var _dqt_prevWrist = {};
+var _dqt_particles = [];
+var _dqt_countdownActive = false;
+var _dqt_recorder = null, _dqt_recChunks = [], _dqt_recActive = false;
+var _dqt_recTimer = null, _dqt_recSec = 0, _dqt_recStream = null;
+var _dqt_state = {};         // état interne par drill
+var _dqt_lastSpawnTs = 0;
+var _dqt_hint = '';          // texte hint affiché haut-centre (varie par drill)
+
+/* ─── Zone utile ZÉRO COLLISION ───
+   x : [W×0.08, W×0.92] (hors REC coins)
+   y : [H×0.26, H×0.86] (hors score top-left, hors chrono bas-gauche)
+   Hint texte en haut : y=0.15, font 0.08H → bbox [0.11, 0.19] */
+function _dqt_zone(W, H){
+  return { xMin: W*0.10, xMax: W*0.90, yMin: H*0.28, yMax: H*0.84 };
+}
+function _dqt_spawnAt(cx, cy, r, extra){
+  var t = { x:cx, y:cy, r:r, born: Date.now(), hit:false, wrongHit:false };
+  if (extra) for (var k in extra) t[k] = extra[k];
+  return t;
+}
+function _dqt_randPos(W, H, r, placed, sepMin){
+  var z = _dqt_zone(W, H);
+  var mx = Math.max(z.xMin, r+10), MX = Math.min(z.xMax, W-r-10);
+  var my = Math.max(z.yMin, r+10), MY = Math.min(z.yMax, H-r-10);
+  var sep = sepMin || r * 3;
+  for (var tr = 0; tr < 150; tr++){
+    var x = mx + Math.random() * (MX - mx);
+    var y = my + Math.random() * (MY - my);
+    var ok = true;
+    for (var j = 0; j < placed.length; j++){
+      var dx = x - placed[j].x, dy = y - placed[j].y;
+      if (dx*dx + dy*dy < sep*sep){ ok = false; break; }
+    }
+    if (ok) return { x:x, y:y };
+  }
+  return { x: (mx+MX)/2, y: (my+MY)/2 };
+}
+
+/* ═══ 11 PRESETS ═══ Chaque preset définit spawn + evaluate (bonne/mauvaise cible)
+     et optionnellement onFrame (rendu custom), onTimeout (si cible disparaît) */
+var _DQT_DRILLS = {
+  'D1': {   // Go/No-Go — toucher vert, NE PAS toucher rouge
+    desc_fr: 'Touche les cibles VERTES · NE touche PAS les ROUGES (inhibition).',
+    desc_en: 'Touch GREEN targets · DO NOT touch RED (inhibition).',
+    hint: function(){ return window._lang==='en' ? 'GREEN = GO · RED = STOP' : 'VERT = GO · ROUGE = STOP'; },
+    maxTargets: 3, spawnIntervalMs: 1400, ttl: 1800,
+    spawn: function(W, H, state){
+      var r = Math.round(Math.min(W*0.06, H*0.11));
+      var placed = _dqt_targets.filter(function(t){return !t.hit&&!t.wrongHit;});
+      var pos = _dqt_randPos(W, H, r, placed);
+      var isGo = Math.random() < 0.7;    // 70% GO (vert), 30% NO-GO (rouge)
+      return _dqt_spawnAt(pos.x, pos.y, r, { color: isGo?'#2dc653':'#e63946', isGo:isGo, label:isGo?'GO':'STOP' });
+    },
+    evaluate: function(t, state){
+      // Hit sur GO = correct, hit sur NO-GO = wrong
+      return t.isGo;
+    },
+    onTimeout: function(t, state){
+      // Si GO disparaît sans hit → wrong (omission), si NO-GO disparaît sans hit → OK (inhibition réussie)
+      if (t.isGo){ _dqt_wrong++; _dqt_combo = 0; }
+    }
+  },
+  'A6': {   // Visual Search — grille 10 cibles, 1 "la bonne" (couleur unique)
+    desc_fr: 'Scanne la grille · touche LA cible unique (couleur ou forme différente).',
+    desc_en: 'Scan the grid · touch THE unique target (different color/shape).',
+    hint: function(){ return window._lang==='en' ? 'FIND THE UNIQUE TARGET' : 'TROUVE LA CIBLE UNIQUE'; },
+    maxTargets: 10, spawnIntervalMs: 3000, ttl: 2800,
+    spawn: function(W, H, state){
+      // Spawn 10 cibles d'un coup si <5 présentes : 9 distracteurs même couleur + 1 cible unique
+      var active = _dqt_targets.filter(function(t){return !t.hit&&!t.wrongHit;});
+      if (active.length >= 5) return null;
+      var r = Math.round(Math.min(W*0.045, H*0.08));
+      var distractorC = _DQT_COLORS[Math.floor(Math.random()*4)];
+      var targetC;
+      do { targetC = _DQT_COLORS[Math.floor(Math.random()*4)]; } while (targetC === distractorC);
+      var placed = [];
+      var now = Date.now();
+      for (var i = 0; i < 10; i++){
+        var pos = _dqt_randPos(W, H, r, placed, r*2.3);
+        placed.push(pos);
+        var isTarget = (i === 0);     // 1ère placée = cible unique
+        _dqt_targets.push(_dqt_spawnAt(pos.x, pos.y, r, { color: isTarget?targetC:distractorC, isTarget:isTarget }));
+      }
+      return null;    // spawn multiples en batch
+    },
+    evaluate: function(t, state){ return t.isTarget; }
+  },
+  'A2': {   // Color Inhibit — toucher sauf couleur annoncée
+    desc_fr: 'Touche toutes les couleurs SAUF celle annoncée en haut.',
+    desc_en: 'Touch all colors EXCEPT the one shown at top.',
+    hint: function(){ return (window._lang==='en'?'FORBIDDEN: ':'INTERDIT : ') + (_dqt_state.forbidden||'ROUGE'); },
+    maxTargets: 3, spawnIntervalMs: 1500, ttl: 2200,
+    spawn: function(W, H, state){
+      if (!state.forbidden){
+        var names = ['ROUGE','BLEU','VERT','JAUNE'];
+        state.forbidden = names[Math.floor(Math.random()*4)];
+      }
+      // Change forbidden tous les 10 spawns
+      state.sp = (state.sp||0) + 1;
+      if (state.sp % 10 === 0){
+        var names2 = ['ROUGE','BLEU','VERT','JAUNE'].filter(function(n){return n!==state.forbidden;});
+        state.forbidden = names2[Math.floor(Math.random()*names2.length)];
+      }
+      var r = Math.round(Math.min(W*0.06, H*0.11));
+      var placed = _dqt_targets.filter(function(t){return !t.hit&&!t.wrongHit;});
+      var pos = _dqt_randPos(W, H, r, placed);
+      var colorMap = {'ROUGE':'#e63946','BLEU':'#4cc9f0','VERT':'#2dc653','JAUNE':'#f5c518'};
+      var allColors = ['ROUGE','BLEU','VERT','JAUNE'];
+      var name = allColors[Math.floor(Math.random()*4)];
+      return _dqt_spawnAt(pos.x, pos.y, r, { color: colorMap[name], colorName: name, isGo: (name !== state.forbidden) });
+    },
+    evaluate: function(t, state){ return t.isGo; }
+  },
+  'A5': {   // Dual Target — 2 zones gauche/droite, règles différentes
+    desc_fr: 'ZONE GAUCHE : touche les ronds · ZONE DROITE : touche les carrés.',
+    desc_en: 'LEFT ZONE: touch circles · RIGHT ZONE: touch squares.',
+    hint: function(){ return window._lang==='en' ? '◯ left · ■ right' : '◯ gauche · ■ droite'; },
+    maxTargets: 4, spawnIntervalMs: 1600, ttl: 2500,
+    spawn: function(W, H, state){
+      var r = Math.round(Math.min(W*0.055, H*0.10));
+      var z = _dqt_zone(W, H);
+      var isLeft = Math.random() < 0.5;
+      var xMin = isLeft ? z.xMin : W/2;
+      var xMax = isLeft ? W/2 : z.xMax;
+      var pos = { x: xMin+r+Math.random()*(xMax-xMin-2*r), y: z.yMin+r+Math.random()*(z.yMax-z.yMin-2*r) };
+      var isCircle = Math.random() < 0.5;
+      // Zone LEFT accepte ronds, zone RIGHT accepte carrés
+      var isGood = (isLeft && isCircle) || (!isLeft && !isCircle);
+      return _dqt_spawnAt(pos.x, pos.y, r, { color: isCircle?'#4cc9f0':'#f5c518', shape: isCircle?'circle':'square', zone:isLeft?'L':'R', isGo:isGood });
+    },
+    evaluate: function(t, state){ return t.isGo; }
+  },
+  'B3': {   // Working Memory Update — suite continue, toucher les 2 derniers vus
+    desc_fr: 'Mémorise les 2 derniers symboles vus · touche-les dans l\'ordre.',
+    desc_en: 'Remember the last 2 symbols seen · touch them in order.',
+    hint: function(){ return (_dqt_state.memory||[]).slice(-2).join(' → ') || '...'; },
+    maxTargets: 4, spawnIntervalMs: 1800, ttl: 3000,
+    spawn: function(W, H, state){
+      if (!state.memory) state.memory = [];
+      var r = Math.round(Math.min(W*0.065, H*0.11));
+      var placed = _dqt_targets.filter(function(t){return !t.hit&&!t.wrongHit;});
+      var pos = _dqt_randPos(W, H, r, placed);
+      var L = _DQT_LETTERS.charAt(Math.floor(Math.random()*8));    // A-H
+      state.memory.push(L);
+      if (state.memory.length > 2) state.memory.shift();
+      return _dqt_spawnAt(pos.x, pos.y, r, { color: '#a78bfa', label: L, letter: L, isGo: state.memory.indexOf(L) >= 0 });
+    },
+    evaluate: function(t, state){ return t.isGo; }
+  },
+  'B4': {   // N-Back — toucher si label = celui d'il y a 2 positions
+    desc_fr: 'Touche quand le symbole = celui d\'il y a 2 positions avant.',
+    desc_en: 'Touch when symbol = the one 2 positions back.',
+    hint: function(){ return 'N-BACK · N=2'; },
+    maxTargets: 1, spawnIntervalMs: 1500, ttl: 1400,
+    spawn: function(W, H, state){
+      if (!state.history) state.history = [];
+      var r = Math.round(Math.min(W*0.08, H*0.14));
+      var z = _dqt_zone(W, H);
+      var x = z.xMin + (z.xMax-z.xMin) * Math.random();
+      var y = (z.yMin + z.yMax)/2;
+      var pool = ['A','B','C','D','E'];
+      var L;
+      // 30% match forcé si historique disponible
+      if (state.history.length >= 2 && Math.random() < 0.3){
+        L = state.history[state.history.length - 2];
+      } else {
+        L = pool[Math.floor(Math.random()*pool.length)];
+      }
+      var isMatch = (state.history.length >= 2 && state.history[state.history.length - 2] === L);
+      state.history.push(L);
+      if (state.history.length > 5) state.history.shift();
+      return _dqt_spawnAt(x, y, r, { color: '#4cc9f0', label: L, letter: L, isGo: isMatch });
+    },
+    evaluate: function(t, state){ return t.isGo; },
+    onTimeout: function(t, state){ if (t.isGo){ _dqt_wrong++; _dqt_combo = 0; } }
+  },
+  'G8': {   // Pattern Violation — touche quand pattern rompu
+    desc_fr: 'Suite régulière (+2) · touche UNIQUEMENT quand le pattern se rompt.',
+    desc_en: 'Regular sequence (+2) · touch ONLY when pattern breaks.',
+    hint: function(){ return 'PATTERN BREAK ?'; },
+    maxTargets: 1, spawnIntervalMs: 1400, ttl: 1300,
+    spawn: function(W, H, state){
+      if (state.cur == null) { state.cur = 2; state.step = 2; }
+      var r = Math.round(Math.min(W*0.08, H*0.14));
+      var z = _dqt_zone(W, H);
+      var x = z.xMin + (z.xMax-z.xMin) * Math.random();
+      var y = (z.yMin + z.yMax)/2;
+      // 25% rupture : saute une valeur aléatoire
+      var isBreak = (Math.random() < 0.25);
+      var val;
+      if (isBreak){ val = state.cur + state.step + (Math.random()<0.5?1:-1) * (1 + Math.floor(Math.random()*3)); }
+      else { val = state.cur + state.step; }
+      state.cur = val;
+      return _dqt_spawnAt(x, y, r, { color: isBreak?'#e63946':'#4cc9f0', label: String(val), isGo: isBreak });
+    },
+    evaluate: function(t, state){ return t.isGo; },
+    onTimeout: function(t, state){ if (t.isGo){ _dqt_wrong++; _dqt_combo = 0; } }
+  },
+  'E3': {   // Reaction Ladder — TTL raccourcit après chaque succès
+    desc_fr: 'Touche la cible avant qu\'elle disparaisse · plus tu réussis, plus c\'est rapide.',
+    desc_en: 'Touch target before it disappears · faster as you succeed.',
+    hint: function(){ return (window._lang==='en'?'LEVEL ':'NIVEAU ') + (_dqt_state.level||1) + ' · ' + Math.round(_dqt_state.curTtl||2000) + 'ms'; },
+    maxTargets: 1, spawnIntervalMs: 500, ttl: 2000,
+    spawn: function(W, H, state){
+      if (state.level == null) { state.level = 1; state.curTtl = 2000; }
+      var r = Math.round(Math.min(W*0.075, H*0.13));
+      var z = _dqt_zone(W, H);
+      var pos = _dqt_randPos(W, H, r, []);
+      var t = _dqt_spawnAt(pos.x, pos.y, r, { color: _DQT_COLORS[state.level%6], isGo:true });
+      t.ttl = state.curTtl;
+      return t;
+    },
+    evaluate: function(t, state){
+      if (t.isGo){ state.level++; state.curTtl = Math.max(400, state.curTtl - 60); }
+      return true;
+    }
+  },
+  'A9': {   // Flash Detection — cible brève à position imprévisible
+    desc_fr: 'Cible brève (500ms) à position aléatoire · réagis vite !',
+    desc_en: 'Brief target (500ms) at random position · react fast!',
+    hint: function(){ return window._lang==='en' ? 'FLASH !' : 'FLASH !'; },
+    maxTargets: 1, spawnIntervalMs: 1800, ttl: 600,
+    spawn: function(W, H, state){
+      var r = Math.round(Math.min(W*0.07, H*0.12));
+      var pos = _dqt_randPos(W, H, r, []);
+      return _dqt_spawnAt(pos.x, pos.y, r, { color: '#f5c518', isGo:true, flash:true });
+    },
+    evaluate: function(t, state){ return true; },
+    onTimeout: function(t, state){ _dqt_wrong++; _dqt_combo = 0; }
+  },
+  'A7': {   // Target Tracking — cible mobile → zone fixe
+    desc_fr: 'Cible mobile · touche QUAND elle entre dans la zone jaune centrale.',
+    desc_en: 'Moving target · touch WHEN it enters the yellow center zone.',
+    hint: function(){ return window._lang==='en' ? 'ENTER ZONE → TOUCH' : 'ENTRE ZONE → TOUCHE'; },
+    maxTargets: 1, spawnIntervalMs: 3500, ttl: 3200,
+    spawn: function(W, H, state){
+      var r = Math.round(Math.min(W*0.055, H*0.09));
+      var z = _dqt_zone(W, H);
+      var x = Math.random() < 0.5 ? z.xMin+r : z.xMax-r;
+      var y = z.yMin+r+Math.random()*(z.yMax-z.yMin-2*r);
+      var vx = (x < W/2 ? 1 : -1) * (120 + Math.random()*80) / 1000;    // px/ms
+      var t = _dqt_spawnAt(x, y, r, { color: '#2dc653', isGo:true, vx:vx, vy:0, mobile:true });
+      return t;
+    },
+    evaluate: function(t, state){
+      // Hit uniquement si cible dans la zone jaune centrale (±W×0.1 du centre)
+      var W = _dqt_canvas.width;
+      return Math.abs(t.x - W/2) < W*0.10;
+    },
+    onFrame: function(ctx, W, H, state){
+      // Dessine la zone jaune centrale
+      ctx.save();
+      ctx.strokeStyle = 'rgba(245,197,24,.5)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 6]);
+      var zx = W/2 - W*0.10;
+      ctx.strokeRect(zx, H*0.28, W*0.20, H*0.56);
+      ctx.restore();
+      // Update mobile targets
+      var now = Date.now();
+      _dqt_targets.forEach(function(t){
+        if (t.mobile && !t.hit && !t.wrongHit){
+          var dt = now - (t._lastUpd || t.born);
+          t._lastUpd = now;
+          t.x += t.vx * dt;
+          if (t.x < t.r || t.x > W - t.r){ t.vx = -t.vx; }
+        }
+      });
+    }
+  },
+  'F4': {   // Hand-Stimulus Mapping — couleur signale la main qui dribble
+    desc_fr: 'ROUGE = dribble main DROITE · BLEU = dribble main GAUCHE.',
+    desc_en: 'RED = dribble RIGHT hand · BLUE = dribble LEFT hand.',
+    hint: function(){ var s = _dqt_state.signal; return s==='right' ? (window._lang==='en'?'🔴 RIGHT HAND':'🔴 MAIN DROITE') : (s==='left'?(window._lang==='en'?'🔵 LEFT HAND':'🔵 MAIN GAUCHE'):'...'); },
+    maxTargets: 999, spawnIntervalMs: 3500, ttl: 3200,    // maxTargets haut pour que spawn soit tjs appelé (change signal)
+    spawn: function(W, H, state){
+      // Change signal tous les 3-4 sec
+      state.signal = Math.random() < 0.5 ? 'right' : 'left';
+      state.signalChangedAt = Date.now();
+      state.lastEvalAt = Date.now();
+      return null;
+    },
+    evaluate: function(){ return false; },    // pas d'évaluation par hit
+    onFrame: function(ctx, W, H, state){
+      // Grande pastille centrale montrant la main attendue
+      var now = Date.now();
+      if (!state.signal) return;
+      var cx = W/2, cy = H*0.56, R = Math.min(W*0.14, H*0.24);
+      ctx.save();
+      ctx.fillStyle = state.signal==='right' ? 'rgba(230,57,70,.25)' : 'rgba(76,201,240,.25)';
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = state.signal==='right' ? '#e63946' : '#4cc9f0';
+      ctx.lineWidth = 4; ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.font = 'bold '+Math.round(R*0.8)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText(state.signal==='right' ? 'D' : 'G', cx, cy+R*0.05);
+      ctx.restore();
+      // Évaluation périodique (chaque 1s) : check quelle main a le plus de BPM
+      if (now - (state.lastEvalAt||0) > 1500 && state.signal){
+        state.lastEvalAt = now;
+        var activeSide = _dqt_detectActiveDribble();
+        if (activeSide){
+          // En vue miroir : main droite réelle = 'left' côté canvas, main gauche = 'right'
+          var expected = state.signal === 'right' ? 'left' : 'right';
+          if (activeSide === expected){
+            _dqt_correct++; _dqt_combo++;
+            _dqt_bestCombo = Math.max(_dqt_bestCombo, _dqt_combo);
+            _dqt_score += 10;
+            _dqt_particles.push({ x:cx, y:cy-R*1.2, floatText:'+10', color:'#2dc653', born:now, life:900 });
+            try { if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.10); } catch(e){}
+          } else {
+            _dqt_wrong++; _dqt_combo = 0;
+            _dqt_score = Math.max(0, _dqt_score - 5);
+            _dqt_particles.push({ x:cx, y:cy-R*1.2, floatText:'-5', color:'#e63946', born:now, life:900 });
+            try { if (typeof _td_beep === 'function') _td_beep(220, 0.05, 0.10); } catch(e){}
+          }
+        }
+      }
+    }
+  }
+};
+
+/* Helper F4 : détecte quelle main oscille le plus (dribble actif) sur fenêtre 1.5s */
+var _dqt_wristHist = {left:[], right:[]};
+function _dqt_detectActiveDribble(){
+  var now = Date.now();
+  var activity = {};
+  ['left','right'].forEach(function(s){
+    var hist = _dqt_wristHist[s] || [];
+    hist = hist.filter(function(h){ return now - h.t < 1500; });
+    _dqt_wristHist[s] = hist;
+    if (hist.length < 4) { activity[s] = 0; return; }
+    var ys = hist.map(function(h){return h.y;});
+    var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
+    activity[s] = ymax - ymin;   // amplitude du mouvement vertical
+  });
+  if (activity.left > activity.right * 1.3) return 'left';
+  if (activity.right > activity.left * 1.3) return 'right';
+  return null;
+}
+
+function _dqt_setDrill(id){
+  _dqt_mode = id;
+  _dqt_state = {};
+  var d = _DQT_DRILLS[id];
+  var desc = document.getElementById('dqt_drillDesc');
+  if (desc && d) desc.textContent = window._lang==='en' ? d.desc_en : d.desc_fr;
+}
+function _dqt_setDur(d){ _dqt_dur = d; _dqt_highlight('.dqt-dur-btn','data-sec',d); }
+function _dqt_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = String(b.getAttribute(attr)) === String(val);
+    b.style.border     = active ? '1px solid rgba(245,197,24,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
+    b.style.color      = active ? '#f5c518' : '#7a8299';
+  });
+}
+function _dqt_status(msg, color){
+  var st = document.getElementById('dqt_status');
+  if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
+}
+function _dqt_start(){
+  if (!navigator.mediaDevices){ _dqt_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _dqt_status(_t('Accès caméra...','Accessing camera...'), '#f5c518');
+  var btn = document.getElementById('dqt_btnStart');
+  if (btn){ btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _dqt_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _dqt_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('dqt', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _dqt_onCamReady(video, canvas, ctx){
+  _dqt_video = video; _dqt_canvas = canvas; _dqt_ctx = ctx;
+  _dqt_countdownActive = true;
+  _dqt_runCountdown(10);
+}
+function _dqt_runCountdown(n){
+  if (!_dqt_countdownActive) return;
+  var cv = _dqt_canvas, ctx = _dqt_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _dqt_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n), W/2, H/2);
+    ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(window._lang==='en'?'GET READY':'PRÊT ?', W/2, H*0.82);
+    _dqt_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _dqt_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _dqt_countdownActive = false;
+    _dqt_startGame();
+  }
+}
+function _dqt_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText('SENSEI', W-10, 10);
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.font='bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText('TARGETS · '+_dqt_mode, W-10, 10 + Math.round(H*0.035));
+  ctx.restore();
+}
+function _dqt_startGame(){
+  _dqt_running = true;
+  _dqt_startTs = Date.now(); _dqt_elapsed = 0;
+  _dqt_score = 0; _dqt_correct = 0; _dqt_wrong = 0;
+  _dqt_combo = 0; _dqt_bestCombo = 0;
+  _dqt_reactTimes = [];
+  _dqt_particles = [];
+  _dqt_prevWrist = {};
+  _dqt_targets = [];
+  _dqt_state = {};
+  _dqt_wristHist = {left:[], right:[]};
+  _dqt_lastSpawnTs = 0;
+  _dqt_rafId = requestAnimationFrame(_dqt_loop);
+}
+function _dqt_tickSpawn(){
+  var d = _DQT_DRILLS[_dqt_mode];
+  if (!d) return;
+  var now = Date.now();
+  var active = _dqt_targets.filter(function(t){return !t.hit && !t.wrongHit && (now - t.born) < (t.ttl || d.ttl);});
+  if (active.length >= d.maxTargets) return;
+  if (now - _dqt_lastSpawnTs < d.spawnIntervalMs) return;
+  _dqt_lastSpawnTs = now;
+  if (!_dqt_canvas) return;
+  var W = _dqt_canvas.width, H = _dqt_canvas.height;
+  var t = d.spawn(W, H, _dqt_state);
+  if (t){ t.ttl = t.ttl || d.ttl; _dqt_targets.push(t); }
+}
+function _dqt_loop(){
+  if (!_dqt_running) return;
+  var cv = _dqt_canvas, ctx = _dqt_ctx, W = cv.width, H = cv.height;
+  _dqt_elapsed = (Date.now() - _dqt_startTs) / 1000;
+  _drawVideoMirror(ctx, _dqt_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dqt_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dqt_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  // Tick spawn + expiry
+  _dqt_tickSpawn();
+  var now = Date.now();
+  var d = _DQT_DRILLS[_dqt_mode];
+  _dqt_targets.forEach(function(t){
+    if (!t.hit && !t.wrongHit && (now - t.born) > (t.ttl || d.ttl)){
+      t._expired = true;
+      if (d.onTimeout) d.onTimeout(t, _dqt_state);
+    }
+  });
+  _dqt_targets = _dqt_targets.filter(function(t){
+    if (t._expired) return false;
+    if (t.hit || t.wrongHit) return (now - (t.hitTime||0) < 300);
+    return true;
+  });
+  // Render per-drill custom (zones, mobile updates…)
+  if (d && d.onFrame) d.onFrame(ctx, W, H, _dqt_state);
+  // Draw targets
+  _dqt_drawTargets(ctx, W, H);
+  // Hint top-center
+  _dqt_drawHint(ctx, W, H, d);
+  // Particules
+  _dqt_particles = _dqt_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life, alpha = 1 - progress;
+    ctx.save(); ctx.globalAlpha = alpha;
+    if (p.ring){
+      var curR = p.r + (p.maxR - p.r) * progress;
+      ctx.beginPath(); ctx.arc(p.x, p.y, curR, 0, Math.PI*2);
+      ctx.strokeStyle = p.color; ctx.lineWidth = 3*(1-progress); ctx.stroke();
+    } else if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    } else {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r*(1-progress*0.5), 0, Math.PI*2);
+      ctx.fillStyle = p.color; ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  });
+  _dqt_drawHud(ctx, W, H);
+  _dqt_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_dqt_elapsed >= _dqt_dur){ _dqt_endGame(); return; }
+  _dqt_rafId = requestAnimationFrame(_dqt_loop);
+}
+function _dqt_drawHint(ctx, W, H, d){
+  if (!d || !d.hint) return;
+  var txt = d.hint();
+  if (!txt) return;
+  var bw = W*0.46, bh = H*0.09;
+  var bx = W/2 - bw/2, by = H*0.14;
+  ctx.save();
+  ctx.fillStyle = 'rgba(13,17,23,.65)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#f5c518';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle = '#f5c518';
+  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
+  ctx.font = 'bold '+Math.round(bh*0.52)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, by + bh*0.55);
+  ctx.restore();
+}
+function _dqt_drawTargets(ctx, W, H){
+  var now = Date.now();
+  _dqt_targets.forEach(function(t){
+    if (t.hit || t.wrongHit){
+      // Expire flash — ring de disparition
+      var fage = (now - (t.hitTime||0)) / 300;
+      ctx.save(); ctx.globalAlpha = Math.max(0, 1-fage);
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r*(1+fage), 0, Math.PI*2);
+      ctx.strokeStyle = t.hit?'#2dc653':'#e63946'; ctx.lineWidth=3; ctx.stroke();
+      ctx.restore();
+      return;
+    }
+    var age = (now - t.born) / (t.ttl || 2000);
+    var alpha = Math.max(0.4, 1 - age);
+    var spawnRamp = Math.min(1, (now - t.born) / 200);
+    var pulse = 1 + 0.09 * spawnRamp * Math.sin(now/150);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    // Ring extérieur pulsant (style TARGETS)
+    ctx.beginPath();
+    if (t.shape === 'square'){
+      var sz = t.r * pulse * 1.3 * 2;
+      ctx.strokeRect(t.x - sz/2, t.y - sz/2, sz, sz);
+    } else {
+      ctx.arc(t.x, t.y, t.r * pulse * 1.3, 0, Math.PI*2);
+    }
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 14; ctx.shadowColor = t.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Cercle plein (ou carré plein)
+    if (t.shape === 'square'){
+      var sz2 = t.r * 2;
+      ctx.fillStyle = t.color;
+      ctx.fillRect(t.x - sz2/2, t.y - sz2/2, sz2, sz2);
+    } else {
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2);
+      ctx.fillStyle = t.color; ctx.fill();
+    }
+    // Label texte si présent
+    if (t.label){
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle = '#fff';
+      ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
+      var L = String(t.label).length;
+      var fs = L <= 2 ? Math.round(t.r*0.80) : Math.round(t.r*0.45);
+      ctx.font = 'bold '+fs+'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillText(t.label, t.x, t.y + t.r*0.04);
+    }
+    ctx.restore();
+  });
+}
+/* Détection STRICT DRIBBLE MATHS + closest-wins (comme TDR Color Reactor corrigé) */
+function _dqt_analyzePose(poses){
+  if (!_dqt_running || !poses || !poses[0] || !_dqt_canvas) return;
+  var cv = _dqt_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_dqt_video ? _dqt_video.videoWidth : W);
+  var sy = H / (_dqt_video ? _dqt_video.videoHeight : H);
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
+  var nowMs = Date.now();
+  var d = _DQT_DRILLS[_dqt_mode];
+  ['left','right'].forEach(function(side){
+    var name = side + 'Wrist';
+    var kp = _tsym_kp_hand(poses, side);
+    if (!kp) return;
+    var wx = W - kp.x * sx;
+    var wy = kp.y * sy;
+    // Hist pour F4 détection active dribble
+    _dqt_wristHist[side] = _dqt_wristHist[side] || [];
+    _dqt_wristHist[side].push({t:nowMs, y:wy});
+    if (_dqt_wristHist[side].length > 50) _dqt_wristHist[side].shift();
+    var prev = _dqt_prevWrist[name];
+    var moved = prev ? Math.sqrt(Math.pow(wx-prev.x,2)+Math.pow(wy-prev.y,2)) : 0;
+    _dqt_prevWrist[name] = { x: wx, y: wy };
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    // CLOSEST-WINS
+    var hitCandidate = null, hitDist = Infinity;
+    _dqt_targets.forEach(function(t){
+      if (t.hit || t.wrongHit) return;
+      if (nowMs - t.born < 500) return;    // grace 500ms
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * 1.2) return;
+      var dot = (-dx) * vx + (-dy) * vy;
+      if (dot <= 0) return;
+      if (dist < hitDist){ hitDist = dist; hitCandidate = t; }
+    });
+    if (!hitCandidate) return;
+    (function(t){
+      var isGood = d.evaluate(t, _dqt_state);
+      var nowH = Date.now();
+      if (isGood){
+        t.hit = true; t.hitTime = nowH;
+        for (var pi = 0; pi < 12; pi++){
+          var angle = (pi/12) * Math.PI * 2;
+          var speed = 2.5 + Math.random()*3;
+          _dqt_particles.push({ x:t.x, y:t.y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, r:3+Math.random()*4, color:t.color, born:nowH, life:500+Math.random()*200 });
+        }
+        _dqt_particles.push({ x:t.x, y:t.y, vx:0, vy:0, r:t.r, color:t.color, born:nowH, life:400, ring:true, maxR:t.r*3 });
+        try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate(20);
+        _dqt_correct++; _dqt_combo++;
+        _dqt_bestCombo = Math.max(_dqt_bestCombo, _dqt_combo);
+        var rt = nowH - t.born;
+        _dqt_reactTimes.push(rt);
+        var sb = Math.max(0, Math.round((2000-rt)/200));
+        var cb = _dqt_combo >= 5 ? 5 : 0;
+        var gain = 10 + sb + cb;
+        _dqt_score += gain;
+        _dqt_particles.push({ x:t.x, y:t.y-t.r*1.6, floatText:'+'+gain, color:'#2dc653', born:nowH, life:900 });
+      } else {
+        t.wrongHit = true; t.hitTime = nowH;
+        _dqt_particles.push({ x:t.x, y:t.y, vx:0, vy:0, r:t.r, color:'#e63946', born:nowH, life:400, ring:true, maxR:t.r*2.4 });
+        _dqt_particles.push({ x:t.x, y:t.y-t.r*1.6, floatText:'✗ -5', color:'#e63946', born:nowH, life:900 });
+        try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+        if (navigator.vibrate) navigator.vibrate([40,30,40]);
+        _dqt_wrong++; _dqt_combo = 0;
+        _dqt_score = Math.max(0, _dqt_score - 5);
+      }
+    })(hitCandidate);
+  });
+}
+function _dqt_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_dqt_score, W*0.04, H*0.12);
+  ctx.font='bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.045);
+  if (_dqt_combo > 0){
+    var mult = _dqt_combo >= 10 ? 3 : _dqt_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.03)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_dqt_combo, W*0.04, H*0.17);
+  }
+  var timeLeft = Math.max(0, _dqt_dur - _dqt_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  var chW = W*0.16, chH = H*0.08;
+  var chX = W*0.04, chY = H - chH - H*0.03;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.fillStyle='rgba(13,17,23,.35)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.05)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  ctx.restore();
+}
+function _dqt_toggleRec(){ if (_dqt_recActive) _dqt_stopRec(); else _dqt_startRec(); }
+function _dqt_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_dqt_recTimer); _dqt_recTimer = null;
+  if (_dqt_recorder){ try{ _dqt_recorder.ondataavailable=null; _dqt_recorder.onstop=null; _dqt_recorder.onerror=null; if(_dqt_recorder.state!=='inactive')_dqt_recorder.stop(); }catch(e){} }
+  if (_dqt_recStream){ try{_dqt_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dqt_recStream=null; }
+  _dqt_recorder=null; _dqt_recChunks=[]; _dqt_recSec=0; _dqt_recActive=false;
+  var cv = _dqt_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dqt_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _dqt_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _dqt_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _dqt_recChunks = []; _dqt_recSec = 0;
+  _dqt_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dqt_recChunks.push(e.data); };
+  _dqt_recorder.onstop = function(){
+    clearInterval(_dqt_recTimer);
+    var mimeFinal = (_dqt_recorder && _dqt_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dqt_recChunks, {type: mimeFinal});
+    if (_dqt_recStream){ try{_dqt_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dqt_recStream=null; }
+    _dqt_recActive=false; _dqt_recChunks=[]; _dqt_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_'+_dqt_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI TARGETS · '+_dqt_mode, filename:fn, onSave:function(b,filename){ _dqt_dlBlob(b, filename); } });
+    } else _dqt_dlBlob(blob, fn);
+  };
+  _dqt_recorder.onerror = function(){ clearInterval(_dqt_recTimer); };
+  setTimeout(function(){
+    if (!_dqt_recorder) return;
+    try { _dqt_recorder.start(1000); _dqt_recActive = true; } catch(e){ return; }
+    _dqt_recTimer = setInterval(function(){
+      _dqt_recSec++;
+      var mm=Math.floor(_dqt_recSec/60)%60,ss=_dqt_recSec%60,hh=Math.floor(_dqt_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_dqt_recSec >= 180) _dqt_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _dqt_stopRec(){
+  _dqt_recActive=false; clearInterval(_dqt_recTimer); _dqt_recTimer=null;
+  if (_dqt_recorder){ try{ if(_dqt_recorder.state!=='inactive')_dqt_recorder.stop(); }catch(e){} }
+  _dqt_updateRecBtn();
+}
+function _dqt_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dqt_recActive, '&#9632; STOP REC', '#e63946'); }
+function _dqt_dlBlob(blob, fn){
+  try { var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.style.display='none'; a.href=url; a.download=fn;
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},10000);
+  } catch(e){}
+}
+function _dqt_endGame(){ _dqt_stop(true); _dqt_renderResults(); }
+function _dqt_stop(fromEnd){
+  _dqt_running = false;
+  _dqt_countdownActive = false;
+  if (_dqt_rafId){ cancelAnimationFrame(_dqt_rafId); _dqt_rafId = null; }
+  if (_dqt_recActive) _dqt_stopRec();
+  if (_dqt_stream){ _dqt_stream.getTracks().forEach(function(t){t.stop();}); _dqt_stream=null; }
+  if (typeof senseiCamStop === 'function') senseiCamStop();
+  var btn = document.getElementById('dqt_btnStart');
+  if (btn) btn.style.display = 'flex';
+  var sv = document.getElementById('dqt_btnSave');
+  if (sv && fromEnd && (_dqt_correct+_dqt_wrong)>0) sv.style.display = 'flex';
+}
+function _dqt_renderResults(){
+  var res = document.getElementById('dqt_results');
+  if (!res) return;
+  var en = window._lang === 'en';
+  var total = _dqt_correct + _dqt_wrong;
+  var pct = total > 0 ? Math.round(_dqt_correct / total * 100) : 0;
+  var avg = _dqt_reactTimes.length > 0 ? Math.round(_dqt_reactTimes.reduce(function(a,b){return a+b;},0) / _dqt_reactTimes.length) : 0;
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#f5c518">'+_dqt_score+'</div><div class="tr-score-lbl">SCORE</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num" style="color:#2dc653">'+_dqt_correct+'/'+total+'</div><div class="tr-score-lbl">'+(en?'CORRECT':'CORRECTS')+'</div></div>';
+  html += '<div class="tr-score-box"><div class="tr-score-num">'+(avg>0?avg+'ms':'--')+'</div><div class="tr-score-lbl">'+(en?'AVG REACT':'RÉACTION')+'</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:10px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:#9aa3b3;text-align:center;letter-spacing:.5px">'+pct+'% · drill '+_dqt_mode+' · combo max ×'+_dqt_bestCombo+'</div>';
+  res.innerHTML = html;
+  _dqt_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _dqt_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _dqt_correct + _dqt_wrong;
+    var pct = total > 0 ? Math.round(_dqt_correct / total * 100) : 0;
+    _sb_recordSession('qt_'+_dqt_mode, pct);
+  }
+  _dqt_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('dqt_btnSave'); if (sv) sv.style.display = 'none';
+}
+
 function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
@@ -32819,7 +33670,8 @@ var _dcog_VIDEOS = [
   // ═══ Nouveaux drills DCOG (format horizontal 16:9) ═══
   {id:'SpqUX_pS8tw', title:'Color React',        drill:'colorreact'},
   {id:'IrW2OCRd5n0', title:'Rule Switch',        drill:'ruleswitch'},
-  {id:'IrW2OCRd5n0', title:'Quick Choice',       drill:'quickchoice'}
+  {id:'IrW2OCRd5n0', title:'Quick Choice',       drill:'quickchoice'},
+  {id:'IrW2OCRd5n0', title:'Quick Targets',      drill:'quicktargets'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -32974,9 +33826,11 @@ function _dcog_applyLang(en) {
     'dcog_lbl_colorreact':  en?'COLOR REACT':'COLOR REACT',
     'dcog_lbl_ruleswitch':  en?'RULE SWITCH':'RULE SWITCH',
     'dcog_lbl_quickchoice': en?'QUICK CHOICE':'QUICK CHOICE',
+    'dcog_lbl_quicktargets':en?'QUICK TARGETS':'QUICK TARGETS',
     'dcrc_lblStart':        en?'▶ START COLOR REACT':'▶ DÉMARRER COLOR REACT',
     'drsw_lblStart':        en?'▶ START RULE SWITCH':'▶ DÉMARRER RULE SWITCH',
     'dqa_lblStart':         en?'▶ START':'▶ DÉMARRER',
+    'dqt_lblStart':         en?'▶ START':'▶ DÉMARRER',
     // ═══ VISUOMOTOR COORDINATION ═══
     'dcog_lbl_viscoord': en?'VISUOMOTOR COORDINATION':'VISUOMOTOR COORDINATION',
     'dcog_vc_objLbl':   en?'⏱ OBJECTIVE':'⏱ OBJECTIF',
@@ -33053,14 +33907,16 @@ function _dcog_selectDrill(drill, langOnly) {
     ruleswitch: en ? 'Classify the stimulus according to the active rule — rule flips periodically. Cognitive flexibility × dribble.'
                    : 'Classifie le stimulus selon la règle active — la règle bascule régulièrement. Flexibilité cognitive × dribble.',
     quickchoice: en ? 'Universal engine — 13 catalogue drills (classify, compare, predict, Stroop, defender read, free space…). Same Dribble Maths detection for all.'
-                    : 'Moteur universel — 13 drills catalogue (classer, comparer, prédire, Stroop, lire défenseur, espace libre…). Même détection Dribble Maths pour tous.'
+                    : 'Moteur universel — 13 drills catalogue (classer, comparer, prédire, Stroop, lire défenseur, espace libre…). Même détection Dribble Maths pour tous.',
+    quicktargets: en ? 'TARGETS engine — 11 remaining catalogue drills (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Hit the correct targets.'
+                     : 'Moteur TARGETS — 11 drills catalogue restants (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Touche les bonnes cibles.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -33069,13 +33925,13 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/colorreact/ruleswitch/quickchoice utilisent flex-direction:column, les autres flex row/wrap
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' ? '12px' : '8px');
+        // viscoord/rcs/colorreact/ruleswitch/quickchoice/quicktargets utilisent flex-direction:column
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -33091,7 +33947,8 @@ function _dcog_selectDrill(drill, langOnly) {
       vcmath:  en ? '🎚 DIFFICULTY'     : '🎚 DIFFICULTÉ',
       colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT',
       ruleswitch: en ? '🔁 RULE SWITCH' : '🔁 RULE SWITCH',
-      quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE'
+      quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE',
+      quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -33125,7 +33982,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice');
+    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice' || drill === 'quicktargets');
     if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
     if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
     if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
@@ -33147,7 +34004,7 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:4, math:7, sprint:8, twoball:9, height:10, tboard:11, burnout:14, vcmath:16, colorreact:17, ruleswitch:18, quickchoice:19 };
+      var _dcogVidMap = { viscoord:0, rcs:4, math:7, sprint:8, twoball:9, height:10, tboard:11, burnout:14, vcmath:16, colorreact:17, ruleswitch:18, quickchoice:19, quicktargets:20 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -37713,6 +38570,7 @@ function senseiCamShow(mod,stream){
     if(mod==='dcrc'&&typeof _dcrc_onCamReady==='function')_dcrc_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='drsw'&&typeof _drsw_onCamReady==='function')_drsw_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dqa'&&typeof _dqa_onCamReady==='function')_dqa_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dqt'&&typeof _dqt_onCamReady==='function')_dqt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -37782,6 +38640,7 @@ function senseiCamToggleRec(){
   else if(m==='dcrc' && typeof _dcrc_toggleRec==='function') _dcrc_toggleRec();
   else if(m==='drsw' && typeof _drsw_toggleRec==='function') _drsw_toggleRec();
   else if(m==='dqa' && typeof _dqa_toggleRec==='function') _dqa_toggleRec();
+  else if(m==='dqt' && typeof _dqt_toggleRec==='function') _dqt_toggleRec();
 }
 // i18n portrait warning
 (function(){
