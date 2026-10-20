@@ -31510,11 +31510,11 @@ var _dqt_lastSpawnTs = 0;
 var _dqt_hint = '';          // texte hint affiché haut-centre (varie par drill)
 
 /* ─── Zone utile ZÉRO COLLISION ───
-   x : [W×0.08, W×0.92] (hors REC coins)
-   y : [H×0.26, H×0.86] (hors score top-left, hors chrono bas-gauche)
-   Hint texte en haut : y=0.15, font 0.08H → bbox [0.11, 0.19] */
+   x : [W×0.10, W×0.90] (hors REC coins)
+   y : [H×0.30, H×0.84] (hors score top-left, hors chrono bas-gauche, hors bandeau consigne agrandi)
+   Hint bandeau : y=0.08, bh=0.11H, font 0.077H → bbox [0.08, 0.19], gap 0.03 avec cercle (r_max 0.08H) */
 function _dqt_zone(W, H){
-  return { xMin: W*0.10, xMax: W*0.90, yMin: H*0.28, yMax: H*0.84 };
+  return { xMin: W*0.10, xMax: W*0.90, yMin: H*0.30, yMax: H*0.84 };
 }
 function _dqt_spawnAt(cx, cy, r, extra){
   var t = { x:cx, y:cy, r:r, born: Date.now(), hit:false, wrongHit:false };
@@ -32014,17 +32014,26 @@ function _dqt_drawHint(ctx, W, H, d){
   if (!d || !d.hint) return;
   var txt = d.hint();
   if (!txt) return;
-  var bw = W*0.46, bh = H*0.09;
-  var bx = W/2 - bw/2, by = H*0.14;
+  // Bandeau consigne harmonisé RULE SWITCH / QUICK CHOICE — lisible trépied
+  var bw = W*0.56, bh = H*0.11;
+  var bx = W/2 - bw/2, by = H*0.08;
   ctx.save();
-  ctx.fillStyle = 'rgba(13,17,23,.65)';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
-  ctx.lineWidth = 2; ctx.strokeStyle = '#f5c518';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
+  ctx.fillStyle = 'rgba(13,17,23,.72)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.fill();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = '#f5c518';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.stroke();
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle = '#f5c518';
-  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
-  ctx.font = 'bold '+Math.round(bh*0.52)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  // Font auto-shrink si texte long
+  var baseFs = Math.round(bh*0.70);
+  ctx.font = 'bold '+baseFs+'px "Bebas Neue","Arial Narrow",sans-serif';
+  var maxW = bw * 0.92;
+  if (ctx.measureText(txt).width > maxW){
+    var ratio = maxW / ctx.measureText(txt).width;
+    baseFs = Math.max(Math.round(bh*0.42), Math.round(baseFs * ratio));
+    ctx.font = 'bold '+baseFs+'px "Bebas Neue","Arial Narrow",sans-serif';
+  }
   ctx.fillText(txt, W/2, by + bh*0.55);
   ctx.restore();
 }
@@ -32073,9 +32082,21 @@ function _dqt_drawTargets(ctx, W, H){
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillStyle = '#fff';
       ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
+      // Label sizing harmonisé QUICK CHOICE — 4 paliers lisibles trépied
       var L = String(t.label).length;
-      var fs = L <= 2 ? Math.round(t.r*0.80) : Math.round(t.r*0.45);
+      var fsRatio = L <= 2 ? 0.80
+                  : L <= 5 ? 0.60
+                  : L <= 8 ? 0.42
+                  : 0.33;
+      var fs = Math.round(t.r * fsRatio);
       ctx.font = 'bold '+fs+'px "Bebas Neue","Arial Narrow",sans-serif';
+      // Auto-shrink de sécurité si le texte dépasse 85% du diamètre
+      var maxTxtW = t.r * 1.70;
+      if (ctx.measureText(t.label).width > maxTxtW){
+        var ratio = maxTxtW / ctx.measureText(t.label).width;
+        fs = Math.max(Math.round(t.r*0.28), Math.round(fs * ratio));
+        ctx.font = 'bold '+fs+'px "Bebas Neue","Arial Narrow",sans-serif';
+      }
       ctx.fillText(t.label, t.x, t.y + t.r*0.04);
     }
     ctx.restore();
@@ -33650,12 +33671,11 @@ var _dcog_VIDEOS = [
   // Chaque vidéo est taguée par son drill → le carrousel filtre dynamiquement
   // selon _dcog_drill courant (dans _dcog_renderVids ci-dessous).
   // Flag `vertical:true` → thumb 9:16 + player iframe en 9:16 (pattern STRENGTH)
-  // ═══ VISUOMOTOR COORDINATION — 4 vidéos jonglage (format horizontal 16:9
+  // ═══ VISUOMOTOR COORDINATION — 3 vidéos jonglage (format horizontal 16:9
   //    comme DRIBBLE/TDR : thumbs landscape + iframe 16:9) ═══
-  {id:'tLthFdKJu9k', title:'Visuomotor 1',       drill:'viscoord'},
-  {id:'_eXwWe5nE80', title:'Visuomotor 2',       drill:'viscoord'},
-  {id:'4iiLTTAA79Y', title:'Visuomotor 3',       drill:'viscoord'},
-  {id:'jsKnPf9TBEs', title:'Visuomotor 4',       drill:'viscoord'},
+  {id:'_eXwWe5nE80', title:'Visuomotor 1',       drill:'viscoord'},
+  {id:'4iiLTTAA79Y', title:'Visuomotor 2',       drill:'viscoord'},
+  {id:'jsKnPf9TBEs', title:'Visuomotor 3',       drill:'viscoord'},
   // ═══ REACTION CATCHING STICK — format Shorts 9:16 (vertical) ═══
   {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs', vertical:true},
   {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs', vertical:true},
@@ -34011,7 +34031,7 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:4, math:9, sprint:10, twoball:11, height:12, tboard:13, burnout:17, vcmath:19, colorreact:20, ruleswitch:21, quickchoice:22, quicktargets:23 };
+      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:22 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
