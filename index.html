@@ -2517,6 +2517,15 @@ window._dojoBackHome = function(){
     </div>
     <!-- RULE SWITCH : mode (chiffres/lettres/mixte) · durée · fréquence switch -->
     <div id="dcog_optRuleswitch" style="display:none;flex-direction:column;gap:12px">
+      <!-- Vidéo tuto YouTube — lite embed (pattern TDR Color Reactor) -->
+      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/IrW2OCRd5n0/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/maxresdefault.jpg';this.addEventListener('error',function(){this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/hqdefault.jpg';});" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
+      </div>
       <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🔤 TYPE</div>
         <div style="display:flex;gap:6px">
@@ -2552,6 +2561,15 @@ window._dojoBackHome = function(){
     </div>
     <!-- QUICK CHOICE : moteur générique "stimulus + N cibles réponse" — 13 presets catalogue -->
     <div id="dcog_optQuickchoice" style="display:none;flex-direction:column;gap:12px">
+      <!-- Vidéo tuto YouTube — lite embed (pattern TDR Color Reactor) -->
+      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/IrW2OCRd5n0/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/maxresdefault.jpg';this.addEventListener('error',function(){this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/hqdefault.jpg';});" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
+      </div>
       <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎯 DRILL</div>
         <select id="dqa_drillSelect" onchange="_dqa_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.1);color:#ff6b35;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
@@ -30455,19 +30473,19 @@ function _drsw_loop(){
   if (_drsw_elapsed >= _drsw_dur){ _drsw_endGame(); return; }
   _drsw_rafId = requestAnimationFrame(_drsw_loop);
 }
-/* ─── Dessine stimulus zone [0.05-0.28] — NE CHEVAUCHE PAS le bandeau ni les cibles ─── */
+/* ─── Dessine stimulus zone [0.05-0.23] — plus petit car consigne doit DOMINER ─── */
 function _drsw_drawStimulus(ctx, W, H){
   if (!_drsw_stimulus) return;
   ctx.save();
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.shadowBlur = 24; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillStyle = '#fff';
-  // ★ Font 0.22H centré à y=0.17H → bbox [0.06-0.28], gap 0.05 avec bandeau (0.33)
-  ctx.font = 'bold '+Math.round(H*0.22)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(_drsw_stimulus, W/2, H*0.17);
+  // ★ Stimulus réduit à 0.18H à y=0.14 → bbox [0.05-0.23], gap 0.03 avec bandeau
+  ctx.font = 'bold '+Math.round(H*0.18)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(_drsw_stimulus, W/2, H*0.14);
   ctx.restore();
 }
-/* ─── Dessine bandeau règle zone [0.33-0.44] — NE CHEVAUCHE NI stimulus NI cibles ─── */
+/* ─── Dessine bandeau règle zone [0.26-0.40] — AGRANDI, consigne LISIBLE ─── */
 function _drsw_drawRuleBanner(ctx, W, H){
   if (!_drsw_ruleActive) return;
   var en = window._lang === 'en';
@@ -30476,18 +30494,23 @@ function _drsw_drawRuleBanner(ctx, W, H){
   else if (_drsw_ruleActive === 'IMPAIR')  txt = en ? 'ODD ?' : 'IMPAIR ?';
   else if (_drsw_ruleActive === 'VOYELLE') txt = en ? 'VOWEL ?' : 'VOYELLE ?';
   else                                     txt = en ? 'CONSONANT ?' : 'CONSONNE ?';
-  // ★ Bandeau W×0.44 et hauteur 0.11H à y=0.33 → bbox [0.33-0.44]
-  var bw = W*0.44, bh = H*0.11;
-  var bx = W/2 - bw/2, by = H*0.33;
+  // ★ Bandeau W×0.56 (plus large) et hauteur 0.14H (plus haut) à y=0.26 → bbox [0.26-0.40]
+  //   Texte bh×0.78 ≈ 0.11H → MÊME TAILLE que stimulus 0.18H était avant (parité visuelle)
+  var bw = W*0.56, bh = H*0.14;
+  var bx = W/2 - bw/2, by = H*0.26;
   ctx.save();
-  ctx.fillStyle = 'rgba(76,201,240,.14)';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.fill();
-  ctx.lineWidth = 3; ctx.strokeStyle = '#4cc9f0';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.stroke();
+  // Fond plus opaque + bordure plus épaisse pour mettre en valeur
+  ctx.fillStyle = 'rgba(76,201,240,.20)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.fill();
+  ctx.lineWidth = 4; ctx.strokeStyle = '#4cc9f0';
+  ctx.shadowBlur = 16; ctx.shadowColor = '#4cc9f0';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
+  ctx.shadowBlur = 0;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle = '#4cc9f0';
-  ctx.font = 'bold '+Math.round(bh*0.70)+'px "Bebas Neue","Arial Narrow",sans-serif';
-  ctx.fillText(txt, W/2, by + bh*0.55);
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.9)';
+  ctx.font = 'bold '+Math.round(bh*0.78)+'px "Bebas Neue","Arial Narrow",sans-serif';
+  ctx.fillText(txt, W/2, by + bh*0.56);
   ctx.restore();
 }
 /* ─── Dessine les 2 cibles OUI/NON (style octogonal LED, labels AGRANDIS) ─── */
