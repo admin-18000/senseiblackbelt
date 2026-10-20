@@ -365,13 +365,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(1
 .testi-author{font-family:var(--font-cond);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase}
 .testi-role{font-size:11px;color:var(--muted);font-family:var(--font-cond)}
 /* ── NEUROSCIENCES ── */
-.neuro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-.neuro-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .2s}
+.neuro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;grid-auto-rows:1fr}
+.neuro-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .2s;display:flex;flex-direction:column;height:100%;min-height:280px}
 .neuro-card:hover{border-color:rgba(245,197,24,.2);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
-.neuro-cat{font-size:10px;font-family:var(--font-cond);font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
-.neuro-title{font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3}
-.neuro-body{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
-.neuro-source{font-size:10px;color:var(--muted2);font-family:var(--font-cond);letter-spacing:.3px;border-top:1px solid var(--border);padding-top:8px;margin-top:8px}
+.neuro-cat{font-size:10px;font-family:var(--font-cond);font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;flex-shrink:0}
+.neuro-title{font-family:var(--font-cond);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3;flex-shrink:0}
+.neuro-body{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px;flex:1 1 auto;overflow:hidden}
+.neuro-source{font-size:10px;color:var(--muted2);font-family:var(--font-cond);letter-spacing:.3px;border-top:1px solid var(--border);padding-top:8px;margin-top:auto;max-height:90px;overflow-y:auto;flex-shrink:0}
+.neuro-source::-webkit-scrollbar{width:4px}
+.neuro-source::-webkit-scrollbar-thumb{background:rgba(245,197,24,.3);border-radius:2px}
 
 /* ── VULGA SCIENTIFIQUE ── */
 .vulga-card{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;display:flex;gap:16px;align-items:flex-start;transition:all .2s}
@@ -8694,6 +8696,7 @@ const BELTS = [
 
 
 const NEURO_ARTICLES = [
+  {cat:'Entraînement cognitivo-moteur',title:'Stefania Lucia · dual-task training en basketball',body:'Les travaux de Stefania Lucia (Università degli Studi di Roma "Foro Italico") démontrent qu\'intégrer une tâche cognitive (calcul, décision, mémoire) PENDANT le dribble améliore à la fois la cognition ET la performance sportive. Chez les basketteurs semi-élites, 8 semaines de dual-task augmentent la précision décisionnelle de 15-25% et accélèrent les processus cérébraux liés à la décision. Effets observés en EEG : amélioration de l\'onde P300 (traitement attentionnel) et réduction des latences motrices. Différences sexe-spécifiques identifiées dans la réponse à l\'entraînement.',source:'Lucia S. et al. — Publications sélectionnées : (1) Integration of cognitive-motor dual-task training in physical sessions of highly-skilled basketball players (2024) · (2) Sex Differences in Cognitive-Motor Dual-Task Training Effects and in Brain Processing of Semi-Elite Basketball Players (2023) · (3) Specific effect of a cognitive-motor dual-task training on sport performance and brain processing associated with decision-making in semi-elite basketball players (2023) · (4) Testing a multicomponent training designed to improve sprint, agility and decision-making in elite basketball players (2023) · (5) Impact of Cognitive-Motor Dual-Task Training on Predictive Brain Functions and Functional Performance of Older Adults (2026) · (6) Motor-cognitive exercise with variability of practice and feedback improves functional ability and cognition in older individuals (2023) · (7) A non-pharmacologic treatment for anxiety in older adults based on cognitive-motor training (2024) · (8) Effects of Walking on Anticipatory Brain Processing During a Concurrent Cognitive Task (2025).'},
   {cat:'Mémoire procédurale',title:'Le cervelet, chef d\'orchestre du dribble',body:'Le dribble répété active les boucles cérébelleuses responsables de l\'automatisation motrice. Après 10 000 répétitions, le cortex préfrontal se déconnecte — le geste devient instinctif, libérant l\'attention pour la lecture du jeu.',source:'Ito, M. (2008). Control of mental activities by internal models in the cerebellum. Nature Reviews Neuroscience, 9, 304–313.'},
   {cat:'Plasticité neuronale',title:'Le dribble remodèle votre cerveau',body:'L\'entraînement intensif induit une neuroplasticité structurelle dans le cortex moteur. Les joueurs experts présentent une densité synaptique supérieure dans les zones dédiées à la motricité fine des mains et des doigts.',source:'Draganski, B. et al. (2004). Neuroplasticity: Changes in grey matter induced by training. Nature, 427, 311–312.'},
   {cat:'Asymétrie & Symétrie',title:'Pourquoi la symétrie main gauche/droite est cruciale',body:'Le corps calleux — faisceau de fibres reliant les deux hémisphères — s\'épaissit chez les athlètes ambidextres. La symétrie du dribble n\'est pas qu\'une compétence technique : c\'est une transformation neurologique mesurable.',source:'Schlaug, G. et al. (1995). Increased corpus callosum size in musicians. Neuropsychologia, 33, 1047–1055.'},
@@ -14228,6 +14231,8 @@ function applyLangTracker(lang) {
 (function(){
   // NEURO EN
   var NA=[
+    {cat_en:'Cognitive-Motor Training',title_en:'Stefania Lucia · dual-task training in basketball',
+     body_en:'Stefania Lucia\'s research (Università degli Studi di Roma "Foro Italico") shows that integrating a cognitive task (math, decision, memory) WHILE dribbling improves both cognition AND sport performance. In semi-elite basketball players, 8 weeks of dual-task training increase decision accuracy by 15-25% and speed up brain processing related to decision-making. EEG findings: improved P300 wave (attentional processing) and reduced motor latencies. Sex-specific differences identified in training response.'},
     {cat_en:'Procedural Memory',title_en:'The cerebellum: conductor of the dribble',
      body_en:'Repeated dribbling activates the cerebellar loops responsible for motor automation. After 10,000 reps, the prefrontal cortex disconnects — the movement becomes instinctive, freeing attention to read the game.'},
     {cat_en:'Neural Plasticity',title_en:'Dribbling reshapes your brain',
@@ -33648,14 +33653,14 @@ var _dcog_VIDEOS = [
   // ═══ VISUOMOTOR COORDINATION — 4 vidéos jonglage (format horizontal 16:9
   //    comme DRIBBLE/TDR : thumbs landscape + iframe 16:9) ═══
   {id:'tLthFdKJu9k', title:'Visuomotor 1',       drill:'viscoord'},
-  {id:'m1gctvzz6nc', title:'Visuomotor 2',       drill:'viscoord'},
-  {id:'Em-ga58-bhY', title:'Visuomotor 3',       drill:'viscoord'},
-  {id:'l5xJnrnOEvk', title:'Visuomotor 4',       drill:'viscoord'},
-  // ═══ REACTION CATCHING STICK — 3 vidéos bâtons (format Shorts 9:16
-  //    comme STRENGTH : thumbs portrait + iframe 9:16) ═══
+  {id:'_eXwWe5nE80', title:'Visuomotor 2',       drill:'viscoord'},
+  {id:'4iiLTTAA79Y', title:'Visuomotor 3',       drill:'viscoord'},
+  {id:'jsKnPf9TBEs', title:'Visuomotor 4',       drill:'viscoord'},
+  // ═══ REACTION CATCHING STICK — format Shorts 9:16 (vertical) ═══
   {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs', vertical:true},
   {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs', vertical:true},
   {id:'y5NsQVSRVB4', title:'Reaction Stick 3',   drill:'rcs', vertical:true},
+  {id:'vO0voL3Q8AI', title:'Reaction Stick 4',   drill:'rcs', vertical:true},
   // ═══ Drills DCOG existants (1 vidéo chacun) ═══
   {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
   {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
@@ -33663,6 +33668,7 @@ var _dcog_VIDEOS = [
   {id:'ar6OA2wxwzw', title:'Dribble Height BAS', drill:'height'},
   {id:'M7DtIYt1he8', title:'TBoard UN BALLON',   drill:'tboard'},
   {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS', drill:'tboard'},
+  {id:'R8MJAiXSKZM', title:'TBoard - 3',         drill:'tboard'},
   {id:'UHNUSFHSrOo', title:'Dribble Height HAUT',drill:'height'},
   {id:'5Fgt7txZEQc', title:'Burnout',            drill:'burnout'},
   {id:'eFXJ32fp54Q', title:'Burnout (alt)',      drill:'burnout'},
@@ -34004,7 +34010,7 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:4, math:7, sprint:8, twoball:9, height:10, tboard:11, burnout:14, vcmath:16, colorreact:17, ruleswitch:18, quickchoice:19, quicktargets:20 };
+      var _dcogVidMap = { viscoord:0, rcs:4, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:22 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
