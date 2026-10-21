@@ -2329,6 +2329,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🎯<div id="dcog_lbl_quicktargets">QUICK TARGETS</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('tapis')" id="dcog_btn_tapis"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🟪<div id="dcog_lbl_tapis">TAPIS SENSEI</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2656,6 +2660,53 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="dqt_btnStart" onclick="_dqt_start()" ontouchstart="" style="width:100%;background:#f5c518;color:#0d1117"><span id="dqt_lblStart">▶ DÉMARRER</span></button>
       <button class="tr-btn tr-btn-save" id="dqt_btnSave" onclick="_dqt_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dqt_results" style="margin-top:4px"></div>
+    </div>
+
+    <!-- TAPIS SENSEI : moteur footwork · 12 drills · détection chevilles sur zones calibrées -->
+    <div id="dcog_optTapis" style="display:none;flex-direction:column;gap:12px">
+      <!-- Vidéo tuto placeholder -->
+      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img loading="lazy" src="https://i.ytimg.com/vi_webp/IrW2OCRd5n0/maxresdefault.webp" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/maxresdefault.jpg';" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
+          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
+            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🟪 DRILL</div>
+        <select id="dtap_drillSelect" onchange="_dtap_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.1);color:#a78bfa;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
+          <option value="pattern">T1 · Foot Pattern (séquence)</option>
+          <option value="color">T2 · Color Call (couleur annoncée)</option>
+          <option value="number">T3 · Number React (chiffre flash)</option>
+          <option value="stroop">T4 · Stroop Foot (couleur de l'encre)</option>
+          <option value="math">T5 · Math Foot (résultat 1-5)</option>
+          <option value="nback">T6 · N-Back Foot (zone N-2)</option>
+          <option value="rule">T7 · Rule Switch Foot (règle bascule)</option>
+          <option value="dual">T8 · Dual Task (calcul + foot)</option>
+          <option value="gonogo">T9 · Go / No-Go (vert bouge · rouge reste)</option>
+          <option value="react">T10 · React & Recover (retour centre)</option>
+          <option value="periph">T11 · Peripheral Flash (vision périphérique)</option>
+          <option value="side">T12 · Dribble Side (zone = main)</option>
+        </select>
+        <div id="dtap_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Suis la séquence de zones · retour centre entre chaque pour +bonus.</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dtap-dur-btn" data-sec="60"  onclick="_dtap_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="dtap-dur-btn" data-sec="90"  onclick="_dtap_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="dtap-dur-btn" data-sec="120" onclick="_dtap_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+          <button class="dtap-dur-btn" data-sec="180" onclick="_dtap_setDur(180)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">3min</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🟪👣 Moteur FOOTWORK universel · 12 drills · détection cheville sur 5 zones (1 BLEU · 2 VERT · 3 JAUNE · 4 ROUGE · 5 BLANC centre) · tapis stylisé en overlay bas-centre.
+      </div>
+      <div id="dtap_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dtap_btnStart" onclick="_dtap_start()" ontouchstart="" style="width:100%;background:#a78bfa;color:#0d1117"><span id="dtap_lblStart">▶ DÉMARRER TAPIS</span></button>
+      <button class="tr-btn tr-btn-save" id="dtap_btnSave" onclick="_dtap_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="dtap_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -32304,6 +32355,867 @@ function _dqt_save(){
   var sv = document.getElementById('dqt_btnSave'); if (sv) sv.style.display = 'none';
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   🟪 DCOG TAPIS SENSEI (_dtap_*) — moteur FOOTWORK pour 12 drills tapis
+   Détection chevilles (strict Dribble Maths adapté pieds) · 5 zones calibrées
+   Mapping canonique : 1=BLEU · 2=VERT · 3=JAUNE · 4=ROUGE · 5=BLANC centre
+   UI zéro-collision : bandeau top [0.08-0.22] · tapis bottom [0.45-0.96]
+   Rules panel : top-left sous branding (RULE SWITCH / N-BACK uniquement)
+═══════════════════════════════════════════════════════════════════ */
+var _dtap_mode = 'pattern';
+var _dtap_dur  = 60;
+var _dtap_running = false, _dtap_stream = null;
+var _dtap_video = null, _dtap_canvas = null, _dtap_ctx = null;
+var _dtap_startTs = 0, _dtap_elapsed = 0;
+var _dtap_score = 0, _dtap_correct = 0, _dtap_wrong = 0;
+var _dtap_reactTimes = [], _dtap_combo = 0, _dtap_bestCombo = 0;
+var _dtap_rafId = null;
+var _dtap_state = {};         // état par drill (séquence, règles, historique…)
+var _dtap_target = null;      // {zone:1-5, born, flashOff?}
+var _dtap_prevFoot = {};      // vitesse chevilles
+var _dtap_lastHitZone = 0;    // dernière zone touchée (anti-rebond)
+var _dtap_lastHitTs = 0;
+var _dtap_particles = [];
+var _dtap_countdownActive = false;
+var _dtap_recorder = null, _dtap_recChunks = [], _dtap_recActive = false;
+var _dtap_recTimer = null, _dtap_recSec = 0, _dtap_recStream = null;
+
+/* Palette canonique */
+var _DTAP_ZC = {
+  1: {hex:'#4cc9f0', name:'BLEU',   name_en:'BLUE'},
+  2: {hex:'#2dc653', name:'VERT',   name_en:'GREEN'},
+  3: {hex:'#f5c518', name:'JAUNE',  name_en:'YELLOW'},
+  4: {hex:'#e63946', name:'ROUGE',  name_en:'RED'},
+  5: {hex:'#f5f5f5', name:'BLANC',  name_en:'WHITE'}
+};
+/* Positions relatives (dans bbox tapis) */
+var _DTAP_ZP = {
+  1: {x:0.27, y:0.36},
+  2: {x:0.73, y:0.36},
+  3: {x:0.27, y:0.72},
+  4: {x:0.73, y:0.72},
+  5: {x:0.50, y:0.54}
+};
+
+/* Bbox tapis dans canvas (W×H) · ratio 1.386 · ancré bottom-center */
+function _dtap_tapisBox(W, H){
+  var bw = Math.min(W*0.68, H*0.55*1.386);
+  var bh = bw / 1.386;
+  var bx = (W - bw) / 2;
+  var by = H - bh - H*0.06;    // marge basse pour HUD
+  return { x:bx, y:by, w:bw, h:bh };
+}
+/* Position écran d'une zone */
+function _dtap_zonePos(zoneId, box){
+  var p = _DTAP_ZP[zoneId];
+  return { x: box.x + p.x * box.w, y: box.y + p.y * box.h, r: box.w * 0.065 };
+}
+
+/* ═══ DRILLS ═══ Chacun : setup(), nextTarget(), hint(), drawExtra() */
+var _DTAP_DRILLS = {
+  pattern: {
+    setup: function(st){ st.seq = _dtap_randSeq(5); st.idx = 0; },
+    nextTarget: function(st){
+      if (st.idx >= st.seq.length){ st.seq = _dtap_randSeq(5); st.idx = 0; }
+      return st.seq[st.idx];
+    },
+    advance: function(st){ st.idx++; },
+    hint: function(st, en){
+      var pre = (en?'SEQ · ':'SÉQ · ');
+      var parts = [];
+      for (var i = 0; i < st.seq.length; i++){
+        var tag = i < st.idx ? '✓' : (i === st.idx ? '●' : '·');
+        parts.push(tag+st.seq[i]);
+      }
+      return pre + parts.join(' ');
+    },
+    evaluate: function(zone, st){ return zone === st.seq[st.idx]; }
+  },
+  color: {
+    setup: function(st){ st.call = _dtap_rnd(1,5); },
+    nextTarget: function(st){ return st.call; },
+    hint: function(st, en){ return (en?'COLOR · ':'COULEUR · ') + (en?_DTAP_ZC[st.call].name_en:_DTAP_ZC[st.call].name); },
+    evaluate: function(zone, st){ return zone === st.call; },
+    next: function(st){ st.call = _dtap_rnd(1,5); },
+    hintColor: function(st){ return _DTAP_ZC[st.call].hex; }
+  },
+  number: {
+    setup: function(st){ st.num = _dtap_rnd(1,5); },
+    nextTarget: function(st){ return st.num; },
+    hint: function(st, en){ return (en?'NUMBER · ':'CHIFFRE · ') + st.num; },
+    evaluate: function(zone, st){ return zone === st.num; },
+    next: function(st){ st.num = _dtap_rnd(1,5); },
+    bigNumber: function(st){ return String(st.num); }
+  },
+  stroop: {
+    setup: function(st){ _dtap_stroopPick(st); },
+    nextTarget: function(st){ return st.answer; },
+    hint: function(st, en){ return (en?'INK COLOR = foot':'COULEUR DE L\'ENCRE'); },
+    evaluate: function(zone, st){ return zone === st.answer; },
+    next: function(st){ _dtap_stroopPick(st); },
+    stroop: function(st){ return st; }
+  },
+  math: {
+    setup: function(st){ _dtap_mathPick(st); },
+    nextTarget: function(st){ return st.answer; },
+    hint: function(st, en){ return st.expr + ' = ?'; },
+    evaluate: function(zone, st){ return zone === st.answer; },
+    next: function(st){ _dtap_mathPick(st); }
+  },
+  nback: {
+    setup: function(st){ st.hist = []; st.N = 2; st.phase = 'build'; st.target = _dtap_rnd(1,5); },
+    nextTarget: function(st){ return st.phase === 'build' ? st.target : st.hist[st.hist.length - st.N]; },
+    hint: function(st, en){
+      if (st.phase === 'build') return (en?'BUILD · touch zone ':'MÉMORISE · pied sur ') + st.target;
+      return (en?'N-BACK · zone shown ':'N-BACK · zone vue il y a ') + st.N;
+    },
+    evaluate: function(zone, st){
+      if (st.phase === 'build') return zone === st.target;
+      return zone === st.hist[st.hist.length - st.N];
+    },
+    next: function(st){
+      st.hist.push(st.target);
+      if (st.hist.length < 3){ st.target = _dtap_rnd(1,5); st.phase = 'build'; }
+      else { st.phase = 'query'; st.target = _dtap_rnd(1,5); }
+    },
+    extra: function(st){ return st.hist; }
+  },
+  rule: {
+    setup: function(st){ st.ruleId = 0; st.swCount = 0; st.num = _dtap_rnd(1,9); st.rules = [
+      {pair:1, impair:4, zero:5, label_fr:'PAIR→1 · IMPAIR→4 · 0/5→5', label_en:'EVEN→1 · ODD→4 · 0/5→5'},
+      {pair:2, impair:3, zero:5, label_fr:'PAIR→2 · IMPAIR→3 · 0/5→5', label_en:'EVEN→2 · ODD→3 · 0/5→5'},
+      {pair:4, impair:2, zero:5, label_fr:'PAIR→4 · IMPAIR→2 · 0/5→5', label_en:'EVEN→4 · ODD→2 · 0/5→5'}
+    ]; },
+    nextTarget: function(st){
+      var r = st.rules[st.ruleId];
+      if (st.num === 0 || st.num === 5) return r.zero;
+      return st.num % 2 === 0 ? r.pair : r.impair;
+    },
+    hint: function(st, en){ return (en?'N = ':'NB = ') + st.num; },
+    evaluate: function(zone, st){ return zone === _DTAP_DRILLS.rule.nextTarget(st); },
+    next: function(st){
+      st.num = _dtap_rnd(0,9);
+      st.swCount++;
+      if (st.swCount >= 5){ st.swCount = 0; st.ruleId = (st.ruleId + 1) % st.rules.length; }
+    },
+    rulePanel: function(st, en){
+      var cur = st.rules[st.ruleId];
+      var nxt = st.rules[(st.ruleId + 1) % st.rules.length];
+      return { curLabel: en?cur.label_en:cur.label_fr, nextLabel: en?nxt.label_en:nxt.label_fr, next:(5 - st.swCount) };
+    }
+  },
+  dual: {
+    setup: function(st){
+      st.seq = _dtap_randSeq(5); st.idx = 0;
+      _dtap_mathPick(st);
+      st.calcScore = 0; st.footScore = 0;
+      st.calcAnswered = false;
+    },
+    nextTarget: function(st){
+      if (st.idx >= st.seq.length){ st.seq = _dtap_randSeq(5); st.idx = 0; }
+      return st.seq[st.idx];
+    },
+    advance: function(st){ st.idx++; },
+    hint: function(st, en){ return st.expr + ' = ?  ·  ' + (en?'FOOT ':'FOOT ') + (st.idx+1) + '/5'; },
+    evaluate: function(zone, st){
+      // zone = résultat math ? → calc OK
+      if (!st.calcAnswered && zone === st.answer){
+        st.calcAnswered = true; st.calcScore++;
+        _dtap_mathPick(st);
+        return true;
+      }
+      // sinon on vérifie la séquence foot
+      return zone === st.seq[st.idx];
+    }
+  },
+  gonogo: {
+    setup: function(st){ st.phase = 'go'; st.num = _dtap_rnd(1,5); },
+    nextTarget: function(st){ return st.phase === 'go' ? st.num : 5; },
+    hint: function(st, en){
+      return st.phase === 'go' ? (en?'GO · '+st.num:'GO · '+st.num) : (en?'NO-GO · stay centre':'NO-GO · reste 5');
+    },
+    evaluate: function(zone, st){
+      if (st.phase === 'go') return zone === st.num;
+      return zone === 5;
+    },
+    next: function(st){
+      st.phase = Math.random() < 0.65 ? 'go' : 'nogo';
+      st.num = _dtap_rnd(1,4);
+    },
+    phase: function(st){ return st.phase; }
+  },
+  react: {
+    setup: function(st){ st.phase = 'target'; st.target = _dtap_rnd(1,4); st.last = 0; },
+    nextTarget: function(st){ return st.phase === 'target' ? st.target : 5; },
+    hint: function(st, en){
+      return st.phase === 'target' ? (en?'REACT · zone '+st.target:'RÉAGIS · zone '+st.target) : (en?'RECOVER · back to 5':'RETOUR · zone 5');
+    },
+    evaluate: function(zone, st){
+      if (st.phase === 'target') return zone === st.target;
+      return zone === 5;
+    },
+    next: function(st){
+      if (st.phase === 'target') st.phase = 'recover';
+      else { st.phase = 'target'; st.target = _dtap_rnd(1,4); while (st.target === st.last) st.target = _dtap_rnd(1,4); st.last = st.target; }
+    }
+  },
+  periph: {
+    setup: function(st){ st.target = _dtap_rnd(1,5); st.flashUntil = Date.now() + 220; },
+    nextTarget: function(st){ return st.target; },
+    hint: function(st, en){ return (en?'PERIPHERAL · catch the flash':'VISION PÉRIPHÉRIQUE'); },
+    evaluate: function(zone, st){ return zone === st.target; },
+    next: function(st){ st.target = _dtap_rnd(1,5); st.flashUntil = Date.now() + 220; },
+    isFlashing: function(st){ return Date.now() < st.flashUntil; }
+  },
+  side: {
+    setup: function(st){ st.target = _dtap_rnd(1,5); _dtap_sideDetectInit(); },
+    nextTarget: function(st){ return st.target; },
+    hint: function(st, en){
+      var r = (st.target <= 2) ? (en?'RIGHT HAND':'MAIN DROITE') : (st.target <= 4) ? (en?'LEFT HAND':'MAIN GAUCHE') : (en?'ALTERNATE':'ALTERNE');
+      return (en?'ZONE ':'ZONE ') + st.target + ' · ' + r;
+    },
+    evaluate: function(zone, st){
+      if (zone !== st.target) return false;
+      var required = (zone <= 2) ? 'right' : (zone <= 4) ? 'left' : 'any';
+      if (required === 'any') return true;
+      var active = _dtap_detectActiveSide();
+      return active === required || active === null; // tolère si incertain
+    },
+    next: function(st){ st.target = _dtap_rnd(1,5); }
+  }
+};
+
+/* ═══ Helpers ═══ */
+function _dtap_rnd(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+function _dtap_randSeq(n){
+  var out = [], last = 0;
+  for (var i = 0; i < n; i++){
+    var v = _dtap_rnd(1,5);
+    while (v === last) v = _dtap_rnd(1,5);
+    out.push(v); last = v;
+  }
+  return out;
+}
+function _dtap_mathPick(st){
+  var ops = ['+','-','*'];
+  var op = ops[_dtap_rnd(0,2)];
+  var a, b, r;
+  for (var tr = 0; tr < 50; tr++){
+    if (op === '+'){ a = _dtap_rnd(1,4); b = _dtap_rnd(1,5-a); r = a+b; }
+    else if (op === '-'){ a = _dtap_rnd(2,9); b = _dtap_rnd(1,a-1); r = a-b; }
+    else { a = _dtap_rnd(1,5); b = _dtap_rnd(1,5); r = a*b; }
+    if (r >= 1 && r <= 5){ st.expr = a+' '+op+' '+b; st.answer = r; return; }
+  }
+  st.expr = '2 + 3'; st.answer = 5;
+}
+function _dtap_stroopPick(st){
+  var zones = [1,2,3,4,5];
+  var word = zones[_dtap_rnd(0,4)];
+  var ink  = zones[_dtap_rnd(0,4)];
+  while (ink === word) ink = zones[_dtap_rnd(0,4)];
+  st.word = word; st.ink = ink; st.answer = ink;
+}
+/* Détection main active (pour DRIBBLE SIDE) */
+var _dtap_wristHist = {left:[], right:[]};
+function _dtap_sideDetectInit(){ _dtap_wristHist = {left:[], right:[]}; }
+function _dtap_detectActiveSide(){
+  var now = Date.now(), win = 1500;
+  var act = {};
+  ['left','right'].forEach(function(s){
+    var h = (_dtap_wristHist[s]||[]).filter(function(p){return now - p.t < win;});
+    if (h.length < 4){ act[s] = 0; return; }
+    var mn = h[0].y, mx = h[0].y;
+    h.forEach(function(p){ if (p.y<mn) mn=p.y; if (p.y>mx) mx=p.y; });
+    act[s] = mx - mn;
+  });
+  if (act.left > act.right * 1.3) return 'left';
+  if (act.right > act.left * 1.3) return 'right';
+  return null;
+}
+
+/* ═══ UI setters ═══ */
+function _dtap_setDrill(id){
+  _dtap_mode = id;
+  _dtap_state = {};
+  var descs = {
+    pattern: _t('Suis la séquence · pied sur chaque zone dans l\'ordre.','Follow the sequence · foot on each zone in order.'),
+    color:   _t('Couleur annoncée · pied sur la zone de cette couleur.','Color called · foot on that colored zone.'),
+    number:  _t('Chiffre affiché · pied sur la zone correspondante.','Number shown · foot on matching zone.'),
+    stroop:  _t('Mot couleur en encre couleur · pied sur la COULEUR DE L\'ENCRE.','Color word in colored ink · foot on INK color.'),
+    math:    _t('Opération · pied sur la zone égale au résultat (1-5).','Equation · foot on zone equal to result (1-5).'),
+    nback:   _t('Retrouve la zone vue il y a 2 coups.','Recall the zone shown 2 steps back.'),
+    rule:    _t('La règle bascule régulièrement · adapte-toi.','Rule flips periodically · adapt.'),
+    dual:    _t('Calcul mental + footwork en parallèle.','Mental math + footwork in parallel.'),
+    gonogo:  _t('Vert = bouge sur zone · Rouge = reste zone 5 centre.','Green = move to zone · Red = stay center zone 5.'),
+    react:   _t('Réagis à la cible puis RETOUR obligatoire au centre.','React to target then MUST return to center.'),
+    periph:  _t('Zone flashe 200ms · retrouve-la ensuite.','Zone flashes 200ms · find it after.'),
+    side:    _t('Zone 1-2 = main droite · 3-4 = main gauche · 5 = alterne.','Zone 1-2 = right hand · 3-4 = left · 5 = alternate.')
+  };
+  var el = document.getElementById('dtap_drillDesc');
+  if (el) el.textContent = descs[id] || '';
+  var sel = document.getElementById('dtap_drillSelect'); if (sel) sel.value = id;
+}
+function _dtap_setDur(d){ _dtap_dur = d; _dtap_highlight('.dtap-dur-btn','data-sec',d); }
+function _dtap_highlight(sel, attr, val){
+  document.querySelectorAll(sel).forEach(function(b){
+    var active = b.getAttribute(attr) == String(val);
+    b.style.border = active ? '1px solid rgba(167,139,250,.5)' : '1px solid #1e2535';
+    b.style.background = active ? 'rgba(167,139,250,.15)' : 'var(--dark3)';
+    b.style.color = active ? '#a78bfa' : '#7a8299';
+  });
+}
+function _dtap_status(msg, color){
+  var el = document.getElementById('dtap_status');
+  if (el){ el.textContent = msg; el.style.color = color || '#8892a6'; }
+}
+
+/* ═══ Démarrage caméra ═══ */
+function _dtap_start(){
+  if (!navigator.mediaDevices){ _dtap_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
+  if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
+  _dtap_status(_t('Accès caméra...','Accessing camera...'), '#a78bfa');
+  var btn = document.getElementById('dtap_btnStart');
+  if (btn){ btn.disabled = true; btn.style.opacity = '0.5'; }
+  var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
+  function tryC(i){
+    if (i >= constraints.length){ _dtap_status(_t('Caméra inaccessible','Camera inaccessible'), '#e63946'); if(btn){btn.disabled=false;btn.style.opacity='1';} return; }
+    navigator.mediaDevices.getUserMedia(constraints[i]).then(function(stream){
+      _dtap_stream = stream;
+      if (btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.display='none'; }
+      senseiCamShow('dtap', stream);
+    }).catch(function(){ tryC(i+1); });
+  }
+  tryC(0);
+}
+function _dtap_onCamReady(video, canvas, ctx){
+  _dtap_video = video; _dtap_canvas = canvas; _dtap_ctx = ctx;
+  _dtap_countdownActive = true;
+  _dtap_runCountdown(5);
+}
+function _dtap_runCountdown(n){
+  if (!_dtap_countdownActive) return;
+  var cv = _dtap_canvas, ctx = _dtap_ctx;
+  if (!cv || !ctx) return;
+  var W = cv.width, H = cv.height;
+  _drawVideoMirror(ctx, _dtap_video, W, H);
+  ctx.save();
+  if (n > 0){
+    ctx.fillStyle = '#a78bfa';
+    ctx.font = 'bold '+Math.round(H*0.50)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.fillText(String(n), W/2, H/2);
+    ctx.font = Math.round(H*0.07)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(window._lang==='en'?'GET ON MAT':'MONTE SUR LE TAPIS', W/2, H*0.82);
+    _dtap_drawBrand(ctx, W, H);
+    ctx.restore();
+    if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+    try { if (typeof _td_beep === 'function') _td_beep(n<=3?880:440, 0.08, 0.12); } catch(e){}
+    setTimeout(function(){ _dtap_runCountdown(n-1); }, 1000);
+  } else {
+    ctx.restore();
+    _dtap_countdownActive = false;
+    _dtap_startGame();
+  }
+}
+function _dtap_startGame(){
+  _dtap_running = true;
+  _dtap_score = 0; _dtap_correct = 0; _dtap_wrong = 0;
+  _dtap_reactTimes = []; _dtap_combo = 0; _dtap_bestCombo = 0;
+  _dtap_elapsed = 0; _dtap_startTs = Date.now();
+  _dtap_particles = []; _dtap_lastHitZone = 0; _dtap_lastHitTs = 0;
+  _dtap_prevFoot = {};
+  _dtap_state = {};
+  var d = _DTAP_DRILLS[_dtap_mode];
+  if (d && d.setup) d.setup(_dtap_state);
+  _dtap_target = { zone: d.nextTarget(_dtap_state), born: Date.now() };
+  _dtap_loop();
+}
+
+/* ═══ Loop & render ═══ */
+function _dtap_loop(){
+  if (!_dtap_running) return;
+  var cv = _dtap_canvas, ctx = _dtap_ctx, W = cv.width, H = cv.height;
+  _dtap_elapsed = (Date.now() - _dtap_startTs) / 1000;
+  _drawVideoMirror(ctx, _dtap_video, W, H);
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dtap_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dtap_analyzePose(poses); }).catch(function(){}); } catch(e){}
+  }
+  // Dessin tapis + zones
+  var box = _dtap_tapisBox(W, H);
+  _dtap_drawTapis(ctx, box);
+  _dtap_drawZones(ctx, box);
+  // Overlays supplémentaires selon drill (number big, stroop word, etc.)
+  _dtap_drawDrillExtras(ctx, W, H, box);
+  // Bandeau consigne haut (zéro collision avec branding/REC)
+  _dtap_drawHint(ctx, W, H);
+  // Panel RULES / N-BACK si applicable
+  _dtap_drawSidePanels(ctx, W, H);
+  // Particules
+  _dtap_drawParticles(ctx, H);
+  // HUD score / chrono
+  _dtap_drawHud(ctx, W, H);
+  _dtap_drawBrand(ctx, W, H);
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (_dtap_elapsed >= _dtap_dur){ _dtap_endGame(); return; }
+  _dtap_rafId = requestAnimationFrame(_dtap_loop);
+}
+
+/* Tapis stylisé dessiné en canvas (zéro dépendance externe) */
+function _dtap_drawTapis(ctx, box){
+  ctx.save();
+  // Fond tapis
+  ctx.fillStyle = 'rgba(10,12,18,.85)';
+  _dcog_vc_roundRect(ctx, box.x, box.y, box.w, box.h, 14); ctx.fill();
+  ctx.strokeStyle = 'rgba(167,139,250,.35)'; ctx.lineWidth = 2;
+  _dcog_vc_roundRect(ctx, box.x, box.y, box.w, box.h, 14); ctx.stroke();
+  // Lignes pointillées entre zones (axes)
+  ctx.setLineDash([5,5]); ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.lineWidth = 1.5;
+  var z1 = _dtap_zonePos(1, box), z2 = _dtap_zonePos(2, box), z3 = _dtap_zonePos(3, box), z4 = _dtap_zonePos(4, box), z5 = _dtap_zonePos(5, box);
+  ctx.beginPath(); ctx.moveTo(z1.x, z1.y); ctx.lineTo(z2.x, z2.y);
+  ctx.moveTo(z3.x, z3.y); ctx.lineTo(z4.x, z4.y);
+  ctx.moveTo(z1.x, z1.y); ctx.lineTo(z3.x, z3.y);
+  ctx.moveTo(z2.x, z2.y); ctx.lineTo(z4.x, z4.y);
+  ctx.stroke(); ctx.setLineDash([]);
+  // Marques en T aux coins
+  var tL = box.w * 0.09;
+  [[box.x+box.w*0.08, box.y+box.h*0.10, _DTAP_ZC[1].hex, 'tl'],
+   [box.x+box.w*0.92, box.y+box.h*0.10, _DTAP_ZC[2].hex, 'tr'],
+   [box.x+box.w*0.08, box.y+box.h*0.90, _DTAP_ZC[3].hex, 'bl'],
+   [box.x+box.w*0.92, box.y+box.h*0.90, _DTAP_ZC[4].hex, 'br']].forEach(function(t){
+    ctx.strokeStyle = t[2]; ctx.lineWidth = Math.max(2, box.w*0.004);
+    ctx.beginPath();
+    if (t[3][0]==='t'){ ctx.moveTo(t[0], t[1]); ctx.lineTo(t[0], t[1]+tL); }
+    else { ctx.moveTo(t[0], t[1]); ctx.lineTo(t[0], t[1]-tL); }
+    if (t[3][1]==='l'){ ctx.lineTo(t[0]+tL, t[3][0]==='t'?t[1]+tL:t[1]-tL); }
+    else { ctx.lineTo(t[0]-tL, t[3][0]==='t'?t[1]+tL:t[1]-tL); }
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+
+/* Zones (5 cibles) sur le tapis */
+function _dtap_drawZones(ctx, box){
+  var now = Date.now();
+  var activeZ = _dtap_target ? _dtap_target.zone : 0;
+  var drill = _DTAP_DRILLS[_dtap_mode];
+  var periphOn = drill === _DTAP_DRILLS.periph ? drill.isFlashing(_dtap_state) : true;
+  for (var z = 1; z <= 5; z++){
+    var pos = _dtap_zonePos(z, box);
+    var zc = _DTAP_ZC[z];
+    var isActive = (z === activeZ);
+    var showActive = isActive && (drill === _DTAP_DRILLS.periph ? periphOn : true);
+    var hitRecent = (_dtap_lastHitZone === z) && (now - _dtap_lastHitTs < 400);
+    ctx.save();
+    // Ring extérieur basket style
+    var pulse = showActive ? (1 + 0.12 * Math.sin(now/180)) : 1;
+    ctx.beginPath(); ctx.arc(pos.x, pos.y, pos.r * pulse * 1.35, 0, Math.PI*2);
+    ctx.strokeStyle = zc.hex;
+    ctx.lineWidth = showActive ? 5 : 3;
+    ctx.shadowBlur = showActive ? 22 : 8; ctx.shadowColor = zc.hex;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Fond cible
+    ctx.beginPath(); ctx.arc(pos.x, pos.y, pos.r, 0, Math.PI*2);
+    ctx.fillStyle = showActive ? zc.hex : _hexA(zc.hex, 0.75);
+    ctx.fill();
+    // Lignes basket (noires)
+    ctx.strokeStyle = 'rgba(0,0,0,.75)'; ctx.lineWidth = Math.max(1.5, pos.r*0.09);
+    ctx.beginPath(); ctx.arc(pos.x, pos.y, pos.r, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pos.x-pos.r, pos.y); ctx.lineTo(pos.x+pos.r, pos.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pos.x, pos.y-pos.r); ctx.lineTo(pos.x, pos.y+pos.r); ctx.stroke();
+    // Numéro
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = z === 5 ? '#000' : '#000';
+    ctx.font = 'bold '+Math.round(pos.r*0.95)+'px "Bebas Neue","Arial Narrow",sans-serif';
+    ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(255,255,255,.6)';
+    ctx.fillText(z, pos.x, pos.y + pos.r*0.05);
+    ctx.shadowBlur = 0;
+    // Flash hit
+    if (hitRecent){
+      var f = 1 - ((now - _dtap_lastHitTs) / 400);
+      ctx.globalAlpha = f;
+      ctx.strokeStyle = '#2dc653'; ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, pos.r * (1.4 + (1-f)*0.6), 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+function _hexA(hex, a){
+  var n = parseInt(hex.slice(1),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+}
+
+/* Extras spécifiques (big number, stroop word) */
+function _dtap_drawDrillExtras(ctx, W, H, box){
+  var d = _dtap_mode;
+  if (d === 'number'){
+    var num = _DTAP_DRILLS.number.bigNumber(_dtap_state);
+    ctx.save();
+    ctx.font = 'bold '+Math.round(H*0.20)+'px "Bebas Neue",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.fillText(num, W/2, H*0.34);
+    ctx.restore();
+  } else if (d === 'stroop'){
+    var st = _dtap_state;
+    if (!st.word) return;
+    var word_fr = _DTAP_ZC[st.word].name;
+    var word_en = _DTAP_ZC[st.word].name_en;
+    var inkHex = _DTAP_ZC[st.ink].hex;
+    ctx.save();
+    ctx.font = 'bold '+Math.round(H*0.14)+'px "Bebas Neue",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = inkHex;
+    ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.fillText(window._lang==='en'?word_en:word_fr, W/2, H*0.33);
+    ctx.restore();
+  }
+}
+
+/* Bandeau consigne — harmonisé QUICK TARGETS / RULE SWITCH */
+function _dtap_drawHint(ctx, W, H){
+  var d = _DTAP_DRILLS[_dtap_mode];
+  if (!d || !d.hint) return;
+  var en = window._lang === 'en';
+  var txt = d.hint(_dtap_state, en);
+  if (!txt) return;
+  var bw = W*0.60, bh = H*0.11;
+  var bx = W/2 - bw/2, by = H*0.07;
+  ctx.save();
+  // Fond adaptatif (GO/NO-GO)
+  var fillHex = 'rgba(13,17,23,.78)';
+  var strokeHex = '#a78bfa';
+  if (_dtap_mode === 'gonogo'){
+    var ph = _DTAP_DRILLS.gonogo.phase(_dtap_state);
+    if (ph === 'go'){ fillHex = 'rgba(45,198,83,.28)'; strokeHex = '#2dc653'; }
+    else { fillHex = 'rgba(230,57,70,.28)'; strokeHex = '#e63946'; }
+  } else if (_dtap_mode === 'color'){
+    var ch = _DTAP_DRILLS.color.hintColor(_dtap_state);
+    fillHex = _hexA(ch, 0.75); strokeHex = '#fff';
+  }
+  ctx.fillStyle = fillHex;
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.fill();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = strokeHex;
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.stroke();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle = '#fff';
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  var baseFs = Math.round(bh*0.56);
+  ctx.font = 'bold '+baseFs+'px "Bebas Neue",sans-serif';
+  var maxW = bw * 0.94;
+  if (ctx.measureText(txt).width > maxW){
+    var ratio = maxW / ctx.measureText(txt).width;
+    baseFs = Math.max(Math.round(bh*0.32), Math.round(baseFs * ratio));
+    ctx.font = 'bold '+baseFs+'px "Bebas Neue",sans-serif';
+  }
+  ctx.fillText(txt, W/2, by + bh*0.55);
+  ctx.restore();
+}
+
+/* Panels latéraux : RULE SWITCH / N-BACK (top-left sous branding) */
+function _dtap_drawSidePanels(ctx, W, H){
+  if (_dtap_mode === 'rule'){
+    var info = _DTAP_DRILLS.rule.rulePanel(_dtap_state, window._lang==='en');
+    _dtap_drawPanel(ctx, W, H, [
+      {label: window._lang==='en'?'CURRENT RULE':'RÈGLE ACTUELLE', color:'#4cc9f0', value:info.curLabel, big:true},
+      {label: (window._lang==='en'?'NEXT in ':'PROCHAINE dans ') + info.next, color:'#8892a6', value:info.nextLabel, big:false}
+    ]);
+  } else if (_dtap_mode === 'nback'){
+    var hist = _DTAP_DRILLS.nback.extra(_dtap_state);
+    _dtap_drawHistoPanel(ctx, W, H, hist);
+  }
+}
+function _dtap_drawPanel(ctx, W, H, lines){
+  var pw = W*0.26, ph = H*0.22;
+  var px = W*0.015, py = H*0.26;
+  ctx.save();
+  ctx.fillStyle = 'rgba(13,17,23,.80)';
+  _dcog_vc_roundRect(ctx, px, py, pw, ph, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(167,139,250,.5)'; ctx.lineWidth = 1.5;
+  _dcog_vc_roundRect(ctx, px, py, pw, ph, 10); ctx.stroke();
+  var y = py + H*0.025;
+  lines.forEach(function(l){
+    ctx.font = 'bold '+Math.round(H*0.020)+'px "Bebas Neue",sans-serif';
+    ctx.fillStyle = l.color;
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(l.label, px + pw*0.07, y);
+    y += H*0.028;
+    ctx.font = 'bold '+Math.round(H*(l.big?0.028:0.022))+'px "Bebas Neue",sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(l.value, px + pw*0.07, y);
+    y += H*0.038;
+  });
+  ctx.restore();
+}
+function _dtap_drawHistoPanel(ctx, W, H, hist){
+  var pw = W*0.28, ph = H*0.11;
+  var px = W*0.015, py = H*0.26;
+  ctx.save();
+  ctx.fillStyle = 'rgba(13,17,23,.80)';
+  _dcog_vc_roundRect(ctx, px, py, pw, ph, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(167,139,250,.5)'; ctx.lineWidth = 1.5;
+  _dcog_vc_roundRect(ctx, px, py, pw, ph, 10); ctx.stroke();
+  ctx.font = 'bold '+Math.round(H*0.018)+'px "Bebas Neue",sans-serif';
+  ctx.fillStyle = '#a78bfa'; ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(window._lang==='en'?'HISTORY · tap N-2':'HISTO · retrouve N-2', px+pw*0.05, py+H*0.012);
+  var cx = px + pw*0.08, cy = py + ph*0.60, cR = H*0.028;
+  var last = hist.slice(-4);
+  for (var i = 0; i < last.length; i++){
+    var zc = _DTAP_ZC[last[i]];
+    ctx.beginPath(); ctx.arc(cx + i*cR*2.2, cy, cR, 0, Math.PI*2);
+    ctx.fillStyle = zc.hex; ctx.fill();
+    ctx.fillStyle = '#000'; ctx.font = 'bold '+Math.round(cR*1.1)+'px "Bebas Neue",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(last[i], cx + i*cR*2.2, cy);
+  }
+  ctx.restore();
+}
+
+/* Particules float +N / -5 */
+function _dtap_drawParticles(ctx, H){
+  var now = Date.now();
+  _dtap_particles = _dtap_particles.filter(function(p){
+    var age = now - p.born;
+    if (age > p.life) return false;
+    var progress = age / p.life;
+    ctx.save();
+    ctx.globalAlpha = 1 - progress;
+    if (p.floatText){
+      var yOff = -progress * (H*0.08);
+      ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=10; ctx.shadowColor='rgba(0,0,0,.9)';
+      ctx.fillStyle = p.color; ctx.fillText(p.floatText, p.x, p.y + yOff);
+    }
+    ctx.restore();
+    return true;
+  });
+}
+
+/* HUD score / chrono / combo */
+function _dtap_drawHud(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle='#f5c518';
+  ctx.font='bold '+Math.round(H*0.075)+'px "Bebas Neue",sans-serif';
+  ctx.fillText(_dtap_score, W*0.04, H*0.98 - H*0.01);
+  ctx.font='bold '+Math.round(H*0.020)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText('SCORE', W*0.04, H*0.98 - H*0.08);
+  if (_dtap_combo > 0){
+    var mult = _dtap_combo >= 10 ? 3 : _dtap_combo >= 5 ? 2 : 1;
+    ctx.fillStyle = mult >= 3 ? '#e63946' : mult >= 2 ? '#ff6b35' : '#fff';
+    ctx.font='bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
+    ctx.fillText('×'+mult+' COMBO '+_dtap_combo, W*0.18, H*0.98 - H*0.01);
+  }
+  var timeLeft = Math.max(0, _dtap_dur - _dtap_elapsed);
+  var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
+  if (tmm===0 && tss===60){ tss=0; tmm=1; }
+  var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
+  var chW = W*0.14, chH = H*0.07;
+  var chX = W - chW - W*0.03, chY = H - chH - H*0.025;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.shadowBlur=10;
+  ctx.fillStyle='rgba(13,17,23,.45)';
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
+  ctx.lineWidth=1.5;
+  _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
+  ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
+  ctx.font='bold '+Math.round(H*0.044)+'px "Bebas Neue",sans-serif';
+  ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
+  ctx.restore();
+}
+function _dtap_drawBrand(ctx, W, H){
+  ctx.save();
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.font='bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
+  ctx.fillStyle='rgba(245,197,24,.85)';
+  ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
+  ctx.fillText('SENSEI · TAPIS', W*0.04, H*0.025);
+  ctx.restore();
+}
+
+/* ═══ Détection chevilles (strict Dribble Maths adapté pieds) ═══
+   Pour chaque cheville : vitesse > seuil + dans zone + grace 500ms
+   closest-wins par rapport au centre de la zone */
+function _dtap_analyzePose(poses){
+  if (!_dtap_running || !poses || !poses[0] || !_dtap_canvas) return;
+  var cv = _dtap_canvas, W = cv.width, H = cv.height;
+  var sx = W / (_dtap_video ? _dtap_video.videoWidth : W);
+  var sy = H / (_dtap_video ? _dtap_video.videoHeight : H);
+  var box = _dtap_tapisBox(W, H);
+  var moveThresh = Math.max(4, Math.round(W * 0.012)); // pied bouge moins vite que main
+  var nowMs = Date.now();
+  // Track mains pour DRIBBLE SIDE
+  ['leftWrist','rightWrist'].forEach(function(k){
+    var side = k.replace('Wrist','');
+    var kp = _tsym_kp_hand ? _tsym_kp_hand(poses, side) : null;
+    if (!kp) return;
+    var wy = kp.y * sy;
+    _dtap_wristHist[side] = _dtap_wristHist[side] || [];
+    _dtap_wristHist[side].push({t:nowMs, y:wy});
+    if (_dtap_wristHist[side].length > 50) _dtap_wristHist[side].shift();
+  });
+  // Chevilles
+  var kps = poses[0].keypoints || [];
+  var kpMap = {};
+  kps.forEach(function(k){ kpMap[k.name] = k; });
+  ['leftAnkle','rightAnkle'].forEach(function(name){
+    var kp = kpMap[name];
+    if (!kp || (kp.score !== undefined && kp.score < 0.3)) return;
+    var fx = W - kp.x * sx; // miroir
+    var fy = kp.y * sy;
+    var prev = _dtap_prevFoot[name];
+    var moved = prev ? Math.sqrt(Math.pow(fx-prev.x,2)+Math.pow(fy-prev.y,2)) : 0;
+    _dtap_prevFoot[name] = { x:fx, y:fy };
+    if (moved < moveThresh) return;
+    // Chercher zone touchée (closest-wins)
+    var best = 0, bestD = Infinity;
+    for (var z = 1; z <= 5; z++){
+      var pos = _dtap_zonePos(z, box);
+      var dx = fx - pos.x, dy = fy - pos.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > pos.r * 1.6) continue;
+      if (dist < bestD){ bestD = dist; best = z; }
+    }
+    if (!best) return;
+    // Anti-rebond : même zone < 400ms = ignore
+    if (best === _dtap_lastHitZone && (nowMs - _dtap_lastHitTs) < 400) return;
+    // Grace spawn
+    if (_dtap_target && (nowMs - _dtap_target.born) < 300) return;
+    _dtap_registerHit(best, nowMs);
+  });
+}
+function _dtap_registerHit(zone, nowMs){
+  var d = _DTAP_DRILLS[_dtap_mode];
+  var isGood = d.evaluate(zone, _dtap_state);
+  var box = _dtap_tapisBox(_dtap_canvas.width, _dtap_canvas.height);
+  var pos = _dtap_zonePos(zone, box);
+  _dtap_lastHitZone = zone; _dtap_lastHitTs = nowMs;
+  if (isGood){
+    _dtap_correct++; _dtap_combo++;
+    _dtap_bestCombo = Math.max(_dtap_bestCombo, _dtap_combo);
+    var rt = nowMs - (_dtap_target ? _dtap_target.born : nowMs);
+    _dtap_reactTimes.push(rt);
+    var sb = Math.max(0, Math.round((2000-rt)/200));
+    var cb = _dtap_combo >= 5 ? 5 : 0;
+    var gain = 10 + sb + cb;
+    _dtap_score += gain;
+    _dtap_particles.push({ x:pos.x, y:pos.y-pos.r*1.6, floatText:'+'+gain, color:'#2dc653', born:nowMs, life:900 });
+    try { if (typeof _td_soundOK === 'function') _td_soundOK(); if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.12); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate(20);
+    // Avance drill
+    if (d.advance) d.advance(_dtap_state);
+    if (d.next) d.next(_dtap_state);
+    _dtap_target = { zone: d.nextTarget(_dtap_state), born: Date.now() };
+  } else {
+    _dtap_wrong++; _dtap_combo = 0;
+    _dtap_score = Math.max(0, _dtap_score - 5);
+    _dtap_particles.push({ x:pos.x, y:pos.y-pos.r*1.6, floatText:'-5', color:'#e63946', born:nowMs, life:900 });
+    try { if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.15); } catch(e){}
+    if (navigator.vibrate) navigator.vibrate([40,30,40]);
+  }
+}
+
+/* ═══ REC (pattern identique _dqt_*) ═══ */
+function _dtap_toggleRec(){ if (_dtap_recActive) _dtap_stopRec(); else _dtap_startRec(); }
+function _dtap_startRec(){
+  if (typeof MediaRecorder === 'undefined') return;
+  clearInterval(_dtap_recTimer); _dtap_recTimer = null;
+  if (_dtap_recorder){ try{ _dtap_recorder.ondataavailable=null; _dtap_recorder.onstop=null; _dtap_recorder.onerror=null; if(_dtap_recorder.state!=='inactive')_dtap_recorder.stop(); }catch(e){} }
+  if (_dtap_recStream){ try{_dtap_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dtap_recStream=null; }
+  _dtap_recorder=null; _dtap_recChunks=[]; _dtap_recSec=0; _dtap_recActive=false;
+  var cv = _dtap_canvas; if (!cv) return;
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  if (!stream) return;
+  if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
+  _dtap_recStream = stream;
+  var mime = typeof _tsym_getBestMime === 'function' ? _tsym_getBestMime() : '';
+  try { _dtap_recorder = mime ? new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:3500000,audioBitsPerSecond:128000}) : new MediaRecorder(stream); }
+  catch(e){ try{ _dtap_recorder = new MediaRecorder(stream); } catch(e2){ return; } }
+  _dtap_recChunks = []; _dtap_recSec = 0;
+  _dtap_recorder.ondataavailable = function(e){ if(e.data && e.data.size>0) _dtap_recChunks.push(e.data); };
+  _dtap_recorder.onstop = function(){
+    clearInterval(_dtap_recTimer);
+    var mimeFinal = (_dtap_recorder && _dtap_recorder.mimeType) || 'video/webm';
+    var blob = new Blob(_dtap_recChunks, {type: mimeFinal});
+    if (_dtap_recStream){ try{_dtap_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _dtap_recStream=null; }
+    _dtap_recActive=false; _dtap_recChunks=[]; _dtap_updateRecBtn();
+    if (!blob || blob.size < 1024) return;
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_TAPIS_'+_dtap_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI TAPIS · '+_dtap_mode, filename:fn, onSave:function(b,filename){ _dtap_dlBlob(b, filename); } });
+    } else _dtap_dlBlob(blob, fn);
+  };
+  _dtap_recorder.onerror = function(){ clearInterval(_dtap_recTimer); };
+  setTimeout(function(){
+    if (!_dtap_recorder) return;
+    try { _dtap_recorder.start(1000); _dtap_recActive = true; } catch(e){ return; }
+    _dtap_recTimer = setInterval(function(){
+      _dtap_recSec++;
+      var mm=Math.floor(_dtap_recSec/60)%60,ss=_dtap_recSec%60,hh=Math.floor(_dtap_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_dtap_recSec >= 180) _dtap_stopRec();
+    }, 1000);
+  }, 200);
+}
+function _dtap_stopRec(){
+  _dtap_recActive=false; clearInterval(_dtap_recTimer); _dtap_recTimer=null;
+  if (_dtap_recorder && _dtap_recorder.state !== 'inactive'){ try{ _dtap_recorder.stop(); }catch(e){} }
+  _dtap_updateRecBtn();
+}
+function _dtap_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dtap_recActive, '&#9632; STOP REC', '#e63946'); }
+function _dtap_dlBlob(blob, fn){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = fn;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 2000);
+}
+
+/* ═══ End / stop / save ═══ */
+function _dtap_endGame(){ _dtap_stop(true); _dtap_renderResults(); }
+function _dtap_stop(fromEnd){
+  _dtap_running = false;
+  if (_dtap_rafId){ cancelAnimationFrame(_dtap_rafId); _dtap_rafId = null; }
+  if (_dtap_recActive) _dtap_stopRec();
+  if (!fromEnd){
+    if (_dtap_stream){ _dtap_stream.getTracks().forEach(function(t){t.stop();}); _dtap_stream = null; }
+    if (typeof senseiCamStop === 'function') senseiCamStop();
+  }
+}
+function _dtap_renderResults(){
+  var total = _dtap_correct + _dtap_wrong;
+  var pct = total > 0 ? Math.round(_dtap_correct / total * 100) : 0;
+  var avgRt = _dtap_reactTimes.length ? Math.round(_dtap_reactTimes.reduce(function(a,b){return a+b;},0) / _dtap_reactTimes.length) : 0;
+  var r = document.getElementById('dtap_results');
+  if (r){
+    r.innerHTML = '<div style="padding:12px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:8px;font-family:var(--font-cond);font-size:12px;line-height:1.9">'+
+      '<div><strong style="color:#a78bfa">SCORE :</strong> '+_dtap_score+' pts</div>'+
+      '<div><strong>Corrects :</strong> '+_dtap_correct+' · <strong>Erreurs :</strong> '+_dtap_wrong+' · <strong>Précision :</strong> '+pct+'%</div>'+
+      '<div><strong>Combo max :</strong> '+_dtap_bestCombo+' · <strong>Réaction moy. :</strong> '+avgRt+' ms</div></div>';
+  }
+  var sv = document.getElementById('dtap_btnSave'); if (sv) sv.style.display = 'block';
+  _dtap_status(_t('Session terminée','Session complete'), '#2dc653');
+}
+function _dtap_save(){
+  if (typeof _sb_recordSession === 'function'){
+    var total = _dtap_correct + _dtap_wrong;
+    var pct = total > 0 ? Math.round(_dtap_correct / total * 100) : 0;
+    _sb_recordSession('tapis_'+_dtap_mode, pct);
+  }
+  _dtap_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var sv = document.getElementById('dtap_btnSave'); if (sv) sv.style.display = 'none';
+}
+
 function _tsym_onError(msg) {
   var status = document.getElementById('tsym_status');
   if (status) { status.textContent = '❌ ' + msg; status.style.color = '#e63946'; }
@@ -33698,7 +34610,8 @@ var _dcog_VIDEOS = [
   {id:'SpqUX_pS8tw', title:'Color React',        drill:'colorreact'},
   {id:'IrW2OCRd5n0', title:'Rule Switch',        drill:'ruleswitch'},
   {id:'IrW2OCRd5n0', title:'Quick Choice',       drill:'quickchoice'},
-  {id:'IrW2OCRd5n0', title:'Quick Targets',      drill:'quicktargets'}
+  {id:'IrW2OCRd5n0', title:'Quick Targets',      drill:'quicktargets'},
+  {id:'IrW2OCRd5n0', title:'Tapis Sensei',       drill:'tapis'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -33854,6 +34767,8 @@ function _dcog_applyLang(en) {
     'dcog_lbl_ruleswitch':  en?'RULE SWITCH':'RULE SWITCH',
     'dcog_lbl_quickchoice': en?'QUICK CHOICE':'QUICK CHOICE',
     'dcog_lbl_quicktargets':en?'QUICK TARGETS':'QUICK TARGETS',
+    'dcog_lbl_tapis':       en?'TAPIS SENSEI':'TAPIS SENSEI',
+    'dtap_lblStart':        en?'▶ START MAT':'▶ DÉMARRER TAPIS',
     'dcrc_lblStart':        en?'▶ START COLOR REACT':'▶ DÉMARRER COLOR REACT',
     'drsw_lblStart':        en?'▶ START RULE SWITCH':'▶ DÉMARRER RULE SWITCH',
     'dqa_lblStart':         en?'▶ START':'▶ DÉMARRER',
@@ -33936,14 +34851,16 @@ function _dcog_selectDrill(drill, langOnly) {
     quickchoice: en ? 'Universal engine — 13 catalogue drills (classify, compare, predict, Stroop, defender read, free space…). Same Dribble Maths detection for all.'
                     : 'Moteur universel — 13 drills catalogue (classer, comparer, prédire, Stroop, lire défenseur, espace libre…). Même détection Dribble Maths pour tous.',
     quicktargets: en ? 'TARGETS engine — 11 remaining catalogue drills (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Hit the correct targets.'
-                     : 'Moteur TARGETS — 11 drills catalogue restants (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Touche les bonnes cibles.'
+                     : 'Moteur TARGETS — 11 drills catalogue restants (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Touche les bonnes cibles.',
+    tapis: en ? 'TAPIS SENSEI engine — 12 footwork drills on your physical mat. Ankle detection on 5 calibrated zones (1=BLUE·2=GREEN·3=YELLOW·4=RED·5=WHITE centre).'
+             : 'Moteur TAPIS SENSEI — 12 drills footwork sur ton tapis physique. Détection cheville sur 5 zones calibrées (1=BLEU·2=VERT·3=JAUNE·4=ROUGE·5=BLANC centre).'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','tapis'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -33952,13 +34869,12 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets', tapis:'dcog_optTapis'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        // viscoord/rcs/colorreact/ruleswitch/quickchoice/quicktargets utilisent flex-direction:column
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' ? '12px' : '8px');
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' || d === 'tapis' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -33975,7 +34891,8 @@ function _dcog_selectDrill(drill, langOnly) {
       colorreact: en ? '🌈 COLOR REACT'  : '🌈 COLOR REACT',
       ruleswitch: en ? '🔁 RULE SWITCH' : '🔁 RULE SWITCH',
       quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE',
-      quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS'
+      quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS',
+      tapis:        en ? '🟪 TAPIS SENSEI'  : '🟪 TAPIS SENSEI'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -33990,7 +34907,8 @@ function _dcog_selectDrill(drill, langOnly) {
       tboard:  [en?'CORRECT':'CORRECTS', en?'BEST STREAK':'STREAK MAX', en?'BEST SPEED':'VITESSE MAX'],
       burnout: [en?'REPS':'REPS', en?'MAX SPEED':'VITESSE MAX', en?'TIME':'TEMPS'],
       vcmath:  [en?'CORRECT':'CORRECTS',  en?'ERRORS':'ERREURS',    en?'AVG TIME':'TEMPS RÉP.'],
-      memory:  [en?'SEQUENCES':'SÉQUENCES', en?'ERRORS':'ERREURS', en?'AVG REACT':'RÉACTION MOY.']
+      memory:  [en?'SEQUENCES':'SÉQUENCES', en?'ERRORS':'ERREURS', en?'AVG REACT':'RÉACTION MOY.'],
+      tapis:   [en?'CORRECT':'CORRECTS',   en?'ERRORS':'ERREURS',    en?'AVG REACT':'RÉACTION MOY.']
     };
     var lbls = scoreLabels[drill] || ['--','--','--'];
     ['dcog_lbl_correct','dcog_lbl_wrong','dcog_lbl_time'].forEach(function(id,i){
@@ -34009,7 +34927,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice' || drill === 'quicktargets');
+    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice' || drill === 'quicktargets' || drill === 'tapis');
     if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
     if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
     if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
@@ -34031,7 +34949,7 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:22 };
+      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:22, tapis:23 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -38598,6 +39516,7 @@ function senseiCamShow(mod,stream){
     if(mod==='drsw'&&typeof _drsw_onCamReady==='function')_drsw_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dqa'&&typeof _dqa_onCamReady==='function')_dqa_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
     if(mod==='dqt'&&typeof _dqt_onCamReady==='function')_dqt_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
+    if(mod==='dtap'&&typeof _dtap_onCamReady==='function')_dtap_onCamReady(_scam.video,_scam.canvas,_scam.ctx);
   };
 }
 function senseiCamStop(){
@@ -38630,6 +39549,7 @@ function senseiCamStop(){
   if(m==='tsym'&&typeof _tsym_stopCamera==='function')_tsym_stopCamera();
   if(m==='ss'&&typeof _ss_stopCamera==='function')_ss_stopCamera();
   if(m==='bt'&&typeof _bt_stopCamera==='function')_bt_stopCamera();
+  if(m==='dtap'&&typeof _dtap_stop==='function')_dtap_stop(true);
   // Restaurer tous les panels tr-panel
   document.querySelectorAll('.tr-panel').forEach(function(p){
     p.style.visibility = '';
@@ -38668,6 +39588,7 @@ function senseiCamToggleRec(){
   else if(m==='drsw' && typeof _drsw_toggleRec==='function') _drsw_toggleRec();
   else if(m==='dqa' && typeof _dqa_toggleRec==='function') _dqa_toggleRec();
   else if(m==='dqt' && typeof _dqt_toggleRec==='function') _dqt_toggleRec();
+  else if(m==='dtap' && typeof _dtap_toggleRec==='function') _dtap_toggleRec();
 }
 // i18n portrait warning
 (function(){
