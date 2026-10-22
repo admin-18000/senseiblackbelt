@@ -2384,6 +2384,18 @@ window._dojoBackHome = function(){
     </div>
     <!-- ═══ REACTION CATCHING STICK — niveau de difficulté (intervalle entre drops) ═══ -->
     <div id="dcog_optRcs" style="display:none;flex-direction:column;gap:12px">
+      <!-- MODE COLOR : dropdown 4 modes (CLASSIC = sans couleur, autres = coloré) -->
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🎨 <span id="dcog_rcs_modeLbl">MODE SCORING</span></div>
+        <select id="dcog_rcs_mode" onchange="_dcog_rcs_setMode(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:#f5c518;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
+          <option value="classic">R0 · CLASSIC (sans couleur)</option>
+          <option value="color">R1 · CLASSIC COLOR (points par couleur)</option>
+          <option value="target">R2 · COLOR TARGET (couleur cible ×3)</option>
+          <option value="avoid">R3 · AVOID RED (ne pas attraper rouge)</option>
+          <option value="rainbow">R4 · COMBO RAINBOW (6 couleurs = +100)</option>
+        </select>
+        <div id="dcog_rcs_modeDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Attrape chaque bâton avant qu'il touche le sol.</div>
+      </div>
       <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px" id="dcog_rcs_lvlLbl">⚡ NIVEAU</div>
         <div style="display:flex;gap:8px">
@@ -32355,55 +32367,59 @@ function _dqt_save(){
 }
 
 
+
 /* ═══════════════════════════════════════════════════════════════════
-   🚧 DCOG LIMBO (_dlim_*) — 3 drills fondamentaux posture basse
-   Détection tête (nose) + épaules (shoulders) via MoveNet (~95%+ fiable)
-   L1 STATIC HOLD · L2 SIDE-TO-SIDE · L3 DESCENDING
-   UI zéro-collision : branding [0.00-0.06] · bandeau [0.07-0.21]
-                       cylindre [centre, suit joueur] · HUD bottom
+   🚧 DCOG LIMBO v2 (_dlim_*) — refonte terrain
+   • Calibration hauteur en 2 étapes (debout + bas)
+   • Cylindre dimensionné sur épaules + pieds détectés
+   • Portrait pour L1/L3 · Paysage pour L2 side-to-side
+   • Guide cadrage + pastille détection tête visible
 ═══════════════════════════════════════════════════════════════════ */
 var _dlim_mode = 'static';
-var _dlim_level = 'medium';           // easy=haut, medium=moyen, hard=bas
+var _dlim_level = 'medium';
 var _dlim_dur = 60;
 var _dlim_running = false, _dlim_stream = null;
 var _dlim_video = null, _dlim_canvas = null, _dlim_ctx = null;
 var _dlim_startTs = 0, _dlim_elapsed = 0;
 var _dlim_score = 0;
-var _dlim_timeHeld = 0;               // temps cumulé sous la barre (secondes)
+var _dlim_timeHeld = 0;
 var _dlim_bestHold = 0;
-var _dlim_breaks = 0;                 // nb de sorties au-dessus
-var _dlim_sides = 0;                  // nb de glisses complètes (L2)
+var _dlim_breaks = 0;
+var _dlim_sides = 0;
 var _dlim_lastFrameTs = 0;
 var _dlim_rafId = null;
 var _dlim_countdownActive = false;
 var _dlim_recorder = null, _dlim_recChunks = [], _dlim_recActive = false;
 var _dlim_recTimer = null, _dlim_recSec = 0, _dlim_recStream = null;
-var _dlim_barY = 0.40;                // Y relatif de la barre (0..1 vs H) — init medium
-var _dlim_descendStart = 0;           // L3 : temps de départ pour descente
-var _dlim_sideState = 'center';       // L2 : 'left' | 'center' | 'right'
+var _dlim_barY = 0.40;
+var _dlim_descendStart = 0;
+var _dlim_sideState = 'center';
 var _dlim_sideLastSwitch = 0;
-var _dlim_cylinderX = 0.5;            // X relatif du centre du cylindre (suit joueur, lissé)
-var _dlim_wristYHist = [];            // pour détecter dribble actif
+var _dlim_cylinderX = 0.5;
+var _dlim_wristYHist = [];
 var _dlim_dribbleActive = false;
-var _dlim_lastHeadY = null;           // pour lissage
-var _dlim_lastInside = false;         // état précédent (pour compter breaks)
+var _dlim_lastHeadY = null;
+var _dlim_lastHeadX = null;              // pastille détection
+var _dlim_lastInside = false;
+/* NEW v2 */
+var _dlim_calib = { phase:null, standingY:null, lowY:null, samples:[], startedAt:0, done:false };
+var _dlim_shoulderDist = 0.14;           // relatif à W (épaules gauche-droite), défaut
+var _dlim_minFootY = 0.95;               // Y max cheville détectée (bas écran)
+var _dlim_frameWarning = null;           // {msg_fr, msg_en} si cadrage mauvais
 
-/* ═══ Setters UI ═══ */
+/* ═══ Setters ═══ */
 function _dlim_setDrill(id){
   _dlim_mode = id;
   var descs = {
     static:     _t('Reste bas sous la barre · chrono +1 pt par seconde tenue.','Stay low under the bar · +1 pt per second held.'),
-    sidetoside: _t('Glisse gauche/droite en restant bas · shuffle défensif.','Slide left/right staying low · defensive shuffle.'),
+    sidetoside: _t('Glisse gauche/droite en restant bas · shuffle défensif (PAYSAGE).','Slide left/right staying low · defensive shuffle (LANDSCAPE).'),
     descending: _t('La barre descend progressivement · tiens le plus bas possible.','Bar descends progressively · hold as low as possible.')
   };
   var el = document.getElementById('dlim_drillDesc');
   if (el) el.textContent = descs[id] || '';
   var sel = document.getElementById('dlim_drillSelect'); if (sel) sel.value = id;
 }
-function _dlim_setLvl(lvl){
-  _dlim_level = lvl;
-  _dlim_highlight('.dlim-lvl-btn','data-lvl',lvl);
-}
+function _dlim_setLvl(lvl){ _dlim_level = lvl; _dlim_highlight('.dlim-lvl-btn','data-lvl',lvl); }
 function _dlim_setDur(d){ _dlim_dur = d; _dlim_highlight('.dlim-dur-btn','data-sec',d); }
 function _dlim_highlight(sel, attr, val){
   document.querySelectorAll(sel).forEach(function(b){
@@ -32417,12 +32433,15 @@ function _dlim_status(msg, color){
   var st = document.getElementById('dlim_status');
   if (st){ st.textContent = msg; st.style.color = color || 'var(--muted)'; }
 }
+function _dlim_wantsPortrait(){ return _dlim_mode === 'static' || _dlim_mode === 'descending'; }
 
-/* ═══ Camera start (pattern standard) ═══ */
+/* ═══ Camera start ═══ */
 function _dlim_start(){
   if (!navigator.mediaDevices){ _dlim_status(_t('Caméra non disponible','Camera not available'), '#e63946'); return; }
   if (typeof _camIsLocked === 'function' && _camIsLocked()) return;
   _dlim_status(_t('Accès caméra...','Accessing camera...'), '#ff6b35');
+  // Set flag portrait AVANT ouverture caméra pour que senseiCamShow en tienne compte
+  window._dlim_portraitMode = _dlim_wantsPortrait();
   var btn = document.getElementById('dlim_btnStart');
   if (btn){ btn.disabled = true; btn.style.opacity = '0.5'; }
   var constraints = [{video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30},facingMode:'user'}},{video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}},{video:{facingMode:'user'}},{video:true}];
@@ -32438,9 +32457,144 @@ function _dlim_start(){
 }
 function _dlim_onCamReady(video, canvas, ctx){
   _dlim_video = video; _dlim_canvas = canvas; _dlim_ctx = ctx;
-  _dlim_countdownActive = true;
-  _dlim_runCountdown(5);
+  // Reset calibration à chaque session
+  _dlim_calib = { phase:null, standingY:null, lowY:null, samples:[], startedAt:0, done:false };
+  _dlim_lastHeadY = null; _dlim_lastHeadX = null;
+  _dlim_shoulderDist = 0.14; _dlim_minFootY = 0.95;
+  _dlim_frameWarning = null;
+  // L2 : pas de calibration (ça ne sert à rien sans barre adaptative)
+  if (_dlim_mode === 'sidetoside'){
+    _dlim_countdownActive = true;
+    _dlim_runCountdown(5);
+  } else {
+    // L1 / L3 : calibration AVANT countdown
+    _dlim_startCalibration('standing');
+  }
 }
+
+/* ═══ CALIBRATION ═══ */
+function _dlim_startCalibration(phase){
+  _dlim_calib.phase = phase;
+  _dlim_calib.samples = [];
+  _dlim_calib.startedAt = Date.now();
+  _dlim_calibLoop();
+}
+function _dlim_calibLoop(){
+  if (!_dlim_calib || !_dlim_calib.phase) return;
+  var cv = _dlim_canvas, ctx = _dlim_ctx, W = cv.width, H = cv.height;
+  var now = Date.now();
+  var elapsed = (now - _dlim_calib.startedAt) / 1000;
+  var PHASE_DUR = 4; // 1s préparation + 3s mesure
+  _drawVideoMirror(ctx, _dlim_video, W, H);
+  // Analyse pose pour collecter head Y
+  if (window._tsym_detector){
+    try { _tsym_detector.estimatePoses(_dlim_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dlim_calibCollect(poses); }).catch(function(){}); } catch(e){}
+  }
+  // Overlay instructions
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0,0,W,H);
+  var en = window._lang === 'en';
+  var isStanding = _dlim_calib.phase === 'standing';
+  var titleTxt = isStanding
+    ? (en?'STEP 1 — STAND TALL':'ÉTAPE 1 — RESTE DEBOUT')
+    : (en?'STEP 2 — LOWEST STANCE':'ÉTAPE 2 — POSITION LA PLUS BASSE');
+  var subTxt = isStanding
+    ? (en?'Arms relaxed, head up':'Bras relâchés, tête droite')
+    : (en?'Deepest dribble position':'Position de dribble la plus basse');
+  // Bandeau titre
+  ctx.fillStyle = '#ff6b35';
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.fillText(titleTxt, W/2, H*0.25);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold '+Math.round(H*0.032)+'px "Bebas Neue",sans-serif';
+  ctx.fillText(subTxt, W/2, H*0.33);
+  // Barre de progression circulaire centrale
+  var remain = Math.max(0, PHASE_DUR - elapsed);
+  var progress = Math.min(1, elapsed / PHASE_DUR);
+  var cR = Math.min(W, H) * 0.11;
+  var cx = W/2, cy = H*0.52;
+  ctx.beginPath(); ctx.arc(cx, cy, cR, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.lineWidth = 10; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, cR, -Math.PI/2, -Math.PI/2 + Math.PI*2*progress);
+  ctx.strokeStyle = '#2dc653'; ctx.lineWidth = 10; ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold '+Math.round(cR*0.9)+'px "Bebas Neue",sans-serif';
+  ctx.fillText(Math.ceil(remain), cx, cy);
+  // Pastille sur tête détectée (feedback live)
+  if (_dlim_lastHeadX !== null && _dlim_lastHeadY !== null){
+    var hx = _dlim_lastHeadX * W, hy = _dlim_lastHeadY * H;
+    ctx.beginPath(); ctx.arc(hx, hy, Math.max(10, H*0.014), 0, Math.PI*2);
+    ctx.fillStyle = '#f5c518'; ctx.fill();
+    ctx.shadowBlur = 16; ctx.shadowColor = '#f5c518'; ctx.fill();
+  }
+  ctx.restore();
+  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  if (elapsed >= PHASE_DUR){
+    _dlim_calibEnd();
+  } else {
+    requestAnimationFrame(_dlim_calibLoop);
+  }
+}
+function _dlim_calibCollect(poses){
+  if (!poses || !poses[0]) return;
+  var kps = poses[0].keypoints || [];
+  var kpMap = {};
+  kps.forEach(function(k){ kpMap[k.name] = k; });
+  var sy = _dlim_canvas.height / (_dlim_video ? _dlim_video.videoHeight : _dlim_canvas.height);
+  var sx = _dlim_canvas.width / (_dlim_video ? _dlim_video.videoWidth : _dlim_canvas.width);
+  // Collecte Y tête (nose ou shoulders)
+  var headY = null, headX = null;
+  var nose = kpMap['nose'];
+  if (nose && (nose.score === undefined || nose.score >= 0.3)){
+    headY = nose.y * sy; headX = (_dlim_canvas.width - nose.x * sx);
+  } else {
+    var ls = kpMap['leftShoulder'], rs = kpMap['rightShoulder'];
+    if (ls && rs){
+      headY = ((ls.y + rs.y) / 2) * sy - _dlim_canvas.height*0.06;
+      headX = _dlim_canvas.width - ((ls.x + rs.x) / 2) * sx;
+    }
+  }
+  if (headY !== null){
+    _dlim_lastHeadY = headY / _dlim_canvas.height;
+    _dlim_lastHeadX = headX / _dlim_canvas.width;
+    // Ne collecte que durant les 3 dernières sec de la phase (laisse 1s pour se mettre en position)
+    var elapsed = (Date.now() - _dlim_calib.startedAt) / 1000;
+    if (elapsed >= 1) _dlim_calib.samples.push(_dlim_lastHeadY);
+  }
+  // Distance épaules (pour cylindre)
+  var ls2 = kpMap['leftShoulder'], rs2 = kpMap['rightShoulder'];
+  if (ls2 && rs2 && (ls2.score === undefined || ls2.score >= 0.3) && (rs2.score === undefined || rs2.score >= 0.3)){
+    var d = Math.abs(ls2.x - rs2.x) * sx;
+    _dlim_shoulderDist = d / _dlim_canvas.width;
+  }
+}
+function _dlim_calibEnd(){
+  // Median des samples
+  var s = _dlim_calib.samples.slice().sort(function(a,b){return a-b;});
+  var med = s.length ? s[Math.floor(s.length/2)] : (_dlim_calib.phase==='standing'?0.20:0.55);
+  if (_dlim_calib.phase === 'standing'){
+    _dlim_calib.standingY = med;
+    try { if (typeof _td_beep === 'function') _td_beep(660, 0.08, 0.14); } catch(e){}
+    // Pause 1s puis étape 2
+    setTimeout(function(){ _dlim_startCalibration('low'); }, 800);
+  } else {
+    _dlim_calib.lowY = med;
+    _dlim_calib.done = true;
+    try { if (typeof _td_beep === 'function') _td_beep(880, 0.10, 0.14); } catch(e){}
+    // Garde-fou : si standingY et lowY trop proches, écart min
+    if (_dlim_calib.lowY - _dlim_calib.standingY < 0.08){
+      _dlim_calib.lowY = _dlim_calib.standingY + 0.15;
+    }
+    _dlim_calib.phase = null;
+    // Countdown avant start
+    _dlim_countdownActive = true;
+    _dlim_runCountdown(3);
+  }
+}
+
+/* ═══ Countdown & start ═══ */
 function _dlim_runCountdown(n){
   if (!_dlim_countdownActive) return;
   var cv = _dlim_canvas, ctx = _dlim_ctx;
@@ -32449,14 +32603,15 @@ function _dlim_runCountdown(n){
   _drawVideoMirror(ctx, _dlim_video, W, H);
   ctx.save();
   if (n > 0){
+    ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle = '#ff6b35';
     ctx.font = 'bold '+Math.round(H*0.50)+'px "Bebas Neue",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(0,0,0,.9)';
     ctx.fillText(String(n), W/2, H/2);
-    ctx.font = Math.round(H*0.07)+'px "Bebas Neue",sans-serif';
+    ctx.font = Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.fillText(window._lang==='en'?'GET LOW':'POSITION BASSE', W/2, H*0.82);
+    ctx.fillText(window._lang==='en'?'GET LOW · DRIBBLE':'POSITION BASSE · DRIBBLE', W/2, H*0.82);
     _dlim_drawBrand(ctx, W, H);
     ctx.restore();
     if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
@@ -32476,9 +32631,15 @@ function _dlim_startGame(){
   _dlim_sideState = 'center'; _dlim_sideLastSwitch = Date.now();
   _dlim_cylinderX = 0.5;
   _dlim_wristYHist = []; _dlim_dribbleActive = false;
-  _dlim_lastHeadY = null; _dlim_lastInside = false;
-  // Barre initiale selon level
-  _dlim_barY = _dlim_level === 'easy' ? 0.32 : _dlim_level === 'hard' ? 0.52 : 0.42;
+  _dlim_lastInside = false;
+  // Calcul barre selon calibration (si disponible)
+  if (_dlim_calib.done){
+    var ratio = _dlim_level === 'easy' ? 0.20 : _dlim_level === 'hard' ? 0.85 : 0.50;
+    _dlim_barY = _dlim_calib.standingY + ratio * (_dlim_calib.lowY - _dlim_calib.standingY);
+  } else {
+    // Fallback (L2 sans calibration)
+    _dlim_barY = _dlim_level === 'easy' ? 0.32 : _dlim_level === 'hard' ? 0.52 : 0.42;
+  }
   _dlim_loop();
 }
 
@@ -32494,21 +32655,25 @@ function _dlim_loop(){
   if (window._tsym_detector){
     try { _tsym_detector.estimatePoses(_dlim_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){ _dlim_analyzePose(poses, dt); }).catch(function(){}); } catch(e){}
   }
-  // Update dynamic bar position (L3)
+  // L3 : barre qui descend
   if (_dlim_mode === 'descending'){
-    var elapsed = (now - _dlim_descendStart) / 1000;
-    var startY = _dlim_level === 'easy' ? 0.28 : _dlim_level === 'hard' ? 0.42 : 0.34;
-    var targetY = _dlim_level === 'easy' ? 0.52 : _dlim_level === 'hard' ? 0.62 : 0.58;
-    var speed = _dlim_level === 'easy' ? 0.008 : _dlim_level === 'hard' ? 0.015 : 0.011; // par seconde
-    _dlim_barY = Math.min(targetY, startY + elapsed * speed);
+    var el = (now - _dlim_descendStart) / 1000;
+    var startY, targetY, speed;
+    if (_dlim_calib.done){
+      startY  = _dlim_calib.standingY + 0.15 * (_dlim_calib.lowY - _dlim_calib.standingY);
+      targetY = _dlim_calib.standingY + 0.95 * (_dlim_calib.lowY - _dlim_calib.standingY);
+      speed = _dlim_level === 'easy' ? 0.008 : _dlim_level === 'hard' ? 0.016 : 0.011;
+    } else {
+      startY = 0.30; targetY = 0.56;
+      speed = _dlim_level === 'easy' ? 0.008 : _dlim_level === 'hard' ? 0.016 : 0.011;
+    }
+    _dlim_barY = Math.min(targetY, startY + el * speed);
   }
-  // Draw cylindre + barre
   _dlim_drawCylinder(ctx, W, H);
-  // Draw gauge hauteur (côté gauche)
+  _dlim_drawHeadDot(ctx, W, H);
   _dlim_drawGauge(ctx, W, H);
-  // Bandeau consigne
+  _dlim_drawFrameGuide(ctx, W, H);
   _dlim_drawHint(ctx, W, H);
-  // HUD
   _dlim_drawHud(ctx, W, H);
   _dlim_drawBrand(ctx, W, H);
   if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
@@ -32516,28 +32681,29 @@ function _dlim_loop(){
   _dlim_rafId = requestAnimationFrame(_dlim_loop);
 }
 
-/* ═══ Cylindre LIMBO stylisé ═══ */
+/* ═══ Cylindre proportionnel à la morpho ═══ */
 function _dlim_drawCylinder(ctx, W, H){
-  // Dimensions
-  var cw = Math.min(W*0.38, H*0.55);
+  // Largeur basée sur épaules (×2.5) ou min 30% W
+  var cw = Math.max(W*0.30, _dlim_shoulderDist * W * 2.5);
+  cw = Math.min(cw, W*0.90);
   var cx = _dlim_cylinderX * W;
   var barY = _dlim_barY * H;
-  var baseY = H * 0.93;
+  // Base : utilise min foot Y détecté, min 90% H
+  var baseY = Math.max(H*0.85, _dlim_minFootY * H + H*0.02);
+  if (baseY <= barY + H*0.08) baseY = barY + H*0.10;   // garde une hauteur minimale
   var toitH = Math.max(10, H*0.028);
   var xL = cx - cw/2, xR = cx + cw/2;
   var inside = _dlim_lastInside;
-  var strokeOk = inside ? '#2dc653' : '#e63946';
   ctx.save();
   // Safe zone translucide sous la barre
   ctx.fillStyle = inside ? 'rgba(45,198,83,.08)' : 'rgba(230,57,70,.12)';
   ctx.fillRect(xL, barY + toitH, cw, baseY - barY - toitH);
-  // Toit (barre limbo) rayé rouge/blanc 45°
+  // Toit rayé rouge/blanc 45°
   ctx.save();
   ctx.beginPath();
   _dcog_vc_roundRect(ctx, xL, barY, cw, toitH, 4);
-  ctx.closePath();
-  ctx.clip();
-  var stripeW = Math.max(10, cw*0.025);
+  ctx.closePath(); ctx.clip();
+  var stripeW = Math.max(10, cw*0.028);
   for (var i = -cw; i < cw*2; i += stripeW*2){
     ctx.fillStyle = '#e63946';
     ctx.beginPath();
@@ -32555,11 +32721,9 @@ function _dlim_drawCylinder(ctx, W, H){
     ctx.closePath(); ctx.fill();
   }
   ctx.restore();
-  // Bordure toit
   ctx.strokeStyle = 'rgba(0,0,0,.75)'; ctx.lineWidth = 2.5;
   _dcog_vc_roundRect(ctx, xL, barY, cw, toitH, 4); ctx.stroke();
-  // Glow état
-  ctx.shadowBlur = inside ? 18 : 22; ctx.shadowColor = inside ? '#2dc653' : '#e63946';
+  ctx.shadowBlur = inside ? 20 : 24; ctx.shadowColor = inside ? '#2dc653' : '#e63946';
   _dcog_vc_roundRect(ctx, xL, barY, cw, toitH, 4); ctx.stroke();
   ctx.shadowBlur = 0;
   // Parois pointillés orange
@@ -32572,24 +32736,23 @@ function _dlim_drawCylinder(ctx, W, H){
   ctx.setLineDash([Math.max(6, W*0.008), Math.max(4, W*0.006)]);
   ctx.strokeStyle = 'rgba(255,107,53,.75)'; ctx.lineWidth = Math.max(2.5, W*0.0035);
   ctx.beginPath();
-  if (ctx.ellipse){ ctx.ellipse(cx, baseY, cw*0.56, H*0.025, 0, 0, Math.PI*2); }
+  if (ctx.ellipse){ ctx.ellipse(cx, baseY, cw*0.56, H*0.022, 0, 0, Math.PI*2); }
   else { ctx.arc(cx, baseY, cw*0.4, 0, Math.PI*2); }
   ctx.stroke();
   ctx.setLineDash([]);
-  // Bulle instruction au-dessus
+  // Bulle instruction
   var bubbleTxt = _dlim_bubbleText();
   var bColor = inside ? '#2dc653' : '#e63946';
-  var bTextColor = '#fff';
   if (bubbleTxt){
-    ctx.font = 'bold '+Math.round(H*0.038)+'px "Bebas Neue",sans-serif';
+    ctx.font = 'bold '+Math.round(H*0.036)+'px "Bebas Neue",sans-serif';
     var bw = ctx.measureText(bubbleTxt).width + H*0.055;
-    var bh = H*0.055;
-    var bx = cx - bw/2, by = barY - bh - H*0.025;
+    var bh = H*0.052;
+    var bx = cx - bw/2, by = barY - bh - H*0.022;
     ctx.fillStyle = bColor;
     _dcog_vc_roundRect(ctx, bx, by, bw, bh, bh/2); ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 2;
     _dcog_vc_roundRect(ctx, bx, by, bw, bh, bh/2); ctx.stroke();
-    ctx.fillStyle = bTextColor;
+    ctx.fillStyle = '#fff';
     ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(0,0,0,.7)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(bubbleTxt, cx, by + bh/2);
@@ -32609,18 +32772,40 @@ function _dlim_bubbleText(){
   return en?'TOO HIGH ✗':'TROP HAUT ✗';
 }
 
+/* ═══ Pastille tête détectée (feedback live) ═══ */
+function _dlim_drawHeadDot(ctx, W, H){
+  if (_dlim_lastHeadX === null || _dlim_lastHeadY === null) return;
+  var hx = _dlim_lastHeadX * W, hy = _dlim_lastHeadY * H;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(hx, hy, Math.max(8, H*0.012), 0, Math.PI*2);
+  ctx.fillStyle = '#f5c518';
+  ctx.shadowBlur = 14; ctx.shadowColor = '#f5c518';
+  ctx.fill();
+  ctx.restore();
+}
+
 /* ═══ Jauge hauteur ═══ */
 function _dlim_drawGauge(ctx, W, H){
-  var gX = W*0.02, gY = H*0.26, gH = H*0.55, gW = 6;
+  var gX = W*0.025, gY = H*0.26, gH = H*0.55, gW = 6;
   ctx.save();
   ctx.fillStyle = 'rgba(255,255,255,.15)';
   _dcog_vc_roundRect(ctx, gX, gY, gW, gH, 3); ctx.fill();
+  // Repères debout/bas
+  if (_dlim_calib.done){
+    var sRel = (_dlim_calib.standingY - 0.26) / 0.55;
+    var lRel = (_dlim_calib.lowY - 0.26) / 0.55;
+    sRel = Math.max(0, Math.min(1, sRel));
+    lRel = Math.max(0, Math.min(1, lRel));
+    ctx.fillStyle = 'rgba(255,255,255,.4)';
+    ctx.fillRect(gX - 6, gY + gH*sRel - 1, 18, 2);
+    ctx.fillRect(gX - 6, gY + gH*lRel - 1, 18, 2);
+  }
   // Barre repère
-  var barRel = (_dlim_barY - 0.26) / 0.55; // mapping sur la jauge
+  var barRel = (_dlim_barY - 0.26) / 0.55;
   barRel = Math.max(0, Math.min(1, barRel));
   var brY = gY + gH * barRel;
   ctx.fillStyle = '#e63946';
-  ctx.fillRect(gX - 6, brY - 2, 18, 4);
+  ctx.fillRect(gX - 7, brY - 2, 20, 4);
   // Pastille tête
   if (_dlim_lastHeadY !== null){
     var hRel = (_dlim_lastHeadY - 0.26) / 0.55;
@@ -32631,6 +32816,26 @@ function _dlim_drawGauge(ctx, W, H){
     ctx.shadowBlur = 10; ctx.shadowColor = '#f5c518'; ctx.fill();
     ctx.shadowBlur = 0;
   }
+  ctx.restore();
+}
+
+/* ═══ Guide cadrage ═══ */
+function _dlim_drawFrameGuide(ctx, W, H){
+  if (!_dlim_frameWarning) return;
+  var en = window._lang === 'en';
+  var msg = en ? _dlim_frameWarning.en : _dlim_frameWarning.fr;
+  ctx.save();
+  var bw = W*0.72, bh = H*0.09;
+  var bx = W/2 - bw/2, by = H*0.22;
+  ctx.fillStyle = 'rgba(230,57,70,.88)';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold '+Math.round(bh*0.55)+'px "Bebas Neue",sans-serif';
+  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.9)';
+  ctx.fillText(msg, W/2, by + bh*0.55);
   ctx.restore();
 }
 
@@ -32647,7 +32852,7 @@ function _dlim_drawHint(ctx, W, H){
     sidetoside: en?'Slide low · follow the arrows':'Glisse bas · suis les flèches',
     descending: en?'Hold as the bar descends':'Tiens pendant que la barre descend'
   };
-  var bw = W*0.72, bh = H*0.14;
+  var bw = W*0.72, bh = H*0.13;
   var bx = W/2 - bw/2, by = H*0.06;
   ctx.save();
   ctx.fillStyle = 'rgba(13,17,23,.82)';
@@ -32668,6 +32873,7 @@ function _dlim_drawHint(ctx, W, H){
 
 /* ═══ HUD ═══ */
 function _dlim_drawHud(ctx, W, H){
+  var en = window._lang === 'en';
   ctx.save();
   ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,.95)';
@@ -32677,17 +32883,13 @@ function _dlim_drawHud(ctx, W, H){
   ctx.font='bold '+Math.round(H*0.020)+'px "Barlow Condensed",sans-serif';
   ctx.fillStyle='rgba(255,255,255,.7)';
   ctx.fillText('SCORE', W*0.04, H*0.90);
-  // HELD badge
-  var en = window._lang === 'en';
   ctx.fillStyle = '#2dc653';
   ctx.font='bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
-  ctx.fillText('🏀 '+ _dlim_timeHeld.toFixed(1) +'s '+(en?'HELD':'TENU'), W*0.18, H*0.97);
-  // Breaks
+  ctx.fillText('🏀 '+ _dlim_timeHeld.toFixed(1) +'s '+(en?'HELD':'TENU'), W*0.20, H*0.97);
   if (_dlim_breaks > 0){
     ctx.fillStyle = '#e63946';
-    ctx.fillText('✗ '+_dlim_breaks, W*0.40, H*0.97);
+    ctx.fillText('✗ '+_dlim_breaks, W*0.44, H*0.97);
   }
-  // Chrono
   var timeLeft = Math.max(0, _dlim_dur - _dlim_elapsed);
   var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
   if (tmm===0 && tss===60){ tss=0; tmm=1; }
@@ -32718,7 +32920,7 @@ function _dlim_drawBrand(ctx, W, H){
   ctx.restore();
 }
 
-/* ═══ Analyse pose : head Y + shoulders X + wrist dribble ═══ */
+/* ═══ Analyse pose (head Y + shoulders + pieds + wrists) ═══ */
 function _dlim_analyzePose(poses, dt){
   if (!_dlim_running || !poses || !poses[0] || !_dlim_canvas) return;
   var cv = _dlim_canvas, W = cv.width, H = cv.height;
@@ -32727,39 +32929,51 @@ function _dlim_analyzePose(poses, dt){
   var kps = poses[0].keypoints || [];
   var kpMap = {};
   kps.forEach(function(k){ kpMap[k.name] = k; });
-  // Head Y : nose en priorité, fallback épaules
-  var headY = null;
+  // Head Y + X
+  var headY = null, headX = null;
   var nose = kpMap['nose'];
-  if (nose && (nose.score === undefined || nose.score >= 0.3)) headY = nose.y * sy;
-  else {
+  if (nose && (nose.score === undefined || nose.score >= 0.3)){
+    headY = nose.y * sy; headX = W - nose.x * sx;
+  } else {
     var ls = kpMap['leftShoulder'], rs = kpMap['rightShoulder'];
     if (ls && rs){
-      var lsOk = (ls.score === undefined || ls.score >= 0.3);
-      var rsOk = (rs.score === undefined || rs.score >= 0.3);
-      if (lsOk && rsOk) headY = ((ls.y + rs.y) / 2) * sy - H*0.06; // top of head approx
-      else if (lsOk) headY = ls.y * sy - H*0.06;
-      else if (rsOk) headY = rs.y * sy - H*0.06;
+      headY = ((ls.y + rs.y) / 2) * sy - H*0.06;
+      headX = W - ((ls.x + rs.x) / 2) * sx;
     }
   }
-  // Shoulders X : center of body (pour cylindre qui suit)
-  var shX = null;
-  var lsh = kpMap['leftShoulder'], rsh = kpMap['rightShoulder'];
-  if (lsh && rsh && (lsh.score === undefined || lsh.score >= 0.3) && (rsh.score === undefined || rsh.score >= 0.3)){
-    var mx = (lsh.x + rsh.x) / 2;
-    shX = (W - mx * sx) / W;              // miroir, relatif
-  }
-  // Lissage cylindre X (suit joueur en douceur)
-  if (shX !== null){
-    _dlim_cylinderX = _dlim_cylinderX * 0.88 + shX * 0.12;
+  // Shoulders dist
+  var ls2 = kpMap['leftShoulder'], rs2 = kpMap['rightShoulder'];
+  if (ls2 && rs2 && (ls2.score === undefined || ls2.score >= 0.3) && (rs2.score === undefined || rs2.score >= 0.3)){
+    var d = Math.abs(ls2.x - rs2.x) * sx;
+    _dlim_shoulderDist = _dlim_shoulderDist * 0.85 + (d/W) * 0.15;
+    var midX = (ls2.x + rs2.x)/2;
+    var shXRel = (W - midX * sx) / W;
+    _dlim_cylinderX = _dlim_cylinderX * 0.88 + shXRel * 0.12;
     _dlim_cylinderX = Math.max(0.22, Math.min(0.78, _dlim_cylinderX));
   }
-  // Lissage headY
+  // Chevilles → min Y (le plus bas = baseY cylindre)
+  var la = kpMap['leftAnkle'], ra = kpMap['rightAnkle'];
+  var footYs = [];
+  if (la && (la.score === undefined || la.score >= 0.3)) footYs.push((la.y * sy) / H);
+  if (ra && (ra.score === undefined || ra.score >= 0.3)) footYs.push((ra.y * sy) / H);
+  if (footYs.length){
+    var maxFoot = Math.max.apply(null, footYs);
+    _dlim_minFootY = _dlim_minFootY * 0.85 + maxFoot * 0.15;
+  }
+  // Lissage headY/headX
   if (headY !== null){
     var headRel = headY / H;
-    if (_dlim_lastHeadY === null) _dlim_lastHeadY = headRel;
-    else _dlim_lastHeadY = _dlim_lastHeadY * 0.65 + headRel * 0.35;
+    _dlim_lastHeadY = _dlim_lastHeadY === null ? headRel : (_dlim_lastHeadY * 0.6 + headRel * 0.4);
+    _dlim_lastHeadX = _dlim_lastHeadX === null ? (headX/W) : (_dlim_lastHeadX * 0.6 + (headX/W) * 0.4);
   }
-  // Détection dribble actif via amplitude Y du poignet
+  // Guide cadrage
+  _dlim_frameWarning = null;
+  if (_dlim_lastHeadY !== null && _dlim_lastHeadY < 0.05){
+    _dlim_frameWarning = { fr:'↑ RECULE · TÊTE COUPÉE', en:'↑ STEP BACK · HEAD CUT' };
+  } else if (_dlim_minFootY < 0.80){
+    _dlim_frameWarning = { fr:'↓ RECULE · PIEDS COUPÉS', en:'↓ STEP BACK · FEET CUT' };
+  }
+  // Dribble actif
   var wristHits = 0;
   ['leftWrist','rightWrist'].forEach(function(n){
     var k = kpMap[n]; if (!k || (k.score !== undefined && k.score < 0.3)) return;
@@ -32778,7 +32992,6 @@ function _dlim_analyzePose(poses, dt){
   }
   // Scoring
   var inside = (_dlim_lastHeadY !== null) && (_dlim_lastHeadY > _dlim_barY);
-  // Side-to-side detection
   if (_dlim_mode === 'sidetoside'){
     var cxRel = _dlim_cylinderX;
     var prevSide = _dlim_sideState;
@@ -32787,21 +33000,16 @@ function _dlim_analyzePose(poses, dt){
     else _dlim_sideState = 'center';
     if (prevSide !== _dlim_sideState && _dlim_sideState !== 'center'){
       _dlim_sides++;
-      // Bonus +5 par glisse complète si on est aussi inside
-      if (inside && _dlim_dribbleActive){
-        _dlim_score += 5;
-      }
+      if (inside && _dlim_dribbleActive) _dlim_score += 5;
     }
   }
-  // Chrono + pts si inside + dribble actif
   if (inside){
     if (_dlim_dribbleActive){
       _dlim_timeHeld += dt;
       _dlim_bestHold = Math.max(_dlim_bestHold, _dlim_timeHeld);
-      _dlim_score += Math.round(dt * 10); // 10 pts/sec
+      _dlim_score += Math.round(dt * 10);
     }
   } else {
-    // break detection
     if (_dlim_lastInside){
       _dlim_breaks++;
       try { if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15); } catch(e){}
@@ -32812,7 +33020,7 @@ function _dlim_analyzePose(poses, dt){
   _dlim_lastInside = inside;
 }
 
-/* ═══ REC (pattern identique _dqt_) ═══ */
+/* ═══ REC (inchangé v1) ═══ */
 function _dlim_toggleRec(){ if (_dlim_recActive) _dlim_stopRec(); else _dlim_startRec(); }
 function _dlim_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
@@ -32875,6 +33083,7 @@ function _dlim_stop(fromEnd){
   _dlim_running = false;
   if (_dlim_rafId){ cancelAnimationFrame(_dlim_rafId); _dlim_rafId = null; }
   if (_dlim_recActive) _dlim_stopRec();
+  window._dlim_portraitMode = false;    // reset flag
   if (!fromEnd){
     if (_dlim_stream){ _dlim_stream.getTracks().forEach(function(t){t.stop();}); _dlim_stream = null; }
     if (typeof senseiCamStop === 'function') senseiCamStop();
@@ -34472,6 +34681,7 @@ function _dcog_applyLang(en) {
     'dcog_rcs_lvlEasy':  en?'EASY':'FACILE',
     'dcog_rcs_lvlNormal':en?'NORMAL':'NORMAL',
     'dcog_rcs_lvlHard':  en?'HARD':'DIFFICILE',
+    'dcog_rcs_modeLbl':  en?'SCORING MODE':'MODE SCORING',
     'dcog_rcs_setupHint':en?'📱 Phone at 2m · full body in frame · 6 sticks drop in random order — catch each with your hand before it hits the floor':'📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu\'ils touchent le sol',
     // ═══ SENSEI REFLEX RUSH ═══
   };
@@ -37698,6 +37908,46 @@ var _dcog_rcs_gravity   = 1600;     // px/s² sur canvas 480h (ajusté par H dyn
 var _dcog_rcs_sessionEndTs = 0;
 
 /* ── Setter niveau de difficulté ─────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   🎨 RCS COLOR — surcouche scoring (classic / color / target / avoid / rainbow)
+   Palette : 6 couleurs du jouet (jaune, vert, bleu, rouge, orange, violet)
+═══════════════════════════════════════════════════════════════════ */
+var _dcog_rcs_scoringMode = 'classic';
+var _dcog_rcs_targetColor = null;         // mode TARGET : couleur à viser
+var _dcog_rcs_colorsCaught = {};          // mode RAINBOW : set couleurs attrapées
+var _dcog_rcs_pointsScore = 0;            // score cumulé en mode color
+var _dcog_rcs_rainbowBonus = false;
+var _RCS_PALETTE = [
+  { key:'yellow', hex:'#f5c518', pts:5,  name_fr:'JAUNE',  name_en:'YELLOW' },
+  { key:'green',  hex:'#2dc653', pts:10, name_fr:'VERT',   name_en:'GREEN'  },
+  { key:'blue',   hex:'#4cc9f0', pts:10, name_fr:'BLEU',   name_en:'BLUE'   },
+  { key:'red',    hex:'#e63946', pts:15, name_fr:'ROUGE',  name_en:'RED'    },
+  { key:'orange', hex:'#ff6b35', pts:20, name_fr:'ORANGE', name_en:'ORANGE' },
+  { key:'violet', hex:'#a78bfa', pts:30, name_fr:'VIOLET', name_en:'PURPLE' }
+];
+function _dcog_rcs_setMode(m){
+  _dcog_rcs_scoringMode = m;
+  var en = window._lang === 'en';
+  var descs = {
+    classic: _t('Classique : attrape chaque bâton avant qu\'il touche le sol.', 'Classic: catch each stick before it hits the floor.'),
+    color:   _t('Chaque couleur = valeur fixe (🟡5 · 🟢10 · 🔵10 · 🔴15 · 🟠20 · 🟣30).', 'Each color = fixed points (🟡5 · 🟢10 · 🔵10 · 🔴15 · 🟠20 · 🟣30).'),
+    target:  _t('Attrape la couleur CIBLE annoncée · ×3 pts · −20 si ratée.', 'Catch the TARGET color · ×3 pts · −20 if missed.'),
+    avoid:   _t('Attrape tout SAUF le ROUGE · piège Go/No-Go · −15 si rouge.', 'Catch everything EXCEPT RED · Go/No-Go trap · −15 if red.'),
+    rainbow: _t('3 couleurs d\'affilée = ×2 · les 6 couleurs = +100 RAINBOW.', '3 colors in a row = ×2 · all 6 = +100 RAINBOW.')
+  };
+  var el = document.getElementById('dcog_rcs_modeDesc');
+  if (el) el.textContent = descs[m] || '';
+}
+function _dcog_rcs_pickColorsForRun(){
+  // Shuffle de la palette, 1 couleur par stick
+  var pool = _RCS_PALETTE.slice();
+  for (var i = pool.length - 1; i > 0; i--){
+    var r = Math.floor(Math.random() * (i + 1));
+    var t = pool[i]; pool[i] = pool[r]; pool[r] = t;
+  }
+  return pool;
+}
+
 function _dcog_rcs_setLevel(ms) {
   _dcog_rcs_intervalMs = ms;
   document.querySelectorAll('.dcog-rcs-lvl-btn').forEach(function(b){
@@ -37717,18 +37967,39 @@ function _dcog_rcs_startRun() {
   _dcog_rcs_particles = [];
   _dcog_rcs_curDropIdx = 0;
   _dcog_rcs_lastFrameTs = 0;
+  _dcog_rcs_pointsScore = 0;
+  _dcog_rcs_colorsCaught = {};
+  _dcog_rcs_rainbowBonus = false;
+  // Mode COLOR : assigner 1 couleur par stick (6 bâtons = 1 couleur chacun, chaque run utilise toutes)
+  var colorAssign = (_dcog_rcs_scoringMode !== 'classic') ? _dcog_rcs_pickColorsForRun() : null;
+  // Mode TARGET : couleur cible = celle du PROCHAIN stick à tomber (annonce visible)
+  _dcog_rcs_targetColor = null;
   // Init 6 bâtons dans l'état "hanging" (accrochés en haut)
   _dcog_rcs_sticks = [];
   for (var i = 0; i < 6; i++) {
-    _dcog_rcs_sticks.push({
+    var stick = {
       idx: i,
-      state: 'hanging',   // 'hanging' | 'falling' | 'caught' | 'missed'
+      state: 'hanging',
       dropStartTs: 0,
       catchTs: 0,
-      y: 0,               // décalage vertical depuis la position accrochée
+      y: 0,
       vy: 0,
-      landedY: 0          // Y de chute finale (si missed)
-    });
+      landedY: 0
+    };
+    if (colorAssign){
+      var c = colorAssign[i];
+      stick.color = c.hex;
+      stick.colorKey = c.key;
+      stick.colorName_fr = c.name_fr;
+      stick.colorName_en = c.name_en;
+      stick.points = c.pts;
+    }
+    _dcog_rcs_sticks.push(stick);
+  }
+  // Mode TARGET : première cible = couleur du premier stick qui va tomber
+  if (_dcog_rcs_scoringMode === 'target' && _dcog_rcs_sticks.length){
+    var pool = _dcog_rcs_sticks.filter(function(s){return s.colorKey;});
+    if (pool.length) _dcog_rcs_targetColor = pool[Math.floor(Math.random()*pool.length)].colorKey;
   }
   // Ordre random des 6 drops (Fisher-Yates shuffle)
   _dcog_rcs_dropOrder = [0,1,2,3,4,5];
@@ -37903,6 +38174,39 @@ function _dcog_rcs_onCatch(stickIdx, stk, bb) {
   var reactMs = stk.catchTs - stk.dropStartTs;
   _dcog_rcs_reactTimes.push(reactMs);
   _dcog_rcs_catches++;
+  // ═══ SCORING MODE COLOR ═══
+  if (_dcog_rcs_scoringMode !== 'classic' && stk.points){
+    var mode = _dcog_rcs_scoringMode;
+    var gain = stk.points;
+    var floatColor = '#2dc653';
+    if (mode === 'target'){
+      if (_dcog_rcs_targetColor === stk.colorKey){ gain = stk.points * 3; floatColor = '#f5c518'; }
+    } else if (mode === 'avoid'){
+      if (stk.colorKey === 'red'){ gain = -15; floatColor = '#e63946'; }
+    } else if (mode === 'rainbow'){
+      _dcog_rcs_colorsCaught[stk.colorKey] = (_dcog_rcs_colorsCaught[stk.colorKey]||0)+1;
+      // Compte des 3 derniers catches : combo ×2 si 3 couleurs distinctes
+      var lastKeys = _dcog_rcs_sticks.filter(function(s){return s.state==='caught';}).slice(-3).map(function(s){return s.colorKey;});
+      var uniq = {}; lastKeys.forEach(function(k){uniq[k]=1;});
+      if (lastKeys.length === 3 && Object.keys(uniq).length === 3){ gain *= 2; floatColor = '#ff6b35'; }
+      // Rainbow bonus : 6 couleurs distinctes attrapées
+      if (!_dcog_rcs_rainbowBonus && Object.keys(_dcog_rcs_colorsCaught).length >= 6){
+        _dcog_rcs_rainbowBonus = true;
+        _dcog_rcs_pointsScore += 100;
+        _dcog_rcs_particles.push({ x: bb.x+bb.w/2, y: bb.y, vx:0, vy:-30, life:1.5, color:'#f5c518', text:'RAINBOW +100', isText:true });
+      }
+    }
+    _dcog_rcs_pointsScore = Math.max(0, _dcog_rcs_pointsScore + gain);
+    // Float +X
+    _dcog_rcs_particles.push({ x: bb.x+bb.w/2, y: bb.y - bb.h*0.3, vx:0, vy:-40, life:1.2, color:floatColor, text:(gain>=0?'+':'')+gain, isText:true });
+  }
+  // Mode TARGET : nouvelle cible aléatoire parmi les restantes
+  if (_dcog_rcs_scoringMode === 'target'){
+    var remain = _dcog_rcs_sticks.filter(function(s){return s.state==='hanging' && s.colorKey;});
+    if (remain.length){
+      _dcog_rcs_targetColor = remain[Math.floor(Math.random()*remain.length)].colorKey;
+    } else _dcog_rcs_targetColor = null;
+  }
   // Burst de particules dorées
   for (var i = 0; i < 18; i++) {
     var ang = Math.random() * Math.PI * 2;
@@ -38022,16 +38326,19 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
   for (var i = 0; i < _dcog_rcs_sticks.length; i++) {
     var s = _dcog_rcs_sticks[i];
     var vb = _dcog_rcs_getStickVisual(i, s, W, H);
-    // Couleur selon état
+    // Couleur selon état · si mode COLOR actif, prendre s.color pour hanging/falling
     var bodyColor, capColor, glowColor;
+    var hasColorMode = _dcog_rcs_scoringMode !== 'classic' && s.color;
     if (s.state === 'caught') {
-      bodyColor = '#f5c518'; capColor = '#2a2200'; glowColor = 'rgba(245,197,24,0.9)';
+      bodyColor = hasColorMode ? s.color : '#f5c518'; capColor = '#2a2200'; glowColor = 'rgba(245,197,24,0.9)';
     } else if (s.state === 'missed') {
       bodyColor = '#e63946'; capColor = '#2a0000'; glowColor = 'rgba(230,57,70,0.7)';
     } else if (s.state === 'falling') {
-      bodyColor = '#4cc9f0'; capColor = '#f5c518'; glowColor = 'rgba(76,201,240,0.95)';
+      bodyColor = hasColorMode ? s.color : '#4cc9f0'; capColor = '#f5c518';
+      glowColor = hasColorMode ? s.color.replace(')','').replace('rgb','rgba') + ')' : 'rgba(76,201,240,0.95)';
+      glowColor = hasColorMode ? s.color : 'rgba(76,201,240,0.95)';
     } else {
-      bodyColor = '#1d7fb5'; capColor = '#d4a700'; glowColor = 'rgba(0,0,0,0.4)';
+      bodyColor = hasColorMode ? s.color : '#1d7fb5'; capColor = '#d4a700'; glowColor = 'rgba(0,0,0,0.4)';
     }
     ctx.save();
     if (s.state === 'falling') { ctx.shadowBlur = 18; ctx.shadowColor = glowColor; }
@@ -38061,17 +38368,47 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
     _dcog_vc_roundRect(ctx, capX, vb.y + vb.h * 0.9, capW, vb.h * 0.1, capW * 0.3);
     ctx.fill();
     ctx.restore();
-    // Numéro du bâton (micro, discret, posé sur la hitbox pour meilleure lisibilité)
-    if (s.state === 'hanging') {
+    // Numéro OU valeur points selon mode
+    if (s.state === 'hanging' || s.state === 'falling') {
       var hb = _dcog_rcs_getStickBBox(i, s, W, H);
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.font = 'bold ' + Math.round(hb.w * 0.35) + 'px "Bebas Neue","Arial Narrow",sans-serif';
+      ctx.fillStyle = hasColorMode ? '#fff' : 'rgba(255,255,255,0.55)';
+      var showText = hasColorMode ? String(s.points) : String(i+1);
+      ctx.font = 'bold ' + Math.round(hb.w * (hasColorMode ? 0.42 : 0.35)) + 'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowBlur = 3; ctx.shadowColor = 'rgba(0,0,0,0.9)';
-      ctx.fillText(String(i+1), hb.x + hb.w/2, hb.y + hb.h * 0.5);
+      ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,0.95)';
+      ctx.fillText(showText, hb.x + hb.w/2, hb.y + hb.h * 0.5);
       ctx.shadowBlur = 0;
     }
+  }
+  // ═══ ANNONCE TARGET (mode TARGET) ═══
+  if (_dcog_rcs_scoringMode === 'target' && _dcog_rcs_targetColor){
+    var pal = _RCS_PALETTE.find(function(c){return c.key===_dcog_rcs_targetColor;});
+    if (pal){
+      var en2 = window._lang === 'en';
+      var tw = W*0.5, th = H*0.08;
+      var tx = W/2 - tw/2, ty = H*0.11;
+      ctx.save();
+      ctx.fillStyle = pal.hex;
+      _dcog_vc_roundRect(ctx, tx, ty, tw, th, th/2); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+      _dcog_vc_roundRect(ctx, tx, ty, tw, th, th/2); ctx.stroke();
+      ctx.fillStyle = '#000';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.font = 'bold '+Math.round(th*0.55)+'px "Bebas Neue",sans-serif';
+      ctx.fillText('🎯 ' + (en2?'TARGET: ':'CIBLE : ') + (en2?pal.name_en:pal.name_fr), W/2, ty + th*0.55);
+      ctx.restore();
+    }
+  }
+  // ═══ SCORE POINTS (mode COLOR) ═══
+  if (_dcog_rcs_scoringMode !== 'classic'){
+    ctx.save();
+    ctx.textAlign='right'; ctx.textBaseline='top';
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold '+Math.round(H*0.05)+'px "Bebas Neue",sans-serif';
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.fillText(_dcog_rcs_pointsScore+' pts', W*0.96, H*0.11);
+    ctx.restore();
   }
 
   // ═══ PARTICULES catch (dessinées par-dessus) ═══
@@ -38081,9 +38418,16 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
     ctx.globalAlpha = alpha;
     ctx.fillStyle = pt.color;
     ctx.shadowBlur = 8; ctx.shadowColor = pt.color;
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, Math.max(2, H * 0.006), 0, Math.PI * 2);
-    ctx.fill();
+    if (pt.isText){
+      // Floater texte (+X, RAINBOW)
+      ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(pt.text, pt.x, pt.y);
+    } else {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, Math.max(2, H * 0.006), 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   ctx.globalAlpha = 1;
   ctx.shadowBlur = 0;
@@ -39178,12 +39522,12 @@ function senseiCamShow(mod,stream){
   _scam.video.onloadedmetadata=function(){
     _scam.video.play();
     // ── Forçage paysage natif : si iOS est verrouillé portrait, on rotate l'overlay
-    //    en CSS pour que le canvas raisonne TOUJOURS en paysage (W > H).
+    //    EXCEPTION LIMBO L1/L3 : respecte le portrait naturel (phone vertical)
     var iw = window.innerWidth, ih = window.innerHeight;
     var devicePortrait = iw < ih;
-    if (devicePortrait) {
+    var allowPortrait = (mod === 'dlim' && window._dlim_portraitMode === true);
+    if (devicePortrait && !allowPortrait) {
       ov.classList.add('force-landscape');
-      // Après rotation CSS l'overlay fait ih × iw → canvas en paysage
       _scam.canvas.width  = ih;
       _scam.canvas.height = iw;
     } else {
@@ -39249,7 +39593,8 @@ window.addEventListener('resize',function(){
   if(!ov||ov.style.display==='none')return;
   var iw = window.innerWidth, ih = window.innerHeight;
   var devicePortrait = iw < ih;
-  if (devicePortrait) {
+  var allowPortrait = (_scam.module === 'dlim' && window._dlim_portraitMode === true);
+  if (devicePortrait && !allowPortrait) {
     ov.classList.add('force-landscape');
     _scam.canvas.width  = ih;
     _scam.canvas.height = iw;
