@@ -32076,19 +32076,21 @@ function _dqt_drawHint(ctx, W, H, d){
   if (!d || !d.hint) return;
   var txt = d.hint();
   if (!txt) return;
-  // Bandeau consigne harmonisé RULE SWITCH / QUICK CHOICE — lisible trépied
-  var bw = W*0.56, bh = H*0.11;
-  var bx = W/2 - bw/2, by = H*0.08;
+  // ★ Bandeau consigne harmonisé RULE SWITCH (0.56W × 0.14H × font 0.78×bh)
+  var bw = W*0.56, bh = H*0.14;
+  var bx = W/2 - bw/2, by = H*0.07;
   ctx.save();
   ctx.fillStyle = 'rgba(13,17,23,.72)';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.fill();
-  ctx.lineWidth = 2.5; ctx.strokeStyle = '#f5c518';
-  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 12); ctx.stroke();
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#f5c518';
+  ctx.shadowBlur = 14; ctx.shadowColor = '#f5c518';
+  _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
+  ctx.shadowBlur = 0;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle = '#f5c518';
   ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
-  // Font auto-shrink si texte long
-  var baseFs = Math.round(bh*0.70);
+  // Font 0.78×bh (standard RULE SWITCH) + auto-shrink si texte long
+  var baseFs = Math.round(bh*0.78);
   ctx.font = 'bold '+baseFs+'px "Bebas Neue","Arial Narrow",sans-serif';
   var maxW = bw * 0.92;
   if (ctx.measureText(txt).width > maxW){
@@ -32096,7 +32098,7 @@ function _dqt_drawHint(ctx, W, H, d){
     baseFs = Math.max(Math.round(bh*0.42), Math.round(baseFs * ratio));
     ctx.font = 'bold '+baseFs+'px "Bebas Neue","Arial Narrow",sans-serif';
   }
-  ctx.fillText(txt, W/2, by + bh*0.55);
+  ctx.fillText(txt, W/2, by + bh*0.56);
   ctx.restore();
 }
 function _dqt_drawTargets(ctx, W, H){
@@ -32681,11 +32683,11 @@ function _dlim_loop(){
   _dlim_rafId = requestAnimationFrame(_dlim_loop);
 }
 
-/* ═══ Cylindre proportionnel à la morpho ═══ */
+/* ═══ Cylindre proportionnel à la morpho (élargi v2.1) ═══ */
 function _dlim_drawCylinder(ctx, W, H){
-  // Largeur basée sur épaules (×2.5) ou min 30% W
-  var cw = Math.max(W*0.30, _dlim_shoulderDist * W * 2.5);
-  cw = Math.min(cw, W*0.90);
+  // ★ Largeur basée sur épaules (×3.5) ou min 55% W · plafond 95% W
+  var cw = Math.max(W*0.55, _dlim_shoulderDist * W * 3.5);
+  cw = Math.min(cw, W*0.95);
   var cx = _dlim_cylinderX * W;
   var barY = _dlim_barY * H;
   // Base : utilise min foot Y détecté, min 90% H
@@ -32740,14 +32742,14 @@ function _dlim_drawCylinder(ctx, W, H){
   else { ctx.arc(cx, baseY, cw*0.4, 0, Math.PI*2); }
   ctx.stroke();
   ctx.setLineDash([]);
-  // Bulle instruction
+  // Bulle instruction (gap AGRANDI au-dessus du toit)
   var bubbleTxt = _dlim_bubbleText();
   var bColor = inside ? '#2dc653' : '#e63946';
   if (bubbleTxt){
     ctx.font = 'bold '+Math.round(H*0.036)+'px "Bebas Neue",sans-serif';
     var bw = ctx.measureText(bubbleTxt).width + H*0.055;
     var bh = H*0.052;
-    var bx = cx - bw/2, by = barY - bh - H*0.022;
+    var bx = cx - bw/2, by = barY - bh - H*0.055;    // ★ gap H×0.055 au lieu de 0.022
     ctx.fillStyle = bColor;
     _dcog_vc_roundRect(ctx, bx, by, bw, bh, bh/2); ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 2;
@@ -32839,7 +32841,7 @@ function _dlim_drawFrameGuide(ctx, W, H){
   ctx.restore();
 }
 
-/* ═══ Bandeau consigne (grand, trépied) ═══ */
+/* ═══ Bandeau consigne (adaptatif portrait/paysage, lisible trépied) ═══ */
 function _dlim_drawHint(ctx, W, H){
   var en = window._lang === 'en';
   var titles = {
@@ -32848,26 +32850,48 @@ function _dlim_drawHint(ctx, W, H){
     descending: en?'LIMBO · DESCENDING':'LIMBO · BARRE DESCEND'
   };
   var subs = {
-    static:     en?'Head under the bar · dribble non-stop':'Tête sous la barre · dribble non-stop',
-    sidetoside: en?'Slide low · follow the arrows':'Glisse bas · suis les flèches',
-    descending: en?'Hold as the bar descends':'Tiens pendant que la barre descend'
+    static:     en?'Head under the bar · dribble':'Tête sous la barre · dribble',
+    sidetoside: en?'Slide low · follow arrows':'Glisse bas · suis les flèches',
+    descending: en?'Hold as the bar descends':'Barre descend · tiens'
   };
-  var bw = W*0.72, bh = H*0.13;
-  var bx = W/2 - bw/2, by = H*0.06;
+  var isPortrait = H > W;
+  // Portrait : bandeau quasi plein-largeur bas sous REC/STOP, hauteur réduite
+  // Paysage : standard RULE SWITCH 0.56W × 0.14H
+  var bw = isPortrait ? W*0.92 : W*0.56;
+  var bh = isPortrait ? H*0.085 : H*0.14;
+  var by = isPortrait ? H*0.095 : H*0.07;    // descend sous les boutons REC/STOP en portrait
+  var bx = W/2 - bw/2;
   ctx.save();
-  ctx.fillStyle = 'rgba(13,17,23,.82)';
+  ctx.fillStyle = 'rgba(13,17,23,.86)';
   _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.fill();
   ctx.lineWidth = 3; ctx.strokeStyle = '#ff6b35';
+  ctx.shadowBlur = 14; ctx.shadowColor = '#ff6b35';
   _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
+  ctx.shadowBlur = 0;
   ctx.textAlign='center'; ctx.textBaseline='middle';
+  var titleTxt = titles[_dlim_mode] || '';
+  var subTxt   = subs[_dlim_mode] || '';
+  // Title
   ctx.fillStyle = '#ff6b35';
-  ctx.font = 'bold '+Math.round(bh*0.26)+'px "Bebas Neue",sans-serif';
-  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.9)';
-  ctx.fillText(titles[_dlim_mode] || '', W/2, by + bh*0.26);
+  var titleFs = Math.round(bh * (isPortrait ? 0.32 : 0.26));
+  ctx.font = 'bold '+titleFs+'px "Bebas Neue",sans-serif';
+  var maxW = bw * 0.94;
+  if (ctx.measureText(titleTxt).width > maxW){
+    titleFs = Math.max(Math.round(bh*0.22), Math.round(titleFs * maxW / ctx.measureText(titleTxt).width));
+    ctx.font = 'bold '+titleFs+'px "Bebas Neue",sans-serif';
+  }
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  ctx.fillText(titleTxt, W/2, by + bh*(isPortrait ? 0.28 : 0.26));
+  // Sub
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold '+Math.round(bh*0.42)+'px "Bebas Neue",sans-serif';
-  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
-  ctx.fillText(subs[_dlim_mode] || '', W/2, by + bh*0.68);
+  var subFs = Math.round(bh * (isPortrait ? 0.50 : 0.42));
+  ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
+  if (ctx.measureText(subTxt).width > maxW){
+    subFs = Math.max(Math.round(bh*0.32), Math.round(subFs * maxW / ctx.measureText(subTxt).width));
+    ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
+  }
+  ctx.shadowBlur = 12;
+  ctx.fillText(subTxt, W/2, by + bh*(isPortrait ? 0.70 : 0.68));
   ctx.restore();
 }
 
@@ -32894,15 +32918,17 @@ function _dlim_drawHud(ctx, W, H){
   var tmm = Math.floor(timeLeft/60), tss = Math.ceil(timeLeft)%60;
   if (tmm===0 && tss===60){ tss=0; tmm=1; }
   var tStr = tmm>0 ? (tmm+':'+(tss<10?'0':'')+tss) : (tss+'s');
-  var chW = W*0.14, chH = H*0.07;
-  var chX = W - chW - W*0.03, chY = H - chH - H*0.025;
+  // ★ Chrono déplacé bas-CENTRE (évite collision logo Powered by en bas-droite)
+  var isPortrait2 = H > W;
+  var chW = isPortrait2 ? W*0.26 : W*0.14, chH = H*0.065;
+  var chX = W/2 - chW/2, chY = H - chH - H*0.015;
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   ctx.shadowBlur=10;
-  ctx.fillStyle='rgba(13,17,23,.45)';
+  ctx.fillStyle='rgba(13,17,23,.65)';
   _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.fill();
   ctx.shadowBlur=0;
-  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.65)' : 'rgba(255,255,255,.25)';
-  ctx.lineWidth=1.5;
+  ctx.strokeStyle = timeLeft<10 ? 'rgba(230,57,70,.75)' : 'rgba(255,255,255,.3)';
+  ctx.lineWidth=2;
   _dcog_vc_roundRect(ctx, chX, chY, chW, chH, 8); ctx.stroke();
   ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.95)';
   ctx.fillStyle = timeLeft<10 ? '#e63946' : '#fff';
@@ -39555,6 +39581,11 @@ function senseiCamStop(){
   if(sb)sb.style.display='none';
   var lg=document.getElementById('sensei-cam-logo');if(lg)lg.style.display='none';
   var rb2=document.getElementById('sensei-cam-rec-btn');if(rb2)rb2.style.display='none';
+  // ★ Restaure TOUS les boutons START des drills caméra pour permettre relance
+  ['tdrc_btnStart','dcrc_btnStart','drsw_btnStart','dqa_btnStart','dqt_btnStart','dlim_btnStart'].forEach(function(id){
+    var b = document.getElementById(id);
+    if (b){ b.style.display = ''; b.disabled = false; b.style.opacity = '1'; }
+  });
   var qOv=document.getElementById('sensei-cam-question');
   if(qOv){qOv.style.display='none';qOv.textContent='';}
   // Mode Sensei : couper la vidéo + masquer le split
