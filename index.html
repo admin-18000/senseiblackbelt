@@ -2278,7 +2278,7 @@ window._dojoBackHome = function(){
       <!-- REACTION CATCHING STICK — 2ème drill coordination (bâtons qui tombent) -->
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('rcs')" id="dcog_btn_rcs"
         style="padding:14px 10px;border-radius:10px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;cursor:pointer;text-align:center;font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.5px;transition:all .2s">
-        <div style="font-size:22px;margin-bottom:4px">🟦🟦🟦</div>
+        <div style="font-size:22px;margin-bottom:4px">🟨🟦🟦🟦🟨</div>
         <div id="dcog_lbl_rcs">REACTION CATCHING STICK</div>
       </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('math')" id="dcog_btn_math"
@@ -2331,7 +2331,7 @@ window._dojoBackHome = function(){
       </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('limbo')" id="dcog_btn_limbo"
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
-        🚧<div id="dcog_lbl_limbo">LIMBO</div>
+        🚧<div id="dcog_lbl_limbo">LEVEL CHANGE</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Shifty</div>
       </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
@@ -2724,7 +2724,7 @@ window._dojoBackHome = function(){
         🚧🏀 Moteur LIMBO · 3 drills fondamentaux · détection tête + épaules via MoveNet (95%+ fiable) · zéro calibration · cylindre virtuel qui suit le joueur.
       </div>
       <div id="dlim_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
-      <button class="tr-btn tr-btn-start" id="dlim_btnStart" onclick="_dlim_start()" ontouchstart="" style="width:100%;background:#ff6b35;color:#0d1117"><span id="dlim_lblStart">▶ DÉMARRER LIMBO</span></button>
+      <button class="tr-btn tr-btn-start" id="dlim_btnStart" onclick="_dlim_start()" ontouchstart="" style="width:100%;background:#ff6b35;color:#0d1117"><span id="dlim_lblStart">▶ DÉMARRER LEVEL CHANGE</span></button>
       <button class="tr-btn tr-btn-save" id="dlim_btnSave" onclick="_dlim_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="dlim_results" style="margin-top:4px"></div>
     </div>
@@ -32905,9 +32905,9 @@ function _dlim_drawFrameGuide(ctx, W, H){
 function _dlim_drawHint(ctx, W, H){
   var en = window._lang === 'en';
   var titles = {
-    static:     en?'LIMBO · STATIC HOLD':'LIMBO · TENIR BAS',
-    sidetoside: en?'LIMBO · SHIFTY':'LIMBO · SHIFTY',
-    descending: en?'LIMBO · DESCENDING':'LIMBO · BARRE DESCEND'
+    static:     en?'LEVEL CHANGE · STATIC HOLD':'LEVEL CHANGE · TENIR BAS',
+    sidetoside: en?'LEVEL CHANGE · SHIFTY':'LEVEL CHANGE · SHIFTY',
+    descending: en?'LEVEL CHANGE · DESCENDING':'LEVEL CHANGE · BARRE DESCEND'
   };
   var subs = {
     static:     en?'Head under the bar · dribble':'Tête sous la barre · dribble',
@@ -33002,7 +33002,7 @@ function _dlim_drawBrand(ctx, W, H){
   ctx.font='bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
   ctx.fillStyle='rgba(245,197,24,.85)';
   ctx.shadowBlur=6; ctx.shadowColor='rgba(0,0,0,.9)';
-  ctx.fillText('SENSEI · LIMBO', W*0.04, H*0.025);
+  ctx.fillText('SENSEI · LEVEL CHANGE', W*0.04, H*0.025);
   ctx.restore();
 }
 
@@ -33132,9 +33132,9 @@ function _dlim_startRec(){
     _dlim_recActive=false; _dlim_recChunks=[]; _dlim_updateRecBtn();
     if (!blob || blob.size < 1024) return;
     var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
-    var fn = 'SENSEI_LIMBO_'+_dlim_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    var fn = 'SENSEI_LEVEL_CHANGE_'+_dlim_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
     if (window._replay && window._replay.show){
-      window._replay.show(blob, { title:'SENSEI LIMBO · '+_dlim_mode, filename:fn, onSave:function(b,filename){ _dlim_dlBlob(b, filename); } });
+      window._replay.show(blob, { title:'SENSEI LEVEL CHANGE · '+_dlim_mode, filename:fn, onSave:function(b,filename){ _dlim_dlBlob(b, filename); } });
     } else _dlim_dlBlob(blob, fn);
   };
   _dlim_recorder.onerror = function(){ clearInterval(_dlim_recTimer); };
@@ -34750,8 +34750,8 @@ function _dcog_applyLang(en) {
     'dcog_lbl_ruleswitch':  en?'RULE SWITCH':'RULE SWITCH',
     'dcog_lbl_quickchoice': en?'QUICK CHOICE':'QUICK CHOICE',
     'dcog_lbl_quicktargets':en?'QUICK TARGETS':'QUICK TARGETS',
-    'dcog_lbl_limbo':       en?'LIMBO':'LIMBO',
-    'dlim_lblStart':        en?'▶ START LIMBO':'▶ DÉMARRER LIMBO',
+    'dcog_lbl_limbo':       en?'LEVEL CHANGE':'LEVEL CHANGE',
+    'dlim_lblStart':        en?'▶ START LEVEL CHANGE':'▶ DÉMARRER LEVEL CHANGE',
     'dcrc_lblStart':        en?'▶ START COLOR REACT':'▶ DÉMARRER COLOR REACT',
     'drsw_lblStart':        en?'▶ START RULE SWITCH':'▶ DÉMARRER RULE SWITCH',
     'dqa_lblStart':         en?'▶ START':'▶ DÉMARRER',
@@ -34836,8 +34836,8 @@ function _dcog_selectDrill(drill, langOnly) {
                     : 'Moteur universel — 13 drills catalogue (classer, comparer, prédire, Stroop, lire défenseur, espace libre…). Même détection Dribble Maths pour tous.',
     quicktargets: en ? 'TARGETS engine — 11 remaining catalogue drills (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Hit the correct targets.'
                      : 'Moteur TARGETS — 11 drills catalogue restants (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Touche les bonnes cibles.',
-    limbo: en ? 'LIMBO engine — 3 fundamental low-stance drills (static · side-to-side · descending). Head detection via MoveNet, no calibration needed.'
-             : 'Moteur LIMBO — 3 drills fondamentaux posture basse (static · gauche/droite · descente). Détection tête via MoveNet, zéro calibration.'
+    limbo: en ? 'LEVEL CHANGE · Shifty — 3 fundamental low-stance drills (static · shifty · descending). Head detection via MoveNet.'
+             : 'LEVEL CHANGE · Shifty — 3 drills fondamentaux posture basse (static · shifty · descente). Détection tête via MoveNet.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
@@ -34876,7 +34876,7 @@ function _dcog_selectDrill(drill, langOnly) {
       ruleswitch: en ? '🔁 RULE SWITCH' : '🔁 RULE SWITCH',
       quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE',
       quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS',
-      limbo:        en ? '🚧 LIMBO'         : '🚧 LIMBO'
+      limbo:        en ? '🚧 LEVEL CHANGE · Shifty' : '🚧 LEVEL CHANGE · Shifty'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
