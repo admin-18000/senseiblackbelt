@@ -32757,14 +32757,51 @@ function _dlim_drawCylinder(ctx, W, H){
   ctx.beginPath(); ctx.moveTo(xL, barY + toitH); ctx.lineTo(xL, baseY); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(xR, barY + toitH); ctx.lineTo(xR, baseY); ctx.stroke();
   ctx.setLineDash([]);
-  // Base ellipse orange
-  ctx.setLineDash([Math.max(6, W*0.008), Math.max(4, W*0.006)]);
-  ctx.strokeStyle = 'rgba(255,107,53,.75)'; ctx.lineWidth = Math.max(2.5, W*0.0035);
+  // ★ Base ellipse 3D : ombre portée au sol + fond gradient + double contour + reflet brillant
+  var rx = cw*0.56, ry = H*0.028;
+  ctx.save();
+  // 1) Ombre portée sous l'ellipse (ancrage sol)
+  ctx.shadowBlur = 22; ctx.shadowColor = 'rgba(0,0,0,.85)';
+  ctx.shadowOffsetY = 6;
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
   ctx.beginPath();
-  if (ctx.ellipse){ ctx.ellipse(cx, baseY, cw*0.56, H*0.022, 0, 0, Math.PI*2); }
-  else { ctx.arc(cx, baseY, cw*0.4, 0, Math.PI*2); }
+  if (ctx.ellipse) ctx.ellipse(cx, baseY+ry*0.35, rx*0.95, ry*0.6, 0, 0, Math.PI*2);
+  else ctx.arc(cx, baseY+ry*0.35, rx*0.6, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  // 2) Fond ellipse plein (gradient radial sombre → orange translucide)
+  var grad = ctx.createRadialGradient(cx, baseY, 2, cx, baseY, rx);
+  grad.addColorStop(0,   'rgba(20,10,0,.55)');
+  grad.addColorStop(0.6, 'rgba(120,45,15,.35)');
+  grad.addColorStop(1,   'rgba(255,107,53,.20)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  if (ctx.ellipse) ctx.ellipse(cx, baseY, rx, ry, 0, 0, Math.PI*2);
+  else ctx.arc(cx, baseY, rx*0.75, 0, Math.PI*2);
+  ctx.fill();
+  // 3) Contour pointillé extérieur orange vif
+  ctx.setLineDash([Math.max(6, W*0.008), Math.max(4, W*0.006)]);
+  ctx.strokeStyle = '#ff6b35'; ctx.lineWidth = Math.max(2.5, W*0.0038);
+  ctx.shadowBlur = 10; ctx.shadowColor = '#ff6b35';
+  ctx.beginPath();
+  if (ctx.ellipse) ctx.ellipse(cx, baseY, rx, ry, 0, 0, Math.PI*2);
+  else ctx.arc(cx, baseY, rx*0.75, 0, Math.PI*2);
   ctx.stroke();
+  ctx.shadowBlur = 0;
+  // 4) Contour intérieur fin pour effet "double rail"
   ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(255,107,53,.55)'; ctx.lineWidth = Math.max(1, W*0.0018);
+  ctx.beginPath();
+  if (ctx.ellipse) ctx.ellipse(cx, baseY, rx*0.88, ry*0.75, 0, 0, Math.PI*2);
+  else ctx.arc(cx, baseY, rx*0.65, 0, Math.PI*2);
+  ctx.stroke();
+  // 5) Reflet brillant en haut de l'ellipse (demi-arc clair)
+  ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = Math.max(1.5, W*0.0022);
+  ctx.beginPath();
+  if (ctx.ellipse) ctx.ellipse(cx, baseY, rx*0.72, ry*0.6, 0, Math.PI*1.1, Math.PI*1.9);
+  else ctx.arc(cx, baseY, rx*0.5, Math.PI*1.1, Math.PI*1.9);
+  ctx.stroke();
+  ctx.restore();
   // Bulle instruction (gap AGRANDI au-dessus du toit)
   var bubbleTxt = _dlim_bubbleText();
   var bColor = inside ? '#2dc653' : '#e63946';
@@ -32894,27 +32931,27 @@ function _dlim_drawHint(ctx, W, H){
   ctx.textAlign='center'; ctx.textBaseline='middle';
   var titleTxt = titles[_dlim_mode] || '';
   var subTxt   = subs[_dlim_mode] || '';
-  // Title
+  // Title (★ AGRANDI)
   ctx.fillStyle = '#ff6b35';
-  var titleFs = Math.round(bh * (isPortrait ? 0.32 : 0.26));
+  var titleFs = Math.round(bh * (isPortrait ? 0.42 : 0.40));
   ctx.font = 'bold '+titleFs+'px "Bebas Neue",sans-serif';
   var maxW = bw * 0.94;
   if (ctx.measureText(titleTxt).width > maxW){
-    titleFs = Math.max(Math.round(bh*0.22), Math.round(titleFs * maxW / ctx.measureText(titleTxt).width));
+    titleFs = Math.max(Math.round(bh*0.28), Math.round(titleFs * maxW / ctx.measureText(titleTxt).width));
     ctx.font = 'bold '+titleFs+'px "Bebas Neue",sans-serif';
   }
   ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(0,0,0,.95)';
-  ctx.fillText(titleTxt, W/2, by + bh*(isPortrait ? 0.28 : 0.26));
-  // Sub
+  ctx.fillText(titleTxt, W/2, by + bh*(isPortrait ? 0.26 : 0.24));
+  // Sub (★ AGRANDI)
   ctx.fillStyle = '#fff';
-  var subFs = Math.round(bh * (isPortrait ? 0.50 : 0.42));
+  var subFs = Math.round(bh * (isPortrait ? 0.62 : 0.55));
   ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
   if (ctx.measureText(subTxt).width > maxW){
-    subFs = Math.max(Math.round(bh*0.32), Math.round(subFs * maxW / ctx.measureText(subTxt).width));
+    subFs = Math.max(Math.round(bh*0.38), Math.round(subFs * maxW / ctx.measureText(subTxt).width));
     ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
   }
   ctx.shadowBlur = 12;
-  ctx.fillText(subTxt, W/2, by + bh*(isPortrait ? 0.70 : 0.68));
+  ctx.fillText(subTxt, W/2, by + bh*(isPortrait ? 0.72 : 0.70));
   ctx.restore();
 }
 
