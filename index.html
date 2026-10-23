@@ -29042,22 +29042,16 @@ var _TDRC_COLORS_CROSS = [
 function _tdrc_setShape(s){
   _tdrc_shape = s;
   _tdrc_highlight('.tdrc-shape-btn','data-shape',s);
-  // ★ Switch vidéo tuto dynamique selon forme : Y → 0ml1KUUCUms · CROIX → YH61sCfDqWE
+  // ★ Switch vidéo tuto DYNAMIQUE + AUTOPLAY (user gesture = clic bouton forme)
+  //   Y → 0ml1KUUCUms · CROIX → YH61sCfDqWE
   var vidId = (s === 'cross') ? 'YH61sCfDqWE' : '0ml1KUUCUms';
   var box = document.getElementById('tdrc_liteYt');
-  var img = document.getElementById('tdrc_liteYtImg');
   if (box){
     box.setAttribute('data-vid', vidId);
-    // Si déjà en mode playing (iframe injectée), restaurer le poster
-    var ifr = box.querySelector('iframe');
-    if (ifr){ ifr.remove(); box.setAttribute('data-played','0'); }
-  }
-  if (img){
-    img.src = 'https://i.ytimg.com/vi_webp/'+vidId+'/maxresdefault.webp';
-    img.onerror = function(){
-      this.onerror = null;
-      this.src = 'https://i.ytimg.com/vi/'+vidId+'/maxresdefault.jpg';
-    };
+    box._loaded = false;
+    box.innerHTML = '<iframe width="100%" height="100%" style="border:none;display:block;position:absolute;inset:0" src="https://www.youtube-nocookie.com/embed/'+vidId+'?rel=0&modestbranding=1&playsinline=1&autoplay=1&mute=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    box._loaded = true;
+    box.style.cursor = 'default';
   }
 }
 function _tdrc_setMode(m){ _tdrc_mode = m;  _tdrc_highlight('.tdrc-mode-btn','data-mode',m); }
@@ -37998,15 +37992,13 @@ function _dcog_rcs_setMode(m){
   // ★ Switch vidéo tuto : R0 CLASSIC → 0RiPX6ZB7t8 · R1-R4 (color/target/avoid/rainbow) → oy5XoR0hAo0
   var vidId = (m === 'classic') ? '0RiPX6ZB7t8' : 'oy5XoR0hAo0';
   var box = document.getElementById('rcs_liteYt');
-  var img = document.getElementById('rcs_liteYtImg');
   if (box){
     box.setAttribute('data-vid', vidId);
-    var ifr = box.querySelector('iframe');
-    if (ifr){ ifr.remove(); box.setAttribute('data-played','0'); }
-  }
-  if (img){
-    img.src = 'https://i.ytimg.com/vi/'+vidId+'/hqdefault.jpg';
-    img.onerror = function(){ this.onerror = null; this.src = 'https://i.ytimg.com/vi/'+vidId+'/mqdefault.jpg'; };
+    box._loaded = false;    // reset pour autoriser re-load
+    // Autoplay immédiat au changement de mode (user gesture = onchange du select)
+    box.innerHTML = '<iframe width="100%" height="100%" style="border:none;display:block;position:absolute;inset:0" src="https://www.youtube-nocookie.com/embed/'+vidId+'?rel=0&modestbranding=1&playsinline=1&autoplay=1&mute=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    box._loaded = true;
+    box.style.cursor = 'default';
   }
 }
 function _dcog_rcs_pickColorsForRun(){
