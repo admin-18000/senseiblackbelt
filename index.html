@@ -2689,7 +2689,7 @@ window._dojoBackHome = function(){
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🚧 DRILL</div>
         <select id="dlim_drillSelect" onchange="_dlim_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.1);color:#ff6b35;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
           <option value="static">L1 · Static Hold (tenir sous la barre)</option>
-          <option value="sidetoside">L2 · Side-to-Side (glisse gauche/droite bas)</option>
+          <option value="sidetoside">L2 · SHIFTY (bouge sans arrêt côté à côté)</option>
           <option value="descending">L3 · Descending (barre qui descend)</option>
         </select>
         <div id="dlim_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Reste en position basse sous la barre · chrono +pts par seconde.</div>
@@ -32414,7 +32414,7 @@ function _dlim_setDrill(id){
   _dlim_mode = id;
   var descs = {
     static:     _t('Reste bas sous la barre · chrono +1 pt par seconde tenue.','Stay low under the bar · +1 pt per second held.'),
-    sidetoside: _t('Glisse gauche/droite en restant bas · shuffle défensif (PAYSAGE).','Slide left/right staying low · defensive shuffle (LANDSCAPE).'),
+    sidetoside: _t('Bouge sans arrêt côté à côté en restant bas · SHIFTY NBA (PAYSAGE).','Keep bouncing side to side staying low · SHIFTY NBA style (LANDSCAPE).'),
     descending: _t('La barre descend progressivement · tiens le plus bas possible.','Bar descends progressively · hold as low as possible.')
   };
   var el = document.getElementById('dlim_drillDesc');
@@ -32766,7 +32766,7 @@ function _dlim_bubbleText(){
   if (_dlim_mode === 'sidetoside'){
     if (_dlim_sideState === 'left') return en?'← LEFT':'← GAUCHE';
     if (_dlim_sideState === 'right') return en?'RIGHT →':'DROITE →';
-    return en?'SIDE TO SIDE':'GAUCHE / DROITE';
+    return en?'SHIFTY ·  BOUNCE':'SHIFTY · BOUGE';
   }
   if (_dlim_lastInside){
     return _dlim_dribbleActive ? (en?'HOLD ✓':'TIENS ✓') : (en?'DRIBBLE !':'DRIBBLE !');
@@ -32846,12 +32846,12 @@ function _dlim_drawHint(ctx, W, H){
   var en = window._lang === 'en';
   var titles = {
     static:     en?'LIMBO · STATIC HOLD':'LIMBO · TENIR BAS',
-    sidetoside: en?'LIMBO · SIDE TO SIDE':'LIMBO · GAUCHE / DROITE',
+    sidetoside: en?'LIMBO · SHIFTY':'LIMBO · SHIFTY',
     descending: en?'LIMBO · DESCENDING':'LIMBO · BARRE DESCEND'
   };
   var subs = {
     static:     en?'Head under the bar · dribble':'Tête sous la barre · dribble',
-    sidetoside: en?'Slide low · follow arrows':'Glisse bas · suis les flèches',
+    sidetoside: en?'Low · never stop moving':'Bas · ne t\'arrête jamais',
     descending: en?'Hold as the bar descends':'Barre descend · tiens'
   };
   var isPortrait = H > W;
@@ -33122,7 +33122,7 @@ function _dlim_renderResults(){
     r.innerHTML = '<div style="padding:12px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.3);border-radius:8px;font-family:var(--font-cond);font-size:12px;line-height:1.9">'+
       '<div><strong style="color:#ff6b35">SCORE :</strong> '+_dlim_score+' pts</div>'+
       '<div><strong>'+(en?'Time held':'Temps tenu')+' :</strong> '+_dlim_timeHeld.toFixed(1)+'s · <strong>'+(en?'Best streak':'Meilleur streak')+' :</strong> '+_dlim_bestHold.toFixed(1)+'s</div>'+
-      '<div><strong>'+(en?'Breaks':'Sorties')+' :</strong> '+_dlim_breaks+(_dlim_mode==='sidetoside'?(' · <strong>'+(en?'Slides':'Glisses')+' :</strong> '+_dlim_sides):'')+'</div></div>';
+      '<div><strong>'+(en?'Breaks':'Sorties')+' :</strong> '+_dlim_breaks+(_dlim_mode==='sidetoside'?(' · <strong>'+(en?'Shifts':'Shifts')+' :</strong> '+_dlim_sides):'')+'</div></div>';
   }
   var sv = document.getElementById('dlim_btnSave'); if (sv) sv.style.display = 'block';
   _dlim_status(_t('Session terminée','Session complete'), '#2dc653');
