@@ -2452,9 +2452,9 @@ window._dojoBackHome = function(){
     <div id="dcog_optHeight" style="display:none;flex-direction:column;gap:10px">
       <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700">📏 <span id="dcog_lbl_height_mode">SOUS-MODE</span></div>
       <select id="dcog_heightModeSelect" onchange="_dcog_setHeightZone(this.value)" style="width:100%;padding:12px 10px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:#f5c518;font-family:var(--font-cond);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px">
-        <option value="low">⬇ BAS · sous le genou (1 ballon)</option>
-        <option value="high">⬆ HAUT · hauteur hanches (1 ballon)</option>
-        <option value="alt">⬆⬇ HI/LO ⇄ LO/HI · ALTERNATE (2 ballons · switch 5s)</option>
+        <option id="dcog_opt_h_low"  value="low">⬇ BAS · sous le genou (1 ballon)</option>
+        <option id="dcog_opt_h_high" value="high">⬆ HAUT · hauteur hanches (1 ballon)</option>
+        <option id="dcog_opt_h_alt"  value="alt">⬆⬇ HI/LO ⇄ LO/HI · ALTERNATE (2 ballons · switch 5s)</option>
       </select>
       <!-- Boutons invisibles conservés pour compat `.dcog-ht-btn` highlight -->
       <div style="display:none">
@@ -31769,7 +31769,7 @@ var _DQT_DRILLS = {
   'G8': {   // Pattern Violation — touche quand pattern rompu
     desc_fr: 'Suite régulière (+2) · touche UNIQUEMENT quand le pattern se rompt.',
     desc_en: 'Regular sequence (+2) · touch ONLY when pattern breaks.',
-    hint: function(){ return 'PATTERN BREAK ?'; },
+    hint: function(){ return window._lang==='en'?'PATTERN BREAK ?':'RUPTURE DU PATTERN ?'; },
     maxTargets: 1, spawnIntervalMs: 1400, ttl: 1300,
     spawn: function(W, H, state){
       if (state.cur == null) { state.cur = 2; state.step = 2; }
@@ -32525,19 +32525,30 @@ function _dlim_calibLoop(){
   var en = window._lang === 'en';
   var isStanding = _dlim_calib.phase === 'standing';
   var titleTxt = isStanding
-    ? (en?'STEP 1 — STAND TALL':'ÉTAPE 1 — RESTE DEBOUT')
-    : (en?'STEP 2 — LOWEST STANCE':'ÉTAPE 2 — POSITION LA PLUS BASSE');
+    ? (en?'STEP 1 — STAND TALL':'ÉTAPE 1 — DEBOUT')
+    : (en?'STEP 2 — LOWEST STANCE':'ÉTAPE 2 — POSITION BASSE');
   var subTxt = isStanding
     ? (en?'Arms relaxed, head up':'Bras relâchés, tête droite')
     : (en?'Deepest dribble position':'Position de dribble la plus basse');
-  // Bandeau titre
+  // ★ Bandeau titre avec auto-shrink (portrait coupe sinon)
   ctx.fillStyle = '#ff6b35';
-  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+  var titFs = Math.round(H*0.055);
+  ctx.font = 'bold '+titFs+'px "Bebas Neue",sans-serif';
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  var maxTitW = W*0.90;
+  if (ctx.measureText(titleTxt).width > maxTitW){
+    titFs = Math.max(Math.round(H*0.030), Math.round(titFs * maxTitW / ctx.measureText(titleTxt).width));
+    ctx.font = 'bold '+titFs+'px "Bebas Neue",sans-serif';
+  }
   ctx.fillText(titleTxt, W/2, H*0.25);
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold '+Math.round(H*0.032)+'px "Bebas Neue",sans-serif';
+  var subFs = Math.round(H*0.032);
+  ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
+  if (ctx.measureText(subTxt).width > maxTitW){
+    subFs = Math.max(Math.round(H*0.020), Math.round(subFs * maxTitW / ctx.measureText(subTxt).width));
+    ctx.font = 'bold '+subFs+'px "Bebas Neue",sans-serif';
+  }
   ctx.fillText(subTxt, W/2, H*0.33);
   // Barre de progression circulaire centrale
   var remain = Math.max(0, PHASE_DUR - elapsed);
@@ -32915,7 +32926,7 @@ function _dlim_drawHint(ctx, W, H){
   };
   var subs = {
     static:     en?'Head under the bar · dribble':'Tête sous la barre · dribble',
-    sidetoside: en?'Low · never stop moving':'Bas · ne t\'arrête jamais',
+    sidetoside: en?'LEFT ↔ RIGHT · stay low':'GAUCHE ↔ DROITE · reste bas',
     descending: en?'Hold as the bar descends':'Barre descend · tiens'
   };
   var isPortrait = H > W;
@@ -34582,11 +34593,12 @@ var _dcog_VIDEOS = [
   {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
   {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
   {id:'aNeIFfhsy-0', title:'Two-Ball',           drill:'twoball'},
-  {id:'ar6OA2wxwzw', title:'Dribble Height BAS', drill:'height'},
+  {id:'ar6OA2wxwzw', title:'Dribble Height BAS',       drill:'height'},
   {id:'M7DtIYt1he8', title:'TBoard UN BALLON',   drill:'tboard'},
   {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS', drill:'tboard'},
   {id:'R8MJAiXSKZM', title:'TBoard - 3',         drill:'tboard'},
-  {id:'UHNUSFHSrOo', title:'Dribble Height HAUT',drill:'height'},
+  {id:'UHNUSFHSrOo', title:'Dribble Height HAUT',      drill:'height'},
+  {id:'2a2oVhjcKXQ', title:'Dribble Height HIGH/LOW',  drill:'height'},
   {id:'5Fgt7txZEQc', title:'Burnout',            drill:'burnout'},
   {id:'eFXJ32fp54Q', title:'Burnout (alt)',      drill:'burnout'},
   {id:'pibR0Ri47PM', title:'Visual Math',        drill:'vcmath'},
@@ -34596,7 +34608,7 @@ var _dcog_VIDEOS = [
   {id:'pIbdz2zQJLQ', title:'Quick Choice 1',     drill:'quickchoice'},
   {id:'T5uvSrRoFi8', title:'Quick Choice 2',     drill:'quickchoice'},
   {id:'pIbdz2zQJLQ', title:'Quick Targets',      drill:'quicktargets'},
-  {id:'IrW2OCRd5n0', title:'Limbo',              drill:'limbo'},
+  {id:'9s4wyM_2iPU', title:'Level Change',       drill:'limbo'},
   // ═══ RCS COLOR (R1-R4 modes) — 1 vidéo démo partagée ═══
   {id:'oy5XoR0hAo0', title:'RCS Color R1-R4',    drill:'rcs'}
 ];
@@ -34716,6 +34728,10 @@ function _dcog_applyLang(en) {
     'dcog_sub_high': en?'hip height':'hauteur hanches',
     'dcog_lbl_alt':  en?'HI/LO ⇄ LO/HI · ALTERNATE':'HI/LO ⇄ LO/HI · ALTERNATE',
     'dcog_sub_alt':  en?'2 balls · switch every 5s':'2 ballons · switch toutes les 5 s',
+    'dcog_lbl_height_mode': en?'SUB-MODE':'SOUS-MODE',
+    'dcog_opt_h_low':  en?'⬇ LOW · below knee (1 ball)':'⬇ BAS · sous le genou (1 ballon)',
+    'dcog_opt_h_high': en?'⬆ HIGH · hip height (1 ball)':'⬆ HAUT · hauteur hanches (1 ballon)',
+    'dcog_opt_h_alt':  en?'⬆⬇ HI/LO ⇄ LO/HI · ALTERNATE (2 balls · switch 5s)':'⬆⬇ HI/LO ⇄ LO/HI · ALTERNATE (2 ballons · switch 5s)',
     'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
     'dcog_lbl_sameheight': en?'SAME HEIGHT':'MÊME HAUTEUR',
     'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
@@ -34939,7 +34955,8 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:23, limbo:24 };
+      // Vidéos : "Dribble Height HIGH/LOW" ajoutée à l'index 16 → tout après décalé +1
+      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:17, vcmath:19, colorreact:20, ruleswitch:21, quickchoice:22, quicktargets:24, limbo:25 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -35024,9 +35041,9 @@ function _dcog_setHeightZone(zone) {
     _dcog_heightZonePx = null;         // reset pour forcer re-calcul propre
   }
   // 🎬 Auto-open vidéo démo correspondante
-  // Index _dcog_VIDEOS : Dribble Height BAS = 11 · Dribble Height HAUT = 15
+  // Index _dcog_VIDEOS : Dribble Height BAS = 11 · HAUT = 15 · HIGH/LOW = 16
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (zone === 'high') ? 15 : (zone === 'low') ? 11 : null;
+    var idx = (zone === 'high') ? 15 : (zone === 'low') ? 11 : (zone === 'alt') ? 16 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
@@ -36884,43 +36901,57 @@ function _dcog_drawHeightLine(ctx, W, H) {
   ctx.restore();
 }
 
-/* ═══ Mode ALTERNATE : 2 lignes + 2 pastilles + annonce config + flash SWITCH ═══ */
+/* ═══ Mode ALTERNATE : 2 lignes BIEN séparées + 2 pastilles + annonce config + flash SWITCH ═══ */
 function _dcog_drawAltLines(ctx, W, H){
-  if (!ctx || _dcog_altHighLineY === null) return;
+  if (!ctx || _dcog_altHighLineY === null || _dcog_altLowLineY === null) return;
   var en = window._lang === 'en';
   ctx.save();
   var hiY = _dcog_altHighLineY, loY = _dcog_altLowLineY;
+  // ★ Garantir séparation visuelle minimale : 25% H entre les 2 lignes
+  var minGap = H * 0.25;
+  if (loY - hiY < minGap){
+    var mid = (hiY + loY) / 2;
+    hiY = mid - minGap / 2;
+    loY = mid + minGap / 2;
+  }
   // Ligne HAUTE (rouge pointillée)
-  ctx.strokeStyle = '#e63946'; ctx.lineWidth = 4; ctx.setLineDash([14,6]);
+  ctx.strokeStyle = '#e63946'; ctx.lineWidth = 5; ctx.setLineDash([16,8]);
+  ctx.shadowBlur = 10; ctx.shadowColor = '#e63946';
   ctx.beginPath(); ctx.moveTo(0, hiY); ctx.lineTo(W, hiY); ctx.stroke();
   // Ligne BASSE (bleue pointillée)
-  ctx.strokeStyle = '#4cc9f0';
+  ctx.strokeStyle = '#4cc9f0'; ctx.shadowColor = '#4cc9f0';
   ctx.beginPath(); ctx.moveTo(0, loY); ctx.lineTo(W, loY); ctx.stroke();
-  ctx.setLineDash([]);
-  // Labels latéraux lignes
-  ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
+  ctx.setLineDash([]); ctx.shadowBlur = 0;
+  // Labels latéraux lignes (plus gros)
+  ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue",sans-serif';
   ctx.textBaseline = 'bottom'; ctx.textAlign = 'left';
-  ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,.95)';
+  ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,.95)';
   ctx.strokeText(en?'HIGH':'HAUT', W*0.03, hiY - 10);
-  ctx.strokeText(en?'LOW':'BAS',  W*0.03, loY - 10);
+  ctx.strokeText(en?'LOW':'BAS',   W*0.03, loY - 10);
   ctx.fillStyle = '#e63946'; ctx.fillText(en?'HIGH':'HAUT', W*0.03, hiY - 10);
-  ctx.fillStyle = '#4cc9f0'; ctx.fillText(en?'LOW':'BAS',  W*0.03, loY - 10);
-  // Annonce config courante en haut-centre
+  ctx.fillStyle = '#4cc9f0'; ctx.fillText(en?'LOW':'BAS',   W*0.03, loY - 10);
+  // Annonce config courante en haut-centre — AGRANDIE
   var annonceTxt = _dcog_altConfig === 'HL'
     ? (en ? 'LEFT HIGH · RIGHT LOW' : 'G HAUT · D BAS')
     : (en ? 'LEFT LOW · RIGHT HIGH' : 'G BAS · D HAUT');
-  var bw = W*0.72, bh = H*0.11;
-  var bx = W/2 - bw/2, by = H*0.04;
-  ctx.fillStyle = 'rgba(13,17,23,.82)';
+  var bw = W*0.80, bh = H*0.15;
+  var bx = W/2 - bw/2, by = H*0.025;
+  ctx.fillStyle = 'rgba(13,17,23,.86)';
   _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.fill();
-  ctx.lineWidth = 3; ctx.strokeStyle = '#f5c518';
-  ctx.shadowBlur = 12; ctx.shadowColor = '#f5c518';
+  ctx.lineWidth = 4; ctx.strokeStyle = '#f5c518';
+  ctx.shadowBlur = 16; ctx.shadowColor = '#f5c518';
   _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
   ctx.shadowBlur = 0;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle = '#f5c518';
-  ctx.font = 'bold '+Math.round(bh*0.65)+'px "Bebas Neue",sans-serif';
-  ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.95)';
+  // Font 0.78×bh + auto-shrink si débordement
+  var annFs = Math.round(bh*0.78);
+  ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
+  if (ctx.measureText(annonceTxt).width > bw * 0.92){
+    annFs = Math.max(Math.round(bh*0.45), Math.round(annFs * bw * 0.92 / ctx.measureText(annonceTxt).width));
+    ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
+  }
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillText(annonceTxt, W/2, by + bh*0.55);
   ctx.shadowBlur = 0;
   // Flash SWITCH! pendant 1s après le switch
