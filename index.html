@@ -2689,15 +2689,6 @@ window._dojoBackHome = function(){
 
     <!-- LIMBO : moteur posture basse · 3 drills · détection tête vs barre virtuelle -->
     <div id="dcog_optLimbo" style="display:none;flex-direction:column;gap:12px">
-      <!-- Vidéo tuto placeholder -->
-      <div class="lite-yt" data-vid="IrW2OCRd5n0" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
-        <img loading="lazy" src="https://i.ytimg.com/vi/IrW2OCRd5n0/hqdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/IrW2OCRd5n0/mqdefault.jpg';" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
-          <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
-            <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
-          </div>
-        </div>
-      </div>
       <div>
         <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🚧 DRILL</div>
         <select id="dlim_drillSelect" onchange="_dlim_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.1);color:#ff6b35;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
@@ -28052,6 +28043,10 @@ function _tsym_startDetection() {
       ctx.fillStyle='#f5c518';
       ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = Math.round(H*0.015);
+      ctx.strokeStyle = '#000';
+      ctx.strokeText(String(n), W/2, H/2);
       ctx.fillText(String(n), W/2, H/2);
       // Message "PRÊT" affiché pendant tout le countdown
       var en = window._lang === 'en';
@@ -29117,6 +29112,10 @@ function _tdrc_runCountdown(n){
     ctx.fillStyle='#f5c518';
     ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     var en = window._lang === 'en';
     ctx.font=Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -29922,6 +29921,10 @@ function _dcrc_runCountdown(n){
     ctx.fillStyle = '#4cc9f0';
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     var en = window._lang === 'en';
     ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -30494,6 +30497,10 @@ function _drsw_runCountdown(n){
     ctx.fillStyle = '#4cc9f0';
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     var en = window._lang === 'en';
     ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -31203,6 +31210,10 @@ function _dqa_runCountdown(n){
     ctx.fillStyle = '#ff6b35';
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     var en = window._lang === 'en';
     ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -31986,6 +31997,10 @@ function _dqt_runCountdown(n){
     ctx.fillStyle = '#f5c518';
     ctx.font = 'bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     ctx.font = Math.round(H*0.08)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.fillStyle = '#fff';
@@ -32647,7 +32662,10 @@ function _dlim_runCountdown(n){
     ctx.fillStyle = '#ff6b35';
     ctx.font = 'bold '+Math.round(H*0.50)+'px "Bebas Neue",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(0,0,0,.9)';
+    ctx.shadowBlur = 0;    // NET — pas d'ombre blur
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     ctx.font = Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
     ctx.fillStyle = '#fff';
@@ -35394,6 +35412,10 @@ function _dcog_launchDrill() {
     ctx.fillStyle='#f5c518';
     ctx.font='bold '+Math.round(H*0.55)+'px "Bebas Neue","Arial Narrow",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.round(H*0.015);
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(String(n), W/2, H/2);
     ctx.fillText(String(n), W/2, H/2);
     // Message "PRÊT" affiché pendant tout le countdown
     var en = window._lang === 'en';
@@ -36954,17 +36976,19 @@ function _dcog_drawAltLines(ctx, W, H){
   ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,.95)';
   ctx.fillText(annonceTxt, W/2, by + bh*0.55);
   ctx.shadowBlur = 0;
-  // Flash SWITCH! pendant 1s après le switch
+  // Flash SWITCH! pendant 1s après le switch (NET — stroke net, zéro blur sur le texte)
   var sinceSwitch = Date.now() - _dcog_altSwitchFlashTs;
   if (sinceSwitch < 1000){
     ctx.globalAlpha = 1 - sinceSwitch/1000;
     ctx.font = 'bold '+Math.round(H*0.18)+'px "Bebas Neue",sans-serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(0,0,0,.95)';
+    ctx.shadowBlur = 0;                            // ← pas d'ombre blur sur le texte
+    ctx.lineWidth = Math.round(H*0.012);           // stroke net proportionnel
+    ctx.strokeStyle = '#000';
     ctx.strokeText('⇄ SWITCH !', W/2, H*0.50);
-    ctx.fillStyle = '#ff6b35'; ctx.shadowBlur = 20; ctx.shadowColor = '#ff6b35';
+    ctx.fillStyle = '#ff6b35';
     ctx.fillText('⇄ SWITCH !', W/2, H*0.50);
-    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
   }
   // Pastilles G (gauche écran) + D (droite écran) · colorées selon in-zone
   if (_dcog_altLeftWristPx !== null){
