@@ -2449,14 +2449,20 @@ window._dojoBackHome = function(){
       </button>
     </div>
     <!-- Height zone -->
-    <div id="dcog_optHeight" style="display:none">
-      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
-        style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;width:calc(50% - 4px);margin-right:8px;text-align:center;transition:all .2s">
-        ⬇ <span id="dcog_lbl_low" style="font-size:16px;font-weight:800;letter-spacing:1px">BAS</span><br><span id="dcog_sub_low" style="font-size:12px;opacity:.85;font-weight:600">sous le genou</span>
-      </button>
-      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('high')" data-zone="high"
-        style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;width:calc(50% - 4px);text-align:center;transition:all .2s">
-        ⬆ <span id="dcog_lbl_high" style="font-size:16px;font-weight:800;letter-spacing:1px">HAUT</span><br><span id="dcog_sub_high" style="font-size:12px;opacity:.85;font-weight:600">hauteur hanches</span>
+    <div id="dcog_optHeight" style="display:none;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
+          style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+          ⬇ <span id="dcog_lbl_low" style="font-size:16px;font-weight:800;letter-spacing:1px">BAS</span><br><span id="dcog_sub_low" style="font-size:12px;opacity:.85;font-weight:600">sous le genou</span>
+        </button>
+        <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('high')" data-zone="high"
+          style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+          ⬆ <span id="dcog_lbl_high" style="font-size:16px;font-weight:800;letter-spacing:1px">HAUT</span><br><span id="dcog_sub_high" style="font-size:12px;opacity:.85;font-weight:600">hauteur hanches</span>
+        </button>
+      </div>
+      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('alt')" data-zone="alt"
+        style="width:100%;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+        ⬆⬇ <span id="dcog_lbl_alt" style="font-size:16px;font-weight:800;letter-spacing:1px">HI/LO ⇄ LO/HI · ALTERNATE</span><br><span id="dcog_sub_alt" style="font-size:12px;opacity:.85;font-weight:600">2 ballons · switch toutes les 5 s</span>
       </button>
     </div>
     <!-- Two ball mode -->
@@ -34710,6 +34716,8 @@ function _dcog_applyLang(en) {
     'dcog_lbl_high': en?'HIGH':'HAUT',
     'dcog_sub_low': en?'below the knee':'sous le genou',
     'dcog_sub_high': en?'hip height':'hauteur hanches',
+    'dcog_lbl_alt':  en?'HI/LO ⇄ LO/HI · ALTERNATE':'HI/LO ⇄ LO/HI · ALTERNATE',
+    'dcog_sub_alt':  en?'2 balls · switch every 5s':'2 ballons · switch toutes les 5 s',
     'dcog_lbl_alternate': en?'ALTERNATE':'ALTERNÉ',
     'dcog_lbl_sameheight': en?'SAME HEIGHT':'MÊME HAUTEUR',
     'dcog_lbl_diffheight': en?'DIFF. HEIGHT':'HAUTEUR DIFF.',
@@ -34999,10 +35007,15 @@ function _dcog_setHeightZone(zone) {
     b.style.background = active?'rgba(245,197,24,.15)':'var(--dark3)';
     b.style.color = active?'#f5c518':'#7a8299';
   });
-  // 🎬 Auto-open vidéo démo correspondante (sauf pendant init auto)
-  // Indices +7 depuis l'ajout des 4 videos VISUOMOTOR + 3 RCS en tête
-  // BAS (low) → index 10 (Dribble Height BAS = ar6OA2wxwzw)
-  // HAUT (high) → index 13 (Dribble Height HAUT = UHNUSFHSrOo)
+  // Reset alternate state à chaque sélection
+  if (zone === 'alt'){
+    _dcog_altConfig = 'HL';
+    _dcog_altLastSwitch = Date.now();
+    _dcog_altSwitchFlashTs = 0;
+    _dcog_altPrevLY = null; _dcog_altPrevRY = null;
+    _dcog_altLeftInZone = false; _dcog_altRightInZone = false;
+  }
+  // 🎬 Auto-open vidéo démo correspondante
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
     var idx = (zone === 'high') ? 13 : (zone === 'low') ? 10 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
@@ -36692,6 +36705,58 @@ function _dcog_analyzeHeight(poses) {
   var wristY    = activeWrist.y * sy;
   var normY     = (wristY - shoulderY) / bodyH; // 0=shoulder, 1=ankle
 
+  // ═══ MODE ALTERNATE : 2 ballons · HI/LO ⇄ LO/HI avec switch toutes les 5s ═══
+  if (_dcog_heightZone === 'alt'){
+    if (!lW || !rW) return;
+    var now = Date.now();
+    // Switch config toutes les 5s
+    if (now - _dcog_altLastSwitch > _dcog_altSwitchInterval){
+      _dcog_altConfig = (_dcog_altConfig === 'HL') ? 'LH' : 'HL';
+      _dcog_altLastSwitch = now;
+      _dcog_altSwitchFlashTs = now;
+      try { _td_beep(880, 0.12, 0.20); } catch(e){}
+      if (navigator.vibrate) navigator.vibrate([30,20,30]);
+      try { _sensei_speak(window._lang==='en'?'Switch!':'Change !', 3000); } catch(e){}
+    }
+    // Lignes cibles pour affichage
+    _dcog_altHighLineY = hipY;
+    _dcog_altLowLineY  = kneeY;
+    // Y des 2 poignets (coords écran, mirror pour affichage à gauche-droite par rapport à l'image)
+    var lwy = lW.y * sy, rwy = rW.y * sy;
+    _dcog_altLeftWristPx  = lwy;
+    _dcog_altRightWristPx = rwy;
+    // Zones autorisées (identiques aux modes LOW et HIGH classiques)
+    var highMin = (hipY - shoulderY) / bodyH * 0.7;
+    var highMax = (hipY - shoulderY) / bodyH * 1.1;
+    var lowMin  = (kneeY - shoulderY) / bodyH;
+    var lowMax  = (ankleY - shoulderY) / bodyH;
+    // Y normalisés
+    var lNorm = (lwy - shoulderY) / bodyH;
+    var rNorm = (rwy - shoulderY) / bodyH;
+    // Configuration attendue : HL = Gauche HIGH + Droite LOW · LH = inverse
+    var leftExpectHigh = (_dcog_altConfig === 'HL');
+    var leftInZone  = leftExpectHigh  ? (lNorm >= highMin && lNorm <= highMax) : (lNorm >= lowMin && lNorm <= lowMax);
+    var rightInZone = leftExpectHigh  ? (rNorm >= lowMin  && rNorm <= lowMax)  : (rNorm >= highMin && rNorm <= highMax);
+    // Garde de mouvement 2 poignets (même seuil 8px que le mode simple)
+    var lMoving = _dcog_altPrevLY !== null && Math.abs(lwy - _dcog_altPrevLY) > 8;
+    var rMoving = _dcog_altPrevRY !== null && Math.abs(rwy - _dcog_altPrevRY) > 8;
+    _dcog_altPrevLY = lwy; _dcog_altPrevRY = rwy;
+    _dcog_altLeftInZone  = leftInZone;
+    _dcog_altRightInZone = rightInZone;
+    if (lMoving && rMoving){
+      _dcog_heightFrames++;
+      if (leftInZone && rightInZone) _dcog_heightInZone++;
+    }
+    // Mise à jour score display
+    var pctAlt = _dcog_heightFrames > 0 ? Math.round(_dcog_heightInZone / _dcog_heightFrames * 100) : 0;
+    var scoreBigAlt = document.getElementById('dcog_heightScoreBig');
+    if (scoreBigAlt){
+      scoreBigAlt.textContent = pctAlt + '%';
+      scoreBigAlt.style.color = pctAlt >= 70 ? '#2dc653' : pctAlt >= 40 ? '#f5c518' : '#e63946';
+    }
+    return;
+  }
+
   // Target zone thresholds
   var zoneMin, zoneMax, zonePx;
   if (_dcog_heightZone === 'low') {
@@ -36759,20 +36824,112 @@ var _dcog_heightZonePx   = null;
 var _dcog_heightWristPx  = null;
 var _dcog_heightInZoneNow= false;
 var _dcog_heightZoneEnterTime = 0; // timestamp entrée en zone
+// ═══ Mode ALTERNATE (HI/LO ⇄ LO/HI) — 2 ballons ═══
+var _dcog_altConfig = 'HL';           // 'HL' = Gauche HAUT + Droite BAS · 'LH' = Gauche BAS + Droite HAUT
+var _dcog_altLastSwitch = 0;          // timestamp dernier switch
+var _dcog_altSwitchInterval = 5000;   // 5 s par défaut
+var _dcog_altSwitchFlashTs = 0;       // timestamp du dernier flash SWITCH (pour animation)
+var _dcog_altHighLineY = null;        // ligne HIGH (hanche)
+var _dcog_altLowLineY  = null;        // ligne LOW (genou)
+var _dcog_altLeftWristPx = null;      // pastille G
+var _dcog_altRightWristPx = null;     // pastille D
+var _dcog_altLeftInZone = false;
+var _dcog_altRightInZone = false;
+var _dcog_altPrevLY = null;           // garde mouvement G
+var _dcog_altPrevRY = null;           // garde mouvement D
 
 function _dcog_drawHeightLine(ctx, W, H) {
-  if (!ctx || _dcog_heightZonePx === null) return;
+  if (!ctx) return;
   var en  = window._lang === 'en';
+  // ═══ MODE ALTERNATE : 2 lignes + 2 pastilles + annonce config + flash SWITCH ═══
+  if (_dcog_heightZone === 'alt' && _dcog_altHighLineY !== null){
+    ctx.save();
+    var hiY = _dcog_altHighLineY, loY = _dcog_altLowLineY;
+    // Ligne HAUTE (rouge)
+    ctx.strokeStyle = '#e63946'; ctx.lineWidth = 4; ctx.setLineDash([14,6]);
+    ctx.beginPath(); ctx.moveTo(0, hiY); ctx.lineTo(W, hiY); ctx.stroke();
+    // Ligne BASSE (bleu)
+    ctx.strokeStyle = '#4cc9f0';
+    ctx.beginPath(); ctx.moveTo(0, loY); ctx.lineTo(W, loY); ctx.stroke();
+    ctx.setLineDash([]);
+    // Labels latéraux lignes (contour noir pour lisibilité)
+    var lblFs = Math.round(H*0.045);
+    ctx.font = 'bold '+lblFs+'px "Bebas Neue",sans-serif';
+    ctx.textBaseline = 'bottom';
+    ctx.textAlign = 'left';
+    ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,.95)';
+    ctx.strokeText(en?'HIGH':'HAUT', W*0.03, hiY - 10);
+    ctx.strokeText(en?'LOW':'BAS',  W*0.03, loY - 10);
+    ctx.fillStyle = '#e63946'; ctx.fillText(en?'HIGH':'HAUT', W*0.03, hiY - 10);
+    ctx.fillStyle = '#4cc9f0'; ctx.fillText(en?'LOW':'BAS',  W*0.03, loY - 10);
+    // Grosse annonce config courante en haut-centre
+    var cfg = _dcog_altConfig;
+    var annonceTxt = cfg === 'HL'
+      ? (en ? 'LEFT HIGH · RIGHT LOW' : 'G HAUT · D BAS')
+      : (en ? 'LEFT LOW · RIGHT HIGH' : 'G BAS · D HAUT');
+    var bw = W*0.72, bh = H*0.11;
+    var bx = W/2 - bw/2, by = H*0.04;
+    ctx.fillStyle = 'rgba(13,17,23,.82)';
+    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#f5c518';
+    ctx.shadowBlur = 12; ctx.shadowColor = '#f5c518';
+    _dcog_vc_roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = '#f5c518';
+    ctx.font = 'bold '+Math.round(bh*0.65)+'px "Bebas Neue",sans-serif';
+    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,.95)';
+    ctx.fillText(annonceTxt, W/2, by + bh*0.55);
+    ctx.shadowBlur = 0;
+    // Flash "SWITCH!" pendant 1s après le switch (pleine largeur)
+    var sinceSwitch = Date.now() - _dcog_altSwitchFlashTs;
+    if (sinceSwitch < 1000){
+      var alpha = 1 - sinceSwitch/1000;
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold '+Math.round(H*0.18)+'px "Bebas Neue",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(0,0,0,.95)';
+      ctx.strokeText('⇄ SWITCH !', W/2, H*0.50);
+      ctx.fillStyle = '#ff6b35'; ctx.shadowBlur = 20; ctx.shadowColor = '#ff6b35';
+      ctx.fillText('⇄ SWITCH !', W/2, H*0.50);
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
+    // Pastilles G (cyan clair) + D (orange clair) · positions actuelles poignets
+    // G à gauche de l'écran (W*0.33), D à droite (W*0.67) · vert si inZone
+    if (_dcog_altLeftWristPx !== null){
+      ctx.beginPath(); ctx.arc(W*0.33, _dcog_altLeftWristPx, 14, 0, Math.PI*2);
+      ctx.fillStyle = _dcog_altLeftInZone ? '#2dc653' : '#4cc9f0';
+      ctx.shadowBlur = 16; ctx.shadowColor = ctx.fillStyle;
+      ctx.fill();
+      // Mini-label "G"
+      ctx.font = 'bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
+      ctx.fillStyle = '#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.9)';
+      ctx.fillText(en?'L':'G', W*0.33, _dcog_altLeftWristPx);
+    }
+    if (_dcog_altRightWristPx !== null){
+      ctx.beginPath(); ctx.arc(W*0.67, _dcog_altRightWristPx, 14, 0, Math.PI*2);
+      ctx.fillStyle = _dcog_altRightInZone ? '#2dc653' : '#ff6b35';
+      ctx.shadowBlur = 16; ctx.shadowColor = ctx.fillStyle;
+      ctx.fill();
+      ctx.font = 'bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
+      ctx.fillStyle = '#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.9)';
+      ctx.fillText(en?'R':'D', W*0.67, _dcog_altRightWristPx);
+    }
+    ctx.restore();
+    return;
+  }
+  // ═══ MODES SIMPLES (BAS / HAUT) — comportement d'origine ═══
+  if (_dcog_heightZonePx === null) return;
   var ly  = _dcog_heightZonePx;
   var inZ = _dcog_heightInZoneNow;
   ctx.save();
-  // Ligne cible verte/or selon si dans la zone
   ctx.strokeStyle = inZ ? '#2dc653' : 'rgba(245,197,24,.8)';
   ctx.lineWidth   = 3;
   ctx.setLineDash([14, 6]);
   ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(W, ly); ctx.stroke();
   ctx.setLineDash([]);
-  // Label horizontal — centré sur la ligne, contour noir pour lisibilité
   var lbl = _dcog_heightZone === 'low' ? (en?'LOW DRIBBLE':'DRIBBLE BAS') : (en?'HIGH DRIBBLE':'DRIBBLE HAUT');
   ctx.save();
   ctx.font         = 'bold ' + Math.round(H*0.075) + 'px "Bebas Neue","Arial Narrow",sans-serif';
@@ -36781,11 +36938,9 @@ function _dcog_drawHeightLine(ctx, W, H) {
   ctx.lineWidth    = 5;
   ctx.strokeStyle  = 'rgba(0,0,0,0.95)';
   ctx.strokeText(lbl, Math.round(W*0.50), ly - 10);
-  // Vert vif si dans la zone, jaune sinon
   ctx.fillStyle    = inZ ? '#00e676' : '#f5c518';
   ctx.fillText(lbl, Math.round(W*0.50), ly - 10);
   ctx.restore();
-  // Point poignet actif
   if (_dcog_heightWristPx !== null) {
     ctx.beginPath();
     ctx.arc(W * 0.5, _dcog_heightWristPx, 10, 0, Math.PI*2);
