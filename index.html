@@ -2448,20 +2448,22 @@ window._dojoBackHome = function(){
         600 DRIBBLES
       </button>
     </div>
-    <!-- Height zone — DROPDOWN sous-modes -->
-    <div id="dcog_optHeight" style="display:none;flex-direction:column;gap:10px">
-      <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:2px">📏 <span id="dcog_lbl_height_mode">SOUS-MODE</span></div>
-      <select id="dcog_heightModeSelect" onchange="_dcog_setHeightZone(this.value)" style="width:100%;padding:12px 10px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.1);color:#f5c518;font-family:var(--font-cond);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px">
-        <option value="low">⬇ BAS · sous le genou (1 ballon)</option>
-        <option value="high">⬆ HAUT · hauteur hanches (1 ballon)</option>
-        <option value="alt">⬆⬇ HI/LO ⇄ LO/HI · ALTERNATE (2 ballons · switch 5s)</option>
-      </select>
-      <!-- Boutons héritage pour compatibilité _dcog_setHeightZone highlights (gardés masqués) -->
-      <div style="display:none">
-        <button class="dcog-ht-btn" data-zone="low"></button>
-        <button class="dcog-ht-btn" data-zone="high"></button>
-        <button class="dcog-ht-btn" data-zone="alt"></button>
+    <!-- Height zone — mapping ORIGINAL restauré · ALTERNATE ajouté en 3e bouton -->
+    <div id="dcog_optHeight" style="display:none;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('low')" data-zone="low"
+          style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid rgba(245,197,24,.5);background:rgba(245,197,24,.15);color:#f5c518;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+          ⬇ <span id="dcog_lbl_low" style="font-size:16px;font-weight:800;letter-spacing:1px">BAS</span><br><span id="dcog_sub_low" style="font-size:12px;opacity:.85;font-weight:600">sous le genou</span>
+        </button>
+        <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('high')" data-zone="high"
+          style="flex:1;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+          ⬆ <span id="dcog_lbl_high" style="font-size:16px;font-weight:800;letter-spacing:1px">HAUT</span><br><span id="dcog_sub_high" style="font-size:12px;opacity:.85;font-weight:600">hauteur hanches</span>
+        </button>
       </div>
+      <button class="dcog-ht-btn" onclick="_dcog_setHeightZone('alt')" data-zone="alt"
+        style="width:100%;padding:14px 12px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:15px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s">
+        ⬆⬇ <span id="dcog_lbl_alt" style="font-size:16px;font-weight:800;letter-spacing:1px">HI/LO ⇄ LO/HI · ALTERNATE</span><br><span id="dcog_sub_alt" style="font-size:12px;opacity:.85;font-weight:600">2 ballons · switch toutes les 5 s</span>
+      </button>
     </div>
     <!-- Two ball mode -->
     <div id="dcog_optTwoball" style="display:none">
@@ -34939,7 +34941,7 @@ function _dcog_selectDrill(drill, langOnly) {
       // viscoord : idx 0 (3 autres accessibles manuellement 1,2,3)
       // rcs : idx 4 (2 autres accessibles manuellement 5,6)
       // Autres drills DCOG : indices +7 vs tout premier état
-      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:22, limbo:23 };
+      var _dcogVidMap = { viscoord:0, rcs:3, math:8, sprint:9, twoball:10, height:11, tboard:12, burnout:16, vcmath:18, colorreact:19, ruleswitch:20, quickchoice:21, quicktargets:23, limbo:24 };
       var _dcogVidIdx = _dcogVidMap[drill];
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
@@ -34999,10 +35001,6 @@ function _dcog_setSprintTarget(n) {
 }
 function _dcog_setHeightZone(zone) {
   _dcog_heightZone = zone;
-  // Sync select dropdown si appel programmatique
-  var sel = document.getElementById('dcog_heightModeSelect');
-  if (sel && sel.value !== zone) sel.value = zone;
-  // Highlight boutons (gardés pour compat historique, maintenant invisibles)
   document.querySelectorAll('.dcog-ht-btn').forEach(function(b){
     var active = b.dataset.zone === zone;
     b.style.border = active?'1px solid rgba(245,197,24,.5)':'1px solid #1e2535';
@@ -35018,8 +35016,9 @@ function _dcog_setHeightZone(zone) {
     _dcog_altLeftInZone = false; _dcog_altRightInZone = false;
   }
   // 🎬 Auto-open vidéo démo correspondante
+  // Index _dcog_VIDEOS : Dribble Height BAS = 11 · Dribble Height HAUT = 15
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (zone === 'high') ? 13 : (zone === 'low') ? 10 : null;
+    var idx = (zone === 'high') ? 15 : (zone === 'low') ? 11 : null;
     if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
   }
 }
