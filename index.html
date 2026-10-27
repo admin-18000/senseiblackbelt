@@ -14421,6 +14421,8 @@ function applyLangTracker(lang) {
     arcade_dribble_sub:"\ud83c\udfb5 Rhythm \u00b7 Tape au rythme",
     arcade_horse_lbl:"HORSE vs AI",
     arcade_horse_sub:"\ud83e\udd16 Duel classique H-O-R-S-E",
+    arcade_iso_lbl:"SENSEI 1v1 \u00b7 ISO",
+    arcade_iso_sub:"\ud83c\udfc0 Duel iso \u00b7 Casse les chevilles",
     bb_tagline:"\u23f1\ufe0f 5 secondes par tir \u00b7 Sois clutch",
     bb_btn_start:"\u25b6 COMMENCER",
     bb_btn_retry:"\u21bb REJOUER",
@@ -14798,6 +14800,8 @@ function applyLangTracker(lang) {
     arcade_dribble_sub:"\ud83c\udfb5 Rhythm \u00b7 Tap to the beat",
     arcade_horse_lbl:"HORSE vs AI",
     arcade_horse_sub:"\ud83e\udd16 Classic H-O-R-S-E duel",
+    arcade_iso_lbl:"SENSEI 1v1 \u00b7 ISO",
+    arcade_iso_sub:"\ud83c\udfc0 Iso duel \u00b7 Break ankles",
     bb_tagline:"\u23f1\ufe0f 5 seconds per shot \u00b7 Be clutch",
     bb_btn_start:"\u25b6 START",
     bb_btn_retry:"\u21bb RETRY",
@@ -45733,6 +45737,16 @@ window._QI_DATA['pnr_05'] = {
         <div id="arcade-best-horse" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
       </button>
 
+      <!-- Card SENSEI 1v1 · ISO -->
+      <button onclick="_arcade_launch('iso')" ontouchstart="" class="arcade-card"
+        style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.22),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.75);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(245,197,24,.25);font-family:inherit;overflow:hidden">
+        <div style="position:absolute;top:10px;right:10px;background:#f5c518;color:#0a0d18;font-size:9px;font-weight:900;padding:3px 7px;border-radius:6px;letter-spacing:.5px;font-family:'Inter',sans-serif">NEW</div>
+        <div style="font-size:44px;line-height:1;margin-bottom:12px">⛹️‍♂️</div>
+        <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:#f5c518;line-height:1;margin-bottom:6px" data-i18n="arcade_iso_lbl">SENSEI 1v1 · ISO</div>
+        <div style="font-size:11px;color:#cfd3e0;letter-spacing:.5px;font-weight:600;margin-bottom:10px" data-i18n="arcade_iso_sub">🏀 Duel iso · Casse les chevilles</div>
+        <div id="arcade-best-iso" style="font-family:'Bebas Neue','Impact',sans-serif;font-size:11px;color:#f5c518;letter-spacing:1.5px;padding-top:8px;border-top:1px solid rgba(245,197,24,.25)">🏆 —</div>
+      </button>
+
       <!-- Card REACTION SNIPER -->
       <button onclick="_arcade_launch('reaction')" ontouchstart="" class="arcade-card"
         style="position:relative;cursor:pointer;background:linear-gradient(160deg,rgba(245,197,24,.15),rgba(0,0,0,.6));border:1.5px solid rgba(245,197,24,.6);border-radius:14px;padding:22px 20px;color:#fff;text-align:left;transition:all .2s;box-shadow:0 6px 24px rgba(0,0,0,.4);font-family:inherit;overflow:hidden">
@@ -45837,6 +45851,7 @@ window._QI_DATA['pnr_05'] = {
       else if (gameId === 'memory' && typeof _mc_open === 'function') _mc_open();
       else if (gameId === 'tp' && typeof _tp_open === 'function') _tp_open();
       else if (gameId === 'cv' && typeof _cv_open === 'function') _cv_open();
+      else if (gameId === 'iso' && typeof _iso_open === 'function') _iso_open();
       if (window._haptic) { try { window._haptic.tap && window._haptic.tap(); } catch(e){} }
     };
     // Intercept avec le modal pseudo (si nécessaire)
