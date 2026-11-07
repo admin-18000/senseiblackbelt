@@ -2335,7 +2335,7 @@ window._dojoBackHome = function(){
       </button>
       <button class="dcog-drill-btn" onclick="_dcog_selectDrill('opto')" id="dcog_btn_opto"
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
-        👁️<div id="dcog_lbl_opto">OPTOMOTOR</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Eye Suite</div>
+        👁️<div id="dcog_lbl_opto">OPTOMOTOR</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Visual Motion</div>
       </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
@@ -2751,10 +2751,10 @@ window._dojoBackHome = function(){
         </div>
       </div>
       <div style="padding:8px 10px;background:rgba(100,180,255,.06);border-left:2px solid rgba(100,180,255,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
-        👁️🏀 OPTOMOTOR SUITE · 5 drills d'entraînement oculomoteur · détection face MoveNet (nose/eyes) · mesure pitch/yaw tête · pas d'eye-tracker nécessaire.
+        👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 5 drills de la réponse oculomotrice · détection face MoveNet (nose/eyes) · mesure pitch/yaw tête · pas d'eye-tracker nécessaire.
       </div>
       <div id="opto_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
-      <button class="tr-btn tr-btn-start" id="opto_btnStart" onclick="_opto_start()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="opto_lblStart">▶ DÉMARRER OPTOMOTOR</span></button>
+      <button class="tr-btn tr-btn-start" id="opto_btnStart" onclick="_opto_start()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="opto_lblStart">▶ DÉMARRER OPTOMOTOR RESPONSE</span></button>
       <button class="tr-btn tr-btn-save" id="opto_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="opto_results" style="margin-top:4px"></div>
     </div>
@@ -33290,6 +33290,32 @@ var _opto_hu_pitchSmoothed=0;
 var _opto_hu_maxPitch=0;         // max absolu pitch observé pendant la session
 var _opto_hu_ok=true;            // état instantané "tête haute acceptable"
 var _opto_hu_itemCount=0;
+// Mode F11 HEAD/TRUNK ISO state
+var _opto_iso_headYaw=0;         // yaw de la tête en degrés (approx)
+var _opto_iso_headYawS=0;        // smoothed
+var _opto_iso_shouldersY=0;      // dérive épaules (variance)
+var _opto_iso_lastYawDir=0;      // -1 gauche, +1 droite, 0 centre
+var _opto_iso_swings=0;          // nb cycles G↔D complets
+var _opto_iso_shouldersBaseline=null; // ligne de référence épaules
+var _opto_iso_shouldersDrift=0;  // drift actuel
+var _opto_iso_lastCycleTs=0;
+// Mode A3 PERIPHERAL TARGET state
+var _opto_pt_targets=[];         // [{corner:'tl|tr|bl|br', born, hit:bool}]
+var _opto_pt_lastSpawn=0;
+var _opto_pt_headStab=0;         // variance head position
+var _opto_pt_noseBaseline=null;
+var _opto_pt_tapDeltaBuf=[];     // for head stability metric
+// Mode G3 VANISHING TARGET state
+var _opto_vt_ball=null;          // {startTs, dur, startX, endX, y, hidden:bool, hideStart, hideEnd, exitZone}
+var _opto_vt_zones=[];           // [{y, h, label:'A'|'B'|'C', correct:bool}]
+var _opto_vt_phase='idle';       // 'idle'|'flying'|'answer'|'result'
+var _opto_vt_answered=null;
+var _opto_vt_nextBallTs=0;
+// Mode A7-MOT state
+var _opto_mot_balls=[];          // [{x,y,vx,vy,tracked,originallyTracked,tappedWrong,tappedRight}]
+var _opto_mot_phase='mark';      // 'mark'|'track'|'answer'|'result'
+var _opto_mot_phaseStart=0;
+var _opto_mot_userTaps=0;        // nb de boules tapées par user en phase answer
 
 window._opto_setMode = function(m){
   _opto_mode = m;
@@ -33346,10 +33372,20 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_running = true;
   _opto_score = 0; _opto_hits = 0; _opto_miss = 0;
   _opto_elapsed = 0;
-  _opto_hu_current = null;
-  _opto_hu_itemCount = 0;
-  _opto_hu_maxPitch = 0;
+  // Reset state de tous les modes
+  _opto_hu_current = null; _opto_hu_itemCount = 0; _opto_hu_maxPitch = 0;
   _opto_hu_pitch = 0; _opto_hu_pitchSmoothed = 0;
+  _opto_iso_headYaw = 0; _opto_iso_headYawS = 0; _opto_iso_shouldersBaseline = null;
+  _opto_iso_shouldersDrift = 0; _opto_iso_swings = 0; _opto_iso_lastYawDir = 0;
+  _opto_pt_targets = []; _opto_pt_lastSpawn = 0; _opto_pt_noseBaseline = null;
+  _opto_pt_headStab = 0; _opto_pt_tapDeltaBuf = [];
+  _opto_vt_ball = null; _opto_vt_phase = 'idle'; _opto_vt_nextBallTs = Date.now() + 1500;
+  _opto_vt_answered = null; _opto_vt_zones = [];
+  _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
+  _opto_mot_userTaps = 0;
+  if (_opto_mode === 'mot') _opto_motInit();
+  // Setup wrist hit buffer (pour A3/G3/A7)
+  _opto_prevWrist = {left:null, right:null};
   // Afficher bouton REC standard (identique autres drills caméra)
   var rb = document.getElementById('sensei-cam-rec-btn');
   if (rb){
@@ -33424,7 +33460,11 @@ function _opto_detect(){
   }
   _tsym_detector.estimatePoses(_opto_video, {maxPoses:1, flipHorizontal:false}).then(function(poses){
     _opto_drawFrame(poses);
-    if (_opto_mode === 'headup') _opto_analyzeHeadUp(poses);
+    if (_opto_mode === 'headup')      _opto_analyzeHeadUp(poses);
+    else if (_opto_mode === 'iso')    _opto_analyzeIso(poses);
+    else if (_opto_mode === 'periph') _opto_analyzePeriph(poses);
+    else if (_opto_mode === 'vanish') _opto_analyzeVanish(poses);
+    else if (_opto_mode === 'mot')    _opto_analyzeMot(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
   }).catch(function(){
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
@@ -33439,8 +33479,11 @@ function _opto_drawFrame(poses){
   // ── HUD commun : (1) consigne (2) barre score/chrono ──
   _opto_drawHUD(W, H);
   // ── Overlay drill-spécifique ──
-  if (_opto_mode === 'headup') _opto_drawHeadUp(W, H);
-  else _opto_drawComingSoon(W, H);
+  if      (_opto_mode === 'headup') _opto_drawHeadUp(W, H);
+  else if (_opto_mode === 'iso')    _opto_drawIso(W, H);
+  else if (_opto_mode === 'periph') _opto_drawPeriph(W, H);
+  else if (_opto_mode === 'vanish') _opto_drawVanish(W, H);
+  else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   // ── Logo SENSEI (identique autres drills) ──
   if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
 }
@@ -33509,23 +33552,544 @@ function _opto_drawHUD(W, H){
   ctx.fillText(tStr, W/2, cby + cbh/2);
 }
 
-function _opto_drawComingSoon(W, H){
+/* ───────────── HELPER WRIST → TARGET HIT (pattern TDR) ───────────── */
+var _opto_prevWrist = {left:null, right:null};
+function _opto_wristHit(kp, target, radiusTol){
+  // kp: {left_wrist, right_wrist, left_elbow, right_elbow}
+  // target: {x, y, r}
+  // radiusTol multiplier (default 2.0 comme TDR Reaction)
+  radiusTol = radiusTol || 2.0;
+  var sides = ['left','right'];
+  for (var i=0;i<sides.length;i++){
+    var s = sides[i];
+    var w = kp[s+'_wrist'], e = kp[s+'_elbow'];
+    if (!w || w.score < 0.3) { _opto_prevWrist[s] = null; continue; }
+    // Extrapolation main : coude→poignet +25% (comme TDR)
+    var wx = w.x, wy = w.y;
+    if (e && e.score > 0.3){
+      wx = w.x + (w.x - e.x) * 0.25;
+      wy = w.y + (w.y - e.y) * 0.25;
+    }
+    var dx = wx - target.x, dy = wy - target.y;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist >= target.r * radiusTol) { _opto_prevWrist[s] = {x:wx, y:wy}; continue; }
+    // Vitesse : vecteur depuis frame précédente
+    var prev = _opto_prevWrist[s];
+    _opto_prevWrist[s] = {x:wx, y:wy};
+    if (!prev) continue;
+    var vx = wx - prev.x, vy = wy - prev.y;
+    // Seuil mouvement min : max(8 px, W*0.02) comme TDR
+    var minMove = Math.max(8, _opto_canvas.width * 0.02);
+    if (vx*vx + vy*vy < minMove*minMove) continue;
+    // Filtre directionnel : main va vers la cible (produit scalaire > 0)
+    var dot = (-dx)*vx + (-dy)*vy;
+    if (dot <= 0) continue;
+    return s; // hit valide côté 's'
+  }
+  return null;
+}
+function _opto_kpMap(poses){
+  if (!poses || !poses[0]) return null;
+  var kps = poses[0].keypoints || [];
+  var map = {};
+  for (var i=0;i<kps.length;i++) map[kps[i].name] = kps[i];
+  return map;
+}
+
+/* ═══════════════ MODE F11 · HEAD/TRUNK ISOLATION ═══════════════════
+   Détection : yaw tête (nose x relative aux oreilles) · dérive épaules (variance Y)
+   Score : +5 pt par cycle G↔D complet avec dérive épaules < seuil
+═════════════════════════════════════════════════════════════════════ */
+function _opto_drawIso(W, H){
   var ctx = _opto_ctx;
-  ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.65)';
-  var mw = W*0.65, mh = H*0.18, mx = W/2 - mw/2, my = H*0.45;
-  _opto_roundRect(ctx, mx, my, mw, mh, 14); ctx.fill();
-  ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 2;
-  _opto_roundRect(ctx, mx, my, mw, mh, 14); ctx.stroke();
-  ctx.fillStyle = '#64b4ff';
-  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   var en = window._lang === 'en';
-  ctx.fillText(en?'COMING SOON':'BIENTÔT DISPO', W/2, my + mh*0.38);
+  // Line épaules "verrouillées" au centre bas
+  var slY = H*0.75, slW = W*0.30, slX = W/2 - slW/2;
+  var shouldersOK = Math.abs(_opto_iso_shouldersDrift) < 0.08;
+  ctx.save();
+  ctx.strokeStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.lineWidth = 4;
+  ctx.shadowBlur = 10; ctx.shadowColor = ctx.strokeStyle;
+  ctx.beginPath();
+  ctx.moveTo(slX, slY); ctx.lineTo(slX + slW, slY);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  // Points épaules (fake visuels)
+  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.beginPath(); ctx.arc(slX, slY, 7, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(slX + slW, slY, 7, 0, Math.PI*2); ctx.fill();
+  // Label
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText((en?'SHOULDERS LOCKED ':'ÉPAULES VERROUILLÉES ') + (shouldersOK?'✓':'✗'), W/2, slY + 10);
+  // Yaw wheel : arc horizontal au-dessus avec marker rotatif
+  var wx = W/2, wy = H*0.60;
+  var wR = Math.min(W*0.08, H*0.07);
+  ctx.strokeStyle = 'rgba(100,180,255,0.3)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(wx, wy, wR, Math.PI*1.2, Math.PI*1.8, false);
+  ctx.stroke();
+  // Marker (rotation selon yaw -45° à +45°)
+  var yawDeg = Math.max(-45, Math.min(45, _opto_iso_headYawS));
+  var yawRad = Math.PI*1.5 + (yawDeg/45) * (Math.PI*0.3);
+  var mx = wx + Math.cos(yawRad) * wR;
+  var my = wy + Math.sin(yawRad) * wR;
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 4;
+  ctx.shadowBlur = 10; ctx.shadowColor = '#f5c518';
+  ctx.beginPath();
+  ctx.moveTo(wx, wy); ctx.lineTo(mx, my); ctx.stroke();
+  ctx.shadowBlur = 0;
+  // Labels G / D
+  ctx.font = 'bold '+Math.round(H*0.025)+'px "Bebas Neue",sans-serif';
   ctx.fillStyle = '#9ba3b4';
-  ctx.font = 'bold '+Math.round(H*0.025)+'px "Barlow Condensed",sans-serif';
-  ctx.fillText(_opto_mode.toUpperCase() + ' · ' + (en?'ONLY HEAD-UP SCAN LIVE':'SEUL HEAD-UP SCAN EST ACTIF'), W/2, my + mh*0.75);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('← G', wx - wR*1.4, wy);
+  ctx.fillText('D →', wx + wR*1.4, wy);
+  // Compteur swings
+  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  ctx.fillStyle = '#f5c518';
+  ctx.fillText(_opto_iso_swings + ' ↔', wx, wy + wR + 20);
   ctx.restore();
+}
+function _opto_analyzeIso(poses){
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var nose = kp['nose'], leye = kp['left_eye'], reye = kp['right_eye'];
+  var lear = kp['left_ear'], rear = kp['right_ear'];
+  var ls = kp['left_shoulder'], rs = kp['right_shoulder'];
+  if (!nose || !ls || !rs || nose.score < 0.3 || ls.score < 0.3 || rs.score < 0.3) return;
+  // Yaw : offset nose entre les deux oreilles (si disponibles) ou entre les yeux
+  var left = lear && lear.score>0.3 ? lear.x : (leye && leye.score>0.3 ? leye.x : null);
+  var right = rear && rear.score>0.3 ? rear.x : (reye && reye.score>0.3 ? reye.x : null);
+  if (left === null || right === null) return;
+  var mid = (left + right)/2;
+  var halfWidth = Math.abs(right - left)/2;
+  if (halfWidth < 5) return;
+  // noseOffset normalisé : -1 (tourné G) à +1 (tourné D)
+  var noseOff = (nose.x - mid) / halfWidth;
+  // Vidéo miroir : flip signe
+  var yawDeg = -noseOff * 45; // approximation
+  _opto_iso_headYaw = Math.max(-45, Math.min(45, yawDeg));
+  _opto_iso_headYawS = _opto_iso_headYawS * 0.7 + _opto_iso_headYaw * 0.3;
+  // Épaules : baseline Y moyenne + drift
+  var shY = (ls.y + rs.y)/2;
+  var shDist = Math.abs(ls.x - rs.x);
+  if (_opto_iso_shouldersBaseline === null) _opto_iso_shouldersBaseline = {y: shY, dist: shDist};
+  var dyPct = (shY - _opto_iso_shouldersBaseline.y) / shDist;
+  _opto_iso_shouldersDrift = _opto_iso_shouldersDrift * 0.85 + dyPct * 0.15;
+  // Swing detection : yaw dépasse ±25° alternativement
+  var now = Date.now();
+  if (_opto_iso_headYawS > 25 && _opto_iso_lastYawDir !== 1 && now - _opto_iso_lastCycleTs > 400){
+    if (_opto_iso_lastYawDir === -1){
+      _opto_iso_swings++;
+      // Score si épaules OK
+      if (Math.abs(_opto_iso_shouldersDrift) < 0.08){
+        _opto_score += 5; _opto_hits++;
+        if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
+        if (navigator.vibrate) navigator.vibrate(15);
+      } else {
+        _opto_miss++;
+      }
+    }
+    _opto_iso_lastYawDir = 1; _opto_iso_lastCycleTs = now;
+  } else if (_opto_iso_headYawS < -25 && _opto_iso_lastYawDir !== -1 && now - _opto_iso_lastCycleTs > 400){
+    if (_opto_iso_lastYawDir === 1){
+      _opto_iso_swings++;
+      if (Math.abs(_opto_iso_shouldersDrift) < 0.08){
+        _opto_score += 5; _opto_hits++;
+        if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
+        if (navigator.vibrate) navigator.vibrate(15);
+      } else {
+        _opto_miss++;
+      }
+    }
+    _opto_iso_lastYawDir = -1; _opto_iso_lastCycleTs = now;
+  }
+}
+
+/* ═══════════════ MODE A3 · PERIPHERAL TARGET ═══════════════════════
+   Point rouge central à FIXER · 4 cibles coins qui spawn aléatoirement
+   Hit : poignet vers la cible (wrist pattern) + head stability bonus
+═════════════════════════════════════════════════════════════════════ */
+function _opto_drawPeriph(W, H){
+  var ctx = _opto_ctx;
+  var en = window._lang === 'en';
+  var now = Date.now();
+  // Spawn cible si pas déjà max 2
+  if (_opto_pt_targets.length < 2 && now - _opto_pt_lastSpawn > 1200){
+    var corners = ['tl','tr','bl','br'];
+    var c = corners[Math.floor(Math.random()*4)];
+    var cx, cy;
+    var m = Math.min(W*0.06, H*0.08);
+    if (c === 'tl') { cx = m + W*0.05; cy = H*0.30; }
+    else if (c === 'tr') { cx = W - m - W*0.05; cy = H*0.30; }
+    else if (c === 'bl') { cx = m + W*0.05; cy = H*0.85; }
+    else { cx = W - m - W*0.05; cy = H*0.85; }
+    _opto_pt_targets.push({
+      corner: c, x: cx, y: cy,
+      r: Math.max(26, Math.min(W*0.035, H*0.055)),
+      born: now
+    });
+    _opto_pt_lastSpawn = now;
+  }
+  // Point rouge central (fixation)
+  var fxR = Math.max(10, W*0.012);
+  ctx.save();
+  ctx.fillStyle = '#ff3b3b';
+  ctx.shadowBlur = 20; ctx.shadowColor = '#ff3b3b';
+  ctx.beginPath(); ctx.arc(W/2, H/2, fxR, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+  // Croix de fixation
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W/2, H/2 - fxR*3); ctx.lineTo(W/2, H/2 + fxR*3);
+  ctx.moveTo(W/2 - fxR*3, H/2); ctx.lineTo(W/2 + fxR*3, H/2);
+  ctx.stroke();
+  // Label "FIXE"
+  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText(en?'FIX':'FIXE', W/2, H/2 + fxR*3 + 4);
+  // Cibles
+  for (var i = _opto_pt_targets.length - 1; i >= 0; i--){
+    var t = _opto_pt_targets[i];
+    var age = now - t.born;
+    if (age > 3000){ _opto_pt_targets.splice(i,1); _opto_miss++; continue; }
+    // Pulse
+    var pulse = 1 + Math.sin(age/160) * 0.1;
+    ctx.fillStyle = '#f5c518';
+    ctx.shadowBlur = 16; ctx.shadowColor = '#f5c518';
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r * pulse, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+  // Head stability HUD (bas droite)
+  var hsText = (en?'HEAD STAB. ':'TÊTE STAB. ') + (_opto_pt_headStab * 100).toFixed(1) + '%';
+  var stable = _opto_pt_headStab < 0.03;
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  var hsW = W*0.18, hsH = H*0.04;
+  var hsX = W - hsW - 8, hsY = H - hsH - 8;
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.fill();
+  ctx.strokeStyle = stable ? '#4ade80' : '#ff8a94';
+  ctx.lineWidth = 1;
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.stroke();
+  ctx.fillStyle = stable ? '#4ade80' : '#ff8a94';
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(hsText, hsX + hsW/2, hsY + hsH/2);
+  ctx.restore();
+}
+function _opto_analyzePeriph(poses){
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var nose = kp['nose'];
+  if (!nose || nose.score < 0.3) return;
+  // Head stability : variance de la position du nez
+  if (_opto_pt_noseBaseline === null) _opto_pt_noseBaseline = {x:nose.x, y:nose.y};
+  var dx = (nose.x - _opto_pt_noseBaseline.x) / _opto_canvas.width;
+  var dy = (nose.y - _opto_pt_noseBaseline.y) / _opto_canvas.height;
+  var dist = Math.sqrt(dx*dx + dy*dy);
+  _opto_pt_headStab = _opto_pt_headStab * 0.9 + dist * 0.1;
+  // Hit detection sur cibles via wrist
+  for (var i = _opto_pt_targets.length - 1; i >= 0; i--){
+    var hit = _opto_wristHit(kp, _opto_pt_targets[i], 2.0);
+    if (hit){
+      var t = _opto_pt_targets[i];
+      _opto_pt_targets.splice(i,1);
+      _opto_hits++;
+      var basePts = 10;
+      var bonus = _opto_pt_headStab < 0.03 ? 5 : 0;
+      _opto_score += basePts + bonus;
+      if (typeof _td_beep === 'function') _td_beep(bonus?1320:880, 0.05, 0.1);
+      if (navigator.vibrate) navigator.vibrate(bonus?30:15);
+    }
+  }
+}
+
+/* ═══════════════ MODE G3 · VANISHING TARGET ════════════════════════
+   Ballon traverse l'écran · masqué au milieu 300ms · tape zone de sortie
+═════════════════════════════════════════════════════════════════════ */
+function _opto_drawVanish(W, H){
+  var ctx = _opto_ctx;
+  var en = window._lang === 'en';
+  var now = Date.now();
+  // Spawn ball si idle et délai OK
+  if (_opto_vt_phase === 'idle' && now >= _opto_vt_nextBallTs){
+    var dir = Math.random() < 0.5 ? 1 : -1;
+    var yBand = 0.45 + Math.random()*0.15; // y entre 45% et 60%
+    var dur = 2200 + Math.random()*1000;
+    // Zones de sortie : 3 (A haut · B milieu · C bas)
+    _opto_vt_zones = [];
+    var zoneCount = 3;
+    var zoneH = H*0.14;
+    var gap = H*0.025;
+    var totalH = zoneH * zoneCount + gap * (zoneCount-1);
+    var startY = H*0.28;
+    var exitZoneIdx = Math.floor(Math.random()*zoneCount);
+    for (var k=0;k<zoneCount;k++){
+      _opto_vt_zones.push({
+        y: startY + k*(zoneH+gap),
+        h: zoneH,
+        label: String.fromCharCode(65+k), // A, B, C
+        correct: (k === exitZoneIdx)
+      });
+    }
+    var zoneCorrect = _opto_vt_zones[exitZoneIdx];
+    var exitY = zoneCorrect.y + zoneCorrect.h/2;
+    _opto_vt_ball = {
+      startTs: now, dur: dur,
+      startX: dir === 1 ? -40 : W + 40,
+      endX:   dir === 1 ? W + 40 : -40,
+      startY: H * yBand,
+      endY: exitY,
+      hideStart: dur*0.45, hideEnd: dur*0.72
+    };
+    _opto_vt_phase = 'flying';
+    _opto_vt_answered = null;
+  }
+  // Draw ball flying
+  if (_opto_vt_ball){
+    var t = (now - _opto_vt_ball.startTs) / _opto_vt_ball.dur;
+    if (t < 1){
+      var hidden = (now - _opto_vt_ball.startTs) > _opto_vt_ball.hideStart &&
+                   (now - _opto_vt_ball.startTs) < _opto_vt_ball.hideEnd;
+      var bx = _opto_vt_ball.startX + (_opto_vt_ball.endX - _opto_vt_ball.startX) * t;
+      var by = _opto_vt_ball.startY + (_opto_vt_ball.endY - _opto_vt_ball.startY) * t;
+      if (!hidden){
+        var r = Math.max(16, W*0.022);
+        var gb = ctx.createRadialGradient(bx-r*0.3, by-r*0.3, 0, bx, by, r);
+        gb.addColorStop(0, '#ffb47a'); gb.addColorStop(0.6, '#ff7730'); gb.addColorStop(1, '#c04010');
+        ctx.fillStyle = gb;
+        ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+      } else {
+        // Zone de masquage
+        var mx = W*0.42, mw = W*0.26;
+        var my = Math.min(_opto_vt_ball.startY, _opto_vt_ball.endY) - 50;
+        var mh = Math.abs(_opto_vt_ball.endY - _opto_vt_ball.startY) + 100;
+        ctx.fillStyle = 'rgba(10,13,24,0.88)';
+        ctx.fillRect(mx, my, mw, mh);
+        ctx.strokeStyle = 'rgba(100,180,255,0.4)';
+        ctx.lineWidth = 2; ctx.setLineDash([8,6]);
+        ctx.strokeRect(mx, my, mw, mh);
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#64b4ff';
+        ctx.font = 'bold '+Math.round(H*0.08)+'px "Bebas Neue",sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('?', mx + mw/2, my + mh/2);
+      }
+    } else if (_opto_vt_phase === 'flying'){
+      _opto_vt_phase = 'answer';
+    }
+  }
+  // Draw zones de sortie à droite
+  for (var i=0;i<_opto_vt_zones.length;i++){
+    var z = _opto_vt_zones[i];
+    var zx = W - W*0.08, zw = W*0.06;
+    var answered = _opto_vt_answered === z.label;
+    var reveal = _opto_vt_phase === 'result';
+    ctx.fillStyle = reveal && z.correct ? 'rgba(74,222,128,0.4)' :
+                    reveal && answered ? 'rgba(255,138,148,0.4)' :
+                    'rgba(0,0,0,0.5)';
+    ctx.fillRect(zx, z.y, zw, z.h);
+    ctx.strokeStyle = reveal && z.correct ? '#4ade80' :
+                      reveal && answered ? '#ff8a94' : '#f5c518';
+    ctx.lineWidth = 2; ctx.setLineDash([5,4]);
+    ctx.strokeRect(zx, z.y, zw, z.h);
+    ctx.setLineDash([]);
+    ctx.fillStyle = reveal && z.correct ? '#4ade80' : '#f5c518';
+    ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(z.label, zx + zw/2, z.y + z.h/2);
+  }
+}
+function _opto_analyzeVanish(poses){
+  if (_opto_vt_phase !== 'answer') return;
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var W = _opto_canvas.width, H = _opto_canvas.height;
+  // Check si wrist dans une zone de sortie
+  for (var i=0;i<_opto_vt_zones.length;i++){
+    var z = _opto_vt_zones[i];
+    var zx = W - W*0.08, zw = W*0.06;
+    // Zone centrale pour hit
+    var tgt = {x: zx + zw/2, y: z.y + z.h/2, r: Math.max(zw/2, z.h/2)};
+    var hit = _opto_wristHit(kp, tgt, 1.5);
+    if (hit){
+      _opto_vt_answered = z.label;
+      _opto_vt_phase = 'result';
+      if (z.correct){
+        _opto_hits++;
+        _opto_score += 15;
+        if (typeof _td_beep === 'function') _td_beep(1320, 0.08, 0.15);
+        if (navigator.vibrate) navigator.vibrate(30);
+      } else {
+        _opto_miss++;
+        if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15);
+      }
+      // Reset après 1.2s pour nouveau spawn
+      setTimeout(function(){
+        if (!_opto_running) return;
+        _opto_vt_phase = 'idle';
+        _opto_vt_ball = null;
+        _opto_vt_zones = [];
+        _opto_vt_nextBallTs = Date.now() + 800;
+      }, 1200);
+      return;
+    }
+  }
+}
+
+/* ═══════════════ MODE A7-MOT · MULTI-OBJECT TRACKING ═══════════════
+   8 boules se déplacent · 3 marquées en vert pendant 2s au départ
+   Le joueur suit des yeux 8s · puis tape 3 boules · score par match
+═════════════════════════════════════════════════════════════════════ */
+function _opto_motInit(){
+  var W = _opto_canvas ? _opto_canvas.width : 1280;
+  var H = _opto_canvas ? _opto_canvas.height : 720;
+  _opto_mot_balls = [];
+  for (var i=0;i<8;i++){
+    var ang = Math.random() * Math.PI * 2;
+    var sp = Math.max(60, Math.min(W*0.08, 120));
+    _opto_mot_balls.push({
+      x: W*0.15 + Math.random() * W*0.70,
+      y: H*0.28 + Math.random() * H*0.42,
+      vx: Math.cos(ang) * sp,
+      vy: Math.sin(ang) * sp,
+      r: Math.max(18, Math.min(W*0.022, H*0.035)),
+      tracked: false,
+      originallyTracked: false,
+      tapped: false
+    });
+  }
+  // Marquer 3 aléatoires
+  var idxs = [0,1,2,3,4,5,6,7];
+  for (var i=idxs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=idxs[i];idxs[i]=idxs[j];idxs[j]=t; }
+  for (var i=0;i<3;i++){
+    _opto_mot_balls[idxs[i]].tracked = true;
+    _opto_mot_balls[idxs[i]].originallyTracked = true;
+  }
+  _opto_mot_phase = 'mark';
+  _opto_mot_phaseStart = Date.now();
+  _opto_mot_userTaps = 0;
+}
+function _opto_drawMot(W, H){
+  var ctx = _opto_ctx;
+  var en = window._lang === 'en';
+  var now = Date.now();
+  var dt = Math.min(50, now - (_opto_mot_lastFrame || now));
+  _opto_mot_lastFrame = now;
+  // Transitions de phase
+  if (_opto_mot_phase === 'mark' && now - _opto_mot_phaseStart > 2000){
+    // Enlever le marquage visuel (mais garder originallyTracked en mémoire)
+    for (var i=0;i<_opto_mot_balls.length;i++) _opto_mot_balls[i].tracked = false;
+    _opto_mot_phase = 'track'; _opto_mot_phaseStart = now;
+  } else if (_opto_mot_phase === 'track' && now - _opto_mot_phaseStart > 8000){
+    // Arrêter les boules et passer en phase answer
+    _opto_mot_phase = 'answer'; _opto_mot_phaseStart = now;
+  } else if (_opto_mot_phase === 'result' && now - _opto_mot_phaseStart > 2000){
+    // Nouveau cycle
+    _opto_motInit();
+  }
+  // Update positions (sauf en phase answer/result)
+  if (_opto_mot_phase === 'mark' || _opto_mot_phase === 'track'){
+    for (var i=0;i<_opto_mot_balls.length;i++){
+      var b = _opto_mot_balls[i];
+      b.x += b.vx * dt / 1000;
+      b.y += b.vy * dt / 1000;
+      // Bounce aux bords
+      var padX = W*0.08, padY = H*0.25;
+      if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
+      if (b.x > W-padX) { b.x = W-padX; b.vx = -Math.abs(b.vx); }
+      if (b.y < padY) { b.y = padY; b.vy = Math.abs(b.vy); }
+      if (b.y > H*0.90) { b.y = H*0.90; b.vy = -Math.abs(b.vy); }
+    }
+  }
+  // Draw boules
+  for (var i=0;i<_opto_mot_balls.length;i++){
+    var b = _opto_mot_balls[i];
+    var isGreen = (_opto_mot_phase === 'mark' && b.tracked) ||
+                  (_opto_mot_phase === 'result' && b.originallyTracked);
+    var isTapCorrect = _opto_mot_phase === 'result' && b.tapped && b.originallyTracked;
+    var isTapWrong = _opto_mot_phase === 'result' && b.tapped && !b.originallyTracked;
+    ctx.fillStyle = isGreen ? '#4ade80' :
+                    isTapWrong ? '#ff8a94' : '#ffffff';
+    ctx.strokeStyle = isGreen ? '#166534' : '#333';
+    ctx.lineWidth = 2;
+    if (isGreen) { ctx.shadowBlur = 12; ctx.shadowColor = '#4ade80'; }
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Croix sur erreurs
+    if (isTapWrong){
+      ctx.strokeStyle = '#8b0000'; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(b.x - b.r*0.6, b.y - b.r*0.6); ctx.lineTo(b.x + b.r*0.6, b.y + b.r*0.6);
+      ctx.moveTo(b.x + b.r*0.6, b.y - b.r*0.6); ctx.lineTo(b.x - b.r*0.6, b.y + b.r*0.6);
+      ctx.stroke();
+    }
+  }
+  // Phase indicator (centre haut, sous la barre HUD)
+  ctx.save();
+  ctx.font = 'bold '+Math.round(H*0.028)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  var py = H*0.26;
+  if (_opto_mot_phase === 'mark'){
+    var remain = Math.max(0, 2 - (now - _opto_mot_phaseStart)/1000).toFixed(1);
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText((en?'MEMORIZE · ':'MÉMORISE · ') + remain + 's', W/2, py);
+  } else if (_opto_mot_phase === 'track'){
+    var remain = Math.max(0, 8 - (now - _opto_mot_phaseStart)/1000).toFixed(1);
+    ctx.fillStyle = '#f5c518';
+    ctx.fillText((en?'TRACK · ':'SUIS · ') + remain + 's', W/2, py);
+  } else if (_opto_mot_phase === 'answer'){
+    ctx.fillStyle = '#64b4ff';
+    ctx.fillText((en?'TAP 3 TRACKED BALLS · ':'TAPE LES 3 SUIVIES · ') + _opto_mot_userTaps + '/3', W/2, py);
+  } else if (_opto_mot_phase === 'result'){
+    var got = 0;
+    for (var i=0;i<_opto_mot_balls.length;i++){
+      if (_opto_mot_balls[i].tapped && _opto_mot_balls[i].originallyTracked) got++;
+    }
+    ctx.fillStyle = got === 3 ? '#4ade80' : got >= 2 ? '#f5c518' : '#ff8a94';
+    ctx.fillText(got + '/3 ' + (en?'CORRECT':'JUSTE'), W/2, py);
+  }
+  ctx.restore();
+}
+var _opto_mot_lastFrame = 0;
+function _opto_analyzeMot(poses){
+  if (_opto_mot_phase !== 'answer') return;
+  if (_opto_mot_userTaps >= 3) {
+    // Fin du choix → passer en result
+    _opto_mot_phase = 'result';
+    _opto_mot_phaseStart = Date.now();
+    var got = 0;
+    for (var i=0;i<_opto_mot_balls.length;i++){
+      if (_opto_mot_balls[i].tapped && _opto_mot_balls[i].originallyTracked) got++;
+    }
+    if (got === 3) { _opto_score += 50; _opto_hits++; }
+    else if (got === 2) { _opto_score += 20; _opto_hits++; }
+    else if (got === 1) { _opto_score += 5; _opto_miss++; }
+    else { _opto_miss++; }
+    return;
+  }
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  // Check hit sur chaque boule non-tapée
+  for (var i=0;i<_opto_mot_balls.length;i++){
+    var b = _opto_mot_balls[i];
+    if (b.tapped) continue;
+    var hit = _opto_wristHit(kp, {x:b.x, y:b.y, r:b.r}, 1.6);
+    if (hit){
+      b.tapped = true;
+      _opto_mot_userTaps++;
+      if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
+      if (navigator.vibrate) navigator.vibrate(15);
+      break;
+    }
+  }
 }
 
 /* ─── MODE A11 : HEAD-UP SCAN ──────────────────────────────── */
@@ -35444,8 +36008,8 @@ function _dcog_selectDrill(drill, langOnly) {
                      : 'Moteur TARGETS — 11 drills catalogue restants (Go/No-Go, Visual Search, N-Back, Pattern Violation, Flash, Tracking…). Touche les bonnes cibles.',
     limbo: en ? 'LEVEL CHANGE · Shifty — 3 fundamental low-stance drills (static · shifty · descending). Head detection via MoveNet.'
              : 'LEVEL CHANGE · Shifty — 3 drills fondamentaux posture basse (static · shifty · descente). Détection tête via MoveNet.',
-    opto: en ? 'OPTOMOTOR SUITE — 5 oculomotor training drills (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Face tracking via MoveNet.'
-            : 'OPTOMOTOR SUITE — 5 drills d\'entraînement oculomoteur (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Suivi face via MoveNet.'
+    opto: en ? 'OPTOMOTOR RESPONSE · Visual Motion — 5 oculomotor response drills (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Face tracking via MoveNet.'
+            : 'OPTOMOTOR RESPONSE · Visual Motion — 5 drills d\'entraînement de la réponse oculomotrice (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Suivi face via MoveNet.'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
@@ -35485,7 +36049,7 @@ function _dcog_selectDrill(drill, langOnly) {
       quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE',
       quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS',
       limbo:        en ? '🚧 LEVEL CHANGE · Shifty' : '🚧 LEVEL CHANGE · Shifty',
-      opto:         en ? '👁️ OPTOMOTOR SUITE' : '👁️ OPTOMOTOR SUITE'
+      opto:         en ? '👁️ OPTOMOTOR RESPONSE · Visual Motion' : '👁️ OPTOMOTOR RESPONSE · Visual Motion'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -35548,6 +36112,14 @@ function _dcog_selectDrill(drill, langOnly) {
       if (typeof _dcogVidIdx === 'number' && typeof _dcog_selectVid === 'function') {
         try { _dcog_selectVid(_dcogVidIdx); } catch(e) {}
       }
+    }
+    // ★ Cacher le bouton START générique DCOG (vert) pour les sous-modules
+    //   qui ont leur propre bouton START (LIMBO orange, OPTOMOTOR bleu) → évite
+    //   le 2ᵉ bouton visible qui crée un conflit UX.
+    var _dcogMainStart = document.getElementById('dcog_btnStart');
+    if (_dcogMainStart){
+      var ownStart = (drill === 'limbo' || drill === 'opto');
+      _dcogMainStart.style.display = ownStart ? 'none' : '';
     }
   }
 }
