@@ -2738,8 +2738,7 @@ window._dojoBackHome = function(){
           <option value="periph">A3 · PERIPHERAL TARGET (fixe centre, tape coins)</option>
           <option value="vanish">G3 · VANISHING TARGET (anticipe sortie balle)</option>
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
-          <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible en carré)</option>
-          <option value="verg">A11-V · VERGENCE SWITCH (focus près/loin)</option>
+          <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -33351,10 +33350,8 @@ window._opto_setMode = function(m){
               : 'Anticipe la sortie du ballon après 300ms d\'occlusion · G3 Occlusion temporelle · BIENTÔT',
     mot:    en ? 'Track 3 of 8 moving balls for 8s · identify them at the end · A7-MOT NeuroTracker-lite.'
               : 'Suis 3 boules sur 8 pendant 8s · identifie-les à la fin · A7-MOT NeuroTracker-lite.',
-    sp:     en ? 'Follow a single bright target drawing a square path · keep head still · A7-SP Smooth Pursuit.'
-              : 'Suis une seule cible qui trace un carré à l\'écran · garde la tête fixe · A7-SP Poursuite lisse.',
-    verg:   en ? 'Alternate focus between NEAR (big target) and FAR (small target) · trains vergence · A11-V Vergence Switch.'
-              : 'Alterne ton focus entre PRÈS (grosse cible) et LOIN (petite cible) · entraîne la vergence · A11-V Switch vergence.'
+    sp:     en ? 'Follow a single bright target through 6 trajectories (square · horizontal · vertical · 2 diagonals · circle) · keep head still · A7-SP Smooth Pursuit.'
+              : 'Suis une seule cible sur 6 trajectoires (carré · horizontale · verticale · 2 diagonales · cercle) · garde la tête fixe · A7-SP Poursuite lisse.'
   };
   var el = document.getElementById('opto_drillDesc');
   if (el) el.textContent = d[m] || '';
@@ -33495,7 +33492,6 @@ function _opto_detect(){
     else if (_opto_mode === 'vanish') _opto_analyzeVanish(poses);
     else if (_opto_mode === 'mot')    _opto_analyzeMot(poses);
     else if (_opto_mode === 'sp')     _opto_analyzeSp(poses);
-    else if (_opto_mode === 'verg')   _opto_analyzeVerg(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
   }).catch(function(){
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
@@ -33516,7 +33512,6 @@ function _opto_drawFrame(poses){
   else if (_opto_mode === 'vanish') _opto_drawVanish(W, H);
   else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
-  else if (_opto_mode === 'verg')   _opto_drawVerg(W, H);
   // ── Logo SENSEI (identique autres drills) ──
   if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
 }
@@ -33530,9 +33525,8 @@ function _opto_drawHUD(W, H){
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
     periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
     vanish: en ? 'PREDICT BALL EXIT'               : 'ANTICIPE LA SORTIE DU BALLON',
-    mot:    en ? 'TRACK THE 3 GREEN BALLS'         : 'SUIS LES 3 BOULES VERTES',
-    sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE',
-    verg:   en ? 'FOCUS NEAR THEN FAR · ALTERNATE' : 'FOCUS PRÈS PUIS LOIN · ALTERNE'
+    mot:    en ? 'TRACK THE 3 GREEN BALLS WITH EYES · HIT THEM AT END' : 'SUIS LES 3 BOULES VERTES DES YEUX · TOUCHE-LES À LA FIN',
+    sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
   var bw = W*0.80, bh = H*0.10;
@@ -33587,41 +33581,45 @@ function _opto_drawHUD(W, H){
   ctx.fillText(tStr, W/2, cby + cbh/2);
 }
 
-/* ───────────── HELPER WRIST → TARGET HIT (pattern TDR) ───────────── */
-var _opto_prevWrist = {left:null, right:null};
-function _opto_wristHit(kp, target, radiusTol){
-  // kp: {left_wrist, right_wrist, left_elbow, right_elbow}
-  // target: {x, y, r}
-  // radiusTol multiplier (default 2.0 comme TDR Reaction)
+/* ───────── HIT DETECTION STRICTEMENT IDENTIQUE À TDR REACTION ─────────
+   Même mirror (W - kp.x * sx), même scaling (sx = W / videoWidth),
+   même seuil mouvement max(8, W*0.02), même rayon × 2.0, même filtre
+   directionnel (dot > 0), même extrapolation coude→poignet +25% via
+   _tsym_kp_hand(). Port strict du code _tdr_checkHits().
+───────────────────────────────────────────────────────────────────── */
+var _opto_prevWrist = {leftWrist:null, rightWrist:null};
+function _opto_doHits(poses, targets, radiusTol, onHit){
+  if (!poses || !poses[0] || !_opto_canvas || !_opto_video) return;
   radiusTol = radiusTol || 2.0;
+  var W = _opto_canvas.width, H = _opto_canvas.height;
+  var sx = W / (_opto_video.videoWidth || W);
+  var sy = H / (_opto_video.videoHeight || H);
   var sides = ['left','right'];
-  for (var i=0;i<sides.length;i++){
-    var s = sides[i];
-    var w = kp[s+'_wrist'], e = kp[s+'_elbow'];
-    if (!w || w.score < 0.3) { _opto_prevWrist[s] = null; continue; }
-    // Extrapolation main : coude→poignet +25% (comme TDR)
-    var wx = w.x, wy = w.y;
-    if (e && e.score > 0.3){
-      wx = w.x + (w.x - e.x) * 0.25;
-      wy = w.y + (w.y - e.y) * 0.25;
-    }
-    var dx = wx - target.x, dy = wy - target.y;
-    var dist = Math.sqrt(dx*dx + dy*dy);
-    if (dist >= target.r * radiusTol) { _opto_prevWrist[s] = {x:wx, y:wy}; continue; }
-    // Vitesse : vecteur depuis frame précédente
-    var prev = _opto_prevWrist[s];
-    _opto_prevWrist[s] = {x:wx, y:wy};
-    if (!prev) continue;
-    var vx = wx - prev.x, vy = wy - prev.y;
-    // Seuil mouvement min : max(8 px, W*0.02) comme TDR
-    var minMove = Math.max(8, _opto_canvas.width * 0.02);
-    if (vx*vx + vy*vy < minMove*minMove) continue;
-    // Filtre directionnel : main va vers la cible (produit scalaire > 0)
-    var dot = (-dx)*vx + (-dy)*vy;
-    if (dot <= 0) continue;
-    return s; // hit valide côté 's'
-  }
-  return null;
+  sides.forEach(function(side){
+    var name = side + 'Wrist';
+    var kp = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, side) : null;
+    if (!kp) return;
+    var wx = W - kp.x * sx;   // ★ MIRROR comme TDR
+    var wy = kp.y * sy;
+    var prev = _opto_prevWrist[name];
+    var moved = prev ? Math.sqrt((wx-prev.x)*(wx-prev.x) + (wy-prev.y)*(wy-prev.y)) : 0;
+    _opto_prevWrist[name] = {x:wx, y:wy};
+    var moveThresh = Math.max(8, Math.round(W * 0.02));
+    if (moved < moveThresh) return;
+    var vx = prev ? wx - prev.x : 0;
+    var vy = prev ? wy - prev.y : 0;
+    targets.forEach(function(t){
+      if (t.hit) return;
+      var dx = wx - t.x, dy = wy - t.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist >= t.r * radiusTol) return;
+      var dot = (-dx)*vx + (-dy)*vy;
+      if (dot <= 0) return;
+      t.hit = true;
+      var rt = Date.now() - (t.born || Date.now());
+      if (onHit) onHit(t, side, rt);
+    });
+  });
 }
 function _opto_kpMap(poses){
   if (!poses || !poses[0]) return null;
@@ -33638,69 +33636,74 @@ function _opto_kpMap(poses){
 function _opto_drawIso(W, H){
   var ctx = _opto_ctx;
   var en = window._lang === 'en';
-  // FIX 2 : tout agrandi × 1.8 à ×2.5 pour lisibilité terrain
-  // Barre épaules "verrouillées" au centre bas (plus épaisse + plus longue)
-  var slY = H*0.78, slW = W*0.50, slX = W/2 - slW/2;
+  // FIX 3 : LAYOUT REFACTORÉ — 3 étages empilés sans overlap
+  //   (1) y=0.32-0.50 : YAW WHEEL + labels G/D sur ses côtés
+  //   (2) y=0.56-0.68 : COMPTEUR SWINGS centré (badge jaune indépendant)
+  //   (3) y=0.76-0.92 : BARRE ÉPAULES verte/rouge + label dessous
   var shouldersOK = Math.abs(_opto_iso_shouldersDrift) < 0.08;
   ctx.save();
-  ctx.strokeStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  ctx.moveTo(slX, slY); ctx.lineTo(slX + slW, slY);
-  ctx.stroke();
-  // Points épaules (×2)
-  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.beginPath(); ctx.arc(slX, slY, 14, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(slX + slW, slY, 14, 0, Math.PI*2); ctx.fill();
-  // Label épaules (plus gros + fond opaque pour lisibilité sur vidéo)
-  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
-  var lblTxt = (en?'SHOULDERS LOCKED ':'ÉPAULES VERROUILLÉES ') + (shouldersOK?'✓':'✗');
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  var lblW = ctx.measureText(lblTxt).width + 24;
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';
-  _opto_roundRect(ctx, W/2 - lblW/2, slY + 18, lblW, H*0.06, 8); ctx.fill();
-  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.fillText(lblTxt, W/2, slY + 18 + H*0.03);
-  // Yaw wheel : plus grand (×1.8), marker plus épais
-  var wx = W/2, wy = H*0.55;
-  var wR = Math.min(W*0.14, H*0.12);
+
+  // ═══ ÉTAGE 1 : YAW WHEEL ═══
+  var wx = W/2, wy = H*0.41;
+  var wR = Math.min(W*0.14, H*0.11);
   // Arc fond
   ctx.strokeStyle = 'rgba(100,180,255,0.35)';
   ctx.lineWidth = 6;
   ctx.beginPath();
   ctx.arc(wx, wy, wR, Math.PI*1.2, Math.PI*1.8, false);
   ctx.stroke();
-  // Marker (rotation selon yaw -45° à +45°)
+  // Marker
   var yawDeg = Math.max(-45, Math.min(45, _opto_iso_headYawS));
   var yawRad = Math.PI*1.5 + (yawDeg/45) * (Math.PI*0.3);
   var mx = wx + Math.cos(yawRad) * wR;
   var my = wy + Math.sin(yawRad) * wR;
-  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 9;
-  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 9; ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(wx, wy); ctx.lineTo(mx, my); ctx.stroke();
   ctx.lineCap = 'butt';
-  // Labels G / D (plus gros avec fond opaque)
+  // Labels G / D (sur les côtés du wheel, pas sur la barre épaules)
   ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  var lblGY = wy + 2;
   var gTxt = '← G', dTxt = 'D →';
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  _opto_roundRect(ctx, wx - wR*1.6 - 30, lblGY - H*0.025, 60, H*0.05, 6); ctx.fill();
-  _opto_roundRect(ctx, wx + wR*1.6 - 30, lblGY - H*0.025, 60, H*0.05, 6); ctx.fill();
+  _opto_roundRect(ctx, wx - wR*1.6 - 30, wy - H*0.025, 60, H*0.05, 6); ctx.fill();
+  _opto_roundRect(ctx, wx + wR*1.6 - 30, wy - H*0.025, 60, H*0.05, 6); ctx.fill();
   ctx.fillStyle = '#cfd3e0';
-  ctx.fillText(gTxt, wx - wR*1.6, lblGY);
-  ctx.fillText(dTxt, wx + wR*1.6, lblGY);
-  // Compteur swings (×2.5, fond opaque jaune)
+  ctx.fillText(gTxt, wx - wR*1.6, wy);
+  ctx.fillText(dTxt, wx + wR*1.6, wy);
+
+  // ═══ ÉTAGE 2 : COMPTEUR SWINGS (bloc isolé entre yaw wheel et barre épaules) ═══
   var swTxt = _opto_iso_swings + ' ↔';
-  ctx.font = 'bold '+Math.round(H*0.09)+'px "Bebas Neue",sans-serif';
-  var swW = ctx.measureText(swTxt).width + 36;
+  ctx.font = 'bold '+Math.round(H*0.08)+'px "Bebas Neue",sans-serif';
+  var swW = ctx.measureText(swTxt).width + 44;
+  var swY = H*0.60;
   ctx.fillStyle = 'rgba(245,197,24,0.15)';
-  _opto_roundRect(ctx, wx - swW/2, wy + wR + 14, swW, H*0.11, 10); ctx.fill();
-  ctx.strokeStyle = 'rgba(245,197,24,0.5)'; ctx.lineWidth = 2;
-  _opto_roundRect(ctx, wx - swW/2, wy + wR + 14, swW, H*0.11, 10); ctx.stroke();
+  _opto_roundRect(ctx, wx - swW/2, swY - H*0.05, swW, H*0.10, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(245,197,24,0.6)'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, wx - swW/2, swY - H*0.05, swW, H*0.10, 10); ctx.stroke();
   ctx.fillStyle = '#f5c518';
-  ctx.fillText(swTxt, wx, wy + wR + 14 + H*0.055);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(swTxt, wx, swY);
+
+  // ═══ ÉTAGE 3 : BARRE ÉPAULES (bien séparée du compteur) ═══
+  var slY = H*0.80, slW = W*0.50, slX = W/2 - slW/2;
+  ctx.strokeStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(slX, slY); ctx.lineTo(slX + slW, slY);
+  ctx.stroke();
+  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.beginPath(); ctx.arc(slX, slY, 14, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(slX + slW, slY, 14, 0, Math.PI*2); ctx.fill();
+  // Label SOUS la barre (indépendant du compteur)
+  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  var lblTxt = (en?'SHOULDERS LOCKED ':'ÉPAULES VERROUILLÉES ') + (shouldersOK?'✓':'✗');
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  var lblW = ctx.measureText(lblTxt).width + 24;
+  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  _opto_roundRect(ctx, W/2 - lblW/2, slY + 18, lblW, H*0.06, 8); ctx.fill();
+  ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
+  ctx.fillText(lblTxt, W/2, slY + 18 + H*0.03);
   ctx.restore();
 }
 function _opto_analyzeIso(poses){
@@ -33842,28 +33845,29 @@ function _opto_drawPeriph(W, H){
 }
 function _opto_analyzePeriph(poses){
   var kp = _opto_kpMap(poses);
-  if (!kp) return;
-  var nose = kp['nose'];
-  if (!nose || nose.score < 0.3) return;
-  // Head stability : variance de la position du nez
-  if (_opto_pt_noseBaseline === null) _opto_pt_noseBaseline = {x:nose.x, y:nose.y};
-  var dx = (nose.x - _opto_pt_noseBaseline.x) / _opto_canvas.width;
-  var dy = (nose.y - _opto_pt_noseBaseline.y) / _opto_canvas.height;
-  var dist = Math.sqrt(dx*dx + dy*dy);
-  _opto_pt_headStab = _opto_pt_headStab * 0.9 + dist * 0.1;
-  // Hit detection sur cibles via wrist
-  for (var i = _opto_pt_targets.length - 1; i >= 0; i--){
-    var hit = _opto_wristHit(kp, _opto_pt_targets[i], 2.0);
-    if (hit){
-      var t = _opto_pt_targets[i];
-      _opto_pt_targets.splice(i,1);
-      _opto_hits++;
-      var basePts = 10;
-      var bonus = _opto_pt_headStab < 0.03 ? 5 : 0;
-      _opto_score += basePts + bonus;
-      if (typeof _td_beep === 'function') _td_beep(bonus?1320:880, 0.05, 0.1);
-      if (navigator.vibrate) navigator.vibrate(bonus?30:15);
+  if (kp){
+    var nose = kp['nose'];
+    if (nose && nose.score > 0.3){
+      if (_opto_pt_noseBaseline === null) _opto_pt_noseBaseline = {x:nose.x, y:nose.y};
+      var dnx = (nose.x - _opto_pt_noseBaseline.x) / _opto_canvas.width;
+      var dny = (nose.y - _opto_pt_noseBaseline.y) / _opto_canvas.height;
+      var dist = Math.sqrt(dnx*dnx + dny*dny);
+      _opto_pt_headStab = _opto_pt_headStab * 0.9 + dist * 0.1;
     }
+  }
+  // HIT strictement comme TDR : rayon × 2.0 + mirror + scaling + directionnel
+  _opto_doHits(poses, _opto_pt_targets, 2.0, function(t, side, rt){
+    _opto_hits++;
+    var basePts = 10;
+    var bonus = _opto_pt_headStab < 0.03 ? 5 : 0;
+    var speedBonus = Math.max(0, Math.round((2000 - rt) / 200));
+    _opto_score += basePts + bonus + speedBonus;
+    if (typeof _td_beep === 'function') _td_beep(rt < 500 ? 1320 : rt < 1000 ? 880 : 660, 0.05, 0.1);
+    if (navigator.vibrate) navigator.vibrate(rt < 500 ? 20 : 40);
+  });
+  // Nettoyer les cibles hit
+  for (var i = _opto_pt_targets.length - 1; i >= 0; i--){
+    if (_opto_pt_targets[i].hit) _opto_pt_targets.splice(i, 1);
   }
 }
 
@@ -34005,39 +34009,37 @@ function _opto_drawVanish(W, H){
 }
 function _opto_analyzeVanish(poses){
   if (_opto_vt_phase !== 'answer') return;
-  var kp = _opto_kpMap(poses);
-  if (!kp) return;
   var W = _opto_canvas.width, H = _opto_canvas.height;
-  // Check si wrist dans une zone de sortie
+  // Construit les cibles "zones" avec propriété .hit (pour que _opto_doHits puisse les marquer)
+  //   rayon généreux basé sur la plus grande dimension — HIT comme TDR Reaction ×2.0
+  var zoneTargets = [];
   for (var i=0;i<_opto_vt_zones.length;i++){
     var z = _opto_vt_zones[i];
     var zx = W - W*0.08, zw = W*0.06;
-    // Zone centrale pour hit
-    var tgt = {x: zx + zw/2, y: z.y + z.h/2, r: Math.max(zw/2, z.h/2)};
-    var hit = _opto_wristHit(kp, tgt, 1.5);
-    if (hit){
-      _opto_vt_answered = z.label;
-      _opto_vt_phase = 'result';
-      if (z.correct){
-        _opto_hits++;
-        _opto_score += 15;
-        if (typeof _td_beep === 'function') _td_beep(1320, 0.08, 0.15);
-        if (navigator.vibrate) navigator.vibrate(30);
-      } else {
-        _opto_miss++;
-        if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15);
-      }
-      // Reset après 1.2s pour nouveau spawn
-      setTimeout(function(){
-        if (!_opto_running) return;
-        _opto_vt_phase = 'idle';
-        _opto_vt_ball = null;
-        _opto_vt_zones = [];
-        _opto_vt_nextBallTs = Date.now() + 800;
-      }, 1200);
-      return;
-    }
+    zoneTargets.push({
+      x: zx + zw/2, y: z.y + z.h/2,
+      r: Math.max(zw*0.7, z.h*0.5),
+      label: z.label, correct: z.correct, born: _opto_vt_answerStart
+    });
   }
+  _opto_doHits(poses, zoneTargets, 2.0, function(t, side, rt){
+    _opto_vt_answered = t.label;
+    _opto_vt_phase = 'result';
+    if (t.correct){
+      _opto_hits++; _opto_score += 15;
+      if (typeof _td_beep === 'function') _td_beep(1320, 0.08, 0.15);
+      if (navigator.vibrate) navigator.vibrate(30);
+    } else {
+      _opto_miss++;
+      if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15);
+    }
+    setTimeout(function(){
+      if (!_opto_running) return;
+      _opto_vt_phase = 'idle';
+      _opto_vt_ball = null; _opto_vt_zones = [];
+      _opto_vt_nextBallTs = Date.now() + 800;
+    }, 1200);
+  });
 }
 
 /* ═══════════════ MODE A7-MOT · MULTI-OBJECT TRACKING ═══════════════
@@ -34182,21 +34184,22 @@ function _opto_analyzeMot(poses){
     else { _opto_miss++; }
     return;
   }
-  var kp = _opto_kpMap(poses);
-  if (!kp) return;
-  // Check hit sur chaque boule non-tapée
+  // HIT strictement comme TDR Reaction ×2.0 (mêmes seuils que A3 et G3)
+  var motTargets = [];
   for (var i=0;i<_opto_mot_balls.length;i++){
     var b = _opto_mot_balls[i];
     if (b.tapped) continue;
-    var hit = _opto_wristHit(kp, {x:b.x, y:b.y, r:b.r}, 1.6);
-    if (hit){
+    motTargets.push({x:b.x, y:b.y, r:b.r, _idx:i, born:_opto_mot_phaseStart});
+  }
+  _opto_doHits(poses, motTargets, 2.0, function(t, side, rt){
+    var b = _opto_mot_balls[t._idx];
+    if (b && !b.tapped){
       b.tapped = true;
       _opto_mot_userTaps++;
       if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
       if (navigator.vibrate) navigator.vibrate(15);
-      break;
     }
-  }
+  });
 }
 
 /* ─── MODE A11 : HEAD-UP SCAN ──────────────────────────────── */
@@ -34235,17 +34238,17 @@ function _opto_drawHeadUp(W, H){
   // ── Dessin du chiffre courant ──
   if (_opto_hu_current){
     var t = (now - _opto_hu_current.born) / 1000;
-    var x = _opto_hu_current.startX - t * _opto_hu_current.speedPxPerSec;
+    // FIX 2 : x arrondi entier pour éviter anti-aliasing sub-pixel (floutage)
+    var x = Math.round(_opto_hu_current.startX - t * _opto_hu_current.speedPxPerSec);
+    var y = Math.round(tby + tbh*0.55);
     // Couleur selon pitch (vert si OK, rouge si tête baissée)
     var col = _opto_hu_ok ? '#f5c518' : '#ff8a94';
-    // FIX 1 : zéro shadowBlur pour chiffres NETS (comme countdowns)
     ctx.shadowBlur = 0;
     ctx.font = 'bold '+Math.round(tbh*0.78)+'px "Bebas Neue",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.lineWidth = 5; ctx.strokeStyle = '#000';
-    ctx.strokeText(_opto_hu_current.n, x, tby + tbh*0.55);
+    // Chiffre plein uniquement (pas de strokeText qui crée un halo flouté sur certains navigateurs)
     ctx.fillStyle = col;
-    ctx.fillText(_opto_hu_current.n, x, tby + tbh*0.55);
+    ctx.fillText(_opto_hu_current.n, x, y);
     // Zone "milieu" (x entre 30% et 70%) = fenêtre de lecture valide
     // Scoring auto quand chiffre passe en zone centrale ET tête haute
     if (!_opto_hu_current.scored && x < W*0.70 && x > W*0.30 && _opto_hu_ok){
@@ -34471,38 +34474,74 @@ function _opto_drawSp(W, H){
   var dt = Math.min(50, now - (_opto_sp_lastFrame || now));
   _opto_sp_lastFrame = now;
   _opto_sp_t += dt / 1000;
-  // Carré safe : x [0.20, 0.80], y [0.32, 0.88] — bien SOUS le HUD (qui finit à y=0.24)
+  // Zone safe : x [0.20, 0.80], y [0.32, 0.88] — sous HUD, au-dessus de la zone chrono
   var x1 = W*0.20, x2 = W*0.80, y1 = H*0.32, y2 = H*0.88;
-  var perim = 2*(x2-x1) + 2*(y2-y1);
   var LAP_DUR = 6.0; // secondes par tour
   var prog = (_opto_sp_t % LAP_DUR) / LAP_DUR;
-  // Détection tour complet (passage du 1.0 → 0)
+  // Détection tour complet
   if (_opto_sp_prevProg !== undefined && _opto_sp_prevProg > 0.85 && prog < 0.15){
     _opto_sp_lapCount++;
-    // Bonus si avg stab < 3% sur le tour
     var avgStab = _opto_sp_stabSamples > 0 ? _opto_sp_stabSum / _opto_sp_stabSamples : 0;
     if (avgStab < 0.03){
-      _opto_score += 20;
-      _opto_hits++;
+      _opto_score += 20; _opto_hits++;
       if (typeof _td_beep === 'function') _td_beep(1320, 0.06, 0.12);
       if (navigator.vibrate) navigator.vibrate(30);
     }
     _opto_sp_stabSum = 0; _opto_sp_stabSamples = 0;
   }
   _opto_sp_prevProg = prog;
-  // Position cible le long du carré (sens horaire : top → right → bottom → left)
-  var d = prog * perim;
+  // ★ 6 TRAJECTOIRES auto-cyclées (2 laps chacune)
+  var patternIdx = Math.floor(_opto_sp_lapCount / 2) % 6;
+  var patternNames = en
+    ? ['SQUARE','HORIZONTAL','VERTICAL','DIAGONAL \\','DIAGONAL /','CIRCLE']
+    : ['CARRÉ','HORIZONTALE','VERTICALE','DIAGONALE \\','DIAGONALE /','CERCLE'];
   var tx, ty;
-  if (d < (x2-x1)){ tx = x1 + d; ty = y1; }
-  else if (d < (x2-x1) + (y2-y1)){ tx = x2; ty = y1 + (d - (x2-x1)); }
-  else if (d < 2*(x2-x1) + (y2-y1)){ tx = x2 - (d - (x2-x1) - (y2-y1)); ty = y2; }
-  else { tx = x1; ty = y2 - (d - 2*(x2-x1) - (y2-y1)); }
-  // Draw path (ghost rectangle)
+  var cx = (x1+x2)/2, cy = (y1+y2)/2;
+  var halfW = (x2-x1)/2, halfH = (y2-y1)/2;
+  if (patternIdx === 0){ // CARRÉ
+    var perim = 2*(x2-x1) + 2*(y2-y1);
+    var d = prog * perim;
+    if (d < (x2-x1)){ tx = x1 + d; ty = y1; }
+    else if (d < (x2-x1) + (y2-y1)){ tx = x2; ty = y1 + (d - (x2-x1)); }
+    else if (d < 2*(x2-x1) + (y2-y1)){ tx = x2 - (d - (x2-x1) - (y2-y1)); ty = y2; }
+    else { tx = x1; ty = y2 - (d - 2*(x2-x1) - (y2-y1)); }
+  } else if (patternIdx === 1){ // HORIZONTALE (aller-retour)
+    var ph = prog < 0.5 ? (prog*2) : (2 - prog*2);
+    tx = x1 + ph * (x2-x1); ty = cy;
+  } else if (patternIdx === 2){ // VERTICALE
+    var pv = prog < 0.5 ? (prog*2) : (2 - prog*2);
+    tx = cx; ty = y1 + pv * (y2-y1);
+  } else if (patternIdx === 3){ // DIAGONALE \ (top-left ↔ bottom-right)
+    var pd1 = prog < 0.5 ? (prog*2) : (2 - prog*2);
+    tx = x1 + pd1 * (x2-x1); ty = y1 + pd1 * (y2-y1);
+  } else if (patternIdx === 4){ // DIAGONALE / (bottom-left ↔ top-right)
+    var pd2 = prog < 0.5 ? (prog*2) : (2 - prog*2);
+    tx = x1 + pd2 * (x2-x1); ty = y2 - pd2 * (y2-y1);
+  } else { // CERCLE
+    var ang = prog * Math.PI * 2 - Math.PI/2;
+    var r = Math.min(halfW, halfH);
+    tx = cx + Math.cos(ang) * r; ty = cy + Math.sin(ang) * r;
+  }
+  // Draw path ghost (selon pattern)
   ctx.save();
   ctx.strokeStyle = 'rgba(100,180,255,0.18)';
   ctx.lineWidth = 2; ctx.setLineDash([6,6]);
-  ctx.strokeRect(x1, y1, x2-x1, y2-y1);
+  if (patternIdx === 0) ctx.strokeRect(x1, y1, x2-x1, y2-y1);
+  else if (patternIdx === 1){ ctx.beginPath(); ctx.moveTo(x1, cy); ctx.lineTo(x2, cy); ctx.stroke(); }
+  else if (patternIdx === 2){ ctx.beginPath(); ctx.moveTo(cx, y1); ctx.lineTo(cx, y2); ctx.stroke(); }
+  else if (patternIdx === 3){ ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+  else if (patternIdx === 4){ ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y1); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.arc(cx, cy, Math.min(halfW,halfH), 0, Math.PI*2); ctx.stroke(); }
   ctx.setLineDash([]);
+  // ★ Pattern name (coin haut-gauche, sous HUD)
+  ctx.font = 'bold '+Math.round(H*0.035)+'px "Bebas Neue",sans-serif';
+  var pn = patternNames[patternIdx];
+  var pnW = ctx.measureText(pn).width + 24;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  _opto_roundRect(ctx, W*0.02, H*0.26, pnW, H*0.045, 6); ctx.fill();
+  ctx.fillStyle = '#64b4ff';
+  ctx.fillText(pn, W*0.02 + 12, H*0.26 + H*0.0225);
   // Cible (pastille lumineuse jaune ~W*0.04)
   var tR = Math.max(26, Math.min(W*0.04, H*0.07));
   // Halo
@@ -34660,16 +34699,14 @@ function _opto_applyLang(lang){
       'A3 · PERIPHERAL TARGET (fix center, hit corners)',
       'G3 · VANISHING TARGET (anticipate ball exit)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
-      'A7-SP · SMOOTH PURSUIT (follow target in square path)',
-      'A11-V · VERGENCE SWITCH (near/far focus)'
+      'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
       'A3 · PERIPHERAL TARGET (fixe centre, tape coins)',
       'G3 · VANISHING TARGET (anticipe sortie balle)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
-      'A7-SP · SMOOTH PURSUIT (suis la cible en carré)',
-      'A11-V · VERGENCE SWITCH (focus près/loin)'
+      'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -36476,13 +36513,13 @@ function _dcog_selectDrill(drill, langOnly) {
       var ownStart = (drill === 'limbo' || drill === 'opto');
       _dcogMainStart.style.display = ownStart ? 'none' : '';
     }
-    // ★ FIX 0 : vider la section "Choisis ton drill" (vidéo tuto) pour OPTOMOTOR
-    //   Pas de vidéo pédagogique dispo pour les drills OPTOMOTOR → panneau caché
+    // ★ FIX 0 : cacher TOUTE la carte "🎬 CHOISIS TON DRILL" (vidéo + liste + player)
+    //   pour OPTOMOTOR → section totalement vide (pas de mapping vidéo défini)
+    var _optoCard = document.getElementById('dcog_chooseDrillCard');
+    if (_optoCard) _optoCard.style.display = (drill === 'opto') ? 'none' : '';
     if (drill === 'opto'){
-      var _optVid = document.getElementById('dcog_vidPlayer');
       var _optFr  = document.getElementById('dcog_ytFrame');
-      if (_optFr) _optFr.src = ''; // stop autoplay audio
-      if (_optVid) _optVid.style.display = 'none';
+      if (_optFr) _optFr.src = ''; // stop autoplay résiduel
     }
   }
 }
