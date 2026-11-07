@@ -33316,6 +33316,7 @@ var _opto_vt_answered=null;
 var _opto_vt_nextBallTs=0;
 var _opto_vt_ballCount=0;        // nb de balles lancées
 var _opto_vt_answerStart=0;      // timestamp début phase answer (pour timeout)
+var _opto_vt_hitCount=0;         // nb de hits réussis (pour masquer tuto après 1er hit)
 // Mode A7-SP SMOOTH PURSUIT state
 var _opto_sp_t=0;                // temps écoulé en seconds depuis début
 var _opto_sp_lapCount=0;         // tours complets
@@ -33402,7 +33403,7 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_pt_headStab = 0; _opto_pt_tapDeltaBuf = [];
   _opto_vt_ball = null; _opto_vt_phase = 'idle'; _opto_vt_nextBallTs = Date.now() + 1500;
   _opto_vt_answered = null; _opto_vt_zones = [];
-  _opto_vt_ballCount = 0; _opto_vt_answerStart = 0;
+  _opto_vt_ballCount = 0; _opto_vt_answerStart = 0; _opto_vt_hitCount = 0;
   _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
   _opto_mot_userTaps = 0;
   _opto_sp_t = 0; _opto_sp_lapCount = 0; _opto_sp_headStab = 0;
@@ -33412,15 +33413,12 @@ window._opto_onCamReady = function(video, canvas, ctx){
   if (_opto_mode === 'mot') _opto_motInit();
   // Setup wrist hit buffer (pour A3/G3/A7)
   _opto_prevWrist = {left:null, right:null};
-  // Afficher bouton REC standard (identique autres drills caméra)
+  // Bouton REC géré par le dispatcher global senseiCamToggleRec()
+  //   → inutile d'override onclick ici (identique DLIM/DCOG/TDR)
   var rb = document.getElementById('sensei-cam-rec-btn');
-  if (rb){
-    rb.style.display = 'block';
-    rb.textContent = '● REC';
-    rb.onclick = _opto_toggleRec;
-  }
-  // Démarrer countdown puis session
-  _opto_runCountdown(3);
+  if (rb){ rb.style.display = 'block'; rb.textContent = '● REC'; }
+  // Démarrer countdown puis session — 10s comme tdrc/dcrc/drsw/dqa/dqt
+  _opto_runCountdown(10);
 };
 
 function _opto_runCountdown(n){
@@ -33513,70 +33511,79 @@ function _opto_drawFrame(poses){
   else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
   // ── Logo SENSEI (identique autres drills) ──
-  if (typeof window._camDrawLogo === 'function') window._camDrawLogo(ctx, W, H);
+  //   A11 (ticker en bas) : passer tickerTop comme H pour que le logo soit dessiné
+  //   AU-DESSUS du ticker au lieu de dedans (sinon "Powered by SENSEI AI" chevauche les chiffres)
+  if (typeof window._camDrawLogo === 'function') {
+    if (_opto_mode === 'headup'){
+      var _logoH = Math.round(H*0.84);  // au-dessus du ticker (ticker commence à ~0.84H)
+      window._camDrawLogo(ctx, W, _logoH);
+    } else {
+      window._camDrawLogo(ctx, W, H);
+    }
+  }
 }
 
 function _opto_drawHUD(W, H){
   var ctx = _opto_ctx;
   var en = window._lang === 'en';
-  // ── (1) Consigne pill — top centré, 80% de large, lisibilité max ──
+  // ── (1) Consigne pill — DESCENDU à y=0.09 pour laisser les boutons REC/STOP
+  //        (qui occupent y=0 → ~0.08) sans collision visuelle ──
   var consignes = {
     headup: en ? 'HEAD UP · READ WITHOUT LOWERING' : 'TÊTE HAUTE · LIS SANS BAISSER',
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
     periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
     vanish: en ? 'PREDICT BALL EXIT'               : 'ANTICIPE LA SORTIE DU BALLON',
-    mot:    en ? 'TRACK THE 3 GREEN BALLS WITH EYES · HIT THEM AT END' : 'SUIS LES 3 BOULES VERTES DES YEUX · TOUCHE-LES À LA FIN',
+    mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
-  var bw = W*0.80, bh = H*0.10;
-  var bx = W/2 - bw/2, by = H*0.025;
-  ctx.fillStyle = 'rgba(13,17,23,0.88)';
+  var bw = W*0.74, bh = H*0.09;
+  var bx = W/2 - bw/2, by = H*0.09;
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
   ctx.lineWidth = 3;
   ctx.strokeStyle = '#64b4ff';
   ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(100,180,255,0.4)';
   _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
   ctx.shadowBlur = 0;
-  // Texte consigne (auto-shrink si dépassement)
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#64b4ff';
-  var annFs = Math.round(bh*0.5);
+  var annFs = Math.round(bh*0.52);
   ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   if (ctx.measureText(txt).width > bw * 0.92){
     annFs = Math.max(Math.round(bh*0.3), Math.round(annFs * bw * 0.92 / ctx.measureText(txt).width));
     ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   }
   ctx.fillText(txt, W/2, by + bh*0.5);
-  // ── (2) Barre HUD : score [G] · chrono [centre] · (REC = bouton HTML externe) ──
-  var hy = H * 0.19;
-  // Score box gauche
-  var sbw = Math.max(90, W*0.14), sbh = Math.max(38, H*0.06);
+  // ── (2) Barre HUD AGRANDIE : score et chrono plus gros, zéro collision ──
+  var hy = H * 0.235;
+  // Score box gauche (plus large + plus haut)
+  var sbw = Math.max(130, W*0.18), sbh = Math.max(56, H*0.08);
   var sbx = W*0.03, sby = hy - sbh/2;
-  ctx.fillStyle = 'rgba(13,17,23,0.85)';
-  _opto_roundRect(ctx, sbx, sby, sbw, sbh, 6); ctx.fill();
-  ctx.strokeStyle = 'rgba(100,180,255,0.3)'; ctx.lineWidth = 1;
-  _opto_roundRect(ctx, sbx, sby, sbw, sbh, 6); ctx.stroke();
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.fill();
+  ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.stroke();
   ctx.fillStyle = '#9ba3b4';
-  ctx.font = 'bold '+Math.round(H*0.014)+'px "Barlow Condensed",sans-serif';
+  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.fillText('SCORE', sbx + sbw/2, sby + sbh*0.08);
+  ctx.fillText(en?'SCORE':'SCORE', sbx + sbw/2, sby + sbh*0.08);
   ctx.fillStyle = '#64b4ff';
-  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText(String(_opto_score), sbx + sbw/2, sby + sbh*0.9);
-  // Chrono centré
+  ctx.fillText(String(_opto_score), sbx + sbw/2, sby + sbh*0.92);
+  // Chrono centré (plus large aussi)
   var remain = Math.max(0, _opto_dur - _opto_elapsed);
   var mm = Math.floor(remain/60), ss = remain%60;
   var tStr = mm + ':' + (ss<10?'0':'') + ss;
-  var cbw = Math.max(90, W*0.14), cbh = sbh;
+  var cbw = Math.max(130, W*0.18), cbh = sbh;
   var cbx = W/2 - cbw/2, cby = hy - cbh/2;
-  ctx.fillStyle = 'rgba(0,0,0,0.85)';
-  _opto_roundRect(ctx, cbx, cby, cbw, cbh, 6); ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-  _opto_roundRect(ctx, cbx, cby, cbw, cbh, 6); ctx.stroke();
+  ctx.fillStyle = 'rgba(0,0,0,0.90)';
+  _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.stroke();
   ctx.fillStyle = remain <= 5 ? '#ff8a94' : '#4ade80';
-  ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
+  ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(tStr, W/2, cby + cbh/2);
 }
@@ -34050,156 +34057,115 @@ function _opto_motInit(){
   var W = _opto_canvas ? _opto_canvas.width : 1280;
   var H = _opto_canvas ? _opto_canvas.height : 720;
   _opto_mot_balls = [];
+  var colors = ['#ff3b3b','#4ade80','#64b4ff']; // ROUGE / VERT / BLEU
+  var coloredIdxs = [];
+  while (coloredIdxs.length < 3){
+    var k = Math.floor(Math.random()*8);
+    if (coloredIdxs.indexOf(k) < 0) coloredIdxs.push(k);
+  }
   for (var i=0;i<8;i++){
     var ang = Math.random() * Math.PI * 2;
     var sp = Math.max(60, Math.min(W*0.08, 120));
+    var colorIdx = coloredIdxs.indexOf(i);
     _opto_mot_balls.push({
       x: W*0.15 + Math.random() * W*0.70,
-      y: H*0.28 + Math.random() * H*0.42,
+      y: H*0.32 + Math.random() * H*0.50,
       vx: Math.cos(ang) * sp,
       vy: Math.sin(ang) * sp,
-      r: Math.max(18, Math.min(W*0.022, H*0.035)),
-      tracked: false,
-      originallyTracked: false,
-      tapped: false
+      r: Math.max(20, Math.min(W*0.024, H*0.038)),
+      colored: colorIdx >= 0,
+      color: colorIdx >= 0 ? colors[colorIdx] : '#ffffff'
     });
   }
-  // Marquer 3 aléatoires
-  var idxs = [0,1,2,3,4,5,6,7];
-  for (var i=idxs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=idxs[i];idxs[i]=idxs[j];idxs[j]=t; }
-  for (var i=0;i<3;i++){
-    _opto_mot_balls[idxs[i]].tracked = true;
-    _opto_mot_balls[idxs[i]].originallyTracked = true;
-  }
-  _opto_mot_phase = 'mark';
+  _opto_mot_phase = 'track';
   _opto_mot_phaseStart = Date.now();
-  _opto_mot_userTaps = 0;
+  _opto_mot_cycleCount = 0;
+  _opto_mot_headStab = 0;
+  _opto_mot_noseBaseline = null;
+  _opto_mot_stabSum = 0; _opto_mot_stabSamples = 0;
 }
+var _opto_mot_cycleCount=0, _opto_mot_headStab=0, _opto_mot_noseBaseline=null;
+var _opto_mot_stabSum=0, _opto_mot_stabSamples=0, _opto_mot_lastSec=0;
+/* MOT redesigné : 3 boules colorées (R/V/B) + 5 blanches, aucun tap,
+   tracking continu tête fixe · score +1/sec si stab < 3% + bonus 20/cycle */
 function _opto_drawMot(W, H){
   var ctx = _opto_ctx;
   var en = window._lang === 'en';
   var now = Date.now();
   var dt = Math.min(50, now - (_opto_mot_lastFrame || now));
   _opto_mot_lastFrame = now;
-  // Transitions de phase
-  if (_opto_mot_phase === 'mark' && now - _opto_mot_phaseStart > 2000){
-    // Enlever le marquage visuel (mais garder originallyTracked en mémoire)
-    for (var i=0;i<_opto_mot_balls.length;i++) _opto_mot_balls[i].tracked = false;
-    _opto_mot_phase = 'track'; _opto_mot_phaseStart = now;
-  } else if (_opto_mot_phase === 'track' && now - _opto_mot_phaseStart > 8000){
-    // Arrêter les boules et passer en phase answer
-    _opto_mot_phase = 'answer'; _opto_mot_phaseStart = now;
-  } else if (_opto_mot_phase === 'result' && now - _opto_mot_phaseStart > 2000){
-    // Nouveau cycle
-    _opto_motInit();
-  }
-  // Update positions (sauf en phase answer/result)
-  if (_opto_mot_phase === 'mark' || _opto_mot_phase === 'track'){
-    for (var i=0;i<_opto_mot_balls.length;i++){
-      var b = _opto_mot_balls[i];
-      b.x += b.vx * dt / 1000;
-      b.y += b.vy * dt / 1000;
-      // Bounce aux bords
-      var padX = W*0.08, padY = H*0.25;
-      if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
-      if (b.x > W-padX) { b.x = W-padX; b.vx = -Math.abs(b.vx); }
-      if (b.y < padY) { b.y = padY; b.vy = Math.abs(b.vy); }
-      if (b.y > H*0.90) { b.y = H*0.90; b.vy = -Math.abs(b.vy); }
+  // Cycle toutes les 8s : nouvelle configuration des boules colorées
+  if (now - _opto_mot_phaseStart > 8000){
+    _opto_mot_cycleCount++;
+    // Bonus cycle si stab moyen < 3%
+    var avgStab = _opto_mot_stabSamples > 0 ? _opto_mot_stabSum / _opto_mot_stabSamples : 0;
+    if (avgStab < 0.03){
+      _opto_score += 20; _opto_hits++;
+      if (typeof _td_beep === 'function') _td_beep(1320, 0.06, 0.12);
+      if (navigator.vibrate) navigator.vibrate(30);
     }
+    _opto_motInit(); // nouvelles positions + 3 nouveaux colorés
+    return;
   }
-  // Draw boules
+  // Mise à jour positions (continu)
   for (var i=0;i<_opto_mot_balls.length;i++){
     var b = _opto_mot_balls[i];
-    var isGreen = (_opto_mot_phase === 'mark' && b.tracked) ||
-                  (_opto_mot_phase === 'result' && b.originallyTracked);
-    var isTapCorrect = _opto_mot_phase === 'result' && b.tapped && b.originallyTracked;
-    var isTapWrong = _opto_mot_phase === 'result' && b.tapped && !b.originallyTracked;
-    ctx.fillStyle = isGreen ? '#4ade80' :
-                    isTapWrong ? '#ff8a94' : '#ffffff';
-    ctx.strokeStyle = isGreen ? '#166534' : '#333';
-    ctx.lineWidth = 2;
-    if (isGreen) { ctx.shadowBlur = 12; ctx.shadowColor = '#4ade80'; }
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    // Croix sur erreurs
-    if (isTapWrong){
-      ctx.strokeStyle = '#8b0000'; ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(b.x - b.r*0.6, b.y - b.r*0.6); ctx.lineTo(b.x + b.r*0.6, b.y + b.r*0.6);
-      ctx.moveTo(b.x + b.r*0.6, b.y - b.r*0.6); ctx.lineTo(b.x - b.r*0.6, b.y + b.r*0.6);
-      ctx.stroke();
-    }
+    b.x += b.vx * dt / 1000;
+    b.y += b.vy * dt / 1000;
+    var padX = W*0.08, padY = H*0.32;
+    if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
+    if (b.x > W-padX) { b.x = W-padX; b.vx = -Math.abs(b.vx); }
+    if (b.y < padY) { b.y = padY; b.vy = Math.abs(b.vy); }
+    if (b.y > H*0.93) { b.y = H*0.93; b.vy = -Math.abs(b.vy); }
   }
-  // FIX 5 : Phase indicator ×1.6 avec fond opaque pour lisibilité sur vidéo
-  ctx.save();
-  var phaseTxt='', phaseCol='#fff';
-  if (_opto_mot_phase === 'mark'){
-    var remainM = Math.max(0, 2 - (now - _opto_mot_phaseStart)/1000).toFixed(1);
-    phaseTxt = (en?'MEMORIZE · ':'MÉMORISE · ') + remainM + 's';
-    phaseCol = '#4ade80';
-  } else if (_opto_mot_phase === 'track'){
-    var remainT = Math.max(0, 8 - (now - _opto_mot_phaseStart)/1000).toFixed(1);
-    phaseTxt = (en?'TRACK · ':'SUIS · ') + remainT + 's';
-    phaseCol = '#f5c518';
-  } else if (_opto_mot_phase === 'answer'){
-    phaseTxt = (en?'TAP 3 TRACKED · ':'TAPE LES 3 SUIVIES · ') + _opto_mot_userTaps + '/3';
-    phaseCol = '#64b4ff';
-  } else if (_opto_mot_phase === 'result'){
-    var got = 0;
+  // Draw boules : colorées en premier (dessus), blanches en arrière-plan
+  for (var pass=0;pass<2;pass++){
     for (var i=0;i<_opto_mot_balls.length;i++){
-      if (_opto_mot_balls[i].tapped && _opto_mot_balls[i].originallyTracked) got++;
+      var b = _opto_mot_balls[i];
+      if (pass === 0 && b.colored) continue;
+      if (pass === 1 && !b.colored) continue;
+      ctx.fillStyle = b.color;
+      ctx.strokeStyle = b.colored ? '#000' : '#333';
+      ctx.lineWidth = b.colored ? 3 : 2;
+      if (b.colored){ ctx.shadowBlur = 14; ctx.shadowColor = b.color; }
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
     }
-    phaseTxt = got + '/3 ' + (en?'CORRECT':'JUSTE');
-    phaseCol = got === 3 ? '#4ade80' : got >= 2 ? '#f5c518' : '#ff8a94';
   }
-  if (phaseTxt){
-    ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    var ptW = ctx.measureText(phaseTxt).width + 36;
-    var pty = H*0.27;
-    ctx.fillStyle = 'rgba(0,0,0,0.78)';
-    _opto_roundRect(ctx, W/2 - ptW/2, pty - H*0.035, ptW, H*0.07, 10); ctx.fill();
-    ctx.strokeStyle = phaseCol; ctx.lineWidth = 2;
-    _opto_roundRect(ctx, W/2 - ptW/2, pty - H*0.035, ptW, H*0.07, 10); ctx.stroke();
-    ctx.fillStyle = phaseCol;
-    ctx.fillText(phaseTxt, W/2, pty);
-  }
+  // Compteur cycles (bas centre)
+  var cycTxt = _opto_mot_cycleCount + (en?' CYCLES ·  ':' CYCLES ·  ') + Math.ceil(8 - (now - _opto_mot_phaseStart)/1000) + 's';
+  ctx.save();
+  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  var cW = ctx.measureText(cycTxt).width + 36;
+  var cY = H*0.95;
+  ctx.fillStyle = 'rgba(0,0,0,0.80)';
+  _opto_roundRect(ctx, W/2 - cW/2, cY - H*0.03, cW, H*0.055, 8); ctx.fill();
+  ctx.fillStyle = '#f5c518';
+  ctx.fillText(cycTxt, W/2, cY);
   ctx.restore();
 }
 var _opto_mot_lastFrame = 0;
 function _opto_analyzeMot(poses){
-  if (_opto_mot_phase !== 'answer') return;
-  if (_opto_mot_userTaps >= 3) {
-    // Fin du choix → passer en result
-    _opto_mot_phase = 'result';
-    _opto_mot_phaseStart = Date.now();
-    var got = 0;
-    for (var i=0;i<_opto_mot_balls.length;i++){
-      if (_opto_mot_balls[i].tapped && _opto_mot_balls[i].originallyTracked) got++;
-    }
-    if (got === 3) { _opto_score += 50; _opto_hits++; }
-    else if (got === 2) { _opto_score += 20; _opto_hits++; }
-    else if (got === 1) { _opto_score += 5; _opto_miss++; }
-    else { _opto_miss++; }
-    return;
+  // Analyse head stability pour scoring continu
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var nose = kp['nose'];
+  if (!nose || nose.score < 0.3) return;
+  if (_opto_mot_noseBaseline === null) _opto_mot_noseBaseline = {x:nose.x, y:nose.y};
+  var dnx = (nose.x - _opto_mot_noseBaseline.x) / _opto_canvas.width;
+  var dny = (nose.y - _opto_mot_noseBaseline.y) / _opto_canvas.height;
+  var dist = Math.sqrt(dnx*dnx + dny*dny);
+  _opto_mot_headStab = _opto_mot_headStab * 0.9 + dist * 0.1;
+  _opto_mot_stabSum += _opto_mot_headStab;
+  _opto_mot_stabSamples++;
+  // +1 pt/sec si tête stable
+  var nowS = Math.floor((Date.now() - _opto_mot_phaseStart) / 1000) + _opto_mot_cycleCount * 8;
+  if (nowS > _opto_mot_lastSec && _opto_mot_headStab < 0.03){
+    _opto_score++; _opto_hits++;
   }
-  // HIT strictement comme TDR Reaction ×2.0 (mêmes seuils que A3 et G3)
-  var motTargets = [];
-  for (var i=0;i<_opto_mot_balls.length;i++){
-    var b = _opto_mot_balls[i];
-    if (b.tapped) continue;
-    motTargets.push({x:b.x, y:b.y, r:b.r, _idx:i, born:_opto_mot_phaseStart});
-  }
-  _opto_doHits(poses, motTargets, 2.0, function(t, side, rt){
-    var b = _opto_mot_balls[t._idx];
-    if (b && !b.tapped){
-      b.tapped = true;
-      _opto_mot_userTaps++;
-      if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
-      if (navigator.vibrate) navigator.vibrate(15);
-    }
-  });
+  _opto_mot_lastSec = nowS;
 }
 
 /* ─── MODE A11 : HEAD-UP SCAN ──────────────────────────────── */
@@ -41488,6 +41454,7 @@ function senseiCamToggleRec(){
   else if(m==='dqa' && typeof _dqa_toggleRec==='function') _dqa_toggleRec();
   else if(m==='dqt' && typeof _dqt_toggleRec==='function') _dqt_toggleRec();
   else if(m==='dlim' && typeof _dlim_toggleRec==='function') _dlim_toggleRec();
+  else if(m==='opto' && typeof _opto_toggleRec==='function') _opto_toggleRec();
 }
 // i18n portrait warning
 (function(){
