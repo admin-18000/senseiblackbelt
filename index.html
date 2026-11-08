@@ -2736,7 +2736,7 @@ window._dojoBackHome = function(){
           <option value="headup">A11 · HEAD-UP SCAN (lis sans baisser la tête)</option>
           <option value="iso">F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)</option>
           <option value="periph">A3 · PERIPHERAL TARGET (fixe centre, tape coins)</option>
-          <option value="vanish">G3 · VANISHING TARGET (anticipe le rebond du ballon)</option>
+          <option value="vanish">G3 · VANISHING TARGET (suis le ballon rebondissant)</option>
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
         </select>
@@ -33313,15 +33313,18 @@ var _opto_pt_lastSpawn=0;
 var _opto_pt_headStab=0;         // variance head position
 var _opto_pt_noseBaseline=null;
 var _opto_pt_tapDeltaBuf=[];     // for head stability metric
-// Mode G3 VANISHING TARGET state
-var _opto_vt_ball=null;          // {startTs, dur, startX, endX, y, hidden:bool, hideStart, hideEnd, exitZone}
-var _opto_vt_zones=[];           // [{y, h, label:'A'|'B'|'C', correct:bool}]
-var _opto_vt_phase='idle';       // 'idle'|'flying'|'answer'|'result'
-var _opto_vt_answered=null;
-var _opto_vt_nextBallTs=0;
-var _opto_vt_ballCount=0;        // nb de balles lancées
-var _opto_vt_answerStart=0;      // timestamp début phase answer (pour timeout)
-var _opto_vt_hitCount=0;         // nb de hits réussis (pour masquer tuto après 1er hit)
+// Mode G3 v3 : TRACKING OCULOMOTEUR PUR (ballon rebondit · yeux suivent · tête fixe)
+var _opto_vt_ball=null;          // {startTs, dur, startX, endX, bounces, apex, spin}
+var _opto_vt_zones=[];           // legacy, non utilisé en v3
+var _opto_vt_phase='idle';       // legacy, non utilisé en v3
+var _opto_vt_answered=null;      // legacy
+var _opto_vt_nextBallTs=0;       // legacy
+var _opto_vt_ballCount=0;        // nb de balles lancées (compteur)
+var _opto_vt_answerStart=0;      // legacy
+var _opto_vt_hitCount=0;         // legacy
+var _opto_vt_headStab=0;         // ★ v3 : dérive tête (variance nez)
+var _opto_vt_noseBaseline=null;  // ★ v3 : baseline nez pour calcul stab
+var _opto_vt_lastSec=0;          // ★ v3 : dernière seconde scorée
 // Mode A7-SP SMOOTH PURSUIT state
 var _opto_sp_t=0;                // temps écoulé en seconds depuis début
 var _opto_sp_lapCount=0;         // tours complets
@@ -33352,8 +33355,8 @@ window._opto_setMode = function(m){
               : 'Tourne la tête G/D avec épaules fixes · F11 Dissociation cervico-scapulaire · BIENTÔT',
     periph: en ? 'Fix the central red dot · tap corner targets without turning head · A3 Peripheral detection · COMING SOON'
               : 'Fixe le point rouge central · tape les cibles aux coins sans tourner la tête · A3 Détection périphérique · BIENTÔT',
-    vanish: en ? 'A real basketball bounces across the screen · hidden 300ms mid-way · hit the exit zone (A/B/C) · G3 Temporal occlusion.'
-              : 'Un vrai ballon de basket rebondit et traverse l\'écran · masqué 300ms mi-parcours · tape la zone de sortie (A/B/C) · G3 Occlusion temporelle.',
+    vanish: en ? 'A real basketball bounces continuously at varying speeds · follow it with your eyes · keep head still · G3 Smooth pursuit of ballistic motion.'
+              : 'Un vrai ballon de basket rebondit à vitesses variables · suis-le des yeux · garde la tête fixe · G3 Poursuite oculaire de trajectoire balistique.',
     mot:    en ? 'Track 3 of 8 moving balls for 8s · identify them at the end · A7-MOT NeuroTracker-lite.'
               : 'Suis 3 boules sur 8 pendant 8s · identifie-les à la fin · A7-MOT NeuroTracker-lite.',
     sp:     en ? 'Follow a single bright target through 6 trajectories (square · horizontal · vertical · 2 diagonals · circle) · keep head still · A7-SP Smooth Pursuit.'
@@ -33409,6 +33412,7 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_vt_ball = null; _opto_vt_phase = 'idle'; _opto_vt_nextBallTs = Date.now() + 1500;
   _opto_vt_answered = null; _opto_vt_zones = [];
   _opto_vt_ballCount = 0; _opto_vt_answerStart = 0; _opto_vt_hitCount = 0;
+  _opto_vt_headStab = 0; _opto_vt_noseBaseline = null; _opto_vt_lastSec = 0;
   _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
   _opto_mot_userTaps = 0;
   _opto_sp_t = 0; _opto_sp_lapCount = 0; _opto_sp_headStab = 0;
@@ -33537,14 +33541,17 @@ function _opto_drawHUD(W, H){
     headup: en ? 'HEAD UP · READ WITHOUT LOWERING' : 'TÊTE HAUTE · LIS SANS BAISSER',
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
     periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
-    vanish: en ? 'PREDICT BALL EXIT · HIT A/B/C'  : 'ANTICIPE LA SORTIE · TAPE A/B/C',
+    vanish: en ? 'FOLLOW THE BOUNCING BALL · HEAD STILL' : 'SUIS LE REBOND · TÊTE FIXE',
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
-  // ★ FIX : 0.56W au lieu de 0.74W, laisse 0.22W libre de chaque côté pour
-  //   que les boutons REC/STOP (coins sup.) ne chevauchent plus les bords
-  var bw = W*0.56, bh = H*0.09;
+  // ★ FIX : width portrait-aware
+  //   • Portrait (A11) : 0.92W — W est étroit, besoin de la quasi-totalité
+  //   • Landscape : 0.56W — laisse 0.22W libre de chaque côté pour REC/STOP
+  var portraitHUD = !!window._opto_portraitMode;
+  var bw = portraitHUD ? W*0.92 : W*0.56;
+  var bh = H*0.09;
   var bx = W/2 - bw/2, by = H*0.09;
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
@@ -33565,38 +33572,42 @@ function _opto_drawHUD(W, H){
   // ── (2) Barre HUD : score + chrono SYMÉTRIQUES centrés autour de W/2
   //   ★ FIX : fin du déséquilibre (score left + chrono center = tout à gauche)
   //   ★ FIX 2 : hy descendu de 0.235H → 0.30H pour SÉPARER clairement des
-  //     pilules consigne (qui finit à y=0.18H). Gap de 0.07H ≈ 50px, visuel aéré
+  //     pilules consigne (qui finit à y=0.18H). Gap de 0.07H ≈ 50px
+  //   ★ FIX 3 : pilules PLUS RECTANGULAIRES (bh 0.08H → 0.055H, bw +15%)
+  //     pour laisser la place à la rotation wheel F11 juste en dessous
   //   • Portrait (A11) : deux pilules remplissant la largeur
   //   • Landscape (A3 / F11 / A7-MOT / A7-SP) : duo centré autour du milieu
   var hy = H * 0.30;
   var portrait = !!window._opto_portraitMode;
   var sbw, sbh, sbx, sby, cbw, cbh, cbx, cby;
-  sbh = Math.max(56, H*0.08); cbh = sbh;
+  sbh = Math.max(44, H*0.055); cbh = sbh;   // ★ plus plat
   if (portrait){
     sbw = W*0.44; sbx = W*0.04; sby = hy - sbh/2;
     cbw = W*0.44; cbx = W*0.52; cby = hy - cbh/2;
   } else {
-    // Duo centré : score à gauche du milieu, chrono à droite, petit gap
     var gap = W*0.015;
-    var bw = Math.max(140, W*0.19);
+    var bw = Math.max(160, W*0.22);         // ★ plus large
     sbw = bw; cbw = bw;
     sbx = W/2 - bw - gap/2; sby = hy - sbh/2;
     cbx = W/2 + gap/2;      cby = hy - cbh/2;
   }
-  // Score pill
+  // ★ Label + value côte à côte horizontalement (format rectangulaire bas)
+  //   Score pill
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.fill();
   ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.stroke();
+  // Label gauche
   ctx.fillStyle = '#9ba3b4';
-  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.fillText(en?'SCORE':'SCORE', sbx + sbw/2, sby + sbh*0.08);
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(en?'SCORE':'SCORE', sbx + sbw*0.08, sby + sbh/2);
+  // Valeur droite
   ctx.fillStyle = '#64b4ff';
-  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText(String(_opto_score), sbx + sbw/2, sby + sbh*0.92);
-  // Chrono pill
+  ctx.font = 'bold '+Math.round(H*0.042)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(String(_opto_score), sbx + sbw*0.92, sby + sbh/2);
+  //   Chrono pill
   var remain = Math.max(0, _opto_dur - _opto_elapsed);
   var mm = Math.floor(remain/60), ss = remain%60;
   var tStr = mm + ':' + (ss<10?'0':'') + ss;
@@ -33605,13 +33616,13 @@ function _opto_drawHUD(W, H){
   ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.stroke();
   ctx.fillStyle = '#9ba3b4';
-  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.fillText(en?'TIME':'CHRONO', cbx + cbw/2, cby + cbh*0.08);
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(en?'TIME':'CHRONO', cbx + cbw*0.08, cby + cbh/2);
   ctx.fillStyle = remain <= 5 ? '#ff8a94' : '#4ade80';
-  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText(tStr, cbx + cbw/2, cby + cbh*0.92);
+  ctx.font = 'bold '+Math.round(H*0.042)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(tStr, cbx + cbw*0.92, cby + cbh/2);
 }
 
 /* ───────── HIT DETECTION STRICTEMENT IDENTIQUE À TDR REACTION ─────────
@@ -33677,8 +33688,8 @@ function _opto_drawIso(W, H){
   var shouldersOK = Math.abs(_opto_iso_shouldersDrift) < 0.08;
   ctx.save();
 
-  // ═══ ÉTAGE 1 : YAW WHEEL (centré, pas de panneau fond) ═══
-  var wx = W/2, wy = H*0.46;
+  // ═══ ÉTAGE 1 : YAW WHEEL (centré, descendu pour laisser ~30px au-dessus du HUD) ═══
+  var wx = W/2, wy = H*0.50;
   var wR = Math.min(W*0.15, H*0.12);
   // Arc fond épais
   ctx.strokeStyle = 'rgba(100,180,255,0.30)';
@@ -33954,214 +33965,106 @@ function _opto_drawBasketball(ctx, x, y, r, rot){
     ctx.restore();
   }
 }
-/* ═════ OPTION B : 3 zones AU SOL horizontales (A / B / C côte à côte)
-   Ballon entre par le haut, 2 rebonds visibles, occlusion 300ms strictes,
-   atterrit dans l'une des 3 zones au sol. Le joueur anticipe et tape la bonne
-   zone avec le poignet.
-   Paramètres scientifiquement calés (Zago/Lacquaniti, McIntyre) :
-     dur 3200ms · occlusion 300ms stricte · inter-balle 1500ms · timeout 3000ms
+/* ═════ G3 v3 : TRACKING OCULOMOTEUR PUR (pas de tap, pas de zones)
+   Le ballon rebondit en continu à des vitesses variables (change tous les 5s)
+   Les yeux du joueur suivent la trajectoire · la tête reste fixe (nose stab)
+   Score : +1 pt/seconde si tête stable (< 3% de dérive du nez)
 ═════════════════════════════════════════════════════════════════════ */
 function _opto_drawVanish(W, H){
   var ctx = _opto_ctx;
   var en = window._lang === 'en';
   var now = Date.now();
-  var floorY = H*0.80;
-  // ── Tuto (avant la 1re balle)
-  if (_opto_vt_phase === 'idle' && (_opto_vt_hitCount || 0) === 0 && _opto_vt_ballCount === 0){
-    var tx = W/2, ty = H*0.48;
-    var tw = Math.min(W*0.70, 680), th = H*0.20;
-    ctx.save();
-    ctx.fillStyle = 'rgba(10,13,24,0.88)';
-    _opto_roundRect(ctx, tx - tw/2, ty - th/2, tw, th, 14); ctx.fill();
-    ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 3;
-    _opto_roundRect(ctx, tx - tw/2, ty - th/2, tw, th, 14); ctx.stroke();
-    ctx.fillStyle = '#64b4ff';
-    ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(en?'HOW TO PLAY':'COMMENT JOUER', tx, ty - th*0.3);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold '+Math.round(H*0.030)+'px "Barlow Condensed",sans-serif';
-    var l1 = en ? '1· The basketball bounces across the screen' : '1· Le ballon rebondit sur le sol';
-    var l2 = en ? '2· It hides 300ms before landing' : '2· Il disparaît 300ms avant d\'atterrir';
-    var l3 = en ? '3· Hit the landing zone A, B or C with your wrist' : '3· Tape la zone d\'atterrissage A, B ou C avec le poignet';
-    ctx.fillText(l1, tx, ty - th*0.03);
-    ctx.fillText(l2, tx, ty + th*0.12);
-    ctx.fillStyle = '#f5c518';
-    ctx.fillText(l3, tx, ty + th*0.27);
-    ctx.restore();
-  }
-  // ── Spawn : 3 zones AU SOL horizontales + ballon qui rebondit vers l'une d'elles
-  if (_opto_vt_phase === 'idle' && now >= _opto_vt_nextBallTs){
-    var dir = Math.random() < 0.5 ? 1 : -1;
-    var dur = 3200; // 3.2s de traversée (scientifiquement calé)
-    _opto_vt_zones = [];
-    var zoneW = W*0.22;
-    var zoneH = H*0.10;
-    var centers = [W*0.22, W*0.50, W*0.78];
-    var exitIdx = Math.floor(Math.random()*3);
-    for (var k=0;k<3;k++){
-      _opto_vt_zones.push({
-        x: centers[k], y: floorY,
-        w: zoneW, h: zoneH,
-        label: String.fromCharCode(65+k),  // A, B, C
-        correct: (k === exitIdx)
-      });
-    }
-    var targetZone = _opto_vt_zones[exitIdx];
+  var floorY = H*0.82;
+
+  // ── Spawn / respawn : ballon qui va d'un bord à l'autre, rebonds amortis
+  //    puis relancé du côté opposé à une NOUVELLE vitesse aléatoire
+  if (!_opto_vt_ball || now >= (_opto_vt_ball.startTs + _opto_vt_ball.dur)){
+    // Sens alterné (si existant précédent, inverser)
+    var dir = _opto_vt_ball ? -((_opto_vt_ball.endX > _opto_vt_ball.startX) ? 1 : -1)
+                            : (Math.random() < 0.5 ? 1 : -1);
+    // Vitesse aléatoire : durée de traversée entre 2.2s et 4.0s
+    var dur = 2200 + Math.random()*1800;
+    // Nombre de rebonds variable : 2, 3 ou 4
+    var bounces = 2 + Math.floor(Math.random()*3);
+    // Hauteur apex variable : 0.25 à 0.42 H sous la ligne de score
+    var apexHeight = (0.25 + Math.random()*0.17) * H;
     _opto_vt_ball = {
       startTs: now, dur: dur,
       startX: dir === 1 ? -40 : W + 40,
-      endX: targetZone.x,
-      bounces: 2,                       // 2 rebonds visibles (puis atterrissage final)
-      spin: 0,
-      // ★ Occlusion 300ms STRICTES juste avant le dernier arc (pour forcer prédiction)
-      hideStart: dur*0.68, hideEnd: dur*0.68 + 300
+      endX:   dir === 1 ? W + 40 : -40,
+      bounces: bounces,
+      apex: apexHeight,
+      spin: 0
     };
-    _opto_vt_phase = 'flying';
-    _opto_vt_answered = null;
     _opto_vt_ballCount++;
   }
-  // ── Timeout phase answer (3000ms avant d'invalider)
-  if (_opto_vt_phase === 'answer' && now - _opto_vt_answerStart > 3000){
-    _opto_miss++;
-    _opto_vt_phase = 'result';
-    _opto_vt_answered = null;
-    setTimeout(function(){
-      if (!_opto_running) return;
-      _opto_vt_phase = 'idle';
-      _opto_vt_ball = null; _opto_vt_zones = [];
-      _opto_vt_nextBallTs = Date.now() + 1500;  // 1.5s de respiration
-    }, 1200);
-  }
+
   // ── Dessin sol pointillé
   ctx.save();
-  ctx.strokeStyle = 'rgba(100,180,255,0.35)';
+  ctx.strokeStyle = 'rgba(100,180,255,0.30)';
   ctx.lineWidth = 2; ctx.setLineDash([8,6]);
   ctx.beginPath();
   ctx.moveTo(W*0.03, floorY); ctx.lineTo(W*0.97, floorY);
   ctx.stroke();
   ctx.setLineDash([]);
-  // ── Dessin des 3 zones au sol (A/B/C) — fond semi-transparent + label
-  for (var i=0;i<_opto_vt_zones.length;i++){
-    var z = _opto_vt_zones[i];
-    var zx = z.x - z.w/2, zy = z.y - z.h/2;
-    var answered = _opto_vt_answered === z.label;
-    var reveal = _opto_vt_phase === 'result';
-    var fillCol = reveal && z.correct ? 'rgba(74,222,128,0.45)' :
-                  reveal && answered ? 'rgba(255,138,148,0.45)' :
-                  'rgba(13,17,23,0.55)';
-    var strokeCol = reveal && z.correct ? '#4ade80' :
-                    reveal && answered ? '#ff8a94' : '#f5c518';
-    ctx.fillStyle = fillCol;
-    _opto_roundRect(ctx, zx, zy, z.w, z.h, 10); ctx.fill();
-    ctx.strokeStyle = strokeCol;
-    ctx.lineWidth = 3; ctx.setLineDash([6,5]);
-    _opto_roundRect(ctx, zx, zy, z.w, z.h, 10); ctx.stroke();
-    ctx.setLineDash([]);
-    // Label gros
-    ctx.fillStyle = reveal && z.correct ? '#4ade80' : '#f5c518';
-    ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(z.label, z.x, z.y);
-  }
+
   // ── Dessin ballon rebondissant
-  if (_opto_vt_ball){
-    var elapsed = now - _opto_vt_ball.startTs;
-    var t = elapsed / _opto_vt_ball.dur;
-    if (t < 1){
-      var hidden = elapsed > _opto_vt_ball.hideStart && elapsed < _opto_vt_ball.hideEnd;
-      // X linéaire sur la traversée (vers la zone cible)
-      var bx = _opto_vt_ball.startX + (_opto_vt_ball.endX - _opto_vt_ball.startX) * t;
-      // Y : rebonds multiples amortis
-      var bN = _opto_vt_ball.bounces;
-      // On fait bN bonds visibles sur 0..0.85, puis 0.85..1 = descente vers la zone
-      var t1 = Math.min(1, t / 0.85);
-      var phase = (t1 * bN) % 1;
-      var bidx = Math.floor(t1 * bN);
-      var decay = Math.pow(0.70, bidx);
-      var baseApex = floorY - H*0.30;
-      var apex = baseApex * decay;
-      var by;
-      if (t < 0.85){
-        by = floorY - Math.sin(Math.PI * phase) * apex;
-      } else {
-        // Dernier arc : du haut du dernier apex vers la zone
-        var lastT = (t - 0.85) / 0.15;
-        var lastApexY = floorY - apex;
-        by = lastApexY + (floorY - lastApexY) * Math.pow(lastT, 2);
-      }
-      var ballDir = (_opto_vt_ball.endX > _opto_vt_ball.startX) ? 1 : -1;
-      _opto_vt_ball.spin += (ballDir === 1 ? 0.35 : -0.35);
-      var r = Math.max(26, Math.min(W*0.038, H*0.065));
-      if (!hidden){
-        // Ombre au sol — se contracte quand la balle est haute
-        var airHeight = Math.max(0, (floorY - by) / baseApex);
-        var shadowScale = 1 - airHeight*0.55;
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        ctx.beginPath();
-        ctx.ellipse(bx, floorY + 4, r*0.9*shadowScale, r*0.25*shadowScale, 0, 0, Math.PI*2);
-        ctx.fill();
-        // Ballon
-        _opto_drawBasketball(ctx, bx, by, r, _opto_vt_ball.spin);
-      } else {
-        // Masque d'occlusion vertical (300ms strict)
-        var mw = W*0.14, mx = bx - mw/2;
-        var mh = floorY - H*0.30;
-        var my = H*0.28;
-        ctx.fillStyle = 'rgba(10,13,24,0.92)';
-        _opto_roundRect(ctx, mx, my, mw, mh, 10); ctx.fill();
-        ctx.strokeStyle = 'rgba(100,180,255,0.55)';
-        ctx.lineWidth = 2; ctx.setLineDash([8,6]);
-        _opto_roundRect(ctx, mx, my, mw, mh, 10); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#64b4ff';
-        ctx.font = 'bold '+Math.round(H*0.10)+'px "Bebas Neue",sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('?', mx + mw/2, my + mh/2);
-      }
-    } else if (_opto_vt_phase === 'flying'){
-      _opto_vt_phase = 'answer';
-      _opto_vt_answerStart = now;
-    }
-  }
+  var b = _opto_vt_ball;
+  var elapsed = now - b.startTs;
+  var t = Math.max(0, Math.min(1, elapsed / b.dur));
+  var bx = b.startX + (b.endX - b.startX) * t;
+  // Y : rebonds amortis via sin(pi*phase) sur chaque cycle
+  var phase = (t * b.bounces) % 1;
+  var bidx = Math.floor(t * b.bounces);
+  var decay = Math.pow(0.75, bidx);
+  var apex = b.apex * decay;
+  var by = floorY - Math.sin(Math.PI * phase) * apex;
+  var ballDir = (b.endX > b.startX) ? 1 : -1;
+  b.spin += (ballDir === 1 ? 0.30 : -0.30);
+  var r = Math.max(26, Math.min(W*0.040, H*0.068));
+  // Ombre au sol — se contracte quand la balle monte
+  var airHeight = Math.max(0, (floorY - by) / b.apex);
+  var shadowScale = 1 - airHeight*0.55;
+  ctx.fillStyle = 'rgba(0,0,0,0.30)';
+  ctx.beginPath();
+  ctx.ellipse(bx, floorY + 4, r*0.9*shadowScale, r*0.25*shadowScale, 0, 0, Math.PI*2);
+  ctx.fill();
+  _opto_drawBasketball(ctx, bx, by, r, b.spin);
+
+  // ── HUD stabilité tête (bas droite)
+  var hsText = (en?'HEAD STAB. ':'TÊTE STAB. ') + ((_opto_vt_headStab||0) * 100).toFixed(1) + '%';
+  var stable = (_opto_vt_headStab||0) < 0.03;
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  var hsW = W*0.18, hsH = H*0.04;
+  var hsX = W - hsW - 8, hsY = H - hsH - 8;
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.fill();
+  ctx.strokeStyle = stable ? '#4ade80' : '#ff8a94';
+  ctx.lineWidth = 1;
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.stroke();
+  ctx.fillStyle = stable ? '#4ade80' : '#ff8a94';
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(hsText, hsX + hsW/2, hsY + hsH/2);
   ctx.restore();
 }
 function _opto_analyzeVanish(poses){
-  // On autorise HIT dès que les zones sont affichées (dès le spawn)
-  // → le joueur peut anticiper AVANT l'atterrissage (c'est le principe G3)
-  if (_opto_vt_phase !== 'answer' && _opto_vt_phase !== 'flying') return;
-  if (!_opto_vt_zones.length) return;
-  // Zones au sol horizontales → cibles rondes pour _opto_doHits
-  var zoneTargets = [];
-  for (var i=0;i<_opto_vt_zones.length;i++){
-    var z = _opto_vt_zones[i];
-    zoneTargets.push({
-      x: z.x, y: z.y,
-      r: Math.max(z.w, z.h)/2,  // rayon généreux couvrant toute la zone
-      label: z.label, correct: z.correct,
-      born: (_opto_vt_ball ? _opto_vt_ball.startTs : Date.now())
-    });
+  // ★ G3 v3 : TRACKING OCULOMOTEUR PUR — pas de HIT, pas de tap
+  //   Scoring : +1 pt/seconde si tête stable (dérive nez < 3%)
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var nose = kp['nose'];
+  if (!nose || nose.score < 0.3) return;
+  if (!_opto_vt_noseBaseline) _opto_vt_noseBaseline = {x:nose.x, y:nose.y};
+  var dnx = (nose.x - _opto_vt_noseBaseline.x) / _opto_canvas.width;
+  var dny = (nose.y - _opto_vt_noseBaseline.y) / _opto_canvas.height;
+  var dist = Math.sqrt(dnx*dnx + dny*dny);
+  _opto_vt_headStab = (_opto_vt_headStab||0) * 0.9 + dist * 0.1;
+  // +1 pt/seconde si tête stable
+  var nowS = Math.floor(Date.now() / 1000);
+  if (nowS !== _opto_vt_lastSec && _opto_vt_headStab < 0.03){
+    _opto_score++; _opto_hits++;
   }
-  // HIT strict TDR Reaction ×2.0 (mirror, moveThresh, directional — identique)
-  _opto_doHits(poses, zoneTargets, 2.0, function(t, side, rt){
-    _opto_vt_answered = t.label;
-    _opto_vt_phase = 'result';
-    if (t.correct){
-      _opto_hits++; _opto_vt_hitCount++;
-      _opto_score += 20 + Math.max(0, Math.round((2500 - rt)/150));
-      if (typeof _td_beep === 'function') _td_beep(1320, 0.08, 0.15);
-      if (navigator.vibrate) navigator.vibrate(30);
-    } else {
-      _opto_miss++;
-      if (typeof _td_beep === 'function') _td_beep(220, 0.1, 0.15);
-    }
-    setTimeout(function(){
-      if (!_opto_running) return;
-      _opto_vt_phase = 'idle';
-      _opto_vt_ball = null; _opto_vt_zones = [];
-      _opto_vt_nextBallTs = Date.now() + 1500;  // ★ 1.5s inter-balle
-    }, 1200);
-  });
+  _opto_vt_lastSec = nowS;
 }
 
 /* ═══════════════ MODE A7-MOT · MULTI-OBJECT TRACKING ═══════════════
@@ -34587,9 +34490,8 @@ function _opto_drawSp(W, H){
   var dt = Math.min(50, now - (_opto_sp_lastFrame || now));
   _opto_sp_lastFrame = now;
   _opto_sp_t += dt / 1000;
-  // ★ FIX : Zone safe DESCENDUE (HUD finit maintenant à y=0.34H)
-  //   y1=0.48 : halo ball (r×1.8 ≈ 0.08H) donne top halo ≈ 0.40H, bien sous le HUD
-  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.48, y2 = H*0.90;
+  // ★ FIX : Zone safe DESCENDUE à y1=0.52H (laisse place au pattern badge y=0.44H + sa hauteur)
+  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.52, y2 = H*0.92;
   var LAP_DUR = 6.0; // secondes par tour
   var prog = (_opto_sp_t % LAP_DUR) / LAP_DUR;
   // Détection tour complet
@@ -34647,12 +34549,13 @@ function _opto_drawSp(W, H){
   else if (patternIdx === 4){ ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y1); ctx.stroke(); }
   else { ctx.beginPath(); ctx.arc(cx, cy, Math.min(halfW,halfH), 0, Math.PI*2); ctx.stroke(); }
   ctx.setLineDash([]);
-  // ★ Pattern name (centré, entre HUD et trajectoire : y=0.385H, sous nouveau HUD à 0.34H)
-  ctx.font = 'bold '+Math.round(H*0.032)+'px "Bebas Neue",sans-serif';
+  // ★ Pattern name : descendu à y=0.44H (HUD rectangulaire mince finit à 0.3275H)
+  //   Badge n'empiète plus du tout sur score/chrono
+  ctx.font = 'bold '+Math.round(H*0.030)+'px "Bebas Neue",sans-serif';
   var pn = patternNames[patternIdx];
   var pnW = ctx.measureText(pn).width + 28;
-  var pnH = H*0.045;
-  var pnX = W/2 - pnW/2, pnY = H*0.385;
+  var pnH = H*0.042;
+  var pnX = W/2 - pnW/2, pnY = H*0.44;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, pnX, pnY - pnH/2, pnW, pnH, 7); ctx.fill();
@@ -34815,14 +34718,14 @@ function _opto_applyLang(lang){
       'A11 · HEAD-UP SCAN (read without lowering)',
       'F11 · HEAD/TRUNK ISO (rotate head, fix shoulders)',
       'A3 · PERIPHERAL TARGET (fix center, hit corners)',
-      'G3 · VANISHING TARGET (predict bouncing ball exit)',
+      'G3 · VANISHING TARGET (follow bouncing ball · varying speeds)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
       'A3 · PERIPHERAL TARGET (fixe centre, tape coins)',
-      'G3 · VANISHING TARGET (anticipe le rebond du ballon)',
+      'G3 · VANISHING TARGET (suis le ballon rebondissant · vitesses variables)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)'
     ];
