@@ -33549,9 +33549,10 @@ function _opto_drawHUD(W, H){
     ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   }
   ctx.fillText(txt, W/2, by + bh*0.5);
-  // ── (2) Barre HUD : score et chrono répartis symétriquement
-  //   ★ FIX A11 : en portrait (headup), on remplit la largeur avec 2 pilules
-  //   égales 0.04W-0.48W et 0.52W-0.96W — plus esthétique, pas de cramped
+  // ── (2) Barre HUD : score + chrono SYMÉTRIQUES centrés autour de W/2
+  //   ★ FIX : fin du déséquilibre (score left + chrono center = tout à gauche)
+  //   • Portrait (A11) : deux pilules remplissant la largeur
+  //   • Landscape (A3 / F11 / A7-MOT / A7-SP) : duo centré autour du milieu
   var hy = H * 0.235;
   var portrait = !!window._opto_portraitMode;
   var sbw, sbh, sbx, sby, cbw, cbh, cbx, cby;
@@ -33560,8 +33561,12 @@ function _opto_drawHUD(W, H){
     sbw = W*0.44; sbx = W*0.04; sby = hy - sbh/2;
     cbw = W*0.44; cbx = W*0.52; cby = hy - cbh/2;
   } else {
-    sbw = Math.max(130, W*0.18); sbx = W*0.03; sby = hy - sbh/2;
-    cbw = Math.max(130, W*0.18); cbx = W/2 - cbw/2; cby = hy - cbh/2;
+    // Duo centré : score à gauche du milieu, chrono à droite, petit gap
+    var gap = W*0.015;
+    var bw = Math.max(140, W*0.19);
+    sbw = bw; cbw = bw;
+    sbx = W/2 - bw - gap/2; sby = hy - sbh/2;
+    cbx = W/2 + gap/2;      cby = hy - cbh/2;
   }
   // Score pill
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
@@ -33653,20 +33658,12 @@ function _opto_drawIso(W, H){
   //   (1) y=0.32-0.50 : YAW WHEEL + labels G/D sur ses côtés
   //   (2) y=0.56-0.68 : COMPTEUR SWINGS centré (badge jaune indépendant)
   //   (3) y=0.76-0.92 : BARRE ÉPAULES verte/rouge + label dessous
-  // ★ FIX F11 : panneau central unifié (wheel + compteur + barre épaules dans
-  //   une même "console" visuelle avec fond semi-transparent commun)
+  // ★ FIX F11 : AUCUN encadré/fond noir — overlays purs sur live video
   var shouldersOK = Math.abs(_opto_iso_shouldersDrift) < 0.08;
   ctx.save();
 
-  // Panneau fond commun (toute la zone de jeu)
-  var pX = W*0.14, pY = H*0.32, pW = W*0.72, pH = H*0.60;
-  ctx.fillStyle = 'rgba(13,17,23,0.55)';
-  _opto_roundRect(ctx, pX, pY, pW, pH, 14); ctx.fill();
-  ctx.strokeStyle = 'rgba(100,180,255,0.25)'; ctx.lineWidth = 1.5;
-  _opto_roundRect(ctx, pX, pY, pW, pH, 14); ctx.stroke();
-
-  // ═══ ÉTAGE 1 : YAW WHEEL (centré en haut du panneau) ═══
-  var wx = W/2, wy = pY + pH*0.22;
+  // ═══ ÉTAGE 1 : YAW WHEEL (centré, pas de panneau fond) ═══
+  var wx = W/2, wy = H*0.46;
   var wR = Math.min(W*0.15, H*0.12);
   // Arc fond épais
   ctx.strokeStyle = 'rgba(100,180,255,0.30)';
@@ -33706,9 +33703,9 @@ function _opto_drawIso(W, H){
   ctx.fillText(gTxt, wx - wR*1.8, wy);
   ctx.fillText(dTxt, wx + wR*1.8, wy);
 
-  // ═══ ÉTAGE 2 : COMPTEUR SWINGS (gros, au centre du panneau) ═══
+  // ═══ ÉTAGE 2 : COMPTEUR SWINGS (gros, centré, pas de panneau) ═══
   var swTxt = _opto_iso_swings + ' ↔';
-  var swY = pY + pH*0.55;
+  var swY = H*0.66;
   ctx.font = 'bold '+Math.round(H*0.090)+'px "Bebas Neue",sans-serif';
   var swW = ctx.measureText(swTxt).width + 50;
   var swH = H*0.11;
@@ -33724,8 +33721,8 @@ function _opto_drawIso(W, H){
   ctx.fillStyle = '#9ba3b4';
   ctx.fillText(en?'SWINGS G↔D':'OSCILLATIONS G↔D', wx, swY + swH/2 + H*0.02);
 
-  // ═══ ÉTAGE 3 : BARRE ÉPAULES (reliée visuellement au panneau) ═══
-  var slY = pY + pH*0.88, slW = pW*0.75, slX = W/2 - slW/2;
+  // ═══ ÉTAGE 3 : BARRE ÉPAULES (floating pur) ═══
+  var slY = H*0.84, slW = W*0.50, slX = W/2 - slW/2;
   // Guide rails pointillé gris foncé en fond
   ctx.strokeStyle = 'rgba(155,163,180,0.25)';
   ctx.lineWidth = 1.5; ctx.setLineDash([4,4]);
