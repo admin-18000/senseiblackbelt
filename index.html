@@ -2736,6 +2736,7 @@ window._dojoBackHome = function(){
           <option value="headup">A11 · HEAD-UP SCAN (lis sans baisser la tête)</option>
           <option value="iso">F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)</option>
           <option value="periph">A3 · PERIPHERAL TARGET (fixe centre, tape coins)</option>
+          <option value="vanish">G3 · VANISHING TARGET (anticipe le rebond du ballon)</option>
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
         </select>
@@ -33275,6 +33276,11 @@ function _dlim_save(){
    Détection : face keypoints MoveNet (nose, eyes, ears) + shoulders
    Pattern : identique DLIM (senseiCamShow, countdown, REC, résultats)
 ═══════════════════════════════════════════════════════════════════ */
+/* ─── Basketball clipart user-provided (160×160 WebP · base64 inline) ─── */
+window._opto_basketImg = new Image();
+window._opto_basketImg.src = 'data:image/webp;base64,UklGRkwWAABXRUJQVlA4WAoAAAAQAAAAnwAAnwAAQUxQSNsFAAAB8IVts2nbtm39EVFrc7dt27btuz5sm922bdu2bdvuzW4dJSL+gc6UU2q3PSImAN8VU0RVBBA1M1MVmZoQM8UXiuIripnKVICa4f9t+gUXm7MPGLbEpjtuv/Wqi8/Sj/9XU2mZmgDAnJv/67wHXxs94YOHL7nw+Ukk+fnEd5+48qBdVxoGAKbSJjEFMM/2B905nF8zM/nFvVcu+M2KCsCkPWIA5vnRVcNJMt0jMjPcI0kyM8I9SPLTB3ZbDYBpW8SA/g3PGk4y3ZPfeIYHyd5dP50ZMG2HGDDTbx8iGZ781jOc5BsHLwaYNMKAWf74OklPFpoR5NgjFgasBSoY/Oc3SI9kyeHkx7tND9HqGbDFo6QHi08nn9sRsLqJYrHLSA92Mp08Zy6YVMyAHw8ng52N5JtbAVItw6znkM5OO3t7KbROolj1KUay40GeOwRSIxH8dByd3U/nrTNC6yOCf5PBKvZ4aZ9pbUTsJEaykj3uAVhdRO0UerKWGb1/DIZITRTHspes6mM/AKQeih/TkzXNIE8eBKmFYrHRGaxsOC8dDKmFXEZndbPH8/pUqmBY3yPrQ/Z4KKwGiv67Gaxxen4f1j2BnsBgnTPHrQztmujgcxisdfChwSodM5xMZ72du8G6ZfgVPSuWMWlVaJcU603OZM2D9w9S6Y7KrC8zWPfgL6Adwul01i7fmkWkK4b1e5G1Y/BQaEdEBt7LYPUzxy4i2g3Dlgw20Lk/OiJyHb0FkR/NDe2CYQNPNjH4D1gXBJfTG5HPDIaUp1h6ErMNzNwGVp7hADob6bwEWpxgyHOMViRHzwctzbBVJpsZ/BmsNMUJ9HZ4Xg0pTDD0BUY7kqPmhZalWMeTDU1uDyvL8E96S5wHlya4oi3Bu0SkJMHQlxgtSY6cE1qSYoVPmS1h5gawkgw/YbCpzj+Udgy9NSeXJbiyPbcJpBxB/+OMtgSfHVTWNC+3JvnRXNByFPOPYrZm4hJlLTW5PZOXLmulzxu0VEmGLZhszbiFy9q2OcFXpoWUtH2DHu6b2nnAytq8QU8NKkmxyufMtiRHzActaZlP2vPpCmXNO7I1TG4OK0cw4AlGc7YqCYqj6W1J9laDFmRY17M1k5YoSjDkJUZTgu/OCikIgivojXmoryzFiY1xngNFWcc25y+wogx7NCa5ZXE7M1uSHDkXtCjFMp8wG+K8RQRFCwY9zWjKbrCyoDiZ3pCMDYoz7MxoR/DFYZDCBDO/y2yG80gYSlccT29FZmzQiTU/z2xE8NFBkOJE7O70ZvwBhvINP2K0IXPE3NAOiEz7ckYTnMdD0UXDH9iEzAlLd0Rk5ncyGuA8HopuKv7JBmSOX0K6IjLD6xnVcx4PRVcNP2f1IofPL90RHXQ/o3LOX0PRXcM6n0dWzXl3v0qHYDiKXrOMSStD0WWR6V9kVMz5Dxi6rdgiPKvlvLlfpWMwHEavVfDDxaDouujQ++h1yvx0Yxi6r1j0PUaN0vPXMNTQsO7YjPqkc2/0oY592MUza5PO08ykEujDr5lZFydP7hNBNRV/IqMmzsl/AwT1FMWveuxFLTJ5/+oQQVUV275FRh0yedgQGGqrmP2PjzBrkM4/Aob6KjD4SHp2Lp1HwxQ1lj7gaHrXgjyjXwWVVu2/gJ6dcvZ2FwiqLRh4LundieALm0EEFRfYvycxoxvp5FmzwwRVF2Dla8iI8tLJ53YEDLUXA7Z8mIwoK538+B/TQQQNVMHgX71Gpmcx4eSEIxcCDI00YIbfP07SIwsIT3L4cUsAJmimGDBw28snkAyP/BYynCQf/tO8gCqaKgZgqb/fO4Uk090jMsPdPZLMzHD3JMk3j91oAKCK5oopIEv96JQnJ/JrJ7901J27bTAjAFO0WQ0A+hfe7p9n3fXsm2PHPnXuCcdd8uoUMqaMfuWes/fYam4AUBO0W9QUXzhw+gXmHwgA0y65wearLjn/MHyhmaD5omaGL1QzxZermWIqUkRVAEDUTFVF8B0xAQBWUDggShAAABBBAJ0BKqAAoAA+USSPRSOiIRSqxVg4BQS2AGsW+e+vDn7p5rNZfq3469e3Yv1R5tnN//O+6/5v/4j1I/oX/g+4H+oHnHfsB7l/MB/SP9F+3fur/5D1If3n1AP6n/oPWd/4/sJegB+z3q4/8T9vvgj/bH9uPgP/YL/99YB/5vUA7IL+1fh54df4zpDPVnuJnHvuj+z80PA3gBfkH8/8BHafWf9ALuf+tfjcanff72AP1b8Y3wPvLfYD/m39c/5/+H91/+c/9v+e8630P/3P8j8A/8x/rH/N/u/+H97r2Vfuh7IP69M4nE4nE4m9G+p2OVu3f4F503CG308V9KgKNqMfq/dsVvPmdnGvVfhwWtvy1+lOs6fzGkiCoLmXDVX8sW4QCFqPa+5E3DmBhymHzZIVHgfEfJ5U8JzPSvdrkErKLkfnCDZAMeUEsERrWGWkDF3AAbkt8kKSa+PLJ5WvuTmS9mTbz54p50wVLxvoH3RZP3/7CXXKS6tqu8g4zJPpRxfh39w7D8DBim2sorxjRqbMHn94va0hGd20WI6JKDHHKdIU0Gam94EU+V/n0npd5wFSbWEgKYl08MEfIdjS8/SM8tulbq32RaWRnNGeYXwnmkR4N0CD+AUHFy9EW83KhjGylo1Voe1oXU3onte/QQMcsCx51QKpsmLW+WgZfD5PhpMdM8H7EkwScTjacSrNtRAA/v7QHAADn9G2bfMAb2U6mOgVjIIZ6YGMf+vxlW2dbu2uWo5xUWAX2Saa54dScI+l3s2drvj/VTfha2ZOz9OcuIZxvFNUUPIaj8dsgNjTMnPPSo2+zrBvZ1rChY/TBmgrjds3/kcaLQO57Ehcw0xWiI6fKujvfwfOuuhYwpqdS+d35QBXb9Tby9uy7cK1zj/U2lf4JMftbvZWNqA9n41jHuDBB48wMqhWH5ww3Wg1zR98gq3TglAlzEEcOsFOspf3jCdDIzrbyrn6UWplQuKMwLxslkS/Rn0kapLoIw1ncYbK1JEyegmvHWHjCrZEV7bjnkLnetBWM7J5nT9fNELfpxEbby29ytYTl2va8QPlf+Z1N6GEcmlumQ4WqMb9EpWmsTeXqx3fgsU3m5IJxF/ziMeQ/XcCNx6t3nf39v/+1WniVUSyqcDEw9CY/kE3hO2C2TyeSBqs9L43yWpVumAPdsmnf5fiECCHGU97DFtvK9K8xkoEQ8lsySR2XW+LTlZ7jCChwDj2zmMNSvkAov/uZ5/MqA8tqTM9V6yjUvDoKyUOpEmWfUR3/kSaPCyhaFzGweKR6SyttnbFm/guFwwzHGOAYMLBluXYFjhnyq0u79droiH3/avnv19TZb1xBYKlJAd/8UVDykWe5JiWRmfiZNqoudnIfxxw8h7CQD1TTZToHN7bo/+xA/UgFN+NvKoAggWpFAes1d8k7xv3j3XO/+cc0FGOkavAy48eV1NwjWzqhUt2GMAjLoWerlussPjircFnVVO/D33vg4PN+/VoPR3n4bMOeyvnA5ufytM4alCUBqzofl2z65qu9SaqTHKddZZEJvVxAYe8I/TVPJo7rdN2o8hydbV0W7pqv7/oXjP9qDo9c3jyqYp+YzLo2nD/s8ghrqH7RkK4OnltVwpW5UwJJAW2ymrUi3g+xJ7Fzm2Ca1W7hrYZA6enzx/YP8HQ32ldg37K65YZSw2UHpC9uVLWSPS5Y+RaVnUh37ADfswVtgXaIysQNqMvErul0jK0yb5LfG2b47j5uXcAnM2/eTg7tdyuL/Quwz/IrnArhvqa++IGrfVTEAhdCyPw02MeP6rH76VLwq7xZxby3DQGgXk/w9k9ctpl2qORfhTqpm57YL8x54xc53mEa0no9LCfXNsLl2frDuudlfYKsVP1xK9xJNQIZL3K31VwjwcBAgQ6dOPCkk4LScQRAmdReffsLODvKoY6gTD3RiqUXXE61MQrpExQs7213vsFTatYxF1pXc0PEQ0ifZ4caHM09bpWna+3DyWqMXrTez65svmj94ryDzIpiWmikfZaZS8sqvs/algDewAFAqCxvu8Sq3m1AeNCXOY+jwhcYl8MWAR51wANJGwQWJ31h+DANBMOOGOqb2xzF2CbU4HCZ+htIR3Co+46yhE+avHFJUfAXqlgFu6Z8AStBrQtEpymSnVyoT+iDwC16RhoeXUcjZuZZvTj2rmv/pTueOKiM9j7OBSna/+gaHk6F5wOoOBvMLy7QJDL7uR8vdpxAtRD0OUSUMpjhGoLaCgHvrwUBJTB9HurJcY4qvpMvuwhMzsQCuBaVs22cjUrO6LqviYkKTi+M7iGlluD/c4XHC29uHreqbfYKR3huwli+ZsBdH8Yps9RbPEF+bzBJfW81oPbH7RZFgpg1IrWeD4MxMlw66DSbzvr3f0er3koFVKm6qRiXiFeg4xaD6OZ/O/EdtiydDmoj3sHTP8sm3zPZBsGg6rzxHydHv23MFo29g9P10gbmQxR5Rd/3iYjo+YBZqGuUfWSYA3vbdfo0elsZXlYMhFEGZEMwWRfoQI28i2+5e15/Z9D1E9Iz1f2/DX+il2IvSXicWXoTQRsoEPum57/OXW2Rh6sGNM1CbX90on2i6qoxWzwRv1Q0cBEjHCYG6CXr9OtudtI7U9c2qs0HTih+7Qg8zCe/lKHT9w0mD6yyVPlXJWFATR+Eoxd28G8k+ojWNW5zoBjOrso+/z7hGNc/WaGsMc0WV5Ke/sZPllDP0pQmXYcf7/loCrCwZq3/4+nVwejDznWILMaXGIle1Aq3xsG1MttSFgsYDSiegTJhzG70CGAWtVx/uiwV9k9vmQGC5mrlKbRNFJ6hdyZa9SjOd0Iz4grI85YBVF6ms2UtRWwnH/v2u44UyyF9x91C8T5UtJNcSSK+Wn13ET0Iij6ZA20vYauxbFee+tt72VugVlin0y17MZa+4xeZ05Ch/mo3W+dt61T8DtYLFvCNXsV2clG85o/ubxpJ5Ze//TSRMItZpYmAFHtK6OLGgXyrb2Bi6qC6K+aw7csSHdh2ZyK8UEBcCrxRKyOQUiptD0ImmYyBauo38U60XJN3PWijpc+yK+Md4ri7yVAptcwEPanmdh+ADGw+nAF7f9hQciWQT9qseKoqmkEDqCq/xOfkYWM6JUdOWwIdzjbU47saCeHl1ovZUMvv/8SpYf42ryUfRkVE0PSHwkWNLNt22NfOt0cbdujAzaMvc6/BxDm/mp4sgT6ThrXamO1uJ4lfX7FX75hmeJTEATPmGP16HgLqULvra8x7M+g4daQuz7Lc/Xin5GF9z5iQgbTBHV/ZFPmuzd+UH/OhT5Y1SCRkicyXzmtUa80PqwajWgWtWC2u15fm59QE0PCtfkhUq2nzqenm45QFm9VZIk3L+IdALIQHOHVH4kleX0oCFiDVvjk4zZJzpmJ3MGRXWvVxjyDmTxLkHCHVK4hvpNSXacwcnuNeAO5BNU/TM3asPPf4mZNmCZqM9HtTFOfgDrwsckR0CPKcMkRrUzHDJIjrrOFV7ejmtMR62UxSTr6Tqvc2cEPhtcXtTcddqHKFRpscWtqTyDvzWXoDcbQktHFC0czC97RRylr896ZV4lp73DdoGX8RODU7qUslGevqAThDjqU1WPjj+/7gmDVwz7ou/JxY1CQ5Ze0oa6SaUQfYa8/doxAo+hvEY7znxYuF2480Vcd7Jw4V4bfFtDP2Xrl5sFrysfkWr1LXa7lB2jXjNRKNDJoICBijws43qjRuUy+Fjo6dbMSwrgkKTrn6X/Mf50meNBvFaxPz6WYQAz+COV2i3AuqZG6yIOEr2VUSGCogd1CHKpqzUEqUpVy0akZzTo0g3SIyUn6COyvB6v+nyYlLT/TpxemNq3+HhP62WZZLI70isuLYYXCT+Du+sZEBAFBxtx13DrlAaJuBZmqHeTkMfIOdnTiZorNURoBvhM795FzRAuWsdrhTMpXmy68Y7+CWILjZqQyNt8QlCgvoTUjySUa1AT1IPFNB5kxu2QNT5tuH29x7W55OvsLe+BvUMV9PeTqg4uCBl0Jm7qFUZGdwRd4pevLYX+70P/z0/M//b+vZSZKI3E2edt00scr2ZC/lLtImKLzGZ19GvdxjT6NDwWNNUZx6b93skRFNSDjYtPFBYYzVzyU31Oz0/h1dz3G0h3wF1tC7H/zHuUdE3bWJmNodf8vXXNPlUG5wS3fCaHkHzDwJvHXO8JLRfmIKqwEliBkmeYwAqKe7yMRI7eXla1RU5zxsyd9sgVtsJnFo6GbMmtVVFugwoEo001LZvR/tCt9u+Lt/4YsIx6sjPMEUxMD0kWGoFAae5YgJD+U3dpmphDHWbI/z4/gYpjxPnYH2fEsPlT1b3qyCYjFFL6TGI5x7ew+e7QnXFYECi8zsdXspeDNoQ073BhV0WNVr7GsTAN7Lc+USR3eczchWF+rekwL8kYXgy120nHD/ZY3a3YAenFFPQ2yVCTLWSvNg+ELkny+hrmEfOD2rAxnK5s1jNC7tYw7Oj8feTmaMwnSt9ebyPLYzEJ6K4+wsHWU/cJgy0j5HuRNEuqJHS7vxkQu3AKmtCpwuWH1CNmIXS/fH4FeiCSnsADus2pc00asI/qBZIa8FW9cwf+mWAj+xYAtj01YP3hFF8mOKMQd0NOYtwiRACI5Pgyudwek/u7iNiYQPozSzyDP+WdE9iGjuKSwLLIVOB3o7fFL19kOUaNbCSJudYrkKpD9EGbWvwcbfd/acXbJbmYDlRaVkezgROmdfUMtfcCfTUNuR0/eoFkGSCMaLPTY2TWgGaPGeFuHjqUrii7Itn+nHdXfBsvDzXWmfd7gZ6PBL1l2dqrya6iSPSOD9OlsTvmHIn1vAsBugwqQKkd+H5xSYGhx0OOFPEAgG0p41UZXCk3hzz7fpcE78YqQtdlNvVXaH41LneGbN1J23sefeK/IeA+CUPyRBnybN123Kl4oRd0A27cEbLcvfl+bjOeZjnq1biwDeQckeCTNbz2NCVZltKEbP5WWGmX+kU+RspT4HMY691ZeGm/v9WpE8WsIoMf+JCs8F9+c0lFXP2aX/A0FrXQy4keKYRU/5BiYKIJ800QJy6D26Txxs55NCRJGGTz31vgnYIzGrJ686LxOUpHdMXgP3uTfSZJEk3/J/oSxfhapV6nDmVjr2M5RSsHa450PLlFa5kPkUZTUlSRbn+25ju1eZFeyuSjMVfBnFxVKS+8gLH70Hx+147g4of+OsLxmimyQFPHvLrz782796tqpg3BcOVFR/J8XJKFD8esEbFMfPNIRrn5tconhq2P8XIZTGv00cyJAeEZkbaUzkcmD+EIsnsqEdVSnrfdt+FQPZM5aJAjLFOQijyUvjmQsSXF7JFLyr8QJ6dxujArNP8chR4Pp3WsXAtgGO6gPanPlO2x5bnWnYPUhszx3VIGwf8XNq3+5UrtT+93G0fR44X3HCTZBqyqvhtSNO0H387upGkOFVvXXa//Gv6HBeyWLR6PyCQgourIIlo+NtoX2IHvolsPJLy0IA2832ajhIO3GZlT7kQIIr+1QGBG3MhV2hSDTJb/fdHwAAAAAAAAAAA==';
+window._opto_basketImgReady = false;
+window._opto_basketImg.onload = function(){ window._opto_basketImgReady = true; };
 var _opto_mode = 'headup';   // 'headup'|'iso'|'periph'|'vanish'|'mot'
 var _opto_dur  = 60;         // durée session en s
 var _opto_video=null, _opto_canvas=null, _opto_ctx=null;
@@ -33346,6 +33352,8 @@ window._opto_setMode = function(m){
               : 'Tourne la tête G/D avec épaules fixes · F11 Dissociation cervico-scapulaire · BIENTÔT',
     periph: en ? 'Fix the central red dot · tap corner targets without turning head · A3 Peripheral detection · COMING SOON'
               : 'Fixe le point rouge central · tape les cibles aux coins sans tourner la tête · A3 Détection périphérique · BIENTÔT',
+    vanish: en ? 'A real basketball bounces across the screen · hidden 300ms mid-way · hit the exit zone (A/B/C) · G3 Temporal occlusion.'
+              : 'Un vrai ballon de basket rebondit et traverse l\'écran · masqué 300ms mi-parcours · tape la zone de sortie (A/B/C) · G3 Occlusion temporelle.',
     mot:    en ? 'Track 3 of 8 moving balls for 8s · identify them at the end · A7-MOT NeuroTracker-lite.'
               : 'Suis 3 boules sur 8 pendant 8s · identifie-les à la fin · A7-MOT NeuroTracker-lite.',
     sp:     en ? 'Follow a single bright target through 6 trajectories (square · horizontal · vertical · 2 diagonals · circle) · keep head still · A7-SP Smooth Pursuit.'
@@ -33484,6 +33492,7 @@ function _opto_detect(){
     if (_opto_mode === 'headup')      _opto_analyzeHeadUp(poses);
     else if (_opto_mode === 'iso')    _opto_analyzeIso(poses);
     else if (_opto_mode === 'periph') _opto_analyzePeriph(poses);
+    else if (_opto_mode === 'vanish') _opto_analyzeVanish(poses);
     else if (_opto_mode === 'mot')    _opto_analyzeMot(poses);
     else if (_opto_mode === 'sp')     _opto_analyzeSp(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
@@ -33503,6 +33512,7 @@ function _opto_drawFrame(poses){
   if      (_opto_mode === 'headup') _opto_drawHeadUp(W, H);
   else if (_opto_mode === 'iso')    _opto_drawIso(W, H);
   else if (_opto_mode === 'periph') _opto_drawPeriph(W, H);
+  else if (_opto_mode === 'vanish') _opto_drawVanish(W, H);
   else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
   // ── Logo SENSEI (identique autres drills) ──
@@ -33527,11 +33537,14 @@ function _opto_drawHUD(W, H){
     headup: en ? 'HEAD UP · READ WITHOUT LOWERING' : 'TÊTE HAUTE · LIS SANS BAISSER',
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
     periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
+    vanish: en ? 'PREDICT BALL EXIT · HIT A/B/C'  : 'ANTICIPE LA SORTIE · TAPE A/B/C',
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
-  var bw = W*0.74, bh = H*0.09;
+  // ★ FIX : 0.56W au lieu de 0.74W, laisse 0.22W libre de chaque côté pour
+  //   que les boutons REC/STOP (coins sup.) ne chevauchent plus les bords
+  var bw = W*0.56, bh = H*0.09;
   var bx = W/2 - bw/2, by = H*0.09;
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
@@ -33551,9 +33564,11 @@ function _opto_drawHUD(W, H){
   ctx.fillText(txt, W/2, by + bh*0.5);
   // ── (2) Barre HUD : score + chrono SYMÉTRIQUES centrés autour de W/2
   //   ★ FIX : fin du déséquilibre (score left + chrono center = tout à gauche)
+  //   ★ FIX 2 : hy descendu de 0.235H → 0.30H pour SÉPARER clairement des
+  //     pilules consigne (qui finit à y=0.18H). Gap de 0.07H ≈ 50px, visuel aéré
   //   • Portrait (A11) : deux pilules remplissant la largeur
   //   • Landscape (A3 / F11 / A7-MOT / A7-SP) : duo centré autour du milieu
-  var hy = H * 0.235;
+  var hy = H * 0.30;
   var portrait = !!window._opto_portraitMode;
   var sbw, sbh, sbx, sby, cbw, cbh, cbx, cby;
   sbh = Math.max(56, H*0.08); cbh = sbh;
@@ -33824,10 +33839,10 @@ function _opto_drawPeriph(W, H){
     var corners = ['tl','tr','bl','br'];
     var c = corners[Math.floor(Math.random()*4)];
     var cx, cy;
-    if (c === 'tl') { cx = W*0.14; cy = H*0.42; }
-    else if (c === 'tr') { cx = W*0.86; cy = H*0.42; }
-    else if (c === 'bl') { cx = W*0.14; cy = H*0.80; }
-    else { cx = W*0.86; cy = H*0.80; }
+    if (c === 'tl') { cx = W*0.14; cy = H*0.48; }
+    else if (c === 'tr') { cx = W*0.86; cy = H*0.48; }
+    else if (c === 'bl') { cx = W*0.14; cy = H*0.82; }
+    else { cx = W*0.86; cy = H*0.82; }
     _opto_pt_targets.push({
       corner: c, x: cx, y: cy,
       r: Math.max(24, Math.min(W*0.032, H*0.05)),
@@ -33920,161 +33935,220 @@ function _opto_analyzePeriph(poses){
 }
 
 /* ═══════════════ MODE G3 · VANISHING TARGET ════════════════════════
-   Ballon traverse l'écran · masqué au milieu 300ms · tape zone de sortie
+   VRAI ballon de basket qui REBONDIT · masqué 300ms mi-parcours
+   · tape la zone de sortie A/B/C avec le poignet (HIT ×2.0 TDR-strict)
+═════════════════════════════════════════════════════════════════════ */
+function _opto_drawBasketball(ctx, x, y, r, rot){
+  // Dessine le PNG clipart utilisateur (fond transparent, pas de contour ajouté)
+  if (window._opto_basketImgReady && window._opto_basketImg){
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.drawImage(window._opto_basketImg, -r, -r, r*2, r*2);
+    ctx.restore();
+  } else {
+    // Fallback léger (cercle orange) tant que l'image n'a pas chargé
+    ctx.save();
+    ctx.fillStyle = '#e86d1f';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+}
+/* ═════ OPTION B : 3 zones AU SOL horizontales (A / B / C côte à côte)
+   Ballon entre par le haut, 2 rebonds visibles, occlusion 300ms strictes,
+   atterrit dans l'une des 3 zones au sol. Le joueur anticipe et tape la bonne
+   zone avec le poignet.
+   Paramètres scientifiquement calés (Zago/Lacquaniti, McIntyre) :
+     dur 3200ms · occlusion 300ms stricte · inter-balle 1500ms · timeout 3000ms
 ═════════════════════════════════════════════════════════════════════ */
 function _opto_drawVanish(W, H){
   var ctx = _opto_ctx;
   var en = window._lang === 'en';
   var now = Date.now();
-  // FIX 4a : tuto pédagogique affiché avant le 1er ball (idle au tout début)
+  var floorY = H*0.80;
+  // ── Tuto (avant la 1re balle)
   if (_opto_vt_phase === 'idle' && (_opto_vt_hitCount || 0) === 0 && _opto_vt_ballCount === 0){
-    // Panneau explicatif centré
-    var tx = W/2, ty = H*0.42;
-    var tw = Math.min(W*0.75, 720), th = H*0.22;
+    var tx = W/2, ty = H*0.48;
+    var tw = Math.min(W*0.70, 680), th = H*0.20;
     ctx.save();
     ctx.fillStyle = 'rgba(10,13,24,0.88)';
     _opto_roundRect(ctx, tx - tw/2, ty - th/2, tw, th, 14); ctx.fill();
     ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 3;
     _opto_roundRect(ctx, tx - tw/2, ty - th/2, tw, th, 14); ctx.stroke();
     ctx.fillStyle = '#64b4ff';
-    ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue",sans-serif';
+    ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(en?'HOW TO PLAY':'COMMENT JOUER', tx, ty - th*0.3);
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold '+Math.round(H*0.032)+'px "Barlow Condensed",sans-serif';
-    var l1 = en ? '1· The ball crosses the screen' : '1· Le ballon traverse l\'écran';
-    var l2 = en ? '2· It hides briefly behind the mask' : '2· Il disparaît derrière le masque';
-    var l3 = en ? '3· Hit zone A, B or C (right) where it exits' : '3· Tape zone A, B ou C (droite) où il sort';
+    ctx.font = 'bold '+Math.round(H*0.030)+'px "Barlow Condensed",sans-serif';
+    var l1 = en ? '1· The basketball bounces across the screen' : '1· Le ballon rebondit sur le sol';
+    var l2 = en ? '2· It hides 300ms before landing' : '2· Il disparaît 300ms avant d\'atterrir';
+    var l3 = en ? '3· Hit the landing zone A, B or C with your wrist' : '3· Tape la zone d\'atterrissage A, B ou C avec le poignet';
     ctx.fillText(l1, tx, ty - th*0.03);
-    ctx.fillText(l2, tx, ty + th*0.10);
+    ctx.fillText(l2, tx, ty + th*0.12);
     ctx.fillStyle = '#f5c518';
-    ctx.fillText(l3, tx, ty + th*0.23);
+    ctx.fillText(l3, tx, ty + th*0.27);
     ctx.restore();
   }
-  // Spawn ball si idle et délai OK
+  // ── Spawn : 3 zones AU SOL horizontales + ballon qui rebondit vers l'une d'elles
   if (_opto_vt_phase === 'idle' && now >= _opto_vt_nextBallTs){
     var dir = Math.random() < 0.5 ? 1 : -1;
-    var yBand = 0.45 + Math.random()*0.15; // y entre 45% et 60%
-    var dur = 2200 + Math.random()*1000;
-    // Zones de sortie : 3 (A haut · B milieu · C bas)
+    var dur = 3200; // 3.2s de traversée (scientifiquement calé)
     _opto_vt_zones = [];
-    var zoneCount = 3;
-    var zoneH = H*0.14;
-    var gap = H*0.025;
-    var totalH = zoneH * zoneCount + gap * (zoneCount-1);
-    var startY = H*0.28;
-    var exitZoneIdx = Math.floor(Math.random()*zoneCount);
-    for (var k=0;k<zoneCount;k++){
+    var zoneW = W*0.22;
+    var zoneH = H*0.10;
+    var centers = [W*0.22, W*0.50, W*0.78];
+    var exitIdx = Math.floor(Math.random()*3);
+    for (var k=0;k<3;k++){
       _opto_vt_zones.push({
-        y: startY + k*(zoneH+gap),
-        h: zoneH,
-        label: String.fromCharCode(65+k), // A, B, C
-        correct: (k === exitZoneIdx)
+        x: centers[k], y: floorY,
+        w: zoneW, h: zoneH,
+        label: String.fromCharCode(65+k),  // A, B, C
+        correct: (k === exitIdx)
       });
     }
-    var zoneCorrect = _opto_vt_zones[exitZoneIdx];
-    var exitY = zoneCorrect.y + zoneCorrect.h/2;
+    var targetZone = _opto_vt_zones[exitIdx];
     _opto_vt_ball = {
       startTs: now, dur: dur,
       startX: dir === 1 ? -40 : W + 40,
-      endX:   dir === 1 ? W + 40 : -40,
-      startY: H * yBand,
-      endY: exitY,
-      hideStart: dur*0.45, hideEnd: dur*0.72
+      endX: targetZone.x,
+      bounces: 2,                       // 2 rebonds visibles (puis atterrissage final)
+      spin: 0,
+      // ★ Occlusion 300ms STRICTES juste avant le dernier arc (pour forcer prédiction)
+      hideStart: dur*0.68, hideEnd: dur*0.68 + 300
     };
     _opto_vt_phase = 'flying';
     _opto_vt_answered = null;
     _opto_vt_ballCount++;
   }
-  // FIX 4b : timeout en phase answer (3s max pour taper, sinon on compte un miss)
+  // ── Timeout phase answer (3000ms avant d'invalider)
   if (_opto_vt_phase === 'answer' && now - _opto_vt_answerStart > 3000){
     _opto_miss++;
     _opto_vt_phase = 'result';
-    _opto_vt_answered = null; // ne mettra pas en évidence une mauvaise réponse
+    _opto_vt_answered = null;
     setTimeout(function(){
       if (!_opto_running) return;
       _opto_vt_phase = 'idle';
       _opto_vt_ball = null; _opto_vt_zones = [];
-      _opto_vt_nextBallTs = Date.now() + 800;
-    }, 1000);
+      _opto_vt_nextBallTs = Date.now() + 1500;  // 1.5s de respiration
+    }, 1200);
   }
-  // Draw ball flying
+  // ── Dessin sol pointillé
+  ctx.save();
+  ctx.strokeStyle = 'rgba(100,180,255,0.35)';
+  ctx.lineWidth = 2; ctx.setLineDash([8,6]);
+  ctx.beginPath();
+  ctx.moveTo(W*0.03, floorY); ctx.lineTo(W*0.97, floorY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // ── Dessin des 3 zones au sol (A/B/C) — fond semi-transparent + label
+  for (var i=0;i<_opto_vt_zones.length;i++){
+    var z = _opto_vt_zones[i];
+    var zx = z.x - z.w/2, zy = z.y - z.h/2;
+    var answered = _opto_vt_answered === z.label;
+    var reveal = _opto_vt_phase === 'result';
+    var fillCol = reveal && z.correct ? 'rgba(74,222,128,0.45)' :
+                  reveal && answered ? 'rgba(255,138,148,0.45)' :
+                  'rgba(13,17,23,0.55)';
+    var strokeCol = reveal && z.correct ? '#4ade80' :
+                    reveal && answered ? '#ff8a94' : '#f5c518';
+    ctx.fillStyle = fillCol;
+    _opto_roundRect(ctx, zx, zy, z.w, z.h, 10); ctx.fill();
+    ctx.strokeStyle = strokeCol;
+    ctx.lineWidth = 3; ctx.setLineDash([6,5]);
+    _opto_roundRect(ctx, zx, zy, z.w, z.h, 10); ctx.stroke();
+    ctx.setLineDash([]);
+    // Label gros
+    ctx.fillStyle = reveal && z.correct ? '#4ade80' : '#f5c518';
+    ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(z.label, z.x, z.y);
+  }
+  // ── Dessin ballon rebondissant
   if (_opto_vt_ball){
-    var t = (now - _opto_vt_ball.startTs) / _opto_vt_ball.dur;
+    var elapsed = now - _opto_vt_ball.startTs;
+    var t = elapsed / _opto_vt_ball.dur;
     if (t < 1){
-      var hidden = (now - _opto_vt_ball.startTs) > _opto_vt_ball.hideStart &&
-                   (now - _opto_vt_ball.startTs) < _opto_vt_ball.hideEnd;
+      var hidden = elapsed > _opto_vt_ball.hideStart && elapsed < _opto_vt_ball.hideEnd;
+      // X linéaire sur la traversée (vers la zone cible)
       var bx = _opto_vt_ball.startX + (_opto_vt_ball.endX - _opto_vt_ball.startX) * t;
-      var by = _opto_vt_ball.startY + (_opto_vt_ball.endY - _opto_vt_ball.startY) * t;
-      if (!hidden){
-        var r = Math.max(16, W*0.022);
-        var gb = ctx.createRadialGradient(bx-r*0.3, by-r*0.3, 0, bx, by, r);
-        gb.addColorStop(0, '#ffb47a'); gb.addColorStop(0.6, '#ff7730'); gb.addColorStop(1, '#c04010');
-        ctx.fillStyle = gb;
-        ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI*2); ctx.fill();
-        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+      // Y : rebonds multiples amortis
+      var bN = _opto_vt_ball.bounces;
+      // On fait bN bonds visibles sur 0..0.85, puis 0.85..1 = descente vers la zone
+      var t1 = Math.min(1, t / 0.85);
+      var phase = (t1 * bN) % 1;
+      var bidx = Math.floor(t1 * bN);
+      var decay = Math.pow(0.70, bidx);
+      var baseApex = floorY - H*0.30;
+      var apex = baseApex * decay;
+      var by;
+      if (t < 0.85){
+        by = floorY - Math.sin(Math.PI * phase) * apex;
       } else {
-        // Zone de masquage
-        var mx = W*0.42, mw = W*0.26;
-        var my = Math.min(_opto_vt_ball.startY, _opto_vt_ball.endY) - 50;
-        var mh = Math.abs(_opto_vt_ball.endY - _opto_vt_ball.startY) + 100;
-        ctx.fillStyle = 'rgba(10,13,24,0.88)';
-        ctx.fillRect(mx, my, mw, mh);
-        ctx.strokeStyle = 'rgba(100,180,255,0.4)';
+        // Dernier arc : du haut du dernier apex vers la zone
+        var lastT = (t - 0.85) / 0.15;
+        var lastApexY = floorY - apex;
+        by = lastApexY + (floorY - lastApexY) * Math.pow(lastT, 2);
+      }
+      var ballDir = (_opto_vt_ball.endX > _opto_vt_ball.startX) ? 1 : -1;
+      _opto_vt_ball.spin += (ballDir === 1 ? 0.35 : -0.35);
+      var r = Math.max(26, Math.min(W*0.038, H*0.065));
+      if (!hidden){
+        // Ombre au sol — se contracte quand la balle est haute
+        var airHeight = Math.max(0, (floorY - by) / baseApex);
+        var shadowScale = 1 - airHeight*0.55;
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(bx, floorY + 4, r*0.9*shadowScale, r*0.25*shadowScale, 0, 0, Math.PI*2);
+        ctx.fill();
+        // Ballon
+        _opto_drawBasketball(ctx, bx, by, r, _opto_vt_ball.spin);
+      } else {
+        // Masque d'occlusion vertical (300ms strict)
+        var mw = W*0.14, mx = bx - mw/2;
+        var mh = floorY - H*0.30;
+        var my = H*0.28;
+        ctx.fillStyle = 'rgba(10,13,24,0.92)';
+        _opto_roundRect(ctx, mx, my, mw, mh, 10); ctx.fill();
+        ctx.strokeStyle = 'rgba(100,180,255,0.55)';
         ctx.lineWidth = 2; ctx.setLineDash([8,6]);
-        ctx.strokeRect(mx, my, mw, mh);
+        _opto_roundRect(ctx, mx, my, mw, mh, 10); ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = '#64b4ff';
-        ctx.font = 'bold '+Math.round(H*0.08)+'px "Bebas Neue",sans-serif';
+        ctx.font = 'bold '+Math.round(H*0.10)+'px "Bebas Neue",sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText('?', mx + mw/2, my + mh/2);
       }
     } else if (_opto_vt_phase === 'flying'){
       _opto_vt_phase = 'answer';
-      _opto_vt_answerStart = now; // ★ FIX 4b : départ du timeout
+      _opto_vt_answerStart = now;
     }
   }
-  // Draw zones de sortie à droite
-  for (var i=0;i<_opto_vt_zones.length;i++){
-    var z = _opto_vt_zones[i];
-    var zx = W - W*0.08, zw = W*0.06;
-    var answered = _opto_vt_answered === z.label;
-    var reveal = _opto_vt_phase === 'result';
-    ctx.fillStyle = reveal && z.correct ? 'rgba(74,222,128,0.4)' :
-                    reveal && answered ? 'rgba(255,138,148,0.4)' :
-                    'rgba(0,0,0,0.5)';
-    ctx.fillRect(zx, z.y, zw, z.h);
-    ctx.strokeStyle = reveal && z.correct ? '#4ade80' :
-                      reveal && answered ? '#ff8a94' : '#f5c518';
-    ctx.lineWidth = 2; ctx.setLineDash([5,4]);
-    ctx.strokeRect(zx, z.y, zw, z.h);
-    ctx.setLineDash([]);
-    ctx.fillStyle = reveal && z.correct ? '#4ade80' : '#f5c518';
-    ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(z.label, zx + zw/2, z.y + z.h/2);
-  }
+  ctx.restore();
 }
 function _opto_analyzeVanish(poses){
-  if (_opto_vt_phase !== 'answer') return;
-  var W = _opto_canvas.width, H = _opto_canvas.height;
-  // Construit les cibles "zones" avec propriété .hit (pour que _opto_doHits puisse les marquer)
-  //   rayon généreux basé sur la plus grande dimension — HIT comme TDR Reaction ×2.0
+  // On autorise HIT dès que les zones sont affichées (dès le spawn)
+  // → le joueur peut anticiper AVANT l'atterrissage (c'est le principe G3)
+  if (_opto_vt_phase !== 'answer' && _opto_vt_phase !== 'flying') return;
+  if (!_opto_vt_zones.length) return;
+  // Zones au sol horizontales → cibles rondes pour _opto_doHits
   var zoneTargets = [];
   for (var i=0;i<_opto_vt_zones.length;i++){
     var z = _opto_vt_zones[i];
-    var zx = W - W*0.08, zw = W*0.06;
     zoneTargets.push({
-      x: zx + zw/2, y: z.y + z.h/2,
-      r: Math.max(zw*0.7, z.h*0.5),
-      label: z.label, correct: z.correct, born: _opto_vt_answerStart
+      x: z.x, y: z.y,
+      r: Math.max(z.w, z.h)/2,  // rayon généreux couvrant toute la zone
+      label: z.label, correct: z.correct,
+      born: (_opto_vt_ball ? _opto_vt_ball.startTs : Date.now())
     });
   }
+  // HIT strict TDR Reaction ×2.0 (mirror, moveThresh, directional — identique)
   _opto_doHits(poses, zoneTargets, 2.0, function(t, side, rt){
     _opto_vt_answered = t.label;
     _opto_vt_phase = 'result';
     if (t.correct){
-      _opto_hits++; _opto_score += 15;
+      _opto_hits++; _opto_vt_hitCount++;
+      _opto_score += 20 + Math.max(0, Math.round((2500 - rt)/150));
       if (typeof _td_beep === 'function') _td_beep(1320, 0.08, 0.15);
       if (navigator.vibrate) navigator.vibrate(30);
     } else {
@@ -34085,7 +34159,7 @@ function _opto_analyzeVanish(poses){
       if (!_opto_running) return;
       _opto_vt_phase = 'idle';
       _opto_vt_ball = null; _opto_vt_zones = [];
-      _opto_vt_nextBallTs = Date.now() + 800;
+      _opto_vt_nextBallTs = Date.now() + 1500;  // ★ 1.5s inter-balle
     }, 1200);
   });
 }
@@ -34155,7 +34229,7 @@ function _opto_drawMot(W, H){
     var b = _opto_mot_balls[i];
     b.x += b.vx * dt / 1000;
     b.y += b.vy * dt / 1000;
-    var padX = W*0.08, padYtop = H*0.32, padYbot = H*0.84;
+    var padX = W*0.08, padYtop = H*0.38, padYbot = H*0.84;
     if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
     if (b.x > W-padX) { b.x = W-padX; b.vx = -Math.abs(b.vx); }
     if (b.y < padYtop) { b.y = padYtop; b.vy = Math.abs(b.vy); }
@@ -34350,8 +34424,31 @@ function _opto_endSession(){
   if (_opto_rafId) cancelAnimationFrame(_opto_rafId);
   _opto_rafId = null;
   if (_opto_sessTimer){ clearInterval(_opto_sessTimer); _opto_sessTimer=null; }
+  // ★ Auto-stop REC pour déclencher replay modal avant d'afficher résultats
+  if (_opto_recActive) _opto_stopRec();
   _opto_showResults();
 }
+
+/* ─── STOP HARD (appelé par senseiCamStop quand cam fermée) ─────── */
+window._opto_stop = function(hard){
+  _opto_running = false;
+  if (_opto_rafId) cancelAnimationFrame(_opto_rafId);
+  _opto_rafId = null;
+  if (_opto_sessTimer){ clearInterval(_opto_sessTimer); _opto_sessTimer=null; }
+  // Stop recorder cleanly (no pending timer/state carry-over)
+  if (_opto_recorder){
+    try{ _opto_recorder.ondataavailable=null; _opto_recorder.onstop=null; _opto_recorder.onerror=null;
+         if (_opto_recorder.state!=='inactive') _opto_recorder.stop(); }catch(e){}
+  }
+  if (_opto_recStream){
+    try{ _opto_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){}
+    _opto_recStream = null;
+  }
+  _opto_recorder = null; _opto_recChunks = [];
+  _opto_recActive = false; _opto_recSec = 0;
+  clearInterval(_opto_recTimer); _opto_recTimer = null;
+  if (typeof _syncRecBtns === 'function') _syncRecBtns(false, '&#9632; STOP REC', '#e63946');
+};
 
 function _opto_showResults(){
   var en = window._lang === 'en';
@@ -34490,10 +34587,9 @@ function _opto_drawSp(W, H){
   var dt = Math.min(50, now - (_opto_sp_lastFrame || now));
   _opto_sp_lastFrame = now;
   _opto_sp_t += dt / 1000;
-  // ★ FIX : Zone safe DESCENDUE pour ne pas toucher la zone chrono (qui se termine à y=0.275H)
-  //   y1 passe de 0.32 → 0.42 : avec un ball halo de rayon ≈0.126H, le haut du halo
-  //   atteint y=0.42-0.126=0.294H, donc BIEN SOUS le chrono (qui se termine à 0.275H)
-  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.42, y2 = H*0.88;
+  // ★ FIX : Zone safe DESCENDUE (HUD finit maintenant à y=0.34H)
+  //   y1=0.48 : halo ball (r×1.8 ≈ 0.08H) donne top halo ≈ 0.40H, bien sous le HUD
+  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.48, y2 = H*0.90;
   var LAP_DUR = 6.0; // secondes par tour
   var prog = (_opto_sp_t % LAP_DUR) / LAP_DUR;
   // Détection tour complet
@@ -34551,12 +34647,12 @@ function _opto_drawSp(W, H){
   else if (patternIdx === 4){ ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y1); ctx.stroke(); }
   else { ctx.beginPath(); ctx.arc(cx, cy, Math.min(halfW,halfH), 0, Math.PI*2); ctx.stroke(); }
   ctx.setLineDash([]);
-  // ★ Pattern name (centré, entre chrono et trajectoire : y=0.33H)
+  // ★ Pattern name (centré, entre HUD et trajectoire : y=0.385H, sous nouveau HUD à 0.34H)
   ctx.font = 'bold '+Math.round(H*0.032)+'px "Bebas Neue",sans-serif';
   var pn = patternNames[patternIdx];
   var pnW = ctx.measureText(pn).width + 28;
   var pnH = H*0.045;
-  var pnX = W/2 - pnW/2, pnY = H*0.33;
+  var pnX = W/2 - pnW/2, pnY = H*0.385;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, pnX, pnY - pnH/2, pnW, pnH, 7); ctx.fill();
@@ -34719,12 +34815,14 @@ function _opto_applyLang(lang){
       'A11 · HEAD-UP SCAN (read without lowering)',
       'F11 · HEAD/TRUNK ISO (rotate head, fix shoulders)',
       'A3 · PERIPHERAL TARGET (fix center, hit corners)',
+      'G3 · VANISHING TARGET (predict bouncing ball exit)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
       'A3 · PERIPHERAL TARGET (fixe centre, tape coins)',
+      'G3 · VANISHING TARGET (anticipe le rebond du ballon)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)'
     ];
@@ -41468,6 +41566,7 @@ function senseiCamStop(){
   if(m==='ss'&&typeof _ss_stopCamera==='function')_ss_stopCamera();
   if(m==='bt'&&typeof _bt_stopCamera==='function')_bt_stopCamera();
   if(m==='dlim'&&typeof _dlim_stop==='function')_dlim_stop(true);
+  if(m==='opto'&&typeof _opto_stop==='function')_opto_stop(true);
   // Restaurer tous les panels tr-panel
   document.querySelectorAll('.tr-panel').forEach(function(p){
     p.style.visibility = '';
