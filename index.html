@@ -2736,7 +2736,6 @@ window._dojoBackHome = function(){
           <option value="headup">A11 · HEAD-UP SCAN (lis sans baisser la tête)</option>
           <option value="iso">F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)</option>
           <option value="periph">A3 · PERIPHERAL TARGET (fixe centre, tape coins)</option>
-          <option value="vanish">G3 · VANISHING TARGET (anticipe sortie balle)</option>
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
         </select>
@@ -33347,8 +33346,6 @@ window._opto_setMode = function(m){
               : 'Tourne la tête G/D avec épaules fixes · F11 Dissociation cervico-scapulaire · BIENTÔT',
     periph: en ? 'Fix the central red dot · tap corner targets without turning head · A3 Peripheral detection · COMING SOON'
               : 'Fixe le point rouge central · tape les cibles aux coins sans tourner la tête · A3 Détection périphérique · BIENTÔT',
-    vanish: en ? 'Anticipate ball exit after 300ms occlusion · G3 Temporal occlusion · COMING SOON'
-              : 'Anticipe la sortie du ballon après 300ms d\'occlusion · G3 Occlusion temporelle · BIENTÔT',
     mot:    en ? 'Track 3 of 8 moving balls for 8s · identify them at the end · A7-MOT NeuroTracker-lite.'
               : 'Suis 3 boules sur 8 pendant 8s · identifie-les à la fin · A7-MOT NeuroTracker-lite.',
     sp:     en ? 'Follow a single bright target through 6 trajectories (square · horizontal · vertical · 2 diagonals · circle) · keep head still · A7-SP Smooth Pursuit.'
@@ -33487,7 +33484,6 @@ function _opto_detect(){
     if (_opto_mode === 'headup')      _opto_analyzeHeadUp(poses);
     else if (_opto_mode === 'iso')    _opto_analyzeIso(poses);
     else if (_opto_mode === 'periph') _opto_analyzePeriph(poses);
-    else if (_opto_mode === 'vanish') _opto_analyzeVanish(poses);
     else if (_opto_mode === 'mot')    _opto_analyzeMot(poses);
     else if (_opto_mode === 'sp')     _opto_analyzeSp(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
@@ -33507,7 +33503,6 @@ function _opto_drawFrame(poses){
   if      (_opto_mode === 'headup') _opto_drawHeadUp(W, H);
   else if (_opto_mode === 'iso')    _opto_drawIso(W, H);
   else if (_opto_mode === 'periph') _opto_drawPeriph(W, H);
-  else if (_opto_mode === 'vanish') _opto_drawVanish(W, H);
   else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
   // ── Logo SENSEI (identique autres drills) ──
@@ -33532,7 +33527,6 @@ function _opto_drawHUD(W, H){
     headup: en ? 'HEAD UP · READ WITHOUT LOWERING' : 'TÊTE HAUTE · LIS SANS BAISSER',
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
     periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
-    vanish: en ? 'PREDICT BALL EXIT'               : 'ANTICIPE LA SORTIE DU BALLON',
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE'
   };
@@ -33555,11 +33549,21 @@ function _opto_drawHUD(W, H){
     ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   }
   ctx.fillText(txt, W/2, by + bh*0.5);
-  // ── (2) Barre HUD AGRANDIE : score et chrono plus gros, zéro collision ──
+  // ── (2) Barre HUD : score et chrono répartis symétriquement
+  //   ★ FIX A11 : en portrait (headup), on remplit la largeur avec 2 pilules
+  //   égales 0.04W-0.48W et 0.52W-0.96W — plus esthétique, pas de cramped
   var hy = H * 0.235;
-  // Score box gauche (plus large + plus haut)
-  var sbw = Math.max(130, W*0.18), sbh = Math.max(56, H*0.08);
-  var sbx = W*0.03, sby = hy - sbh/2;
+  var portrait = !!window._opto_portraitMode;
+  var sbw, sbh, sbx, sby, cbw, cbh, cbx, cby;
+  sbh = Math.max(56, H*0.08); cbh = sbh;
+  if (portrait){
+    sbw = W*0.44; sbx = W*0.04; sby = hy - sbh/2;
+    cbw = W*0.44; cbx = W*0.52; cby = hy - cbh/2;
+  } else {
+    sbw = Math.max(130, W*0.18); sbx = W*0.03; sby = hy - sbh/2;
+    cbw = Math.max(130, W*0.18); cbx = W/2 - cbw/2; cby = hy - cbh/2;
+  }
+  // Score pill
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.fill();
   ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 2;
@@ -33572,20 +33576,22 @@ function _opto_drawHUD(W, H){
   ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
   ctx.textBaseline = 'alphabetic';
   ctx.fillText(String(_opto_score), sbx + sbw/2, sby + sbh*0.92);
-  // Chrono centré (plus large aussi)
+  // Chrono pill
   var remain = Math.max(0, _opto_dur - _opto_elapsed);
   var mm = Math.floor(remain/60), ss = remain%60;
   var tStr = mm + ':' + (ss<10?'0':'') + ss;
-  var cbw = Math.max(130, W*0.18), cbh = sbh;
-  var cbx = W/2 - cbw/2, cby = hy - cbh/2;
   ctx.fillStyle = 'rgba(0,0,0,0.90)';
   _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.fill();
   ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.stroke();
+  ctx.fillStyle = '#9ba3b4';
+  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText(en?'TIME':'CHRONO', cbx + cbw/2, cby + cbh*0.08);
   ctx.fillStyle = remain <= 5 ? '#ff8a94' : '#4ade80';
-  ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(tStr, W/2, cby + cbh/2);
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(tStr, cbx + cbw/2, cby + cbh*0.92);
 }
 
 /* ───────── HIT DETECTION STRICTEMENT IDENTIQUE À TDR REACTION ─────────
@@ -33647,70 +33653,104 @@ function _opto_drawIso(W, H){
   //   (1) y=0.32-0.50 : YAW WHEEL + labels G/D sur ses côtés
   //   (2) y=0.56-0.68 : COMPTEUR SWINGS centré (badge jaune indépendant)
   //   (3) y=0.76-0.92 : BARRE ÉPAULES verte/rouge + label dessous
+  // ★ FIX F11 : panneau central unifié (wheel + compteur + barre épaules dans
+  //   une même "console" visuelle avec fond semi-transparent commun)
   var shouldersOK = Math.abs(_opto_iso_shouldersDrift) < 0.08;
   ctx.save();
 
-  // ═══ ÉTAGE 1 : YAW WHEEL ═══
-  var wx = W/2, wy = H*0.41;
-  var wR = Math.min(W*0.14, H*0.11);
-  // Arc fond
-  ctx.strokeStyle = 'rgba(100,180,255,0.35)';
-  ctx.lineWidth = 6;
+  // Panneau fond commun (toute la zone de jeu)
+  var pX = W*0.14, pY = H*0.32, pW = W*0.72, pH = H*0.60;
+  ctx.fillStyle = 'rgba(13,17,23,0.55)';
+  _opto_roundRect(ctx, pX, pY, pW, pH, 14); ctx.fill();
+  ctx.strokeStyle = 'rgba(100,180,255,0.25)'; ctx.lineWidth = 1.5;
+  _opto_roundRect(ctx, pX, pY, pW, pH, 14); ctx.stroke();
+
+  // ═══ ÉTAGE 1 : YAW WHEEL (centré en haut du panneau) ═══
+  var wx = W/2, wy = pY + pH*0.22;
+  var wR = Math.min(W*0.15, H*0.12);
+  // Arc fond épais
+  ctx.strokeStyle = 'rgba(100,180,255,0.30)';
+  ctx.lineWidth = 7;
   ctx.beginPath();
   ctx.arc(wx, wy, wR, Math.PI*1.2, Math.PI*1.8, false);
   ctx.stroke();
+  // Graduations G/D max (-45° / +45°)
+  ctx.strokeStyle = 'rgba(100,180,255,0.55)'; ctx.lineWidth = 3;
+  [-45, 0, 45].forEach(function(deg){
+    var a = Math.PI*1.5 + (deg/45)*(Math.PI*0.3);
+    var x0 = wx + Math.cos(a)*(wR-10), y0 = wy + Math.sin(a)*(wR-10);
+    var x1 = wx + Math.cos(a)*(wR+10), y1 = wy + Math.sin(a)*(wR+10);
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+  });
   // Marker
   var yawDeg = Math.max(-45, Math.min(45, _opto_iso_headYawS));
   var yawRad = Math.PI*1.5 + (yawDeg/45) * (Math.PI*0.3);
   var mx = wx + Math.cos(yawRad) * wR;
   var my = wy + Math.sin(yawRad) * wR;
-  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 9; ctx.lineCap = 'round';
+  ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 10; ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(wx, wy); ctx.lineTo(mx, my); ctx.stroke();
+  // Hub central
+  ctx.fillStyle = '#f5c518';
+  ctx.beginPath(); ctx.arc(wx, wy, 7, 0, Math.PI*2); ctx.fill();
   ctx.lineCap = 'butt';
-  // Labels G / D (sur les côtés du wheel, pas sur la barre épaules)
-  ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
+  // Labels G / D plus gros + mieux placés
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   var gTxt = '← G', dTxt = 'D →';
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  _opto_roundRect(ctx, wx - wR*1.6 - 30, wy - H*0.025, 60, H*0.05, 6); ctx.fill();
-  _opto_roundRect(ctx, wx + wR*1.6 - 30, wy - H*0.025, 60, H*0.05, 6); ctx.fill();
-  ctx.fillStyle = '#cfd3e0';
-  ctx.fillText(gTxt, wx - wR*1.6, wy);
-  ctx.fillText(dTxt, wx + wR*1.6, wy);
+  var chipW = 80, chipH = H*0.062;
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  _opto_roundRect(ctx, wx - wR*1.8 - chipW/2, wy - chipH/2, chipW, chipH, 7); ctx.fill();
+  _opto_roundRect(ctx, wx + wR*1.8 - chipW/2, wy - chipH/2, chipW, chipH, 7); ctx.fill();
+  ctx.fillStyle = '#f5c518';
+  ctx.fillText(gTxt, wx - wR*1.8, wy);
+  ctx.fillText(dTxt, wx + wR*1.8, wy);
 
-  // ═══ ÉTAGE 2 : COMPTEUR SWINGS (bloc isolé entre yaw wheel et barre épaules) ═══
+  // ═══ ÉTAGE 2 : COMPTEUR SWINGS (gros, au centre du panneau) ═══
   var swTxt = _opto_iso_swings + ' ↔';
-  ctx.font = 'bold '+Math.round(H*0.08)+'px "Bebas Neue",sans-serif';
-  var swW = ctx.measureText(swTxt).width + 44;
-  var swY = H*0.60;
-  ctx.fillStyle = 'rgba(245,197,24,0.15)';
-  _opto_roundRect(ctx, wx - swW/2, swY - H*0.05, swW, H*0.10, 10); ctx.fill();
-  ctx.strokeStyle = 'rgba(245,197,24,0.6)'; ctx.lineWidth = 2;
-  _opto_roundRect(ctx, wx - swW/2, swY - H*0.05, swW, H*0.10, 10); ctx.stroke();
+  var swY = pY + pH*0.55;
+  ctx.font = 'bold '+Math.round(H*0.090)+'px "Bebas Neue",sans-serif';
+  var swW = ctx.measureText(swTxt).width + 50;
+  var swH = H*0.11;
+  ctx.fillStyle = 'rgba(245,197,24,0.18)';
+  _opto_roundRect(ctx, wx - swW/2, swY - swH/2, swW, swH, 12); ctx.fill();
+  ctx.strokeStyle = 'rgba(245,197,24,0.65)'; ctx.lineWidth = 2.5;
+  _opto_roundRect(ctx, wx - swW/2, swY - swH/2, swW, swH, 12); ctx.stroke();
   ctx.fillStyle = '#f5c518';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(swTxt, wx, swY);
+  // Mini-label "CYCLES" sous le compteur
+  ctx.font = 'bold '+Math.round(H*0.018)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = '#9ba3b4';
+  ctx.fillText(en?'SWINGS G↔D':'OSCILLATIONS G↔D', wx, swY + swH/2 + H*0.02);
 
-  // ═══ ÉTAGE 3 : BARRE ÉPAULES (bien séparée du compteur) ═══
-  var slY = H*0.80, slW = W*0.50, slX = W/2 - slW/2;
+  // ═══ ÉTAGE 3 : BARRE ÉPAULES (reliée visuellement au panneau) ═══
+  var slY = pY + pH*0.88, slW = pW*0.75, slX = W/2 - slW/2;
+  // Guide rails pointillé gris foncé en fond
+  ctx.strokeStyle = 'rgba(155,163,180,0.25)';
+  ctx.lineWidth = 1.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(slX, slY); ctx.lineTo(slX + slW, slY); ctx.stroke();
+  ctx.setLineDash([]);
+  // Barre épaules colorée
   ctx.strokeStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.lineWidth = 8;
+  ctx.lineWidth = 9;
   ctx.beginPath();
   ctx.moveTo(slX, slY); ctx.lineTo(slX + slW, slY);
   ctx.stroke();
   ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.beginPath(); ctx.arc(slX, slY, 14, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(slX + slW, slY, 14, 0, Math.PI*2); ctx.fill();
-  // Label SOUS la barre (indépendant du compteur)
-  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  ctx.shadowBlur = shouldersOK ? 12 : 0; ctx.shadowColor = shouldersOK ? '#4ade80' : 'transparent';
+  ctx.beginPath(); ctx.arc(slX, slY, 16, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(slX + slW, slY, 16, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+  // Label SOUS la barre, plus gros
+  ctx.font = 'bold '+Math.round(H*0.034)+'px "Bebas Neue",sans-serif';
   var lblTxt = (en?'SHOULDERS LOCKED ':'ÉPAULES VERROUILLÉES ') + (shouldersOK?'✓':'✗');
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  var lblW = ctx.measureText(lblTxt).width + 24;
-  ctx.fillStyle = 'rgba(0,0,0,0.8)';
-  _opto_roundRect(ctx, W/2 - lblW/2, slY + 18, lblW, H*0.06, 8); ctx.fill();
+  var lblW = ctx.measureText(lblTxt).width + 28;
+  ctx.fillStyle = 'rgba(0,0,0,0.80)';
+  _opto_roundRect(ctx, W/2 - lblW/2, slY + 16, lblW, H*0.055, 8); ctx.fill();
   ctx.fillStyle = shouldersOK ? '#4ade80' : '#ff8a94';
-  ctx.fillText(lblTxt, W/2, slY + 18 + H*0.03);
+  ctx.fillText(lblTxt, W/2, slY + 16 + H*0.0275);
   ctx.restore();
 }
 function _opto_analyzeIso(poses){
@@ -33778,18 +33818,22 @@ function _opto_drawPeriph(W, H){
   var en = window._lang === 'en';
   var now = Date.now();
   // Spawn cible si pas déjà max 2
+  // ★ FIX : positions ajustées pour éviter collision avec SCORE (top-left)
+  //   et logo "Powered by SENSEI AI" (bottom-right)
+  //   TL/TR : y=0.42H (bien SOUS la barre HUD qui se termine à y=0.275H)
+  //   BL/BR : y=0.80H (bien AU-DESSUS du logo qui est à y≈0.92H)
+  //   x : 0.14W / 0.86W (plus centrés que les coins exacts)
   if (_opto_pt_targets.length < 2 && now - _opto_pt_lastSpawn > 1200){
     var corners = ['tl','tr','bl','br'];
     var c = corners[Math.floor(Math.random()*4)];
     var cx, cy;
-    var m = Math.min(W*0.06, H*0.08);
-    if (c === 'tl') { cx = m + W*0.05; cy = H*0.30; }
-    else if (c === 'tr') { cx = W - m - W*0.05; cy = H*0.30; }
-    else if (c === 'bl') { cx = m + W*0.05; cy = H*0.85; }
-    else { cx = W - m - W*0.05; cy = H*0.85; }
+    if (c === 'tl') { cx = W*0.14; cy = H*0.42; }
+    else if (c === 'tr') { cx = W*0.86; cy = H*0.42; }
+    else if (c === 'bl') { cx = W*0.14; cy = H*0.80; }
+    else { cx = W*0.86; cy = H*0.80; }
     _opto_pt_targets.push({
       corner: c, x: cx, y: cy,
-      r: Math.max(26, Math.min(W*0.035, H*0.055)),
+      r: Math.max(24, Math.min(W*0.032, H*0.05)),
       born: now
     });
     _opto_pt_lastSpawn = now;
@@ -34108,15 +34152,17 @@ function _opto_drawMot(W, H){
     return;
   }
   // Mise à jour positions (continu)
+  // ★ FIX : zone balles réduite en Y : 0.32H → 0.84H pour laisser 0.86H-0.96H
+  //   au badge cycles sans collision avec les balles
   for (var i=0;i<_opto_mot_balls.length;i++){
     var b = _opto_mot_balls[i];
     b.x += b.vx * dt / 1000;
     b.y += b.vy * dt / 1000;
-    var padX = W*0.08, padY = H*0.32;
+    var padX = W*0.08, padYtop = H*0.32, padYbot = H*0.84;
     if (b.x < padX) { b.x = padX; b.vx = Math.abs(b.vx); }
     if (b.x > W-padX) { b.x = W-padX; b.vx = -Math.abs(b.vx); }
-    if (b.y < padY) { b.y = padY; b.vy = Math.abs(b.vy); }
-    if (b.y > H*0.93) { b.y = H*0.93; b.vy = -Math.abs(b.vy); }
+    if (b.y < padYtop) { b.y = padYtop; b.vy = Math.abs(b.vy); }
+    if (b.y > padYbot) { b.y = padYbot; b.vy = -Math.abs(b.vy); }
   }
   // Draw boules : colorées en premier (dessus), blanches en arrière-plan
   for (var pass=0;pass<2;pass++){
@@ -34133,15 +34179,19 @@ function _opto_drawMot(W, H){
       ctx.shadowBlur = 0;
     }
   }
-  // Compteur cycles (bas centre)
-  var cycTxt = _opto_mot_cycleCount + (en?' CYCLES ·  ':' CYCLES ·  ') + Math.ceil(8 - (now - _opto_mot_phaseStart)/1000) + 's';
+  // Compteur cycles (bas centre, pastille nette au-dessous des balles)
+  var cycTxt = _opto_mot_cycleCount + (en?' CYCLES · ':' CYCLES · ') + Math.ceil(8 - (now - _opto_mot_phaseStart)/1000) + 's';
   ctx.save();
-  ctx.font = 'bold '+Math.round(H*0.04)+'px "Bebas Neue",sans-serif';
+  ctx.font = 'bold '+Math.round(H*0.038)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  var cW = ctx.measureText(cycTxt).width + 36;
-  var cY = H*0.95;
-  ctx.fillStyle = 'rgba(0,0,0,0.80)';
-  _opto_roundRect(ctx, W/2 - cW/2, cY - H*0.03, cW, H*0.055, 8); ctx.fill();
+  var cW = ctx.measureText(cycTxt).width + 44;
+  var cH = H*0.06;
+  var cY = H*0.91;
+  // Pastille pleine opaque bordée jaune
+  ctx.fillStyle = 'rgba(13,17,23,0.92)';
+  _opto_roundRect(ctx, W/2 - cW/2, cY - cH/2, cW, cH, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(245,197,24,0.6)'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, W/2 - cW/2, cY - cH/2, cW, cH, 10); ctx.stroke();
   ctx.fillStyle = '#f5c518';
   ctx.fillText(cycTxt, W/2, cY);
   ctx.restore();
@@ -34334,7 +34384,7 @@ window._opto_save = function(){
   var sv = document.getElementById('opto_btnSave'); if (sv) sv.style.display = 'none';
 };
 
-/* ─── REC (pattern identique autres drills caméra) ────────── */
+/* ─── REC (pattern STRICT DLIM : _syncRecBtns + _replay.show + _dlBlob) ─── */
 var _opto_recorder=null, _opto_recChunks=[], _opto_recStream=null, _opto_recActive=false;
 var _opto_recTimer=null, _opto_recSec=0;
 
@@ -34345,12 +34395,11 @@ function _opto_startRec(){
   if (_opto_countdownActive){ _opto_recPending = true; return; }
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_opto_recTimer); _opto_recTimer = null;
-  if (_opto_recorder){ try{_opto_recorder.ondataavailable=null;_opto_recorder.onstop=null;_opto_recorder.onerror=null;if(_opto_recorder.state!=='inactive')_opto_recorder.stop();}catch(e){} }
+  if (_opto_recorder){ try{ _opto_recorder.ondataavailable=null; _opto_recorder.onstop=null; _opto_recorder.onerror=null; if(_opto_recorder.state!=='inactive')_opto_recorder.stop(); }catch(e){} }
   if (_opto_recStream){ try{_opto_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _opto_recStream=null; }
   _opto_recorder=null; _opto_recChunks=[]; _opto_recSec=0; _opto_recActive=false;
   var cv = _opto_canvas; if (!cv) return;
-  var stream;
-  try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
+  var stream; try { stream = cv.captureStream ? cv.captureStream(25) : null; } catch(e){}
   if (!stream) return;
   if (typeof _td_combineStreamWithAudio === 'function') stream = _td_combineStreamWithAudio(stream);
   _opto_recStream = stream;
@@ -34364,35 +34413,39 @@ function _opto_startRec(){
     var mimeFinal = (_opto_recorder && _opto_recorder.mimeType) || 'video/webm';
     var blob = new Blob(_opto_recChunks, {type: mimeFinal});
     if (_opto_recStream){ try{_opto_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});}catch(e){} _opto_recStream=null; }
-    _opto_recActive = false;
-    _opto_updateRecBtn();
+    _opto_recActive=false; _opto_recChunks=[]; _opto_updateRecBtn();
     if (!blob || blob.size < 1024) return;
-    if (typeof _tsym_shareOrDownload === 'function') _tsym_shareOrDownload(blob, 'sensei_opto_'+_opto_mode+'_'+Date.now());
+    var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
+    var fn = 'SENSEI_OPTOMOTOR_'+_opto_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    if (window._replay && window._replay.show){
+      window._replay.show(blob, { title:'SENSEI OPTOMOTOR · '+_opto_mode, filename:fn, onSave:function(b,filename){ _opto_dlBlob(b, filename); } });
+    } else _opto_dlBlob(blob, fn);
   };
-  _opto_recorder.onerror = function(){};
-  try { _opto_recorder.start(1000); } catch(e){ return; }
-  _opto_recActive = true;
-  _opto_updateRecBtn();
-  _opto_recTimer = setInterval(function(){
-    _opto_recSec++;
-    _opto_updateRecBtn();
-    if (_opto_recSec >= 180) _opto_stopRec(); // 3 min max
-  }, 1000);
+  _opto_recorder.onerror = function(){ clearInterval(_opto_recTimer); };
+  setTimeout(function(){
+    if (!_opto_recorder) return;
+    try { _opto_recorder.start(1000); _opto_recActive = true; } catch(e){ return; }
+    _opto_recTimer = setInterval(function(){
+      _opto_recSec++;
+      var mm=Math.floor(_opto_recSec/60)%60, ss=_opto_recSec%60, hh=Math.floor(_opto_recSec/3600);
+      var t=(hh>0?(hh<10?'0':'')+hh+':':'')+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+      if (typeof _syncRecBtns === 'function') _syncRecBtns(true, '&#9632; STOP REC · '+t, '#7a0000');
+      if (_opto_recSec >= 180) _opto_stopRec();
+    }, 1000);
+  }, 200);
 }
 function _opto_stopRec(){
-  if (!_opto_recorder || !_opto_recActive) return;
-  try { if (_opto_recorder.state !== 'inactive') _opto_recorder.stop(); } catch(e){}
+  _opto_recActive=false; clearInterval(_opto_recTimer); _opto_recTimer=null;
+  if (_opto_recorder && _opto_recorder.state !== 'inactive'){ try{ _opto_recorder.stop(); }catch(e){} }
+  _opto_updateRecBtn();
 }
-function _opto_updateRecBtn(){
-  var rb = document.getElementById('sensei-cam-rec-btn');
-  if (!rb) return;
-  if (_opto_recActive){
-    rb.textContent = '⏹ STOP · ' + _opto_recSec + 's';
-    rb.style.background = 'rgba(230,57,70,.95)';
-  } else {
-    rb.textContent = '● REC';
-    rb.style.background = 'rgba(230,57,70,.92)';
-  }
+function _opto_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_opto_recActive, '&#9632; STOP REC', '#e63946'); }
+function _opto_dlBlob(blob, fn){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = fn;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){} }, 400);
 }
 
 /* ─── UTILS ────────────────────────────────────────────────── */
@@ -34440,8 +34493,10 @@ function _opto_drawSp(W, H){
   var dt = Math.min(50, now - (_opto_sp_lastFrame || now));
   _opto_sp_lastFrame = now;
   _opto_sp_t += dt / 1000;
-  // Zone safe : x [0.20, 0.80], y [0.32, 0.88] — sous HUD, au-dessus de la zone chrono
-  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.32, y2 = H*0.88;
+  // ★ FIX : Zone safe DESCENDUE pour ne pas toucher la zone chrono (qui se termine à y=0.275H)
+  //   y1 passe de 0.32 → 0.42 : avec un ball halo de rayon ≈0.126H, le haut du halo
+  //   atteint y=0.42-0.126=0.294H, donc BIEN SOUS le chrono (qui se termine à 0.275H)
+  var x1 = W*0.20, x2 = W*0.80, y1 = H*0.42, y2 = H*0.88;
   var LAP_DUR = 6.0; // secondes par tour
   var prog = (_opto_sp_t % LAP_DUR) / LAP_DUR;
   // Détection tour complet
@@ -34499,17 +34554,21 @@ function _opto_drawSp(W, H){
   else if (patternIdx === 4){ ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y1); ctx.stroke(); }
   else { ctx.beginPath(); ctx.arc(cx, cy, Math.min(halfW,halfH), 0, Math.PI*2); ctx.stroke(); }
   ctx.setLineDash([]);
-  // ★ Pattern name (coin haut-gauche, sous HUD)
-  ctx.font = 'bold '+Math.round(H*0.035)+'px "Bebas Neue",sans-serif';
+  // ★ Pattern name (centré, entre chrono et trajectoire : y=0.33H)
+  ctx.font = 'bold '+Math.round(H*0.032)+'px "Bebas Neue",sans-serif';
   var pn = patternNames[patternIdx];
-  var pnW = ctx.measureText(pn).width + 24;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';
-  _opto_roundRect(ctx, W*0.02, H*0.26, pnW, H*0.045, 6); ctx.fill();
+  var pnW = ctx.measureText(pn).width + 28;
+  var pnH = H*0.045;
+  var pnX = W/2 - pnW/2, pnY = H*0.33;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, pnX, pnY - pnH/2, pnW, pnH, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(100,180,255,0.4)'; ctx.lineWidth = 1.5;
+  _opto_roundRect(ctx, pnX, pnY - pnH/2, pnW, pnH, 7); ctx.stroke();
   ctx.fillStyle = '#64b4ff';
-  ctx.fillText(pn, W*0.02 + 12, H*0.26 + H*0.0225);
-  // Cible (pastille lumineuse jaune ~W*0.04)
-  var tR = Math.max(26, Math.min(W*0.04, H*0.07));
+  ctx.fillText(pn, W/2, pnY);
+  // Cible (pastille lumineuse jaune, rayon réduit pour ne pas déborder)
+  var tR = Math.max(22, Math.min(W*0.03, H*0.045));
   // Halo
   var grad = ctx.createRadialGradient(tx, ty, 0, tx, ty, tR*1.8);
   grad.addColorStop(0, 'rgba(245,197,24,0.6)');
@@ -34663,14 +34722,12 @@ function _opto_applyLang(lang){
       'A11 · HEAD-UP SCAN (read without lowering)',
       'F11 · HEAD/TRUNK ISO (rotate head, fix shoulders)',
       'A3 · PERIPHERAL TARGET (fix center, hit corners)',
-      'G3 · VANISHING TARGET (anticipate ball exit)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
       'A3 · PERIPHERAL TARGET (fixe centre, tape coins)',
-      'G3 · VANISHING TARGET (anticipe sortie balle)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)'
     ];
