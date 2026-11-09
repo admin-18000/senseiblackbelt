@@ -28960,7 +28960,8 @@ function _tdr_startRec(){
       if (_cxFixTdr) { _cxFixTdr.save(); _cxFixTdr.globalAlpha = 0; _cxFixTdr.fillRect(0,0,1,1); _cxFixTdr.restore(); }
     }
   } catch(eFixT) { /* silencieux */ }
-  setTimeout(function() {
+  _tdr_startTimeoutId = setTimeout(function() {
+    _tdr_startTimeoutId = null;
     if (!_tdr_recorder) return;
     try { _tdr_recorder.start(1000); _tdr_recActive = true; }
     catch(eStartT) { _tdr_recError('start failed'); return; }
@@ -28980,19 +28981,13 @@ function _tdr_startRec(){
 }
 function _tdr_stopRec(){
   _tdr_recActive = false; clearInterval(_tdr_recTimer); _tdr_recTimer = null;
-  // ★ FIX race setTimeout 200ms : si STOP cliqué AVANT que recorder.start() ne s'exécute
-  //   (state === 'inactive'), on nullifie recorder + stream pour que le setTimeout
-  //   pending exit via son guard `if (!_tdr_recorder) return` et ne lance pas un
-  //   enregistrement fantôme.
-  if (_tdr_recorder) {
-    if (_tdr_recorder.state === 'inactive'){
-      try { _tdr_recorder.ondataavailable = null; _tdr_recorder.onstop = null; _tdr_recorder.onerror = null; } catch(e){}
-      _tdr_recorder = null;
-      if (_tdr_recStream){ try{ _tdr_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _tdr_recStream = null; }
-    } else { try { _tdr_recorder.stop(); } catch(e){} }
-  }
+  // ★ FIX race SAFE : annule juste le setTimeout pending (ne touche PAS recorder/stream)
+  if (_tdr_startTimeoutId){ clearTimeout(_tdr_startTimeoutId); _tdr_startTimeoutId = null; }
+  // Stop recorder seulement — tracks stoppées dans onstop (après drainage chunks)
+  if (_tdr_recorder) { try { if (_tdr_recorder.state && _tdr_recorder.state !== 'inactive') _tdr_recorder.stop(); } catch(e) {} }
   _tdr_updateRecBtn();
 }
+var _tdr_startTimeoutId = null;
 // Helper global : met à jour les 2 boutons REC (panneau ET overlay plein écran)
 function _syncRecBtns(active, html, bgIdle){
   var ids = ['tdr_btnRec','tsym_btnRec','dcog_btnRec','sensei-cam-rec-btn'];
@@ -29812,7 +29807,8 @@ function _tdrc_startRec(){
     } else { _tdrc_dlBlob(blob, fn); }
   };
   _tdrc_recorder.onerror = function(){ clearInterval(_tdrc_recTimer); };
-  setTimeout(function(){
+  _tdrc_startTimeoutId = setTimeout(function(){
+    _tdrc_startTimeoutId = null;
     if (!_tdrc_recorder) return;
     try { _tdrc_recorder.start(1000); _tdrc_recActive = true; } catch(e){ return; }
     _tdrc_recTimer = setInterval(function(){
@@ -29827,16 +29823,11 @@ function _tdrc_startRec(){
 }
 function _tdrc_stopRec(){
   _tdrc_recActive=false; clearInterval(_tdrc_recTimer); _tdrc_recTimer=null;
-  // ★ FIX race setTimeout 200ms (voir _tdr_stopRec pour détails)
-  if (_tdrc_recorder){
-    if (_tdrc_recorder.state === 'inactive'){
-      try{ _tdrc_recorder.ondataavailable=null; _tdrc_recorder.onstop=null; _tdrc_recorder.onerror=null; }catch(e){}
-      _tdrc_recorder = null;
-      if (_tdrc_recStream){ try{ _tdrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _tdrc_recStream = null; }
-    } else { try{ _tdrc_recorder.stop(); }catch(e){} }
-  }
+  if (_tdrc_startTimeoutId){ clearTimeout(_tdrc_startTimeoutId); _tdrc_startTimeoutId = null; }
+  if (_tdrc_recorder){ try{ if(_tdrc_recorder.state!=='inactive')_tdrc_recorder.stop(); }catch(e){} }
   _tdrc_updateRecBtn();
 }
+var _tdrc_startTimeoutId = null;
 function _tdrc_updateRecBtn(){
   // Utilise le bouton REC partagé (sensei-cam-rec-btn) via _syncRecBtns — idem TARGETS
   if (typeof _syncRecBtns === 'function'){
@@ -30409,7 +30400,8 @@ function _dcrc_startRec(){
     } else _dcrc_dlBlob(blob, fn);
   };
   _dcrc_recorder.onerror = function(){ clearInterval(_dcrc_recTimer); };
-  setTimeout(function(){
+  _dcrc_startTimeoutId = setTimeout(function(){
+    _dcrc_startTimeoutId = null;
     if (!_dcrc_recorder) return;
     try { _dcrc_recorder.start(1000); _dcrc_recActive = true; } catch(e){ return; }
     _dcrc_recTimer = setInterval(function(){
@@ -30423,16 +30415,11 @@ function _dcrc_startRec(){
 }
 function _dcrc_stopRec(){
   _dcrc_recActive=false; clearInterval(_dcrc_recTimer); _dcrc_recTimer=null;
-  // ★ FIX race setTimeout 200ms (voir _tdr_stopRec)
-  if (_dcrc_recorder){
-    if (_dcrc_recorder.state === 'inactive'){
-      try{ _dcrc_recorder.ondataavailable=null; _dcrc_recorder.onstop=null; _dcrc_recorder.onerror=null; }catch(e){}
-      _dcrc_recorder = null;
-      if (_dcrc_recStream){ try{ _dcrc_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _dcrc_recStream = null; }
-    } else { try{ _dcrc_recorder.stop(); }catch(e){} }
-  }
+  if (_dcrc_startTimeoutId){ clearTimeout(_dcrc_startTimeoutId); _dcrc_startTimeoutId = null; }
+  if (_dcrc_recorder){ try{ if(_dcrc_recorder.state!=='inactive')_dcrc_recorder.stop(); }catch(e){} }
   _dcrc_updateRecBtn();
 }
+var _dcrc_startTimeoutId = null;
 function _dcrc_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dcrc_recActive, '&#9632; STOP REC', '#e63946'); }
 function _dcrc_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -30957,7 +30944,8 @@ function _drsw_startRec(){
     } else _drsw_dlBlob(blob, fn);
   };
   _drsw_recorder.onerror = function(){ clearInterval(_drsw_recTimer); };
-  setTimeout(function(){
+  _drsw_startTimeoutId = setTimeout(function(){
+    _drsw_startTimeoutId = null;
     if (!_drsw_recorder) return;
     try { _drsw_recorder.start(1000); _drsw_recActive = true; } catch(e){ return; }
     _drsw_recTimer = setInterval(function(){
@@ -30971,15 +30959,11 @@ function _drsw_startRec(){
 }
 function _drsw_stopRec(){
   _drsw_recActive=false; clearInterval(_drsw_recTimer); _drsw_recTimer=null;
-  if (_drsw_recorder){
-    if (_drsw_recorder.state === 'inactive'){
-      try{ _drsw_recorder.ondataavailable=null; _drsw_recorder.onstop=null; _drsw_recorder.onerror=null; }catch(e){}
-      _drsw_recorder = null;
-      if (_drsw_recStream){ try{ _drsw_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _drsw_recStream = null; }
-    } else { try{ _drsw_recorder.stop(); }catch(e){} }
-  }
+  if (_drsw_startTimeoutId){ clearTimeout(_drsw_startTimeoutId); _drsw_startTimeoutId = null; }
+  if (_drsw_recorder){ try{ if(_drsw_recorder.state!=='inactive')_drsw_recorder.stop(); }catch(e){} }
   _drsw_updateRecBtn();
 }
+var _drsw_startTimeoutId = null;
 function _drsw_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_drsw_recActive, '&#9632; STOP REC', '#e63946'); }
 function _drsw_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -31590,7 +31574,8 @@ function _dqa_startRec(){
     } else _dqa_dlBlob(blob, fn);
   };
   _dqa_recorder.onerror = function(){ clearInterval(_dqa_recTimer); };
-  setTimeout(function(){
+  _dqa_startTimeoutId = setTimeout(function(){
+    _dqa_startTimeoutId = null;
     if (!_dqa_recorder) return;
     try { _dqa_recorder.start(1000); _dqa_recActive = true; } catch(e){ return; }
     _dqa_recTimer = setInterval(function(){
@@ -31604,15 +31589,11 @@ function _dqa_startRec(){
 }
 function _dqa_stopRec(){
   _dqa_recActive=false; clearInterval(_dqa_recTimer); _dqa_recTimer=null;
-  if (_dqa_recorder){
-    if (_dqa_recorder.state === 'inactive'){
-      try{ _dqa_recorder.ondataavailable=null; _dqa_recorder.onstop=null; _dqa_recorder.onerror=null; }catch(e){}
-      _dqa_recorder = null;
-      if (_dqa_recStream){ try{ _dqa_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _dqa_recStream = null; }
-    } else { try{ _dqa_recorder.stop(); }catch(e){} }
-  }
+  if (_dqa_startTimeoutId){ clearTimeout(_dqa_startTimeoutId); _dqa_startTimeoutId = null; }
+  if (_dqa_recorder){ try{ if(_dqa_recorder.state!=='inactive')_dqa_recorder.stop(); }catch(e){} }
   _dqa_updateRecBtn();
 }
+var _dqa_startTimeoutId = null;
 function _dqa_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dqa_recActive, '&#9632; STOP REC', '#e63946'); }
 function _dqa_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -32425,7 +32406,8 @@ function _dqt_startRec(){
     } else _dqt_dlBlob(blob, fn);
   };
   _dqt_recorder.onerror = function(){ clearInterval(_dqt_recTimer); };
-  setTimeout(function(){
+  _dqt_startTimeoutId = setTimeout(function(){
+    _dqt_startTimeoutId = null;
     if (!_dqt_recorder) return;
     try { _dqt_recorder.start(1000); _dqt_recActive = true; } catch(e){ return; }
     _dqt_recTimer = setInterval(function(){
@@ -32439,15 +32421,11 @@ function _dqt_startRec(){
 }
 function _dqt_stopRec(){
   _dqt_recActive=false; clearInterval(_dqt_recTimer); _dqt_recTimer=null;
-  if (_dqt_recorder){
-    if (_dqt_recorder.state === 'inactive'){
-      try{ _dqt_recorder.ondataavailable=null; _dqt_recorder.onstop=null; _dqt_recorder.onerror=null; }catch(e){}
-      _dqt_recorder = null;
-      if (_dqt_recStream){ try{ _dqt_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _dqt_recStream = null; }
-    } else { try{ _dqt_recorder.stop(); }catch(e){} }
-  }
+  if (_dqt_startTimeoutId){ clearTimeout(_dqt_startTimeoutId); _dqt_startTimeoutId = null; }
+  if (_dqt_recorder){ try{ if(_dqt_recorder.state!=='inactive')_dqt_recorder.stop(); }catch(e){} }
   _dqt_updateRecBtn();
 }
+var _dqt_startTimeoutId = null;
 function _dqt_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dqt_recActive, '&#9632; STOP REC', '#e63946'); }
 function _dqt_dlBlob(blob, fn){
   try { var url=URL.createObjectURL(blob);
@@ -33255,7 +33233,8 @@ function _dlim_startRec(){
     } else _dlim_dlBlob(blob, fn);
   };
   _dlim_recorder.onerror = function(){ clearInterval(_dlim_recTimer); };
-  setTimeout(function(){
+  _dlim_startTimeoutId = setTimeout(function(){
+    _dlim_startTimeoutId = null;
     if (!_dlim_recorder) return;
     try { _dlim_recorder.start(1000); _dlim_recActive = true; } catch(e){ return; }
     _dlim_recTimer = setInterval(function(){
@@ -33269,15 +33248,11 @@ function _dlim_startRec(){
 }
 function _dlim_stopRec(){
   _dlim_recActive=false; clearInterval(_dlim_recTimer); _dlim_recTimer=null;
-  if (_dlim_recorder){
-    if (_dlim_recorder.state === 'inactive'){
-      try{ _dlim_recorder.ondataavailable=null; _dlim_recorder.onstop=null; _dlim_recorder.onerror=null; }catch(e){}
-      _dlim_recorder = null;
-      if (_dlim_recStream){ try{ _dlim_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _dlim_recStream = null; }
-    } else { try{ _dlim_recorder.stop(); }catch(e){} }
-  }
+  if (_dlim_startTimeoutId){ clearTimeout(_dlim_startTimeoutId); _dlim_startTimeoutId = null; }
+  if (_dlim_recorder && _dlim_recorder.state !== 'inactive'){ try{ _dlim_recorder.stop(); }catch(e){} }
   _dlim_updateRecBtn();
 }
+var _dlim_startTimeoutId = null;
 function _dlim_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_dlim_recActive, '&#9632; STOP REC', '#e63946'); }
 function _dlim_dlBlob(blob, fn){
   var url = URL.createObjectURL(blob);
@@ -33661,9 +33636,8 @@ function _opto_drawHUD(W, H){
     cbx = W/2 + gap/2;      cby = hy - cbh/2;
   }
   // ★ Label + value côte à côte horizontalement (format rectangulaire bas)
+  //   ★ Pilules TOTALEMENT TRANSPARENTES (pas de fill, juste bordure)
   //   Score pill
-  ctx.fillStyle = 'rgba(13,17,23,0.90)';
-  _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.fill();
   ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.stroke();
   // Label gauche
@@ -33676,13 +33650,11 @@ function _opto_drawHUD(W, H){
   ctx.font = 'bold '+Math.round(H*0.042)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText(String(_opto_score), sbx + sbw*0.92, sby + sbh/2);
-  //   Chrono pill
+  //   Chrono pill (totalement transparent, juste bordure)
   var remain = Math.max(0, _opto_dur - _opto_elapsed);
   var mm = Math.floor(remain/60), ss = remain%60;
   var tStr = mm + ':' + (ss<10?'0':'') + ss;
-  ctx.fillStyle = 'rgba(0,0,0,0.90)';
-  _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.stroke();
   ctx.fillStyle = '#9ba3b4';
   ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
@@ -34569,7 +34541,8 @@ function _opto_startRec(){
     } else _opto_dlBlob(blob, fn);
   };
   _opto_recorder.onerror = function(){ clearInterval(_opto_recTimer); };
-  setTimeout(function(){
+  _opto_startTimeoutId = setTimeout(function(){
+    _opto_startTimeoutId = null;
     if (!_opto_recorder) return;
     try { _opto_recorder.start(1000); _opto_recActive = true; } catch(e){ return; }
     _opto_recTimer = setInterval(function(){
@@ -34583,15 +34556,11 @@ function _opto_startRec(){
 }
 function _opto_stopRec(){
   _opto_recActive=false; clearInterval(_opto_recTimer); _opto_recTimer=null;
-  if (_opto_recorder){
-    if (_opto_recorder.state === 'inactive'){
-      try{ _opto_recorder.ondataavailable=null; _opto_recorder.onstop=null; _opto_recorder.onerror=null; }catch(e){}
-      _opto_recorder = null;
-      if (_opto_recStream){ try{ _opto_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _opto_recStream = null; }
-    } else { try{ _opto_recorder.stop(); }catch(e){} }
-  }
+  if (_opto_startTimeoutId){ clearTimeout(_opto_startTimeoutId); _opto_startTimeoutId = null; }
+  if (_opto_recorder && _opto_recorder.state !== 'inactive'){ try{ _opto_recorder.stop(); }catch(e){} }
   _opto_updateRecBtn();
 }
+var _opto_startTimeoutId = null;
 function _opto_updateRecBtn(){ if (typeof _syncRecBtns === 'function') _syncRecBtns(_opto_recActive, '&#9632; STOP REC', '#e63946'); }
 function _opto_dlBlob(blob, fn){
   var url = URL.createObjectURL(blob);
@@ -35181,7 +35150,8 @@ function _tsym_startRec() {
       if (_cxFixS) { _cxFixS.save(); _cxFixS.globalAlpha = 0; _cxFixS.fillRect(0,0,1,1); _cxFixS.restore(); }
     }
   } catch(eFixS) { /* silencieux */ }
-  setTimeout(function() {
+  _tsym_startTimeoutId = setTimeout(function() {
+    _tsym_startTimeoutId = null;
     if (!_tsym_recorder) return;
     try { _tsym_recorder.start(1000); _tsym_recActive = true; }
     catch(eStartS) { _tsym_recError(_t('Erreur enregistrement','Recording error')); return; }
@@ -35207,16 +35177,11 @@ function _tsym_startRec() {
 
 function _tsym_stopRec() {
   _tsym_recActive = false; clearInterval(_tsym_recTimer); _tsym_recTimer = null;
-  // ★ FIX race setTimeout 200ms
-  if (_tsym_recorder){
-    if (_tsym_recorder.state === 'inactive'){
-      try{ _tsym_recorder.ondataavailable=null; _tsym_recorder.onstop=null; _tsym_recorder.onerror=null; }catch(e){}
-      _tsym_recorder = null;
-      if (_tsym_recStream){ try{ _tsym_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _tsym_recStream = null; }
-    } else { try{ _tsym_recorder.stop(); }catch(e){} }
-  }
+  if (_tsym_startTimeoutId){ clearTimeout(_tsym_startTimeoutId); _tsym_startTimeoutId = null; }
+  if (_tsym_recorder) { try { if (_tsym_recorder.state && _tsym_recorder.state !== 'inactive') _tsym_recorder.stop(); } catch(e){} }
   _tsym_updateRecBtn();
 }
+var _tsym_startTimeoutId = null;
 
 function _tsym_updateRecBtn() {
   _syncRecBtns(_tsym_recActive, '&#9632; STOP REC', '#e63946');
@@ -41093,7 +41058,8 @@ function _dcog_startRec() {
   } catch(eFix) { /* silencieux */ }
   // Petit délai (200ms) pour laisser une frame stable arriver dans le stream
   // avant de lancer l'encodage — indispensable sur Height + certains devices lents
-  setTimeout(function() {
+  _dcog_startTimeoutId = setTimeout(function() {
+    _dcog_startTimeoutId = null;
     if (!_dcog_recorder) return;
     try { _dcog_recorder.start(1000); _dcog_recActive = true; }
     catch(eStart) { _dcog_recError('start failed'); return; }
@@ -41121,16 +41087,11 @@ function _dcog_startRec() {
 
 function _dcog_stopRec() {
   _dcog_recActive = false; clearInterval(_dcog_recTimer); _dcog_recTimer = null;
-  // ★ FIX race setTimeout 200ms
-  if (_dcog_recorder){
-    if (_dcog_recorder.state === 'inactive'){
-      try{ _dcog_recorder.ondataavailable=null; _dcog_recorder.onstop=null; _dcog_recorder.onerror=null; }catch(e){}
-      _dcog_recorder = null;
-      if (_dcog_recStream){ try{ _dcog_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _dcog_recStream = null; }
-    } else { try{ _dcog_recorder.stop(); }catch(e){} }
-  }
+  if (_dcog_startTimeoutId){ clearTimeout(_dcog_startTimeoutId); _dcog_startTimeoutId = null; }
+  if (_dcog_recorder) { try { if (_dcog_recorder.state && _dcog_recorder.state !== 'inactive') _dcog_recorder.stop(); } catch(e){} }
   _dcog_updateRecBtn();
 }
+var _dcog_startTimeoutId = null;
 
 function _dcog_updateRecBtn() {
   _syncRecBtns(_dcog_recActive, '&#9632; STOP REC', '#e63946');
@@ -59954,7 +59915,8 @@ body.si-banner-on { padding-top: 52px; }
       }
     } catch(eFix) { /* silencieux */ }
 
-    setTimeout(function() {
+    _ss_startTimeoutId = setTimeout(function() {
+      _ss_startTimeoutId = null;
       if (!_ss_recorder) return;
       try { _ss_recorder.start(1000); }
       catch(e) {
@@ -59985,17 +59947,12 @@ body.si-banner-on { padding-top: 52px; }
     return true;
   }
 
+  var _ss_startTimeoutId = null;
   function _ss_stopRec() {
     _ss_recActive = false;
     if (_ss_recTimer) { clearInterval(_ss_recTimer); _ss_recTimer = null; }
-    // ★ FIX race setTimeout 200ms
-    if (_ss_recorder){
-      if (_ss_recorder.state === 'inactive'){
-        try{ _ss_recorder.ondataavailable=null; _ss_recorder.onstop=null; _ss_recorder.onerror=null; }catch(e){}
-        _ss_recorder = null;
-        if (_ss_recStream){ try{ _ss_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _ss_recStream = null; }
-      } else { try{ _ss_recorder.stop(); }catch(e){} }
-    }
+    if (_ss_startTimeoutId){ clearTimeout(_ss_startTimeoutId); _ss_startTimeoutId = null; }
+    if (_ss_recorder) { try { if (_ss_recorder.state && _ss_recorder.state !== 'inactive') _ss_recorder.stop(); } catch(e){} }
     if (typeof _ss_updateRecBtnUI === 'function') _ss_updateRecBtnUI();
   }
 
@@ -60961,7 +60918,8 @@ body.si-banner-on { padding-top: 52px; }
       if (cv) { var cx = cv.getContext('2d'); if (cx) { cx.save(); cx.globalAlpha = 0; cx.fillRect(0,0,1,1); cx.restore(); } }
     } catch(e) {}
 
-    setTimeout(function() {
+    _bt_startTimeoutId = setTimeout(function() {
+      _bt_startTimeoutId = null;
       if (!_bt_recorder) return;
       try { _bt_recorder.start(1000); }
       catch(e) { alert(_t('Erreur de démarrage de l\'enregistrement. Vérifie les permissions.', 'Recording start error. Check permissions.')); return; }
@@ -60994,17 +60952,12 @@ body.si-banner-on { padding-top: 52px; }
     return true;
   }
 
+  var _bt_startTimeoutId = null;
   function _bt_stopRec() {
     _bt_recActive = false;
     if (_bt_recTimer) { clearInterval(_bt_recTimer); _bt_recTimer = null; }
-    // ★ FIX race setTimeout 200ms
-    if (_bt_recorder){
-      if (_bt_recorder.state === 'inactive'){
-        try{ _bt_recorder.ondataavailable=null; _bt_recorder.onstop=null; _bt_recorder.onerror=null; }catch(e){}
-        _bt_recorder = null;
-        if (_bt_recStream){ try{ _bt_recStream.getTracks().forEach(function(t){try{t.stop();}catch(e){}}); }catch(e){} _bt_recStream = null; }
-      } else { try{ _bt_recorder.stop(); }catch(e){} }
-    }
+    if (_bt_startTimeoutId){ clearTimeout(_bt_startTimeoutId); _bt_startTimeoutId = null; }
+    if (_bt_recorder) { try { if (_bt_recorder.state && _bt_recorder.state !== 'inactive') _bt_recorder.stop(); } catch(e){} }
     if (typeof _bt_updateRecBtnUI === 'function') _bt_updateRecBtnUI();
   }
 
