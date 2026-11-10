@@ -2402,6 +2402,10 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         👁️<div id="dcog_lbl_opto">OPTOMOTOR</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Visual Motion</div>
       </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('ar')" id="dcog_btn_ar"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🚧<div id="dcog_lbl_ar">AUGMENTED REALITY</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">AR · Virtual Cones</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2806,6 +2810,7 @@ window._dojoBackHome = function(){
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
           <option value="sac">A7-SAC · SACCADES (lis gauche/droite rapidement)</option>
+          <option value="play">A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -2825,6 +2830,39 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="opto_btnStart" onclick="_opto_start()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="opto_lblStart">▶ DÉMARRER OPTOMOTOR RESPONSE</span></button>
       <button class="tr-btn tr-btn-save" id="opto_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="opto_results" style="margin-top:4px"></div>
+    </div>
+    <div id="dcog_optAr" style="display:none;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">🚧 DRILL</div>
+        <select id="ar_drillSelect" onchange="_ar_setDrill(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,122,26,.5);background:rgba(255,122,26,.1);color:#ff7a1a;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
+          <option value="c1t">AR-1 · OVERHAND · 1 CÔNE + CIBLES</option>
+          <option value="c2t">AR-2 · OVERHAND · 2 CÔNES + CIBLES</option>
+          <option value="c1">AR-3 · OVERHAND · 1 CÔNE (sans cible)</option>
+          <option value="c2">AR-4 · OVERHAND · 2 CÔNES (sans cible)</option>
+        </select>
+        <div id="ar_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px"></div>
+      </div>
+      <div>
+        <div id="ar_lblHand" style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">✋ MAIN QUI DRIBBLE</div>
+        <div style="display:flex;gap:6px">
+          <button class="ar-hand-btn" data-hand="right" id="ar_handR" onclick="_ar_setHand('right')" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">DROITE</button>
+          <button class="ar-hand-btn" data-hand="left"  id="ar_handL" onclick="_ar_setHand('left')"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">GAUCHE</button>
+        </div>
+      </div>
+      <div>
+        <div id="ar_lblDur" style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ DURÉE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="ar-dur-btn" data-sec="30"  onclick="_ar_setDur(30)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="ar-dur-btn" data-sec="60"  onclick="_ar_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="ar-dur-btn" data-sec="90"  onclick="_ar_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="ar-dur-btn" data-sec="120" onclick="_ar_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div id="ar_info" style="padding:8px 10px;background:rgba(255,122,26,.06);border-left:2px solid rgba(255,122,26,.45);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5"></div>
+      <div id="ar_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="ar_btnStart" onclick="_ar_start()" ontouchstart="" style="width:100%;background:#ff7a1a;color:#0d1117"><span id="ar_lblStart">▶ DÉMARRER AUGMENTED REALITY</span></button>
+      <button class="tr-btn tr-btn-save" id="ar_btnSave" onclick="_ar_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+      <div id="ar_results" style="margin-top:4px"></div>
     </div>
   </div>
 
@@ -33370,7 +33408,7 @@ window._opto_basketImg = new Image();
 window._opto_basketImg.src = 'data:image/webp;base64,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';
 window._opto_basketImgReady = false;
 window._opto_basketImg.onload = function(){ window._opto_basketImgReady = true; };
-var _opto_mode = 'headup';   // 'headup'|'iso'|'periph'|'vanish'|'vanishShoot'|'mot'|'sp'|'sac'
+var _opto_mode = 'headup';   // 'headup'|'iso'|'periph'|'vanish'|'vanishShoot'|'mot'|'sp'|'sac'|'play'|'ar' (famille AUGMENTED REALITY)
 var _opto_dur  = 60;         // durée session en s
 var _opto_video=null, _opto_canvas=null, _opto_ctx=null;
 var _opto_running=false, _opto_rafId=null;
@@ -33462,14 +33500,16 @@ window._opto_setMode = function(m){
     sp:     en ? 'Follow a single bright target through 6 trajectories (square · horizontal · vertical · 2 diagonals · circle) · keep head still · A7-SP Smooth Pursuit.'
               : 'Suis une seule cible sur 6 trajectoires (carré · horizontale · verticale · 2 diagonales · cercle) · garde la tête fixe · A7-SP Poursuite lisse.',
     sac:    en ? 'Digits appear alternately left/right at random intervals · read them aloud · keep head still · A7-SAC Saccadic eye jumps (elite scanning).'
-              : 'Des chiffres apparaissent en alternance G/D à intervalles aléatoires · lis-les à voix haute · garde la tête fixe · A7-SAC Saccades oculaires (scanning élite).'
+              : 'Des chiffres apparaissent en alternance G/D à intervalles aléatoires · lis-les à voix haute · garde la tête fixe · A7-SAC Saccades oculaires (scanning élite).',
+    play:   en ? 'Transparent half-court · 5 players run real plays (pick & roll, give & go, backdoor, horns, flex) · follow the BALL with your eyes · keep head still · A7-PLAY.'
+              : 'Demi-terrain transparent · 5 joueurs exécutent des systèmes (pick & roll, give & go, backdoor, horns, flex) · suis le BALLON des yeux · garde la tête fixe · A7-PLAY.'
   };
   var el = document.getElementById('opto_drillDesc');
-  if (el) el.textContent = d[m] || '';
+  if (el && d[m]) el.textContent = d[m];
 };
 
 window._opto_setDur = function(sec){
-  _opto_dur = sec;
+  _opto_dur = sec; window._opto_durSel = sec;
   document.querySelectorAll('.opto-dur-btn').forEach(function(b){
     var active = parseInt(b.dataset.sec,10) === sec;
     b.style.border = active ? '1px solid rgba(100,180,255,.5)' : '1px solid #1e2535';
@@ -33479,7 +33519,7 @@ window._opto_setDur = function(sec){
 };
 
 function _opto_status(msg, color){
-  var s = document.getElementById('opto_status');
+  var s = document.getElementById(_opto_mode === 'ar' ? 'ar_status' : 'opto_status');
   if (s){ s.textContent = msg; s.style.color = color || 'var(--muted)'; }
 }
 
@@ -33518,6 +33558,8 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_sac_current = null; _opto_sac_side = 'R'; _opto_sac_lastSwap = 0;
   _opto_sac_interval = 600; _opto_sac_count = 0; _opto_sac_lastCountScored = 0;
   _opto_sac_headStab = 0; _opto_sac_noseBaseline = null;
+  _opto_play_idx = -1; _opto_play_start = 0; _opto_play_count = 0;
+  _opto_play_headStab = 0; _opto_play_noseBaseline = null; _opto_play_lastSec = 0;
   _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
   _opto_mot_userTaps = 0;
   _opto_sp_t = 0; _opto_sp_lapCount = 0; _opto_sp_headStab = 0;
@@ -33525,6 +33567,7 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_vg_phase = 'near'; _opto_vg_phaseStart = Date.now();
   _opto_vg_cycleCount = 0; _opto_vg_headStabV = 0; _opto_vg_noseBaselineV = null;
   if (_opto_mode === 'mot') _opto_motInit();
+  if (typeof _ar_reset === 'function') _ar_reset();
   // Setup wrist hit buffer (pour A3/G3/A7)
   _opto_prevWrist = {left:null, right:null};
   // Bouton REC géré par le dispatcher global senseiCamToggleRec()
@@ -33605,6 +33648,8 @@ function _opto_detect(){
     else if (_opto_mode === 'mot')    _opto_analyzeMot(poses);
     else if (_opto_mode === 'sp')     _opto_analyzeSp(poses);
     else if (_opto_mode === 'sac')    _opto_analyzeSac(poses);
+    else if (_opto_mode === 'play')   _opto_analyzePlay(poses);
+    else if (_opto_mode === 'ar')     _opto_analyzeAr(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
   }).catch(function(){
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
@@ -33626,6 +33671,8 @@ function _opto_drawFrame(poses){
   else if (_opto_mode === 'mot')    _opto_drawMot(W, H);
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
   else if (_opto_mode === 'sac')    _opto_drawSac(W, H);
+  else if (_opto_mode === 'play')   _opto_drawPlay(W, H);
+  else if (_opto_mode === 'ar')     _opto_drawAr(W, H);
   // ── Logo SENSEI (identique autres drills) ──
   //   A11 (ticker en bas) : passer tickerTop comme H pour que le logo soit dessiné
   //   AU-DESSUS du ticker au lieu de dedans (sinon "Powered by SENSEI AI" chevauche les chiffres)
@@ -33652,9 +33699,11 @@ function _opto_drawHUD(W, H){
     vanishShoot: en ? 'FOLLOW BOUNCE → SHOT IN HOOP · HEAD STILL' : 'SUIS LE REBOND → SHOOT · TÊTE FIXE',
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE',
-    sac:    en ? 'READ LEFT/RIGHT DIGITS · HEAD STILL' : 'LIS LES CHIFFRES G/D · TÊTE FIXE'
+    sac:    en ? 'READ LEFT/RIGHT DIGITS · HEAD STILL' : 'LIS LES CHIFFRES G/D · TÊTE FIXE',
+    play:   en ? 'FOLLOW THE BALL · HEAD STILL' : 'SUIS LE BALLON · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
+  if (_opto_mode === 'ar' && typeof _ar_consigne === 'function') txt = _ar_consigne(window._lang === 'en');
   // ★ FIX : width portrait-aware
   //   • Portrait (A11) : 0.92W — W est étroit, besoin de la quasi-totalité
   //   • Landscape : 0.56W — laisse 0.22W libre de chaque côté pour REC/STOP
@@ -34541,6 +34590,7 @@ window._opto_stop = function(hard){
 };
 
 function _opto_showResults(){
+  if (_opto_mode === 'ar' && typeof _ar_showResults === 'function'){ _ar_showResults(); return; }
   var en = window._lang === 'en';
   var total = _opto_hits + _opto_miss;
   var pct = total > 0 ? Math.round(_opto_hits / total * 100) : 0;
@@ -34911,6 +34961,500 @@ function _opto_analyzeSac(poses){
   _opto_sac_lastCountScored = _opto_sac_count;
 }
 
+/* ═══════════════ MODE A7-PLAY · PLAY TRACKING ═══════════════════════
+   Demi-terrain FIBA transparent (lignes seules, proportions réelles 15×14 m)
+   5 attaquants exécutent un système · les yeux SUIVENT LE BALLON · tête fixe
+   Pas de tap, pas de choix. Score : +1 pt/seconde si tête stable (< 3 %)
+   Coordonnées en mètres, origine = coin ligne de fond gauche, panier en haut.
+   ⚠ Déplacements des systèmes à faire valider par un coach.
+═════════════════════════════════════════════════════════════════════ */
+var _opto_play_idx = -1, _opto_play_start = 0, _opto_play_speed = 1, _opto_play_count = 0;
+var _opto_play_headStab = 0, _opto_play_noseBaseline = null, _opto_play_lastSec = 0;
+var _OPTO_PLAY_BASKET = [7.5, 1.575];
+var _OPTO_PLAY_PRE = 900, _OPTO_PLAY_POST = 800;
+// start : positions des joueurs 1..5 · holder : index du porteur
+// steps : d = durée ms · mv = déplacements {index:[x,y]} · pass = index receveur · shot = tir
+var _OPTO_PLAYS = [
+  { name:'PICK & ROLL', holder:0,
+    start:[[7.5,9.6],[12.6,6.8],[2.4,6.8],[1.3,1.6],[9.4,2.8]],
+    steps:[ {d:1200, mv:{4:[8.5,9.2]}},
+            {d:1300, mv:{0:[10.4,7.2], 1:[13.6,2.0]}},
+            {d:1100, mv:{4:[8.2,3.2]}},
+            {d:550,  pass:4},
+            {d:450,  shot:true} ] },
+  { name:'GIVE & GO', holder:0,
+    start:[[7.5,9.6],[12.4,7.0],[2.6,7.0],[1.3,1.6],[5.4,2.8]],
+    steps:[ {d:600,  pass:1},
+            {d:1300, mv:{0:[8.6,3.0], 2:[7.5,9.6]}},
+            {d:500,  pass:0},
+            {d:400,  shot:true} ] },
+  { name:'BACKDOOR', holder:0,
+    start:[[7.5,9.6],[12.4,7.0],[2.6,7.0],[1.3,1.6],[5.3,5.8]],
+    steps:[ {d:1000, mv:{0:[10.2,8.8]}},
+            {d:600,  mv:{1:[13.2,8.4]}},
+            {d:1000, mv:{1:[8.8,2.8]}},
+            {d:500,  pass:1},
+            {d:400,  shot:true} ] },
+  { name:'HORNS', holder:0,
+    start:[[7.5,10.0],[13.7,1.6],[1.3,1.6],[5.3,6.2],[9.7,6.2]],
+    steps:[ {d:900,  mv:{4:[8.6,9.4]}},
+            {d:1200, mv:{0:[10.8,7.2]}},
+            {d:1100, mv:{4:[8.2,3.2], 3:[7.2,8.8]}},
+            {d:600,  pass:3},
+            {d:600,  pass:4},
+            {d:450,  shot:true} ] },
+  { name:'FLEX', holder:0,
+    start:[[5.0,8.8],[10.0,8.8],[1.3,1.8],[13.7,1.8],[5.4,2.8]],
+    steps:[ {d:650,  pass:1},
+            {d:1300, mv:{2:[9.3,2.8], 0:[5.6,4.2]}},
+            {d:550,  pass:2, mv:{4:[5.2,7.2]}},
+            {d:400,  shot:true} ] }
+];
+function _opto_playDuration(p){
+  var t = 0; for (var i=0;i<p.steps.length;i++) t += p.steps[i].d; return t;
+}
+// État du système à l'instant t (ms) : positions des 5 joueurs + ballon
+function _opto_playState(p, t){
+  var pos = p.start.map(function(q){ return [q[0], q[1]]; });
+  var holder = p.holder, ball = null, lift = 0, acc = 0;
+  for (var i=0;i<p.steps.length;i++){
+    var st = p.steps[i];
+    var u = (t - acc) / st.d;
+    if (u <= 0) break;
+    var done = u >= 1; if (done) u = 1;
+    var e = u*u*(3 - 2*u);                       // smoothstep (déplacements joueurs)
+    var from = pos.map(function(q){ return [q[0], q[1]]; });
+    if (st.mv){ for (var k in st.mv){
+      var a = from[k], b = st.mv[k];
+      pos[k] = [a[0] + (b[0]-a[0])*e, a[1] + (b[1]-a[1])*e];
+    } }
+    if (st.pass != null){
+      if (done) holder = st.pass;
+      else { var A = pos[holder], B = pos[st.pass];
+             ball = [A[0] + (B[0]-A[0])*u, A[1] + (B[1]-A[1])*u]; }
+    } else if (st.shot){
+      var S = pos[holder], K = _OPTO_PLAY_BASKET;
+      ball = [S[0] + (K[0]-S[0])*u, S[1] + (K[1]-S[1])*u];
+      lift = Math.sin(Math.PI*u);
+      if (done){ ball = [K[0], K[1]]; lift = 0; holder = -1; }
+    }
+    acc += st.d;
+    if (!done) break;
+  }
+  if (!ball && holder >= 0) ball = [pos[holder][0] + 0.6, pos[holder][1] + 0.6];
+  if (!ball) ball = [_OPTO_PLAY_BASKET[0], _OPTO_PLAY_BASKET[1]];
+  return { pos: pos, ball: ball, lift: lift };
+}
+// Demi-terrain FIBA (lignes seules). x0,y0 = coin haut-gauche · s = pixels par mètre
+function _opto_drawCourt(ctx, x0, y0, s){
+  function X(m){ return x0 + m*s; } function Y(m){ return y0 + m*s; }
+  var bx = X(7.5), by = Y(1.575);
+  var a3 = Math.asin(1.415/6.75);
+  function path(){
+    ctx.beginPath();
+    ctx.rect(X(0), Y(0), 15*s, 14*s);                         // limites
+    ctx.rect(X(5.05), Y(0), 4.9*s, 5.8*s);                    // raquette
+    ctx.moveTo(X(7.5)+1.8*s, Y(5.8));
+    ctx.arc(X(7.5), Y(5.8), 1.8*s, 0, Math.PI*2);             // cercle lancer franc
+    ctx.moveTo(X(0.9), Y(0)); ctx.lineTo(X(0.9), Y(2.99));    // 3 pts : segments droits
+    ctx.moveTo(X(14.1), Y(0)); ctx.lineTo(X(14.1), Y(2.99));
+    ctx.moveTo(bx + Math.cos(a3)*6.75*s, by + Math.sin(a3)*6.75*s);
+    ctx.arc(bx, by, 6.75*s, a3, Math.PI - a3, false);         // 3 pts : arc
+    ctx.moveTo(X(7.5)-1.8*s, Y(14));
+    ctx.arc(X(7.5), Y(14), 1.8*s, Math.PI, Math.PI*2, false); // demi-cercle central
+    ctx.moveTo(bx + 1.25*s, by);
+    ctx.arc(bx, by, 1.25*s, 0, Math.PI, false);               // demi-cercle no-charge
+    ctx.moveTo(X(6.6), Y(1.2)); ctx.lineTo(X(8.4), Y(1.2));   // planche
+    ctx.stroke();
+  }
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgba(0,0,0,0.60)'; ctx.lineWidth = Math.max(4, s*0.16); path();   // contour sombre (lisibilité sur mur clair)
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = Math.max(1.5, s*0.06); path();
+  ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = Math.max(2, s*0.08);
+  ctx.beginPath(); ctx.arc(bx, by, Math.max(4, 0.23*s), 0, Math.PI*2); ctx.stroke(); // cercle du panier
+  ctx.restore();
+}
+function _opto_drawPlay(W, H){
+  var ctx = _opto_ctx;
+  var en = window._lang === 'en';
+  var now = Date.now();
+  // Zone libre : sous le HUD (bas à 0.3275H), jusqu'à 0.96H. Terrain centré, ratio réel 15:14.
+  var hudBottom = H*0.30 + Math.max(44, H*0.055)/2;      // bas réel des pilules score/chrono
+  var cy0 = Math.max(H*0.37, hudBottom + 14), ch = H*0.96 - cy0;
+  var s = ch / 14, cw = 15*s;
+  if (cw > W*0.46){ cw = W*0.46; s = cw/15; ch = 14*s; }   // garde-fou écrans étroits
+  var cx0 = W/2 - cw/2;
+  // Enchaînement des systèmes
+  var p = _opto_play_idx >= 0 ? _OPTO_PLAYS[_opto_play_idx] : null;
+  var total = p ? (_OPTO_PLAY_PRE + _opto_playDuration(p) + _OPTO_PLAY_POST) : 0;
+  if (!p || (now - _opto_play_start) * _opto_play_speed >= total){
+    _opto_play_idx = (_opto_play_idx + 1) % _OPTO_PLAYS.length;
+    _opto_play_start = now;
+    _opto_play_speed = 0.8 + Math.random()*0.5;            // vitesse variable 0.8× à 1.3×
+    _opto_play_count++;
+    p = _OPTO_PLAYS[_opto_play_idx];
+  }
+  var t = (now - _opto_play_start) * _opto_play_speed - _OPTO_PLAY_PRE;
+  var st = _opto_playState(p, Math.max(0, t));
+  _opto_drawCourt(ctx, cx0, cy0, s);
+  ctx.save();
+  // Joueurs (pastilles bleues numérotées)
+  var pr = Math.max(11, s*0.55);
+  ctx.font = 'bold '+Math.round(pr*1.25)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (var i=0;i<st.pos.length;i++){
+    var px = Math.round(cx0 + st.pos[i][0]*s), py = Math.round(cy0 + st.pos[i][1]*s);
+    ctx.fillStyle = '#1d6fd1';
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(String(i+1), px, py + 1);
+  }
+  // Ballon (clipart) avec halo blanc pour rester la cible la plus saillante
+  var br = Math.max(13, s*0.62) * (1 + 0.5*st.lift);
+  var bx = cx0 + st.ball[0]*s, by = cy0 + st.ball[1]*s;
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.beginPath(); ctx.arc(bx, by, br*1.45, 0, Math.PI*2); ctx.fill();
+  _opto_drawBasketball(ctx, bx, by, br, 0);
+  // Badge nom du système (à GAUCHE du terrain, zone libre)
+  var name = p.name;
+  var fs = Math.round(H*0.034);
+  ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+  var maxW = cx0 - W*0.05;
+  while (fs > 9 && ctx.measureText(name).width + 24 > maxW){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+  var bw = ctx.measureText(name).width + 24, bh = fs*1.55;
+  var bcx = (W*0.03 + cx0) / 2, bcy = H*0.62;
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, bcx - bw/2, bcy - bh/2, bw, bh, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 1.5;
+  _opto_roundRect(ctx, bcx - bw/2, bcy - bh/2, bw, bh, 7); ctx.stroke();
+  ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(name, bcx, bcy + 1);
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillStyle = '#f5c518';
+  ctx.fillText((en?'PLAY ':'SYSTÈME ') + _opto_play_count, bcx, bcy + bh/2 + H*0.025);
+  // HUD stabilité tête (bas droite, identique aux autres drills)
+  var hsText = (en?'HEAD STAB. ':'TÊTE STAB. ') + ((_opto_play_headStab||0)*100).toFixed(1) + '%';
+  var stable = (_opto_play_headStab||0) < 0.03;
+  var hsW = W*0.18, hsH = H*0.04, hsX = W - hsW - 8, hsY = H - hsH - 8;
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.fill();
+  ctx.strokeStyle = stable ? '#4ade80' : '#ff8a94'; ctx.lineWidth = 1;
+  _opto_roundRect(ctx, hsX, hsY, hsW, hsH, 5); ctx.stroke();
+  ctx.fillStyle = stable ? '#4ade80' : '#ff8a94';
+  ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
+  ctx.fillText(hsText, hsX + hsW/2, hsY + hsH/2);
+  ctx.restore();
+}
+function _opto_analyzePlay(poses){
+  var kp = _opto_kpMap(poses);
+  if (!kp) return;
+  var nose = kp['nose'];
+  if (!nose || nose.score < 0.3) return;
+  if (!_opto_play_noseBaseline) _opto_play_noseBaseline = {x:nose.x, y:nose.y};
+  var dnx = (nose.x - _opto_play_noseBaseline.x) / _opto_canvas.width;
+  var dny = (nose.y - _opto_play_noseBaseline.y) / _opto_canvas.height;
+  _opto_play_headStab = (_opto_play_headStab||0)*0.9 + Math.sqrt(dnx*dnx + dny*dny)*0.1;
+  var nowS = Math.floor(Date.now()/1000);
+  if (nowS !== _opto_play_lastSec && _opto_play_headStab < 0.03){ _opto_score++; _opto_hits++; }
+  _opto_play_lastSec = nowS;
+}
+
+/* ═══════════════ FAMILLE AUGMENTED REALITY (AR) ═════════════════════
+   Cônes virtuels STATIQUES posés devant le joueur (calibrés une fois sur
+   ses hanches puis figés) · OVERHAND DRIBBLE au-dessus du/des cône(s)
+   Option double tâche : toucher la cible qui apparaît, main libre.
+   • Moteur caméra / REC / HUD / compte à rebours = moteur OPTOMOTOR (mode 'ar')
+   • HIT cibles = _opto_doHits (STRICT TDR Reaction : miroir, rayon ×2.0,
+     moveThresh, filtre directionnel) — seul le TIMING change (double tâche) :
+       TDR Reaction : 1-2 cibles, durée 2000 ms, nouvelle cible toutes les 1500 ms
+       AR           : 1 cible,    durée 3500 ms, pause 1500-3000 ms entre deux
+   • La caméra suit le CORPS, pas le ballon : une répétition = la main qui
+     dribble franchit l'axe du cône (1 cône) ou passe d'un cône à l'autre (2).
+═════════════════════════════════════════════════════════════════════ */
+window._ar_coneImg = new Image();
+window._ar_coneImgReady = false;
+window._ar_coneImg.onload = function(){ window._ar_coneImgReady = true; };
+window._ar_coneImg.src = 'data:image/webp;base64,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';
+var _AR_CONE_RATIO = 189/200;                 // largeur / hauteur de l'image
+var _AR_TTL = 3500, _AR_GAP_MIN = 1500, _AR_GAP_RAND = 1500, _AR_DRIBBLE_WINDOW = 1500;
+var _ar_cfg = { cones:1, targets:true, hand:'right', dur:60 };
+var _ar_calib = null, _ar_calibN = 0, _ar_calibAcc = null;
+var _ar_zone = null, _ar_reps = 0, _ar_lastRepTs = 0;
+var _ar_targets = [], _ar_nextSpawn = 0, _ar_tHit = 0, _ar_tTotal = 0, _ar_fx = [];
+
+function _ar_reset(){
+  _ar_calib = null; _ar_calibN = 0; _ar_calibAcc = null;
+  _ar_zone = null; _ar_reps = 0; _ar_lastRepTs = 0;
+  _ar_targets = []; _ar_nextSpawn = 0; _ar_tHit = 0; _ar_tTotal = 0; _ar_fx = [];
+}
+function _ar_consigne(en){
+  var n = _ar_cfg.cones;
+  if (_ar_cfg.targets) return en ? 'OVERHAND DRIBBLE + HIT THE TARGET' : 'OVERHAND DRIBBLE + TOUCHE LA CIBLE';
+  return en ? ('OVERHAND DRIBBLE · OVER THE CONE' + (n>1?'S':'')) : ('OVERHAND DRIBBLE · AU-DESSUS ' + (n>1?'DES CÔNES':'DU CÔNE'));
+}
+// Position des cônes : calibrée (figée) si dispo, sinon position par défaut
+function _ar_layout(W, H){
+  var sg = _ar_cfg.hand === 'right' ? 1 : -1;      // vue miroir : main droite = côté droit de l'écran
+  var cx, gap, baseY, ch;
+  if (_ar_calib){ cx = _ar_calib.cx; gap = _ar_calib.gap; baseY = _ar_calib.baseY; ch = _ar_calib.ch; }
+  else { cx = W*0.5 + sg*W*0.07; gap = W*0.13; baseY = H*0.90; ch = H*0.17; }
+  var xs = _ar_cfg.cones === 1 ? [cx] : [cx - gap/2, cx + gap/2];
+  // Garde-fous : hors badge compteur (gauche) et hors logo (droite)
+  var lo = W*0.30, hi = W*0.70, shift = 0;
+  if (xs[0] < lo) shift = lo - xs[0];
+  if (xs[xs.length-1] > hi) shift = hi - xs[xs.length-1];
+  xs = xs.map(function(x){ return x + shift; });
+  return { xs: xs, baseY: baseY, ch: ch, cw: ch*_AR_CONE_RATIO };
+}
+function _ar_calibrate(poses, W, H, sx, sy){
+  if (_ar_calib) return;
+  var lH = _tsym_kp_fast(poses,'leftHip'), rH = _tsym_kp_fast(poses,'rightHip');
+  var lS = _tsym_kp_fast(poses,'leftShoulder'), rS = _tsym_kp_fast(poses,'rightShoulder');
+  if (!lH || !rH || !lS || !rS){ _ar_calibN = 0; _ar_calibAcc = null; return; }
+  var side = _ar_cfg.hand === 'right' ? rH : lH;
+  var lA = _tsym_kp_fast(poses,'leftAnkle'), rA = _tsym_kp_fast(poses,'rightAnkle');
+  var s = {
+    hipX: W - side.x*sx,
+    sw: Math.abs(lS.x - rS.x)*sx,
+    torso: ((lH.y + rH.y)/2 - (lS.y + rS.y)/2)*sy,
+    ankleY: (lA && rA) ? Math.max(lA.y, rA.y)*sy : 0
+  };
+  if (!_ar_calibAcc) _ar_calibAcc = {hipX:0, sw:0, torso:0, ankleY:0, an:0};
+  _ar_calibAcc.hipX += s.hipX; _ar_calibAcc.sw += s.sw; _ar_calibAcc.torso += s.torso;
+  if (s.ankleY){ _ar_calibAcc.ankleY += s.ankleY; _ar_calibAcc.an++; }
+  if (++_ar_calibN < 12) return;                    // 12 images stables puis FIGÉ (cônes statiques)
+  var a = _ar_calibAcc, n = _ar_calibN, sg = _ar_cfg.hand === 'right' ? 1 : -1;
+  var sw = a.sw/n, torso = a.torso/n;
+  var ankle = a.an ? a.ankleY/a.an : 0;
+  _ar_calib = {
+    cx: a.hipX/n + sg*sw*0.15,
+    gap: Math.max(W*0.09, Math.min(W*0.16, sw*0.75)),
+    baseY: ankle ? Math.max(H*0.70, Math.min(H*0.93, ankle + H*0.01)) : H*0.90,
+    ch: Math.max(H*0.12, Math.min(H*0.20, torso*0.70))
+  };
+}
+function _ar_spawnTarget(W, H, now){
+  var f = _ar_cfg.hand === 'right' ? -1 : 1;        // côté de la main LIBRE
+  var r = Math.round(Math.min(W*0.06, H*0.10));
+  // Sous le HUD (bas 0.3275H) et au-dessus du logo : y ∈ [0.46H, 0.62H]
+  var P = [[0.20,0.46],[0.34,0.46],[0.27,0.62],[0.40,0.62]];
+  var p = P[Math.floor(Math.random()*P.length)];
+  var colors = ['#22c55e','#4cc9f0','#f5c518','#f97316','#e63946','#9f64e6'];   // palette TDR
+  _ar_targets.push({ x: W*(0.5 + f*p[0]), y: H*p[1], r: r, born: now, ttl: _AR_TTL, hit: false,
+                     color: colors[Math.floor(Math.random()*colors.length)] });
+  _ar_tTotal++;
+}
+function _opto_analyzeAr(poses){
+  if (!_opto_canvas || !_opto_video) return;
+  var W = _opto_canvas.width, H = _opto_canvas.height, now = Date.now();
+  var sx = W / (_opto_video.videoWidth || W), sy = H / (_opto_video.videoHeight || H);
+  _ar_calibrate(poses, W, H, sx, sy);
+  var L = _ar_layout(W, H);
+  // ── Répétitions OVERHAND : main qui dribble (extrapolée comme TDR) ──
+  var hand = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, _ar_cfg.hand) : null;
+  if (hand){
+    var hx = W - hand.x*sx, hy = hand.y*sy;
+    var sh = _tsym_kp_fast(poses, _ar_cfg.hand + 'Shoulder');
+    var low = !sh || hy > sh.y*sy;                  // main sous l'épaule = zone de dribble
+    var z = null;
+    if (L.xs.length === 1){
+      var m = L.cw*0.25;
+      if (hx < L.xs[0] - m) z = 'L'; else if (hx > L.xs[0] + m) z = 'R';
+    } else {
+      if (hx < L.xs[0]) z = 'L'; else if (hx > L.xs[1]) z = 'R';
+    }
+    if (low && z){
+      if (_ar_zone && z !== _ar_zone){
+        _ar_reps++; _ar_lastRepTs = now; _opto_score++;
+        if (typeof _td_beep === 'function') _td_beep(520, 0.03, 0.05);
+      }
+      _ar_zone = z;
+    }
+  }
+  if (!_ar_cfg.targets) return;
+  // ── Cibles (double tâche) ──
+  if (!_ar_nextSpawn) _ar_nextSpawn = now + 2500;
+  if (!_ar_targets.length && now >= _ar_nextSpawn) _ar_spawnTarget(W, H, now);
+  _opto_doHits(poses, _ar_targets, 2.0, function(t, side, rt){
+    var dribbling = (now - _ar_lastRepTs) < _AR_DRIBBLE_WINDOW;
+    if (dribbling){
+      var pts = 10 + Math.max(0, Math.round((t.ttl - rt)/350));
+      _opto_hits++; _ar_tHit++; _opto_score += pts;
+      _ar_fx.push({x:t.x, y:t.y, txt:'+'+pts, color:'#4ade80', born:now});
+      if (typeof _td_beep === 'function') _td_beep(rt < 1200 ? 1320 : 880, 0.05, 0.1);
+      if (navigator.vibrate) navigator.vibrate(25);
+    } else {
+      _opto_miss++;
+      _ar_fx.push({x:t.x, y:t.y, txt:'DRIBBLE !', color:'#ff8a94', born:now});
+      if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.12);
+    }
+  });
+  var kept = [];
+  for (var i=0;i<_ar_targets.length;i++){
+    var t = _ar_targets[i];
+    if (t.hit){ _ar_nextSpawn = now + _AR_GAP_MIN + Math.random()*_AR_GAP_RAND; continue; }
+    if (now - t.born > t.ttl){
+      _opto_miss++;
+      _ar_nextSpawn = now + _AR_GAP_MIN + Math.random()*_AR_GAP_RAND;
+      if (typeof _td_beep === 'function') _td_beep(220, 0.06, 0.08);
+      continue;
+    }
+    kept.push(t);
+  }
+  _ar_targets = kept;
+}
+function _opto_drawAr(W, H){
+  var ctx = _opto_ctx, en = window._lang === 'en', now = Date.now();
+  var L = _ar_layout(W, H);
+  ctx.save();
+  // ── Cônes ──
+  for (var i=0;i<L.xs.length;i++){
+    var x = L.xs[i];
+    ctx.fillStyle = 'rgba(0,0,0,0.30)';
+    ctx.beginPath(); ctx.ellipse(x, L.baseY - L.ch*0.03, L.cw*0.52, L.ch*0.07, 0, 0, Math.PI*2); ctx.fill();
+    if (window._ar_coneImgReady) ctx.drawImage(window._ar_coneImg, x - L.cw/2, L.baseY - L.ch, L.cw, L.ch);
+    else { ctx.fillStyle = '#f26a1b'; ctx.beginPath(); ctx.moveTo(x, L.baseY - L.ch);
+           ctx.lineTo(x + L.cw/2, L.baseY); ctx.lineTo(x - L.cw/2, L.baseY); ctx.closePath(); ctx.fill(); }
+  }
+  // ── Cibles : disque + anneau de temps restant ──
+  for (var k=0;k<_ar_targets.length;k++){
+    var t = _ar_targets[k];
+    var left = Math.max(0, 1 - (now - t.born)/t.ttl);
+    ctx.fillStyle = t.color; ctx.globalAlpha = 0.92;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
+  }
+  // ── Textes flottants (+pts / DRIBBLE !) ──
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold '+Math.round(H*0.06)+'px "Bebas Neue",sans-serif';
+  _ar_fx = _ar_fx.filter(function(f){ return now - f.born < 800; });
+  for (var j=0;j<_ar_fx.length;j++){
+    var f = _ar_fx[j], a = (now - f.born)/800;
+    ctx.globalAlpha = 1 - a;
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.strokeText(f.txt, f.x, f.y - a*H*0.06);
+    ctx.fillStyle = f.color; ctx.fillText(f.txt, f.x, f.y - a*H*0.06);
+  }
+  ctx.globalAlpha = 1;
+  // ── Badge compteur (bas gauche) : répétitions + cibles + état du dribble ──
+  var dribbling = (now - _ar_lastRepTs) < _AR_DRIBBLE_WINDOW;
+  var txt = 'OVERHAND ' + _ar_reps;
+  if (_ar_cfg.targets) txt += (en ? '  ·  TARGETS ' : '  ·  CIBLES ') + _ar_tHit + '/' + _ar_tTotal;
+  var fs = Math.round(H*0.036);
+  ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+  while (fs > 9 && ctx.measureText(txt).width + 28 > W*0.25){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+  var bw = ctx.measureText(txt).width + 28, bh = Math.max(fs*1.6, H*0.05), bx = W*0.03, by = H*0.91 - bh/2;
+  var col = (!_ar_cfg.targets || dribbling) ? '#4ade80' : '#ff8a94';
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, bx, by, bw, bh, 9); ctx.fill();
+  ctx.strokeStyle = col; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, bx, by, bw, bh, 9); ctx.stroke();
+  ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, bx + bw/2, by + bh/2 + 1);
+  ctx.restore();
+}
+function _ar_showResults(){
+  var en = window._lang === 'en';
+  var r = document.getElementById('ar_results');
+  if (r){
+    var html = '<div style="margin-top:10px;padding:12px;background:rgba(255,122,26,.08);border:1px solid rgba(255,122,26,.35);border-radius:8px;font-family:var(--font-cond)">';
+    html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:#ff7a1a;letter-spacing:.1em;margin-bottom:6px">🚧 '+(en?'RESULTS':'RÉSULTATS')+'</div>';
+    html += '<div style="font-size:12px;color:#cfd3e0;line-height:1.7">';
+    html += '· Score : <b style="color:#f5c518">'+_opto_score+'</b><br>';
+    html += '· Overhand dribbles : '+_ar_reps;
+    if (_ar_cfg.targets){
+      var pct = _ar_tTotal > 0 ? Math.round(_ar_tHit/_ar_tTotal*100) : 0;
+      html += '<br>· '+(en?'Targets hit while dribbling':'Cibles touchées en dribblant')+' : '+_ar_tHit+' / '+_ar_tTotal+' ('+pct+'%)';
+    }
+    html += '</div></div>';
+    r.innerHTML = html;
+  }
+  var b = document.getElementById('ar_btnSave'); if (b) b.style.display = '';
+}
+window._ar_save = function(){
+  if (typeof _sb_recordSession === 'function'){
+    var pct = _ar_cfg.targets ? (_ar_tTotal > 0 ? Math.round(_ar_tHit/_ar_tTotal*100) : 0) : 100;
+    _sb_recordSession('ar_overhand_'+_ar_cfg.cones+(_ar_cfg.targets?'_targets':''), pct);
+  }
+  _opto_status(_t('✓ Sauvegardé','✓ Saved'), '#2dc653');
+  var b = document.getElementById('ar_btnSave'); if (b) b.style.display = 'none';
+};
+function _ar_desc(){
+  var en = window._lang === 'en', n = _ar_cfg.cones;
+  var base = en
+    ? ('Stand still behind the virtual cone' + (n>1?'s':'') + ' · overhand dribble ' + (n>1?'from one cone to the other':'over the cone') + ' with the selected hand.')
+    : ('Reste statique derrière ' + (n>1?'les cônes virtuels':'le cône virtuel') + ' · overhand dribble ' + (n>1?'d\'un cône à l\'autre':'au-dessus du cône') + ' avec la main choisie.');
+  if (_ar_cfg.targets) base += en
+    ? ' Hit the target with your free hand WITHOUT stopping the dribble (a hit with no dribble scores 0).'
+    : ' Touche la cible avec la main libre SANS arrêter le dribble (cible touchée sans dribble = 0 point).';
+  return base;
+}
+function _ar_refreshUI(){
+  var d = document.getElementById('ar_drillDesc'); if (d) d.textContent = _ar_desc();
+  document.querySelectorAll('.ar-hand-btn').forEach(function(b){
+    var on = b.dataset.hand === _ar_cfg.hand;
+    b.style.border = on ? '1px solid rgba(255,122,26,.6)' : '1px solid #1e2535';
+    b.style.background = on ? 'rgba(255,122,26,.15)' : 'var(--dark3)';
+    b.style.color = on ? '#ff7a1a' : '#7a8299';
+  });
+  document.querySelectorAll('.ar-dur-btn').forEach(function(b){
+    var on = parseInt(b.dataset.sec,10) === _ar_cfg.dur;
+    b.style.border = on ? '1px solid rgba(255,122,26,.6)' : '1px solid #1e2535';
+    b.style.background = on ? 'rgba(255,122,26,.15)' : 'var(--dark3)';
+    b.style.color = on ? '#ff7a1a' : '#7a8299';
+  });
+}
+window._ar_setDrill = function(v){
+  _ar_cfg.cones = (v === 'c2t' || v === 'c2') ? 2 : 1;
+  _ar_cfg.targets = (v === 'c1t' || v === 'c2t');
+  _ar_refreshUI();
+};
+window._ar_setHand = function(h){ _ar_cfg.hand = h; _ar_refreshUI(); };
+window._ar_setDur  = function(s){ _ar_cfg.dur = s; _ar_refreshUI(); };
+window._ar_start = function(){
+  if (_opto_running) return;
+  _opto_mode = 'ar'; _opto_dur = _ar_cfg.dur;
+  var r = document.getElementById('ar_results'); if (r) r.innerHTML = '';
+  _opto_start();
+};
+// Retour sur la famille OPTOMOTOR : on lui rend son drill et sa durée
+window._ar_restoreOpto = function(){
+  var s = document.getElementById('opto_drillSelect');
+  if (s && typeof _opto_setMode === 'function') _opto_setMode(s.value);
+  _opto_dur = window._opto_durSel || 60;
+};
+function _ar_applyLang(){
+  var en = window._lang === 'en';
+  var sel = document.getElementById('ar_drillSelect');
+  if (sel){
+    var lab = en ? ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)']
+                 : ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)'];
+    for (var i=0;i<sel.options.length && i<lab.length;i++) sel.options[i].textContent = lab[i];
+  }
+  var set = function(id, t){ var e = document.getElementById(id); if (e) e.textContent = t; };
+  set('ar_lblHand', en ? '✋ DRIBBLING HAND' : '✋ MAIN QUI DRIBBLE');
+  set('ar_lblDur',  en ? '⏱ DURATION' : '⏱ DURÉE');
+  set('ar_handR',   en ? 'RIGHT' : 'DROITE');
+  set('ar_handL',   en ? 'LEFT' : 'GAUCHE');
+  set('ar_lblStart', en ? '▶ START AUGMENTED REALITY' : '▶ DÉMARRER AUGMENTED REALITY');
+  set('ar_btnSave', en ? '💾 SAVE' : '💾 SAUVEGARDER');
+  var info = document.getElementById('ar_info');
+  if (info) info.innerHTML = en
+    ? '🚧🏀 <b style="color:#ff7a1a">AUGMENTED REALITY (AR)</b> · virtual cones placed in front of you · phone must stay still (tripod) · whole body in frame · the camera tracks your hand, not the ball.'
+    : '🚧🏀 <b style="color:#ff7a1a">AUGMENTED REALITY (AR)</b> · cônes virtuels posés devant toi · téléphone fixe (trépied) · corps entier dans le cadre · la caméra suit ta main, pas le ballon.';
+  var st = document.getElementById('ar_status');
+  if (st && (st.textContent === 'Appuie sur DÉMARRER' || st.textContent === 'Press START')) st.textContent = en ? 'Press START' : 'Appuie sur DÉMARRER';
+  _ar_refreshUI();
+}
+
 /* ═══════════════ MODE A11-V · VERGENCE SWITCH ═════════════════════
    Cible centrale alterne GROSSE (loin) / PETITE (près) toutes les 2s
    Le joueur alterne son focus (honneur, pas de mesure vergence réelle)
@@ -35004,7 +35548,8 @@ function _opto_applyLang(lang){
       'G3-H · VANISHING TARGET (bounce → shot into hoop)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)',
-      'A7-SAC · SACCADES (read L/R digits · head still)'
+      'A7-SAC · SACCADES (read L/R digits · head still)',
+      'A7-PLAY · PLAY TRACKING (follow the ball through plays)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
@@ -35013,7 +35558,8 @@ function _opto_applyLang(lang){
       'G3-H · VANISHING TARGET (ballon rebondit + rentre au panier)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)',
-      'A7-SAC · SACCADES (lis chiffres G/D · tête fixe)'
+      'A7-SAC · SACCADES (lis chiffres G/D · tête fixe)',
+      'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -35032,8 +35578,8 @@ function _opto_applyLang(lang){
   var info = panel && panel.querySelector('div[style*="border-left:2px solid rgba(100,180,255"]');
   if (info){
     info.innerHTML = en
-      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 7 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
-      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 7 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
+      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 8 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
+      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 8 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
   }
   // Status
   var status = document.getElementById('opto_status');
@@ -35047,7 +35593,8 @@ function _opto_applyLang(lang){
   var btnSave = document.getElementById('opto_btnSave');
   if (btnSave) btnSave.textContent = en ? '💾 SAVE' : '💾 SAUVEGARDER';
   // Rafraîchir la description active du drill sélectionné
-  if (typeof _opto_setMode === 'function' && typeof _opto_mode !== 'undefined') _opto_setMode(_opto_mode);
+  if (typeof _opto_setMode === 'function' && typeof _opto_mode !== 'undefined' && _opto_mode !== 'ar') _opto_setMode(_opto_mode);
+  if (typeof _ar_applyLang === 'function') _ar_applyLang();
 }
 
 // Init la description au chargement
@@ -36710,14 +37257,16 @@ function _dcog_selectDrill(drill, langOnly) {
     limbo: en ? 'LEVEL CHANGE · Shifty — 3 fundamental low-stance drills (static · shifty · descending). Head detection via MoveNet.'
              : 'LEVEL CHANGE · Shifty — 3 drills fondamentaux posture basse (static · shifty · descente). Détection tête via MoveNet.',
     opto: en ? 'OPTOMOTOR RESPONSE · Visual Motion — 5 oculomotor response drills (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Face tracking via MoveNet.'
-            : 'OPTOMOTOR RESPONSE · Visual Motion — 5 drills d\'entraînement de la réponse oculomotrice (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Suivi face via MoveNet.'
+            : 'OPTOMOTOR RESPONSE · Visual Motion — 5 drills d\'entraînement de la réponse oculomotrice (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Suivi face via MoveNet.',
+    ar: en ? 'AUGMENTED REALITY (AR) — camera drills with static virtual cones: overhand dribble over 1 or 2 cones, with or without targets to hit (dual task).'
+          : 'AUGMENTED REALITY (AR) — drills caméra avec cônes virtuels statiques : overhand dribble au-dessus de 1 ou 2 cônes, avec ou sans cibles à toucher (double tâche).'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto','ar'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -36726,12 +37275,12 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets', limbo:'dcog_optLimbo', opto:'dcog_optOpto'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets', limbo:'dcog_optLimbo', opto:'dcog_optOpto', ar:'dcog_optAr'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' || d === 'limbo' || d === 'opto' ? '12px' : '8px');
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' || d === 'limbo' || d === 'opto' || d === 'ar' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -36750,7 +37299,8 @@ function _dcog_selectDrill(drill, langOnly) {
       quickchoice: en ? '⚡ QUICK CHOICE' : '⚡ QUICK CHOICE',
       quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS',
       limbo:        en ? '🚧 LEVEL CHANGE · Shifty' : '🚧 LEVEL CHANGE · Shifty',
-      opto:         en ? '👁️ OPTOMOTOR RESPONSE · Visual Motion' : '👁️ OPTOMOTOR RESPONSE · Visual Motion'
+      opto:         en ? '👁️ OPTOMOTOR RESPONSE · Visual Motion' : '👁️ OPTOMOTOR RESPONSE · Visual Motion',
+      ar:           '🚧 AUGMENTED REALITY (AR) · Virtual Cones'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -36819,14 +37369,16 @@ function _dcog_selectDrill(drill, langOnly) {
     //   le 2ᵉ bouton visible qui crée un conflit UX.
     var _dcogMainStart = document.getElementById('dcog_btnStart');
     if (_dcogMainStart){
-      var ownStart = (drill === 'limbo' || drill === 'opto');
+      var ownStart = (drill === 'limbo' || drill === 'opto' || drill === 'ar');
       _dcogMainStart.style.display = ownStart ? 'none' : '';
     }
     // ★ FIX 0 : cacher TOUTE la carte "🎬 CHOISIS TON DRILL" (vidéo + liste + player)
     //   pour OPTOMOTOR → section totalement vide (pas de mapping vidéo défini)
     var _optoCard = document.getElementById('dcog_chooseDrillCard');
-    if (_optoCard) _optoCard.style.display = (drill === 'opto') ? 'none' : '';
-    if (drill === 'opto'){
+    if (_optoCard) _optoCard.style.display = (drill === 'opto' || drill === 'ar') ? 'none' : '';
+    if (drill === 'opto' && typeof _ar_restoreOpto === 'function' && !(typeof _opto_running !== 'undefined' && _opto_running)) _ar_restoreOpto();
+    if (drill === 'ar' && typeof _ar_applyLang === 'function') _ar_applyLang();
+    if (drill === 'opto' || drill === 'ar'){
       var _optFr  = document.getElementById('dcog_ytFrame');
       if (_optFr) _optFr.src = ''; // stop autoplay résiduel
     }
