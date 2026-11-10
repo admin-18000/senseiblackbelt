@@ -2822,6 +2822,7 @@ window._dojoBackHome = function(){
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
           <option value="sac">A7-SAC · SACCADES (lis gauche/droite rapidement)</option>
           <option value="play">A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)</option>
+          <option value="qe">A7-QE · QUIET EYE (fixe · attends · tape au GO)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -33522,6 +33523,8 @@ window._opto_setMode = function(m){
               : 'Suis une seule cible sur 6 trajectoires (carré · horizontale · verticale · 2 diagonales · cercle) · garde la tête fixe · A7-SP Poursuite lisse.',
     sac:    en ? 'Digits appear alternately left/right at random intervals · read them aloud · keep head still · A7-SAC Saccadic eye jumps (elite scanning).'
               : 'Des chiffres apparaissent en alternance G/D à intervalles aléatoires · lis-les à voix haute · garde la tête fixe · A7-SAC Saccades oculaires (scanning élite).',
+    qe:     en ? 'Fix the red target · keep your head perfectly still · the target turns GREEN at a random time · hit immediately. A7-QE Quiet Eye (Vickers) — proxy: head stability, not pupil tracking.'
+              : 'Fixe la cible rouge · garde la tête parfaitement immobile · elle passe au VERT à un moment aléatoire · tape immédiatement. A7-QE Quiet Eye (Vickers) — proxy : stabilité tête, pas pupille.',
     play:   en ? 'Transparent half-court · 5 players run real plays (pick & roll, give & go, backdoor, horns, flex) · follow the BALL with your eyes · keep head still · A7-PLAY.'
               : 'Demi-terrain transparent · 5 joueurs exécutent des systèmes (pick & roll, give & go, backdoor, horns, flex) · suis le BALLON des yeux · garde la tête fixe · A7-PLAY.'
   };
@@ -33581,6 +33584,7 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_sac_headStab = 0; _opto_sac_noseBaseline = null;
   _opto_play_idx = -1; _opto_play_start = 0; _opto_play_count = 0;
   _opto_play_headStab = 0; _opto_play_noseBaseline = null; _opto_play_lastSec = 0;
+  if (typeof _opto_qe_reset === 'function') _opto_qe_reset();
   _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
   _opto_mot_userTaps = 0;
   _opto_sp_t = 0; _opto_sp_lapCount = 0; _opto_sp_headStab = 0;
@@ -33670,6 +33674,7 @@ function _opto_detect(){
     else if (_opto_mode === 'sp')     _opto_analyzeSp(poses);
     else if (_opto_mode === 'sac')    _opto_analyzeSac(poses);
     else if (_opto_mode === 'play')   _opto_analyzePlay(poses);
+    else if (_opto_mode === 'qe')     _opto_analyzeQe(poses);
     else if (_opto_mode === 'ar')     _opto_analyzeAr(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
   }).catch(function(){
@@ -33693,6 +33698,7 @@ function _opto_drawFrame(poses){
   else if (_opto_mode === 'sp')     _opto_drawSp(W, H);
   else if (_opto_mode === 'sac')    _opto_drawSac(W, H);
   else if (_opto_mode === 'play')   _opto_drawPlay(W, H);
+  else if (_opto_mode === 'qe')     _opto_drawQe(W, H);
   else if (_opto_mode === 'ar')     _opto_drawAr(W, H);
   // ── Logo SENSEI (identique autres drills) ──
   //   A11 (ticker en bas) : passer tickerTop comme H pour que le logo soit dessiné
@@ -33721,6 +33727,7 @@ function _opto_drawHUD(W, H){
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE',
     sac:    en ? 'READ LEFT/RIGHT DIGITS · HEAD STILL' : 'LIS LES CHIFFRES G/D · TÊTE FIXE',
+    qe:     en ? 'STARE · WAIT · HIT ON GREEN' : 'FIXE · ATTENDS · TAPE AU GO',
     play:   en ? 'FOLLOW THE BALL · HEAD STILL' : 'SUIS LE BALLON · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
@@ -34587,7 +34594,7 @@ function _opto_drillLabel(){
   var m = { headup:'A11 · HEAD-UP SCAN', iso:'F11 · HEAD / TRUNK ISO', periph:'A3 · PERIPHERAL TARGET',
             vanish:'G3 · VANISHING TARGET', vanishShoot:'G3 · VANISHING TARGET',
             mot:'A7 · MULTI-OBJECT TRACKING', sp:'A7 · SMOOTH PURSUIT',
-            sac:'A7 · SACCADES', play:'A7 · PLAY TRACKING' };
+            sac:'A7 · SACCADES', play:'A7 · PLAY TRACKING', qe:'A7 · QUIET EYE' };
   return m[_opto_mode] || 'OPTOMOTOR RESPONSE';
 }
 function _opto_drawOutro(ms){
@@ -35168,10 +35175,15 @@ function _opto_drawPlay(W, H){
   var en = window._lang === 'en';
   var now = Date.now();
   // Zone libre : sous le HUD (bas à 0.3275H), jusqu'à 0.96H. Terrain centré, ratio réel 15:14.
-  var hudBottom = H*0.30 + Math.max(44, H*0.055)/2;      // bas réel des pilules score/chrono
-  var cy0 = Math.max(H*0.37, hudBottom + 14), ch = H*0.96 - cy0;
+  // ★ A7-PLAY = drill PAYSAGE. On optimise pour W > H : terrain plus large (cap 0.55W au lieu de 0.46W)
+  //   et hauteur étendue (top à 0.32H au lieu de 0.37H → +12% de hauteur de terrain).
+  //   Badge repositionné à gauche (comportement d'origine). En portrait, retombe sur cap étroit.
+  var isLandscape = W > H;
+  var hudBottom = H*0.30 + Math.max(44, H*0.055)/2;
+  var cy0 = Math.max(isLandscape ? H*0.32 : H*0.37, hudBottom + 14), ch = H*0.96 - cy0;
   var s = ch / 14, cw = 15*s;
-  if (cw > W*0.46){ cw = W*0.46; s = cw/15; ch = 14*s; }   // garde-fou écrans étroits
+  var cwCap = isLandscape ? W*0.55 : W*0.46;
+  if (cw > cwCap){ cw = cwCap; s = cw/15; ch = 14*s; }
   var cx0 = W/2 - cw/2;
   // Enchaînement des systèmes
   var p = _opto_play_idx >= 0 ? _OPTO_PLAYS[_opto_play_idx] : null;
@@ -35205,7 +35217,7 @@ function _opto_drawPlay(W, H){
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.beginPath(); ctx.arc(bx, by, br*1.45, 0, Math.PI*2); ctx.fill();
   _opto_drawBasketball(ctx, bx, by, br, 0);
-  // Badge nom du système (à GAUCHE du terrain, zone libre)
+  // Badge nom du système (à GAUCHE du terrain, zone libre) — comportement d'origine, pensé paysage
   var name = p.name;
   var fs = Math.round(H*0.034);
   ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
@@ -35781,6 +35793,155 @@ function _ar_cc_draw(W, H, now){
   ctx.restore();
 }
 
+/* ═══════════════ A7-QE · QUIET EYE (fixation mesurée + geste) ════════════
+   Cible rouge au centre · mesure la DURÉE de fixation stable AVANT le GO
+   (proxy = stabilité du nez + présence face à la caméra). Au GO, mesure le
+   temps de réaction du geste (HIT au poignet strict TDR, radius ×2.0).
+   Vickers 1996-2016 : élite fixe 1000-2000 ms avant le tir, moyen 400 ms.
+   Pas de capteur œil → proxy honnête, documenté dans la carte résumé.
+═════════════════════════════════════════════════════════════════════════ */
+var _AR_QE_MIN_HOLD = 400;       // en-dessous : pas de GO
+var _AR_QE_MAX_HOLD = 2500;      // on force le GO pour ne pas bloquer
+var _AR_QE_STAB = 0.025;         // nez stable sous 2.5% de dérive
+var _opto_qe_phase = 'wait';     // 'wait' | 'hold' | 'ask' | 'result'
+var _opto_qe_holdStart = 0, _opto_qe_askStart = 0, _opto_qe_lastHoldMs = 0;
+var _opto_qe_lastRtMs = 0, _opto_qe_count = 0, _opto_qe_sumHold = 0, _opto_qe_sumRt = 0, _opto_qe_hitCount = 0;
+var _opto_qe_nextRoundTs = 0, _opto_qe_noseBaseline = null, _opto_qe_fx = [];
+
+function _opto_qe_reset(){
+  _opto_qe_phase = 'wait'; _opto_qe_holdStart = 0; _opto_qe_askStart = 0;
+  _opto_qe_lastHoldMs = 0; _opto_qe_lastRtMs = 0; _opto_qe_count = 0;
+  _opto_qe_sumHold = 0; _opto_qe_sumRt = 0; _opto_qe_hitCount = 0;
+  _opto_qe_nextRoundTs = Date.now() + 600; _opto_qe_noseBaseline = null; _opto_qe_fx = [];
+}
+function _opto_analyzeQe(poses){
+  if (!poses || !poses[0] || !_opto_canvas) return;
+  var W = _opto_canvas.width, H = _opto_canvas.height, now = Date.now();
+  var kp = _opto_kpMap(poses); if (!kp) return;
+  var nose = kp['nose']; if (!nose || nose.score < 0.3){ _opto_qe_noseBaseline = null; return; }
+  if (_opto_qe_phase === 'wait'){
+    if (now >= _opto_qe_nextRoundTs){
+      _opto_qe_phase = 'hold'; _opto_qe_holdStart = 0; _opto_qe_noseBaseline = {x:nose.x, y:nose.y};
+    } else return;
+  }
+  var dnx = (nose.x - _opto_qe_noseBaseline.x)/W, dny = (nose.y - _opto_qe_noseBaseline.y)/H;
+  var drift = Math.sqrt(dnx*dnx + dny*dny);
+  if (_opto_qe_phase === 'hold'){
+    // ★ Proxy fixation : la tête reste stable, sans tirer sur la main (yeux non mesurés)
+    if (drift > _AR_QE_STAB){ _opto_qe_holdStart = now; _opto_qe_noseBaseline = {x:nose.x, y:nose.y}; return; }
+    if (!_opto_qe_holdStart) _opto_qe_holdStart = now;
+    var hold = now - _opto_qe_holdStart;
+    if (hold < _AR_QE_MIN_HOLD) return;
+    // Tirage du GO : plus la fixation est longue, plus la probabilité augmente
+    //   (seuil doux : 70% par seconde au-delà de MIN_HOLD, jusqu'au max)
+    if (hold >= _AR_QE_MAX_HOLD || Math.random() < 0.012){
+      _opto_qe_phase = 'ask'; _opto_qe_askStart = now; _opto_qe_lastHoldMs = hold;
+      _opto_qe_sumHold += hold; _opto_qe_count++;
+      if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.1);
+    }
+    return;
+  }
+  if (_opto_qe_phase === 'ask'){
+    // HIT strict TDR Reaction : rayon ×2.0, moveThresh, filtre directionnel
+    var tR = Math.max(28, Math.min(W*0.045, H*0.075));
+    var tx = W/2, ty = H*0.56;
+    var target = [{ x:tx, y:ty, r:tR, born:_opto_qe_askStart, hit:false }];
+    _opto_doHits(poses, target, 2.0, function(t, side, rt){
+      _opto_qe_phase = 'result'; _opto_qe_lastRtMs = rt; _opto_qe_sumRt += rt; _opto_qe_hitCount++;
+      // Barème : fixation ≥ 1s + RT ≤ 400ms = élite
+      var fixBonus = Math.max(0, Math.min(40, Math.round((_opto_qe_lastHoldMs - 400)/50)));
+      var rtBonus = Math.max(0, Math.round((700 - rt)/20));
+      var pts = 10 + fixBonus + rtBonus;
+      _opto_score += pts; _opto_hits++;
+      _opto_qe_fx.push({ x:tx, y:ty - H*0.12, txt:'+'+pts+'  ·  '+(rt)+'ms', color:'#4ade80', born:Date.now() });
+      if (typeof _td_beep === 'function') _td_beep(rt < 350 ? 1760 : 1100, 0.05, 0.12);
+      if (navigator.vibrate) navigator.vibrate(25);
+      _opto_qe_nextRoundTs = Date.now() + 1200;
+    });
+    // Timeout 1.5s : rate la fenêtre
+    if (now - _opto_qe_askStart > 1500){
+      _opto_miss++; _opto_qe_phase = 'result';
+      _opto_qe_fx.push({ x:W/2, y:H*0.44, txt:(window._lang==='en'?'TOO SLOW':'TROP LENT'), color:'#ff8a94', born:now });
+      _opto_qe_nextRoundTs = now + 1200;
+      if (typeof _td_beep === 'function') _td_beep(200, 0.08, 0.1);
+    }
+    return;
+  }
+  if (_opto_qe_phase === 'result'){
+    if (now >= _opto_qe_nextRoundTs){ _opto_qe_phase = 'wait'; _opto_qe_noseBaseline = null; }
+  }
+}
+function _opto_drawQe(W, H){
+  var ctx = _opto_ctx, en = window._lang === 'en', now = Date.now();
+  var cx = W/2, cy = H*0.56;
+  var tR = Math.max(28, Math.min(W*0.045, H*0.075));
+  ctx.save();
+  // Zone de visée : croix fine + cible rouge centrale
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2; ctx.setLineDash([6,8]);
+  ctx.beginPath(); ctx.moveTo(cx - tR*4, cy); ctx.lineTo(cx + tR*4, cy);
+  ctx.moveTo(cx, cy - tR*4); ctx.lineTo(cx, cy + tR*4); ctx.stroke(); ctx.setLineDash([]);
+  // Halo pulse selon phase
+  var pulse = 0;
+  if (_opto_qe_phase === 'hold' && _opto_qe_holdStart){
+    var hold = Math.max(0, now - _opto_qe_holdStart);
+    pulse = Math.min(1, hold / _AR_QE_MAX_HOLD);
+  } else if (_opto_qe_phase === 'ask'){
+    pulse = 1 + 0.4*Math.max(0, 1 - (now - _opto_qe_askStart)/180);
+  }
+  if (pulse > 0){
+    ctx.fillStyle = _opto_qe_phase === 'ask' ? 'rgba(74,222,128,0.35)' : 'rgba(230,57,70,0.35)';
+    ctx.beginPath(); ctx.arc(cx, cy, tR*(1.6 + pulse*0.8), 0, Math.PI*2); ctx.fill();
+  }
+  // Cible : rouge en attente/hold, verte au GO
+  ctx.fillStyle = _opto_qe_phase === 'ask' ? '#4ade80' : '#e63946';
+  ctx.beginPath(); ctx.arc(cx, cy, tR, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(cx, cy, tR, 0, Math.PI*2); ctx.stroke();
+  // Label d'état (à GAUCHE, loin de la cible)
+  var state;
+  if (_opto_qe_phase === 'wait')   state = { txt:(en?'READY…':'PRÊT…'), col:'rgba(255,255,255,0.75)' };
+  else if (_opto_qe_phase === 'hold'){
+    var ms = _opto_qe_holdStart ? (now - _opto_qe_holdStart) : 0;
+    state = { txt:(en?'FIX  ':'FIXE  ') + Math.max(0,Math.round(ms))+'ms', col:'#64b4ff' };
+  }
+  else if (_opto_qe_phase === 'ask') state = { txt:(en?'HIT !':'TAPE !'), col:'#4ade80' };
+  else state = { txt:(en?'BREATHE':'RESPIRE'), col:'#9ba3b4' };
+  var pw = Math.min(W*0.26, 280), ph = Math.min(H*0.11, 94);
+  var px = W*0.035, py = H*0.42, rr = ph*0.5;
+  ctx.fillStyle = 'rgba(8,11,18,0.88)';
+  _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
+  ctx.strokeStyle = state.col; ctx.lineWidth = 4;
+  _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
+  ctx.font = 'bold '+Math.round(ph*0.40)+'px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = state.col;
+  ctx.fillText(state.txt, px + pw/2, py + ph/2);
+  // Compteur bas gauche
+  var avgHold = _opto_qe_count ? Math.round(_opto_qe_sumHold/_opto_qe_count) : 0;
+  var avgRt = _opto_qe_hitCount ? Math.round(_opto_qe_sumRt/_opto_qe_hitCount) : 0;
+  var txt = (en?'FIX ':'FIX ') + avgHold + 'ms  ·  ' + (en?'RT ':'TR ') + avgRt + 'ms';
+  var fs2 = Math.round(H*0.034);
+  ctx.font = 'bold '+fs2+'px "Bebas Neue",sans-serif';
+  while (fs2 > 9 && ctx.measureText(txt).width + 28 > W*0.30){ fs2--; ctx.font = 'bold '+fs2+'px "Bebas Neue",sans-serif'; }
+  var bw2 = ctx.measureText(txt).width + 28, bh2 = Math.max(fs2*1.6, H*0.05), bx2 = W*0.03, by2 = H*0.91 - bh2/2;
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, bx2, by2, bw2, bh2, 9); ctx.fill();
+  ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, bx2, by2, bw2, bh2, 9); ctx.stroke();
+  ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, bx2 + bw2/2, by2 + bh2/2);
+  // Textes flottants
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+  _opto_qe_fx = _opto_qe_fx.filter(function(f){ return now - f.born < 1100; });
+  for (var j=0;j<_opto_qe_fx.length;j++){
+    var f = _opto_qe_fx[j], a = (now - f.born)/1100;
+    ctx.globalAlpha = Math.min(1, (1-a)*2);
+    ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.strokeText(f.txt, f.x, f.y - a*H*0.06);
+    ctx.fillStyle = f.color; ctx.fillText(f.txt, f.x, f.y - a*H*0.06);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
 /* ═══════════════ MODE A11-V · VERGENCE SWITCH ═════════════════════
    Cible centrale alterne GROSSE (loin) / PETITE (près) toutes les 2s
    Le joueur alterne son focus (honneur, pas de mesure vergence réelle)
@@ -35875,7 +36036,8 @@ function _opto_applyLang(lang){
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)',
       'A7-SAC · SACCADES (read L/R digits · head still)',
-      'A7-PLAY · PLAY TRACKING (follow the ball through plays)'
+      'A7-PLAY · PLAY TRACKING (follow the ball through plays)',
+      'A7-QE · QUIET EYE (fix · wait · hit on GO)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
@@ -35885,7 +36047,8 @@ function _opto_applyLang(lang){
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)',
       'A7-SAC · SACCADES (lis chiffres G/D · tête fixe)',
-      'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)'
+      'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)',
+      'A7-QE · QUIET EYE (fixe · attends · tape au GO)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -35904,8 +36067,8 @@ function _opto_applyLang(lang){
   var info = panel && panel.querySelector('div[style*="border-left:2px solid rgba(100,180,255"]');
   if (info){
     info.innerHTML = en
-      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 8 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
-      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 8 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
+      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 9 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
+      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 9 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
   }
   // Status
   var status = document.getElementById('opto_status');
@@ -37303,7 +37466,7 @@ var _dcog_VIDEOS = [
   // Flag `vertical:true` → thumb 9:16 + player iframe en 9:16 (pattern STRENGTH)
   // ═══ VISUOMOTOR COORDINATION — 3 vidéos jonglage (format horizontal 16:9
   //    comme DRIBBLE/TDR : thumbs landscape + iframe 16:9) ═══
-  {id:'_eXwWe5nE80', title:'Visuomotor 1',       drill:'viscoord'},
+  {id:'HPIsDjVirlE', title:'Tennis Ball',        drill:'viscoord'},
   {id:'4iiLTTAA79Y', title:'Visuomotor 2',       drill:'viscoord'},
   {id:'jsKnPf9TBEs', title:'Visuomotor 3',       drill:'viscoord'},
   // ═══ REACTION CATCHING STICK — format Shorts 9:16 (vertical) ═══
@@ -37321,7 +37484,7 @@ var _dcog_VIDEOS = [
   {id:'DJHKF-LCaKE', title:'TBoard - 2 BALLONS', drill:'tboard'},
   {id:'R8MJAiXSKZM', title:'TBoard - 3',         drill:'tboard'},
   {id:'UHNUSFHSrOo', title:'Dribble Height HAUT',      drill:'height'},
-  {id:'2a2oVhjcKXQ', title:'Dribble Height HIGH/LOW',  drill:'height'},
+  {id:'5QmpY2f0TeI', title:'Dribble Height HIGH/LOW',  drill:'height'},
   {id:'5Fgt7txZEQc', title:'Burnout',            drill:'burnout'},
   {id:'eFXJ32fp54Q', title:'Burnout (alt)',      drill:'burnout'},
   {id:'pibR0Ri47PM', title:'Visual Math',        drill:'vcmath'},
