@@ -34418,7 +34418,9 @@ function _opto_drawMot(W, H){
     }
   }
   // Compteur cycles (bas centre, pastille nette au-dessous des balles)
-  var cycTxt = _opto_mot_cycleCount + (en?' CYCLES · ':' CYCLES · ') + Math.ceil(8 - (now - _opto_mot_phaseStart)/1000) + 's';
+  // ★ Pluriel CYCLE/CYCLES (0 et 1 = singulier)
+  var _nCyc = _opto_mot_cycleCount|0;
+  var cycTxt = _nCyc + ' ' + (_nCyc <= 1 ? 'CYCLE' : 'CYCLES') + ' · ' + Math.ceil(8 - (now - _opto_mot_phaseStart)/1000) + 's';
   ctx.save();
   ctx.font = 'bold '+Math.round(H*0.038)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -34912,7 +34914,9 @@ function _opto_drawSp(W, H){
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
   ctx.stroke();
   // Compteur tours (gros en bas centre)
-  var lapTxt = _opto_sp_lapCount + (en?' LAPS':' TOURS');
+  // ★ Pluriel : 0/1 = singulier (TOUR / LAP), ≥2 = pluriel (TOURS / LAPS)
+  var _nLap = _opto_sp_lapCount|0;
+  var lapTxt = _nLap + ' ' + (en ? (_nLap <= 1 ? 'LAP' : 'LAPS') : (_nLap <= 1 ? 'TOUR' : 'TOURS'));
   ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   var lapW = ctx.measureText(lapTxt).width + 36;
@@ -35012,7 +35016,9 @@ function _opto_drawSac(W, H){
   ctx.fillText(_opto_sac_current, 0, 0);
   ctx.restore();
   // Compteur bas centre
-  var cTxt = _opto_sac_count + (en?' SACCADES':' SACCADES');
+  // ★ Pluriel : SACCADE au singulier à 0/1, SACCADES au-delà (EN et FR identiques)
+  var _nSac = _opto_sac_count|0;
+  var cTxt = _nSac + ' ' + (_nSac <= 1 ? 'SACCADE' : 'SACCADES');
   ctx.font = 'bold '+Math.round(H*0.038)+'px "Bebas Neue",sans-serif';
   var cW = ctx.measureText(cTxt).width + 44;
   var cH = H*0.055;
@@ -35744,9 +35750,10 @@ function _ar_cc_draw(W, H, now){
     var left = Math.max(0, 1 - age/_AR_CC_TTL);
     ctx.save();
     ctx.translate(px + pw/2, py + ph/2); ctx.scale(pop, pop); ctx.translate(-(px + pw/2), -(py + ph/2));
-    ctx.fillStyle = 'rgba(8,11,18,0.88)';
+    // ★ Pilule arrondie transparente : fond très léger (0.35), bordure couleur conservée
+    ctx.fillStyle = 'rgba(8,11,18,0.35)';
     _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
-    ctx.strokeStyle = c2.hex; ctx.lineWidth = 5;
+    ctx.strokeStyle = c2.hex; ctx.lineWidth = 4;
     _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
     var label = en ? c2.en : c2.fr;
     var fs = Math.round(ph*0.46);
@@ -35766,9 +35773,10 @@ function _ar_cc_draw(W, H, now){
   } else {
     var wait = en ? 'GET READY' : 'PRÊT…';
     ctx.save();
-    ctx.fillStyle = 'rgba(8,11,18,0.70)';
+    // ★ Phase d'attente : pilule arrondie transparente, contour blanc fin
+    ctx.fillStyle = 'rgba(8,11,18,0.28)';
     _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.30)'; ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
     _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
     ctx.font = 'bold '+Math.round(ph*0.38)+'px "Bebas Neue",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -35994,7 +36002,9 @@ function _opto_drawVerg(W, H){
   ctx.fillStyle = tCol;
   ctx.fillText(phTxt, W/2, phY);
   // Compteur cycles bas
-  var cycTxt = _opto_vg_cycleCount + (en?' SWITCHES':' SWITCHS');
+  // ★ Pluriel SWITCH/SWITCHES (0 et 1 = singulier · EN et FR identiques)
+  var _nSw = _opto_vg_cycleCount|0;
+  var cycTxt = _nSw + ' ' + (_nSw <= 1 ? 'SWITCH' : (en ? 'SWITCHES' : 'SWITCHS'));
   ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
   var cW = ctx.measureText(cycTxt).width + 36;
   var cY = H*0.92;
@@ -37879,7 +37889,9 @@ function _dcog_selectDrill(drill, langOnly) {
     // ★ AUTOPLAY : la vidéo du mapping s'ouvre direct quand on choisit la famille,
     //   sans passer par un clic sur la vignette. Ignoré pendant l'init (évite un
     //   autoplay au premier chargement de l'app).
-    if (!_dcog_initing && (drill === 'opto' || drill === 'ar' || drill === 'rcs')){
+    // ★ AUTOPLAY généralisé : tout changement de drill dans DCOG lance direct la 1re vidéo
+    //   taguée du drill courant — comportement attendu pour TOUS les modules.
+    if (!_dcog_initing){
       var _vi = -1;
       for (var _k=0; _k<_dcog_VIDEOS.length; _k++){ if (_dcog_VIDEOS[_k].drill === drill){ _vi = _k; break; } }
       if (_vi >= 0 && typeof _dcog_selectVid === 'function') _dcog_selectVid(_vi);
