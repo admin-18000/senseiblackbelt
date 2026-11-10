@@ -33746,26 +33746,29 @@ function _opto_drawHUD(W, H){
   // ★ FIX : width portrait-aware
   //   • Portrait (A11) : 0.92W — W est étroit, besoin de la quasi-totalité
   //   • Landscape : 0.56W — laisse 0.22W libre de chaque côté pour REC/STOP
-  var portraitHUD = !!window._opto_portraitMode;
-  var bw = portraitHUD ? W*0.92 : W*0.56;
-  var bh = H*0.09;
-  var bx = W/2 - bw/2, by = H*0.09;
-  ctx.fillStyle = 'rgba(13,17,23,0.90)';
-  _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = '#64b4ff';
-  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(100,180,255,0.4)';
-  _opto_roundRect(ctx, bx, by, bw, bh, 10); ctx.stroke();
-  ctx.shadowBlur = 0;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#64b4ff';
+  // ★ CONSIGNE GLOBALE = petite pilule arrondie transparente à GAUCHE (homogène
+  //   AR Color Call). Pas un énorme bandeau qui bouffe le haut de l'écran.
+  var bh = Math.max(32, H*0.045);
   var annFs = Math.round(bh*0.52);
   ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
-  if (ctx.measureText(txt).width > bw * 0.92){
-    annFs = Math.max(Math.round(bh*0.3), Math.round(annFs * bw * 0.92 / ctx.measureText(txt).width));
+  var pad = 18;
+  var bw = Math.min(W*0.42, ctx.measureText(txt).width + pad*2);
+  var bx = W*0.035, by = H*0.025;
+  var rr = bh*0.5;
+  ctx.fillStyle = 'rgba(8,11,18,0.35)';
+  _opto_roundRect(ctx, bx, by, bw, bh, rr); ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(100,180,255,0.70)';
+  _opto_roundRect(ctx, bx, by, bw, bh, rr); ctx.stroke();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (ctx.measureText(txt).width > bw - pad){
+    annFs = Math.max(10, Math.round(annFs * (bw - pad) / ctx.measureText(txt).width));
     ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   }
-  ctx.fillText(txt, W/2, by + bh*0.5);
+  ctx.lineWidth = Math.max(2, annFs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  ctx.strokeText(txt, bx + bw/2, by + bh*0.5);
+  ctx.fillStyle = '#64b4ff';
+  ctx.fillText(txt, bx + bw/2, by + bh*0.5);
   // ── (2) Barre HUD : score + chrono SYMÉTRIQUES centrés autour de W/2
   //   ★ FIX : fin du déséquilibre (score left + chrono center = tout à gauche)
   //   ★ FIX 2 : hy descendu de 0.235H → 0.30H pour SÉPARER clairement des
@@ -35749,51 +35752,53 @@ function _ar_cc_draw(W, H, now){
     else { ctx.fillStyle = c.hex; ctx.beginPath(); ctx.moveTo(x, L.baseY - L.ch);
            ctx.lineTo(x + L.cw/2, L.baseY); ctx.lineTo(x - L.cw/2, L.baseY); ctx.closePath(); ctx.fill(); }
   }
-  // ── Consigne ÉCRITE : pastille arrondie à GAUCHE, loin de la rangée centrée
-  //    de cônes, en-dessous du HUD (bas HUD ≈ 0.3275H). Hauteur réduite, bords
-  //    très arrondis (demi-pilule), bordure couleur. Pas de chevauchement.
-  var pw = Math.min(W*0.26, 260), ph = Math.min(H*0.13, 110);
-  var px = W*0.035, py = H*0.42;
-  var rr = ph*0.5;                              // arrondi = moitié de la hauteur → pilule
+  // ★ VRAI ROND transparent à GAUCHE avec le nom de la couleur (homogène A7-BEAD).
+  //   Les noms de couleurs font 4-6 lettres, rentrent dans un cercle de 220px max.
+  var cD = Math.min(W*0.22, H*0.30, 220);
+  var cR_cc = cD / 2;
+  var ccx = W*0.03 + cR_cc, ccy = H*0.50;
   if (_ar_cc_phase === 'ask' && _ar_cc_target){
     var c2 = _ar_colorByKey(_ar_cc_target);
     var age = now - _ar_cc_askTs;
     var pop = 1 + 0.07*Math.max(0, 1 - age/180);
     var left = Math.max(0, 1 - age/_AR_CC_TTL);
     ctx.save();
-    ctx.translate(px + pw/2, py + ph/2); ctx.scale(pop, pop); ctx.translate(-(px + pw/2), -(py + ph/2));
-    // ★ Pilule arrondie transparente : fond très léger (0.35), bordure couleur conservée
+    ctx.translate(ccx, ccy); ctx.scale(pop, pop); ctx.translate(-ccx, -ccy);
+    // Cercle fond transparent + bordure couleur
     ctx.fillStyle = 'rgba(8,11,18,0.35)';
-    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
-    ctx.strokeStyle = c2.hex; ctx.lineWidth = 4;
-    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ccx, ccy, cR_cc, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = c2.hex; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(ccx, ccy, cR_cc, 0, Math.PI*2); ctx.stroke();
+    // Nom couleur au centre
     var label = en ? c2.en : c2.fr;
-    var fs = Math.round(ph*0.46);
+    var fs = Math.round(cD*0.30);
     ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
-    while (fs > 12 && ctx.measureText(label).width > pw*0.80){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+    while (fs > 14 && ctx.measureText(label).width > cD*0.78){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.lineWidth = Math.max(3, fs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-    ctx.strokeText(label, px + pw/2, py + ph*0.42);
-    ctx.fillStyle = c2.hex; ctx.fillText(label, px + pw/2, py + ph*0.42);
-    // barre de temps restant, pleine largeur sous le label
-    var bw = pw*0.78, bx = px + pw/2 - bw/2, by = py + ph*0.80;
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    _opto_roundRect(ctx, bx, by, bw, Math.max(4, ph*0.09), 3); ctx.fill();
-    ctx.fillStyle = c2.hex;
-    _opto_roundRect(ctx, bx, by, bw*left, Math.max(4, ph*0.09), 3); ctx.fill();
+    ctx.strokeText(label, ccx, ccy);
+    ctx.fillStyle = c2.hex; ctx.fillText(label, ccx, ccy);
+    // Arc de temps restant AUTOUR du cercle (au lieu d'une barre droite — plus cohérent avec un rond)
+    ctx.strokeStyle = c2.hex; ctx.lineWidth = 6; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(ccx, ccy, cR_cc + 10, -Math.PI/2, -Math.PI/2 + left*Math.PI*2);
+    ctx.stroke();
     ctx.restore();
   } else {
     var wait = en ? 'GET READY' : 'PRÊT…';
     ctx.save();
-    // ★ Phase d'attente : pilule arrondie transparente, contour blanc fin
     ctx.fillStyle = 'rgba(8,11,18,0.28)';
-    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
-    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
-    ctx.font = 'bold '+Math.round(ph*0.38)+'px "Bebas Neue",sans-serif';
+    ctx.beginPath(); ctx.arc(ccx, ccy, cR_cc, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(ccx, ccy, cR_cc, 0, Math.PI*2); ctx.stroke();
+    var fsW = Math.round(cD*0.22);
+    ctx.font = 'bold '+fsW+'px "Bebas Neue",sans-serif';
+    while (fsW > 11 && ctx.measureText(wait).width > cD*0.78){ fsW--; ctx.font = 'bold '+fsW+'px "Bebas Neue",sans-serif'; }
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = Math.max(2, fsW*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+    ctx.strokeText(wait, ccx, ccy);
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.fillText(wait, px + pw/2, py + ph/2);
+    ctx.fillText(wait, ccx, ccy);
     ctx.restore();
   }
   // ── Badge compteur (bas gauche) ──
@@ -35865,18 +35870,20 @@ function _opto_bead_layout(W, H){
   var R;
   if (vertical){
     R = Math.max(18, Math.min(H*0.034, W*0.045));
-    var yA = H*0.18, yB = H*0.82;
+    // ★ Vertical : démarre PLUS BAS pour éviter chevauchement avec consigne + HUD (y≤0.34H)
+    var yA = H*0.40, yB = H*0.92;
     var step = (yB - yA) / (n-1);
     var xs = [], ys = [];
     for (var i=0;i<n;i++){ xs.push(W*0.5); ys.push(yA + i*step); }
-    return { vertical:true, xs:xs, ys:ys, R:R, fix:{x:W*0.5, y:H*0.09} };
+    return { vertical:true, xs:xs, ys:ys, R:R, fix:{x:W*0.5, y:H*0.36} };
   } else {
     R = Math.max(18, Math.min(W*0.034, H*0.055));
-    var xA = W*0.18, xB = W*0.82;
+    // ★ Horizontal : baisse la ligne pour éviter chevauchement avec pilule consigne
+    var xA = W*0.15, xB = W*0.95;
     var step = (xB - xA) / (n-1);
     var xs2 = [], ys2 = [];
-    for (var i2=0;i2<n;i2++){ xs2.push(xA + i2*step); ys2.push(H*0.52); }
-    return { vertical:false, xs:xs2, ys:ys2, R:R, fix:{x:W*0.08, y:H*0.52} };
+    for (var i2=0;i2<n;i2++){ xs2.push(xA + i2*step); ys2.push(H*0.70); }
+    return { vertical:false, xs:xs2, ys:ys2, R:R, fix:{x:W*0.065, y:H*0.70} };
   }
 }
 function _opto_bead_pickTargets(variant){
@@ -36009,41 +36016,46 @@ function _opto_drawBead(W, H){
     ctx.strokeStyle = active ? '#fff' : 'rgba(0,0,0,0.35)'; ctx.lineWidth = active ? 5 : 2;
     ctx.beginPath(); ctx.arc(L.xs[i], L.ys[i], L.R, 0, Math.PI*2); ctx.stroke();
   }
-  // ★ CONSIGNE à GAUCHE en PILULE ARRONDIE TRANSPARENTE (homogène AR Color Call)
-  //   Annonce couleur courante + type de variante.
+  // ★ VRAI ROND transparent à GAUCHE avec le nom de la couleur à l'intérieur.
+  //   Les mots couleur font 4-6 lettres, ça rentre pile. Diamètre adapté au W/H.
   var annIdx = -1;
-  var subTxt = '';
   if (_opto_bead_phase === 'show'){
-    if (variant === 'simple')    { annIdx = _opto_bead_targets[0]; subTxt = en?'LOOK':'REGARDE'; }
-    else if (variant === 'anti') { annIdx = _opto_bead_targets[0].announce; subTxt = en?'LOOK OPPOSITE':'REGARDE L’OPPOSÉ'; }
-    else {
-      annIdx = _opto_bead_targets[_opto_bead_hitIdx];
-      subTxt = (en?'SEQUENCE ':'SÉQUENCE ') + (_opto_bead_hitIdx+1) + '/' + _opto_bead_targets.length;
-    }
-  } else {
-    subTxt = en?'READY…':'PRÊT…';
+    if (variant === 'simple')    annIdx = _opto_bead_targets[0];
+    else if (variant === 'anti') annIdx = _opto_bead_targets[0].announce;
+    else                         annIdx = _opto_bead_targets[_opto_bead_hitIdx];
   }
-  var pw = Math.min(W*0.30, 300), ph = Math.min(H*0.14, 115);
-  var px = W*0.035, py = H*0.42, rr = ph*0.5;
+  var cD = Math.min(W*0.22, H*0.30, 220);         // diamètre du rond
+  var cR2 = cD / 2;
+  var ccx = W*0.03 + cR2;                          // bord gauche + rayon
+  var ccy = H*0.50;                                // milieu vertical (hors zone HUD + billes H)
+  var cColor = (annIdx >= 0) ? _AR_BEAD_COLORS[annIdx].hex : 'rgba(255,255,255,0.45)';
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
-  _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
-  var borderCol = (annIdx >= 0) ? _AR_BEAD_COLORS[annIdx].hex : 'rgba(255,255,255,0.35)';
-  ctx.strokeStyle = borderCol; ctx.lineWidth = 4;
-  _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
-  // Grande ligne : la couleur annoncée (ou "PRÊT…")
-  var bigTxt = (annIdx >= 0) ? (en ? _AR_BEAD_COLORS[annIdx].en : _AR_BEAD_COLORS[annIdx].fr) : (en?'READY…':'PRÊT…');
-  var fs = Math.round(ph*0.38);
-  ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
-  while (fs > 11 && ctx.measureText(bigTxt).width > pw*0.86){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+  ctx.beginPath(); ctx.arc(ccx, ccy, cR2, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = cColor; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.arc(ccx, ccy, cR2, 0, Math.PI*2); ctx.stroke();
+  var inTxt = (annIdx >= 0) ? (en ? _AR_BEAD_COLORS[annIdx].en : _AR_BEAD_COLORS[annIdx].fr) : (en?'…':'…');
+  var fsIn = Math.round(cD*0.30);
+  ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif';
+  // Auto-fit : on ne dépasse jamais 85% du diamètre
+  while (fsIn > 14 && ctx.measureText(inTxt).width > cD*0.78){
+    fsIn--; ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif';
+  }
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.lineWidth = Math.max(3, fs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-  ctx.strokeText(bigTxt, px + pw/2, py + ph*0.36);
-  ctx.fillStyle = borderCol; ctx.fillText(bigTxt, px + pw/2, py + ph*0.36);
-  // Petite ligne en dessous : type de variante
-  var fs3 = Math.round(ph*0.20);
-  ctx.font = 'bold '+fs3+'px "Barlow Condensed",sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.80)';
-  ctx.fillText(subTxt, px + pw/2, py + ph*0.75);
+  ctx.lineWidth = Math.max(3, fsIn*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  ctx.strokeText(inTxt, ccx, ccy);
+  ctx.fillStyle = cColor; ctx.fillText(inTxt, ccx, ccy);
+  // Mini-badge variante sous le rond (SIMPLE · ANTI · SÉQUENCE N/3)
+  var subTxt;
+  if (_opto_bead_phase !== 'show')       subTxt = en?'READY…':'PRÊT…';
+  else if (variant === 'simple')         subTxt = en?'LOOK':'REGARDE';
+  else if (variant === 'anti')           subTxt = en?'LOOK OPPOSITE':'L’OPPOSÉ';
+  else                                   subTxt = (en?'SEQ ':'SÉQ ') + (_opto_bead_hitIdx+1) + '/' + _opto_bead_targets.length;
+  var fsSub = Math.round(cD*0.11);
+  ctx.font = 'bold '+fsSub+'px "Barlow Condensed",sans-serif';
+  ctx.lineWidth = Math.max(2, fsSub*0.12); ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+  ctx.strokeText(subTxt, ccx, ccy + cR2 + fsSub*0.9);
+  ctx.fillStyle = 'rgba(255,255,255,0.90)';
+  ctx.fillText(subTxt, ccx, ccy + cR2 + fsSub*0.9);
   // Badge mode + round en haut à gauche
   var variantLabel = (variant === 'simple') ? (en?'SIMPLE':'SIMPLE')
                    : (variant === 'anti')   ? (en?'ANTI-SACCADE':'ANTI-SACCADE')
