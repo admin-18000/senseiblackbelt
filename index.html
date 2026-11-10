@@ -28086,7 +28086,7 @@ function _tsym_stopCamera() {
   var btnSv=document.getElementById('tsym_btnSave');
   if(btnSv&&_tsym_frameScores.length>0)btnSv.style.display='flex';
   var bRec2=document.getElementById('tsym_btnRec');if(bRec2)bRec2.style.display='none';
-  if(_tsym_recActive)_tsym_stopRec();
+  if (_tsym_recActive || _tsym_startTimeoutId)_tsym_stopRec();
   var status=document.getElementById('tsym_status');
   if(status)status.textContent=_tsym_frameScores.length>0
     ?_t('Analyse terminée — sauvegarde ?','Analysis done — save?')
@@ -28972,7 +28972,7 @@ function _tsym_updateInsight() {
 
 /* ── REC DRIBBLE RÉACTION ─────────────────────────────────────────── */
 var _tdr_recorder=null,_tdr_recChunks=[],_tdr_recActive=false,_tdr_recTimer=null,_tdr_recSec=0,_tdr_recStream=null;
-function _tdr_toggleRec(){if(_tdr_recActive)_tdr_stopRec();else _tdr_startRec();}
+function _tdr_toggleRec(){if (_tdr_recActive || _tdr_startTimeoutId)_tdr_stopRec();else _tdr_startRec();}
 function _tdr_startRec(){
   // Si un countdown est en cours, différer le vrai démarrage jusqu'à sa fin
   // (évite un fichier vidéo corrompu / durée aberrante)
@@ -29068,6 +29068,7 @@ function _tdr_startRec(){
     if (!_tdr_recorder) return;
     try { _tdr_recorder.start(1000); _tdr_recActive = true; }
     catch(eStartT) { _tdr_recError('start failed'); return; }
+    _tdr_updateRecBtn();
     _tdr_recTimer=setInterval(function(){
       _tdr_recSec++;var rem=180-_tdr_recSec;
       // Fix bug "1988:25:26" : modulo partout + STOP REC visible sur les 2 boutons (panneau + overlay)
@@ -29872,7 +29873,7 @@ function _tdrc_drawCommand(ctx, W, H){
 }
 
 /* ─── Toggle REC + pipeline simplifié ──────────────────────────── */
-function _tdrc_toggleRec(){ if (_tdrc_recActive) _tdrc_stopRec(); else _tdrc_startRec(); }
+function _tdrc_toggleRec(){ if (_tdrc_recActive || _tdrc_startTimeoutId) _tdrc_stopRec(); else _tdrc_startRec(); }
 function _tdrc_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_tdrc_recTimer); _tdrc_recTimer = null;
@@ -29914,6 +29915,7 @@ function _tdrc_startRec(){
     _tdrc_startTimeoutId = null;
     if (!_tdrc_recorder) return;
     try { _tdrc_recorder.start(1000); _tdrc_recActive = true; } catch(e){ return; }
+    _tdrc_updateRecBtn();
     _tdrc_recTimer = setInterval(function(){
       _tdrc_recSec++;
       var mm=Math.floor(_tdrc_recSec/60)%60,ss=_tdrc_recSec%60,hh=Math.floor(_tdrc_recSec/3600);
@@ -29954,7 +29956,7 @@ function _tdrc_stop(fromEnd){
   _tdrc_countdownActive = false; // ★ coupe les beeps de countdown restants (fini le chain-click)
   if (_tdrc_rafId){ cancelAnimationFrame(_tdrc_rafId); _tdrc_rafId = null; }
   if (_tdrc_cmdTimer){ clearTimeout(_tdrc_cmdTimer); _tdrc_cmdTimer = null; }
-  if (_tdrc_recActive) _tdrc_stopRec();
+  if (_tdrc_recActive || _tdrc_startTimeoutId) _tdrc_stopRec();
   try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
   if (_tdrc_stream){ _tdrc_stream.getTracks().forEach(function(t){t.stop();}); _tdrc_stream=null; }
   // Overlay partagée gérée par senseiCamStop (idem TARGETS)
@@ -30472,7 +30474,7 @@ function _dcrc_drawHud(ctx, W, H){
   ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
   ctx.restore();
 }
-function _dcrc_toggleRec(){ if (_dcrc_recActive) _dcrc_stopRec(); else _dcrc_startRec(); }
+function _dcrc_toggleRec(){ if (_dcrc_recActive || _dcrc_startTimeoutId) _dcrc_stopRec(); else _dcrc_startRec(); }
 function _dcrc_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_dcrc_recTimer); _dcrc_recTimer = null;
@@ -30507,6 +30509,7 @@ function _dcrc_startRec(){
     _dcrc_startTimeoutId = null;
     if (!_dcrc_recorder) return;
     try { _dcrc_recorder.start(1000); _dcrc_recActive = true; } catch(e){ return; }
+    _dcrc_updateRecBtn();
     _dcrc_recTimer = setInterval(function(){
       _dcrc_recSec++;
       var mm=Math.floor(_dcrc_recSec/60)%60,ss=_dcrc_recSec%60,hh=Math.floor(_dcrc_recSec/3600);
@@ -30536,7 +30539,7 @@ function _dcrc_stop(fromEnd){
   _dcrc_countdownActive = false;
   if (_dcrc_rafId){ cancelAnimationFrame(_dcrc_rafId); _dcrc_rafId = null; }
   if (_dcrc_cmdTimer){ clearTimeout(_dcrc_cmdTimer); _dcrc_cmdTimer = null; }
-  if (_dcrc_recActive) _dcrc_stopRec();
+  if (_dcrc_recActive || _dcrc_startTimeoutId) _dcrc_stopRec();
   try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e){}
   if (_dcrc_stream){ _dcrc_stream.getTracks().forEach(function(t){t.stop();}); _dcrc_stream=null; }
   if (typeof senseiCamStop === 'function') senseiCamStop();
@@ -31016,7 +31019,7 @@ function _drsw_drawHud(ctx, W, H){
   ctx.fillText(_drsw_switchCount, pX + pW/2, pY + pH*0.75);
   ctx.restore();
 }
-function _drsw_toggleRec(){ if (_drsw_recActive) _drsw_stopRec(); else _drsw_startRec(); }
+function _drsw_toggleRec(){ if (_drsw_recActive || _drsw_startTimeoutId) _drsw_stopRec(); else _drsw_startRec(); }
 function _drsw_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_drsw_recTimer); _drsw_recTimer = null;
@@ -31051,6 +31054,7 @@ function _drsw_startRec(){
     _drsw_startTimeoutId = null;
     if (!_drsw_recorder) return;
     try { _drsw_recorder.start(1000); _drsw_recActive = true; } catch(e){ return; }
+    _drsw_updateRecBtn();
     _drsw_recTimer = setInterval(function(){
       _drsw_recSec++;
       var mm=Math.floor(_drsw_recSec/60)%60,ss=_drsw_recSec%60,hh=Math.floor(_drsw_recSec/3600);
@@ -31079,7 +31083,7 @@ function _drsw_stop(fromEnd){
   _drsw_running = false;
   _drsw_countdownActive = false;
   if (_drsw_rafId){ cancelAnimationFrame(_drsw_rafId); _drsw_rafId = null; }
-  if (_drsw_recActive) _drsw_stopRec();
+  if (_drsw_recActive || _drsw_startTimeoutId) _drsw_stopRec();
   if (_drsw_stream){ _drsw_stream.getTracks().forEach(function(t){t.stop();}); _drsw_stream=null; }
   if (typeof senseiCamStop === 'function') senseiCamStop();
   var btn = document.getElementById('drsw_btnStart');
@@ -31646,7 +31650,7 @@ function _dqa_drawHud(ctx, W, H){
   ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
   ctx.restore();
 }
-function _dqa_toggleRec(){ if (_dqa_recActive) _dqa_stopRec(); else _dqa_startRec(); }
+function _dqa_toggleRec(){ if (_dqa_recActive || _dqa_startTimeoutId) _dqa_stopRec(); else _dqa_startRec(); }
 function _dqa_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_dqa_recTimer); _dqa_recTimer = null;
@@ -31681,6 +31685,7 @@ function _dqa_startRec(){
     _dqa_startTimeoutId = null;
     if (!_dqa_recorder) return;
     try { _dqa_recorder.start(1000); _dqa_recActive = true; } catch(e){ return; }
+    _dqa_updateRecBtn();
     _dqa_recTimer = setInterval(function(){
       _dqa_recSec++;
       var mm=Math.floor(_dqa_recSec/60)%60,ss=_dqa_recSec%60,hh=Math.floor(_dqa_recSec/3600);
@@ -31709,7 +31714,7 @@ function _dqa_stop(fromEnd){
   _dqa_running = false;
   _dqa_countdownActive = false;
   if (_dqa_rafId){ cancelAnimationFrame(_dqa_rafId); _dqa_rafId = null; }
-  if (_dqa_recActive) _dqa_stopRec();
+  if (_dqa_recActive || _dqa_startTimeoutId) _dqa_stopRec();
   if (_dqa_stream){ _dqa_stream.getTracks().forEach(function(t){t.stop();}); _dqa_stream=null; }
   if (typeof senseiCamStop === 'function') senseiCamStop();
   var btn = document.getElementById('dqa_btnStart');
@@ -32478,7 +32483,7 @@ function _dqt_drawHud(ctx, W, H){
   ctx.fillText(tStr, chX + chW/2, chY + chH*0.68);
   ctx.restore();
 }
-function _dqt_toggleRec(){ if (_dqt_recActive) _dqt_stopRec(); else _dqt_startRec(); }
+function _dqt_toggleRec(){ if (_dqt_recActive || _dqt_startTimeoutId) _dqt_stopRec(); else _dqt_startRec(); }
 function _dqt_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_dqt_recTimer); _dqt_recTimer = null;
@@ -32513,6 +32518,7 @@ function _dqt_startRec(){
     _dqt_startTimeoutId = null;
     if (!_dqt_recorder) return;
     try { _dqt_recorder.start(1000); _dqt_recActive = true; } catch(e){ return; }
+    _dqt_updateRecBtn();
     _dqt_recTimer = setInterval(function(){
       _dqt_recSec++;
       var mm=Math.floor(_dqt_recSec/60)%60,ss=_dqt_recSec%60,hh=Math.floor(_dqt_recSec/3600);
@@ -32541,7 +32547,7 @@ function _dqt_stop(fromEnd){
   _dqt_running = false;
   _dqt_countdownActive = false;
   if (_dqt_rafId){ cancelAnimationFrame(_dqt_rafId); _dqt_rafId = null; }
-  if (_dqt_recActive) _dqt_stopRec();
+  if (_dqt_recActive || _dqt_startTimeoutId) _dqt_stopRec();
   if (_dqt_stream){ _dqt_stream.getTracks().forEach(function(t){t.stop();}); _dqt_stream=null; }
   if (typeof senseiCamStop === 'function') senseiCamStop();
   var btn = document.getElementById('dqt_btnStart');
@@ -33305,7 +33311,7 @@ function _dlim_analyzePose(poses, dt){
 }
 
 /* ═══ REC (inchangé v1) ═══ */
-function _dlim_toggleRec(){ if (_dlim_recActive) _dlim_stopRec(); else _dlim_startRec(); }
+function _dlim_toggleRec(){ if (_dlim_recActive || _dlim_startTimeoutId) _dlim_stopRec(); else _dlim_startRec(); }
 function _dlim_startRec(){
   if (typeof MediaRecorder === 'undefined') return;
   clearInterval(_dlim_recTimer); _dlim_recTimer = null;
@@ -33340,6 +33346,7 @@ function _dlim_startRec(){
     _dlim_startTimeoutId = null;
     if (!_dlim_recorder) return;
     try { _dlim_recorder.start(1000); _dlim_recActive = true; } catch(e){ return; }
+    _dlim_updateRecBtn();
     _dlim_recTimer = setInterval(function(){
       _dlim_recSec++;
       var mm=Math.floor(_dlim_recSec/60)%60,ss=_dlim_recSec%60,hh=Math.floor(_dlim_recSec/3600);
@@ -33369,7 +33376,7 @@ function _dlim_endGame(){ _dlim_stop(true); _dlim_renderResults(); }
 function _dlim_stop(fromEnd){
   _dlim_running = false;
   if (_dlim_rafId){ cancelAnimationFrame(_dlim_rafId); _dlim_rafId = null; }
-  if (_dlim_recActive) _dlim_stopRec();
+  if (_dlim_recActive || _dlim_startTimeoutId) _dlim_stopRec();
   window._dlim_portraitMode = false;    // reset flag
   if (!fromEnd){
     if (_dlim_stream){ _dlim_stream.getTracks().forEach(function(t){t.stop();}); _dlim_stream = null; }
@@ -34564,7 +34571,7 @@ function _opto_endSession(){
   _opto_rafId = null;
   if (_opto_sessTimer){ clearInterval(_opto_sessTimer); _opto_sessTimer=null; }
   // ★ Auto-stop REC pour déclencher replay modal avant d'afficher résultats
-  if (_opto_recActive) _opto_stopRec();
+  if (_opto_recActive || _opto_startTimeoutId) _opto_stopRec();
   _opto_showResults();
 }
 
@@ -34623,7 +34630,7 @@ var _opto_recorder=null, _opto_recChunks=[], _opto_recStream=null, _opto_recActi
 var _opto_recTimer=null, _opto_recSec=0;
 
 function _opto_toggleRec(){
-  if (_opto_recActive) _opto_stopRec(); else _opto_startRec();
+  if (_opto_recActive || _opto_startTimeoutId) _opto_stopRec(); else _opto_startRec();
 }
 function _opto_startRec(){
   if (_opto_countdownActive){ _opto_recPending = true; return; }
@@ -34650,9 +34657,11 @@ function _opto_startRec(){
     _opto_recActive=false; _opto_recChunks=[]; _opto_updateRecBtn();
     if (!blob || blob.size < 1024) return;
     var ext = /webm/i.test(blob.type) ? 'webm' : 'mp4';
-    var fn = 'SENSEI_OPTOMOTOR_'+_opto_mode+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
+    var _isAr = (_opto_mode === 'ar');
+    var _recTag = _isAr ? ('AR_OVERHAND_'+_ar_cfg.cones+'CONE'+(_ar_cfg.targets?'_TARGETS':'')) : ('OPTOMOTOR_'+_opto_mode);
+    var fn = 'SENSEI_'+_recTag+'_'+new Date().toISOString().slice(0,10)+'.'+ext;
     if (window._replay && window._replay.show){
-      window._replay.show(blob, { title:'SENSEI OPTOMOTOR · '+_opto_mode, filename:fn, onSave:function(b,filename){ _opto_dlBlob(b, filename); } });
+      window._replay.show(blob, { title:(_isAr ? 'SENSEI AR · OVERHAND' : 'SENSEI OPTOMOTOR · '+_opto_mode), filename:fn, onSave:function(b,filename){ _opto_dlBlob(b, filename); } });
     } else _opto_dlBlob(blob, fn);
   };
   _opto_recorder.onerror = function(){ clearInterval(_opto_recTimer); };
@@ -34660,6 +34669,7 @@ function _opto_startRec(){
     _opto_startTimeoutId = null;
     if (!_opto_recorder) return;
     try { _opto_recorder.start(1000); _opto_recActive = true; } catch(e){ return; }
+    _opto_updateRecBtn();
     _opto_recTimer = setInterval(function(){
       _opto_recSec++;
       var mm=Math.floor(_opto_recSec/60)%60, ss=_opto_recSec%60, hh=Math.floor(_opto_recSec/3600);
@@ -35662,7 +35672,7 @@ function _tsym_getBestMime() {
 }
 
 function _tsym_toggleRec() {
-  if (_tsym_recActive) {
+  if (_tsym_recActive || _tsym_startTimeoutId) {
     _tsym_stopRec();
   } else {
     _tsym_startRec();
@@ -35767,6 +35777,7 @@ function _tsym_startRec() {
     if (!_tsym_recorder) return;
     try { _tsym_recorder.start(1000); _tsym_recActive = true; }
     catch(eStartS) { _tsym_recError(_t('Erreur enregistrement','Recording error')); return; }
+    _tsym_updateRecBtn();
     // Timer + limite 3 min
     _tsym_recTimer = setInterval(function() {
       _tsym_recSec++;
@@ -41571,7 +41582,7 @@ var _dcog_recSec    = 0;
 var _dcog_recStream = null;  // Stream capturé — stop tracks pour autoriser re-start iOS/Android
 
 function _dcog_toggleRec() {
-  if (_dcog_recActive) _dcog_stopRec(); else _dcog_startRec();
+  if (_dcog_recActive || _dcog_startTimeoutId) _dcog_stopRec(); else _dcog_startRec();
 }
 
 function _dcog_startRec() {
@@ -41680,6 +41691,7 @@ function _dcog_startRec() {
     if (!_dcog_recorder) return;
     try { _dcog_recorder.start(1000); _dcog_recActive = true; }
     catch(eStart) { _dcog_recError('start failed'); return; }
+    _dcog_updateRecBtn();
     // Cap REC : par défaut 180s (3min) pour math/sprint/height/twoball/tboard/vcmath
     // Pour viscoord : cap = objectif choisi + 15s buffer (ou 600s si objectif ∞)
     var _recCapSec = 180;
@@ -60631,7 +60643,7 @@ body.si-banner-on { padding-top: 52px; }
   // ═══ toggleRec : bouton REC officiel — vrai enregistrement démarré/arrêté ═══
   window._ss_toggleRec = function() {
     if (window._haptic) window._haptic.tap();
-    if (_ss_recActive) _ss_stopRec();
+    if (_ss_recActive || _ss_startTimeoutId) _ss_stopRec();
     else _ss_startRec();
   };
 
@@ -61451,7 +61463,7 @@ body.si-banner-on { padding-top: 52px; }
 
   window._bt_toggleRec = function() {
     if (window._haptic) window._haptic.tap();
-    if (_bt_recActive) _bt_stopRec();
+    if (_bt_recActive || _bt_startTimeoutId) _bt_stopRec();
     else _bt_startRec();
   };
 
