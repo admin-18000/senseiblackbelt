@@ -2457,9 +2457,9 @@ window._dojoBackHome = function(){
     </div>
     <!-- ═══ REACTION CATCHING STICK — niveau de difficulté (intervalle entre drops) ═══ -->
     <div id="dcog_optRcs" style="display:none;flex-direction:column;gap:12px">
-      <!-- Vidéo tuto DYNAMIQUE : R0 CLASSIC → 0RiPX6ZB7t8 · R1-R4 COLOR → oy5XoR0hAo0 -->
-      <div id="rcs_liteYt" class="lite-yt" data-vid="0RiPX6ZB7t8" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
-        <img id="rcs_liteYtImg" loading="lazy" src="https://i.ytimg.com/vi/0RiPX6ZB7t8/hqdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/0RiPX6ZB7t8/mqdefault.jpg';" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+      <!-- Vidéo tuto DYNAMIQUE : R0 CLASSIC → xYd4vKWu6oU · R1-R4 COLOR → oy5XoR0hAo0 -->
+      <div id="rcs_liteYt" class="lite-yt" data-vid="xYd4vKWu6oU" style="position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;cursor:pointer" onclick="_liteYT_play(this)">
+        <img id="rcs_liteYtImg" loading="lazy" src="https://i.ytimg.com/vi/xYd4vKWu6oU/hqdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/xYd4vKWu6oU/mqdefault.jpg';" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 100%);transition:background .2s">
           <div style="width:68px;height:48px;border-radius:14%/50%;background:rgba(230,57,70,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5)">
             <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px"></div>
@@ -37470,11 +37470,13 @@ var _dcog_VIDEOS = [
   {id:'4iiLTTAA79Y', title:'Visuomotor 2',       drill:'viscoord'},
   {id:'jsKnPf9TBEs', title:'Visuomotor 3',       drill:'viscoord'},
   // ═══ REACTION CATCHING STICK — format Shorts 9:16 (vertical) ═══
-  {id:'0RiPX6ZB7t8', title:'Reaction Stick 1',   drill:'rcs', vertical:true},
-  {id:'KWmdHJ2A8pg', title:'Reaction Stick 2',   drill:'rcs', vertical:true},
-  {id:'y5NsQVSRVB4', title:'Reaction Stick 3',   drill:'rcs', vertical:true},
-  {id:'vO0voL3Q8AI', title:'Reaction Stick 4',   drill:'rcs', vertical:true},
+  // ★ Ordre explicite : vO0voL3Q8AI en 1er (cible autoplay via _dcog_selectDrill rcs) · 6 Shorts au total
+  {id:'vO0voL3Q8AI', title:'Reaction Stick 1',   drill:'rcs', vertical:true},
+  {id:'0RiPX6ZB7t8', title:'Reaction Stick 2',   drill:'rcs', vertical:true},
+  {id:'KWmdHJ2A8pg', title:'Reaction Stick 3',   drill:'rcs', vertical:true},
+  {id:'y5NsQVSRVB4', title:'Reaction Stick 4',   drill:'rcs', vertical:true},
   {id:'yPFE8K-t244', title:'Reaction Stick 5',   drill:'rcs', vertical:true},
+  {id:'6CtpfIi9NNY', title:'Reaction Stick 6',   drill:'rcs', vertical:true},
   // ═══ Drills DCOG existants (1 vidéo chacun) ═══
   {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
   {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
@@ -37495,8 +37497,8 @@ var _dcog_VIDEOS = [
   {id:'T5uvSrRoFi8', title:'Quick Choice 2',     drill:'quickchoice'},
   {id:'pIbdz2zQJLQ', title:'Quick Targets',      drill:'quicktargets'},
   {id:'9s4wyM_2iPU', title:'Level Change',       drill:'limbo'},
-  // ═══ RCS COLOR (R1-R4 modes) — 1 vidéo démo partagée ═══
-  {id:'oy5XoR0hAo0', title:'RCS Color R1-R4',    drill:'rcs'},
+  // ═══ RCS COLOR (R1-R4 modes) — tuto panneau uniquement, retiré du carrousel pour
+  //   garder exactement 5 vignettes Shorts dans "CHOISIS TON DRILL" ═══
   // ═══ OPTOMOTOR RESPONSE & AUGMENTED REALITY ═══
   {id:'mDfWvQJSQDE', title:'Optomotor Response', drill:'opto'},
   {id:'JjegkQLzTT8', title:'Augmented Reality',  drill:'ar'}
@@ -37877,7 +37879,7 @@ function _dcog_selectDrill(drill, langOnly) {
     // ★ AUTOPLAY : la vidéo du mapping s'ouvre direct quand on choisit la famille,
     //   sans passer par un clic sur la vignette. Ignoré pendant l'init (évite un
     //   autoplay au premier chargement de l'app).
-    if (!_dcog_initing && (drill === 'opto' || drill === 'ar')){
+    if (!_dcog_initing && (drill === 'opto' || drill === 'ar' || drill === 'rcs')){
       var _vi = -1;
       for (var _k=0; _k<_dcog_VIDEOS.length; _k++){ if (_dcog_VIDEOS[_k].drill === drill){ _vi = _k; break; } }
       if (_vi >= 0 && typeof _dcog_selectVid === 'function') _dcog_selectVid(_vi);
@@ -41177,8 +41179,8 @@ function _dcog_rcs_setMode(m){
   };
   var el = document.getElementById('dcog_rcs_modeDesc');
   if (el) el.textContent = descs[m] || '';
-  // ★ Switch vidéo tuto : R0 CLASSIC → 0RiPX6ZB7t8 · R1-R4 (color/target/avoid/rainbow) → oy5XoR0hAo0
-  var vidId = (m === 'classic') ? '0RiPX6ZB7t8' : 'oy5XoR0hAo0';
+  // ★ Switch vidéo tuto : R0 CLASSIC → xYd4vKWu6oU · R1-R4 (color/target/avoid/rainbow) → oy5XoR0hAo0
+  var vidId = (m === 'classic') ? 'xYd4vKWu6oU' : 'oy5XoR0hAo0';
   var box = document.getElementById('rcs_liteYt');
   if (box){
     box.setAttribute('data-vid', vidId);
