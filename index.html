@@ -35206,10 +35206,12 @@ function _ar_consigne(en){
 }
 // Position des cônes : calibrée (figée) si dispo, sinon position par défaut
 function _ar_layout(W, H){
-  var sg = _ar_cfg.hand === 'right' ? 1 : -1;      // vue miroir : main droite = côté droit de l'écran
-  var cx, gap, baseY, ch;
-  if (_ar_calib){ cx = _ar_calib.cx; gap = _ar_calib.gap; baseY = _ar_calib.baseY; ch = _ar_calib.ch; }
-  else { cx = W*0.5 + sg*W*0.07; gap = W*0.13; baseY = H*0.90; ch = H*0.17; }
+  // ★ Cônes CENTRÉS à l'écran (demande utilisateur). La calibration ne sert
+  //   plus qu'à la hauteur du sol (baseY), la taille du cône (ch) et l'écart
+  //   entre 2 cônes (gap), calé sur la largeur d'épaules du joueur.
+  var cx = W*0.5, gap, baseY, ch;
+  if (_ar_calib){ gap = _ar_calib.gap; baseY = _ar_calib.baseY; ch = _ar_calib.ch; }
+  else { gap = W*0.24; baseY = H*0.90; ch = H*0.17; }
   var xs = _ar_cfg.cones === 1 ? [cx] : [cx - gap/2, cx + gap/2];
   // Garde-fous : hors badge compteur (gauche) et hors logo (droite)
   var lo = W*0.30, hi = W*0.70, shift = 0;
@@ -35239,8 +35241,9 @@ function _ar_calibrate(poses, W, H, sx, sy){
   var sw = a.sw/n, torso = a.torso/n;
   var ankle = a.an ? a.ankleY/a.an : 0;
   _ar_calib = {
-    cx: a.hipX/n + sg*sw*0.15,
-    gap: Math.max(W*0.09, Math.min(W*0.16, sw*0.75)),
+    // Écart = 1.6 × largeur d'épaules → le ballon passe vraiment ENTRE les 2 cônes
+    // (avant : 0.75 × épaules, beaucoup trop serré)
+    gap: Math.max(W*0.20, Math.min(W*0.30, sw*1.6)),
     baseY: ankle ? Math.max(H*0.70, Math.min(H*0.93, ankle + H*0.01)) : H*0.90,
     ch: Math.max(H*0.12, Math.min(H*0.20, torso*0.70))
   };
