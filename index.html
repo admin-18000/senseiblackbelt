@@ -2823,6 +2823,8 @@ window._dojoBackHome = function(){
           <option value="sac">A7-SAC · SACCADES (lis gauche/droite rapidement)</option>
           <option value="play">A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)</option>
           <option value="qe">A7-QE · QUIET EYE (fixe · attends · tape au GO)</option>
+          <option value="bead">A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)</option>
+          <option value="bead-v">A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -33525,6 +33527,10 @@ window._opto_setMode = function(m){
               : 'Des chiffres apparaissent en alternance G/D à intervalles aléatoires · lis-les à voix haute · garde la tête fixe · A7-SAC Saccades oculaires (scanning élite).',
     qe:     en ? 'Fix the red target · keep your head perfectly still · the target turns GREEN at a random time · hit immediately. A7-QE Quiet Eye (Vickers) — proxy: head stability, not pupil tracking.'
               : 'Fixe la cible rouge · garde la tête parfaitement immobile · elle passe au VERT à un moment aléatoire · tape immédiatement. A7-QE Quiet Eye (Vickers) — proxy : stabilité tête, pas pupille.',
+    bead:   en ? 'Horizontal row of 5 colored beads · fixation + on the left · a color is called (voice + text), saccade + tap the right bead. 3 variants auto-cycled over 15 rounds: SIMPLE · SEQUENCE (3 colors in order) · ANTI-SACCADE (tap the opposite bead). Classic neurovision (Brock String variant). Honest: single screen plane → no accommodation (vs physical bead rod).'
+              : 'Ligne horizontale de 5 billes colorées · fixation + à gauche · une couleur est annoncée (voix + texte), saccade + tape la bonne bille. 3 variantes auto-enchaînées sur 15 rounds : SIMPLE · SÉQUENCE (3 couleurs dans l\'ordre) · ANTI-SACCADE (tape l\'opposée). Classique neurovision (variante Brock String). Honnête : plan écran unique → pas d\'accommodation (vs tige physique).',
+    'bead-v': en ? 'Same as A7-BEAD but VERTICAL rod · trains vertical saccades (less common in sport-general scan, useful for shot-trajectory tracking). 3 variants auto-cycled.'
+                : 'Comme A7-BEAD mais tige VERTICALE · entraîne les saccades verticales (moins courantes dans le scan général, utiles pour trajectoire de tir). 3 variantes auto-enchaînées.',
     play:   en ? 'Transparent half-court · 5 players run real plays (pick & roll, give & go, backdoor, horns, flex) · follow the BALL with your eyes · keep head still · A7-PLAY.'
               : 'Demi-terrain transparent · 5 joueurs exécutent des systèmes (pick & roll, give & go, backdoor, horns, flex) · suis le BALLON des yeux · garde la tête fixe · A7-PLAY.'
   };
@@ -33585,6 +33591,7 @@ window._opto_onCamReady = function(video, canvas, ctx){
   _opto_play_idx = -1; _opto_play_start = 0; _opto_play_count = 0;
   _opto_play_headStab = 0; _opto_play_noseBaseline = null; _opto_play_lastSec = 0;
   if (typeof _opto_qe_reset === 'function') _opto_qe_reset();
+  if (typeof _opto_bead_reset === 'function') _opto_bead_reset();
   _opto_mot_balls = []; _opto_mot_phase = 'mark'; _opto_mot_phaseStart = Date.now();
   _opto_mot_userTaps = 0;
   _opto_sp_t = 0; _opto_sp_lapCount = 0; _opto_sp_headStab = 0;
@@ -33675,6 +33682,7 @@ function _opto_detect(){
     else if (_opto_mode === 'sac')    _opto_analyzeSac(poses);
     else if (_opto_mode === 'play')   _opto_analyzePlay(poses);
     else if (_opto_mode === 'qe')     _opto_analyzeQe(poses);
+    else if (_opto_mode === 'bead' || _opto_mode === 'bead-v') _opto_analyzeBead(poses);
     else if (_opto_mode === 'ar')     _opto_analyzeAr(poses);
     if (_opto_running) _opto_rafId = requestAnimationFrame(_opto_detect);
   }).catch(function(){
@@ -33699,6 +33707,7 @@ function _opto_drawFrame(poses){
   else if (_opto_mode === 'sac')    _opto_drawSac(W, H);
   else if (_opto_mode === 'play')   _opto_drawPlay(W, H);
   else if (_opto_mode === 'qe')     _opto_drawQe(W, H);
+  else if (_opto_mode === 'bead' || _opto_mode === 'bead-v') _opto_drawBead(W, H);
   else if (_opto_mode === 'ar')     _opto_drawAr(W, H);
   // ── Logo SENSEI (identique autres drills) ──
   //   A11 (ticker en bas) : passer tickerTop comme H pour que le logo soit dessiné
@@ -33728,6 +33737,8 @@ function _opto_drawHUD(W, H){
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE',
     sac:    en ? 'READ LEFT/RIGHT DIGITS · HEAD STILL' : 'LIS LES CHIFFRES G/D · TÊTE FIXE',
     qe:     en ? 'STARE · WAIT · HIT ON GREEN' : 'FIXE · ATTENDS · TAPE AU GO',
+    bead:   en ? 'CALLED COLOR · SACCADE + TAP · HEAD STILL' : 'COULEUR ANNONCÉE · SACCADE + TAPE · TÊTE FIXE',
+    'bead-v': en ? 'CALLED COLOR · SACCADE + TAP · HEAD STILL' : 'COULEUR ANNONCÉE · SACCADE + TAPE · TÊTE FIXE',
     play:   en ? 'FOLLOW THE BALL · HEAD STILL' : 'SUIS LE BALLON · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
@@ -34596,7 +34607,8 @@ function _opto_drillLabel(){
   var m = { headup:'A11 · HEAD-UP SCAN', iso:'F11 · HEAD / TRUNK ISO', periph:'A3 · PERIPHERAL TARGET',
             vanish:'G3 · VANISHING TARGET', vanishShoot:'G3 · VANISHING TARGET',
             mot:'A7 · MULTI-OBJECT TRACKING', sp:'A7 · SMOOTH PURSUIT',
-            sac:'A7 · SACCADES', play:'A7 · PLAY TRACKING', qe:'A7 · QUIET EYE' };
+            sac:'A7 · SACCADES', play:'A7 · PLAY TRACKING', qe:'A7 · QUIET EYE',
+            bead:'A7 · BEAD ROD H', 'bead-v':'A7 · BEAD ROD V' };
   return m[_opto_mode] || 'OPTOMOTOR RESPONSE';
 }
 function _opto_drawOutro(ms){
@@ -35801,6 +35813,312 @@ function _ar_cc_draw(W, H, now){
   ctx.restore();
 }
 
+/* ═══════════════ A7-BEAD · COLOR BEAD ROD (saccades couleur + anti-saccade) ═════
+   Classique neurovision (Brock String / labo_rnp) : ligne de billes colorées
+   (H ou V), fixation + en bout de ligne, annonce voix+texte de la couleur,
+   saccade + HIT main strict TDR Reaction. 3 variantes auto-cyclées sur 15 rounds :
+     • 0-4   SIMPLE      : touche la couleur annoncée
+     • 5-9   SEQUENCE    : 3 couleurs annoncées → tape dans l'ordre
+     • 10-14 ANTI-SACCADE : touche la couleur SYMÉTRIQUEMENT OPPOSÉE
+   Honnête : plan écran unique → saccades + discrimination + inhibition, mais
+   PAS d'accommodation (contrairement à la tige physique à billes en profondeur).
+═══════════════════════════════════════════════════════════════════════════════ */
+var _AR_BEAD_COLORS = [
+  { k:'red',    hex:'#e63946', fr:'ROUGE',  en:'RED'    },
+  { k:'orange', hex:'#f58634', fr:'ORANGE', en:'ORANGE' },
+  { k:'yellow', hex:'#f5c518', fr:'JAUNE',  en:'YELLOW' },
+  { k:'green',  hex:'#2dc653', fr:'VERT',   en:'GREEN'  },
+  { k:'blue',   hex:'#4da6ff', fr:'BLEU',   en:'BLUE'   }
+];
+var _AR_BEAD_ROUND_SIMPLE = 5, _AR_BEAD_ROUND_SEQ = 5, _AR_BEAD_ROUND_ANTI = 5;
+var _AR_BEAD_SEQ_LEN = 3;
+var _AR_BEAD_TTL_SIMPLE = 1800, _AR_BEAD_TTL_SEQ = 3600, _AR_BEAD_TTL_ANTI = 2200;
+
+var _opto_bead_phase='wait', _opto_bead_round=0;
+var _opto_bead_targets=[], _opto_bead_hitIdx=0;
+var _opto_bead_askTs=0, _opto_bead_nextTs=0;
+var _opto_bead_hits=0, _opto_bead_misses=0, _opto_bead_rtSum=0, _opto_bead_rtCount=0;
+var _opto_bead_noseBaseline=null, _opto_bead_headDriftMax=0;
+var _opto_bead_fx=[];      // textes flottants +RT, MISS, etc.
+var _opto_bead_lastSaid=0; // anti-rebond voice
+
+function _opto_bead_reset(){
+  _opto_bead_phase='wait'; _opto_bead_round=0;
+  _opto_bead_targets=[]; _opto_bead_hitIdx=0;
+  _opto_bead_askTs=0; _opto_bead_nextTs=Date.now()+1200;
+  _opto_bead_hits=0; _opto_bead_misses=0; _opto_bead_rtSum=0; _opto_bead_rtCount=0;
+  _opto_bead_noseBaseline=null; _opto_bead_headDriftMax=0; _opto_bead_fx=[]; _opto_bead_lastSaid=0;
+}
+function _opto_bead_isVertical(){ return _opto_mode === 'bead-v'; }
+function _opto_bead_variant(){
+  var r = _opto_bead_round|0;
+  if (r < _AR_BEAD_ROUND_SIMPLE) return 'simple';
+  if (r < _AR_BEAD_ROUND_SIMPLE + _AR_BEAD_ROUND_SEQ) return 'sequence';
+  if (r < _AR_BEAD_ROUND_SIMPLE + _AR_BEAD_ROUND_SEQ + _AR_BEAD_ROUND_ANTI) return 'anti';
+  return 'simple'; // cycle
+}
+function _opto_bead_layout(W, H){
+  var vertical = _opto_bead_isVertical();
+  var n = _AR_BEAD_COLORS.length;
+  // Rayon de la bille adaptatif
+  var R;
+  if (vertical){
+    R = Math.max(18, Math.min(H*0.034, W*0.045));
+    var yA = H*0.18, yB = H*0.82;
+    var step = (yB - yA) / (n-1);
+    var xs = [], ys = [];
+    for (var i=0;i<n;i++){ xs.push(W*0.5); ys.push(yA + i*step); }
+    return { vertical:true, xs:xs, ys:ys, R:R, fix:{x:W*0.5, y:H*0.09} };
+  } else {
+    R = Math.max(18, Math.min(W*0.034, H*0.055));
+    var xA = W*0.18, xB = W*0.82;
+    var step = (xB - xA) / (n-1);
+    var xs2 = [], ys2 = [];
+    for (var i2=0;i2<n;i2++){ xs2.push(xA + i2*step); ys2.push(H*0.52); }
+    return { vertical:false, xs:xs2, ys:ys2, R:R, fix:{x:W*0.08, y:H*0.52} };
+  }
+}
+function _opto_bead_pickTargets(variant){
+  var N = _AR_BEAD_COLORS.length, idx = Math.floor(Math.random()*N);
+  if (variant === 'simple') return [idx];
+  if (variant === 'anti'){
+    // Symétrie : position i → N-1-i. Annonce côté A, tape côté B.
+    // Target.id = couleur annoncée ; target.hitIdx = l'opposée à toucher
+    return [{announce:idx, hit:(N-1-idx)}];
+  }
+  // sequence : 3 couleurs distinctes au hasard
+  var used = {}, seq = [];
+  while (seq.length < _AR_BEAD_SEQ_LEN){
+    var k = Math.floor(Math.random()*N);
+    if (!used[k]){ used[k]=1; seq.push(k); }
+  }
+  return seq;
+}
+function _opto_bead_say(colorIdx){
+  // Anti-rebond : pas 2× la même voix dans 300ms
+  var now = Date.now();
+  if (now - _opto_bead_lastSaid < 250) return;
+  _opto_bead_lastSaid = now;
+  if (window._speak && window._speak.say){
+    var c = _AR_BEAD_COLORS[colorIdx];
+    try { window._speak.say({fr:c.fr, en:c.en}); } catch(e){}
+  }
+}
+function _opto_analyzeBead(poses){
+  if (!poses || !poses[0] || !_opto_canvas) return;
+  var W = _opto_canvas.width, H = _opto_canvas.height, now = Date.now();
+  var kp = _opto_kpMap(poses); if (!kp) return;
+  var nose = kp['nose'];
+  // Head stability
+  if (nose && nose.score > 0.3){
+    if (!_opto_bead_noseBaseline) _opto_bead_noseBaseline = {x:nose.x, y:nose.y};
+    else {
+      var dn = Math.sqrt(Math.pow((nose.x-_opto_bead_noseBaseline.x)/W,2) +
+                         Math.pow((nose.y-_opto_bead_noseBaseline.y)/H,2));
+      if (dn > _opto_bead_headDriftMax) _opto_bead_headDriftMax = dn;
+    }
+  }
+  if (_opto_bead_phase === 'wait'){
+    if (now >= _opto_bead_nextTs){
+      var v = _opto_bead_variant();
+      _opto_bead_targets = _opto_bead_pickTargets(v);
+      _opto_bead_hitIdx = 0;
+      _opto_bead_phase = 'ask';
+      _opto_bead_askTs = now;
+      // Annonce vocale immédiate
+      if (v === 'simple')      _opto_bead_say(_opto_bead_targets[0]);
+      else if (v === 'anti')   _opto_bead_say(_opto_bead_targets[0].announce);
+      else if (v === 'sequence'){
+        // Annonce la séquence : 3 couleurs annoncées à 500ms d'intervalle
+        _opto_bead_say(_opto_bead_targets[0]);
+        var self = { seq: _opto_bead_targets.slice() };
+        setTimeout(function(){ if (_opto_bead_phase==='ask') _opto_bead_say(self.seq[1]); }, 550);
+        setTimeout(function(){ if (_opto_bead_phase==='ask') _opto_bead_say(self.seq[2]); }, 1100);
+      }
+      if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
+    }
+    return;
+  }
+  if (_opto_bead_phase === 'ask'){
+    var L = _opto_bead_layout(W, H);
+    var variant = _opto_bead_variant();
+    var ttl = (variant === 'simple') ? _AR_BEAD_TTL_SIMPLE
+            : (variant === 'anti')   ? _AR_BEAD_TTL_ANTI : _AR_BEAD_TTL_SEQ;
+    // Timeout
+    if (now - _opto_bead_askTs > ttl){
+      _opto_bead_misses++;
+      _opto_bead_fx.push({x:W/2, y:H*0.30, txt:(window._lang==='en'?'TOO SLOW':'TROP LENT'), col:'#ff8a94', born:now});
+      _opto_bead_phase = 'wait'; _opto_bead_round++;
+      _opto_bead_nextTs = now + 900;
+      if (typeof _td_beep === 'function') _td_beep(200, 0.08, 0.1);
+      return;
+    }
+    // Cible actuelle (indice de bille) selon variante
+    var curIdx;
+    if (variant === 'simple')        curIdx = _opto_bead_targets[0];
+    else if (variant === 'anti')     curIdx = _opto_bead_targets[0].hit;    // tape l'OPPOSÉ
+    else /* sequence */              curIdx = _opto_bead_targets[_opto_bead_hitIdx];
+    // Zone HIT au poignet : utilise bille ciblée uniquement
+    var target = [{ x:L.xs[curIdx], y:L.ys[curIdx], r:L.R, born:_opto_bead_askTs, hit:false }];
+    _opto_doHits(poses, target, 2.0, function(t, side, rt){
+      // Vérifier si la main n'a pas touché par erreur une autre bille (anti-saccade reflexe)
+      // → ici on considère que si _opto_doHits a validé, c'est bon ; le mode anti pénalise
+      //   simplement en exigeant l'opposé via curIdx recalculé.
+      _opto_bead_rtSum += rt; _opto_bead_rtCount++;
+      if (variant === 'sequence'){
+        _opto_bead_hitIdx++;
+        if (_opto_bead_hitIdx >= _opto_bead_targets.length){
+          // SEQUENCE complétée
+          _opto_bead_hits++; _opto_bead_round++;
+          _opto_score += 30; _opto_hits++;
+          _opto_bead_fx.push({x:W/2, y:H*0.32, txt:'+30 · '+rt+'ms', col:'#4ade80', born:Date.now()});
+          _opto_bead_phase = 'wait'; _opto_bead_nextTs = Date.now() + 900;
+          if (typeof _td_beep === 'function') _td_beep(1760, 0.05, 0.12);
+        } else {
+          // Partielle : continue la séquence, mais reset askTs pour chrono court sur la prochaine
+          if (typeof _td_beep === 'function') _td_beep(1200, 0.03, 0.06);
+        }
+      } else {
+        // simple OR anti
+        var pts = (variant === 'anti' ? 20 : 10) + Math.max(0, Math.round((700-rt)/25));
+        _opto_bead_hits++; _opto_bead_round++;
+        _opto_score += pts; _opto_hits++;
+        _opto_bead_fx.push({x:L.xs[curIdx], y:L.ys[curIdx] - H*0.08, txt:'+'+pts+'  ·  '+rt+'ms', col:'#4ade80', born:Date.now()});
+        _opto_bead_phase = 'wait'; _opto_bead_nextTs = Date.now() + 900;
+        if (typeof _td_beep === 'function') _td_beep(rt<400?1760:1200, 0.05, 0.12);
+        if (navigator.vibrate) navigator.vibrate(25);
+      }
+    });
+    return;
+  }
+}
+function _opto_drawBead(W, H){
+  var ctx = _opto_ctx, en = window._lang === 'en', now = Date.now();
+  var L = _opto_bead_layout(W, H);
+  var vertical = L.vertical;
+  var variant = _opto_bead_variant();
+  ctx.save();
+  // Ligne / tige
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (vertical){
+    ctx.moveTo(L.xs[0], L.ys[0] - L.R*0.4);
+    ctx.lineTo(L.xs[0], L.ys[L.ys.length-1] + L.R*0.4);
+  } else {
+    ctx.moveTo(L.xs[0] - L.R*0.4, L.ys[0]);
+    ctx.lineTo(L.xs[L.xs.length-1] + L.R*0.4, L.ys[0]);
+  }
+  ctx.stroke();
+  // Fixation + à l'origine
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(4, L.R*0.25);
+  var fs2 = L.R*0.9;
+  ctx.beginPath();
+  ctx.moveTo(L.fix.x - fs2, L.fix.y); ctx.lineTo(L.fix.x + fs2, L.fix.y);
+  ctx.moveTo(L.fix.x, L.fix.y - fs2); ctx.lineTo(L.fix.x, L.fix.y + fs2);
+  ctx.stroke();
+  // Billes
+  var curIdx = -1;
+  if (_opto_bead_phase === 'ask'){
+    if (variant === 'simple')   curIdx = _opto_bead_targets[0];
+    else if (variant === 'anti') curIdx = _opto_bead_targets[0].hit;
+    else                         curIdx = _opto_bead_targets[_opto_bead_hitIdx];
+  }
+  for (var i=0;i<_AR_BEAD_COLORS.length;i++){
+    var c = _AR_BEAD_COLORS[i];
+    var active = (i === curIdx);
+    if (active){
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.beginPath(); ctx.arc(L.xs[i], L.ys[i], L.R*1.9, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = c.hex;
+    ctx.beginPath(); ctx.arc(L.xs[i], L.ys[i], L.R, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = active ? '#fff' : 'rgba(0,0,0,0.35)'; ctx.lineWidth = active ? 4 : 2;
+    ctx.beginPath(); ctx.arc(L.xs[i], L.ys[i], L.R, 0, Math.PI*2); ctx.stroke();
+  }
+  // HUD · Consigne variante (pilule arrondie transparente, à gauche, loin de la ligne)
+  var label;
+  if (variant === 'simple')   label = en?'TAP':'TAPE';
+  else if (variant === 'anti')  label = en?'OPPOSITE':'OPPOSÉ';
+  else                         label = en?'SEQUENCE':'SÉQUENCE';
+  // Annonce couleur courante : grande pastille texte en bas
+  var annIdx = -1, seqProgress = '';
+  if (_opto_bead_phase === 'ask'){
+    if (variant === 'simple')    annIdx = _opto_bead_targets[0];
+    else if (variant === 'anti')  annIdx = _opto_bead_targets[0].announce;
+    else {
+      annIdx = _opto_bead_targets[_opto_bead_hitIdx];
+      seqProgress = '  (' + (_opto_bead_hitIdx+1) + '/' + _opto_bead_targets.length + ')';
+    }
+  }
+  if (annIdx >= 0){
+    var c2 = _AR_BEAD_COLORS[annIdx];
+    var pw = Math.min(W*0.42, 380), ph = Math.min(H*0.14, 110);
+    // Position : bas-centre en horizontal, haut-droite en vertical
+    var px = vertical ? (W - pw - W*0.04) : (W/2 - pw/2);
+    var py = vertical ? (H*0.08) : (H*0.85 - ph/2);
+    var rr = ph*0.5;
+    ctx.fillStyle = 'rgba(8,11,18,0.35)';
+    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.fill();
+    ctx.strokeStyle = c2.hex; ctx.lineWidth = 4;
+    _opto_roundRect(ctx, px, py, pw, ph, rr); ctx.stroke();
+    var txt = (en ? c2.en : c2.fr);
+    if (variant === 'anti') txt += en ? ' · OPP' : ' · OPP';
+    if (seqProgress)        txt += seqProgress;
+    var fs = Math.round(ph*0.42);
+    ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+    while (fs > 11 && ctx.measureText(txt).width > pw*0.86){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = Math.max(3, fs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+    ctx.strokeText(txt, px + pw/2, py + ph*0.52);
+    ctx.fillStyle = c2.hex; ctx.fillText(txt, px + pw/2, py + ph*0.52);
+    // Barre de temps restant
+    var ttl2 = (variant === 'simple') ? _AR_BEAD_TTL_SIMPLE : (variant === 'anti') ? _AR_BEAD_TTL_ANTI : _AR_BEAD_TTL_SEQ;
+    var left = Math.max(0, 1 - (now - _opto_bead_askTs)/ttl2);
+    var bw = pw*0.78, bx = px + pw/2 - bw/2, by = py + ph*0.82;
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    _opto_roundRect(ctx, bx, by, bw, Math.max(4, ph*0.09), 3); ctx.fill();
+    ctx.fillStyle = c2.hex;
+    _opto_roundRect(ctx, bx, by, bw*left, Math.max(4, ph*0.09), 3); ctx.fill();
+  }
+  // Badge mode + round en haut à gauche
+  var modeTxt = label + '  ·  R' + (_opto_bead_round+1) + '/15';
+  var fsM = Math.round(H*0.028);
+  ctx.font = 'bold '+fsM+'px "Barlow Condensed",sans-serif';
+  var bwM = ctx.measureText(modeTxt).width + 20, bhM = Math.max(fsM*1.6, H*0.045);
+  var bxM = W*0.03, byM = H*0.07;
+  ctx.fillStyle = 'rgba(13,17,23,0.85)';
+  _opto_roundRect(ctx, bxM, byM, bwM, bhM, 7); ctx.fill();
+  ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, bxM, byM, bwM, bhM, 7); ctx.stroke();
+  ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(modeTxt, bxM + bwM/2, byM + bhM/2);
+  // Compteur bas gauche
+  var avgRt = _opto_bead_rtCount ? Math.round(_opto_bead_rtSum/_opto_bead_rtCount) : 0;
+  var cTxt = (en?'HITS ':'RÉUSSIS ') + _opto_bead_hits + '  ·  ' + (en?'MISS ':'RATÉS ') + _opto_bead_misses + '  ·  ' + (en?'RT ':'TR ') + avgRt + 'ms';
+  var fsC = Math.round(H*0.028);
+  ctx.font = 'bold '+fsC+'px "Bebas Neue",sans-serif';
+  while (fsC > 9 && ctx.measureText(cTxt).width + 28 > W*0.60){ fsC--; ctx.font = 'bold '+fsC+'px "Bebas Neue",sans-serif'; }
+  var bwC = ctx.measureText(cTxt).width + 28, bhC = Math.max(fsC*1.6, H*0.05);
+  var bxC = W*0.03, byC = H*0.93 - bhC/2;
+  ctx.fillStyle = 'rgba(13,17,23,0.90)';
+  _opto_roundRect(ctx, bxC, byC, bwC, bhC, 9); ctx.fill();
+  ctx.strokeStyle = '#64b4ff'; ctx.lineWidth = 2;
+  _opto_roundRect(ctx, bxC, byC, bwC, bhC, 9); ctx.stroke();
+  ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(cTxt, bxC + bwC/2, byC + bhC/2);
+  // FX flottants
+  ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
+  _opto_bead_fx = _opto_bead_fx.filter(function(f){ return now - f.born < 1100; });
+  for (var j=0;j<_opto_bead_fx.length;j++){
+    var f = _opto_bead_fx[j], a = (now - f.born)/1100;
+    ctx.globalAlpha = Math.min(1, (1-a)*2);
+    ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+    ctx.strokeText(f.txt, f.x, f.y - a*H*0.06);
+    ctx.fillStyle = f.col; ctx.fillText(f.txt, f.x, f.y - a*H*0.06);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
 /* ═══════════════ A7-QE · QUIET EYE (fixation mesurée + geste) ════════════
    Cible rouge au centre · mesure la DURÉE de fixation stable AVANT le GO
    (proxy = stabilité du nez + présence face à la caméra). Au GO, mesure le
@@ -36047,7 +36365,9 @@ function _opto_applyLang(lang){
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)',
       'A7-SAC · SACCADES (read L/R digits · head still)',
       'A7-PLAY · PLAY TRACKING (follow the ball through plays)',
-      'A7-QE · QUIET EYE (fix · wait · hit on GO)'
+      'A7-QE · QUIET EYE (fix · wait · hit on GO)',
+      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (called color · saccade + tap)',
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (called color · saccade + tap)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
@@ -36058,7 +36378,9 @@ function _opto_applyLang(lang){
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)',
       'A7-SAC · SACCADES (lis chiffres G/D · tête fixe)',
       'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)',
-      'A7-QE · QUIET EYE (fixe · attends · tape au GO)'
+      'A7-QE · QUIET EYE (fixe · attends · tape au GO)',
+      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)',
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -36077,8 +36399,8 @@ function _opto_applyLang(lang){
   var info = panel && panel.querySelector('div[style*="border-left:2px solid rgba(100,180,255"]');
   if (info){
     info.innerHTML = en
-      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 9 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
-      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 9 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
+      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 11 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
+      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 11 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
   }
   // Status
   var status = document.getElementById('opto_status');
@@ -37975,10 +38297,20 @@ function _dcog_setHeightZone(zone) {
     _dcog_heightZonePx = null;         // reset pour forcer re-calcul propre
   }
   // 🎬 Auto-open vidéo démo correspondante
-  // Index _dcog_VIDEOS : Dribble Height BAS = 11 · HAUT = 15 · HIGH/LOW = 16
+  // ★ Lookup par ID (robuste au réordonnancement de _dcog_VIDEOS, contrairement aux
+  //   indices codés en dur 11/15/16 qui dérivaient à chaque ajout de vidéo RCS/autre).
   if (!_dcog_initing && typeof _dcog_selectVid === 'function') {
-    var idx = (zone === 'high') ? 15 : (zone === 'low') ? 11 : (zone === 'alt') ? 16 : null;
-    if (idx !== null) { try { _dcog_selectVid(idx); } catch(e) {} }
+    var _targetId = (zone === 'low')  ? 'ar6OA2wxwzw'   // Dribble Height BAS
+                  : (zone === 'high') ? 'UHNUSFHSrOo'   // Dribble Height HAUT
+                  : (zone === 'alt')  ? '5QmpY2f0TeI'   // Dribble Height HIGH/LOW ⇄ LO/HI
+                  : null;
+    if (_targetId) {
+      var _idx = -1;
+      for (var _m = 0; _m < _dcog_VIDEOS.length; _m++){
+        if (_dcog_VIDEOS[_m].id === _targetId){ _idx = _m; break; }
+      }
+      if (_idx >= 0) { try { _dcog_selectVid(_idx); } catch(e) {} }
+    }
   }
 }
 function _dcog_setTwoBallMode(mode) {
