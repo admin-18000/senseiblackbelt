@@ -36370,29 +36370,29 @@ function _opto_drawColormove(W, H){
     ctx.arc(ccx, ccy, cR + 10, -Math.PI/2, -Math.PI/2 + left*Math.PI*2);
     ctx.stroke();
   }
-  // ── Légende mapping couleur→move à DROITE (SANS ENCADRÉ — juste dots + labels)
-  //   Chaque ligne = cercle couleur + nom du move avec stroke noir épais.
-  //   Pas de rectangle/pilule autour. Transparence totale. Toujours visible.
+  // ── Légende mapping couleur→move à DROITE (SANS ENCADRÉ, LABELS GROS)
+  //   Dots + labels free-floating, stroke noir très épais pour lisibilité caméra.
+  //   ★ Font agrandie (0.46 → 0.60 de rowH) + rowH augmenté pour visibilité terrain.
   {
     ctx.save();
     var lgRows = _AR_CM_COLORS.length;
-    var rowH = Math.min(H*0.09, 72);                  // hauteur par ligne
-    var dotR = Math.min(rowH*0.30, 26);
-    var lgX = W*0.72;                                  // colonne droite
-    var lgY = H*0.35;                                  // début
+    var rowH = Math.min(H*0.12, 96);                   // ★ hauteur par ligne agrandie (0.09H → 0.12H)
+    var dotR = Math.min(rowH*0.32, 32);                // ★ dot un peu plus gros
+    var lgX = W*0.72;                                   // colonne droite
+    var lgY = H*0.28;                                   // ★ remonté pour tenir 4 rows à rowH plus grand
     for (var r=0; r<lgRows; r++){
       var c = _AR_CM_COLORS[r];
       var ry = lgY + rowH*r;
       // Cercle couleur
       ctx.fillStyle = c.hex;
       ctx.beginPath(); ctx.arc(lgX, ry, dotR, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.65)'; ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(0,0,0,0.75)'; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.arc(lgX, ry, dotR, 0, Math.PI*2); ctx.stroke();
-      // Label — grosse police, stroke noir très épais, aucun fond
-      var fsL = Math.round(rowH*0.46);
+      // ★ Label TRÈS gros, stroke noir ultra-épais
+      var fsL = Math.round(rowH*0.60);
       ctx.font = 'bold '+fsL+'px "Bebas Neue",sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.lineWidth = Math.max(5, fsL*0.18);   // stroke noir très épais pour lisibilité sur caméra
+      ctx.lineWidth = Math.max(6, fsL*0.20);
       ctx.strokeStyle = 'rgba(0,0,0,0.95)';
       var lbl = en ? c.en_m : c.fr_m;
       ctx.strokeText(lbl, lgX + dotR*1.7, ry);
@@ -38394,6 +38394,7 @@ var _dcog_VIDEOS = [
   // ═══ OPTOMOTOR RESPONSE & AUGMENTED REALITY ═══
   {id:'mDfWvQJSQDE', title:'Optomotor Response', drill:'opto'},
   {id:'JjegkQLzTT8', title:'Augmented Reality',  drill:'ar'}
+  // DCOG-CM et DCOG-GN : pas de vidéos — l'utilisateur fournira les IDs
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -42190,9 +42191,9 @@ function _dcog_rcs_startRun() {
 
 function _dcog_rcs_dropNext() {
   if (!_dcog_rcs_running) return;
-  // ★ R5 CHAIN : si phase react en cours, ne pas drop le suivant
-  if (_dcog_rcs_scoringMode === 'chain' && _dcog_rcs_chainPhase === 'react'){
-    setTimeout(_dcog_rcs_dropNext, 200); return;
+  // ★ R5 CHAIN : si phase react ou preWait en cours, ne pas drop le suivant
+  if (_dcog_rcs_scoringMode === 'chain' && (_dcog_rcs_chainPhase === 'react' || _dcog_rcs_chainPhase === 'preWait')){
+    setTimeout(_dcog_rcs_dropNext, 250); return;
   }
   if (_dcog_rcs_curDropIdx >= 6) {
     // Tous les bâtons sont tombés → laisser 2s puis fin de session
@@ -42357,7 +42358,9 @@ function _dcog_rcs_analyzePose(poses) {
    Reaction (mirror + moveThresh + filtre directionnel, via calcul inline sur les
    `hands` déjà dérivées dans _dcog_rcs_analyzePose).
 ═══════════════════════════════════════════════════════════════════════════════ */
-var _RCS_CHAIN_REACT_MS = 2200;    // TTL phase react avant timeout
+var _RCS_CHAIN_REACT_MS = 3000;    // ★ TTL rallongé (2200 → 3000ms) — temps de lire la couleur + taper
+var _RCS_CHAIN_PRE_MS   = 600;     // ★ pause APRÈS catch avant que les cibles apparaissent (brain switch)
+var _RCS_CHAIN_POST_MS  = 700;     // ★ pause APRÈS hit/miss avant drop suivant (rythme humain)
 var _RCS_CHAIN_TARGET_XS = [0.30, 0.50, 0.70];
 var _RCS_CHAIN_TARGET_Y  = 0.72;
 var _dcog_rcs_chainPhase = 'idle';      // 'idle' | 'react'
@@ -42440,7 +42443,7 @@ function _dcog_rcs_chainCheckHit(hands, W){
       _dcog_rcs_chainPhase = 'idle';
       _dcog_rcs_chainTargetColor = null;
       // Relance drop suivant immédiatement
-      setTimeout(function(){ if (_dcog_rcs_running) _dcog_rcs_dropNext(); }, 350);
+      setTimeout(function(){ if (_dcog_rcs_running) _dcog_rcs_dropNext(); }, _RCS_CHAIN_POST_MS);
       return;
     }
   });
@@ -42454,7 +42457,7 @@ function _dcog_rcs_chainTimeoutCheck(W){
   try { _td_beep(400, 0.06, 0.08); } catch(e){}
   _dcog_rcs_chainPhase = 'idle';
   _dcog_rcs_chainTargetColor = null;
-  setTimeout(function(){ if (_dcog_rcs_running) _dcog_rcs_dropNext(); }, 350);
+  setTimeout(function(){ if (_dcog_rcs_running) _dcog_rcs_dropNext(); }, _RCS_CHAIN_POST_MS);
 }
 function _dcog_rcs_chainDraw(ctx, W, H){
   var en = window._lang === 'en', now = Date.now();
@@ -42587,9 +42590,14 @@ function _dcog_rcs_onCatch(stickIdx, stk, bb) {
     msg.style.opacity = '1';
     setTimeout(function(){ if(msg) msg.style.opacity = '0'; }, 900);
   }
-  // ★ R5 CHAIN : déclenche la phase react couleur après chaque catch
+  // ★ R5 CHAIN : déclenche la phase react couleur après une pause (brain switch 600ms)
   if (_dcog_rcs_scoringMode === 'chain' && _dcog_canvas){
-    _dcog_rcs_chainSpawn(_dcog_canvas.width, _dcog_canvas.height);
+    _dcog_rcs_chainPhase = 'preWait';
+    setTimeout(function(){
+      if (_dcog_rcs_scoringMode === 'chain' && _dcog_rcs_running && _dcog_canvas){
+        _dcog_rcs_chainSpawn(_dcog_canvas.width, _dcog_canvas.height);
+      }
+    }, _RCS_CHAIN_PRE_MS);
   }
   // Si c'est le dernier bâton ET aucun autre encore en chute → fin anticipée
   if (_dcog_rcs_curDropIdx >= 6) {
@@ -42741,22 +42749,34 @@ function _dcog_rcs_drawCanvasHud(ctx, W, H) {
       ctx.shadowBlur = 0;
     }
   }
-  // ═══ ANNONCE TARGET (mode TARGET) ═══
+  // ═══ ANNONCE TARGET (mode TARGET) — rond gauche (évite collision avec sticks) ═══
   if (_dcog_rcs_scoringMode === 'target' && _dcog_rcs_targetColor){
     var pal = _RCS_PALETTE.find(function(c){return c.key===_dcog_rcs_targetColor;});
     if (pal){
       var en2 = window._lang === 'en';
-      var tw = W*0.5, th = H*0.08;
-      var tx = W/2 - tw/2, ty = H*0.11;
+      var cD = Math.min(W*0.20, H*0.26, 200), cR = cD/2;
+      var ccx = W*0.03 + cR, ccy = H*0.50;
       ctx.save();
-      ctx.fillStyle = pal.hex;
-      _dcog_vc_roundRect(ctx, tx, ty, tw, th, th/2); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
-      _dcog_vc_roundRect(ctx, tx, ty, tw, th, th/2); ctx.stroke();
-      ctx.fillStyle = '#000';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.font = 'bold '+Math.round(th*0.55)+'px "Bebas Neue",sans-serif';
-      ctx.fillText('🎯 ' + (en2?'TARGET: ':'CIBLE : ') + (en2?pal.name_en:pal.name_fr), W/2, ty + th*0.55);
+      ctx.fillStyle = 'rgba(8,11,18,0.35)';
+      ctx.beginPath(); ctx.arc(ccx, ccy, cR, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = pal.hex; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(ccx, ccy, cR, 0, Math.PI*2); ctx.stroke();
+      var labelName = en2 ? pal.name_en : pal.name_fr;
+      var fsIn = Math.round(cD*0.28);
+      ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif';
+      while (fsIn > 14 && ctx.measureText(labelName).width > cD*0.78){ fsIn--; ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif'; }
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = Math.max(3, fsIn*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+      ctx.strokeText(labelName, ccx, ccy);
+      ctx.fillStyle = pal.hex; ctx.fillText(labelName, ccx, ccy);
+      // Sub-label "CIBLE"
+      var subTxt = en2?'TARGET':'CIBLE';
+      var fsSub = Math.round(cD*0.13);
+      ctx.font = 'bold '+fsSub+'px "Barlow Condensed",sans-serif';
+      ctx.lineWidth = Math.max(2, fsSub*0.10); ctx.strokeStyle = 'rgba(0,0,0,0.80)';
+      ctx.strokeText(subTxt, ccx, ccy + cR + fsSub*0.9);
+      ctx.fillStyle = 'rgba(255,255,255,0.90)';
+      ctx.fillText(subTxt, ccx, ccy + cR + fsSub*0.9);
       ctx.restore();
     }
   }
