@@ -33844,14 +33844,15 @@ function _opto_drawHUD(W, H){
   // ★ FIX : width portrait-aware
   //   • Portrait (A11) : 0.92W — W est étroit, besoin de la quasi-totalité
   //   • Landscape : 0.56W — laisse 0.22W libre de chaque côté pour REC/STOP
-  // ★ CONSIGNE GLOBALE = petite pilule arrondie transparente à GAUCHE (homogène
-  //   AR Color Call). Pas un énorme bandeau qui bouffe le haut de l'écran.
+  // ★ CONSIGNE GLOBALE = petite pilule arrondie transparente CENTRÉE en haut.
+  //   Centrée (pas à gauche) pour éviter chevauchement avec les boutons REC/STOP
+  //   qui occupent les 2 coins supérieurs. Homogène AR Color Call.
   var bh = Math.max(32, H*0.045);
   var annFs = Math.round(bh*0.52);
   ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   var pad = 18;
-  var bw = Math.min(W*0.42, ctx.measureText(txt).width + pad*2);
-  var bx = W*0.035, by = H*0.025;
+  var bw = Math.min(W*0.48, ctx.measureText(txt).width + pad*2);
+  var bx = (W - bw) / 2, by = H*0.025;
   var rr = bh*0.5;
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
   _opto_roundRect(ctx, bx, by, bw, bh, rr); ctx.fill();
@@ -36198,7 +36199,6 @@ var _AR_CM_COLORS = [
 var _AR_CM_TTL = 3000;        // 3s pour exécuter le move après l'annonce
 var _AR_CM_RESULT_MS = 900;
 var _AR_CM_WAIT_MS = 700;
-var _AR_CM_LEGEND_FADE_ROUND = 5; // la légende s'estompe après le round 5
 
 var _opto_cm_phase='wait', _opto_cm_round=0;
 var _opto_cm_target=null, _opto_cm_askTs=0, _opto_cm_nextTs=0, _opto_cm_resultTs=0;
@@ -36398,34 +36398,37 @@ function _opto_drawColormove(W, H){
     ctx.arc(ccx, ccy, cR + 10, -Math.PI/2, -Math.PI/2 + left*Math.PI*2);
     ctx.stroke();
   }
-  // ── Légende mapping couleur→move à DROITE (fade out après round 5) ──
-  //   Pattern BlazePod : cercle couleur + label court, 4 lignes empilées
-  var legendOpacity = Math.max(0, 1 - _opto_cm_round / _AR_CM_LEGEND_FADE_ROUND);
-  if (legendOpacity > 0.05){
+  // ── Légende mapping couleur→move à DROITE (TOUJOURS visible, fond transparent, lisible) ──
+  //   Pattern BlazePod : cercle couleur + label court, 4 lignes empilées.
+  //   La légende reste à l'écran en permanence — en situation de jeu réel, on ne
+  //   mémorise pas un mapping arbitraire en 5 rounds, surtout avec un ballon.
+  {
     ctx.save();
-    ctx.globalAlpha = Math.min(1, legendOpacity);
-    var lgW = Math.min(W*0.26, 260), lgH = Math.min(H*0.44, 300);
+    var lgW = Math.min(W*0.28, 300), lgH = Math.min(H*0.46, 320);
     var lgX = W - lgW - W*0.03, lgY = H*0.33;
-    ctx.fillStyle = 'rgba(8,11,18,0.30)';
-    _opto_roundRect(ctx, lgX, lgY, lgW, lgH, 16); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
-    _opto_roundRect(ctx, lgX, lgY, lgW, lgH, 16); ctx.stroke();
+    // Fond VRAIMENT transparent (comme la pilule consigne) + bordure claire
+    ctx.fillStyle = 'rgba(8,11,18,0.35)';
+    _opto_roundRect(ctx, lgX, lgY, lgW, lgH, 18); ctx.fill();
+    ctx.strokeStyle = 'rgba(100,180,255,0.45)'; ctx.lineWidth = 2;
+    _opto_roundRect(ctx, lgX, lgY, lgW, lgH, 18); ctx.stroke();
     var rowH = lgH / (_AR_CM_COLORS.length + 0.4);
-    var dotR = Math.min(rowH*0.28, 22);
+    var dotR = Math.min(rowH*0.30, 26);
     for (var r=0; r<_AR_CM_COLORS.length; r++){
       var c = _AR_CM_COLORS[r];
       var ry = lgY + rowH*(r+0.6);
+      // Cercle couleur
       ctx.fillStyle = c.hex;
       ctx.beginPath(); ctx.arc(lgX + lgW*0.13, ry, dotR, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(lgX + lgW*0.13, ry, dotR, 0, Math.PI*2); ctx.stroke();
-      var fsL = Math.round(rowH*0.32);
+      // Label — plus gros, stroke noir épais pour lisibilité sur caméra variable
+      var fsL = Math.round(rowH*0.42);
       ctx.font = 'bold '+fsL+'px "Bebas Neue",sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.lineWidth = Math.max(2, fsL*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.80)';
+      ctx.lineWidth = Math.max(4, fsL*0.14); ctx.strokeStyle = 'rgba(0,0,0,0.88)';
       var lbl = en ? c.en_m : c.fr_m;
-      ctx.strokeText(lbl, lgX + lgW*0.27, ry);
-      ctx.fillStyle = '#fff'; ctx.fillText(lbl, lgX + lgW*0.27, ry);
+      ctx.strokeText(lbl, lgX + lgW*0.28, ry);
+      ctx.fillStyle = '#fff'; ctx.fillText(lbl, lgX + lgW*0.28, ry);
     }
     ctx.restore();
   }
@@ -36684,20 +36687,24 @@ function _opto_drawGonogo(W, H){
    Visuel bâton : barre support + pilule élancée + bouchons cap jaunes +
    gradient cylindre 3D + halo coloré (homogène RCS existant).
 ═══════════════════════════════════════════════════════════════════════════ */
-var _AR_SC_DROP_MS   = 1200;        // durée de chute du bâton
-var _AR_SC_REACT_MS  = 1500;        // TTL phase react (targets)
+var _AR_SC_DROP_MS   = 1400;        // ★ un peu plus long : stick plus visible
+var _AR_SC_REACT_MS  = 2200;        // ★ TTL react rallongé (1500 → 2200ms pour avoir le temps)
+var _AR_SC_TRANS_MS  = 500;         // ★ pause catch → targets (brain switch, 180 → 500ms)
 var _AR_SC_RESULT_MS = 900;
-var _AR_SC_WAIT_MS   = 700;
+var _AR_SC_WAIT_MS   = 800;
 var _AR_SC_BAR_Y     = 0.03;        // position Y barre support (ratio H)
 var _AR_SC_BAR_H     = 0.055;       // hauteur barre
 var _AR_SC_STICK_HANG_Y = 0.08;     // y du haut du stick suspendu
 var _AR_SC_STICK_FALL_MAX_Y = 0.40; // y max du bas du stick qui tombe
-var _AR_SC_STICK_H   = 0.18;        // hauteur du stick (ratio H)
+var _AR_SC_STICK_H   = 0.17;        // hauteur du stick (ratio H)
+var _AR_SC_STICK_COUNT = 6;         // ★ 6 bâtons suspendus (comme vrai RCS)
 var _AR_SC_TARGET_Y  = 0.55;        // Y des 3 targets couleur
 var _AR_SC_TARGET_XS = [0.30, 0.50, 0.70];
 
 var _opto_sc_phase='wait', _opto_sc_round=0;
-var _opto_sc_dropStart=0, _opto_sc_stickColor=null;
+var _opto_sc_sticks=[];              // ★ les 6 sticks suspendus {x, color, state}
+var _opto_sc_fallIdx=-1;             // index du stick qui tombe ce round
+var _opto_sc_dropStart=0;
 var _opto_sc_catchTs=0, _opto_sc_catchRt=0;
 var _opto_sc_reactStart=0, _opto_sc_targets=null, _opto_sc_targetColor=null;
 var _opto_sc_resultTs=0, _opto_sc_resultType='';
@@ -36711,7 +36718,8 @@ var _opto_sc_reactRtSum=0, _opto_sc_reactRtCount=0;
 var _opto_sc_fx=[];
 function _opto_sc_reset(){
   _opto_sc_phase='wait'; _opto_sc_round=0;
-  _opto_sc_dropStart=0; _opto_sc_stickColor=null;
+  _opto_sc_sticks=[]; _opto_sc_fallIdx=-1;
+  _opto_sc_dropStart=0;
   _opto_sc_catchTs=0; _opto_sc_catchRt=0;
   _opto_sc_reactStart=0; _opto_sc_targets=null; _opto_sc_targetColor=null;
   _opto_sc_resultTs=0; _opto_sc_resultType='';
@@ -36722,10 +36730,30 @@ function _opto_sc_reset(){
   _opto_sc_catchRtSum=0; _opto_sc_catchRtCount=0;
   _opto_sc_reactRtSum=0; _opto_sc_reactRtCount=0;
   _opto_sc_fx=[];
+  // Initialise les 6 sticks suspendus (couleurs aléatoires, positions fixes réparties)
+  for (var i=0;i<_AR_SC_STICK_COUNT;i++){
+    _opto_sc_sticks.push({
+      xRatio: 0.11 + i * (0.78/(_AR_SC_STICK_COUNT-1)),  // 0.11, 0.26, 0.41, 0.56, 0.71, 0.89
+      color: _AR_GN_COLORS[Math.floor(Math.random()*_AR_GN_COLORS.length)],
+      state: 'hanging'   // 'hanging' | 'falling' | 'caught' | 'missed'
+    });
+  }
 }
 function _opto_sc_spawnStick(){
-  // Couleur du stick : visuelle uniquement (aucune incidence sur scoring)
-  _opto_sc_stickColor = _AR_GN_COLORS[Math.floor(Math.random()*_AR_GN_COLORS.length)];
+  // Sélectionne un stick HANGING au hasard parmi les 6 (ou re-respawn si tous consommés)
+  var candidates = [];
+  for (var i=0;i<_opto_sc_sticks.length;i++) if (_opto_sc_sticks[i].state === 'hanging') candidates.push(i);
+  if (candidates.length === 0){
+    // Tous les sticks ont été utilisés → on reset le set (re-pend tous en hanging avec nouvelles couleurs)
+    for (var j=0;j<_opto_sc_sticks.length;j++){
+      _opto_sc_sticks[j].state = 'hanging';
+      _opto_sc_sticks[j].color = _AR_GN_COLORS[Math.floor(Math.random()*_AR_GN_COLORS.length)];
+    }
+    candidates = [];
+    for (var k=0;k<_opto_sc_sticks.length;k++) candidates.push(k);
+  }
+  _opto_sc_fallIdx = candidates[Math.floor(Math.random()*candidates.length)];
+  _opto_sc_sticks[_opto_sc_fallIdx].state = 'falling';
   _opto_sc_dropStart = Date.now();
   _opto_sc_phase = 'drop';
   if (typeof _td_beep === 'function') _td_beep(880, 0.03, 0.06);
@@ -36770,14 +36798,15 @@ function _opto_analyzeStickcolor(poses){
     if (now >= _opto_sc_nextTs) _opto_sc_spawnStick();
     return;
   }
-  // ── Phase 'drop' : stick qui tombe, player attrape ──
+  // ── Phase 'drop' : le stick choisi tombe à son X propre, les 5 autres restent ──
   if (_opto_sc_phase === 'drop'){
     var elapsed = now - _opto_sc_dropStart;
     var progress = Math.min(1, elapsed / _AR_SC_DROP_MS);
     var sYmin = H*_AR_SC_STICK_HANG_Y, sYmax = H*_AR_SC_STICK_FALL_MAX_Y;
     var stickBottomY = sYmin + (sYmax - sYmin)*progress;
-    var stickW = Math.max(22, W*0.035);
-    var cx = W*0.50;
+    var stickW = Math.max(22, W*0.030);
+    var fallingStick = _opto_sc_sticks[_opto_sc_fallIdx];
+    var cx = W * fallingStick.xRatio;
     var target = [{ x:cx, y:stickBottomY, r:stickW*1.8, born:_opto_sc_dropStart, hit:false }];
     _opto_doHits(poses, target, 2.0, function(tt, side, rt){
       _opto_sc_catches++;
@@ -36787,26 +36816,30 @@ function _opto_analyzeStickcolor(poses){
       _opto_sc_fx.push({x:cx, y:stickBottomY-H*0.08, txt:'CATCH +5 · '+rt+'ms', col:'#4ade80', born:now});
       if (typeof _td_beep === 'function') _td_beep(1760, 0.04, 0.10);
       if (navigator.vibrate) navigator.vibrate(20);
-      // Transition rapide vers phase react : 180ms pour laisser le brain switch
+      // ★ Transition rallongée : 500ms pour que le brain switch de "catch" à "react/scan couleur"
       _opto_sc_catchTs = now;
+      fallingStick.state = 'caught';
       setTimeout(function(){
-        if (_opto_sc_phase === 'drop' && _opto_canvas) _opto_sc_spawnTargets(_opto_canvas.width, _opto_canvas.height);
-      }, 180);
-      // On passe phase à 'transition' pour éviter double-déclenchement
+        if (_opto_sc_phase === 'transition' && _opto_canvas) _opto_sc_spawnTargets(_opto_canvas.width, _opto_canvas.height);
+      }, _AR_SC_TRANS_MS);
       _opto_sc_phase = 'transition';
     });
     // Timeout : stick touche le sol sans être attrapé
     if (progress >= 1){
       _opto_sc_catchMisses++;
+      fallingStick.state = 'missed';
       _opto_sc_fx.push({x:cx, y:H*0.45, txt:(window._lang==='en'?'STICK MISS':'STICK RATÉ'), col:'#ff8a94', born:now});
       if (typeof _td_beep === 'function') _td_beep(300, 0.06, 0.08);
-      _opto_sc_catchTs = 0; // pas de catch
-      // On passe directement en phase 'react' quand même (le joueur a quand même sa chance couleur)
-      _opto_sc_spawnTargets(W, H);
+      _opto_sc_catchTs = 0;
+      // Pause transition même en miss (pour cohérence rythme)
+      setTimeout(function(){
+        if (_opto_sc_phase === 'transition' && _opto_canvas) _opto_sc_spawnTargets(_opto_canvas.width, _opto_canvas.height);
+      }, _AR_SC_TRANS_MS);
+      _opto_sc_phase = 'transition';
     }
     return;
   }
-  // ── Phase 'transition' : pause courte entre catch et targets (évite flash) ──
+  // ── Phase 'transition' : pause courte entre catch et targets (évite flash + brain switch) ──
   if (_opto_sc_phase === 'transition') return;
   // ── Phase 'react' : 3 targets couleur, tape la bonne ──
   if (_opto_sc_phase === 'react'){
@@ -36917,25 +36950,30 @@ function _opto_drawStickcolor(W, H){
   ctx.save();
   // ══ BARRE SUPPORT (toujours visible) ══
   _opto_sc_drawBar(ctx, W, H);
-  // ══ STICK selon phase ══
-  var stickW = Math.max(22, W*0.035);
+  // ══ 6 STICKS SUSPENDUS à la barre (comme vrai RCS) ══
+  //   Les sticks caught/missed restent visibles mais atténués, les hanging sont pleins
+  var stickW = Math.max(18, W*0.028);
   var stickH = H * _AR_SC_STICK_H;
-  var cx = W*0.50;
-  if (_opto_sc_phase === 'wait' || _opto_sc_phase === 'result' || _opto_sc_phase === 'react' || _opto_sc_phase === 'transition'){
-    // Stick suspendu (visualise le système prêt) OU rien si après catch
-    // Pendant react/transition, pas de stick (il est "attrapé")
-    if (_opto_sc_phase === 'wait' || _opto_sc_phase === 'result'){
-      // Un stick suspendu à la barre (couleur neutre pour signaler "prêt à tomber")
-      var hangColor = _opto_sc_phase === 'wait' ? 'rgba(200,210,230,0.8)' : 'rgba(150,160,180,0.4)';
-      _opto_sc_drawStick(ctx, cx, H*_AR_SC_STICK_HANG_Y + stickH, stickW, stickH, hangColor, false);
-    }
+  var hangBottomY = H*_AR_SC_STICK_HANG_Y + stickH;
+  for (var si=0; si<_opto_sc_sticks.length; si++){
+    var s = _opto_sc_sticks[si];
+    if (si === _opto_sc_fallIdx && _opto_sc_phase === 'drop') continue; // le stick qui tombe est dessiné à part
+    var sx = W * s.xRatio;
+    var color;
+    if (s.state === 'hanging') color = s.color.hex;
+    else if (s.state === 'caught') color = 'rgba(100,180,255,0.35)';   // atténué bleu léger
+    else if (s.state === 'missed') color = 'rgba(230,57,70,0.35)';      // atténué rouge léger
+    else color = s.color.hex;
+    _opto_sc_drawStick(ctx, sx, hangBottomY, stickW, stickH, color, false);
   }
-  if (_opto_sc_phase === 'drop' && _opto_sc_stickColor){
+  // ══ Le stick qui tombe (dessiné séparément pour le halo + glow) ══
+  if (_opto_sc_phase === 'drop' && _opto_sc_fallIdx >= 0){
+    var fs = _opto_sc_sticks[_opto_sc_fallIdx];
     var elapsed = now - _opto_sc_dropStart;
     var progress = Math.min(1, elapsed / _AR_SC_DROP_MS);
     var sYmin = H*_AR_SC_STICK_HANG_Y, sYmax = H*_AR_SC_STICK_FALL_MAX_Y;
-    var stickBottomY = sYmin + stickH + (sYmax - sYmin - stickH*0)*progress;
-    _opto_sc_drawStick(ctx, cx, stickBottomY, stickW, stickH, _opto_sc_stickColor.hex, true);
+    var stickBottomY = sYmin + stickH + (sYmax - sYmin)*progress;
+    _opto_sc_drawStick(ctx, W * fs.xRatio, stickBottomY, stickW, stickH, fs.color.hex, true);
   }
   // ══ TARGETS COULEUR (phase react) ══
   if (_opto_sc_phase === 'react' && _opto_sc_targets){
