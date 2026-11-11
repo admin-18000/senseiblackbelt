@@ -855,11 +855,17 @@ body.unlocked .sensei-only{display:revert !important}
       } catch(e){}
     }
   }
-  if (document.readyState === 'complete' || document.readyState === 'interactive'){
-    setTimeout(function(){ forcePlayHeros(); hideSplash(); }, 300);
-  } else {
-    window.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ forcePlayHeros(); hideSplash(); }, 200); });
+  // ★ BOOT PERF — hide splash dès que le browser peut paint (RAF au lieu de setTimeout)
+  //   Fallback setTimeout si RAF retardé par thread saturé. Smartphones bas de gamme bénef.
+  function _bootFinalize(){ forcePlayHeros(); hideSplash(); }
+  function _bootKick(){
+    if (typeof requestAnimationFrame === 'function'){
+      requestAnimationFrame(function(){ requestAnimationFrame(_bootFinalize); });
+      setTimeout(_bootFinalize, 300);   // fallback si RAF bloqué
+    } else setTimeout(_bootFinalize, 200);
   }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') _bootKick();
+  else window.addEventListener('DOMContentLoaded', _bootKick);
 })();
 </script>
 
@@ -2406,6 +2412,19 @@ window._dojoBackHome = function(){
         style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
         🚧<div id="dcog_lbl_ar">AUGMENTED REALITY</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">AR · Virtual Cones</div>
       </button>
+      <!-- ═══ RELIANCE · 3 drills Famille B + C migrés d'OPTOMOTOR vers DCOG ═══ -->
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('dccm')" id="dcog_btn_dccm"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🎨<div id="dcog_lbl_dccm">COLOR MOVE</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Dribble × Color</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('dcgn')" id="dcog_btn_dcgn"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🚦<div id="dcog_lbl_dcgn">GO / NO-GO</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Side + Color</div>
+      </button>
+      <button class="dcog-drill-btn" onclick="_dcog_selectDrill('dcsc')" id="dcog_btn_dcsc"
+        style="flex:1;min-width:88px;background:var(--dark3);color:#7a8299;border:1px solid #1e2535;border-radius:8px;padding:10px 6px;font-family:var(--font-cond);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s">
+        🩵<div id="dcog_lbl_dcsc">STICK + COLOR</div><div style="font-size:9px;color:#9aa3b3;margin-top:2px;letter-spacing:.5px;font-weight:600">Catch Switch</div>
+      </button>
     </div>
     <div id="dcog_drillDesc" style="font-size:10px;color:#7a8299;text-align:center;min-height:28px;line-height:1.5;padding:0 8px">
       Résous des opérations en dribblant — entraînement cognitif-moteur
@@ -2825,9 +2844,6 @@ window._dojoBackHome = function(){
           <option value="qe">A7-QE · QUIET EYE (fixe · attends · tape au GO)</option>
           <option value="bead">A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)</option>
           <option value="bead-v">A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)</option>
-          <option value="colormove">A7-CM · COLOR MOVE (couleur annoncée → geste dribble : crossover · entre-jambes · dos · in-out)</option>
-          <option value="gonogo">A7-GN · GO/NO-GO (cible G/D + couleur · tape si côté ET couleur matchent)</option>
-          <option value="stickcolor">A7-SC · STICK + COLOR (bâton tombe · attrape si couleur annoncée match)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -2882,6 +2898,63 @@ window._dojoBackHome = function(){
       <button class="tr-btn tr-btn-start" id="ar_btnStart" onclick="_ar_start()" ontouchstart="" style="width:100%;background:#ff7a1a;color:#0d1117"><span id="ar_lblStart">▶ DÉMARRER AUGMENTED REALITY</span></button>
       <button class="tr-btn tr-btn-save" id="ar_btnSave" onclick="_ar_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
       <div id="ar_results" style="margin-top:4px"></div>
+    </div>
+
+    <!-- ═══ DCOG-CM · COLOR MOVE · panel DCOG dédié (réutilise moteur OPTOMOTOR) ═══ -->
+    <div id="dcog_optDccm" style="display:none;flex-direction:column;gap:12px">
+      <div style="padding:8px 10px;background:rgba(100,180,255,.06);border-left:2px solid rgba(100,180,255,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🎨 <b style="color:#64b4ff" id="dcog_dccm_desc_hdr">DCOG-CM · COLOR MOVE</b> — Couleur annoncée (voix + rond gauche) → tu exécutes le GESTE DRIBBLE correspondant (CROSSOVER · ENTRE JAMBES · DANS LE DOS · IN-OUT). Détection via keypoints MoveNet (poignet/hanche/cheville). Légende à droite qui s'estompe après le round 5.
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ <span id="dcog_dccm_durLbl">DURÉE</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="opto-dur-btn" data-sec="30"  onclick="_opto_setDur(30)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="opto-dur-btn" data-sec="60"  onclick="_opto_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(100,180,255,.5);background:rgba(100,180,255,.15);color:#64b4ff;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="opto-dur-btn" data-sec="90"  onclick="_opto_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="opto-dur-btn" data-sec="120" onclick="_opto_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div id="dccm_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dccm_btnStart" onclick="_dcog_startDccm()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="dccm_lblStart">▶ DÉMARRER COLOR MOVE</span></button>
+      <button class="tr-btn tr-btn-save" id="dccm_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+    </div>
+
+    <!-- ═══ DCOG-GN · GO/NO-GO · panel DCOG dédié ═══ -->
+    <div id="dcog_optDcgn" style="display:none;flex-direction:column;gap:12px">
+      <div style="padding:8px 10px;background:rgba(100,180,255,.06);border-left:2px solid rgba(100,180,255,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🚦 <b style="color:#64b4ff" id="dcog_dcgn_desc_hdr">DCOG-GN · GO / NO-GO</b> — Cible G ou D avec une couleur · voix annonce "GAUCHE ROUGE" (par ex). Tape UNIQUEMENT si côté ET couleur matchent. Mauvais tap = faux positif (-10). Inhibition réussie = +8. Vrai paradigme go/no-go (Vickers/Hallett).
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ <span id="dcog_dcgn_durLbl">DURÉE</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="opto-dur-btn" data-sec="30"  onclick="_opto_setDur(30)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="opto-dur-btn" data-sec="60"  onclick="_opto_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(100,180,255,.5);background:rgba(100,180,255,.15);color:#64b4ff;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="opto-dur-btn" data-sec="90"  onclick="_opto_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="opto-dur-btn" data-sec="120" onclick="_opto_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div id="dcgn_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dcgn_btnStart" onclick="_dcog_startDcgn()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="dcgn_lblStart">▶ DÉMARRER GO / NO-GO</span></button>
+      <button class="tr-btn tr-btn-save" id="dcgn_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
+    </div>
+
+    <!-- ═══ DCOG-SC · STICK + COLOR · panel DCOG dédié ═══ -->
+    <div id="dcog_optDcsc" style="display:none;flex-direction:column;gap:12px">
+      <div style="padding:8px 10px;background:rgba(100,180,255,.06);border-left:2px solid rgba(100,180,255,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5">
+        🩵 <b style="color:#64b4ff" id="dcog_dcsc_desc_hdr">DCOG-SC · STICK + COLOR</b> — Chaîne séquentielle. ÉTAPE 1 attrape le bâton qui tombe. ÉTAPE 2 3 cibles couleur apparaissent, le rond gauche annonce la couleur à toucher. Visuel style RCS (barre support + bouchons jaunes + gradient cylindre + halo coloré). Détection HIT strict TDR Reaction.
+      </div>
+      <div>
+        <div style="font-family:var(--font-cond);font-size:9px;color:#7a8299;letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⏱ <span id="dcog_dcsc_durLbl">DURÉE</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="opto-dur-btn" data-sec="30"  onclick="_opto_setDur(30)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">30s</button>
+          <button class="opto-dur-btn" data-sec="60"  onclick="_opto_setDur(60)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid rgba(100,180,255,.5);background:rgba(100,180,255,.15);color:#64b4ff;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">60s</button>
+          <button class="opto-dur-btn" data-sec="90"  onclick="_opto_setDur(90)"  style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">90s</button>
+          <button class="opto-dur-btn" data-sec="120" onclick="_opto_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
+        </div>
+      </div>
+      <div id="dcsc_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
+      <button class="tr-btn tr-btn-start" id="dcsc_btnStart" onclick="_dcog_startDcsc()" ontouchstart="" style="width:100%;background:#64b4ff;color:#0d1117"><span id="dcsc_lblStart">▶ DÉMARRER STICK + COLOR</span></button>
+      <button class="tr-btn tr-btn-save" id="dcsc_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
     </div>
   </div>
 
@@ -9306,9 +9379,13 @@ function _budo_page_selectVid(i) {
 }
 
 // Init au chargement DOM
+// ★ BOOT PERF — ces rendus vidéo ne sont pas critiques pour le 1er paint.
+//   Si requestIdleCallback dispo, on les planifie quand le thread est libre
+//   (évite de bloquer l'interaction pendant le boot sur smartphones low-end).
 document.addEventListener('DOMContentLoaded', function() {
-  _budo_renderVids();
-  _budo_page_renderVids();
+  var runRenders = function(){ try { _budo_renderVids(); } catch(e){}; try { _budo_page_renderVids(); } catch(e){} };
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(runRenders, {timeout:1500});
+  else setTimeout(runRenders, 50);
 });
 
 // ══ BUILD BELTS ══════════════════════════════════════
@@ -33536,8 +33613,8 @@ window._opto_setMode = function(m){
                 : 'Comme A7-BEAD mais tige VERTICALE · entraîne les saccades verticales (moins courantes dans le scan général, utiles pour trajectoire de tir). Mêmes règles de mesure.',
     gonogo: en ? 'Conditional reaction: a target appears LEFT or RIGHT with a color + voice calls "LEFT RED" (for example). Hit ONLY if BOTH side AND color match the voice. Wrong tap = false positive (penalty -10). Not tapping on NO-GO = successful inhibition (+8). Real go/no-go paradigm (Vickers/Hallett) — trains response inhibition, not just RT.'
           : 'Réaction conditionnelle : une cible apparaît à GAUCHE ou DROITE avec une couleur + la voix annonce "GAUCHE ROUGE" (par ex). Tape UNIQUEMENT si côté ET couleur matchent la voix. Mauvais tap = faux positif (pénalité -10). Ne pas taper sur NO-GO = inhibition réussie (+8). Vrai paradigme go/no-go (Vickers/Hallett) — entraîne l\'inhibition de réponse, pas juste le RT.',
-    stickcolor: en ? 'Vertical stick drops from the top in a color · voice announces a target color before the drop. Catch ONLY if stick color matches announced. Wrong catch = false positive (-10). Let a correct one fall = miss (-5). Correctly ignoring a wrong-color stick = successful inhibition (+8). Same go/no-go logic as A7-GN but visually simulates the Reaction Catching Stick tool.'
-              : 'Bâton vertical tombe du haut dans une couleur · la voix annonce une couleur cible AVANT la chute. Attrape SEULEMENT si la couleur du bâton = couleur annoncée. Mauvais attrape = faux positif (-10). Laisser tomber un bon = raté (-5). Ignorer correctement un bâton mauvaise couleur = inhibition réussie (+8). Même logique go/no-go que A7-GN mais simule visuellement l\'outil Reaction Catching Stick.',
+    stickcolor: en ? 'Sequential chain drill (BlazePod reliance): PHASE 1 catch the falling stick (any catch is good). PHASE 2 three colored targets appear — the left circle announces one color, hit the matching one. Wrong color = -5. Timeout = -3. Full chain (catch + correct color) is tracked separately. Visuals: RCS-style stick (support bar, yellow caps, 3D cylinder gradient, color halo on fall). Hit detection: strict TDR Reaction pattern.'
+              : 'Drill chaîne séquentielle (reliance BlazePod) : ÉTAPE 1 attrape le bâton qui tombe (n\'importe quel catch compte). ÉTAPE 2 trois cibles couleur apparaissent — le rond gauche annonce une couleur, tape la bonne. Mauvaise couleur = -5. Timeout = -3. Chaîne complète (catch + bonne couleur) comptée séparément. Visuel : style RCS (barre support, bouchons jaunes, gradient cylindre 3D, halo coloré pendant chute). Détection : pattern TDR Reaction strict.',
     colormove: en ? 'BlazePod-style reliance : a color is called (voice + left circle), you execute the corresponding DRIBBLE MOVE on the ball: YELLOW crossover · RED between legs · BLUE behind back · GREEN in-out. Detection via MoveNet wrist/hip/ankle keypoints. Honest: IN-OUT is the least reliable of the 4 detectors (motion pattern, not position) and scored slightly lower. Legend (right side) fades after round 5 (you memorize the mapping).'
                   : 'Reliance façon BlazePod : une couleur est annoncée (voix + rond gauche), tu exécutes le GESTE DE DRIBBLE correspondant sur le ballon : JAUNE crossover · ROUGE entre les jambes · BLEU dans le dos · VERT in-out. Détection via keypoints MoveNet poignet/hanche/cheville. Honnête : IN-OUT est la détection la moins fiable des 4 (pattern de mouvement, pas de position) et scorée un peu moins. Légende (à droite) s\'estompe après le round 5 (tu auras mémorisé le mapping).',
     play:   en ? 'Transparent half-court · 5 players run real plays (pick & roll, give & go, backdoor, horns, flex) · follow the BALL with your eyes · keep head still · A7-PLAY.'
@@ -33759,7 +33836,7 @@ function _opto_drawHUD(W, H){
     'bead-v': en ? 'CALLED COLOR · SACCADE (eyes only) · HEAD STILL' : 'COULEUR ANNONCÉE · SACCADE (yeux) · TÊTE FIXE',
     colormove: en ? 'COLOR = DRIBBLE MOVE · LEGEND RIGHT' : 'COULEUR = GESTE DRIBBLE · LÉGENDE DROITE',
     gonogo: en ? 'TAP IF SIDE + COLOR MATCH · INHIBIT OTHERWISE' : 'TAPE SI CÔTÉ + COULEUR MATCHENT · SINON INHIBE',
-    stickcolor: en ? 'CATCH IF COLOR MATCHES ANNOUNCED' : 'ATTRAPE SI COULEUR MATCHE L\'ANNONCE',
+    stickcolor: en ? 'CATCH STICK → HIT MATCHING COLOR' : 'ATTRAPE BÂTON → TAPE LA COULEUR',
     play:   en ? 'FOLLOW THE BALL · HEAD STILL' : 'SUIS LE BALLON · TÊTE FIXE'
   };
   var txt = consignes[_opto_mode] || '';
@@ -34633,7 +34710,7 @@ function _opto_drillLabel(){
             mot:'A7 · MULTI-OBJECT TRACKING', sp:'A7 · SMOOTH PURSUIT',
             sac:'A7 · SACCADES', play:'A7 · PLAY TRACKING', qe:'A7 · QUIET EYE',
             bead:'A7 · BEAD ROD H', 'bead-v':'A7 · BEAD ROD V',
-            colormove:'A7 · COLOR MOVE', gonogo:'A7 · GO/NO-GO', stickcolor:'A7 · STICK + COLOR' };
+            colormove:'DCOG · COLOR MOVE', gonogo:'DCOG · GO/NO-GO', stickcolor:'DCOG · STICK + COLOR' };
   return m[_opto_mode] || 'OPTOMOTOR RESPONSE';
 }
 function _opto_drawOutro(ms){
@@ -35713,9 +35790,8 @@ function _ar_cc_announce(now){
   while (k === _ar_cc_last && _ar_cc_order.length > 1 && ++guard < 20);
   _ar_cc_last = k; _ar_cc_target = k; _ar_cc_askTs = now;
   _ar_cc_phase = 'ask'; _ar_cc_total++;
-  var c = _ar_colorByKey(k);
-  // VOIX + ÉCRIT : la pastille est dessinée dans _ar_cc_draw, jamais que du son
-  try { if (window._speak && window._speak.isEnabled && window._speak.isEnabled()) window._speak.say({fr:c.fr, en:c.en}); } catch(e){}
+  // ★ VOIX DÉSACTIVÉE — écosystème bruyant (ballon, coach, autres joueurs).
+  //   La couleur annoncée est transmise 100% visuellement : rond gauche + nom couleur.
   if (typeof _td_beep === 'function') _td_beep(990, 0.04, 0.07);
 }
 function _ar_cc_endRound(now, extraPause){
@@ -35874,7 +35950,6 @@ var _opto_bead_askTs=0, _opto_bead_nextTs=0;
 var _opto_bead_hits=0, _opto_bead_misses=0, _opto_bead_rtSum=0, _opto_bead_rtCount=0;
 var _opto_bead_noseBaseline=null, _opto_bead_headDriftMax=0;
 var _opto_bead_stabSum=0, _opto_bead_stabSamples=0;
-var _opto_bead_lastSaid=0;
 
 function _opto_bead_reset(){
   _opto_bead_phase='wait'; _opto_bead_round=0;
@@ -35882,7 +35957,7 @@ function _opto_bead_reset(){
   _opto_bead_askTs=0; _opto_bead_nextTs=Date.now()+1200;
   _opto_bead_hits=0; _opto_bead_misses=0; _opto_bead_rtSum=0; _opto_bead_rtCount=0;
   _opto_bead_noseBaseline=null; _opto_bead_headDriftMax=0;
-  _opto_bead_stabSum=0; _opto_bead_stabSamples=0; _opto_bead_lastSaid=0;
+  _opto_bead_stabSum=0; _opto_bead_stabSamples=0;
 }
 function _opto_bead_isVertical(){ return _opto_mode === 'bead-v'; }
 function _opto_bead_variant(){
@@ -35931,16 +36006,6 @@ function _opto_bead_pickTargets(variant){
   }
   return seq;
 }
-function _opto_bead_say(colorIdx){
-  // Anti-rebond : pas 2× la même voix dans 300ms
-  var now = Date.now();
-  if (now - _opto_bead_lastSaid < 250) return;
-  _opto_bead_lastSaid = now;
-  if (window._speak && window._speak.say){
-    var c = _AR_BEAD_COLORS[colorIdx];
-    try { window._speak.say({fr:c.fr, en:c.en}); } catch(e){}
-  }
-}
 function _opto_analyzeBead(poses){
   if (!poses || !poses[0] || !_opto_canvas) return;
   var W = _opto_canvas.width, H = _opto_canvas.height, now = Date.now();
@@ -35967,15 +36032,7 @@ function _opto_analyzeBead(poses){
       _opto_bead_hitIdx = 0;
       _opto_bead_phase = 'show';
       _opto_bead_askTs = now;
-      if (v === 'simple')      _opto_bead_say(_opto_bead_targets[0]);
-      else if (v === 'anti')   _opto_bead_say(_opto_bead_targets[0].announce);
-      else if (v === 'sequence'){
-        _opto_bead_say(_opto_bead_targets[0]);
-        var self = { seq: _opto_bead_targets.slice() };
-        setTimeout(function(){ if (_opto_bead_phase==='show') _opto_bead_say(self.seq[1]); }, 700);
-        setTimeout(function(){ if (_opto_bead_phase==='show') _opto_bead_say(self.seq[2]); }, 1400);
-      }
-      if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
+      if (v === 'simple')      if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
     }
     return;
   }
@@ -36157,12 +36214,6 @@ function _opto_cm_reset(){
   _opto_cm_hits=0; _opto_cm_miss=0; _opto_cm_wrong=0; _opto_cm_rtSum=0; _opto_cm_rtCount=0;
   _opto_cm_lastResult=null; _opto_cm_wrBuf=[]; _opto_cm_fx=[]; _opto_cm_lastDetTs=0;
 }
-function _opto_cm_say(colorIdx){
-  if (window._speak && window._speak.say){
-    var c = _AR_CM_COLORS[colorIdx];
-    try { window._speak.say({fr:c.fr, en:c.en}); } catch(e){}
-  }
-}
 function _opto_cm_sampleBuf(kp, now){
   var lw=kp['left_wrist'], rw=kp['right_wrist'];
   var lh=kp['left_hip'], rh=kp['right_hip'];
@@ -36258,7 +36309,6 @@ function _opto_analyzeColormove(poses){
       _opto_cm_phase = 'ask';
       _opto_cm_askTs = now;
       _opto_cm_lastDetTs = now; // évite une détection faussement reliée au round précédent
-      _opto_cm_say(idx);
       if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
     }
     return;
@@ -36467,12 +36517,8 @@ function _opto_gn_announce(){
     }
   }
   _opto_gn_target = { side:side, colorIdx:colorIdx, callSide:callSide, callColor:callColor, isGo:isGo };
-  // Voix : "GAUCHE ROUGE" / "DROITE BLEU"
-  if (window._speak && window._speak.say){
-    var sTxt = { fr:(callSide==='L'?'GAUCHE':'DROITE'), en:(callSide==='L'?'LEFT':'RIGHT') };
-    var c = _AR_GN_COLORS[callColor];
-    try { window._speak.say({ fr: sTxt.fr+' '+c.fr, en: sTxt.en+' '+c.en }); } catch(e){}
-  }
+  // ★ VOIX DÉSACTIVÉE — écosystème bruyant. L'annonce "GAUCHE ROUGE" est 100% visuelle :
+  //   rond gauche montre la commande (couleur demandée + côté sous le rond).
   if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
 }
 function _opto_analyzeGonogo(poses){
@@ -36631,153 +36677,320 @@ function _opto_drawGonogo(W, H){
   ctx.globalAlpha = 1;
   ctx.restore();
 }
-/* ═══════════════ A7-SC · STICK + COLOR (Famille C #1 — RCS + Color Target) ═════
-   Bâton vertical TOMBE depuis le haut. Avant le drop, voix+rond annoncent une
-   couleur. Le bâton apparaît avec une couleur (match ou pas). Attrape SEULEMENT
-   si la couleur du bâton = couleur annoncée. Si tu attrapes une mauvaise couleur
-   = faux positif. Si tu laisses tomber un bon = miss. Same logic go/no-go que
-   A7-GN, visuel différent (bâton qui tombe au centre du cadre).
-═══════════════════════════════════════════════════════════════════════════════ */
-var _AR_SC_TTL = 1400;              // temps de chute (ms)
-var _AR_SC_WAIT_MS = 900;
-var _AR_SC_GO_RATIO = 0.50;
+/* ═══════════════ DCOG-SC · STICK CATCH → COLOR REACT CHAIN ════════════════
+   Reliance séquentielle (pas parallèle — MIXER abandonné) inspirée BlazePod
+   images 1/8 : phase 1 attrape le bâton (comme RCS classique) · phase 2
+   3 cibles TDR apparaissent avec couleurs, annonce une → tape la bonne.
+   Visuel bâton : barre support + pilule élancée + bouchons cap jaunes +
+   gradient cylindre 3D + halo coloré (homogène RCS existant).
+═══════════════════════════════════════════════════════════════════════════ */
+var _AR_SC_DROP_MS   = 1200;        // durée de chute du bâton
+var _AR_SC_REACT_MS  = 1500;        // TTL phase react (targets)
+var _AR_SC_RESULT_MS = 900;
+var _AR_SC_WAIT_MS   = 700;
+var _AR_SC_BAR_Y     = 0.03;        // position Y barre support (ratio H)
+var _AR_SC_BAR_H     = 0.055;       // hauteur barre
+var _AR_SC_STICK_HANG_Y = 0.08;     // y du haut du stick suspendu
+var _AR_SC_STICK_FALL_MAX_Y = 0.40; // y max du bas du stick qui tombe
+var _AR_SC_STICK_H   = 0.18;        // hauteur du stick (ratio H)
+var _AR_SC_TARGET_Y  = 0.55;        // Y des 3 targets couleur
+var _AR_SC_TARGET_XS = [0.30, 0.50, 0.70];
 
 var _opto_sc_phase='wait', _opto_sc_round=0;
-var _opto_sc_target=null;           // {colorIdx, callColor, isGo, startY, endY, dropStart}
-var _opto_sc_hits=0, _opto_sc_miss=0, _opto_sc_falsePos=0, _opto_sc_correctIgnore=0;
-var _opto_sc_rtSum=0, _opto_sc_rtCount=0;
+var _opto_sc_dropStart=0, _opto_sc_stickColor=null;
+var _opto_sc_catchTs=0, _opto_sc_catchRt=0;
+var _opto_sc_reactStart=0, _opto_sc_targets=null, _opto_sc_targetColor=null;
+var _opto_sc_resultTs=0, _opto_sc_resultType='';
 var _opto_sc_nextTs=0;
+// Métriques chaîne
+var _opto_sc_catches=0, _opto_sc_catchMisses=0;
+var _opto_sc_colorOK=0, _opto_sc_colorWrong=0, _opto_sc_colorTimeout=0;
+var _opto_sc_chainsOK=0;
+var _opto_sc_catchRtSum=0, _opto_sc_catchRtCount=0;
+var _opto_sc_reactRtSum=0, _opto_sc_reactRtCount=0;
 var _opto_sc_fx=[];
 function _opto_sc_reset(){
   _opto_sc_phase='wait'; _opto_sc_round=0;
-  _opto_sc_target=null; _opto_sc_nextTs=Date.now()+900;
-  _opto_sc_hits=0; _opto_sc_miss=0; _opto_sc_falsePos=0; _opto_sc_correctIgnore=0;
-  _opto_sc_rtSum=0; _opto_sc_rtCount=0; _opto_sc_fx=[];
+  _opto_sc_dropStart=0; _opto_sc_stickColor=null;
+  _opto_sc_catchTs=0; _opto_sc_catchRt=0;
+  _opto_sc_reactStart=0; _opto_sc_targets=null; _opto_sc_targetColor=null;
+  _opto_sc_resultTs=0; _opto_sc_resultType='';
+  _opto_sc_nextTs=Date.now()+900;
+  _opto_sc_catches=0; _opto_sc_catchMisses=0;
+  _opto_sc_colorOK=0; _opto_sc_colorWrong=0; _opto_sc_colorTimeout=0;
+  _opto_sc_chainsOK=0;
+  _opto_sc_catchRtSum=0; _opto_sc_catchRtCount=0;
+  _opto_sc_reactRtSum=0; _opto_sc_reactRtCount=0;
+  _opto_sc_fx=[];
 }
-function _opto_sc_announce(){
-  var colorIdx = Math.floor(Math.random() * _AR_GN_COLORS.length);
-  var isGo = Math.random() < _AR_SC_GO_RATIO;
-  var callColor;
-  if (isGo) callColor = colorIdx;
-  else { do { callColor = Math.floor(Math.random() * _AR_GN_COLORS.length); } while (callColor === colorIdx); }
-  _opto_sc_target = { colorIdx:colorIdx, callColor:callColor, isGo:isGo, dropStart:Date.now() };
-  if (window._speak && window._speak.say){
-    var c = _AR_GN_COLORS[callColor];
-    try { window._speak.say({ fr:c.fr, en:c.en }); } catch(e){}
+function _opto_sc_spawnStick(){
+  // Couleur du stick : visuelle uniquement (aucune incidence sur scoring)
+  _opto_sc_stickColor = _AR_GN_COLORS[Math.floor(Math.random()*_AR_GN_COLORS.length)];
+  _opto_sc_dropStart = Date.now();
+  _opto_sc_phase = 'drop';
+  if (typeof _td_beep === 'function') _td_beep(880, 0.03, 0.06);
+}
+function _opto_sc_spawnTargets(W, H){
+  // 3 targets à positions fixes [0.30, 0.50, 0.70] × Y 0.55, couleurs mélangées
+  var pool = _AR_GN_COLORS.slice();
+  // Mélange
+  for (var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+  var picked = pool.slice(0, _AR_SC_TARGET_XS.length);  // 3 couleurs distinctes
+  var tR = Math.max(28, Math.min(W*0.055, H*0.08));
+  _opto_sc_targets = [];
+  for (var k=0;k<_AR_SC_TARGET_XS.length;k++){
+    _opto_sc_targets.push({
+      x: W * _AR_SC_TARGET_XS[k],
+      y: H * _AR_SC_TARGET_Y,
+      r: tR,
+      color: picked[k],  // {k, hex, fr, en}
+      hit: false,
+      born: Date.now()
+    });
   }
-  if (typeof _td_beep === 'function') _td_beep(880, 0.04, 0.08);
+  // Annonce : une des 3 au hasard
+  _opto_sc_targetColor = picked[Math.floor(Math.random()*picked.length)];
+  _opto_sc_reactStart = Date.now();
+  _opto_sc_phase = 'react';
+  if (typeof _td_beep === 'function') _td_beep(1200, 0.04, 0.08);
+}
+function _opto_sc_endRound(resultType, feedbackTxt, feedbackCol, fxY, fxW){
+  _opto_sc_resultType = resultType;
+  _opto_sc_round++;
+  _opto_sc_phase = 'result';
+  _opto_sc_resultTs = Date.now();
+  _opto_sc_nextTs = _opto_sc_resultTs + _AR_SC_RESULT_MS;
+  if (feedbackTxt) _opto_sc_fx.push({ x:fxW/2, y:fxY, txt:feedbackTxt, col:feedbackCol, born:Date.now() });
 }
 function _opto_analyzeStickcolor(poses){
   if (!poses || !poses[0] || !_opto_canvas) return;
   var W = _opto_canvas.width, H = _opto_canvas.height, now = Date.now();
+  // ── Phase 'wait' ──
   if (_opto_sc_phase === 'wait'){
-    if (now >= _opto_sc_nextTs){
-      _opto_sc_phase = 'drop';
-      _opto_sc_announce();
+    if (now >= _opto_sc_nextTs) _opto_sc_spawnStick();
+    return;
+  }
+  // ── Phase 'drop' : stick qui tombe, player attrape ──
+  if (_opto_sc_phase === 'drop'){
+    var elapsed = now - _opto_sc_dropStart;
+    var progress = Math.min(1, elapsed / _AR_SC_DROP_MS);
+    var sYmin = H*_AR_SC_STICK_HANG_Y, sYmax = H*_AR_SC_STICK_FALL_MAX_Y;
+    var stickBottomY = sYmin + (sYmax - sYmin)*progress;
+    var stickW = Math.max(22, W*0.035);
+    var cx = W*0.50;
+    var target = [{ x:cx, y:stickBottomY, r:stickW*1.8, born:_opto_sc_dropStart, hit:false }];
+    _opto_doHits(poses, target, 2.0, function(tt, side, rt){
+      _opto_sc_catches++;
+      _opto_sc_catchRt = rt;
+      _opto_sc_catchRtSum += rt; _opto_sc_catchRtCount++;
+      _opto_score += 5; _opto_hits++;
+      _opto_sc_fx.push({x:cx, y:stickBottomY-H*0.08, txt:'CATCH +5 · '+rt+'ms', col:'#4ade80', born:now});
+      if (typeof _td_beep === 'function') _td_beep(1760, 0.04, 0.10);
+      if (navigator.vibrate) navigator.vibrate(20);
+      // Transition rapide vers phase react : 180ms pour laisser le brain switch
+      _opto_sc_catchTs = now;
+      setTimeout(function(){
+        if (_opto_sc_phase === 'drop' && _opto_canvas) _opto_sc_spawnTargets(_opto_canvas.width, _opto_canvas.height);
+      }, 180);
+      // On passe phase à 'transition' pour éviter double-déclenchement
+      _opto_sc_phase = 'transition';
+    });
+    // Timeout : stick touche le sol sans être attrapé
+    if (progress >= 1){
+      _opto_sc_catchMisses++;
+      _opto_sc_fx.push({x:cx, y:H*0.45, txt:(window._lang==='en'?'STICK MISS':'STICK RATÉ'), col:'#ff8a94', born:now});
+      if (typeof _td_beep === 'function') _td_beep(300, 0.06, 0.08);
+      _opto_sc_catchTs = 0; // pas de catch
+      // On passe directement en phase 'react' quand même (le joueur a quand même sa chance couleur)
+      _opto_sc_spawnTargets(W, H);
     }
     return;
   }
-  if (_opto_sc_phase === 'drop'){
-    var t = _opto_sc_target;
-    var elapsed = now - t.dropStart;
-    var progress = Math.min(1, elapsed / _AR_SC_TTL);
-    // Y courant du bas du bâton (il descend du haut vers 0.75H)
-    var stickBottomY = H*0.15 + (H*0.75 - H*0.15)*progress;
-    var stickHalfW = Math.max(16, W*0.028);
-    var cx = W*0.50;
-    var target = [{ x:cx, y:stickBottomY, r:stickHalfW*1.8, born:t.dropStart, hit:false }];
-    _opto_doHits(poses, target, 2.0, function(tt, side, rt){
-      if (t.isGo){
-        var pts = 15 + Math.max(0, Math.round((900-rt)/40));
-        _opto_sc_hits++; _opto_sc_rtSum+=rt; _opto_sc_rtCount++; _opto_sc_round++;
+  // ── Phase 'transition' : pause courte entre catch et targets (évite flash) ──
+  if (_opto_sc_phase === 'transition') return;
+  // ── Phase 'react' : 3 targets couleur, tape la bonne ──
+  if (_opto_sc_phase === 'react'){
+    if (!_opto_sc_targets) return;
+    _opto_doHits(poses, _opto_sc_targets, 2.0, function(tt, side, rt){
+      var rtReact = now - _opto_sc_reactStart;
+      _opto_sc_reactRtSum += rtReact; _opto_sc_reactRtCount++;
+      if (tt.color.k === _opto_sc_targetColor.k){
+        // BON : couleur match
+        var pts = 10 + Math.max(0, Math.round((1200 - rtReact)/60));  // max +20 si très rapide
         _opto_score += pts; _opto_hits++;
-        _opto_sc_fx.push({x:cx, y:stickBottomY-H*0.1, txt:'CATCH · +'+pts+' · '+rt+'ms', col:'#4ade80', born:now});
-        if (typeof _td_beep === 'function') _td_beep(1760, 0.05, 0.12);
+        _opto_sc_colorOK++;
+        if (_opto_sc_catchTs) _opto_sc_chainsOK++;   // chaîne complète seulement si catch avait été fait
+        _opto_sc_endRound('full', '+'+pts+' · '+rtReact+'ms', '#4ade80', H*0.30, W);
+        if (typeof _td_beep === 'function') _td_beep(rtReact<500?1760:1200, 0.05, 0.12);
         if (navigator.vibrate) navigator.vibrate(25);
       } else {
-        _opto_sc_falsePos++; _opto_sc_round++;
-        _opto_score = Math.max(0, _opto_score - 10);
-        _opto_sc_fx.push({x:cx, y:stickBottomY-H*0.1, txt:'FALSE CATCH · -10', col:'#ff8a94', born:now});
-        if (typeof _td_beep === 'function') _td_beep(200, 0.12, 0.14);
+        // MAUVAISE couleur
+        _opto_score = Math.max(0, _opto_score - 5);
+        _opto_sc_colorWrong++;
+        _opto_sc_endRound('wrong',
+          (window._lang==='en'?'WRONG · ':'MAUVAIS · ') + (window._lang==='en'?tt.color.en:tt.color.fr),
+          '#ff8a94', H*0.30, W);
+        if (typeof _td_beep === 'function') _td_beep(200, 0.10, 0.14);
         if (navigator.vibrate) navigator.vibrate([20,40,20]);
       }
-      _opto_sc_phase = 'result'; _opto_sc_nextTs = Date.now() + _AR_SC_WAIT_MS;
     });
-    // Fin de chute (bâton au sol)
-    if (progress >= 1){
-      if (t.isGo){
-        _opto_sc_miss++; _opto_sc_round++;
-        _opto_score = Math.max(0, _opto_score - 5);
-        _opto_sc_fx.push({x:W/2, y:H*0.70, txt:(window._lang==='en'?'MISS · -5':'RATÉ · -5'), col:'#ff8a94', born:now});
-        if (typeof _td_beep === 'function') _td_beep(400, 0.06, 0.08);
-      } else {
-        _opto_sc_correctIgnore++; _opto_sc_round++;
-        _opto_score += 8;
-        _opto_sc_fx.push({x:W/2, y:H*0.30, txt:(window._lang==='en'?'INHIBIT ✓ +8':'INHIBÉ ✓ +8'), col:'#64b4ff', born:now});
-        if (typeof _td_beep === 'function') _td_beep(660, 0.04, 0.08);
-      }
-      _opto_sc_phase = 'result'; _opto_sc_nextTs = now + _AR_SC_WAIT_MS;
+    // Timeout phase react
+    if (now - _opto_sc_reactStart > _AR_SC_REACT_MS){
+      _opto_score = Math.max(0, _opto_score - 3);
+      _opto_sc_colorTimeout++;
+      _opto_sc_endRound('timeout',
+        (window._lang==='en'?'TOO SLOW · -3':'TROP LENT · -3'),
+        '#ff8a94', H*0.30, W);
+      if (typeof _td_beep === 'function') _td_beep(400, 0.07, 0.10);
     }
     return;
   }
+  // ── Phase 'result' : pause avant round suivant ──
   if (_opto_sc_phase === 'result'){
-    if (now >= _opto_sc_nextTs){ _opto_sc_phase='wait'; _opto_sc_nextTs = now + 300; }
+    if (now >= _opto_sc_nextTs){ _opto_sc_phase = 'wait'; _opto_sc_nextTs = now + _AR_SC_WAIT_MS; _opto_sc_targets = null; _opto_sc_targetColor = null; }
   }
+}
+function _opto_sc_drawStick(ctx, cx, bottomY, stickW, stickH, color, falling){
+  // Capitalisation visuelle sur le RCS existant : pilule élancée + bouchons cap
+  // jaunes haut/bas + gradient cylindre 3D + halo coloré pendant la chute.
+  var topY = bottomY - stickH;
+  ctx.save();
+  // Halo pendant la chute
+  if (falling){
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = color;
+  } else {
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  }
+  // Corps : pilule élancée, arrondie aux 2 bouts (rr = largeur/2)
+  ctx.fillStyle = color;
+  var bodyR = stickW / 2;
+  var bodyTop = topY + stickH*0.08;
+  var bodyH   = stickH*0.84;
+  _opto_roundRect(ctx, cx - stickW/2, bodyTop, stickW, bodyH, bodyR);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  // Gradient cylindre 3D gauche→droite
+  var grad = ctx.createLinearGradient(cx - stickW/2, 0, cx + stickW/2, 0);
+  grad.addColorStop(0,    'rgba(255,255,255,0.30)');
+  grad.addColorStop(0.30, 'rgba(255,255,255,0.10)');
+  grad.addColorStop(0.65, 'rgba(0,0,0,0)');
+  grad.addColorStop(1,    'rgba(0,0,0,0.30)');
+  ctx.fillStyle = grad;
+  _opto_roundRect(ctx, cx - stickW/2, bodyTop, stickW, bodyH, bodyR);
+  ctx.fill();
+  // Bouchons jaunes haut + bas (légèrement plus larges = effet "cap")
+  var capW = stickW * 1.15;
+  var capX = cx - capW/2;
+  var capH = stickH * 0.10;
+  ctx.fillStyle = '#f5c518';   // SENSEI yellow = cap RCS
+  _opto_roundRect(ctx, capX, topY, capW, capH, capW*0.30);
+  ctx.fill();
+  _opto_roundRect(ctx, capX, topY + stickH*0.90, capW, capH, capW*0.30);
+  ctx.fill();
+  ctx.restore();
+}
+function _opto_sc_drawBar(ctx, W, H){
+  // Barre support en haut, fidèle au RCS existant (yellow bar + 3 trous centraux)
+  var barY = H * _AR_SC_BAR_Y, barH = H * _AR_SC_BAR_H;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 10;
+  ctx.fillStyle = '#f5c518';
+  _opto_roundRect(ctx, W*0.03, barY, W*0.94, barH, barH/3);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  // 3 trous centraux
+  ctx.fillStyle = '#8a6a0a';
+  var hCy = barY + barH/2;
+  var hR = barH * 0.14;
+  for (var hi=-1; hi<=1; hi++){
+    ctx.beginPath();
+    ctx.arc(W/2 + hi * W*0.025, hCy, hR, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 function _opto_drawStickcolor(W, H){
   var ctx = _opto_ctx, en = window._lang === 'en', now = Date.now();
   ctx.save();
-  // ── Bâton qui tombe ──
-  if (_opto_sc_phase === 'drop' && _opto_sc_target){
-    var t = _opto_sc_target;
-    var elapsed = now - t.dropStart;
-    var progress = Math.min(1, elapsed / _AR_SC_TTL);
-    var stickBottomY = H*0.15 + (H*0.75 - H*0.15)*progress;
-    var stickH = H*0.18, stickW = Math.max(22, W*0.035);
-    var cx = W*0.50;
-    var c = _AR_GN_COLORS[t.colorIdx];
-    // Trail ombre
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-    _opto_roundRect(ctx, cx - stickW/2 + 4, stickBottomY - stickH + 4, stickW, stickH, stickW*0.3);
-    ctx.fill();
-    // Bâton
-    ctx.fillStyle = c.hex;
-    _opto_roundRect(ctx, cx - stickW/2, stickBottomY - stickH, stickW, stickH, stickW*0.3);
-    ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
-    _opto_roundRect(ctx, cx - stickW/2, stickBottomY - stickH, stickW, stickH, stickW*0.3);
-    ctx.stroke();
-    // Bout bas du bâton (poignée arrondie, catch point)
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.beginPath(); ctx.arc(cx, stickBottomY, stickW*0.45, 0, Math.PI*2); ctx.fill();
+  // ══ BARRE SUPPORT (toujours visible) ══
+  _opto_sc_drawBar(ctx, W, H);
+  // ══ STICK selon phase ══
+  var stickW = Math.max(22, W*0.035);
+  var stickH = H * _AR_SC_STICK_H;
+  var cx = W*0.50;
+  if (_opto_sc_phase === 'wait' || _opto_sc_phase === 'result' || _opto_sc_phase === 'react' || _opto_sc_phase === 'transition'){
+    // Stick suspendu (visualise le système prêt) OU rien si après catch
+    // Pendant react/transition, pas de stick (il est "attrapé")
+    if (_opto_sc_phase === 'wait' || _opto_sc_phase === 'result'){
+      // Un stick suspendu à la barre (couleur neutre pour signaler "prêt à tomber")
+      var hangColor = _opto_sc_phase === 'wait' ? 'rgba(200,210,230,0.8)' : 'rgba(150,160,180,0.4)';
+      _opto_sc_drawStick(ctx, cx, H*_AR_SC_STICK_HANG_Y + stickH, stickW, stickH, hangColor, false);
+    }
   }
-  // ── Rond consigne à GAUCHE : couleur annoncée ──
+  if (_opto_sc_phase === 'drop' && _opto_sc_stickColor){
+    var elapsed = now - _opto_sc_dropStart;
+    var progress = Math.min(1, elapsed / _AR_SC_DROP_MS);
+    var sYmin = H*_AR_SC_STICK_HANG_Y, sYmax = H*_AR_SC_STICK_FALL_MAX_Y;
+    var stickBottomY = sYmin + stickH + (sYmax - sYmin - stickH*0)*progress;
+    _opto_sc_drawStick(ctx, cx, stickBottomY, stickW, stickH, _opto_sc_stickColor.hex, true);
+  }
+  // ══ TARGETS COULEUR (phase react) ══
+  if (_opto_sc_phase === 'react' && _opto_sc_targets){
+    for (var i=0;i<_opto_sc_targets.length;i++){
+      var t = _opto_sc_targets[i];
+      // Halo
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r*1.6, 0, Math.PI*2); ctx.fill();
+      // Cercle couleur
+      ctx.fillStyle = t.color.hex;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
+    }
+  }
+  // ══ ROND CONSIGNE COULEUR À GAUCHE ══
   var cD = Math.min(W*0.22, H*0.30, 220);
   var cR = cD / 2;
   var ccx = W*0.03 + cR, ccy = H*0.50;
-  var showCmd = (_opto_sc_phase === 'drop' && _opto_sc_target);
-  var cColor = showCmd ? _AR_GN_COLORS[_opto_sc_target.callColor].hex : 'rgba(255,255,255,0.45)';
+  var showAnn = (_opto_sc_phase === 'react' && _opto_sc_targetColor);
+  var cColor = showAnn ? _opto_sc_targetColor.hex : 'rgba(255,255,255,0.45)';
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
   ctx.beginPath(); ctx.arc(ccx, ccy, cR, 0, Math.PI*2); ctx.fill();
   ctx.strokeStyle = cColor; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.arc(ccx, ccy, cR, 0, Math.PI*2); ctx.stroke();
-  var inTxt = showCmd ? (en ? _AR_GN_COLORS[_opto_sc_target.callColor].en : _AR_GN_COLORS[_opto_sc_target.callColor].fr) : '…';
-  var fsIn = Math.round(cD*0.30);
+  var inTxt;
+  if (showAnn) inTxt = (en ? _opto_sc_targetColor.en : _opto_sc_targetColor.fr);
+  else if (_opto_sc_phase === 'drop') inTxt = (en?'CATCH!':'ATTRAPE !');
+  else inTxt = '…';
+  var fsIn = Math.round(cD*0.28);
   ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif';
   while (fsIn > 14 && ctx.measureText(inTxt).width > cD*0.78){ fsIn--; ctx.font = 'bold '+fsIn+'px "Bebas Neue",sans-serif'; }
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.lineWidth = Math.max(3, fsIn*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
   ctx.strokeText(inTxt, ccx, ccy);
   ctx.fillStyle = cColor; ctx.fillText(inTxt, ccx, ccy);
-  var subTxt = showCmd ? (en?'CATCH IF MATCH':'ATTRAPE SI MATCH') : (en?'READY…':'PRÊT…');
-  var fsSub = Math.round(cD*0.12);
+  // Sous-label
+  var subTxt;
+  if (_opto_sc_phase === 'drop')   subTxt = en?'STEP 1 · CATCH':'ÉTAPE 1 · ATTRAPE';
+  else if (showAnn)                subTxt = en?'STEP 2 · HIT COLOR':'ÉTAPE 2 · TAPE LA COULEUR';
+  else                             subTxt = en?'READY…':'PRÊT…';
+  var fsSub = Math.round(cD*0.11);
   ctx.font = 'bold '+fsSub+'px "Barlow Condensed",sans-serif';
   ctx.lineWidth = Math.max(2, fsSub*0.10); ctx.strokeStyle = 'rgba(0,0,0,0.80)';
   ctx.strokeText(subTxt, ccx, ccy + cR + fsSub*0.9);
   ctx.fillStyle = 'rgba(255,255,255,0.90)'; ctx.fillText(subTxt, ccx, ccy + cR + fsSub*0.9);
-  // Badges (round + acc)
-  var modeTxt = 'R' + (_opto_sc_round+1) + '  ·  CATCH ' + _opto_sc_hits + '  ·  INH ' + _opto_sc_correctIgnore + '  ·  FP ' + _opto_sc_falsePos;
-  var fsM = Math.round(H*0.026);
+  // Arc de temps restant (seulement en phase react)
+  if (showAnn){
+    var left = Math.max(0, 1 - (now - _opto_sc_reactStart)/_AR_SC_REACT_MS);
+    ctx.strokeStyle = cColor; ctx.lineWidth = 6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(ccx, ccy, cR + 10, -Math.PI/2, -Math.PI/2 + left*Math.PI*2); ctx.stroke();
+  }
+  // ══ Badge compteurs haut-gauche ══
+  var modeTxt = 'R' + (_opto_sc_round+1) + '  ·  ' + (en?'CHAIN ':'CHAÎNE ') + _opto_sc_chainsOK;
+  var fsM = Math.round(H*0.028);
   ctx.font = 'bold '+fsM+'px "Barlow Condensed",sans-serif';
   var bwM = ctx.measureText(modeTxt).width + 20, bhM = Math.max(fsM*1.6, H*0.045);
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
@@ -36786,12 +36999,16 @@ function _opto_drawStickcolor(W, H){
   _opto_roundRect(ctx, W*0.03, H*0.09, bwM, bhM, bhM*0.5); ctx.stroke();
   ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(modeTxt, W*0.03 + bwM/2, H*0.09 + bhM/2);
-  var totalDecisions = _opto_sc_hits + _opto_sc_falsePos + _opto_sc_correctIgnore + _opto_sc_miss;
-  var accPct = totalDecisions > 0 ? Math.round(100*(_opto_sc_hits + _opto_sc_correctIgnore) / totalDecisions) : 100;
-  var avgRt = _opto_sc_rtCount ? Math.round(_opto_sc_rtSum/_opto_sc_rtCount) : 0;
-  var cTxt = (en?'ACC ':'PRÉC ') + accPct + '%  ·  ' + (en?'RT ':'TR ') + avgRt + 'ms';
-  var fsC = Math.round(H*0.030);
+  // ══ Compteur bas-gauche : CATCH + RT + ACC ══
+  var totalCatchAttempts = _opto_sc_catches + _opto_sc_catchMisses;
+  var catchStr = totalCatchAttempts > 0 ? _opto_sc_catches + '/' + totalCatchAttempts : '0/0';
+  var avgRtReact = _opto_sc_reactRtCount ? Math.round(_opto_sc_reactRtSum/_opto_sc_reactRtCount) : 0;
+  var totalColor = _opto_sc_colorOK + _opto_sc_colorWrong + _opto_sc_colorTimeout;
+  var accPct = totalColor > 0 ? Math.round(100*_opto_sc_colorOK/totalColor) : 100;
+  var cTxt = (en?'CATCH ':'CATCH ') + catchStr + '  ·  RT ' + avgRtReact + 'ms  ·  ACC ' + accPct + '%';
+  var fsC = Math.round(H*0.028);
   ctx.font = 'bold '+fsC+'px "Bebas Neue",sans-serif';
+  while (fsC > 9 && ctx.measureText(cTxt).width + 28 > W*0.70){ fsC--; ctx.font = 'bold '+fsC+'px "Bebas Neue",sans-serif'; }
   var bwC = ctx.measureText(cTxt).width + 28, bhC = Math.max(fsC*1.6, H*0.05);
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
   _opto_roundRect(ctx, W*0.03, H*0.93 - bhC/2, bwC, bhC, bhC*0.5); ctx.fill();
@@ -36799,7 +37016,7 @@ function _opto_drawStickcolor(W, H){
   _opto_roundRect(ctx, W*0.03, H*0.93 - bhC/2, bwC, bhC, bhC*0.5); ctx.stroke();
   ctx.fillStyle = (accPct > 80 ? '#4ade80' : accPct > 60 ? '#f5c518' : '#ff8a94'); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(cTxt, W*0.03 + bwC/2, H*0.93 - bhC/2 + bhC/2);
-  // FX
+  // ══ FX flottants ══
   ctx.font = 'bold '+Math.round(H*0.055)+'px "Bebas Neue",sans-serif';
   _opto_sc_fx = _opto_sc_fx.filter(function(f){ return now - f.born < 1100; });
   for (var jj=0;jj<_opto_sc_fx.length;jj++){
@@ -37090,10 +37307,7 @@ function _opto_applyLang(lang){
       'A7-PLAY · PLAY TRACKING (follow the ball through plays)',
       'A7-QE · QUIET EYE (fix · wait · hit on GO)',
       'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (called color · saccade + tap)',
-      'A7-BEAD · COLOR BEAD ROD · VERTICAL (called color · saccade + tap)',
-      'A7-CM · COLOR MOVE (color → dribble move: crossover · between legs · behind back · in-out)',
-      'A7-GN · GO/NO-GO (L/R target + color · tap only if side AND color match)',
-      'A7-SC · STICK + COLOR (falling stick · catch only if color matches announced)'
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (called color · saccade + tap)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
@@ -37106,10 +37320,7 @@ function _opto_applyLang(lang){
       'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)',
       'A7-QE · QUIET EYE (fixe · attends · tape au GO)',
       'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)',
-      'A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)',
-      'A7-CM · COLOR MOVE (couleur annoncée → geste dribble : crossover · entre-jambes · dos · in-out)',
-      'A7-GN · GO/NO-GO (cible G/D + couleur · tape si côté ET couleur matchent)',
-      'A7-SC · STICK + COLOR (bâton tombe · attrape si couleur annoncée match)'
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -37128,8 +37339,8 @@ function _opto_applyLang(lang){
   var info = panel && panel.querySelector('div[style*="border-left:2px solid rgba(100,180,255"]');
   if (info){
     info.innerHTML = en
-      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 14 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
-      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 14 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
+      ? '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 11 oculomotor drills · MoveNet (nose/eyes/shoulders) · pitch/yaw/saccade tracking · no eye-tracker needed.'
+      : '👁️🏀 <b style="color:#64b4ff">OPTOMOTOR RESPONSE · Visual Motion</b> · 11 drills oculomoteurs · MoveNet (nez/yeux/épaules) · tracking pitch/yaw/saccades · pas d\'eye-tracker nécessaire.';
   }
   // Status
   var status = document.getElementById('opto_status');
@@ -38768,6 +38979,14 @@ function _dcog_applyLang(en) {
 }
 
 /* ── Sélection drill ─────────────────────────────────────────── */
+// ═══ DCOG-CM/GN/SC · wrappers START capitalisés sur le moteur OPTOMOTOR ═══
+//   Zéro duplication : on force juste le _opto_mode avant de déclencher _opto_start().
+//   Cette approche réutilise la totalité de l'infra caméra + REC + HUD + save
+//   déjà éprouvée dans OPTOMOTOR, sans dupliquer une seule ligne par drill.
+window._dcog_startDccm = function(){ if (typeof _opto_setMode === 'function') _opto_setMode('colormove'); if (typeof _opto_start === 'function') _opto_start(); };
+window._dcog_startDcgn = function(){ if (typeof _opto_setMode === 'function') _opto_setMode('gonogo');    if (typeof _opto_start === 'function') _opto_start(); };
+window._dcog_startDcsc = function(){ if (typeof _opto_setMode === 'function') _opto_setMode('stickcolor');if (typeof _opto_start === 'function') _opto_start(); };
+
 function _dcog_selectDrill(drill, langOnly) {
   // Si on quitte viscoord en cours de run → stopper proprement le métronome/timer
   // (évite que setInterval métronome fuite quand user switch drill mid-session)
@@ -38818,14 +39037,20 @@ function _dcog_selectDrill(drill, langOnly) {
     opto: en ? 'OPTOMOTOR RESPONSE · Visual Motion — 5 oculomotor response drills (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Face tracking via MoveNet.'
             : 'OPTOMOTOR RESPONSE · Visual Motion — 5 drills d\'entraînement de la réponse oculomotrice (Head-Up Scan · Head/Trunk Iso · Peripheral Target · Vanishing Target · Multi-Object Tracking). Suivi face via MoveNet.',
     ar: en ? 'AUGMENTED REALITY (AR) — camera drills with static virtual cones: overhand dribble over 1 or 2 cones, with or without targets to hit (dual task).'
-          : 'AUGMENTED REALITY (AR) — drills caméra avec cônes virtuels statiques : overhand dribble au-dessus de 1 ou 2 cônes, avec ou sans cibles à toucher (double tâche).'
+          : 'AUGMENTED REALITY (AR) — drills caméra avec cônes virtuels statiques : overhand dribble au-dessus de 1 ou 2 cônes, avec ou sans cibles à toucher (double tâche).',
+    dccm: en ? 'DCOG-CM · COLOR MOVE — Family B reliance. Called color → dribble move (crossover · between legs · behind back · in-out). MoveNet keypoint detection. Legend fades after round 5.'
+             : 'DCOG-CM · COLOR MOVE — Reliance Famille B. Couleur annoncée → geste dribble (crossover · entre-jambes · dos · in-out). Détection via keypoints MoveNet. Légende s\'estompe après le round 5.',
+    dcgn: en ? 'DCOG-GN · GO/NO-GO — Family C conditional reaction. Target L/R + color + voice. Tap only if BOTH side AND color match (go/no-go paradigm, trains response inhibition).'
+             : 'DCOG-GN · GO/NO-GO — Réaction conditionnelle Famille C. Cible G/D + couleur + voix. Tape uniquement si côté ET couleur matchent (paradigme go/no-go, entraîne l\'inhibition de réponse).',
+    dcsc: en ? 'DCOG-SC · STICK + COLOR — Family C sequential chain (BlazePod reliance). STEP 1: catch the falling stick. STEP 2: hit the matching-color target among 3 colored circles. RCS-style stick visual with yellow caps + 3D cylinder gradient.'
+             : 'DCOG-SC · STICK + COLOR — Chaîne séquentielle Famille C (reliance BlazePod). ÉTAPE 1 : attrape le bâton qui tombe. ÉTAPE 2 : tape la cible dont la couleur matche l\'annonce parmi 3 cercles. Visuel style RCS (bouchons jaunes + gradient cylindre 3D).'
   };
   var el = document.getElementById('dcog_drillDesc');
   if (el) el.textContent = descs[drill] || '';
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto','ar'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto','ar','dccm','dcgn','dcsc'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
@@ -38834,12 +39059,12 @@ function _dcog_selectDrill(drill, langOnly) {
       btn.style.color   = active ? '#f5c518' : '#7a8299';
     });
     // Show correct sub-options
-    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets', limbo:'dcog_optLimbo', opto:'dcog_optOpto', ar:'dcog_optAr'};
+    var optIds = {viscoord:'dcog_optViscoord', rcs:'dcog_optRcs', math:'dcog_optMath', sprint:'dcog_optSprint', height:'dcog_optHeight', twoball:'dcog_optTwoball', tboard:'dcog_optTboard', vcmath:'dcog_optVcmath', colorreact:'dcog_optColorreact', ruleswitch:'dcog_optRuleswitch', quickchoice:'dcog_optQuickchoice', quicktargets:'dcog_optQuicktargets', limbo:'dcog_optLimbo', opto:'dcog_optOpto', ar:'dcog_optAr', dccm:'dcog_optDccm', dcgn:'dcog_optDcgn', dcsc:'dcog_optDcsc'};
     Object.keys(optIds).forEach(function(d) {
       var el2 = document.getElementById(optIds[d]);
       if (el2) {
         el2.style.display = d === drill ? 'flex' : 'none';
-        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' || d === 'limbo' || d === 'opto' || d === 'ar' ? '12px' : '8px');
+        if (d === drill) el2.style.gap = (d === 'viscoord' || d === 'rcs' || d === 'colorreact' || d === 'ruleswitch' || d === 'quickchoice' || d === 'quicktargets' || d === 'limbo' || d === 'opto' || d === 'ar' || d === 'dccm' || d === 'dcgn' || d === 'dcsc' ? '12px' : '8px');
       }
     });
     // Update opt title
@@ -38859,7 +39084,10 @@ function _dcog_selectDrill(drill, langOnly) {
       quicktargets: en ? '🎯 QUICK TARGETS' : '🎯 QUICK TARGETS',
       limbo:        en ? '🚧 LEVEL CHANGE · Shifty' : '🚧 LEVEL CHANGE · Shifty',
       opto:         en ? '👁️ OPTOMOTOR RESPONSE · Visual Motion' : '👁️ OPTOMOTOR RESPONSE · Visual Motion',
-      ar:           '🚧 AUGMENTED REALITY (AR) · Virtual Cones'
+      ar:           '🚧 AUGMENTED REALITY (AR) · Virtual Cones',
+      dccm:         en ? '🎨 COLOR MOVE · Dribble × Color'   : '🎨 COLOR MOVE · Dribble × Couleur',
+      dcgn:         en ? '🚦 GO / NO-GO · Side + Color'      : '🚦 GO / NO-GO · Côté + Couleur',
+      dcsc:         en ? '🩵 STICK + COLOR · Catch Switch'   : '🩵 STICK + COLOR · Attrape Conditionnel'
     };
     var ot = document.getElementById('dcog_optTitle');
     if (ot) ot.textContent = optTitles[drill] || '';
@@ -38894,7 +39122,7 @@ function _dcog_selectDrill(drill, langOnly) {
     var durLbl    = document.getElementById('dcog_durLbl');
     var scoreLive = document.getElementById('dcog_scoreLive');
     var camCard   = document.getElementById('dcog_camContainer');
-    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice' || drill === 'quicktargets' || drill === 'limbo');
+    var isCustomCam = (drill === 'colorreact' || drill === 'ruleswitch' || drill === 'quickchoice' || drill === 'quicktargets' || drill === 'limbo' || drill === 'dccm' || drill === 'dcgn' || drill === 'dcsc');
     if (mainStart)  mainStart.style.display  = isCustomCam ? 'none' : 'flex';
     if (mainStop && mainStop.style.display  !== 'none' && isCustomCam) mainStop.style.display  = 'none';
     if (mainSave && mainSave.style.display  !== 'none' && isCustomCam) mainSave.style.display  = 'none';
@@ -38928,7 +39156,7 @@ function _dcog_selectDrill(drill, langOnly) {
     //   le 2ᵉ bouton visible qui crée un conflit UX.
     var _dcogMainStart = document.getElementById('dcog_btnStart');
     if (_dcogMainStart){
-      var ownStart = (drill === 'limbo' || drill === 'opto' || drill === 'ar');
+      var ownStart = (drill === 'limbo' || drill === 'opto' || drill === 'ar' || drill === 'dccm' || drill === 'dcgn' || drill === 'dcsc');
       _dcogMainStart.style.display = ownStart ? 'none' : '';
     }
     // OPTOMOTOR et AR ont désormais leur mapping vidéo → carte visible comme
