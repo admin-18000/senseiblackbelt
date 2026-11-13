@@ -20,6 +20,42 @@ window.addEventListener('error', function(ev){
 window.addEventListener('unhandledrejection', function(ev){
   try { console.warn('[SENSEI promise]', ev.reason && (ev.reason.message || ev.reason)); } catch(e){}
 });
+
+/* ★ SAFE STORAGE — wrapper try/catch autour de localStorage. Évite les crashes
+   en mode privé Safari (QuotaExceeded), quota plein, ou storage désactivé par
+   la config navigateur. Expose window._safeStorage avec get/set/remove/clear.
+   Les call sites existants qui accèdent directement à localStorage continuent
+   de fonctionner ; ce wrapper est disponible pour tout nouveau code et pour
+   migration progressive. */
+window._safeStorage = (function(){
+  var ok = (function(){ try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
+  var mem = {}; // fallback mémoire si localStorage indispo
+  return {
+    get: function(k, def){
+      try { if(ok){ var v = localStorage.getItem(k); return v===null ? (def===undefined?null:def) : v; } }
+      catch(e){ console.warn('[SENSEI storage]', 'get', k, e && e.message); }
+      return (k in mem) ? mem[k] : (def===undefined?null:def);
+    },
+    set: function(k, v){
+      try { if(ok){ localStorage.setItem(k, String(v)); return true; } }
+      catch(e){ console.warn('[SENSEI storage]', 'set', k, e && e.message); }
+      mem[k] = String(v); return false;
+    },
+    remove: function(k){
+      try { if(ok) localStorage.removeItem(k); } catch(e){}
+      delete mem[k];
+    },
+    getJSON: function(k, def){
+      var raw = this.get(k, null);
+      if(raw===null || raw===undefined) return def===undefined?null:def;
+      try { return JSON.parse(raw); } catch(e){ return def===undefined?null:def; }
+    },
+    setJSON: function(k, obj){
+      try { return this.set(k, JSON.stringify(obj)); } catch(e){ return false; }
+    },
+    available: ok
+  };
+})();
 (function() {
   try {
     // ═══════════════════════════════════════════════════════════════════════
@@ -7248,18 +7284,30 @@ function journalRender() {
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px';
       const stars = '⭐'.repeat(e.feeling||0);
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-          <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold)">${e.date}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            ${e.dur?`<span style="font-family:var(--font-cond);font-size:10px;background:rgba(0,119,182,.15);color:var(--blue-belt);border-radius:10px;padding:2px 8px">⏱ ${e.dur} min</span>`:''}
-            ${e.bench?`<span style="font-family:var(--font-cond);font-size:10px;background:rgba(230,57,70,.12);color:var(--red);border-radius:10px;padding:2px 8px">🏋️ ${e.bench}kg</span>`:''}
-            ${stars?`<span style="font-size:10px">${stars}</span>`:''}
-          </div>
-        </div>
-        ${e.drills?`<div style="font-family:var(--font-cond);font-size:11px;color:var(--text);margin-bottom:4px">🏀 ${e.drills}</div>`:''}
-        ${e.notes?`<div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);font-style:italic">${e.notes}</div>`:''}
-        <div style="text-align:right;margin-top:8px"><button onclick="journalDelete(${e.id})" style="font-family:var(--font-cond);font-size:10px;background:transparent;border:none;color:var(--muted2);cursor:pointer" data-i18n="pr_delete">🗑️ Supprimer</button></div>`;
+      // XSS-safe : e.drills / e.notes viennent d'inputs user → textContent
+      const head = document.createElement('div');
+      head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px';
+      const dt = document.createElement('div');
+      dt.style.cssText = 'font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--gold)';
+      dt.textContent = e.date;
+      const tags = document.createElement('div');
+      tags.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+      if (e.dur)   { const s=document.createElement('span'); s.style.cssText='font-family:var(--font-cond);font-size:10px;background:rgba(0,119,182,.15);color:var(--blue-belt);border-radius:10px;padding:2px 8px'; s.textContent='⏱ '+e.dur+' min'; tags.appendChild(s); }
+      if (e.bench) { const s=document.createElement('span'); s.style.cssText='font-family:var(--font-cond);font-size:10px;background:rgba(230,57,70,.12);color:var(--red);border-radius:10px;padding:2px 8px'; s.textContent='🏋️ '+e.bench+'kg'; tags.appendChild(s); }
+      if (stars)   { const s=document.createElement('span'); s.style.cssText='font-size:10px'; s.textContent=stars; tags.appendChild(s); }
+      head.appendChild(dt); head.appendChild(tags);
+      card.appendChild(head);
+      if (e.drills) { const d=document.createElement('div'); d.style.cssText='font-family:var(--font-cond);font-size:11px;color:var(--text);margin-bottom:4px'; d.textContent='🏀 '+e.drills; card.appendChild(d); }
+      if (e.notes)  { const d=document.createElement('div'); d.style.cssText='font-family:var(--font-cond);font-size:11px;color:var(--muted);font-style:italic'; d.textContent=e.notes; card.appendChild(d); }
+      const foot = document.createElement('div');
+      foot.style.cssText = 'text-align:right;margin-top:8px';
+      const btn = document.createElement('button');
+      btn.style.cssText = 'font-family:var(--font-cond);font-size:10px;background:transparent;border:none;color:var(--muted2);cursor:pointer';
+      btn.setAttribute('data-i18n','pr_delete');
+      btn.textContent = '🗑️ Supprimer';
+      btn.addEventListener('click', function(){ journalDelete(e.id); });
+      foot.appendChild(btn);
+      card.appendChild(foot);
       list.appendChild(card);
     });
   }
@@ -10020,7 +10068,11 @@ function initEinstein() {
       ? ['Ball kinetic energy','Every shot = applied physics','The science behind the move','E = mc² · Basketball differently']
       : ['Énergie cinétique du ballon','Chaque tir = physique appliquée','La science derrière le geste','E = mc² · Le basket autrement'];
     let pi=0, t=0;
-    setInterval(()=>pi=(pi+1)%phrases.length, 2000);
+    // Garde : stop auto-rotation si le canvas disparaît du DOM (évite fuite mémoire)
+    const _einInt = setInterval(function(){
+      if (!document.body.contains(canvas)) { clearInterval(_einInt); return; }
+      pi=(pi+1)%phrases.length;
+    }, 2000);
 
     function draw() {
       ctx.clearRect(0,0,w,h);
@@ -10122,7 +10174,11 @@ function initEinstein() {
       'La science derrière le geste'
     ];
     let subIdx = 0;
-    setInterval(() => { subIdx = (subIdx+1) % subTexts.length; }, 2000);
+    // Garde fuite mémoire : stop si canvas retiré du DOM
+    const _einDtInt = setInterval(() => {
+      if (!document.body.contains(canvas)) { clearInterval(_einDtInt); return; }
+      subIdx = (subIdx+1) % subTexts.length;
+    }, 2000);
 
     function draw() {
       ctx.clearRect(0,0,w,h);
@@ -10283,7 +10339,12 @@ function initVisuSci() {
       :['RÉPÉTITION','SYNAPSE','MYÉLINE','PLASTICITÉ','MÉMOIRE','AUTOMATISME','RÉFLEXE','DOPAMINE'];
     let labelIdx=0;
     function triggerChain(){const s=Math.floor(Math.random()*nodes.length);nodes[s].active=true;nodes[s].activeCooldown=60;labelIdx=(labelIdx+1)%labels.length;}
-    triggerChain(); setInterval(triggerChain,2200);
+    triggerChain();
+    // Garde fuite mémoire : stop si canvas retiré du DOM
+    const _neuroChainInt = setInterval(function(){
+      if (!document.body.contains(canvas)) { clearInterval(_neuroChainInt); return; }
+      triggerChain();
+    }, 2200);
     // ResizeObserver : redimensionne le canvas quand le panel devient visible
     if(window.ResizeObserver){
       const ro=new ResizeObserver(function(){
@@ -13091,8 +13152,15 @@ function networkLoad() {
     members.forEach((m, i) => {
       const tag = document.createElement('div');
       tag.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--dark3);border-radius:20px;border:1px solid var(--border);font-family:var(--font-cond);font-size:11px;color:var(--text)';
-      tag.innerHTML = `<span style="color:var(--gold)">📍</span><strong>${m.name}</strong><span style="color:var(--muted)">— ${m.city}</span>
-        <button onclick="networkRemove(${i})" style="margin-left:4px;background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:10px">✕</button>`;
+      // XSS-safe : m.name / m.city viennent d'inputs user → textContent
+      const pin = document.createElement('span'); pin.style.color='var(--gold)'; pin.textContent='📍';
+      const nm = document.createElement('strong'); nm.textContent = m.name;
+      const ct = document.createElement('span'); ct.style.color='var(--muted)'; ct.textContent='— '+m.city;
+      const btn = document.createElement('button');
+      btn.style.cssText='margin-left:4px;background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:10px';
+      btn.textContent='✕';
+      btn.addEventListener('click', function(){ networkRemove(i); });
+      tag.appendChild(pin); tag.appendChild(nm); tag.appendChild(ct); tag.appendChild(btn);
       pins.appendChild(tag);
     });
   }
@@ -13390,13 +13458,28 @@ function eleveRender() {
   eleves.forEach(e => {
     const row = document.createElement('div');
     row.style.cssText = 'display:grid;grid-template-columns:2fr 1.5fr 1fr 1.5fr 2fr 40px;gap:8px;padding:10px 12px;border-radius:6px;border:1px solid var(--border);background:var(--dark3);margin-bottom:6px;align-items:center';
-    row.innerHTML = `
-      <div style="font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--text)">${e.name}</div>
-      <div style="font-family:var(--font-cond);font-size:12px;color:${BELT_COLS_M[e.belt]}">${BELT_EMOJIS_M[e.belt]} ${BELT_NAMES_M[e.belt]}</div>
-      <div style="font-family:var(--font-display);font-size:18px;color:${e.score>=7.5?'var(--green-belt)':e.score>=5?'var(--gold)':'var(--red)'}">${e.score||'—'}</div>
-      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted)">${e.date||'—'}</div>
-      <div style="font-family:var(--font-cond);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.notes||'—'}</div>
-      <button onclick="eleveDelete(${e.id})" style="background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:14px">🗑️</button>`;
+    // XSS-safe : e.name / e.notes viennent d'inputs user → textContent, pas innerHTML
+    const dName = document.createElement('div');
+    dName.style.cssText = 'font-family:var(--font-cond);font-size:13px;font-weight:700;color:var(--text)';
+    dName.textContent = e.name;
+    const dBelt = document.createElement('div');
+    dBelt.style.cssText = 'font-family:var(--font-cond);font-size:12px;color:'+BELT_COLS_M[e.belt];
+    dBelt.textContent = BELT_EMOJIS_M[e.belt]+' '+BELT_NAMES_M[e.belt];
+    const dScore = document.createElement('div');
+    dScore.style.cssText = 'font-family:var(--font-display);font-size:18px;color:'+(e.score>=7.5?'var(--green-belt)':e.score>=5?'var(--gold)':'var(--red)');
+    dScore.textContent = e.score || '—';
+    const dDate = document.createElement('div');
+    dDate.style.cssText = 'font-family:var(--font-cond);font-size:11px;color:var(--muted)';
+    dDate.textContent = e.date || '—';
+    const dNotes = document.createElement('div');
+    dNotes.style.cssText = 'font-family:var(--font-cond);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+    dNotes.textContent = e.notes || '—';
+    const btn = document.createElement('button');
+    btn.style.cssText = 'background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:14px';
+    btn.textContent = '🗑️';
+    btn.addEventListener('click', function(){ eleveDelete(e.id); });
+    row.appendChild(dName); row.appendChild(dBelt); row.appendChild(dScore);
+    row.appendChild(dDate); row.appendChild(dNotes); row.appendChild(btn);
     table.appendChild(row);
   });
   list.appendChild(table);
@@ -13666,13 +13749,29 @@ function testiAdminRender() {
   testis.forEach(t => {
     const card = document.createElement('div');
     card.style.cssText = 'padding:14px;background:var(--dark3);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)';
-    card.innerHTML = `<div style="font-family:var(--font-cond);font-size:13px;color:var(--text);margin-bottom:6px;font-style:italic">"${t.text}"</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><span style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:var(--gold)">${t.author}</span>
-        ${t.role?`<span style="font-family:var(--font-cond);font-size:10px;color:var(--muted)"> · ${t.role}</span>`:''}
-        </div>
-        <button onclick="testiDelete(${t.id})" style="background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:12px">🗑️</button>
-      </div>`;
+    // XSS-safe : t.text / t.author / t.role viennent d'inputs user → textContent
+    const quote = document.createElement('div');
+    quote.style.cssText = 'font-family:var(--font-cond);font-size:13px;color:var(--text);margin-bottom:6px;font-style:italic';
+    quote.textContent = '"'+t.text+'"';
+    const bar = document.createElement('div');
+    bar.style.cssText = 'display:flex;justify-content:space-between;align-items:center';
+    const meta = document.createElement('div');
+    const sp1 = document.createElement('span');
+    sp1.style.cssText = 'font-family:var(--font-cond);font-size:11px;font-weight:700;color:var(--gold)';
+    sp1.textContent = t.author;
+    meta.appendChild(sp1);
+    if (t.role) {
+      const sp2 = document.createElement('span');
+      sp2.style.cssText = 'font-family:var(--font-cond);font-size:10px;color:var(--muted)';
+      sp2.textContent = ' · ' + t.role;
+      meta.appendChild(sp2);
+    }
+    const btn = document.createElement('button');
+    btn.style.cssText = 'background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:12px';
+    btn.textContent = '🗑️';
+    btn.addEventListener('click', function(){ testiDelete(t.id); });
+    bar.appendChild(meta); bar.appendChild(btn);
+    card.appendChild(quote); card.appendChild(bar);
     list.appendChild(card);
   });
 }
@@ -13692,10 +13791,12 @@ function testiPublicRender() {
   testis.forEach(t => {
     const card = document.createElement('div');
     card.className = 'testi-card';
-    card.innerHTML = `<div class="testi-quote">"</div>
-      <div class="testi-text">${t.text}</div>
-      <div class="testi-author">${t.author}</div>
-      ${t.role?`<div class="testi-role">${t.role}</div>`:''}`;
+    // XSS-safe : données user → textContent
+    const q = document.createElement('div'); q.className = 'testi-quote'; q.textContent = '"';
+    const tx = document.createElement('div'); tx.className = 'testi-text'; tx.textContent = t.text;
+    const au = document.createElement('div'); au.className = 'testi-author'; au.textContent = t.author;
+    card.appendChild(q); card.appendChild(tx); card.appendChild(au);
+    if (t.role) { const r = document.createElement('div'); r.className = 'testi-role'; r.textContent = t.role; card.appendChild(r); }
     dyn.appendChild(card);
   });
 }
@@ -56846,7 +56947,13 @@ window._askPseudoIfNeeded = function(callback){
           if (typeof _dojoLock_show === 'function') _dojoLock_show();
           return;
         }
-        // OK, jouer l'onclick original
+        // OK, jouer l'onclick original.
+        // Sécurité : `orig` vient d'attributs onclick="" écrits en dur dans le HTML
+        // par le dev (aucun user input ne finit ici). `new Function` est le mécanisme
+        // équivalent à l'évaluation d'onclick par le navigateur, strict mode désactivé,
+        // et c'est le seul moyen compat de ré-exécuter ces strings legacy.
+        // Alternative future : refactorer les tiles dojo pour utiliser addEventListener
+        // + dict de callbacks au lieu d'onclick="" inline.
         var orig = this.getAttribute('data-dojo-original-onclick') || '';
         if (orig) {
           try { new Function(orig).call(this); } catch(ex) { console.warn('[dojoTile] onclick err:', ex); }
