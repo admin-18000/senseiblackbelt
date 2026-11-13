@@ -10,6 +10,16 @@
      pour ne pas voir la page principale avant que le hero-onboarding apparaisse.
      ═══════════════════════════════════════════════════════════ -->
 <script>
+/* ★ GLOBAL ERROR HANDLER — intercepte les erreurs non-tracées et les promesses
+   rejetées silencieusement. Évite les régressions invisibles "vibe coding" où
+   un bug casse une fonction sans que personne ne le voit. Log en warn (visible
+   en DevTools, invisible user final). */
+window.addEventListener('error', function(ev){
+  try { console.warn('[SENSEI err]', ev.message, (ev.filename||'')+':'+(ev.lineno||'')); } catch(e){}
+});
+window.addEventListener('unhandledrejection', function(ev){
+  try { console.warn('[SENSEI promise]', ev.reason && (ev.reason.message || ev.reason)); } catch(e){}
+});
 (function() {
   try {
     // ═══════════════════════════════════════════════════════════════════════
@@ -51,6 +61,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <!-- ★ CSP défensive : whitelist stricte des origines approuvées (fonts, CDN JS,
+       YouTube). Bloque les injections de scripts non-prévus et sécurise contre
+       les attaques XSS qui réussiraient à insérer du <script src>. -->
+  <!-- CSP retirée : bloquait TF.js (CORS → script error opaque), Service Worker,
+       et nécessiterait tests browser complets. À réimplémenter côté serveur
+       (headers HTTP) plutôt qu'en meta inline si besoin de hardening. -->
   <!-- Preconnect YouTube : accélère le 1er lancement vidéo de 200-500ms (handshake TCP/TLS en avance) -->
   <link rel="preconnect" href="https://www.youtube.com" crossorigin>
   <link rel="preconnect" href="https://www.youtube-nocookie.com" crossorigin>
@@ -36841,81 +36857,7 @@ function _opto_drawQe(W, H){
   ctx.globalAlpha = 1;
   ctx.restore();
 }
-/* ═══════════════ MODE A11-V · VERGENCE SWITCH ═════════════════════
-   Cible centrale alterne GROSSE (loin) / PETITE (près) toutes les 2s
-   Le joueur alterne son focus (honneur, pas de mesure vergence réelle)
-   Score : +2 pts par cycle complet avec head stability
-═════════════════════════════════════════════════════════════════════ */
-function _opto_drawVerg(W, H){
-  var ctx = _opto_ctx;
-  var en = window._lang === 'en';
-  var now = Date.now();
-  // Switch de phase toutes les 2s
-  if (now - _opto_vg_phaseStart > 2000){
-    _opto_vg_phase = _opto_vg_phase === 'near' ? 'far' : 'near';
-    _opto_vg_phaseStart = now;
-    _opto_vg_cycleCount++;
-    if (_opto_vg_headStabV < 0.04){
-      _opto_score += 2; _opto_hits++;
-    } else {
-      _opto_miss++;
-    }
-    if (typeof _td_beep === 'function') _td_beep(880, 0.05, 0.1);
-    if (navigator.vibrate) navigator.vibrate(15);
-  }
-  ctx.save();
-  // Cible centrale (loin = petite, près = grosse)
-  var isNear = _opto_vg_phase === 'near';
-  var tR = isNear ? Math.max(W*0.08, 80) : Math.max(W*0.015, 18);
-  var tCol = isNear ? '#f5c518' : '#64b4ff';
-  // Halo pulsant
-  var pulse = 1 + Math.sin(now/150) * 0.1;
-  var grad = ctx.createRadialGradient(W/2, H*0.55, 0, W/2, H*0.55, tR*2.2*pulse);
-  grad.addColorStop(0, isNear ? 'rgba(245,197,24,0.5)' : 'rgba(100,180,255,0.6)');
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath(); ctx.arc(W/2, H*0.55, tR*2.2*pulse, 0, Math.PI*2); ctx.fill();
-  // Core
-  ctx.fillStyle = tCol;
-  ctx.beginPath(); ctx.arc(W/2, H*0.55, tR, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
-  ctx.stroke();
-  // Label phase (grand + fond)
-  var phTxt = isNear ? (en?'NEAR · BIG':'PRÈS · GROSSE') : (en?'FAR · SMALL':'LOIN · PETITE');
-  ctx.font = 'bold '+Math.round(H*0.065)+'px "Bebas Neue",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  var phW = ctx.measureText(phTxt).width + 44;
-  var phY = H*0.30;
-  ctx.fillStyle = 'rgba(0,0,0,0.8)';
-  _opto_roundRect(ctx, W/2 - phW/2, phY - H*0.045, phW, H*0.09, 12); ctx.fill();
-  ctx.strokeStyle = tCol; ctx.lineWidth = 3;
-  _opto_roundRect(ctx, W/2 - phW/2, phY - H*0.045, phW, H*0.09, 12); ctx.stroke();
-  ctx.fillStyle = tCol;
-  ctx.fillText(phTxt, W/2, phY);
-  // Compteur cycles bas
-  // ★ Pluriel SWITCH/SWITCHES (0 et 1 = singulier · EN et FR identiques)
-  var _nSw = _opto_vg_cycleCount|0;
-  var cycTxt = _nSw + ' ' + (_nSw <= 1 ? 'SWITCH' : (en ? 'SWITCHES' : 'SWITCHS'));
-  ctx.font = 'bold '+Math.round(H*0.045)+'px "Bebas Neue",sans-serif';
-  var cW = ctx.measureText(cycTxt).width + 36;
-  var cY = H*0.92;
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';
-  _opto_roundRect(ctx, W/2 - cW/2, cY - H*0.03, cW, H*0.06, 8); ctx.fill();
-  ctx.fillStyle = '#f5c518';
-  ctx.fillText(cycTxt, W/2, cY);
-  ctx.restore();
-}
-function _opto_analyzeVerg(poses){
-  var kp = _opto_kpMap(poses);
-  if (!kp) return;
-  var nose = kp['nose'];
-  if (!nose || nose.score < 0.3) return;
-  if (_opto_vg_noseBaselineV === null) _opto_vg_noseBaselineV = {x:nose.x, y:nose.y};
-  var dx = (nose.x - _opto_vg_noseBaselineV.x) / _opto_canvas.width;
-  var dy = (nose.y - _opto_vg_noseBaselineV.y) / _opto_canvas.height;
-  var dist = Math.sqrt(dx*dx + dy*dy);
-  _opto_vg_headStabV = _opto_vg_headStabV * 0.9 + dist * 0.1;
-}
+/* MODE A11-V · VERGENCE SWITCH — fonctions supprimées (jamais appelées) */
 
 /* ─── i18n FR / EN : rafraîchit tous les libellés du panel OPTOMOTOR ───── */
 function _opto_applyLang(lang){
@@ -50668,93 +50610,8 @@ if (G.imgBall) {
     ctx.fill();
   }
 
-  // (les fonctions drawBasketball et drawBasketHoop dessinées à la main ont été
-  //  remplacées par l'image basketball.png — voir le rendu principal)
-  function _sr_drawBasketball_UNUSED(ctx, x, y, r, rotation){
-    rotation = rotation || 0;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-    // Sphère avec gradient orange (relief)
-    var grad = ctx.createRadialGradient(-r*0.35, -r*0.35, r*0.1, 0, 0, r);
-    grad.addColorStop(0, '#ff9550');
-    grad.addColorStop(0.5, '#ee7328');
-    grad.addColorStop(1, '#b8461a');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fill();
-    // Contour ballon
-    ctx.strokeStyle = '#5a2810';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    // Les 4 lignes noires classiques d'un ballon de basket :
-    ctx.strokeStyle = '#1a0a05';
-    ctx.lineWidth = Math.max(1.3, r * 0.09);
-    ctx.lineCap = 'round';
-    // 1) Méridien vertical
-    ctx.beginPath();
-    ctx.moveTo(0, -r);
-    ctx.lineTo(0, r);
-    ctx.stroke();
-    // 2) Équateur horizontal (léger arc pour effet 3D)
-    ctx.beginPath();
-    ctx.ellipse(0, 0, r, r * 0.35, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // 3) Arc courbe gauche (part du haut, descend en courbant vers l'extérieur gauche)
-    ctx.beginPath();
-    ctx.ellipse(-r * 0.55, 0, r * 0.55, r * 0.95, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // 4) Arc courbe droit (symétrique)
-    ctx.beginPath();
-    ctx.ellipse(r * 0.55, 0, r * 0.55, r * 0.95, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // Highlight blanc (reflet)
-    ctx.fillStyle = 'rgba(255,255,255,.25)';
-    ctx.beginPath();
-    ctx.ellipse(-r * 0.4, -r * 0.4, r * 0.25, r * 0.15, -Math.PI / 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Dessine un panier de basket stylisé
-  function _sr_drawBasketHoop(ctx, x, y){
-    // Poteau (tige verticale)
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(x, y + 30);
-    ctx.lineTo(x, y + 100);
-    ctx.stroke();
-    // Panneau (backboard blanc)
-    ctx.fillStyle = 'rgba(248,248,248,.9)';
-    ctx.fillRect(x - 5, y - 20, 6, 50);
-    ctx.strokeStyle = '#f5c518';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x - 5, y - 20, 6, 50);
-    // Carré cible sur le panneau
-    ctx.strokeStyle = '#e63946';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(x - 3, y + 5, 2, 10);
-    // Anneau orange
-    ctx.strokeStyle = '#ee7328';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(x + 15, y + 20, 15, 5, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // Filet (petites lignes)
-    ctx.strokeStyle = 'rgba(255,255,255,.5)';
-    ctx.lineWidth = 1;
-    for (var n = 0; n < 6; n++) {
-      var nx = x + 2 + n * 5;
-      ctx.beginPath();
-      ctx.moveTo(nx, y + 22);
-      ctx.lineTo(nx + Math.sin(n) * 2, y + 40);
-      ctx.stroke();
-    }
-  }
-
-  // (l'ancienne fonction drawParallax a été remplacée par le fond salle de basket)
+  // (les fonctions drawBasketball + drawBasketHoop + drawParallax ont été
+  //  remplacées par basketball.png + fond salle de basket — suppression nettoyage vibe coding)
 
   function _sr_drawHUD(ctx){
     if (!G.running) return;
@@ -57854,14 +57711,6 @@ window._askPseudoIfNeeded = function(callback){
   function _escape(s) {
     return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
   }
-  function _contrastColor(hex) {
-    var c = hex.replace('#','');
-    if (c.length === 3) c = c.split('').map(function(x){return x+x;}).join('');
-    var r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
-    var lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-    return lum > 0.6 ? '#000' : '#fff';
-  }
-
   // ─── Rendu principal ───
   function _renderMain() {
     var en = _flang()==='en';
@@ -58207,12 +58056,6 @@ window._askPseudoIfNeeded = function(callback){
               tactique:['TACTIQUE','TACTICAL'], mental:['MENTAL','MENTAL'], mixte:['MIXTE','MIX'] };
     return m[k] ? (en?m[k][1]:m[k][0]) : k;
   }
-  function _hairStyleName(k, en) {
-    var m = { court:['COURT','SHORT'], moyen:['MOYEN','MEDIUM'], long:['LONG','LONG'],
-              crane_ras:['RASÉ','BUZZ'], afro:['AFRO','AFRO'], tresses:['TRESSES','BRAIDS'] };
-    return m[k] ? (en?m[k][1]:m[k][0]) : k;
-  }
-
   // ─── Mise à jour du bouton home (avec cache pour éviter les regénérations inutiles) ───
   var _btnStateCache = { pseudo:null, poste:null, niveau:null, numero:null, complete:false };
   function _updateHomeButton(force) {
@@ -60998,9 +60841,6 @@ body.si-banner-on { padding-top: 52px; }
   function _si_isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   }
-  function _si_isAndroid() {
-    return /Android/i.test(navigator.userAgent);
-  }
   function _si_isStandalone() {
     return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
            (window.navigator && window.navigator.standalone === true);
@@ -63381,70 +63221,7 @@ body.si-banner-on { padding-top: 52px; }
     if (mode === 'ss') return en ? TIPS_SS_EN : TIPS_SS_FR;
     return en ? TIPS_BT_EN : TIPS_BT_FR;
   }
-  function _lbl(fr, en) { return (window._lang === 'en') ? en : fr; }
-
-  // ─── Injection CSS (une seule fois) ───
-  function _injectCSS() {
-    if (document.getElementById('sensei-overlays-css')) return;
-    var css = document.createElement('style');
-    css.id = 'sensei-overlays-css';
-    css.textContent = [
-      '.sf-ol{position:absolute;z-index:20;pointer-events:none;',
-      'font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro","Inter",system-ui,sans-serif;',
-      '-webkit-font-smoothing:antialiased;color:#fff}',
-      /* Score group top-right — décalé sous chrono SS (chrono top:70 hauteur ~44px, donc 70+44=114 + 16px marge = 130) */
-      '.sf-ol-score{top:130px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:120px}',
-      '.sf-score-pts{font-size:clamp(28px,4.5vw,42px);color:#f5c518;line-height:1;font-weight:700;',
-      'font-variant-numeric:tabular-nums;letter-spacing:-1px;text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
-      '.sf-score-lbl{font-size:clamp(9px,1.2vw,12px);color:rgba(255,255,255,0.75);letter-spacing:2.5px;',
-      'font-weight:600;text-transform:uppercase;margin-top:-2px;text-shadow:0 1px 3px rgba(0,0,0,0.9)}',
-      '.sf-score-combo{display:inline-block;background:#e63946;color:#fff;font-size:clamp(15px,2.4vw,22px);',
-      'padding:2px 12px;border-radius:10px;letter-spacing:-0.5px;font-weight:700;',
-      'box-shadow:0 0 12px rgba(230,57,70,0.7);transform-origin:top right;',
-      'animation:sfComboPulse 1s ease-in-out infinite;opacity:0;transition:opacity 0.3s}',
-      '.sf-score-combo.sf-on{opacity:1}',
-      '@keyframes sfComboPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.10)}}',
-      /* Tip top-right sous score */
-      /* Tip décalé + max-width strict pour ne jamais chevaucher mini-terrain (bas-gauche, ~144px de large) */
-      /* calc(100% - 200px) = laisse au moins 200px libre à gauche pour mini-terrain + marge */
-      '.sf-ol-tip{top:250px;right:14px;max-width:min(260px,calc(100% - 200px));background:rgba(0,0,0,0.88);',
-      'border:1.5px solid rgba(245,197,24,0.35);border-radius:10px;padding:10px 14px;text-align:right;',
-      'box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:1;transition:opacity 0.4s}',
-      '.sf-ol-tip.sf-changing{opacity:0}',
-      '.sf-tip-name{font-size:clamp(9px,1.2vw,11px);color:#f5c518;letter-spacing:1.5px;',
-      'text-transform:uppercase;font-weight:600}',
-      '.sf-tip-text{font-size:clamp(12px,1.8vw,16px);color:rgba(255,255,255,0.98);',
-      'line-height:1.35;margin-top:4px;font-weight:500}',
-      /* Compteur central (SS uniquement — BT a déjà son cercle) */
-      '.sf-ol-counter{top:52%;left:50%;transform:translate(-50%,-50%);text-align:center;',
-      'max-width:calc(100% - 300px)}',
-      '.sf-counter-big{font-size:clamp(40px,7vw,68px);line-height:1;color:#fff;font-weight:700;',
-      'font-variant-numeric:tabular-nums;letter-spacing:-1.5px;text-shadow:0 3px 12px rgba(0,0,0,0.95);white-space:nowrap}',
-      '.sf-counter-lbl{font-size:clamp(10px,1.5vw,12px);color:rgba(255,255,255,0.85);',
-      'letter-spacing:3px;margin-top:4px;font-weight:600;text-transform:uppercase;',
-      'text-shadow:0 1px 3px rgba(0,0,0,0.9)}',
-      /* Chrono SS au-dessus du compteur (si activé) */
-      '.sf-counter-chrono{font-size:clamp(16px,2.5vw,22px);color:#fff;font-weight:600;',
-      'font-variant-numeric:tabular-nums;line-height:1;margin-bottom:8px;',
-      'text-shadow:0 2px 8px rgba(0,0,0,0.9)}',
-      /* Animation "points gagnés" flottant */
-      '.sf-pts-float{position:absolute;top:60px;right:14px;color:#f5c518;',
-      'font-size:clamp(18px,2.5vw,24px);font-weight:700;letter-spacing:-0.5px;',
-      'pointer-events:none;animation:sfFloat 900ms ease-out forwards;font-variant-numeric:tabular-nums;',
-      'text-shadow:0 2px 6px rgba(0,0,0,0.9)}',
-      '@keyframes sfFloat{0%{opacity:0;transform:translateY(0)}20%{opacity:1}',
-      '100%{opacity:0;transform:translateY(-30px)}}',
-    ].join('');
-    document.head.appendChild(css);
-  }
-
-  function _fmtNum(n) {
-    // Format "2,736" ou "1 247" selon convention FR/EN
-    try {
-      var lang = (window._lang || 'fr');
-      return n.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US');
-    } catch(e) { return String(n); }
-  }
+  // _lbl / _injectCSS / _fmtNum supprimés (jamais appelés — rendu overlays passé 100% canvas)
 
   function _updateComboMultiplier() {
     // Barème : ×1 (<10), ×2 (10-24), ×3 (25-49), ×5 (50+)
@@ -63472,9 +63249,7 @@ body.si-banner-on { padding-top: 52px; }
     _floats = _floats.filter(function(f){ return (now - f.ts) < 1000; });
     if (_floats.length > 5) _floats = _floats.slice(-5);
   }
-  function _rotateTip() {
-    // No-op HTML — l'index change automatiquement via setInterval dans attach
-  }
+  // _rotateTip supprimé (jamais appelé — rotation via setInterval dans attach)
 
   // ─── API publique ───
   window._senseiOverlays = {
