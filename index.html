@@ -26756,15 +26756,28 @@ function _td_stopMusic() {
 function _td_combineStreamWithAudio(canvasStream) {
   try {
     if (!canvasStream) return canvasStream;
+    // ★ FIX 1 · iOS/Chrome mobile : l'AudioContext démarre en 'suspended'.
+    //   Les oscillators jouent via les speakers MAIS la MediaStreamDestination
+    //   capture du silence tant que le context n'est pas 'running'. On force
+    //   le resume ici (user gesture = clic REC, donc autorisé par la policy).
+    try {
+      var ctx = _td_getAudioCtx();
+      if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function'){
+        ctx.resume();
+      }
+    } catch(e){}
     var rec = _td_getRecDestination();
     if (!rec || !rec.stream) return canvasStream;
     var audioTracks = rec.stream.getAudioTracks();
     if (!audioTracks.length) return canvasStream;
-    var videoTracks = canvasStream.getVideoTracks();
-    var combined = new MediaStream();
-    videoTracks.forEach(function(t){ combined.addTrack(t); });
-    audioTracks.forEach(function(t){ combined.addTrack(t); });
-    return combined;
+    // ★ FIX 2 · WebKit mobile bug : un `new MediaStream() + addTrack` n'est
+    //   pas toujours lu par MediaRecorder (bug connu iOS Safari 15/16/17).
+    //   On préfère ajouter les audio tracks DIRECTEMENT à la canvas stream
+    //   existante (comportement natif supporté partout).
+    audioTracks.forEach(function(t){
+      try { canvasStream.addTrack(t); } catch(e){}
+    });
+    return canvasStream;
   } catch(e) { return canvasStream; }
 }
 
