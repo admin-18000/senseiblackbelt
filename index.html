@@ -38402,11 +38402,21 @@ var _dcog_initing = false; // supprime auto-open vidéo pendant init
 function _dcog_renderVids() {
   var el = document.getElementById('dcog_vidScroll');
   if (!el) return;
-  // Filtrer les vidéos du drill courant (fallback défensif : si rien ne match,
-  // on affiche tout plutôt qu'un carrousel vide — ex : drill sans tag)
+  // ★ Drills sans mapping vidéo défini : carrousel VRAIMENT VIDE (pas de fallback
+  //   qui montre toute la bibliothèque — ça désoriente plus qu'autre chose).
+  //   Ex : dccm (COLOR MOVE) et dcgn (GO/NO-GO) tant que l'utilisateur n'a pas
+  //   fourni ses propres IDs YouTube.
+  var _dcog_DRILLS_SANS_VIDEOS = { dccm:1, dcgn:1 };
   var current = _dcog_drill;
   var filtered = _dcog_VIDEOS.filter(function(v){ return v.drill === current; });
-  if (!filtered.length) filtered = _dcog_VIDEOS;
+  if (!filtered.length && !_dcog_DRILLS_SANS_VIDEOS[current]) filtered = _dcog_VIDEOS;
+  if (!filtered.length){
+    // Carrousel vide : message discret "aucune vidéo"
+    var en = window._lang === 'en';
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;min-height:80px;color:#5a6377;font-family:var(--font-cond);font-size:11px;letter-spacing:.5px;font-style:italic;opacity:.7">' +
+      (en?'— no video yet —':'— aucune vidéo pour le moment —') + '</div>';
+    return;
+  }
   el.innerHTML = filtered.map(function(v) {
     // On garde l'index GLOBAL dans _dcog_VIDEOS pour que _dcog_selectVid(i) et
     // _dcogVidMap continuent de pointer sur les bons objets
