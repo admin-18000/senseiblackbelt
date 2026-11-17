@@ -2580,13 +2580,12 @@ window._dojoBackHome = function(){
             🔥 <span id="dcog_rcs_lvlHard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">2,0s</span>
           </button>
         </div>
-        <!-- ★ VIDÉO TUTO JAUNE / BLEU — apparaît DANS la section NIVEAU
-             quand le skin JAUNE/BLEU est actif (hors du carrousel CHOISIS TON DRILL). -->
-        <div id="dcog_rcs_yb_video" style="display:none;margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid rgba(100,180,255,.35);background:#000">
-          <div style="padding:6px 10px;background:rgba(100,180,255,.08);font-family:var(--font-cond);font-size:10px;letter-spacing:1.5px;color:#64b4ff;font-weight:700" id="dcog_rcs_yb_label">🎥 TUTO JAUNE / BLEU</div>
-          <div style="position:relative;width:100%;aspect-ratio:9/16;max-width:240px;margin:0 auto">
-            <iframe id="dcog_rcs_yb_iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
+        <!-- ★ VIDÉO DU NIVEAU — fait PARTIE de NIVEAU (pas d'encadré/titre séparé).
+             Bascule entre 2 vidéos selon le skin choisi dans APPARENCE :
+             · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
+             · JAUNE/BLEU → 5AwshUgC5TE -->
+        <div id="dcog_rcs_lvl_video" style="margin-top:10px;position:relative;width:100%;aspect-ratio:9/16;max-width:240px;margin-left:auto;margin-right:auto">
+          <iframe id="dcog_rcs_lvl_iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy"></iframe>
         </div>
       </div>
       <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rcs_setupHint">
@@ -42305,29 +42304,14 @@ window._dcog_rcs_setSkin = function(k){
     b.style.background = on ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = on ? '#f5c518' : '#7a8299';
   });
-  // ★ MAPPING STRICT RCS : la vidéo JAUNE/BLEU s'affiche DANS la section NIVEAU
-  //   (conteneur #dcog_rcs_yb_video), PAS dans le carrousel CHOISIS TON DRILL.
-  //   · skin 'yb'     → iframe chargée + autoplay, conteneur visible
-  //   · skin 'classic'→ iframe vidée (coupe la lecture), conteneur caché
-  var _ybBox = document.getElementById('dcog_rcs_yb_video');
-  var _ybIfr = document.getElementById('dcog_rcs_yb_iframe');
-  if (_ybBox && _ybIfr){
-    if (_dcog_rcs_skin === 'yb'){
-      // Trouve la vidéo rcsSkin:'yb' dans _dcog_VIDEOS
-      var _ybId = null;
-      if (typeof _dcog_VIDEOS !== 'undefined'){
-        for (var _vi=0; _vi<_dcog_VIDEOS.length; _vi++){
-          if (_dcog_VIDEOS[_vi].drill === 'rcs' && _dcog_VIDEOS[_vi].rcsSkin === 'yb'){ _ybId = _dcog_VIDEOS[_vi].id; break; }
-        }
-      }
-      if (_ybId){
-        _ybIfr.src = 'https://www.youtube-nocookie.com/embed/'+_ybId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
-        _ybBox.style.display = 'block';
-      }
-    } else {
-      _ybIfr.src = '';   // coupe la lecture
-      _ybBox.style.display = 'none';
-    }
+  // ★ MAPPING RCS : l'unique player vidéo DE la section NIVEAU bascule entre 2 vidéos
+  //   selon le skin choisi. Toujours visible, jamais un bloc séparé.
+  //   · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
+  //   · JAUNE/BLEU → 5AwshUgC5TE
+  var _lvlIfr = document.getElementById('dcog_rcs_lvl_iframe');
+  if (_lvlIfr){
+    var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
+    _lvlIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
   }
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
