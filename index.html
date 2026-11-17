@@ -1070,11 +1070,6 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
     <div class="hero-title" style="font-size:clamp(60px,12vw,140px)">SEN<span>SEI</span></div>
     <div class="hero-sub" style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);font-weight:700" data-i18n="hero_sub">BLACK BELT</div>
-    <!-- ★ VALIDATION ACADÉMIQUE — Université de Trieste (slides Dr. Stefania Lucia, 2026) -->
-    <div style="border:1px solid rgba(245,197,24,.3);border-radius:10px;background:rgba(8,11,18,0.45);padding:11px 16px;max-width:560px;margin:12px auto 10px;box-shadow:0 0 24px rgba(245,197,24,.08);animation:fadeUp .8s .2s ease both">
-      <div style="font-family:var(--font-cond);font-size:clamp(11px,1.6vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px" data-i18n="hero_research_title">🎓 Pour la recherche scientifique</div>
-      <div style="font-family:var(--font-cond);font-size:clamp(10px,1.3vw,12px);font-weight:500;letter-spacing:.3px;color:rgba(255,255,255,.78);line-height:1.55" data-i18n="hero_research_sub">Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027</div>
-    </div>
     <div style="color:rgba(255,255,255,.75);font-family:var(--font-cond);font-size:clamp(12px,1.6vw,15px);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;margin-bottom:8px;animation:fadeUp .8s .25s ease both" data-i18n="hero_positioning">Pour les coachs qui accompagnent · Pour les athlètes déterminés</div>
     <div style="width:100%;max-width:420px;margin:0 auto 36px;border-radius:16px;overflow:hidden;border:2px solid rgba(245,197,24,.3);box-shadow:0 0 40px rgba(245,197,24,.2);animation:fadeUp .8s .35s ease both;position:relative">
       <video src="hero.mp4" autoplay muted loop playsinline webkit-playsinline preload="metadata" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny" style="width:100%;display:block;object-fit:cover;max-height:70vh"></video>
@@ -1100,6 +1095,15 @@ body.unlocked .sensei-only{display:revert !important}
   <!-- ═══════════ POSITIONNEMENT COACH/ATHLÈTE — Vague 5 ═══════════ -->
   <div style="padding:clamp(20px,3vw,30px) clamp(16px,4vw,40px) 0;background:#0d1117">
     <div id="dojo-interactive-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <!-- ★ TUILE "POUR LA RECHERCHE SCIENTIFIQUE" — même format que coachs/athlètes (PAS de grid-column:1/-1).
+           Sur PC, les 3 tuiles se posent côte à côte via auto-fit. Sur mobile, elles s'empilent. -->
+      <div style="background:linear-gradient(135deg,rgba(100,180,255,.10),rgba(13,17,23,.55));border:1px solid rgba(100,180,255,.40);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:28px;line-height:1;flex-shrink:0">🎓</div>
+        <div>
+          <div style="font-family:var(--font-display,'Bebas Neue','Barlow Condensed',sans-serif);font-size:16px;color:#64b4ff;letter-spacing:1.5px;line-height:1.1" data-i18n="pos_research_title">POUR LA RECHERCHE SCIENTIFIQUE</div>
+          <div style="font-size:12px;color:#c8cdd6;margin-top:5px;line-height:1.45" data-i18n="pos_research_desc">Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027.</div>
+        </div>
+      </div>
       <div style="background:linear-gradient(135deg,rgba(245,197,24,.08),rgba(13,17,23,.55));border:1px solid rgba(245,197,24,.35);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
         <div style="font-size:28px;line-height:1;flex-shrink:0">🥋</div>
         <div>
@@ -2575,6 +2579,14 @@ window._dojoBackHome = function(){
           <button class="dcog-rcs-lvl-btn" data-ms="2000" onclick="_dcog_rcs_setLevel(2000)" style="flex:1;padding:10px 6px;border-radius:8px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .2s">
             🔥 <span id="dcog_rcs_lvlHard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">2,0s</span>
           </button>
+        </div>
+        <!-- ★ VIDÉO TUTO JAUNE / BLEU — apparaît DANS la section NIVEAU
+             quand le skin JAUNE/BLEU est actif (hors du carrousel CHOISIS TON DRILL). -->
+        <div id="dcog_rcs_yb_video" style="display:none;margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid rgba(100,180,255,.35);background:#000">
+          <div style="padding:6px 10px;background:rgba(100,180,255,.08);font-family:var(--font-cond);font-size:10px;letter-spacing:1.5px;color:#64b4ff;font-weight:700" id="dcog_rcs_yb_label">🎥 TUTO JAUNE / BLEU</div>
+          <div style="position:relative;width:100%;aspect-ratio:9/16;max-width:240px;margin:0 auto">
+            <iframe id="dcog_rcs_yb_iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy"></iframe>
+          </div>
         </div>
       </div>
       <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rcs_setupHint">
@@ -14541,8 +14553,8 @@ function applyLangTracker(lang) {
     hero_tag:'Ceintures de compétences · Basket',
     hero_sub:'BLACK BELT',
     hero_positioning:'Pour les coachs qui accompagnent · Pour les athlètes déterminés',
-    hero_research_title:'🎓 Pour la recherche scientifique',
-    hero_research_sub:'Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027',
+    pos_research_title:'POUR LA RECHERCHE SCIENTIFIQUE',
+    pos_research_desc:'Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027.',
     pos_coach_title:'POUR LES COACHS',
     pos_coach_desc:"Un outil de séance individuelle qui mesure ce que l'œil ne voit pas et matérialise la progression.",
     pos_athlete_title:'POUR LES ATHLÈTES DÉTERMINÉS',
@@ -14562,8 +14574,8 @@ function applyLangTracker(lang) {
     hero_tag:'Basketball Mastery Belts',
     hero_sub:'BLACK BELT',
     hero_positioning:'For coaches who guide · For determined athletes',
-    hero_research_title:'🎓 For scientific research',
-    hero_research_sub:'Presented at the Master’s « Cognitive Training and Virtual Reality in Sport » · University of Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027',
+    pos_research_title:'FOR SCIENTIFIC RESEARCH',
+    pos_research_desc:'Presented at the Master’s « Cognitive Training and Virtual Reality in Sport » · University of Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027.',
     pos_coach_title:'FOR COACHES',
     pos_coach_desc:"A one-on-one session tool that measures what the eye can't see and makes progress tangible.",
     pos_athlete_title:'FOR DETERMINED ATHLETES',
@@ -35872,8 +35884,18 @@ window._ar_setDrill = function(v){
   }
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
   _ar_refreshUI();
-  // ★ Re-render carrousel vidéos si on est sur le drill AR (mapping sous-mode → vidéo)
-  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'ar' && typeof _dcog_renderVids === 'function') _dcog_renderVids();
+  // ★ MAPPING STRICT : si on est sur le drill AR, re-render le carrousel ET
+  //   autoplay la vidéo spécifique au sous-mode choisi (si elle existe).
+  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'ar' && typeof _dcog_renderVids === 'function'){
+    _dcog_renderVids();
+    if (typeof _dcog_VIDEOS !== 'undefined' && typeof _dcog_selectVid === 'function'){
+      for (var _vi=0; _vi<_dcog_VIDEOS.length; _vi++){
+        if (_dcog_VIDEOS[_vi].drill === 'ar' && _dcog_VIDEOS[_vi].arMode === v){
+          _dcog_selectVid(_vi); break;
+        }
+      }
+    }
+  }
 };
 window._ar_setHand = function(h){ _ar_cfg.hand = h; _ar_refreshUI(); };
 window._ar_setDur  = function(s){ _ar_cfg.dur = s; _ar_refreshUI(); };
@@ -38600,8 +38622,10 @@ function _dcog_renderVids() {
   //   En skin 'classic' : uniquement les 6 "Reaction Stick N" (pas de 'yb').
   if (current === 'ar' && typeof _ar_cfg !== 'undefined'){
     filtered = filtered.filter(function(v){ return !v.arMode || v.arMode === _ar_cfg.subkey; });
-  } else if (current === 'rcs' && typeof _dcog_rcs_skin !== 'undefined'){
-    filtered = filtered.filter(function(v){ return !v.rcsSkin || v.rcsSkin === _dcog_rcs_skin; });
+  } else if (current === 'rcs'){
+    // ★ RCS : les vidéos avec flag rcsSkin ne vont PAS dans le carrousel CHOISIS TON DRILL
+    //   (elles s'affichent dans le conteneur dédié #dcog_rcs_yb_video DANS la section NIVEAU).
+    filtered = filtered.filter(function(v){ return !v.rcsSkin; });
   }
   // Fallback : pas de vidéo pour ce drill/sous-mode → carrousel VRAIMENT vide (pas de dump
   //   de toute la biblio, qui désoriente). Exception : whitelist _dcog_DRILLS_SANS_VIDEOS.
@@ -42281,8 +42305,30 @@ window._dcog_rcs_setSkin = function(k){
     b.style.background = on ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = on ? '#f5c518' : '#7a8299';
   });
-  // ★ Re-render carrousel vidéos si on est sur le drill RCS (mapping skin → vidéo)
-  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'rcs' && typeof _dcog_renderVids === 'function') _dcog_renderVids();
+  // ★ MAPPING STRICT RCS : la vidéo JAUNE/BLEU s'affiche DANS la section NIVEAU
+  //   (conteneur #dcog_rcs_yb_video), PAS dans le carrousel CHOISIS TON DRILL.
+  //   · skin 'yb'     → iframe chargée + autoplay, conteneur visible
+  //   · skin 'classic'→ iframe vidée (coupe la lecture), conteneur caché
+  var _ybBox = document.getElementById('dcog_rcs_yb_video');
+  var _ybIfr = document.getElementById('dcog_rcs_yb_iframe');
+  if (_ybBox && _ybIfr){
+    if (_dcog_rcs_skin === 'yb'){
+      // Trouve la vidéo rcsSkin:'yb' dans _dcog_VIDEOS
+      var _ybId = null;
+      if (typeof _dcog_VIDEOS !== 'undefined'){
+        for (var _vi=0; _vi<_dcog_VIDEOS.length; _vi++){
+          if (_dcog_VIDEOS[_vi].drill === 'rcs' && _dcog_VIDEOS[_vi].rcsSkin === 'yb'){ _ybId = _dcog_VIDEOS[_vi].id; break; }
+        }
+      }
+      if (_ybId){
+        _ybIfr.src = 'https://www.youtube-nocookie.com/embed/'+_ybId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
+        _ybBox.style.display = 'block';
+      }
+    } else {
+      _ybIfr.src = '';   // coupe la lecture
+      _ybBox.style.display = 'none';
+    }
+  }
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
 // Remet les boutons en accord avec l'apparence mémorisée au chargement
