@@ -1070,6 +1070,11 @@ body.unlocked .sensei-only{display:revert !important}
     </div>
     <div class="hero-title" style="font-size:clamp(60px,12vw,140px)">SEN<span>SEI</span></div>
     <div class="hero-sub" style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);font-weight:700" data-i18n="hero_sub">BLACK BELT</div>
+    <!-- ★ VALIDATION ACADÉMIQUE — Université de Trieste (slides Dr. Stefania Lucia, 2026) -->
+    <div style="border:1px solid rgba(245,197,24,.3);border-radius:10px;background:rgba(8,11,18,0.45);padding:11px 16px;max-width:560px;margin:12px auto 10px;box-shadow:0 0 24px rgba(245,197,24,.08);animation:fadeUp .8s .2s ease both">
+      <div style="font-family:var(--font-cond);font-size:clamp(11px,1.6vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px" data-i18n="hero_research_title">🎓 Pour la recherche scientifique</div>
+      <div style="font-family:var(--font-cond);font-size:clamp(10px,1.3vw,12px);font-weight:500;letter-spacing:.3px;color:rgba(255,255,255,.78);line-height:1.55" data-i18n="hero_research_sub">Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027</div>
+    </div>
     <div style="color:rgba(255,255,255,.75);font-family:var(--font-cond);font-size:clamp(12px,1.6vw,15px);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;margin-bottom:8px;animation:fadeUp .8s .25s ease both" data-i18n="hero_positioning">Pour les coachs qui accompagnent · Pour les athlètes déterminés</div>
     <div style="width:100%;max-width:420px;margin:0 auto 36px;border-radius:16px;overflow:hidden;border:2px solid rgba(245,197,24,.3);box-shadow:0 0 40px rgba(245,197,24,.2);animation:fadeUp .8s .35s ease both;position:relative">
       <video src="hero.mp4" autoplay muted loop playsinline webkit-playsinline preload="metadata" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny" style="width:100%;display:block;object-fit:cover;max-height:70vh"></video>
@@ -14536,6 +14541,8 @@ function applyLangTracker(lang) {
     hero_tag:'Ceintures de compétences · Basket',
     hero_sub:'BLACK BELT',
     hero_positioning:'Pour les coachs qui accompagnent · Pour les athlètes déterminés',
+    hero_research_title:'🎓 Pour la recherche scientifique',
+    hero_research_sub:'Présenté au Master « Cognitive Training and Virtual Reality in Sport » · Université de Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027',
     pos_coach_title:'POUR LES COACHS',
     pos_coach_desc:"Un outil de séance individuelle qui mesure ce que l'œil ne voit pas et matérialise la progression.",
     pos_athlete_title:'POUR LES ATHLÈTES DÉTERMINÉS',
@@ -14555,6 +14562,8 @@ function applyLangTracker(lang) {
     hero_tag:'Basketball Mastery Belts',
     hero_sub:'BLACK BELT',
     hero_positioning:'For coaches who guide · For determined athletes',
+    hero_research_title:'🎓 For scientific research',
+    hero_research_sub:'Presented at the Master’s « Cognitive Training and Virtual Reality in Sport » · University of Trieste · Dr. Stefania Lucia, PhD · AY 2026/2027',
     pos_coach_title:'FOR COACHES',
     pos_coach_desc:"A one-on-one session tool that measures what the eye can't see and makes progress tangible.",
     pos_athlete_title:'FOR DETERMINED ATHLETES',
@@ -30116,6 +30125,15 @@ function _tdrc_startRec(){
     } else { _tdrc_dlBlob(blob, fn); }
   };
   _tdrc_recorder.onerror = function(){ clearInterval(_tdrc_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  // Garantit une frame stable dans captureStream avant écriture header WebM.
+  try {
+    var _cvFixTdrc = document.getElementById('sensei-cam-canvas') || document.getElementById('tdrc_canvas') || document.getElementById('tdr_canvas');
+    if (_cvFixTdrc) {
+      var _cxFixTdrc = _cvFixTdrc.getContext('2d');
+      if (_cxFixTdrc) { _cxFixTdrc.save(); _cxFixTdrc.globalAlpha = 0; _cxFixTdrc.fillRect(0,0,1,1); _cxFixTdrc.restore(); }
+    }
+  } catch(eFixTdrc) { /* silencieux */ }
   _tdrc_startTimeoutId = setTimeout(function(){
     _tdrc_startTimeoutId = null;
     if (!_tdrc_recorder) return;
@@ -30710,6 +30728,14 @@ function _dcrc_startRec(){
     } else _dcrc_dlBlob(blob, fn);
   };
   _dcrc_recorder.onerror = function(){ clearInterval(_dcrc_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixDcrc = document.getElementById('sensei-cam-canvas') || document.getElementById('dcrc_canvas');
+    if (_cvFixDcrc) {
+      var _cxFixDcrc = _cvFixDcrc.getContext('2d');
+      if (_cxFixDcrc) { _cxFixDcrc.save(); _cxFixDcrc.globalAlpha = 0; _cxFixDcrc.fillRect(0,0,1,1); _cxFixDcrc.restore(); }
+    }
+  } catch(eFixDcrc) { /* silencieux */ }
   _dcrc_startTimeoutId = setTimeout(function(){
     _dcrc_startTimeoutId = null;
     if (!_dcrc_recorder) return;
@@ -31255,6 +31281,14 @@ function _drsw_startRec(){
     } else _drsw_dlBlob(blob, fn);
   };
   _drsw_recorder.onerror = function(){ clearInterval(_drsw_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixDrsw = document.getElementById('sensei-cam-canvas') || document.getElementById('drsw_canvas');
+    if (_cvFixDrsw) {
+      var _cxFixDrsw = _cvFixDrsw.getContext('2d');
+      if (_cxFixDrsw) { _cxFixDrsw.save(); _cxFixDrsw.globalAlpha = 0; _cxFixDrsw.fillRect(0,0,1,1); _cxFixDrsw.restore(); }
+    }
+  } catch(eFixDrsw) { /* silencieux */ }
   _drsw_startTimeoutId = setTimeout(function(){
     _drsw_startTimeoutId = null;
     if (!_drsw_recorder) return;
@@ -31886,6 +31920,14 @@ function _dqa_startRec(){
     } else _dqa_dlBlob(blob, fn);
   };
   _dqa_recorder.onerror = function(){ clearInterval(_dqa_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixDqa = document.getElementById('sensei-cam-canvas') || document.getElementById('dqa_canvas');
+    if (_cvFixDqa) {
+      var _cxFixDqa = _cvFixDqa.getContext('2d');
+      if (_cxFixDqa) { _cxFixDqa.save(); _cxFixDqa.globalAlpha = 0; _cxFixDqa.fillRect(0,0,1,1); _cxFixDqa.restore(); }
+    }
+  } catch(eFixDqa) { /* silencieux */ }
   _dqa_startTimeoutId = setTimeout(function(){
     _dqa_startTimeoutId = null;
     if (!_dqa_recorder) return;
@@ -32719,6 +32761,14 @@ function _dqt_startRec(){
     } else _dqt_dlBlob(blob, fn);
   };
   _dqt_recorder.onerror = function(){ clearInterval(_dqt_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixDqt = document.getElementById('sensei-cam-canvas') || document.getElementById('dqt_canvas');
+    if (_cvFixDqt) {
+      var _cxFixDqt = _cvFixDqt.getContext('2d');
+      if (_cxFixDqt) { _cxFixDqt.save(); _cxFixDqt.globalAlpha = 0; _cxFixDqt.fillRect(0,0,1,1); _cxFixDqt.restore(); }
+    }
+  } catch(eFixDqt) { /* silencieux */ }
   _dqt_startTimeoutId = setTimeout(function(){
     _dqt_startTimeoutId = null;
     if (!_dqt_recorder) return;
@@ -33547,6 +33597,14 @@ function _dlim_startRec(){
     } else _dlim_dlBlob(blob, fn);
   };
   _dlim_recorder.onerror = function(){ clearInterval(_dlim_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixDlim = document.getElementById('sensei-cam-canvas') || document.getElementById('dlim_canvas');
+    if (_cvFixDlim) {
+      var _cxFixDlim = _cvFixDlim.getContext('2d');
+      if (_cxFixDlim) { _cxFixDlim.save(); _cxFixDlim.globalAlpha = 0; _cxFixDlim.fillRect(0,0,1,1); _cxFixDlim.restore(); }
+    }
+  } catch(eFixDlim) { /* silencieux */ }
   _dlim_startTimeoutId = setTimeout(function(){
     _dlim_startTimeoutId = null;
     if (!_dlim_recorder) return;
@@ -33950,11 +34008,13 @@ function _opto_drawHUD(W, H){
   // ★ CONSIGNE GLOBALE = petite pilule arrondie transparente CENTRÉE en haut.
   //   Centrée (pas à gauche) pour éviter chevauchement avec les boutons REC/STOP
   //   qui occupent les 2 coins supérieurs. Homogène AR Color Call.
+  // ★ FIX LISIBILITÉ : min police 16px (au lieu de 10px) et pilule élargie jusqu'à 0.60W
+  //   si le texte demande la place (laisse 0.20W de chaque côté pour REC/STOP).
   var bh = Math.max(32, H*0.045);
   var annFs = Math.round(bh*0.52);
   ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   var pad = 18;
-  var bw = Math.min(W*0.48, ctx.measureText(txt).width + pad*2);
+  var bw = Math.min(W*0.60, ctx.measureText(txt).width + pad*2);
   var bx = (W - bw) / 2, by = H*0.025;
   var rr = bh*0.5;
   ctx.fillStyle = 'rgba(8,11,18,0.35)';
@@ -33964,7 +34024,7 @@ function _opto_drawHUD(W, H){
   _opto_roundRect(ctx, bx, by, bw, bh, rr); ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   if (ctx.measureText(txt).width > bw - pad){
-    annFs = Math.max(10, Math.round(annFs * (bw - pad) / ctx.measureText(txt).width));
+    annFs = Math.max(16, Math.round(annFs * (bw - pad) / ctx.measureText(txt).width));
     ctx.font = 'bold '+annFs+'px "Bebas Neue",sans-serif';
   }
   ctx.lineWidth = Math.max(2, annFs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
@@ -34970,6 +35030,14 @@ function _opto_startRec(){
     } else _opto_dlBlob(blob, fn);
   };
   _opto_recorder.onerror = function(){ clearInterval(_opto_recTimer); };
+  // ═══════ FIX durée corrompue — flush canvas avant start() ═══════
+  try {
+    var _cvFixOpto = document.getElementById('sensei-cam-canvas') || document.getElementById('_opto_canvas') || _opto_canvas;
+    if (_cvFixOpto) {
+      var _cxFixOpto = _cvFixOpto.getContext('2d');
+      if (_cxFixOpto) { _cxFixOpto.save(); _cxFixOpto.globalAlpha = 0; _cxFixOpto.fillRect(0,0,1,1); _cxFixOpto.restore(); }
+    }
+  } catch(eFixOpto) { /* silencieux */ }
   _opto_startTimeoutId = setTimeout(function(){
     _opto_startTimeoutId = null;
     if (!_opto_recorder) return;
@@ -35441,20 +35509,42 @@ function _opto_drawPlay(W, H){
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.beginPath(); ctx.arc(bx, by, br*1.45, 0, Math.PI*2); ctx.fill();
   _opto_drawBasketball(ctx, bx, by, br, 0);
-  // Badge nom du système (à GAUCHE du terrain, zone libre) — comportement d'origine, pensé paysage
+  // Badge nom du système (à GAUCHE du terrain, zone libre).
+  // ★ FIX LISIBILITÉ : min 16px (au lieu de 9px) + wrap sur 2 lignes si trop étroit.
   var name = p.name;
-  var fs = Math.round(H*0.034);
+  var fsMin = 16, fsMax = Math.round(H*0.034);
+  var fs = fsMax;
   ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
   var maxW = cx0 - W*0.05;
-  while (fs > 9 && ctx.measureText(name).width + 24 > maxW){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
-  var bw = ctx.measureText(name).width + 24, bh = fs*1.55;
+  // Tenter 1 ligne : réduit jusqu'à 16px
+  while (fs > fsMin && ctx.measureText(name).width + 24 > maxW){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+  var lines = [name];
+  if (ctx.measureText(name).width + 24 > maxW){
+    // Wrap 2 lignes : coupe sur l'espace le plus proche du milieu
+    var words = name.split(' ');
+    if (words.length >= 2){
+      var midIdx = Math.ceil(words.length/2);
+      lines = [words.slice(0, midIdx).join(' '), words.slice(midIdx).join(' ')];
+      // Re-fit : réduit jusqu'à ce que la plus longue des 2 lignes tienne
+      fs = fsMax;
+      ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+      while (fs > fsMin && Math.max(ctx.measureText(lines[0]).width, ctx.measureText(lines[1]).width) + 24 > maxW){
+        fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+      }
+    }
+  }
+  var bwMax = 0;
+  lines.forEach(function(ln){ bwMax = Math.max(bwMax, ctx.measureText(ln).width); });
+  var bw = bwMax + 24, bh = fs*1.55 * (lines.length) + (lines.length > 1 ? 4 : 0);
   var bcx = (W*0.03 + cx0) / 2, bcy = H*0.62;
   ctx.fillStyle = 'rgba(13,17,23,0.90)';
   _opto_roundRect(ctx, bcx - bw/2, bcy - bh/2, bw, bh, 7); ctx.fill();
   ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 1.5;
   _opto_roundRect(ctx, bcx - bw/2, bcy - bh/2, bw, bh, 7); ctx.stroke();
   ctx.fillStyle = '#64b4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(name, bcx, bcy + 1);
+  var lineH = fs*1.55;
+  var y0 = bcy - (lines.length-1)*lineH/2;
+  for (var li=0; li<lines.length; li++){ ctx.fillText(lines[li], bcx, y0 + li*lineH + 1); }
   ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
   ctx.fillStyle = '#f5c518';
   ctx.fillText((en?'PLAY ':'SYSTÈME ') + _opto_play_count, bcx, bcy + bh/2 + H*0.025);
@@ -35503,7 +35593,7 @@ window._ar_coneImg.onload = function(){ window._ar_coneImgReady = true; };
 window._ar_coneImg.src = 'data:image/webp;base64,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';
 var _AR_CONE_RATIO = 189/200;                 // largeur / hauteur de l'image
 var _AR_TTL = 3500, _AR_GAP_MIN = 1500, _AR_GAP_RAND = 1500, _AR_DRIBBLE_WINDOW = 1500;
-var _ar_cfg = { mode:'overhand', cones:1, targets:true, hand:'right', dur:60 };
+var _ar_cfg = { mode:'overhand', cones:1, targets:true, hand:'right', dur:60, subkey:'c1t' };
 var _ar_calib = null, _ar_calibN = 0, _ar_calibAcc = null;
 var _ar_zone = null, _ar_reps = 0, _ar_lastRepTs = 0;
 var _ar_targets = [], _ar_nextSpawn = 0, _ar_tHit = 0, _ar_tTotal = 0, _ar_fx = [];
@@ -35770,6 +35860,7 @@ function _ar_refreshUI(){
   });
 }
 window._ar_setDrill = function(v){
+  _ar_cfg.subkey = v;   // ★ MAPPING VIDÉO : clé exacte du sous-mode AR (c1t/c1/c2t/c2/col3/col4)
   if (v === 'col3' || v === 'col4'){
     _ar_cfg.mode = 'color';
     _ar_cfg.cones = (v === 'col4') ? 4 : 3;
@@ -35781,6 +35872,8 @@ window._ar_setDrill = function(v){
   }
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
   _ar_refreshUI();
+  // ★ Re-render carrousel vidéos si on est sur le drill AR (mapping sous-mode → vidéo)
+  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'ar' && typeof _dcog_renderVids === 'function') _dcog_renderVids();
 };
 window._ar_setHand = function(h){ _ar_cfg.hand = h; _ar_refreshUI(); };
 window._ar_setDur  = function(s){ _ar_cfg.dur = s; _ar_refreshUI(); };
@@ -35910,7 +36003,30 @@ function _ar_cc_analyze(poses, W, H, now){
     return;
   }
   var tg = _ar_cc_targets(W, H);
-  _opto_doHits(poses, tg, 2.0, function(t, side, rt){
+  // ★ FIX AR-5/AR-6 HIT PRÉMATURÉ (capture: dribble devant = faux HIT)
+  //   · radiusTol 2.0 → 1.3 : zone hit collée au cône physique (fin du halo géant)
+  //   · dribbleGuard inline: ignore les mains au-dessus de hipY + marge (zone dribble devant corps)
+  var _kpGuard = (typeof _opto_kpMap === 'function') ? _opto_kpMap(poses) : null;
+  var _hipY_cc = null;
+  if (_kpGuard){
+    var _lh_cc = _kpGuard['left_hip'] || _kpGuard['leftHip'];
+    var _rh_cc = _kpGuard['right_hip'] || _kpGuard['rightHip'];
+    var _sy_cc = H / (_opto_video && _opto_video.videoHeight ? _opto_video.videoHeight : H);
+    if (_lh_cc && _rh_cc && _lh_cc.score > 0.3 && _rh_cc.score > 0.3){
+      _hipY_cc = ((_lh_cc.y + _rh_cc.y) / 2) * _sy_cc;
+    }
+  }
+  _opto_doHits(poses, tg, 1.3, function(t, side, rt){
+    // Guard dribble : la main qui touche doit être SOUS la hanche + 5% H (niveau sol/cône).
+    //   Les mains qui dribblent devant le corps (au-dessus de la hanche) ne valident PAS.
+    if (_hipY_cc !== null && typeof _tsym_kp_hand === 'function'){
+      var _wristKp = _tsym_kp_hand(poses, side);
+      if (_wristKp){
+        var _syGuard = H / (_opto_video && _opto_video.videoHeight ? _opto_video.videoHeight : H);
+        var _wy = _wristKp.y * _syGuard;
+        if (_wy < _hipY_cc + H*0.05) return;   // main encore en zone dribble → ignore
+      }
+    }
     if (_ar_cc_phase !== 'ask') return;
     var c = _ar_colorByKey(t.key);
     if (t.key === _ar_cc_target){
@@ -38426,6 +38542,8 @@ var _dcog_VIDEOS = [
   {id:'y5NsQVSRVB4', title:'Reaction Stick 4',   drill:'rcs', vertical:true},
   {id:'yPFE8K-t244', title:'Reaction Stick 5',   drill:'rcs', vertical:true},
   {id:'6CtpfIi9NNY', title:'Reaction Stick 6',   drill:'rcs', vertical:true},
+  // ★ RCS SKIN JAUNE/BLEU — vidéo spécifique au skin 'yb' (mapping via rcsSkin)
+  {id:'5AwshUgC5TE', title:'Reaction Stick · Jaune/Bleu', drill:'rcs', vertical:true, rcsSkin:'yb'},
   // ═══ Drills DCOG existants (1 vidéo chacun) ═══
   {id:'gJe63xj-c6w', title:'Dribble Math',       drill:'math'},
   {id:'d2M3gWQyA6s', title:'300 / 600',          drill:'sprint'},
@@ -38448,9 +38566,15 @@ var _dcog_VIDEOS = [
   {id:'9s4wyM_2iPU', title:'Level Change',       drill:'limbo'},
   // ═══ RCS COLOR (R1-R4 modes) — tuto panneau uniquement, retiré du carrousel pour
   //   garder exactement 5 vignettes Shorts dans "CHOISIS TON DRILL" ═══
-  // ═══ OPTOMOTOR RESPONSE & AUGMENTED REALITY ═══
+  // ═══ OPTOMOTOR RESPONSE ═══
   {id:'mDfWvQJSQDE', title:'Optomotor Response', drill:'opto'},
-  {id:'JjegkQLzTT8', title:'Augmented Reality',  drill:'ar'}
+  // ═══ AUGMENTED REALITY — 1 vidéo par sous-mode (mapping via arMode = valeur du select)
+  //   AR-1 → c1t · AR-3 → c1 · AR-5 → col3 · AR-6 → col4
+  //   AR-2 (c2t) et AR-4 (c2) : pas de vidéo pour le moment ═══
+  {id:'JQC8oyoIa0k', title:'AR-1 · 1 Cône + Cibles',        drill:'ar', arMode:'c1t'},
+  {id:'SKUJISKpf1w', title:'AR-3 · 1 Cône (sans cible)',    drill:'ar', arMode:'c1'},
+  {id:'wkGVSLCjZ3I', title:'AR-5 · Color Call · 3 Cônes',   drill:'ar', arMode:'col3'},
+  {id:'D9X5Bm55w88', title:'AR-6 · Color Call · 4 Cônes',   drill:'ar', arMode:'col4'}
   // DCOG-CM et DCOG-GN : pas de vidéos — l'utilisateur fournira les IDs
 ];
 var _dcog_selVid = null;
@@ -38466,7 +38590,22 @@ function _dcog_renderVids() {
   var _dcog_DRILLS_SANS_VIDEOS = { dccm:1, dcgn:1 };
   var current = _dcog_drill;
   var filtered = _dcog_VIDEOS.filter(function(v){ return v.drill === current; });
-  if (!filtered.length && !_dcog_DRILLS_SANS_VIDEOS[current]) filtered = _dcog_VIDEOS;
+  // ★ MAPPING FIN par sous-mode (homogène au pattern drill → vidéos) :
+  //   · drill 'ar' : filtre par v.arMode === _ar_cfg.subkey (vidéo du sous-mode courant)
+  //   · drill 'rcs' : filtre par v.rcsSkin === _dcog_rcs_skin, ou vidéo sans flag (= classic
+  //     et autres skins voient les vidéos "générales" sans rcsSkin ; skin 'yb' voit EN PLUS
+  //     la/les vidéo(s) rcsSkin:'yb').
+  //   Pour 'rcs', on garde les vidéos sans rcsSkin (générales) + celles qui matchent le skin
+  //   courant. En skin 'yb' : les 6 "Reaction Stick N" + la vidéo "Jaune/Bleu".
+  //   En skin 'classic' : uniquement les 6 "Reaction Stick N" (pas de 'yb').
+  if (current === 'ar' && typeof _ar_cfg !== 'undefined'){
+    filtered = filtered.filter(function(v){ return !v.arMode || v.arMode === _ar_cfg.subkey; });
+  } else if (current === 'rcs' && typeof _dcog_rcs_skin !== 'undefined'){
+    filtered = filtered.filter(function(v){ return !v.rcsSkin || v.rcsSkin === _dcog_rcs_skin; });
+  }
+  // Fallback : pas de vidéo pour ce drill/sous-mode → carrousel VRAIMENT vide (pas de dump
+  //   de toute la biblio, qui désoriente). Exception : whitelist _dcog_DRILLS_SANS_VIDEOS.
+  if (!filtered.length && !_dcog_DRILLS_SANS_VIDEOS[current] && current !== 'ar' && current !== 'rcs') filtered = _dcog_VIDEOS;
   if (!filtered.length){
     // Carrousel vide : message discret "aucune vidéo"
     var en = window._lang === 'en';
@@ -42142,6 +42281,8 @@ window._dcog_rcs_setSkin = function(k){
     b.style.background = on ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = on ? '#f5c518' : '#7a8299';
   });
+  // ★ Re-render carrousel vidéos si on est sur le drill RCS (mapping skin → vidéo)
+  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'rcs' && typeof _dcog_renderVids === 'function') _dcog_renderVids();
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
 // Remet les boutons en accord avec l'apparence mémorisée au chargement
