@@ -38627,6 +38627,13 @@ function _dcog_renderVids() {
     var en = window._lang === 'en';
     el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;min-height:80px;color:#5a6377;font-family:var(--font-cond);font-size:11px;letter-spacing:.5px;font-style:italic;opacity:.7">' +
       (en?'— no video yet —':'— aucune vidéo pour le moment —') + '</div>';
+    // ★ Coupe la lecture + masque le player principal pour éviter que la vidéo
+    //   du drill précédent continue de jouer quand on passe sur un drill sans vidéo.
+    var _p = document.getElementById('dcog_vidPlayer');
+    var _ifr = document.getElementById('dcog_ytFrame');
+    if (_ifr) _ifr.src = '';
+    if (_p) _p.style.display = 'none';
+    _dcog_selVid = null;
     return;
   }
   el.innerHTML = filtered.map(function(v) {
