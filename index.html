@@ -42633,6 +42633,8 @@ function _dcog_rcs_analyzePose(poses) {
 var _RCS_CHAIN_REACT_MS = 3000;    // ★ TTL rallongé (2200 → 3000ms) — temps de lire la couleur + taper
 var _RCS_CHAIN_PRE_MS   = 600;     // ★ pause APRÈS catch avant que les cibles apparaissent (brain switch)
 var _RCS_CHAIN_POST_MS  = 700;     // ★ pause APRÈS hit/miss avant drop suivant (rythme humain)
+var _RCS_CHAIN_GRACE_MS = 350;     // ★ grace period après apparition cibles : ignore les hits pendant
+                                    //   que la main redescend du catch (anti faux positif de retour).
 var _RCS_CHAIN_TARGET_XS = [0.30, 0.50, 0.70];
 var _RCS_CHAIN_TARGET_Y  = 0.72;
 var _dcog_rcs_chainPhase = 'idle';      // 'idle' | 'react'
@@ -42683,8 +42685,19 @@ function _dcog_rcs_chainCheckHit(hands, W){
   //   moveThresh = max(8, W*0.02) · rayon ×2.0 · filtre directionnel dot>0 obligatoire.
   //   Les cibles R5 ont été AGRANDIES à la même taille que TDR Reaction pour que ce
   //   pattern identique produise la même fiabilité (voir _dcog_rcs_chainSpawn).
-  var moveThresh = Math.max(8, Math.round(W * 0.02));
   var now = Date.now();
+  // ★ GRACE PERIOD : après l'apparition des cibles, on laisse 350ms à la main
+  //   pour redescendre du catch sans qu'un hit soit validé par erreur pendant ce
+  //   mouvement de retour. On réinitialise aussi prevHands pour éviter qu'une
+  //   grosse vélocité résiduelle (catch) soit utilisée au 1er check post-grace.
+  if (now - _dcog_rcs_chainReactStart < _RCS_CHAIN_GRACE_MS){
+    // Mémorise les positions courantes pour que le 1er diff post-grace soit propre.
+    ['L','R'].forEach(function(sideKey, idx){
+      var hd = hands[idx]; if (hd) _dcog_rcs_prevHandsChain[sideKey] = { x:hd.x, y:hd.y };
+    });
+    return;
+  }
+  var moveThresh = Math.max(8, Math.round(W * 0.02));
   ['L','R'].forEach(function(sideKey, idx){
     var hd = hands[idx]; if (!hd) return;
     var prev = _dcog_rcs_prevHandsChain[sideKey];
