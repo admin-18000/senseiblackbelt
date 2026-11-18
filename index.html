@@ -42659,7 +42659,10 @@ function _dcog_rcs_chainSpawn(W, H){
   var pool = _RCS_PALETTE.slice();
   for (var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
   var picked = pool.slice(0, _RCS_CHAIN_TARGET_XS.length);
-  var tR = Math.max(28, Math.min(W*0.055, H*0.075));
+  // ★ Rayon ALIGNÉ sur TDR Reaction : min(W*0.075, H*0.13) → cibles ~50-80px
+  //   pour que le pattern TDR Reaction 100% strict produise la même fiabilité
+  //   que sur les bâtons (zone hit effective identique).
+  var tR = Math.round(Math.min(W*0.075, H*0.13));
   _dcog_rcs_chainTargets = [];
   for (var k=0;k<_RCS_CHAIN_TARGET_XS.length;k++){
     _dcog_rcs_chainTargets.push({
@@ -42676,7 +42679,10 @@ function _dcog_rcs_chainSpawn(W, H){
   try { _td_beep(1200, 0.04, 0.10); } catch(e){}
 }
 function _dcog_rcs_chainCheckHit(hands, W){
-  // Pattern TDR Reaction strict : moveThresh + rayon ×2.0 + filtre directionnel.
+  // ★ PATTERN TDR REACTION 100% STRICT (identique à _opto_doHits pour les bâtons).
+  //   moveThresh = max(8, W*0.02) · rayon ×2.0 · filtre directionnel dot>0 obligatoire.
+  //   Les cibles R5 ont été AGRANDIES à la même taille que TDR Reaction pour que ce
+  //   pattern identique produise la même fiabilité (voir _dcog_rcs_chainSpawn).
   var moveThresh = Math.max(8, Math.round(W * 0.02));
   var now = Date.now();
   ['L','R'].forEach(function(sideKey, idx){
