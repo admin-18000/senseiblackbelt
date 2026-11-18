@@ -25541,6 +25541,21 @@ function openTrainingTab(id, btn) {
     if (typeof _trApplyLang === 'function') { try { _trApplyLang(); } catch(e){} }
     if (typeof _appI18nSweep === 'function') { try { _appI18nSweep(); } catch(e){} }
   }, 50);
+  // ★ AUTOPLAY au clic sur l'onglet DRILL — la 1ère vidéo du carrousel se lance direct
+  //   pour TOUS les onglets qui ont un carrousel vidéo (pattern homogène à DCOG).
+  //   · dribble → _td_selectVid(0)    · sc → _td2_selectVid(0)
+  //   · shot    → _tsc_selectVid(0)   · ch → _tch_selectVid(0)
+  //   · agility → _tag_selectVid(0)
+  //   DCOG gère son propre autoplay via _dcog_selectDrill au clic sur un sous-drill.
+  setTimeout(function(){
+    try {
+      if (id === 'dribble' && typeof _td_selectVid  === 'function') _td_selectVid(0);
+      if (id === 'shot'    && typeof _tsc_selectVid === 'function') _tsc_selectVid(0);
+      if (id === 'agility' && typeof _tag_selectVid === 'function') _tag_selectVid(0);
+      if (id === 'sc'      && typeof _td2_selectVid === 'function') _td2_selectVid(0);
+      if (id === 'ch'      && typeof _tch_selectVid === 'function') _tch_selectVid(0);
+    } catch(e){}
+  }, 150);
 }
 
 /* DRIBBLE */
