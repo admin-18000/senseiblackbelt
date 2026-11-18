@@ -2580,13 +2580,6 @@ window._dojoBackHome = function(){
             🔥 <span id="dcog_rcs_lvlHard">DIFFICILE</span><br><span style="font-size:9px;opacity:.7">2,0s</span>
           </button>
         </div>
-        <!-- ★ VIDÉO DU NIVEAU — fait PARTIE de NIVEAU (pas d'encadré/titre séparé).
-             Bascule entre 2 vidéos selon le skin choisi dans APPARENCE :
-             · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
-             · JAUNE/BLEU → 5AwshUgC5TE -->
-        <div id="dcog_rcs_lvl_video" style="margin-top:10px;position:relative;width:100%;aspect-ratio:9/16;max-width:240px;margin-left:auto;margin-right:auto">
-          <iframe id="dcog_rcs_lvl_iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy"></iframe>
-        </div>
       </div>
       <div style="margin-top:4px;padding:8px 10px;background:rgba(245,197,24,.06);border-left:2px solid rgba(245,197,24,.4);border-radius:4px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5" id="dcog_rcs_setupHint">
         📱 Phone à 2m · corps entier dans le cadre · 6 bâtons tombent dans un ordre aléatoire — attrape avec la main avant qu'ils touchent le sol
@@ -42304,14 +42297,21 @@ window._dcog_rcs_setSkin = function(k){
     b.style.background = on ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = on ? '#f5c518' : '#7a8299';
   });
-  // ★ MAPPING RCS : l'unique player vidéo DE la section NIVEAU bascule entre 2 vidéos
-  //   selon le skin choisi. Toujours visible, jamais un bloc séparé.
+  // ★ MAPPING RCS : au clic sur un skin dans APPARENCE, le player vidéo PRINCIPAL
+  //   (en haut de la page, iframe #dcog_ytFrame) bascule entre 2 vidéos.
+  //   PAS de 2e player créé — on réutilise le player existant pour éviter le doublon.
   //   · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
   //   · JAUNE/BLEU → 5AwshUgC5TE
-  var _lvlIfr = document.getElementById('dcog_rcs_lvl_iframe');
-  if (_lvlIfr){
-    var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
-    _lvlIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
+  //   Rien dans le carrousel CHOISIS TON DRILL n'est modifié (filtre !v.rcsSkin actif).
+  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'rcs'){
+    var _mainIfr = document.getElementById('dcog_ytFrame');
+    var _mainPl  = document.getElementById('dcog_vidPlayer');
+    if (_mainIfr){
+      var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
+      _mainIfr.style.aspectRatio = '9/16';   // Shorts vertical pour les 2
+      _mainIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
+      if (_mainPl) _mainPl.style.display = 'block';
+    }
   }
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
