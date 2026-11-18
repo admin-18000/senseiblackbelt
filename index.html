@@ -42288,7 +42288,7 @@ var _RCS_SKINS = {
 };
 var _dcog_rcs_skin = 'classic';
 function _dcog_rcs_getSkin(){ return _RCS_SKINS[_dcog_rcs_skin] || _RCS_SKINS.classic; }
-window._dcog_rcs_setSkin = function(k){
+window._dcog_rcs_setSkin = function(k, silent){
   _dcog_rcs_skin = (k === 'yb') ? 'yb' : 'classic';
   try { localStorage.setItem('sb_rcs_skin', _dcog_rcs_skin); } catch(e){}
   document.querySelectorAll('.dcog-rcs-skin-btn').forEach(function(b){
@@ -42297,27 +42297,32 @@ window._dcog_rcs_setSkin = function(k){
     b.style.background = on ? 'rgba(245,197,24,.15)' : 'var(--dark3)';
     b.style.color      = on ? '#f5c518' : '#7a8299';
   });
-  // ★ MAPPING RCS : au clic sur un skin dans APPARENCE, le player vidéo PRINCIPAL
-  //   (en haut de la page, iframe #dcog_ytFrame) bascule entre 2 vidéos.
-  //   PAS de 2e player créé — on réutilise le player existant pour éviter le doublon.
+  // silent === true : initialisation au chargement (restaure la mémoire du skin
+  // dans les styles de boutons uniquement), sans toucher au player vidéo.
+  // Sans ça, le player serait forcé sur une vidéo RCS même quand l'utilisateur
+  // est sur un autre drill au premier chargement de la page.
+  if (silent) return;
+  // ★ MAPPING RCS : au clic UTILISATEUR sur un skin, le player vidéo principal
+  //   (iframe #dcog_ytFrame) bascule entre 2 vidéos.
   //   · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
   //   · JAUNE/BLEU → 5AwshUgC5TE
-  //   Rien dans le carrousel CHOISIS TON DRILL n'est modifié (filtre !v.rcsSkin actif).
-  if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'rcs'){
-    var _mainIfr = document.getElementById('dcog_ytFrame');
-    var _mainPl  = document.getElementById('dcog_vidPlayer');
-    if (_mainIfr){
-      var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
-      _mainIfr.style.aspectRatio = '9/16';   // Shorts vertical pour les 2
-      _mainIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
-      if (_mainPl) _mainPl.style.display = 'block';
-    }
+  var _mainIfr = document.getElementById('dcog_ytFrame');
+  var _mainPl  = document.getElementById('dcog_vidPlayer');
+  if (_mainIfr){
+    var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
+    _mainIfr.setAttribute('width','100%');
+    _mainIfr.style.aspectRatio = '9/16';
+    _mainIfr.style.display = 'block';
+    _mainIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
+    if (_mainPl) _mainPl.style.display = 'block';
+    var _lbl = document.getElementById('dcog_vidLabel');
+    if (_lbl) _lbl.textContent = (_dcog_rcs_skin === 'yb') ? 'Reaction Stick · Jaune/Bleu' : 'Reaction Stick · Original';
   }
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
-// Remet les boutons en accord avec l'apparence mémorisée au chargement
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ _dcog_rcs_setSkin(_dcog_rcs_skin); });
-else setTimeout(function(){ _dcog_rcs_setSkin(_dcog_rcs_skin); }, 0);
+// Au chargement : silent=true → restaure l'état visuel des boutons sans écraser le player.
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ _dcog_rcs_setSkin(_dcog_rcs_skin, true); });
+else setTimeout(function(){ _dcog_rcs_setSkin(_dcog_rcs_skin, true); }, 0);
 
 function _dcog_rcs_setMode(m){
   _dcog_rcs_scoringMode = m;
