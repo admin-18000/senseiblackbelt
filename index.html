@@ -38840,6 +38840,11 @@ function _dcog_selectDrill(drill, langOnly) {
     _dcog_rcs_stopRun();
   }
   _dcog_drill = drill;
+  // ★ Quand on entre dans RCS : synchronise le player lite-yt existant (#rcs_liteYt)
+  //   avec le skin mémorisé — vO0voL3Q8AI pour classic, 5AwshUgC5TE pour yb.
+  if (drill === 'rcs' && typeof _dcog_rcs_setSkin === 'function'){
+    try { _dcog_rcs_setSkin(_dcog_rcs_skin || 'classic', false); } catch(e){}
+  }
   var en = window._lang === 'en';
   var descs = {
     viscoord: en ? '3-ball tennis juggling — streak, rhythm, visuomotor coordination'
@@ -42302,21 +42307,27 @@ window._dcog_rcs_setSkin = function(k, silent){
   // Sans ça, le player serait forcé sur une vidéo RCS même quand l'utilisateur
   // est sur un autre drill au premier chargement de la page.
   if (silent) return;
-  // ★ MAPPING RCS : au clic UTILISATEUR sur un skin, le player vidéo principal
-  //   (iframe #dcog_ytFrame) bascule entre 2 vidéos.
-  //   · ORIGINAL   → vO0voL3Q8AI (Reaction Stick 1)
+  // ★ MAPPING RCS : au clic UTILISATEUR sur un skin, le player vidéo EXISTANT DANS LEVEL
+  //   (lite-yt player #rcs_liteYt, ligne ~2538) bascule entre 2 vidéos.
+  //   · ORIGINAL   → xYd4vKWu6oU (vidéo déjà présente par défaut)
   //   · JAUNE/BLEU → 5AwshUgC5TE
-  var _mainIfr = document.getElementById('dcog_ytFrame');
-  var _mainPl  = document.getElementById('dcog_vidPlayer');
-  if (_mainIfr){
-    var _vidId = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'vO0voL3Q8AI';
-    _mainIfr.setAttribute('width','100%');
-    _mainIfr.style.aspectRatio = '9/16';
-    _mainIfr.style.display = 'block';
-    _mainIfr.src = 'https://www.youtube-nocookie.com/embed/'+_vidId+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
-    if (_mainPl) _mainPl.style.display = 'block';
-    var _lbl = document.getElementById('dcog_vidLabel');
-    if (_lbl) _lbl.textContent = (_dcog_rcs_skin === 'yb') ? 'Reaction Stick · Jaune/Bleu' : 'Reaction Stick · Original';
+  //   PAS de nouveau player créé. On modifie le data-vid + l'image thumbnail,
+  //   et si une iframe est déjà en cours de lecture on la recharge.
+  var _lite = document.getElementById('rcs_liteYt');
+  if (_lite){
+    var _newVid = (_dcog_rcs_skin === 'yb') ? '5AwshUgC5TE' : 'xYd4vKWu6oU';
+    _lite.setAttribute('data-vid', _newVid);
+    var _img = document.getElementById('rcs_liteYtImg');
+    if (_img){
+      _img.src = 'https://i.ytimg.com/vi/'+_newVid+'/hqdefault.jpg';
+      _img.onerror = function(){ this.onerror=null; this.src='https://i.ytimg.com/vi/'+_newVid+'/mqdefault.jpg'; };
+    }
+    // Si une iframe a déjà remplacé le thumbnail (vidéo en cours de lecture),
+    // on la recharge avec la nouvelle vidéo pour qu'elle bascule immédiatement.
+    var _existingIfr = _lite.querySelector('iframe');
+    if (_existingIfr){
+      _existingIfr.src = 'https://www.youtube-nocookie.com/embed/'+_newVid+'?rel=0&modestbranding=1&autoplay=1&mute=1&playsinline=1';
+    }
   }
 };
 try { var _sk = localStorage.getItem('sb_rcs_skin'); if (_sk) _dcog_rcs_skin = _sk; } catch(e){}
