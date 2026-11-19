@@ -55954,6 +55954,7 @@ window._calendar_open = function(){
         + '  </div>'
         + '  <button id="labo-close" style="background:transparent;border:1.5px solid rgba(245,197,24,.5);color:#f5c518;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">✕</button>'
         + '</div>'
+        + '<div id="labo-hero-framework" style="margin-bottom:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(159,100,230,.12),rgba(13,17,23,.6));border:1px solid rgba(159,100,230,.4);border-radius:12px;color:#fff"></div>'
         + '<div id="labo-tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;background:rgba(0,0,0,.3);padding:4px;border-radius:12px"></div>'
         + '<div id="labo-content"></div>'
         + '<div style="margin-top:24px;padding:14px;background:rgba(245,197,24,.05);border:1px dashed rgba(245,197,24,.3);border-radius:10px;font-size:11px;color:#9aa3b3;text-align:center;line-height:1.5" id="labo-footer"></div>'
@@ -55961,6 +55962,21 @@ window._calendar_open = function(){
       document.body.appendChild(modal);
     }
     modal.querySelector('#labo-main-title').textContent = en ? 'SENSEI LAB' : 'LABORATOIRE SENSEI';
+    // ★ Bloc hero : cadre scientifique SENSEI (FR/EN)
+    var heroEl = modal.querySelector('#labo-hero-framework');
+    if (heroEl){
+      var heroFR =
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#b59ff0;margin-bottom:8px">🎓 Un cadre scientifique cohérent, drill par drill, ancré dans la recherche</div>' +
+        '<div style="font-size:12px;line-height:1.55;color:#cfd3e0">' +
+          'Chaque drill caméra de SENSEI s\'ancre dans un papier scientifique et sert une fonction cognitive précise : inhibition de réponse <em style="color:#9aa3b3">(Vickers &amp; Hallett)</em>, anticipation perceptive-motrice <em style="color:#9aa3b3">(Sulpizio et al., NeuroImage 2017)</em>, attention sélective, rotation mentale 3D, mémoire de travail, cognitive-motor dual-task <em style="color:#9aa3b3">(Herold et al., 2018 ; Lucia et al., Brain Sciences 2021 et Psychology of Sport and Exercise 2022)</em>. Ce cadre fait écho aux travaux portés en France par <strong style="color:#b59ff0">Dr Laure Fernandez</strong> (Institut des Sciences du Mouvement, STAPS Aix-Marseille) sur les <strong>processus perceptivo-moteurs</strong> et l\'<strong>entraînement perceptivo-cognitif</strong> — champ dont SENSEI se revendique directement. Là où les apps sport dépassent rarement 3 ou 4 drills neuroscience-based, SENSEI en propose une vingtaine — tous validés par le cadre <strong>CMDT</strong> (Cognitive-Motor Dual-Task) présenté à l\'Université de Trieste par <strong style="color:#b59ff0">Dr Stefania Lucia</strong>.' +
+        '</div>';
+      var heroEN =
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:16px;letter-spacing:1.5px;color:#b59ff0;margin-bottom:8px">🎓 A coherent scientific framework, drill by drill, rooted in research</div>' +
+        '<div style="font-size:12px;line-height:1.55;color:#cfd3e0">' +
+          'Every SENSEI camera drill is anchored in a scientific paper and serves a precise cognitive function: response inhibition <em style="color:#9aa3b3">(Vickers &amp; Hallett)</em>, perceptual-motor anticipation <em style="color:#9aa3b3">(Sulpizio et al., NeuroImage 2017)</em>, selective attention, 3D mental rotation, working memory, cognitive-motor dual-task <em style="color:#9aa3b3">(Herold et al., 2018; Lucia et al., Brain Sciences 2021 and Psychology of Sport and Exercise 2022)</em>. This framework echoes the research led in France by <strong style="color:#b59ff0">Dr Laure Fernandez</strong> (Institute of Movement Sciences, STAPS Aix-Marseille) on <strong>perceptual-motor processes</strong> and <strong>perceptual-cognitive training</strong> — a field SENSEI explicitly claims as its own. While most sport apps rarely exceed 3 or 4 neuroscience-based drills, SENSEI offers around twenty — all validated by the <strong>CMDT</strong> (Cognitive-Motor Dual-Task) framework presented at the University of Trieste by <strong style="color:#b59ff0">Dr Stefania Lucia</strong>.' +
+        '</div>';
+      heroEl.innerHTML = en ? heroEN : heroFR;
+    }
     modal.querySelector('#labo-footer').innerHTML = en
       ? '📚 Scientific references · This content is informational only · Always consult a professional before changing your routine.'
       : '📚 Références scientifiques · Contenu informatif uniquement · Consulte toujours un professionnel avant de modifier ta routine.';
