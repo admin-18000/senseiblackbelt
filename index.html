@@ -39007,6 +39007,30 @@ var _OPTO_GEO_CUBE_E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1
 var _OPTO_GEO_OCTA3D_V = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
 var _OPTO_GEO_OCTA3D_E = [[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]];
 var _OPTO_GEO_DODECA_V, _OPTO_GEO_DODECA_E, _OPTO_GEO_ICOSA_V, _OPTO_GEO_ICOSA_E;
+// ★ FACES (indices de vertices) pour chaque polyèdre — utilisées pour le rendu B
+//   (faces remplies avec tri par profondeur z + ombrage selon orientation).
+//   Les edges existantes restent conservées (backup) mais ne sont plus utilisées.
+var _OPTO_GEO_TETRA_F = [[0,1,2],[0,1,3],[0,2,3],[1,2,3]];
+var _OPTO_GEO_CUBE_F  = [[0,1,2,3],[7,6,5,4],[0,4,5,1],[1,5,6,2],[2,6,7,3],[3,7,4,0]];
+var _OPTO_GEO_OCTA3D_F= [[0,2,4],[2,1,4],[1,3,4],[3,0,4],[2,0,5],[1,2,5],[3,1,5],[0,3,5]];
+var _OPTO_GEO_DODECA_F = [
+  [0,16,2,10,8], [0,8,4,14,12], [0,12,1,17,16], [1,12,14,5,9], [1,9,11,3,17],
+  [2,16,17,3,13], [2,13,15,6,10], [3,11,7,15,13], [4,8,10,6,18], [4,18,19,5,14],
+  [5,19,7,11,9], [6,15,7,19,18]
+];
+var _OPTO_GEO_ICOSA_F = [
+  [0,2,8],[0,8,4],[0,4,6],[0,6,10],[0,10,2],
+  [1,4,9],[1,9,3],[1,3,11],[1,11,6],[1,6,4],
+  [2,5,7],[2,5,8],[2,7,10],[3,5,7],[3,5,9],
+  [3,7,11],[4,8,9],[5,8,9],[6,10,11],[7,10,11]
+];
+// Helper mix color (pour ombrage z-order : face avant lumineuse, face arrière sombre)
+function _opto_geo_mixColor(hex, t){
+  // t=0 → couleur pleine · t=1 → noir (plus le z est faible = plus loin, plus la face est sombre)
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r*(1-t)); g = Math.round(g*(1-t)); b = Math.round(b*(1-t));
+  return 'rgb('+r+','+g+','+b+')';
+}
 (function(){
   var phi = (1 + Math.sqrt(5))/2, iphi = 1/phi, m = Math.sqrt(3);
   _OPTO_GEO_DODECA_V = [
@@ -39135,33 +39159,45 @@ function _opto_geo_proj(v, rot, cx, cy, scale){
   return { x: cx + x2*scale, y: cy + y2*scale, z: -y*sx2 + z*cx2 };
 }
 function _opto_geo_draw3DSolid(ctx, cx, cy, r, kind, rot){
-  var V, E;
+  // ★ RENDU "FACES REMPLIES" avec tri par profondeur z + ombrage selon orientation
+  //   (face avant = couleur pleine · face arrière = plus sombre). Contour blanc
+  //   épais pour marquer les arêtes. Zéro halo de fond (effet 3D préservé).
+  var V, F;
   switch(kind){
-    case 'tetra':  V=_OPTO_GEO_TETRA_V;  E=_OPTO_GEO_TETRA_E;  break;
-    case 'cube':   V=_OPTO_GEO_CUBE_V;   E=_OPTO_GEO_CUBE_E;   break;
-    case 'octa3d': V=_OPTO_GEO_OCTA3D_V; E=_OPTO_GEO_OCTA3D_E; break;
-    case 'dodeca': V=_OPTO_GEO_DODECA_V; E=_OPTO_GEO_DODECA_E; break;
-    case 'icosa':  V=_OPTO_GEO_ICOSA_V;  E=_OPTO_GEO_ICOSA_E;  break;
+    case 'tetra':  V=_OPTO_GEO_TETRA_V;  F=_OPTO_GEO_TETRA_F;  break;
+    case 'cube':   V=_OPTO_GEO_CUBE_V;   F=_OPTO_GEO_CUBE_F;   break;
+    case 'octa3d': V=_OPTO_GEO_OCTA3D_V; F=_OPTO_GEO_OCTA3D_F; break;
+    case 'dodeca': V=_OPTO_GEO_DODECA_V; F=_OPTO_GEO_DODECA_F; break;
+    case 'icosa':  V=_OPTO_GEO_ICOSA_V;  F=_OPTO_GEO_ICOSA_F;  break;
     default: return;
   }
   var col = _OPTO_GEO_COLORS[kind] || '#ffffff';
   var pts = V.map(function(v){ return _opto_geo_proj(v, rot, cx, cy, r); });
-  var sortedEdges = E.map(function(e){ return { e:e, z:(pts[e[0]].z + pts[e[1]].z)/2 }; }).sort(function(a,b){ return a.z - b.z; });
+  // Tri back-to-front par profondeur z moyenne de face
+  var facesSort = F.map(function(face){
+    var zAvg = 0;
+    for (var k=0; k<face.length; k++) zAvg += pts[face[k]].z;
+    return { face: face, z: zAvg / face.length };
+  }).sort(function(a,b){ return a.z - b.z; });
   ctx.save();
-  // ★ Halo coloré de fond : aide à distinguer les solides à distance (couleur unique par forme).
-  ctx.shadowColor = 'rgba(0,0,0,0.65)'; ctx.shadowBlur = 10;
-  ctx.fillStyle = col;
-  ctx.beginPath(); ctx.arc(cx, cy, r*1.1, 0, Math.PI*2); ctx.fill();
-  ctx.shadowBlur = 0;
-  // Arêtes blanches épaisses pour contraste maximum sur le halo coloré
-  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(3, r*0.07);
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-  for (var i=0; i<sortedEdges.length; i++){
-    var e = sortedEdges[i].e, p1 = pts[e[0]], p2 = pts[e[1]];
-    ctx.globalAlpha = sortedEdges[i].z < 0 ? 0.45 : 1;
-    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(1.5, r*0.045);
+  for (var i=0; i<facesSort.length; i++){
+    var face = facesSort[i].face;
+    var z = facesSort[i].z;
+    // Ombrage : plus la face est éloignée (z faible), plus elle est sombre
+    // z va de -1 à +1 (sphère unité). On mappe [-1,+1] → [0.65, 0] darken.
+    var darken = Math.max(0, 0.65 - (z + 1) * 0.4);
+    ctx.fillStyle = _opto_geo_mixColor(col, darken);
+    ctx.beginPath();
+    ctx.moveTo(pts[face[0]].x, pts[face[0]].y);
+    for (var j=1; j<face.length; j++) ctx.lineTo(pts[face[j]].x, pts[face[j]].y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
-  ctx.globalAlpha = 1; ctx.restore();
+  ctx.restore();
 }
 function _opto_geo_nextRound(W, H){
   // ★ OPTION B — Go/No-Go : UNE SEULE cible au centre-droit.
