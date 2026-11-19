@@ -38999,10 +38999,12 @@ var _OPTO_GEO_3D_SHAPES = [
   { k:'icosa',  fr:'ICOSAÈDRE',   en:'ICOSAHEDRON' }
 ];
 
-// Vertices / edges des 5 solides de Platon (coords normalisées)
-var _OPTO_GEO_TETRA_V = [[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]];
+// Vertices / edges des 5 solides de Platon (coords NORMALISÉES sur sphère unité).
+// ★ FIX coupure : les vertices [±1,±1,±1] (tétra, cube) étaient à distance √3 du centre
+//   → débordaient du cercle de rayon r lors de la projection. Divisés par √3.
+var _OPTO_GEO_TETRA_V = (function(){ var m=Math.sqrt(3); return [[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]].map(function(v){ return [v[0]/m,v[1]/m,v[2]/m]; }); })();
 var _OPTO_GEO_TETRA_E = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
-var _OPTO_GEO_CUBE_V = [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+var _OPTO_GEO_CUBE_V = (function(){ var m=Math.sqrt(3); return [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]].map(function(v){ return [v[0]/m,v[1]/m,v[2]/m]; }); })();
 var _OPTO_GEO_CUBE_E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
 var _OPTO_GEO_OCTA3D_V = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
 var _OPTO_GEO_OCTA3D_E = [[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]];
@@ -39186,9 +39188,9 @@ function _opto_geo_draw3DSolid(ctx, cx, cy, r, kind, rot){
   for (var i=0; i<facesSort.length; i++){
     var face = facesSort[i].face;
     var z = facesSort[i].z;
-    // Ombrage : plus la face est éloignée (z faible), plus elle est sombre
-    // z va de -1 à +1 (sphère unité). On mappe [-1,+1] → [0.65, 0] darken.
-    var darken = Math.max(0, 0.65 - (z + 1) * 0.4);
+    // Ombrage CONTRASTÉ : face arrière très sombre (80%), face avant pleine.
+    // z ∈ [-1,+1] (sphère unité). Pente = 0.5 → plus de contraste visuel entre faces.
+    var darken = Math.max(0, 0.80 - (z + 1) * 0.50);
     ctx.fillStyle = _opto_geo_mixColor(col, darken);
     ctx.beginPath();
     ctx.moveTo(pts[face[0]].x, pts[face[0]].y);
@@ -39423,11 +39425,11 @@ window._dcog_geo_renderGloss = function(){
     host.innerHTML = '';
     // ★ Angle de rotation OPTIMAL par solide 3D (montre bien les faces caractéristiques).
     var optimalRot3D = {
-      tetra:  Math.PI * 0.18,   // vue 3/4 : montre 3 faces
-      cube:   Math.PI * 0.20,   // vue iso classique : 3 faces visibles
-      octa3d: Math.PI * 0.25,   // vue bipointe : 4 faces top, 4 bottom
-      dodeca: Math.PI * 0.12,   // vue face pentagonale centrée
-      icosa:  Math.PI * 0.08    // vue 5-fold : coiffe pentagonale visible
+      tetra:  Math.PI * 0.30,   // vue pointe-du-haut + 3 faces descendantes visibles
+      cube:   Math.PI * 0.25,   // vue iso classique 45° (cube marqué, 3 faces nettes)
+      octa3d: Math.PI * 0.25,
+      dodeca: Math.PI * 0.12,
+      icosa:  Math.PI * 0.08
     };
     pool.forEach(function(sh){
       var row = document.createElement('div');
