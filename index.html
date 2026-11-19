@@ -3027,6 +3027,16 @@ window._dojoBackHome = function(){
           <button class="opto-dur-btn" data-sec="120" onclick="_opto_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
         </div>
       </div>
+      <div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--font-cond);font-size:11px;color:#9aa3b3;letter-spacing:.5px">
+          <input type="checkbox" id="geo2d_legendToggle" checked onchange="_dcog_geo_setLegend(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#b59ff0">
+          <span id="geo2d_legendLbl">📖 Afficher la légende à l'écran (recordable)</span>
+        </label>
+      </div>
+      <details style="background:var(--dark3);border:1px solid #1e2535;border-radius:7px;padding:8px 10px">
+        <summary style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:#b59ff0;letter-spacing:1px;cursor:pointer;list-style:none" id="geo2d_glossSum">📖 Les 10 figures planes ▾</summary>
+        <div id="geo2d_glossList" style="margin-top:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-family:var(--font-cond);font-size:10px;color:#c8cdd6"></div>
+      </details>
       <div id="geo2d_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
       <button class="tr-btn tr-btn-start" id="geo2d_btnStart" onclick="_dcog_startGeo2d()" ontouchstart="" style="width:100%;background:#b59ff0;color:#0d1117"><span id="geo2d_lblStart">▶ DÉMARRER GEO-2D</span></button>
       <button class="tr-btn tr-btn-save" id="geo2d_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
@@ -3053,6 +3063,16 @@ window._dojoBackHome = function(){
           <button class="opto-dur-btn" data-sec="120" onclick="_opto_setDur(120)" style="flex:1;min-width:60px;padding:7px 4px;border-radius:7px;border:1px solid #1e2535;background:var(--dark3);color:#7a8299;font-family:var(--font-cond);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s">2min</button>
         </div>
       </div>
+      <div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--font-cond);font-size:11px;color:#9aa3b3;letter-spacing:.5px">
+          <input type="checkbox" id="geo3d_legendToggle" checked onchange="_dcog_geo_setLegend(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#f5c518">
+          <span id="geo3d_legendLbl">📖 Afficher la légende à l'écran (recordable)</span>
+        </label>
+      </div>
+      <details style="background:var(--dark3);border:1px solid #1e2535;border-radius:7px;padding:8px 10px">
+        <summary style="font-family:var(--font-cond);font-size:11px;font-weight:700;color:#f5c518;letter-spacing:1px;cursor:pointer;list-style:none" id="geo3d_glossSum">📖 Les 5 polyèdres de Platon ▾</summary>
+        <div id="geo3d_glossList" style="margin-top:8px;display:grid;grid-template-columns:1fr;gap:6px;font-family:var(--font-cond);font-size:10px;color:#c8cdd6"></div>
+      </details>
       <div id="geo3d_status" style="font-size:11px;color:var(--muted);text-align:center;min-height:16px;letter-spacing:.5px">Appuie sur DÉMARRER</div>
       <button class="tr-btn tr-btn-start" id="geo3d_btnStart" onclick="_dcog_startGeo3d()" ontouchstart="" style="width:100%;background:#f5c518;color:#0d1117"><span id="geo3d_lblStart">▶ DÉMARRER GEO-3D</span></button>
       <button class="tr-btn tr-btn-save" id="geo3d_btnSave" onclick="_opto_save()" ontouchstart="" style="width:100%;margin-top:4px;display:none">💾 SAUVEGARDER</button>
@@ -34127,39 +34147,52 @@ function _opto_drawHUD(W, H){
   //     pour laisser la place à la rotation wheel F11 juste en dessous
   //   • Portrait (A11) : deux pilules remplissant la largeur
   //   • Landscape (A3 / F11 / A7-MOT / A7-SP) : duo centré autour du milieu
+  var remain = Math.max(0, _opto_dur - _opto_elapsed);
+  var mm = Math.floor(remain/60), ss = remain%60;
+  var tStr = mm + ':' + (ss<10?'0':'') + ss;
+  // ★ GEO-2D / GEO-3D : les pilules SCORE/CHRONO sont retirées de la zone
+  //   centrale (collisionnaient avec les cibles en dual-task). On affiche à la
+  //   place un bandeau COMPACT en bas de l'écran, hors de la zone de jeu.
+  if (_opto_mode === 'geo2d' || _opto_mode === 'geo3d'){
+    var bh = Math.max(26, H*0.034);
+    var by = H - bh - 6;
+    var padx = W*0.04;
+    ctx.save();
+    ctx.font = 'bold '+Math.round(H*0.024)+'px "Barlow Condensed",sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#64b4ff';
+    ctx.fillText((en?'SCORE ':'SCORE ')+_opto_score, padx, by + bh/2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = remain <= 5 ? '#ff8a94' : '#4ade80';
+    ctx.fillText((en?'TIME ':'CHRONO ')+tStr, W - padx, by + bh/2);
+    ctx.restore();
+    return;
+  }
   var hy = H * 0.30;
   var portrait = !!window._opto_portraitMode;
   var sbw, sbh, sbx, sby, cbw, cbh, cbx, cby;
-  sbh = Math.max(44, H*0.055); cbh = sbh;   // ★ plus plat
+  sbh = Math.max(44, H*0.055); cbh = sbh;
   if (portrait){
     sbw = W*0.44; sbx = W*0.04; sby = hy - sbh/2;
     cbw = W*0.44; cbx = W*0.52; cby = hy - cbh/2;
   } else {
     var gap = W*0.015;
-    var bw = Math.max(160, W*0.22);         // ★ plus large
+    var bw = Math.max(160, W*0.22);
     sbw = bw; cbw = bw;
     sbx = W/2 - bw - gap/2; sby = hy - sbh/2;
     cbx = W/2 + gap/2;      cby = hy - cbh/2;
   }
-  // ★ Label + value côte à côte horizontalement (format rectangulaire bas)
-  //   ★ Pilules TOTALEMENT TRANSPARENTES (pas de fill, juste bordure)
-  //   Score pill
   ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, sbx, sby, sbw, sbh, 8); ctx.stroke();
-  // Label gauche
   ctx.fillStyle = '#9ba3b4';
   ctx.font = 'bold '+Math.round(H*0.022)+'px "Barlow Condensed",sans-serif';
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.fillText(en?'SCORE':'SCORE', sbx + sbw*0.08, sby + sbh/2);
-  // Valeur droite
   ctx.fillStyle = '#64b4ff';
   ctx.font = 'bold '+Math.round(H*0.042)+'px "Bebas Neue",sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText(String(_opto_score), sbx + sbw*0.92, sby + sbh/2);
-  //   Chrono pill (totalement transparent, juste bordure)
-  var remain = Math.max(0, _opto_dur - _opto_elapsed);
-  var mm = Math.floor(remain/60), ss = remain%60;
-  var tStr = mm + ':' + (ss<10?'0':'') + ss;
   ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
   _opto_roundRect(ctx, cbx, cby, cbw, cbh, 8); ctx.stroke();
   ctx.fillStyle = '#9ba3b4';
@@ -38940,6 +38973,8 @@ var _opto_geo_rtSum = 0, _opto_geo_rtCount = 0;
 var _opto_geo_round = 0;
 var _opto_geo_fx = [];
 var _opto_geo_rot = 0;
+// ★ Légende on-canvas (recordable dans vidéo MediaRecorder). Toggle ON/OFF via UI.
+var _opto_geo_legend = true;
 var _OPTO_GEO_TTL = 5000;
 var _OPTO_GEO_RESULT_MS = 900;
 var _OPTO_GEO_WAIT_MS = 500;
@@ -39007,42 +39042,39 @@ var _OPTO_GEO_COLORS = {
   tetra:'#f5c518',   cube:'#e63946',    octa3d:'#64b4ff', dodeca:'#9f64e6', icosa:'#22c55e'
 };
 
-/* Layout anti-chevauchement STRICT — zones réservées :
-   · ROND CONSIGNE à gauche        → cibles à droite de leftBound
-   · HUD SCORE/CHRONO à Y=0.265-0.335 H → cibles toujours sous Y=0.40H
-   · HEAD STAB. en bas droite Y=0.92-0.99 → cibles toujours au-dessus de Y=0.80H
-   Rayon adaptatif pour éviter tout débordement de ces zones. */
+/* Layout "TDR Reaction-like" — HUD score/chrono retiré en bas (voir _opto_drawHUD)
+   donc toute la hauteur est utilisable. Cibles bien ESPACÉES pour DUAL TASK.
+   Zones réservées :
+   · ROND CONSIGNE à gauche              → cibles à droite de leftBound
+   · CONSIGNE TOP (pilule TOUCHE LA FORME) à Y=0-0.15H → cibles sous Y=0.18H
+   · HEAD STAB. en bas droite Y=0.92-0.99 → cibles au-dessus de Y=0.80H
+   · SCORE/CHRONO compact en Y>0.95H     → cibles au-dessus de Y=0.80H */
 function _opto_geo_layout(W, H, n){
   var consigneCD = Math.min(W*0.28, H*0.36, 260);
-  // leftBound garantit que même le DESSIN le plus large de la cible ne mord
-  // pas sur le rond consigne (consigneCD + marge 6%W de sécurité visuelle).
   var leftBound = Math.max(W*0.40, W*0.03 + consigneCD + W*0.06);
   var rightBound = W*0.97;
   var zoneW = rightBound - leftBound;
-  // Zones Y utilisables (après HUD et avant head stab)
-  var yTop = H * 0.40;    // juste SOUS la pilule score/chrono (qui finit à 0.335H)
-  var yBot = H * 0.78;    // juste AU-DESSUS du head stab (qui commence à 0.92H)
+  // ★ ZONE Y : sous pilule consigne → au-dessus de la légende (si active) ou du bandeau score
+  var yTop = H * 0.18;
+  var yBot = _opto_geo_legend ? H * 0.78 : H * 0.90;   // laisse la place à la légende
   var zoneH = yBot - yTop;
-  // Rayon adaptatif : garantit aucun chevauchement entre cibles ni avec HUD/consigne
   var maxPerRow = (n <= 3) ? n : (n === 4) ? 2 : 3;
   var rows = Math.ceil(n / maxPerRow);
   var colGap = zoneW / Math.max(1, maxPerRow);
   var rowGap = zoneH / Math.max(1, rows);
-  // r ≤ colGap/2.3 (anti-coll horizontale entre cibles)
-  // r ≤ rowGap/2.3 (anti-coll verticale entre rangées)
-  // r ≤ zoneH/2.4 (anti-débord HUD/stab) · plafond W*0.09 · H*0.12
-  var rMax = Math.min(W*0.09, H*0.12, colGap/2.3, rowGap/2.3, zoneH/2.4);
-  var tR = Math.max(28, Math.round(rMax));
+  // Rayon ÉLARGI (plafond W*0.11 vs 0.09) + espacement minimum 2.6 × r
+  var rMax = Math.min(W*0.11, H*0.14, colGap/2.6, rowGap/2.6, zoneH/2.4);
+  var tR = Math.max(32, Math.round(rMax));
   var positions = [];
   if (n <= 3){
-    // 1 rangée centrée verticalement dans la zone utile
+    // 1 rangée centrée verticalement dans la zone utile (grande hauteur dispo)
     var yMid = (yTop + yBot) / 2;
     var gap = (n > 1) ? zoneW / (n-1) : 0;
     for (var i=0; i<n; i++){
       positions.push({ x: (n === 1) ? leftBound + zoneW/2 : leftBound + i * gap, y: yMid });
     }
   } else if (n === 4){
-    // 2×2 — rangées positionnées dans la zone utile
+    // 2×2 — bien séparées verticalement (zoneH grande, rowGap grand)
     var y1 = yTop + rowGap*0.5, y2 = yTop + rowGap*1.5;
     var xL = leftBound + zoneW*0.22, xR = leftBound + zoneW*0.78;
     positions = [{x:xL,y:y1},{x:xR,y:y1},{x:xL,y:y2},{x:xR,y:y2}];
@@ -39132,19 +39164,28 @@ function _opto_geo_draw3DSolid(ctx, cx, cy, r, kind, rot){
   ctx.globalAlpha = 1; ctx.restore();
 }
 function _opto_geo_nextRound(W, H){
+  // ★ OPTION B — Go/No-Go : UNE SEULE cible au centre-droit.
+  //   La consigne annonce UNE forme ("TRIANGLE"). À chaque round une cible apparaît
+  //   avec une forme (choisie dans le pool). Si forme cible === forme annoncée → GO
+  //   (tape = +points). Sinon → NO-GO (ne pas taper = inhibition réussie, +3).
   var pool = (_opto_geo_kind === '2d') ? _OPTO_GEO_2D_SHAPES : _OPTO_GEO_3D_SHAPES;
-  var n = (_opto_geo_level === 'easy') ? 3 : (_opto_geo_level === 'hard') ? 5 : 4;
-  n = Math.min(n, pool.length);
   var shuffled = _opto_geo_shuffle(pool.slice());
-  var picked = shuffled.slice(0, n);
-  var target = picked[Math.floor(Math.random() * picked.length)];
-  // ★ Layout anti-chevauchement (1, 2 rangées adaptatives · rayon dynamique)
-  var L = _opto_geo_layout(W, H, n);
-  _opto_geo_pool = [];
-  for (var i=0; i<n; i++){
-    _opto_geo_pool.push({ x:L.positions[i].x, y:L.positions[i].y, r:L.r, shape:picked[i], hit:false });
-  }
-  _opto_geo_target = target;
+  var announced = shuffled[0]; // forme annoncée dans le rond gauche
+  // Ratio go/no-go selon le niveau :
+  //  · facile : 70% go (plus de GO que NO-GO = plus permissif)
+  //  · normal : 50/50
+  //  · hard : 40% go (plus d'inhibitions requises)
+  var goProb = (_opto_geo_level === 'easy') ? 0.70 : (_opto_geo_level === 'hard') ? 0.40 : 0.50;
+  var isGo = (Math.random() < goProb);
+  var shownShape = isGo ? announced : shuffled[1 + Math.floor(Math.random() * (shuffled.length - 1))];
+  // Position de la cible : centrée dans la zone utile (droite du rond consigne).
+  var L = _opto_geo_layout(W, H, 1);
+  var tR = Math.round(Math.min(L.r * 1.8, W*0.16, H*0.22));  // ★ cible BIG (unique)
+  _opto_geo_pool = [{
+    x: L.positions[0].x, y: L.positions[0].y, r: tR,
+    shape: shownShape, hit: false, isGo: isGo
+  }];
+  _opto_geo_target = announced;
   _opto_geo_phase = 'ask';
   _opto_geo_askTs = Date.now();
   _opto_geo_round++;
@@ -39163,11 +39204,13 @@ function _opto_analyzeGeo(poses){
     }
     return;
   }
+  // ★ Détection TAP (TDR Reaction strict)
   _opto_doHits(poses, _opto_geo_pool, 2.0, function(t, side, rt){
     if (_opto_geo_phase !== 'ask') return;
     var rtMs = now - _opto_geo_askTs;
     var en = window._lang === 'en';
-    if (t.shape.k === _opto_geo_target.k){
+    if (t.isGo){
+      // GO (forme annoncée) tapée → + points selon vitesse
       var pts = (rtMs < 1200) ? 15 : (rtMs < 2500) ? 10 : 5;
       _opto_hits++; _opto_geo_hits++; _opto_score += pts;
       _opto_geo_rtSum += rtMs; _opto_geo_rtCount++;
@@ -39177,18 +39220,29 @@ function _opto_analyzeGeo(poses){
       if (navigator.vibrate) navigator.vibrate(25);
       _opto_geo_lastResult = 'hit';
     } else {
+      // NO-GO (mauvaise forme) tapée → faux positif, −5 (inhibition échouée)
       _opto_miss++; _opto_geo_wrong++; _opto_score = Math.max(0, _opto_score - 5);
-      _opto_geo_fx.push({ x:t.x, y:t.y - H*0.09, txt:(en?'WRONG':'MAUVAIS')+' -5', color:'#ff8a94', born:now });
+      _opto_geo_fx.push({ x:t.x, y:t.y - H*0.09, txt:(en?'WRONG -5':'MAUVAIS -5'), color:'#ff8a94', born:now });
       if (typeof _td_beep === 'function') _td_beep(200, 0.08, 0.1);
       if (navigator.vibrate) navigator.vibrate([20,40,20]);
       _opto_geo_lastResult = 'wrong';
     }
     _opto_geo_phase = 'result'; _opto_geo_resultTs = now;
   });
+  // ★ TIMEOUT : si pas de tap pendant _OPTO_GEO_TTL (go/no-go)
   if (_opto_geo_phase === 'ask' && now - _opto_geo_askTs > _OPTO_GEO_TTL){
+    var t0 = _opto_geo_pool[0];
+    if (t0 && !t0.isGo){
+      // NO-GO ignoré (inhibition réussie) → +3 pts silencieux
+      _opto_score += 3; _opto_geo_lastResult = 'inhibit_ok';
+      _opto_geo_fx.push({ x:t0.x, y:t0.y - H*0.09, txt:'+3 OK', color:'#64b4ff', born:now });
+    } else {
+      // GO manqué → silencieux, pas de pénalité
+      _opto_geo_miss++;
+      _opto_geo_lastResult = 'miss';
+    }
     _opto_geo_phase = 'result';
     _opto_geo_resultTs = now;
-    _opto_geo_lastResult = 'miss';
   }
 }
 function _opto_drawGeo(W, H){
@@ -39224,7 +39278,7 @@ function _opto_drawGeo(W, H){
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(wait, ccx, ccy);
   }
-  // ── Cibles ──
+  // ── Cible unique ──
   if (_opto_geo_kind === '3d'){
     var speed = (_opto_geo_level === 'hard') ? 0.025 : (_opto_geo_level === 'normal') ? 0.012 : 0;
     _opto_geo_rot += speed;
@@ -39233,6 +39287,46 @@ function _opto_drawGeo(W, H){
     var t = _opto_geo_pool[i];
     if (_opto_geo_kind === '2d') _opto_geo_draw2DShape(ctx, t.x, t.y, t.r*0.95, t.shape.k);
     else _opto_geo_draw3DSolid(ctx, t.x, t.y, t.r*0.85, t.shape.k, _opto_geo_rot);
+  }
+  // ── LÉGENDE on-canvas (recordable) ──
+  //   Bande horizontale en bas (Y 80-93% H) : toutes les formes du pool + highlight
+  //   sur celle annoncée (pulse doré). Toggle via _opto_geo_legend.
+  if (_opto_geo_legend && _opto_geo_target){
+    var pool2 = (_opto_geo_kind === '2d') ? _OPTO_GEO_2D_SHAPES : _OPTO_GEO_3D_SHAPES;
+    var n2 = pool2.length;
+    var lgY = H * 0.86;                               // centre vertical de la bande
+    var lgH = H * 0.11;                               // hauteur de la bande
+    var lgPad = W * 0.02;
+    var cellW = (W - 2*lgPad) / n2;
+    var lgR = Math.max(16, Math.round(Math.min(cellW*0.32, lgH*0.42)));
+    // Fond discret (aide la lisibilité sur la caméra)
+    ctx.save();
+    ctx.fillStyle = 'rgba(8,11,18,0.55)';
+    ctx.fillRect(lgPad - 4, lgY - lgH/2, (W - 2*lgPad) + 8, lgH);
+    for (var j=0; j<n2; j++){
+      var sh = pool2[j];
+      var cx2 = lgPad + cellW*(j + 0.5);
+      var cy2 = lgY - lgH*0.10;
+      // Highlight forme annoncée : halo pulsant doré
+      if (sh.k === _opto_geo_target.k){
+        var pulse = 1 + 0.15 * Math.sin(now / 180);
+        ctx.save();
+        ctx.shadowColor = '#f5c518'; ctx.shadowBlur = 20;
+        ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(cx2, cy2, lgR*1.35*pulse, 0, Math.PI*2); ctx.stroke();
+        ctx.restore();
+      }
+      if (_opto_geo_kind === '2d') _opto_geo_draw2DShape(ctx, cx2, cy2, lgR*0.85, sh.k);
+      else _opto_geo_draw3DSolid(ctx, cx2, cy2, lgR*0.75, sh.k, _opto_geo_rot*0.4);
+      // Nom court sous l'icône
+      ctx.fillStyle = (sh.k === _opto_geo_target.k) ? '#f5c518' : 'rgba(255,255,255,0.75)';
+      ctx.font = 'bold '+Math.max(9, Math.round(H*0.013))+'px "Barlow Condensed",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      var en2 = window._lang === 'en';
+      var shortName = (en2 ? sh.en : sh.fr).replace('TRIANGLE ', 'TRI ').replace('TÉTRA', 'TÉT').replace('DODÉCA', 'DOD').replace('ICOSA', 'ICO').replace('OCTA', 'OCT');
+      ctx.fillText(shortName, cx2, lgY + lgH*0.18);
+    }
+    ctx.restore();
   }
   // ── FX ──
   _opto_geo_fx = _opto_geo_fx.filter(function(f){ return (now - f.born) < 900; });
@@ -39249,6 +39343,74 @@ function _opto_drawGeo(W, H){
   });
   ctx.restore();
 }
+/* Toggle légende ON/OFF depuis UI (checkbox). Synchronise les 2 checkboxes. */
+window._dcog_geo_setLegend = function(on){
+  _opto_geo_legend = !!on;
+  var cb2 = document.getElementById('geo2d_legendToggle');
+  var cb3 = document.getElementById('geo3d_legendToggle');
+  if (cb2 && cb2.checked !== !!on) cb2.checked = !!on;
+  if (cb3 && cb3.checked !== !!on) cb3.checked = !!on;
+};
+
+/* Texte éducatif par forme — glossaire déroulable dans le panneau de config. */
+var _OPTO_GEO_2D_EDU = {
+  circle:  { fr:'infinité de symétries',           en:'infinite symmetries' },
+  square:  { fr:'4 côtés égaux · 4 angles 90°',    en:'4 equal sides · 4 right angles' },
+  rect:    { fr:'4 angles droits · côtés opposés =',en:'4 right angles · opposite sides =' },
+  triEq:   { fr:'3 côtés égaux · 3 angles 60°',    en:'3 equal sides · 3×60° angles' },
+  triRect: { fr:'1 angle droit (90°)',             en:'1 right angle (90°)' },
+  rhombus: { fr:'4 côtés égaux · angles variés',   en:'4 equal sides · varied angles' },
+  trap:    { fr:'2 côtés parallèles',              en:'2 parallel sides' },
+  penta:   { fr:'5 côtés · 5 sommets',             en:'5 sides · 5 vertices' },
+  hexa:    { fr:'6 côtés · pavage naturel',        en:'6 sides · natural tiling' },
+  octa:    { fr:'8 côtés · stop signs',            en:'8 sides · stop signs' }
+};
+var _OPTO_GEO_3D_EDU = {
+  tetra:  { fr:'4 faces triangulaires · 4 sommets · 6 arêtes',   en:'4 triangle faces · 4 vertices · 6 edges' },
+  cube:   { fr:'6 faces carrées · 8 sommets · 12 arêtes',        en:'6 square faces · 8 vertices · 12 edges' },
+  octa3d: { fr:'8 faces triangulaires · 6 sommets · 12 arêtes',  en:'8 triangle faces · 6 vertices · 12 edges' },
+  dodeca: { fr:'12 faces pentagonales · 20 sommets · 30 arêtes', en:'12 pentagon faces · 20 vertices · 30 edges' },
+  icosa:  { fr:'20 faces triangulaires · 12 sommets · 30 arêtes',en:'20 triangle faces · 12 vertices · 30 edges' }
+};
+
+/* Rempli les listes déroulables du glossaire (icône canvas + nom + propriété). */
+window._dcog_geo_renderGloss = function(){
+  var en = window._lang === 'en';
+  ['2d','3d'].forEach(function(kind){
+    var pool = (kind === '2d') ? _OPTO_GEO_2D_SHAPES : _OPTO_GEO_3D_SHAPES;
+    var edu  = (kind === '2d') ? _OPTO_GEO_2D_EDU   : _OPTO_GEO_3D_EDU;
+    var host = document.getElementById('geo'+kind+'_glossList');
+    if (!host) return;
+    host.innerHTML = '';
+    pool.forEach(function(sh){
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:4px;background:rgba(255,255,255,0.03)';
+      // Mini canvas pour l'icône (dessin cohérent avec le canvas drill)
+      var can = document.createElement('canvas');
+      can.width = 44; can.height = 44;
+      can.style.cssText = 'flex-shrink:0;background:transparent';
+      var cctx = can.getContext('2d');
+      if (kind === '2d') _opto_geo_draw2DShape(cctx, 22, 22, 16, sh.k);
+      else _opto_geo_draw3DSolid(cctx, 22, 22, 15, sh.k, Math.PI/5);
+      row.appendChild(can);
+      var txt = document.createElement('div');
+      txt.style.cssText = 'flex:1;min-width:0';
+      var nm = document.createElement('div');
+      nm.style.cssText = 'font-weight:700;color:'+(kind==='2d'?'#b59ff0':'#f5c518')+';font-size:11px;letter-spacing:.5px';
+      nm.textContent = en ? sh.en : sh.fr;
+      var pr = document.createElement('div');
+      pr.style.cssText = 'font-size:9px;color:#9aa3b3;line-height:1.3;margin-top:2px';
+      pr.textContent = en ? edu[sh.k].en : edu[sh.k].fr;
+      txt.appendChild(nm); txt.appendChild(pr);
+      row.appendChild(txt);
+      host.appendChild(row);
+    });
+  });
+};
+// Rendu initial au DOMContentLoaded (si DOM prêt) ou au prochain tick
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ try { _dcog_geo_renderGloss(); } catch(e){} });
+else setTimeout(function(){ try { _dcog_geo_renderGloss(); } catch(e){} }, 0);
+
 window._dcog_geo_setLevel = function(kind, lvl){
   _opto_geo_kind = kind;
   _opto_geo_level = lvl;
@@ -39349,7 +39511,7 @@ function _dcog_selectDrill(drill, langOnly) {
 
   if (!langOnly) {
     // Highlight selected drill button
-    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto','ar','dccm','dcgn'].forEach(function(d) {
+    ['viscoord','rcs','math','sprint','height','twoball','tboard','burnout','vcmath','colorreact','ruleswitch','quickchoice','quicktargets','limbo','opto','ar','dccm','dcgn','geo2d','geo3d'].forEach(function(d) {
       var btn = document.getElementById('dcog_btn_'+d);
       if (!btn) return;
       var active = d === drill;
