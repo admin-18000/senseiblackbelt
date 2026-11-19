@@ -39179,8 +39179,11 @@ function _opto_geo_nextRound(W, H){
   var isGo = (Math.random() < goProb);
   var shownShape = isGo ? announced : shuffled[1 + Math.floor(Math.random() * (shuffled.length - 1))];
   // Position de la cible : centrée dans la zone utile (droite du rond consigne).
+  // ★ Taille IDENTIQUE à TDR Reaction standard (demande utilisateur) :
+  //   min(W*0.075, H*0.13) → ~50-80px — assez grande pour viser, pas trop
+  //   pour éviter les faux hits du dribble naturel.
   var L = _opto_geo_layout(W, H, 1);
-  var tR = Math.round(Math.min(L.r * 1.8, W*0.16, H*0.22));  // ★ cible BIG (unique)
+  var tR = Math.round(Math.min(W*0.075, H*0.13));
   _opto_geo_pool = [{
     x: L.positions[0].x, y: L.positions[0].y, r: tR,
     shape: shownShape, hit: false, isGo: isGo
@@ -39382,16 +39385,30 @@ window._dcog_geo_renderGloss = function(){
     var host = document.getElementById('geo'+kind+'_glossList');
     if (!host) return;
     host.innerHTML = '';
+    // ★ Angle de rotation OPTIMAL par solide 3D (montre bien les faces caractéristiques).
+    var optimalRot3D = {
+      tetra:  Math.PI * 0.18,   // vue 3/4 : montre 3 faces
+      cube:   Math.PI * 0.20,   // vue iso classique : 3 faces visibles
+      octa3d: Math.PI * 0.25,   // vue bipointe : 4 faces top, 4 bottom
+      dodeca: Math.PI * 0.12,   // vue face pentagonale centrée
+      icosa:  Math.PI * 0.08    // vue 5-fold : coiffe pentagonale visible
+    };
     pool.forEach(function(sh){
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:4px;background:rgba(255,255,255,0.03)';
-      // Mini canvas pour l'icône (dessin cohérent avec le canvas drill)
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:4px;background:rgba(255,255,255,0.03)';
+      // Mini canvas — plus GRAND pour le 3D (lisibilité)
       var can = document.createElement('canvas');
-      can.width = 44; can.height = 44;
+      var sz = (kind === '2d') ? 44 : 64;   // ★ 3D en 64×64 au lieu de 44×44
+      can.width = sz; can.height = sz;
       can.style.cssText = 'flex-shrink:0;background:transparent';
       var cctx = can.getContext('2d');
-      if (kind === '2d') _opto_geo_draw2DShape(cctx, 22, 22, 16, sh.k);
-      else _opto_geo_draw3DSolid(cctx, 22, 22, 15, sh.k, Math.PI/5);
+      if (kind === '2d') {
+        _opto_geo_draw2DShape(cctx, sz/2, sz/2, sz*0.36, sh.k);
+      } else {
+        // ★ Angle fixe optimal par solide (silhouette la plus reconnaissable)
+        var rot = optimalRot3D[sh.k] || 0;
+        _opto_geo_draw3DSolid(cctx, sz/2, sz/2, sz*0.38, sh.k, rot);
+      }
       row.appendChild(can);
       var txt = document.createElement('div');
       txt.style.cssText = 'flex:1;min-width:0';
