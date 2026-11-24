@@ -2902,16 +2902,16 @@ window._dojoBackHome = function(){
         <select id="opto_drillSelect" onchange="_opto_setMode(this.value)" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(100,180,255,.5);background:rgba(100,180,255,.1);color:#64b4ff;font-family:var(--font-cond);font-size:12px;font-weight:800;cursor:pointer">
           <option value="headup">A11 · HEAD-UP SCAN (lis sans baisser la tête)</option>
           <option value="iso">F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)</option>
-          <option value="periph">A3 · PERIPHERAL TARGET (fixe centre, tape coins)</option>
+          <option value="periph">A3 · PERIPHERAL TARGET (fixe le centre · détection périphérique)</option>
           <option value="vanish">G3-F · VANISHING TARGET (ballon rebondit librement)</option>
           <option value="vanishShoot">G3-H · VANISHING TARGET (ballon rebondit + rentre au panier)</option>
           <option value="mot">A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)</option>
           <option value="sp">A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)</option>
           <option value="sac">A7-SAC · SACCADES (lis gauche/droite rapidement)</option>
           <option value="play">A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)</option>
-          <option value="qe">A7-QE · QUIET EYE (fixe · attends · tape au GO)</option>
-          <option value="bead">A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)</option>
-          <option value="bead-v">A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)</option>
+          <option value="qe">A7-QE · QUIET EYE (fixe · attends · fixation verrouillée au GO)</option>
+          <option value="bead">A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade yeux)</option>
+          <option value="bead-v">A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade yeux)</option>
         </select>
         <div id="opto_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px">Lis les chiffres qui défilent en bas de l'écran · tête haute (pitch < 15°) · chaque chiffre annoncé juste = +10 pts.</div>
       </div>
@@ -25738,7 +25738,8 @@ var _td2_VIDEOS = [
   {id:'otg8XLylw7I', title:'Reaction Rythme'},
   {id:'ftfnNFPv924', title:'Reaction Simple #2'},
   {id:'GORiKQBahLE', title:'Reaction Double'},
-  {id:'aNeIFfhsy-0', title:'Two Ball'}
+  // ★ 5e position : remplacement de "Two Ball" par la nouvelle vidéo utilisateur
+  {id:'pLRLeNyw3CQ', title:'Dribble Reaction #5'}
 ];
 var _td2_selVid = null;
 var _td2_initing = false;
@@ -34083,13 +34084,13 @@ function _opto_drawHUD(W, H){
   var consignes = {
     headup: en ? 'HEAD UP · READ WITHOUT LOWERING' : 'TÊTE HAUTE · LIS SANS BAISSER',
     iso:    en ? 'ROTATE HEAD · SHOULDERS FIXED'   : 'TOURNE LA TÊTE · ÉPAULES FIXES',
-    periph: en ? 'FIX CENTER · HIT CORNERS'        : 'FIXE LE CENTRE · TAPE LES COINS',
+    periph: en ? 'FIX CENTER · PERIPHERAL DETECTION' : 'FIXE LE CENTRE · DÉTECTION PÉRIPHÉRIQUE',
     vanish:      en ? 'FOLLOW THE BOUNCING BALL · HEAD STILL' : 'SUIS LE REBOND · TÊTE FIXE',
     vanishShoot: en ? 'FOLLOW BOUNCE → SHOT IN HOOP · HEAD STILL' : 'SUIS LE REBOND → SHOOT · TÊTE FIXE',
     mot:    en ? 'FOLLOW 3 COLORED BALLS · HEAD STILL' : 'SUIS LES 3 BOULES DE COULEUR · TÊTE FIXE',
     sp:     en ? 'FOLLOW THE TARGET · HEAD STILL'  : 'SUIS LA CIBLE · TÊTE FIXE',
     sac:    en ? 'READ LEFT/RIGHT DIGITS · HEAD STILL' : 'LIS LES CHIFFRES G/D · TÊTE FIXE',
-    qe:     en ? 'STARE · WAIT · HIT ON GREEN' : 'FIXE · ATTENDS · TAPE AU GO',
+    qe:     en ? 'STARE · WAIT · GAZE LOCKED ON GREEN' : 'FIXE · ATTENDS · REGARD VERROUILLÉ AU GO',
     bead:   en ? 'CALLED COLOR · SACCADE (eyes only) · HEAD STILL' : 'COULEUR ANNONCÉE · SACCADE (yeux) · TÊTE FIXE',
     'bead-v': en ? 'CALLED COLOR · SACCADE (eyes only) · HEAD STILL' : 'COULEUR ANNONCÉE · SACCADE (yeux) · TÊTE FIXE',
     colormove: en ? 'COLOR = DRIBBLE MOVE · LEGEND RIGHT' : 'COULEUR = GESTE DRIBBLE · LÉGENDE DROITE',
@@ -35741,6 +35742,15 @@ function _ar_layout(W, H){
 }
 function _ar_calibrate(poses, W, H, sx, sy){
   if (_ar_calib) return;
+  // ★ FIX AR1-AR4 : taille cône OK dès le 1er lancement.
+  //   Avant : calibration lancée AVANT que _opto_video.videoWidth/Height soient
+  //   disponibles → sx/sy = 1 par fallback → torso×sy en coords vidéo brutes au
+  //   lieu de canvas → ch calé sur une mauvaise taille. Au 2e lancement, le vidéo
+  //   était déjà dimensionné → bonne taille. On exige maintenant des dimensions
+  //   vidéo réelles AVANT d'accumuler la calibration.
+  if (!_opto_video || !_opto_video.videoWidth || !_opto_video.videoHeight){
+    _ar_calibN = 0; _ar_calibAcc = null; return;
+  }
   var lH = _tsym_kp_fast(poses,'leftHip'), rH = _tsym_kp_fast(poses,'rightHip');
   var lS = _tsym_kp_fast(poses,'leftShoulder'), rS = _tsym_kp_fast(poses,'rightShoulder');
   if (!lH || !rH || !lS || !rS){ _ar_calibN = 0; _ar_calibAcc = null; return; }
@@ -37154,7 +37164,7 @@ function _opto_drawQe(W, H){
     var ms = _opto_qe_holdStart ? (now - _opto_qe_holdStart) : 0;
     state = { txt:(en?'FIX  ':'FIXE  ') + Math.max(0,Math.round(ms))+'ms', col:'#64b4ff' };
   }
-  else if (_opto_qe_phase === 'ask') state = { txt:(en?'HIT NOW !':'TAPE !'), col:'#4ade80' };
+  else if (_opto_qe_phase === 'ask') state = { txt:(en?'GO !':'GO !'), col:'#4ade80' };
   else state = { txt:(en?'BREATHE':'RESPIRE'), col:'#9ba3b4' };
   var pw = Math.min(W*0.28, 300), ph = Math.min(H*0.12, 100);
   var px = W*0.035, py = H*0.42, rr = ph*0.5;
@@ -37212,29 +37222,29 @@ function _opto_applyLang(lang){
     var optLabels = en ? [
       'A11 · HEAD-UP SCAN (read without lowering)',
       'F11 · HEAD/TRUNK ISO (rotate head, fix shoulders)',
-      'A3 · PERIPHERAL TARGET (fix center, hit corners)',
+      'A3 · PERIPHERAL TARGET (fix center · peripheral detection)',
       'G3-F · VANISHING TARGET (free bouncing ball)',
       'G3-H · VANISHING TARGET (bounce → shot into hoop)',
       'A7-MOT · MULTI-OBJECT TRACKING (track 3 balls)',
       'A7-SP · SMOOTH PURSUIT (follow target · 6 trajectories)',
       'A7-SAC · SACCADES (read L/R digits · head still)',
       'A7-PLAY · PLAY TRACKING (follow the ball through plays)',
-      'A7-QE · QUIET EYE (fix · wait · hit on GO)',
-      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (called color · saccade + tap)',
-      'A7-BEAD · COLOR BEAD ROD · VERTICAL (called color · saccade + tap)'
+      'A7-QE · QUIET EYE (fix · wait · gaze locked on GO)',
+      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (called color · eye saccade)',
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (called color · eye saccade)'
     ] : [
       'A11 · HEAD-UP SCAN (lis sans baisser la tête)',
       'F11 · HEAD/TRUNK ISO (tourne tête, épaules fixes)',
-      'A3 · PERIPHERAL TARGET (fixe centre, tape coins)',
+      'A3 · PERIPHERAL TARGET (fixe le centre · détection périphérique)',
       'G3-F · VANISHING TARGET (ballon rebondit librement)',
       'G3-H · VANISHING TARGET (ballon rebondit + rentre au panier)',
       'A7-MOT · MULTI-OBJECT TRACKING (suis 3 boules)',
       'A7-SP · SMOOTH PURSUIT (suis la cible · 6 trajectoires)',
       'A7-SAC · SACCADES (lis chiffres G/D · tête fixe)',
       'A7-PLAY · PLAY TRACKING (suis le ballon dans les systèmes)',
-      'A7-QE · QUIET EYE (fixe · attends · tape au GO)',
-      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade + tape)',
-      'A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade + tape)'
+      'A7-QE · QUIET EYE (fixe · attends · fixation verrouillée au GO)',
+      'A7-BEAD · COLOR BEAD ROD · HORIZONTAL (annonce couleur · saccade yeux)',
+      'A7-BEAD · COLOR BEAD ROD · VERTICAL (annonce couleur · saccade yeux)'
     ];
     for (var i=0;i<sel.options.length && i<optLabels.length;i++){
       sel.options[i].textContent = optLabels[i];
@@ -38713,15 +38723,27 @@ var _dcog_VIDEOS = [
   // ═══ RCS COLOR (R1-R4 modes) — tuto panneau uniquement, retiré du carrousel pour
   //   garder exactement 5 vignettes Shorts dans "CHOISIS TON DRILL" ═══
   // ═══ OPTOMOTOR RESPONSE ═══
-  {id:'mDfWvQJSQDE', title:'Optomotor Response', drill:'opto'},
+  {id:'mDfWvQJSQDE', title:'Optomotor Response',       drill:'opto'},
+  {id:'usrjetuJ4xY', title:'Optomotor Response #2',    drill:'opto'},
   // ═══ AUGMENTED REALITY — 1 vidéo par sous-mode (mapping via arMode = valeur du select)
   //   AR-1 → c1t · AR-3 → c1 · AR-5 → col3 · AR-6 → col4
   //   AR-2 (c2t) et AR-4 (c2) : pas de vidéo pour le moment ═══
   {id:'JQC8oyoIa0k', title:'AR-1 · 1 Cône + Cibles',        drill:'ar', arMode:'c1t'},
+  // ★ AR-1 : 3 vidéos additionnelles à la suite du carrousel existant
+  {id:'lnQ_YLOqktQ', title:'AR-1 · Démo #2',                drill:'ar', arMode:'c1t'},
+  {id:'2ohPRFONfbs', title:'AR-1 · Démo #3',                drill:'ar', arMode:'c1t'},
+  {id:'EOxQTzt7NF0', title:'AR-1 · Démo #4',                drill:'ar', arMode:'c1t'},
   {id:'SKUJISKpf1w', title:'AR-3 · 1 Cône (sans cible)',    drill:'ar', arMode:'c1'},
   {id:'wkGVSLCjZ3I', title:'AR-5 · Color Call · 3 Cônes',   drill:'ar', arMode:'col3'},
-  {id:'D9X5Bm55w88', title:'AR-6 · Color Call · 4 Cônes',   drill:'ar', arMode:'col4'}
-  // DCOG-CM et DCOG-GN : pas de vidéos — l'utilisateur fournira les IDs
+  // ★ AR-5 : vidéo additionnelle à la suite du carrousel existant
+  {id:'-A58VqC3bkU', title:'AR-5 · Démo #2',                drill:'ar', arMode:'col3'},
+  {id:'D9X5Bm55w88', title:'AR-6 · Color Call · 4 Cônes',   drill:'ar', arMode:'col4'},
+  // ═══ DCOG-CM · COLOR MOVE / DCOG-GN · GO-NO-GO / GEO-2D / GEO-3D
+  //   Autoplay direct au clic sur le drill (1 vidéo chacun) ═══
+  {id:'L3ePoEcUNOM', title:'COLOR MOVE',                    drill:'dccm'},
+  {id:'dOiXKMOQpsU', title:'GO / NO-GO',                    drill:'dcgn'},
+  {id:'gfDZxC5eD40', title:'GEOMETRY 2D',                   drill:'geo2d'},
+  {id:'l7_GGnowNHU', title:'GEOMETRY 3D',                   drill:'geo3d'}
 ];
 var _dcog_selVid = null;
 var _dcog_initing = false; // supprime auto-open vidéo pendant init
@@ -38733,7 +38755,8 @@ function _dcog_renderVids() {
   //   qui montre toute la bibliothèque — ça désoriente plus qu'autre chose).
   //   Ex : dccm (COLOR MOVE) et dcgn (GO/NO-GO) tant que l'utilisateur n'a pas
   //   fourni ses propres IDs YouTube.
-  var _dcog_DRILLS_SANS_VIDEOS = { dccm:1, dcgn:1, geo2d:1, geo3d:1 };
+  // ★ Vidéos désormais mappées pour dccm/dcgn/geo2d/geo3d → whitelist vidée (autoplay OK).
+  var _dcog_DRILLS_SANS_VIDEOS = {};
   var current = _dcog_drill;
   var filtered = _dcog_VIDEOS.filter(function(v){ return v.drill === current; });
   // ★ MAPPING FIN par sous-mode (homogène au pattern drill → vidéos) :
