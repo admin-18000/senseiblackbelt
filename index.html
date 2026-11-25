@@ -36088,13 +36088,18 @@ function _ar_cc_reset(){
 }
 // Rangée de cônes centrée, au sol, sous le HUD et au-dessus du badge du bas
 function _ar_colorLayout(W, H){
+  // ★ AR5/AR6 — POSITION DES CÔNES revue pour un HIT fluide type TDR/RCS :
+  //   · baseY = H × 0.60 (juste au-dessus de l'apex du dribble bas) → la main
+  //     de dribble reste sous les cônes → zéro faux HIT par passage.
+  //   · span  = W × 0.75 (large écart latéral) → couloir central de dribble
+  //     libre, main libre atteint un cône par un geste court et latéral.
+  //   · ch (hauteur visuelle du cône) conservée pour le look.
+  //   Target y = baseY − ch × 0.45 → centre de hit à hauteur ventre/torse.
   var n = _ar_cc_order.length || _ar_cfg.cones;
-  var baseY = _ar_calib ? _ar_calib.baseY : H*0.90;
-  var ch    = _ar_calib ? _ar_calib.ch    : H*0.17;
-  ch = Math.max(H*0.11, Math.min(ch, H*0.155));
-  baseY = Math.min(baseY, H*0.88);
-  var cw = ch*_AR_CONE_RATIO;
-  var span = Math.min(W*0.74, cw*(n-1)*1.95);
+  var ch = Math.max(H*0.11, Math.min(H*0.15, H*0.15));
+  var cw = ch * _AR_CONE_RATIO;
+  var baseY = H * 0.60;                            // hauteur fixe au-dessus dribble
+  var span  = W * 0.75;                            // écart latéral large
   var xs = [];
   for (var i=0;i<n;i++) xs.push(W/2 - span/2 + (n>1 ? span*i/(n-1) : 0));
   return { xs:xs, baseY:baseY, ch:ch, cw:cw };
@@ -36136,13 +36141,18 @@ function _ar_cc_analyze(poses, W, H, now){
     return;
   }
   var tg = _ar_cc_targets(W, H);
-  // ★ HIT DETECTION AR5/AR6 : strict alignement sur TDR Reaction / RCS (hyper fluide).
-  //   - radiusTol 2.0 (identique TDR) : halo généreux autour du cône
-  //   - mouvement min 8 px (identique TDR) : geste intentionnel requis
-  //   - directionnel (dot > 0 vers cible, identique TDR)
-  //   Aucun guard additionnel : les cônes sont POSITIONNÉS au niveau sol/pieds,
-  //   loin de la zone de dribble naturelle (hanches-genoux), donc pas besoin de
-  //   filtrer les dribbles — ils ne tombent pas dans le halo des cônes.
+  // ★ HIT DETECTION AR5/AR6 — STRICTEMENT identique à TDR Reaction / RCS :
+  //   _opto_doHits est un port exact de _tdr_checkHits :
+  //     • mirror wx = W − kp.x × sx
+  //     • _tsym_kp_hand (extrapolation coude→poignet +25%)
+  //     • seuil mouvement min max(8, W×0.02)
+  //     • filtre halo dist < t.r × 2.0
+  //     • filtre directionnel dot((-dx,-dy),(vx,vy)) > 0
+  //   Pas de guard supplémentaire. Les cônes sont désormais POSITIONNÉS à
+  //   hauteur ventre (baseY = H×0.60), au-dessus de l'apex du dribble bas :
+  //   la main qui dribble reste SOUS la zone des cônes, et l'écart latéral
+  //   (span = W×0.75) laisse un couloir central libre pour le ballon.
+  //   Résultat : feeling HIT identique à TDR, sans faux HITs par passage.
   _opto_doHits(poses, tg, 2.0, function(t, side, rt){
     if (_ar_cc_phase !== 'ask') return;
     var c = _ar_colorByKey(t.key);
