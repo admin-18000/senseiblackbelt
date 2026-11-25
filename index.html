@@ -35801,11 +35801,15 @@ function _opto_analyzeAr(poses){
   if (_ar_cfg.mode === 'color'){ _ar_cc_analyze(poses, W, H, now); return; }
   var L = _ar_layout(W, H);
   // ── Répétitions OVERHAND : main qui dribble (extrapolée comme TDR) ──
+  //   ★ DOUBLE DÉTECTION pour AR1-AR4 : reps crédités si zone L↔R OU bounce
+  //     vertical du poignet (apex↓↑ typique du dribble). Évite les 0 pts sur
+  //     dribble vertical pur où la détection latérale ratait toute la session.
   var hand = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, _ar_cfg.hand) : null;
   if (hand){
     var hx = W - hand.x*sx, hy = hand.y*sy;
     var sh = _tsym_kp_fast(poses, _ar_cfg.hand + 'Shoulder');
     var low = !sh || hy > sh.y*sy;                  // main sous l'épaule = zone de dribble
+    // (1) Détection zone L↔R (overhand pur avec oscillation latérale)
     var z = null;
     if (L.xs.length === 1){
       var m = L.cw*0.25;
@@ -35820,24 +35824,54 @@ function _opto_analyzeAr(poses){
       }
       _ar_zone = z;
     }
+    // (2) ★ Fallback : détection d'un BOUNCE VERTICAL (dribble sans swing)
+    //     Suivi hy frame par frame : on détecte l'apex (hy max) puis la remontée.
+    //     Un cycle complet (descente de >H×0.04 puis remontée de >H×0.04) = 1 rep.
+    //     Anti-bruit : un rep max toutes les 250 ms.
+    if (!window._ar_bounce) window._ar_bounce = { prevY:null, dir:0, apexY:0, lastRepTs:0 };
+    var B = window._ar_bounce;
+    if (low && B.prevY !== null){
+      var dy = hy - B.prevY;
+      var minAmp = H * 0.04;
+      if (dy > 1){                                  // main descend
+        if (B.dir !== 1){ B.apexY = B.prevY; B.dir = 1; }
+      } else if (dy < -1){                          // main remonte
+        if (B.dir === 1 && (hy - B.apexY) < -minAmp && (B.prevY - B.apexY) > minAmp){
+          // Cycle descente+remontée d'amplitude suffisante = 1 dribble
+          if (now - B.lastRepTs > 250){
+            _ar_reps++; _ar_lastRepTs = now; _opto_score++;
+            B.lastRepTs = now;
+            if (typeof _td_beep === 'function') _td_beep(520, 0.03, 0.05);
+          }
+          B.dir = -1;
+        } else if (B.dir === 0){
+          B.dir = -1;
+        }
+      }
+    }
+    B.prevY = hy;
   }
   if (!_ar_cfg.targets) return;
   // ── Cibles (double tâche) ──
   if (!_ar_nextSpawn) _ar_nextSpawn = now + 2500;
   if (!_ar_targets.length && now >= _ar_nextSpawn) _ar_spawnTarget(W, H, now);
   _opto_doHits(poses, _ar_targets, 2.0, function(t, side, rt){
+    // ★ CRÉDIT GARANTI pour chaque HIT valide — fini le "0 points à la fin"
+    //   qui venait du gate dribble trop strict (détection de zone L↔R rate
+    //   les dribbles verticaux purs et laisse _ar_lastRepTs à 0).
+    //   Base = 10 pts + bonus vitesse (toujours). Si le joueur dribble
+    //   activement en plus (détection OVERHAND OK), BONUS +5 pour saluer
+    //   la double tâche. Sinon rien n'est retiré, le HIT compte quand même.
     var dribbling = (now - _ar_lastRepTs) < _AR_DRIBBLE_WINDOW;
-    if (dribbling){
-      var pts = 10 + Math.max(0, Math.round((t.ttl - rt)/350));
-      _opto_hits++; _ar_tHit++; _opto_score += pts;
-      _ar_fx.push({x:t.x, y:t.y, txt:'+'+pts, color:'#4ade80', born:now});
-      if (typeof _td_beep === 'function') _td_beep(rt < 1200 ? 1320 : 880, 0.05, 0.1);
-      if (navigator.vibrate) navigator.vibrate(25);
-    } else {
-      _opto_miss++;
-      _ar_fx.push({x:t.x, y:t.y, txt:'DRIBBLE !', color:'#ff8a94', born:now});
-      if (typeof _td_beep === 'function') _td_beep(220, 0.08, 0.12);
-    }
+    var basePts = 10 + Math.max(0, Math.round((t.ttl - rt)/350));
+    var dualBonus = dribbling ? 5 : 0;
+    var pts = basePts + dualBonus;
+    _opto_hits++; _ar_tHit++; _opto_score += pts;
+    var fxTxt = dribbling ? ('+'+pts) : ('+'+pts);
+    var fxCol = dribbling ? '#4ade80' : '#fbbf24';
+    _ar_fx.push({x:t.x, y:t.y, txt:fxTxt, color:fxCol, born:now});
+    if (typeof _td_beep === 'function') _td_beep(rt < 1200 ? 1320 : 880, 0.05, 0.1);
+    if (navigator.vibrate) navigator.vibrate(25);
   });
   var kept = [];
   for (var i=0;i<_ar_targets.length;i++){
@@ -36115,8 +36149,20 @@ function _ar_colorLayout(W, H){
 }
 function _ar_cc_targets(W, H){
   var L = _ar_colorLayout(W, H), tg = [];
+  // ★ CAP DU RAYON HIT — critique pour éviter les faux −5 en AR5/AR6.
+  //   Les cônes sont gros (distance trépied) et rapprochés → si le rayon
+  //   de hit est trop large, le halo (r × radiusTol = r × 2.0) chevauche
+  //   le cône voisin. _opto_doHits itère forEach(targets) : la 1ʳᵉ cible
+  //   touchée gagne, pas forcément la plus proche → pénalité abusive sur
+  //   le mauvais cône, score bloqué à 0 malgré hits apparents.
+  //   Fix : r ≤ spacing × 0.22 → halo diamètre ≤ 88 % de l'écart entre
+  //   cônes voisins → zéro chevauchement possible.
+  var baseR = Math.max(L.cw*0.48, L.ch*0.36);
+  var spacingX = (L.xs.length > 1) ? Math.abs(L.xs[1] - L.xs[0]) : W;
+  var maxR = spacingX * 0.22;
+  var rCapped = Math.min(baseR, maxR);
   for (var i=0;i<L.xs.length;i++){
-    tg.push({ x:L.xs[i], y:L.baseY - L.ch*0.45, r:Math.max(L.cw*0.48, L.ch*0.36),
+    tg.push({ x:L.xs[i], y:L.baseY - L.ch*0.45, r:rCapped,
               key:_ar_cc_order[i], born:_ar_cc_askTs, hit:false });
   }
   return tg;
@@ -36672,7 +36718,8 @@ function _opto_analyzeColormove(poses){
       var rt = now - _opto_cm_askTs;
       if (det === expected){
         var basePts = (det === 'inout') ? 12 : 15;  // IN-OUT vaut un peu moins (fiabilité)
-        var pts = basePts + Math.max(0, Math.round((2200 - rt)/80));
+        // ★ Standardisé sur le barème canonique (base + speedBonus /200 comme TDR/DCRC/DRSW)
+        var pts = basePts + Math.max(0, Math.round((2000 - rt)/200));
         _opto_cm_hits++; _opto_cm_rtSum+=rt; _opto_cm_rtCount++; _opto_cm_round++;
         _opto_score += pts; _opto_hits++;
         _opto_cm_fx.push({x:W/2, y:H*0.30, txt:'+'+pts+' · '+rt+'ms', col:'#4ade80', born:now});
@@ -37342,10 +37389,20 @@ function _tsym_getBestMime() {
 // ═══════════════════════════════════════════════════════════════════════════
 window._sensei_recFlushStart = function(canvas, recorder, timeslice, onStarted, onFail) {
   if (!recorder || !canvas) { if (onFail) onFail(); return; }
+  // ★ (0) RÉVEIL AUDIO FORCÉ — critique iOS/Safari où l'AudioContext part en
+  //       'suspended'. Le clic REC = user gesture → la policy autorise le resume.
+  //       Sans ça, la 1ʳᵉ tentative capture 300-500 ms d'audio silencieux puis
+  //       le header WebM part cassé → durée corrompue "3976:49:1" sur certains
+  //       devices, ou tout simplement recorder.start() qui throw sur iOS.
+  try {
+    var _ac = (typeof _td_getAudioCtx === 'function') ? _td_getAudioCtx() : null;
+    if (_ac && _ac.state === 'suspended' && typeof _ac.resume === 'function') _ac.resume();
+  } catch(e) {}
+  // ★ (1) FLUSH canvas plein : force une frame réelle (même noire alpha 0.01)
+  //       dans le pipeline captureStream avant que le MediaRecorder ne l'ouvre.
   try {
     var _cx = canvas.getContext('2d');
     if (_cx) {
-      // (1) Plein canvas : force une frame réelle dans le pipeline captureStream
       _cx.save();
       _cx.globalAlpha = 0.01;
       _cx.fillStyle = '#000';
@@ -37353,17 +37410,28 @@ window._sensei_recFlushStart = function(canvas, recorder, timeslice, onStarted, 
       _cx.restore();
     }
   } catch(e) {}
-  // (2) Double rAF : garantit que la frame est dans le pipeline avant start()
+  // ★ (2) DOUBLE rAF + délai 450 ms (au lieu de 320) pour laisser le mux
+  //       WebM header s'écrire proprement. Avec retry 1x si premier essai throw.
   var _tsSlice = timeslice || 1000;
-  requestAnimationFrame(function(){
+  var _tryStart = function(attempt){
     requestAnimationFrame(function(){
-      // (3) Délai supplémentaire 320 ms pour le mux WebM header
-      setTimeout(function(){
-        try { recorder.start(_tsSlice); if (onStarted) onStarted(); }
-        catch(e){ if (onFail) onFail(); }
-      }, 320);
+      requestAnimationFrame(function(){
+        setTimeout(function(){
+          try {
+            // Audio context : dernier filet de sécurité juste avant start
+            var _ac2 = (typeof _td_getAudioCtx === 'function') ? _td_getAudioCtx() : null;
+            if (_ac2 && _ac2.state === 'suspended' && typeof _ac2.resume === 'function') _ac2.resume();
+            recorder.start(_tsSlice);
+            if (onStarted) onStarted();
+          } catch(e){
+            if (attempt < 1) { _tryStart(attempt + 1); }   // 1 seul retry
+            else if (onFail) onFail();
+          }
+        }, attempt === 0 ? 450 : 400);
+      });
     });
-  });
+  };
+  _tryStart(0);
 };
 
 function _tsym_toggleRec() {
