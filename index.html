@@ -36136,38 +36136,14 @@ function _ar_cc_analyze(poses, W, H, now){
     return;
   }
   var tg = _ar_cc_targets(W, H);
-  // ★ FIX AR-5/AR-6 HIT PRÉMATURÉ (capture: dribble devant = faux HIT)
-  //   · radiusTol 2.0 → 1.3 : zone hit collée au cône physique (fin du halo géant)
-  //   · dribbleGuard inline: ignore les mains au-dessus de hipY + marge (zone dribble devant corps)
-  var _kpGuard = (typeof _opto_kpMap === 'function') ? _opto_kpMap(poses) : null;
-  var _hipY_cc = null;
-  if (_kpGuard){
-    var _lh_cc = _kpGuard['left_hip'] || _kpGuard['leftHip'];
-    var _rh_cc = _kpGuard['right_hip'] || _kpGuard['rightHip'];
-    var _sy_cc = H / (_opto_video && _opto_video.videoHeight ? _opto_video.videoHeight : H);
-    if (_lh_cc && _rh_cc && _lh_cc.score > 0.3 && _rh_cc.score > 0.3){
-      _hipY_cc = ((_lh_cc.y + _rh_cc.y) / 2) * _sy_cc;
-    }
-  }
-  _opto_doHits(poses, tg, 1.1, function(t, side, rt){
-    // ★ GUARD AR5/AR6 renforcé : dribble en face des cônes ne doit JAMAIS déclencher un HIT.
-    //   (1) La main qui touche doit être à hauteur de cône (sous hipY + 10% H) : filtre les dribbles mi-hauteur
-    //   (2) Le mouvement de la main doit être DOMINÉ par un déplacement LATÉRAL vers le cône
-    //       (dx entre frames > 1.3 × |dy|) : un dribble vertical ne valide pas, seul un geste
-    //       de tap volontaire vers le cône passe le filtre.
-    //   (3) Le poignet doit être réellement PROCHE du cône (radiusTol ramené à 1.1 — zone collée).
-    var _syGuard = H / (_opto_video && _opto_video.videoHeight ? _opto_video.videoHeight : H);
-    var _wristKp = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, side) : null;
-    if (!_wristKp) return;
-    var _wy = _wristKp.y * _syGuard;
-    // (1) Zone hauteur cône : sinon rejette (ignore mains qui dribblent au-dessus)
-    if (_hipY_cc !== null && _wy < _hipY_cc + H*0.10) return;
-    // (2) Mouvement latéral : lit la vélocité stockée frame-par-frame par _opto_doHits
-    var _velName = side + 'Wrist';
-    var _vel = window._opto_lastVel && window._opto_lastVel[_velName];
-    if (_vel){
-      if (Math.abs(_vel.vy) > Math.abs(_vel.vx) * 1.3) return;   // mouvement trop vertical → dribble, ignoré
-    }
+  // ★ HIT DETECTION AR5/AR6 : strict alignement sur TDR Reaction / RCS (hyper fluide).
+  //   - radiusTol 2.0 (identique TDR) : halo généreux autour du cône
+  //   - mouvement min 8 px (identique TDR) : geste intentionnel requis
+  //   - directionnel (dot > 0 vers cible, identique TDR)
+  //   Aucun guard additionnel : les cônes sont POSITIONNÉS au niveau sol/pieds,
+  //   loin de la zone de dribble naturelle (hanches-genoux), donc pas besoin de
+  //   filtrer les dribbles — ils ne tombent pas dans le halo des cônes.
+  _opto_doHits(poses, tg, 2.0, function(t, side, rt){
     if (_ar_cc_phase !== 'ask') return;
     var c = _ar_colorByKey(t.key);
     if (t.key === _ar_cc_target){
