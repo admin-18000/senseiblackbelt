@@ -36093,18 +36093,22 @@ function _ar_cc_reset(){
 }
 // Rangée de cônes centrée, au sol, sous le HUD et au-dessus du badge du bas
 function _ar_colorLayout(W, H){
-  // ★ AR5/AR6 — POSITION DES CÔNES revue pour un HIT fluide type TDR/RCS :
-  //   · baseY = H × 0.60 (juste au-dessus de l'apex du dribble bas) → la main
-  //     de dribble reste sous les cônes → zéro faux HIT par passage.
-  //   · span  = W × 0.75 (large écart latéral) → couloir central de dribble
-  //     libre, main libre atteint un cône par un geste court et latéral.
-  //   · ch (hauteur visuelle du cône) conservée pour le look.
-  //   Target y = baseY − ch × 0.45 → centre de hit à hauteur ventre/torse.
+  // ★ AR5/AR6 — POSITION & TAILLE DES CÔNES pensées pour trépied à distance :
+  //   · baseY = H × 0.60 : juste au-dessus de l'apex du dribble bas.
+  //   · ch (hauteur du cône) AGRANDIE : cible 0.22H pour 3 cônes (AR5),
+  //     0.18H pour 4 cônes (AR6). Plus limitée par la largeur canvas si besoin
+  //     (évite tout chevauchement latéral entre voisins).
+  //   · span latéral adapté au nombre de cônes :
+  //       3 cônes → W × 0.72   ·   4 cônes → W × 0.86
+  //   Target y = baseY − ch × 0.45 → centre hit à hauteur ventre/torse.
   var n = _ar_cc_order.length || _ar_cfg.cones;
-  var ch = Math.max(H*0.11, Math.min(H*0.15, H*0.15));
+  var span = (n <= 3) ? W*0.72 : W*0.86;
+  var spacing = (n > 1) ? span / (n-1) : W*0.60;
+  var chByW = spacing * 0.85 / _AR_CONE_RATIO;      // cap pour garder 15% de gap entre cônes
+  var chByH = (n <= 3) ? H*0.22 : H*0.18;           // cap par la hauteur visible
+  var ch = Math.max(H*0.15, Math.min(chByW, chByH));
   var cw = ch * _AR_CONE_RATIO;
-  var baseY = H * 0.60;                            // hauteur fixe au-dessus dribble
-  var span  = W * 0.75;                            // écart latéral large
+  var baseY = H * 0.60;
   var xs = [];
   for (var i=0;i<n;i++) xs.push(W/2 - span/2 + (n>1 ? span*i/(n-1) : 0));
   return { xs:xs, baseY:baseY, ch:ch, cw:cw };
