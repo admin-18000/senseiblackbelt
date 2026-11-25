@@ -35721,6 +35721,9 @@ function _ar_reset(){
   _ar_calib = null; _ar_calibN = 0; _ar_calibAcc = null;
   _ar_zone = null; _ar_reps = 0; _ar_lastRepTs = 0;
   _ar_targets = []; _ar_nextSpawn = 0; _ar_tHit = 0; _ar_tTotal = 0; _ar_fx = [];
+  // ★ Reset des accumulateurs de détection (bounce vertical + time pt AR3/AR4)
+  window._ar_bounce = null;
+  window._ar_timePtTs = null;
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
 }
 function _ar_consigne(en){
@@ -35851,7 +35854,19 @@ function _opto_analyzeAr(poses){
     }
     B.prevY = hy;
   }
-  if (!_ar_cfg.targets) return;
+  if (!_ar_cfg.targets){
+    // ★ AR3/AR4 (sans cibles) : score baseline temporel GARANTI.
+    //   La techno ne peut pas reconnaître un overhand de façon fiable → sans
+    //   fallback, le drill renvoie 0 pts même si le joueur a dribblé 60 s.
+    //   +1 pt toutes les 2 s de session → 30 pts/min garantis, la détection
+    //   OVERHAND (reps) reste un bonus par-dessus.
+    if (!window._ar_timePtTs) window._ar_timePtTs = now;
+    if (now - window._ar_timePtTs >= 2000){
+      _opto_score++;
+      window._ar_timePtTs = now;
+    }
+    return;
+  }
   // ── Cibles (double tâche) ──
   if (!_ar_nextSpawn) _ar_nextSpawn = now + 2500;
   if (!_ar_targets.length && now >= _ar_nextSpawn) _ar_spawnTarget(W, H, now);
