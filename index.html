@@ -2976,6 +2976,18 @@ window._dojoBackHome = function(){
           <option value="c2_letter_xb">AR-38 · VOYELLE/CONSONNE · 2 CÔNES · CROSS-BODY</option>
           <option value="c2_color">AR-39 · COULEUR · 2 CÔNES</option>
           <option value="c2_color_xb">AR-40 · COULEUR · 2 CÔNES · CROSS-BODY</option>
+          <option value="c0_geo2d">AR-41 · GÉOMÉTRIE 2D · SANS CÔNE</option>
+          <option value="c0_geo2d_xb">AR-42 · GÉOMÉTRIE 2D · SANS CÔNE · CROSS-BODY</option>
+          <option value="c0_geo3d">AR-43 · GÉOMÉTRIE 3D · SANS CÔNE</option>
+          <option value="c0_geo3d_xb">AR-44 · GÉOMÉTRIE 3D · SANS CÔNE · CROSS-BODY</option>
+          <option value="c1_geo2d">AR-45 · GÉOMÉTRIE 2D · 1 CÔNE</option>
+          <option value="c1_geo2d_xb">AR-46 · GÉOMÉTRIE 2D · 1 CÔNE · CROSS-BODY</option>
+          <option value="c1_geo3d">AR-47 · GÉOMÉTRIE 3D · 1 CÔNE</option>
+          <option value="c1_geo3d_xb">AR-48 · GÉOMÉTRIE 3D · 1 CÔNE · CROSS-BODY</option>
+          <option value="c2_geo2d">AR-49 · GÉOMÉTRIE 2D · 2 CÔNES</option>
+          <option value="c2_geo2d_xb">AR-50 · GÉOMÉTRIE 2D · 2 CÔNES · CROSS-BODY</option>
+          <option value="c2_geo3d">AR-51 · GÉOMÉTRIE 3D · 2 CÔNES</option>
+          <option value="c2_geo3d_xb">AR-52 · GÉOMÉTRIE 3D · 2 CÔNES · CROSS-BODY</option>
         </select>
         <div id="ar_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px"></div>
       </div>
@@ -36166,7 +36178,7 @@ window._ar_setDrill = function(v){
   _ar_cfg.taskType = 'simple';   // par défaut : cibles simples (disques)
   // ★ AR17-AR40 : couche cognitive — cibles = chiffres/lettres/couleurs + consigne
   //   Clé format : c{N}_{task}  où N = 0|1|2 cônes · task = arith/parity/letter/color
-  var cogMatch = core.match(/^c([012])_(arith|parity|letter|color)$/);
+  var cogMatch = core.match(/^c([012])_(arith|parity|letter|color|geo2d|geo3d)$/);
   if (cogMatch){
     _ar_cfg.mode = 'overhand';
     _ar_cfg.cones = parseInt(cogMatch[1], 10);
@@ -36248,21 +36260,25 @@ function _ar_applyLang(){
   if (sel){
     var baseEn = ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)','AR-5 · COLOR CALL · 3 CONES (colour called)','AR-6 · COLOR CALL · 4 CONES (colour called)','AR-7 · 1 CONE + TARGETS + STICKS','AR-8 · 2 CONES + TARGETS + STICKS','AR-9 · 1 CONE + STICKS','AR-10 · 2 CONES + STICKS','AR-11 · NO CONE · TARGETS + STICKS','AR-12 · CROSS-BODY · 1 CONE + TARGETS + STICKS','AR-13 · CROSS-BODY · 2 CONES + TARGETS + STICKS','AR-14 · CROSS-BODY · 1 CONE + STICKS','AR-15 · CROSS-BODY · 2 CONES + STICKS','AR-16 · CROSS-BODY · NO CONE · TARGETS + STICKS'];
     var baseFr = ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)','AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)','AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)','AR-7 · 1 CÔNE + CIBLES + STICKS','AR-8 · 2 CÔNES + CIBLES + STICKS','AR-9 · 1 CÔNE + STICKS','AR-10 · 2 CÔNES + STICKS','AR-11 · SANS CÔNE · CIBLES + STICKS','AR-12 · CROSS-BODY · 1 CÔNE + CIBLES + STICKS','AR-13 · CROSS-BODY · 2 CÔNES + CIBLES + STICKS','AR-14 · CROSS-BODY · 1 CÔNE + STICKS','AR-15 · CROSS-BODY · 2 CÔNES + STICKS','AR-16 · CROSS-BODY · SANS CÔNE · CIBLES + STICKS'];
-    // AR-17 à AR-40 : couche cognitive
+    // AR-17 à AR-52 : couche cognitive — ordre doit matcher le HTML exactement
     var cogIdx = 17;
-    var cogTasksEn = {arith:'ARITH', parity:'EVEN/ODD', letter:'VOWEL/CONSONANT', color:'COLOR'};
-    var cogTasksFr = {arith:'ARITH', parity:'PAIR/IMPAIR', letter:'VOYELLE/CONSONNE', color:'COULEUR'};
-    var cogTasks = ['arith','parity','letter','color'];
-    [0,1,2].forEach(function(n){
-      cogTasks.forEach(function(task){
-        var coneEn = (n===0) ? 'NO CONE' : (n+' CONE'+(n>1?'S':''));
-        var coneFr = (n===0) ? 'SANS CÔNE' : (n+' CÔNE'+(n>1?'S':''));
-        baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn);
-        baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr);
-        cogIdx++;
-        baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn+' · CROSS-BODY');
-        baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr+' · CROSS-BODY');
-        cogIdx++;
+    var cogTasksEn = {arith:'ARITH', parity:'EVEN/ODD', letter:'VOWEL/CONSONANT', color:'COLOR', geo2d:'GEOMETRY 2D', geo3d:'GEOMETRY 3D'};
+    var cogTasksFr = {arith:'ARITH', parity:'PAIR/IMPAIR', letter:'VOYELLE/CONSONNE', color:'COULEUR', geo2d:'GÉOMÉTRIE 2D', geo3d:'GÉOMÉTRIE 3D'};
+    // PASSE 1 : arith/parity/letter/color × 3 cônes × 2 symétries = AR-17 à AR-40
+    // PASSE 2 : geo2d/geo3d × 3 cônes × 2 symétries                = AR-41 à AR-52
+    var passes = [['arith','parity','letter','color'], ['geo2d','geo3d']];
+    passes.forEach(function(taskGroup){
+      [0,1,2].forEach(function(n){
+        taskGroup.forEach(function(task){
+          var coneEn = (n===0) ? 'NO CONE' : (n+' CONE'+(n>1?'S':''));
+          var coneFr = (n===0) ? 'SANS CÔNE' : (n+' CÔNE'+(n>1?'S':''));
+          baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn);
+          baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr);
+          cogIdx++;
+          baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn+' · CROSS-BODY');
+          baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr+' · CROSS-BODY');
+          cogIdx++;
+        });
       });
     });
     var lab = en ? baseEn : baseFr;
@@ -36443,6 +36459,25 @@ function _ar_cog_newQuestion(){
     var tgt = pool4[Math.floor(Math.random()*pool4.length)];
     return { prompt: (en ? (tgt.en || tgt.fr) : tgt.fr), values:pool4, answer:tgt, kind:'color' };
   }
+  // ★ GEO-2D / GEO-3D : import des pools et rendus déjà existants dans l'app
+  //   · _OPTO_GEO_2D_SHAPES (ligne 39813) → formes planes (cercle, carré…)
+  //   · _OPTO_GEO_3D_SHAPES (ligne ~39850) → polyèdres de Platon
+  //   · _opto_geo_draw2DShape / _opto_geo_draw3DSolid → rendus canvas déjà écrits
+  if (t === 'geo2d' || t === 'geo3d'){
+    var POOL = (t === 'geo2d')
+      ? (typeof _OPTO_GEO_2D_SHAPES !== 'undefined' ? _OPTO_GEO_2D_SHAPES : [])
+      : (typeof _OPTO_GEO_3D_SHAPES !== 'undefined' ? _OPTO_GEO_3D_SHAPES : []);
+    if (!POOL.length) return null;
+    var shuffled = POOL.slice().sort(function(){return Math.random()-0.5;});
+    var pool5 = shuffled.slice(0, 3);
+    var tgtShape = pool5[Math.floor(Math.random()*pool5.length)];
+    return {
+      prompt: (en ? (tgtShape.en || tgtShape.fr) : tgtShape.fr),
+      values: pool5,
+      answer: tgtShape,
+      kind: t
+    };
+  }
   return null;
 }
 function _ar_cog_announce(now, W, H){
@@ -36513,8 +36548,9 @@ function _ar_cog_endRound(now, extraPause){
   _ar_cog_pool = [];
 }
 function _ar_cog_isCorrect(targetValue){
-  if (_ar_cfg.taskType === 'color'){
-    // answer est un objet {k, hex, fr, en} — compare .k
+  var tt = _ar_cfg.taskType;
+  // Pour color/geo2d/geo3d : l'answer est un objet (shape ou color) → compare .k
+  if (tt === 'color' || tt === 'geo2d' || tt === 'geo3d'){
     return (_ar_cog_answer && targetValue && _ar_cog_answer.k === targetValue.k);
   }
   return (targetValue === _ar_cog_answer);
@@ -36604,7 +36640,7 @@ function _ar_cog_draw(W, H, now){
     ctx.globalAlpha = 1;
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
-    // Valeur au centre (chiffre ou lettre)
+    // Valeur au centre (chiffre / lettre / forme 2D / solide 3D)
     if (t.kind === 'num' || t.kind === 'letter'){
       var txt = String(t.value);
       ctx.fillStyle = '#fff';
@@ -36613,6 +36649,13 @@ function _ar_cog_draw(W, H, now){
       ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.75)';
       ctx.strokeText(txt, t.x, t.y);
       ctx.fillText(txt, t.x, t.y);
+    } else if (t.kind === 'geo2d' && typeof _opto_geo_draw2DShape === 'function' && t.value){
+      // ★ Rendu natif de GEO-2D (ligne 39760+), même code, taille adaptée au disque
+      _opto_geo_draw2DShape(ctx, t.x, t.y, t.r*0.75, t.value.k);
+    } else if (t.kind === 'geo3d' && typeof _opto_geo_draw3DSolid === 'function' && t.value){
+      // ★ Rendu natif de GEO-3D avec rotation lente (même pattern que _opto_drawGeo)
+      var rot = (now / 1000) * ((_ar_cfg.taskType === 'geo3d') ? 0.6 : 0);
+      _opto_geo_draw3DSolid(ctx, t.x, t.y, t.r*0.70, t.value.k, rot);
     }
     // Arc de temps restant autour
     ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
