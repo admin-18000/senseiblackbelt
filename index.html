@@ -2942,6 +2942,11 @@ window._dojoBackHome = function(){
           <option value="c2">AR-4 · OVERHAND · 2 CÔNES (sans cible)</option>
           <option value="col3">AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)</option>
           <option value="col4">AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)</option>
+          <option value="c1ts">AR-7 · 1 CÔNE + CIBLES + STICKS</option>
+          <option value="c2ts">AR-8 · 2 CÔNES + CIBLES + STICKS</option>
+          <option value="c1s">AR-9 · 1 CÔNE + STICKS</option>
+          <option value="c2s">AR-10 · 2 CÔNES + STICKS</option>
+          <option value="nocone">AR-11 · SANS CÔNE · CIBLES + STICKS</option>
         </select>
         <div id="ar_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px"></div>
       </div>
@@ -34084,6 +34089,10 @@ function _opto_drawHUD(W, H){
   //   en haut (rectangle transparent) dans _ar_cc_draw, et rien d'autre, pour
   //   éviter tout chevauchement avec les cônes remontés à hauteur ventre.
   if (_opto_mode === 'ar' && typeof _ar_cfg !== 'undefined' && _ar_cfg.mode === 'color') return;
+  // ★ AR7-AR11 (sticks présents) : idem, pas de HUD standard — le holder RCS
+  //   occupe la moitié haute droite et la consigne/score/chrono collisionneraient
+  //   visuellement. On laisse juste le badge compteur en bas que dessine _opto_drawAr.
+  if (_opto_mode === 'ar' && typeof _ar_cfg !== 'undefined' && _ar_cfg.sticks) return;
   // ── (1) Consigne pill — DESCENDU à y=0.09 pour laisser les boutons REC/STOP
   //        (qui occupent y=0 → ~0.08) sans collision visuelle ──
   var consignes = {
@@ -35725,11 +35734,19 @@ function _ar_reset(){
   window._ar_bounce = null;
   window._ar_timePtTs = null;
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
+  if (typeof _ar_sticks_reset === 'function') _ar_sticks_reset();
 }
 function _ar_consigne(en){
   if (_ar_cfg.mode === 'color') return en ? 'TOUCH THE CALLED CONE' : 'TOUCHE LE CÔNE ANNONCÉ';
   var n = _ar_cfg.cones;
-  if (_ar_cfg.targets) return en ? 'OVERHAND DRIBBLE + HIT THE TARGET' : 'OVERHAND DRIBBLE + TOUCHE LA CIBLE';
+  // AR-11 : sans cône
+  if (n === 0){
+    if (_ar_cfg.targets && _ar_cfg.sticks) return en ? 'HIT TARGETS + CATCH STICKS' : 'CIBLES + STICKS';
+  }
+  // Combinaisons AR1-AR10
+  if (_ar_cfg.targets && _ar_cfg.sticks) return en ? 'OVERHAND + HIT + CATCH' : 'OVERHAND + CIBLE + STICK';
+  if (_ar_cfg.sticks)                    return en ? 'OVERHAND + CATCH STICKS' : 'OVERHAND + CATCH STICKS';
+  if (_ar_cfg.targets)                   return en ? 'OVERHAND DRIBBLE + HIT THE TARGET' : 'OVERHAND DRIBBLE + TOUCHE LA CIBLE';
   return en ? ('OVERHAND DRIBBLE · OVER THE CONE' + (n>1?'S':'')) : ('OVERHAND DRIBBLE · AU-DESSUS ' + (n>1?'DES CÔNES':'DU CÔNE'));
 }
 // Position des cônes : calibrée (figée) si dispo, sinon position par défaut
@@ -35808,7 +35825,9 @@ function _opto_analyzeAr(poses){
   //     vertical du poignet (apex↓↑ typique du dribble). Évite les 0 pts sur
   //     dribble vertical pur où la détection latérale ratait toute la session.
   var hand = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, _ar_cfg.hand) : null;
-  if (hand){
+  // ★ AR11 (nocone, cones=0) : skip la détection overhand (pas de cône comme référence)
+  //   Le drill est juste "dribble libre + réagir aux stimuli" → aucune contrainte.
+  if (hand && _ar_cfg.cones > 0){
     var hx = W - hand.x*sx, hy = hand.y*sy;
     var sh = _tsym_kp_fast(poses, _ar_cfg.hand + 'Shoulder');
     var low = !sh || hy > sh.y*sy;                  // main sous l'épaule = zone de dribble
@@ -35855,7 +35874,13 @@ function _opto_analyzeAr(poses){
     B.prevY = hy;
   }
   if (!_ar_cfg.targets){
-    // ★ AR3/AR4 (sans cibles) : score baseline temporel GARANTI.
+    // ★ AR9/AR10 (sticks sans cibles) : le score vient des catch, pas du temps.
+    //   On tick les sticks AVANT le return pour que la détection catch tourne.
+    if (_ar_cfg.sticks && typeof _ar_sticks_tick === 'function'){
+      _ar_sticks_tick(poses, W, H, now);
+      return;
+    }
+    // ★ AR3/AR4 (sans cibles, sans sticks) : score baseline temporel GARANTI.
     //   La techno ne peut pas reconnaître un overhand de façon fiable → sans
     //   fallback, le drill renvoie 0 pts même si le joueur a dribblé 60 s.
     //   +1 pt toutes les 2 s de session → 30 pts/min garantis, la détection
@@ -35887,6 +35912,8 @@ function _opto_analyzeAr(poses){
     _ar_fx.push({x:t.x, y:t.y, txt:fxTxt, color:fxCol, born:now});
     if (typeof _td_beep === 'function') _td_beep(rt < 1200 ? 1320 : 880, 0.05, 0.1);
     if (navigator.vibrate) navigator.vibrate(25);
+    // ★ AR7/AR8 : chaque HIT cible déclenche la chute d'un stick (reward)
+    if (_ar_cfg.sticks && typeof _ar_sticks_onTargetHit === 'function') _ar_sticks_onTargetHit(now);
   });
   var kept = [];
   for (var i=0;i<_ar_targets.length;i++){
@@ -35901,6 +35928,8 @@ function _opto_analyzeAr(poses){
     kept.push(t);
   }
   _ar_targets = kept;
+  // ★ AR7-AR11 : tick sticks (catch detection + timer-mode drop si applicable)
+  if (_ar_cfg.sticks && typeof _ar_sticks_tick === 'function') _ar_sticks_tick(poses, W, H, now);
 }
 function _ar_drawFx(W, H, now){
   var ctx = _opto_ctx;
@@ -35923,14 +35952,18 @@ function _opto_drawAr(W, H){
   if (_ar_cfg.mode === 'color'){ _ar_cc_draw(W, H, now); _ar_drawFx(W, H, now); return; }
   var L = _ar_layout(W, H);
   ctx.save();
-  // ── Cônes ──
-  for (var i=0;i<L.xs.length;i++){
-    var x = L.xs[i];
-    ctx.fillStyle = 'rgba(0,0,0,0.30)';
-    ctx.beginPath(); ctx.ellipse(x, L.baseY - L.ch*0.03, L.cw*0.52, L.ch*0.07, 0, 0, Math.PI*2); ctx.fill();
-    if (window._ar_coneImgReady) ctx.drawImage(window._ar_coneImg, x - L.cw/2, L.baseY - L.ch, L.cw, L.ch);
-    else { ctx.fillStyle = '#f26a1b'; ctx.beginPath(); ctx.moveTo(x, L.baseY - L.ch);
-           ctx.lineTo(x + L.cw/2, L.baseY); ctx.lineTo(x - L.cw/2, L.baseY); ctx.closePath(); ctx.fill(); }
+  // ── Cônes (skip si AR11 cones=0) ──
+  if (_ar_cfg.cones > 0){
+    for (var i=0;i<L.xs.length;i++){
+      var x = L.xs[i];
+      ctx.fillStyle = 'rgba(0,0,0,0.30)';
+      ctx.beginPath(); ctx.ellipse(x, L.baseY - L.ch*0.03, L.cw*0.52, L.ch*0.07, 0, 0, Math.PI*2); ctx.fill();
+      if (window._ar_coneImgReady) ctx.drawImage(window._ar_coneImg, x - L.cw/2, L.baseY - L.ch, L.cw, L.ch);
+      else { ctx.fillStyle = '#f26a1b'; ctx.beginPath(); ctx.moveTo(x, L.baseY - L.ch);
+             ctx.lineTo(x + L.cw/2, L.baseY); ctx.lineTo(x - L.cw/2, L.baseY); ctx.closePath(); ctx.fill(); }
+      // ★ Pour AR8/AR10 (2 cônes avec sticks) on ne limite QUE le dessin ici. Le
+      //   holder RCS est déjà resserré (narrow) pour tomber à droite du cône droit.
+    }
   }
   // ── Cibles : disque + anneau de temps restant ──
   for (var k=0;k<_ar_targets.length;k++){
@@ -35947,10 +35980,15 @@ function _opto_drawAr(W, H){
     ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
   }
   ctx.restore(); _ar_drawFx(W, H, now); ctx.save();
+  // ── Sticks (AR7-AR11) : dessin DU HOLDER + des 6 sticks ──
+  if (_ar_cfg.sticks && typeof _ar_sticks_draw === 'function'){
+    _ar_sticks_draw(ctx, W, H);
+  }
   // ── Badge compteur (bas gauche) : répétitions + cibles + état du dribble ──
   var dribbling = (now - _ar_lastRepTs) < _AR_DRIBBLE_WINDOW;
-  var txt = 'OVERHAND ' + _ar_reps;
-  if (_ar_cfg.targets) txt += (en ? '  ·  TARGETS ' : '  ·  CIBLES ') + _ar_tHit + '/' + _ar_tTotal;
+  var txt = (_ar_cfg.cones > 0) ? ('OVERHAND ' + _ar_reps) : '';
+  if (_ar_cfg.targets) txt += (txt?'  ·  ':'') + (en ? 'TARGETS ' : 'CIBLES ') + _ar_tHit + '/' + _ar_tTotal;
+  if (_ar_cfg.sticks) txt += (txt?'  ·  ':'') + (en ? 'STICKS ' : 'STICKS ') + _ar_sticks_catches;
   var fs = Math.round(H*0.036);
   ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
   while (fs > 9 && ctx.measureText(txt).width + 28 > W*0.25){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
@@ -36008,15 +36046,25 @@ function _ar_desc(){
   var en = window._lang === 'en', n = _ar_cfg.cones;
   if (_ar_cfg.mode === 'color'){
     return en
-      ? (n + ' coloured cones on the floor · the colour is SPOKEN and SHOWN in large text (works in a noisy gym) · touch the right cone as fast as you can. Wrong cone = −5 pts.')
-      : (n + ' cônes de couleur au sol · la couleur est ANNONCÉE à la voix et ÉCRITE en grand (salle bruyante) · touche le bon cône le plus vite possible. Mauvais cône = −5 pts.');
+      ? (n + ' coloured cones · the colour appears in a top rectangle · touch the right cone as fast as you can.')
+      : (n + ' cônes de couleur · la couleur apparaît dans un rectangle en haut · touche le bon cône le plus vite possible.');
   }
+  // AR-11 : pas de cône
+  if (n === 0){
+    return en
+      ? 'Dribble freely · hit the targets with your free hand and catch the falling sticks with your dribbling hand.'
+      : 'Dribble librement · touche les cibles avec la main libre et attrape les sticks qui tombent avec ta main dribbleuse.';
+  }
+  // Base overhand (1 ou 2 cônes)
   var base = en
-    ? ('Stand still behind the virtual cone' + (n>1?'s':'') + ' · overhand dribble ' + (n>1?'from one cone to the other':'over the cone') + ' with the selected hand.')
-    : ('Reste statique derrière ' + (n>1?'les cônes virtuels':'le cône virtuel') + ' · overhand dribble ' + (n>1?'d\'un cône à l\'autre':'au-dessus du cône') + ' avec la main choisie.');
+    ? ('Stand behind the virtual cone' + (n>1?'s':'') + ' · overhand dribble ' + (n>1?'from one cone to the other':'over the cone') + ' with the selected hand.')
+    : ('Reste derrière ' + (n>1?'les cônes virtuels':'le cône virtuel') + ' · overhand dribble ' + (n>1?'d\'un cône à l\'autre':'au-dessus du cône') + ' avec la main choisie.');
   if (_ar_cfg.targets) base += en
-    ? ' Hit the target with your free hand WITHOUT stopping the dribble (a hit with no dribble scores 0).'
-    : ' Touche la cible avec la main libre SANS arrêter le dribble (cible touchée sans dribble = 0 point).';
+    ? ' Hit the targets with your free hand while keeping the dribble.'
+    : ' Touche les cibles avec la main libre tout en gardant le dribble.';
+  if (_ar_cfg.sticks) base += en
+    ? ' Catch the falling sticks with your dribbling hand.'
+    : ' Attrape les sticks qui tombent avec ta main dribbleuse.';
   return base;
 }
 function _ar_refreshUI(){
@@ -36037,17 +36085,43 @@ function _ar_refreshUI(){
   });
 }
 window._ar_setDrill = function(v){
-  _ar_cfg.subkey = v;   // ★ MAPPING VIDÉO : clé exacte du sous-mode AR (c1t/c1/c2t/c2/col3/col4)
+  _ar_cfg.subkey = v;   // ★ MAPPING VIDÉO : clé exacte du sous-mode AR
+  //  c1t/c2t/c1/c2 : AR1-AR4 (overhand, pas de sticks)
+  //  col3/col4     : AR5-AR6 (color call)
+  //  c1ts/c2ts     : AR7-AR8 (overhand + cibles + sticks)
+  //  c1s/c2s       : AR9-AR10 (overhand + sticks sans cibles)
+  //  nocone        : AR11 (sans cône, cibles + sticks)
   if (v === 'col3' || v === 'col4'){
     _ar_cfg.mode = 'color';
     _ar_cfg.cones = (v === 'col4') ? 4 : 3;
     _ar_cfg.targets = false;
+    _ar_cfg.sticks = false;
+  } else if (v === 'c1ts' || v === 'c2ts'){
+    _ar_cfg.mode = 'overhand';
+    _ar_cfg.cones = (v === 'c2ts') ? 2 : 1;
+    _ar_cfg.targets = true;
+    _ar_cfg.sticks = true;
+    _ar_cfg.stickTrigger = 'hit';     // stick drop déclenché par chaque HIT cible
+  } else if (v === 'c1s' || v === 'c2s'){
+    _ar_cfg.mode = 'overhand';
+    _ar_cfg.cones = (v === 'c2s') ? 2 : 1;
+    _ar_cfg.targets = false;
+    _ar_cfg.sticks = true;
+    _ar_cfg.stickTrigger = 'timer';   // stick drop périodique (timing RCS classic)
+  } else if (v === 'nocone'){
+    _ar_cfg.mode = 'overhand';
+    _ar_cfg.cones = 0;
+    _ar_cfg.targets = true;
+    _ar_cfg.sticks = true;
+    _ar_cfg.stickTrigger = 'timer';   // nocone : les 2 stimuli en continu, pas liés à un HIT
   } else {
     _ar_cfg.mode = 'overhand';
     _ar_cfg.cones = (v === 'c2t' || v === 'c2') ? 2 : 1;
     _ar_cfg.targets = (v === 'c1t' || v === 'c2t');
+    _ar_cfg.sticks = false;
   }
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
+  if (typeof _ar_sticks_reset === 'function') _ar_sticks_reset();
   _ar_refreshUI();
   // ★ MAPPING STRICT : si on est sur le drill AR, re-render le carrousel ET
   //   autoplay la vidéo spécifique au sous-mode choisi (si elle existe).
@@ -36080,8 +36154,9 @@ function _ar_applyLang(){
   var en = window._lang === 'en';
   var sel = document.getElementById('ar_drillSelect');
   if (sel){
-    var lab = en ? ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)','AR-5 · COLOR CALL · 3 CONES (colour called)','AR-6 · COLOR CALL · 4 CONES (colour called)']
-                 : ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)','AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)','AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)'];
+    var lab = en
+      ? ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)','AR-5 · COLOR CALL · 3 CONES (colour called)','AR-6 · COLOR CALL · 4 CONES (colour called)','AR-7 · 1 CONE + TARGETS + STICKS','AR-8 · 2 CONES + TARGETS + STICKS','AR-9 · 1 CONE + STICKS','AR-10 · 2 CONES + STICKS','AR-11 · NO CONE · TARGETS + STICKS']
+      : ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)','AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)','AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)','AR-7 · 1 CÔNE + CIBLES + STICKS','AR-8 · 2 CÔNES + CIBLES + STICKS','AR-9 · 1 CÔNE + STICKS','AR-10 · 2 CÔNES + STICKS','AR-11 · SANS CÔNE · CIBLES + STICKS'];
     for (var i=0;i<sel.options.length && i<lab.length;i++) sel.options[i].textContent = lab[i];
   }
   var set = function(id, t){ var e = document.getElementById(id); if (e) e.textContent = t; };
@@ -36162,6 +36237,245 @@ function _ar_colorLayout(W, H){
   for (var i=0;i<n;i++) xs.push(W/2 - span/2 + (n>1 ? span*i/(n-1) : 0));
   return { xs:xs, baseY:baseY, ch:ch, cw:cw };
 }
+/* ═══════════════ AR7-AR11 · MINI STICKS (RCS miniaturisé) ═══════════════
+   Réutilise la structure stick/state de RCS classic (hanging/falling/caught/missed)
+   mais dessiné dans la moitié droite de l'écran, catch zone remontée au niveau
+   épaule (y≈0.42H) pour éviter tout faux-catch par le geste de dribble naturel
+   (apex à y≈0.60H). Auto-refill quand les 6 sont tombés (drill de 60-120s ≠ test
+   RCS de 9s).
+═════════════════════════════════════════════════════════════════════════ */
+var _AR_STICK_COUNT     = 6;
+var _AR_STICK_FALL_MS   = 1200;      // temps que le stick met pour toucher le sol
+var _AR_STICK_INTERVAL  = 1700;      // timing RCS classic : ~1.5-2s par stick
+var _AR_STICK_HIT_DELAY = 350;       // après un HIT cible, délai avant drop (AR7/AR8)
+var _ar_sticks        = [];
+var _ar_sticks_dropOrder = [];
+var _ar_sticks_curIdx = 0;
+var _ar_sticks_catches = 0;
+var _ar_sticks_misses  = 0;
+var _ar_sticks_lastDropTs = 0;
+var _ar_sticks_prevWrist = null;
+
+function _ar_sticks_layout(W, H){
+  // Holder RESSERRÉ quand il y a 2 cônes (droit à x=0.62W) pour éviter que les
+  // sticks tombent par-dessus le cône droit. Sinon holder large.
+  var narrow = (_ar_cfg.cones === 2);
+  var bx = narrow ? W*0.68 : W*0.52;
+  var bw = narrow ? W*0.30 : W*0.46;
+  // ★ Barre support plus imposante (×1.5) + sticks AGRANDIS (H*0.20 au lieu de 0.11)
+  //   pour être réellement visibles sur une vue partagée avec cônes + cibles.
+  //   Moins "mini", plus proches des proportions RCS classic (encore ~38% plus petits).
+  var barY = H*0.075, barH = H*0.045;
+  var catchY = H*0.40;                        // niveau épaule (zone de catch indicative)
+  var floorY = H*0.72;                        // "sol" visuel du stick (perdu)
+  return { bx:bx, bw:bw, barY:barY, barH:barH, catchY:catchY, floorY:floorY, narrow:narrow };
+}
+function _ar_sticks_stickX(idx, L){
+  var stickW = L.bw / 8;
+  var gap = (L.bw - _AR_STICK_COUNT*stickW) / (_AR_STICK_COUNT + 1);
+  return L.bx + gap + idx*(stickW + gap) + stickW/2;
+}
+function _ar_sticks_stickW(L){ return L.bw / 8; }
+function _ar_sticks_refill(){
+  _ar_sticks = [];
+  for (var i=0;i<_AR_STICK_COUNT;i++){
+    _ar_sticks.push({ idx:i, state:'hanging', dropStartTs:0, catchTs:0 });
+  }
+  // Ordre aléatoire de drop (identique RCS classic)
+  var order = [];
+  for (var k=0;k<_AR_STICK_COUNT;k++) order.push(k);
+  for (var s=order.length-1; s>0; s--){
+    var j = Math.floor(Math.random()*(s+1));
+    var t = order[s]; order[s]=order[j]; order[j]=t;
+  }
+  _ar_sticks_dropOrder = order;
+  _ar_sticks_curIdx = 0;
+}
+function _ar_sticks_reset(){
+  _ar_sticks = [];
+  _ar_sticks_dropOrder = [];
+  _ar_sticks_curIdx = 0;
+  _ar_sticks_catches = 0;
+  _ar_sticks_misses = 0;
+  _ar_sticks_lastDropTs = 0;
+  _ar_sticks_prevWrist = null;
+}
+function _ar_sticks_anyFalling(){
+  for (var i=0;i<_ar_sticks.length;i++) if (_ar_sticks[i].state === 'falling') return true;
+  return false;
+}
+function _ar_sticks_dropNext(now){
+  if (!_ar_sticks.length) _ar_sticks_refill();
+  // Si les 6 sont déjà tombés (caught ou missed) → recharge auto (drill ≠ test)
+  var allGone = true;
+  for (var i=0;i<_ar_sticks.length;i++){
+    if (_ar_sticks[i].state === 'hanging'){ allGone = false; break; }
+  }
+  if (allGone){
+    _ar_sticks_refill();
+  }
+  // Anti-superposition : un seul stick en vol à la fois
+  if (_ar_sticks_anyFalling()) return;
+  // Trouve le prochain hanging dans l'ordre aléatoire
+  for (var k=_ar_sticks_curIdx; k<_ar_sticks_dropOrder.length; k++){
+    var idx = _ar_sticks_dropOrder[k];
+    if (_ar_sticks[idx] && _ar_sticks[idx].state === 'hanging'){
+      _ar_sticks[idx].state = 'falling';
+      _ar_sticks[idx].dropStartTs = now;
+      _ar_sticks_curIdx = k + 1;
+      _ar_sticks_lastDropTs = now;
+      return;
+    }
+  }
+  // Rien trouvé → refill au prochain tour
+}
+function _ar_sticks_tick(poses, W, H, now){
+  if (!_ar_sticks.length) _ar_sticks_refill();
+  var L = _ar_sticks_layout(W, H);
+  // Timer-mode : drop périodique (AR9/AR10/AR11)
+  if (_ar_cfg.stickTrigger === 'timer'){
+    if (now - _ar_sticks_lastDropTs > _AR_STICK_INTERVAL) _ar_sticks_dropNext(now);
+  }
+  // Catch detection : reprend la mécanique RCS classic
+  //   (bbox élargie + tolérance, directionnel implicite par le fait que le stick
+  //    tombe vers la main — pas besoin de dot product ici)
+  var sx = W / (_opto_video && _opto_video.videoWidth || W);
+  var sy = H / (_opto_video && _opto_video.videoHeight || H);
+  var hands = [];
+  ['left','right'].forEach(function(side){
+    var kp = (typeof _tsym_kp_hand === 'function') ? _tsym_kp_hand(poses, side) : null;
+    if (!kp) return;
+    hands.push({ x: W - kp.x * sx, y: kp.y * sy, side:side });
+  });
+  var tolX = W*0.055, tolY = H*0.09;        // tol élargie : stick plus gros, hitbox proportionnelle
+  var stickH = H * 0.20;                    // ★ même valeur que dessin, pour que catch suive le visuel
+  for (var i=0; i<_ar_sticks.length; i++){
+    var s = _ar_sticks[i];
+    if (s.state !== 'falling') continue;
+    var age = now - s.dropStartTs;
+    if (age > _AR_STICK_FALL_MS){
+      // Raté → missed
+      s.state = 'missed';
+      s.catchTs = now;
+      _ar_sticks_misses++;
+      if (typeof _td_beep === 'function') _td_beep(220, 0.07, 0.10);
+      continue;
+    }
+    var prog = age / _AR_STICK_FALL_MS;
+    var stickX = _ar_sticks_stickX(i, L);
+    // ★ Point de catch = CENTRE du stick visuel (aligné sur le dessin)
+    //   Top du stick dans le dessin : sy = barY + barH + 2 + prog * (floorY - barY - barH - stickH*0.5)
+    //   Donc centre = sy + stickH/2
+    var stickTopY = L.barY + L.barH + 2 + prog * (L.floorY - L.barY - L.barH - stickH*0.5);
+    var stickCenterY = stickTopY + stickH * 0.5;
+    // Catch si une main est dans la hitbox autour du centre du stick
+    for (var h=0; h<hands.length; h++){
+      var hx = hands[h].x, hy = hands[h].y;
+      if (Math.abs(hx - stickX) < tolX && Math.abs(hy - stickCenterY) < tolY){
+        // Catch validé — même logique que RCS classic
+        s.state = 'caught';
+        s.catchTs = now;
+        _ar_sticks_catches++;
+        var rt = age;
+        // Barème aligné pattern canonique (base 10 + bonus vitesse /200)
+        var pts = 10 + Math.max(0, Math.round((_AR_STICK_FALL_MS - rt)/(_AR_STICK_FALL_MS/10)));
+        _opto_score += pts;
+        _ar_fx.push({ x: stickX, y: stickCenterY - 10, txt:'+'+pts, color:'#f5c518', born:now });
+        if (typeof _td_beep === 'function') _td_beep(1760, 0.05, 0.11);
+        if (navigator.vibrate) navigator.vibrate(22);
+        break;
+      }
+    }
+  }
+}
+function _ar_sticks_onTargetHit(now){
+  // Déclenché quand une cible est HIT en AR7/AR8/AR11 (stickTrigger === 'hit' pour c1ts/c2ts)
+  //   Note : nocone est en timer, pas en hit, donc n'arrive pas ici.
+  if (_ar_cfg.stickTrigger !== 'hit') return;
+  // Delay pour laisser le FX visuel du HIT respirer avant que le stick parte
+  setTimeout(function(){
+    if (!_opto_running || _opto_mode !== 'ar') return;
+    _ar_sticks_dropNext(Date.now());
+  }, _AR_STICK_HIT_DELAY);
+}
+
+function _ar_sticks_draw(ctx, W, H){
+  if (!_ar_sticks.length) return;
+  var L = _ar_sticks_layout(W, H);
+  var now = Date.now();
+  ctx.save();
+  // ─ Barre support (holder) ─
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 8;
+  ctx.fillStyle = '#1a1d23';
+  var rr = L.barH * 0.33;
+  _opto_roundRect(ctx, L.bx, L.barY, L.bw, L.barH, rr); ctx.fill();
+  ctx.shadowBlur = 0;
+  // 3 petits trous (détail d'objet physique)
+  ctx.fillStyle = '#0a0c10';
+  var hR = L.barH * 0.15;
+  for (var hi=-1; hi<=1; hi++){
+    ctx.beginPath();
+    ctx.arc(L.bx + L.bw/2 + hi*L.bw*0.06, L.barY + L.barH/2, hR, 0, Math.PI*2); ctx.fill();
+  }
+  // ─ Les 6 sticks (AGRANDIS : H*0.20 vs 0.11 avant — "il faut que ça se voie") ─
+  var stickW = _ar_sticks_stickW(L);
+  var stickH = H * 0.20;
+  for (var i=0; i<_ar_sticks.length; i++){
+    var s = _ar_sticks[i];
+    var cx = _ar_sticks_stickX(i, L);
+    var sxL = cx - stickW/2;
+    var sy;
+    if (s.state === 'hanging'){
+      sy = L.barY + L.barH + 2;
+    } else if (s.state === 'falling'){
+      var prog = Math.min(1, (now - s.dropStartTs) / _AR_STICK_FALL_MS);
+      sy = L.barY + L.barH + 2 + prog * (L.floorY - L.barY - L.barH - stickH*0.5);
+    } else if (s.state === 'caught'){
+      sy = L.barY + L.barH + 2;      // reste sur le holder, mais en vert
+    } else { // missed
+      continue;                       // disparaît
+    }
+    var bodyColor, capColor, glowColor;
+    if (s.state === 'caught'){ bodyColor='#4ade80'; capColor='#2d7a39'; glowColor='rgba(74,222,128,0.7)'; }
+    else if (s.state === 'falling'){ bodyColor='#f5c518'; capColor='#c97a00'; glowColor='rgba(245,197,24,0.75)'; }
+    else { bodyColor='#5a6377'; capColor='#f5c518'; glowColor='rgba(0,0,0,0.5)'; }
+    ctx.save();
+    if (s.state === 'falling' || s.state === 'caught'){
+      ctx.shadowBlur = 14; ctx.shadowColor = glowColor;
+    }
+    // Corps pilule
+    var bodyY = sy + stickH*0.08, bodyH = stickH*0.84, bodyR = stickW/2;
+    ctx.fillStyle = bodyColor;
+    _opto_roundRect(ctx, sxL, bodyY, stickW, bodyH, bodyR); ctx.fill();
+    ctx.shadowBlur = 0;
+    // Highlight cylindre
+    var hl = ctx.createLinearGradient(sxL, 0, sxL+stickW, 0);
+    hl.addColorStop(0, 'rgba(255,255,255,0.30)');
+    hl.addColorStop(0.3, 'rgba(255,255,255,0.10)');
+    hl.addColorStop(0.65, 'rgba(0,0,0,0)');
+    hl.addColorStop(1, 'rgba(0,0,0,0.30)');
+    ctx.fillStyle = hl;
+    _opto_roundRect(ctx, sxL, bodyY, stickW, bodyH, bodyR); ctx.fill();
+    // Bouchons
+    var capW = stickW*1.15, capX = sxL - stickW*0.075, capH = stickH*0.10;
+    var capR = capW*0.30;
+    ctx.fillStyle = capColor;
+    _opto_roundRect(ctx, capX, sy, capW, capH, capR); ctx.fill();
+    _opto_roundRect(ctx, capX, sy + stickH - capH, capW, capH, capR); ctx.fill();
+    // Numéro
+    if (s.state === 'hanging' || s.state === 'falling'){
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = 'bold '+Math.round(stickW*0.75)+'px "Bebas Neue",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 2;
+      ctx.fillText(String(i+1), cx, sy + stickH*0.5);
+      ctx.shadowBlur = 0;
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function _ar_cc_targets(W, H){
   var L = _ar_colorLayout(W, H), tg = [];
   // ★ CAP DU RAYON HIT — critique pour éviter les faux −5 en AR5/AR6.
