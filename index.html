@@ -36257,25 +36257,43 @@ var _ar_sticks_lastDropTs = 0;
 var _ar_sticks_prevWrist = null;
 
 function _ar_sticks_layout(W, H){
-  // Holder RESSERRÉ quand il y a 2 cônes (droit à x=0.62W) pour éviter que les
-  // sticks tombent par-dessus le cône droit. Sinon holder large.
-  var narrow = (_ar_cfg.cones === 2);
-  var bx = narrow ? W*0.68 : W*0.52;
-  var bw = narrow ? W*0.30 : W*0.46;
-  // ★ Barre support plus imposante (×1.5) + sticks AGRANDIS (H*0.20 au lieu de 0.11)
-  //   pour être réellement visibles sur une vue partagée avec cônes + cibles.
-  //   Moins "mini", plus proches des proportions RCS classic (encore ~38% plus petits).
-  var barY = H*0.075, barH = H*0.045;
-  var catchY = H*0.40;                        // niveau épaule (zone de catch indicative)
-  var floorY = H*0.72;                        // "sol" visuel du stick (perdu)
-  return { bx:bx, bw:bw, barY:barY, barH:barH, catchY:catchY, floorY:floorY, narrow:narrow };
+  // ★ LAYOUT UNIFORME — même position et dimensions pour tous les AR7-AR11,
+  //   placé toujours à droite du cône droit éventuel (0.62W pour 2 cônes)
+  //   → stickW identique, barH identique, stickH identique → HIT identique.
+  var bx = W*0.68;             // commence après le cône droit (si 2 cônes)
+  var bw = W*0.30;             // largeur fixe
+  var barY = H*0.075;
+  var barH = H*0.045;
+  var floorY = H*0.72;         // "sol" visuel du stick (perdu)
+  return { bx:bx, bw:bw, barY:barY, barH:barH, floorY:floorY };
 }
+// Dimensions uniformes des sticks (indépendantes du nb de cônes)
+function _ar_sticks_stickW(){ return (typeof _opto_canvas !== 'undefined' && _opto_canvas) ? (_opto_canvas.width * 0.03) : 12; }
+function _ar_sticks_stickH(){ return (typeof _opto_canvas !== 'undefined' && _opto_canvas) ? (_opto_canvas.height * 0.20) : 160; }
 function _ar_sticks_stickX(idx, L){
-  var stickW = L.bw / 8;
-  var gap = (L.bw - _AR_STICK_COUNT*stickW) / (_AR_STICK_COUNT + 1);
+  // 6 sticks régulièrement répartis dans bw. stickW fixe (0.03W).
+  var stickW = _ar_sticks_stickW();
+  var totalW = _AR_STICK_COUNT * stickW;
+  var gap = (L.bw - totalW) / (_AR_STICK_COUNT + 1);
   return L.bx + gap + idx*(stickW + gap) + stickW/2;
 }
-function _ar_sticks_stickW(L){ return L.bw / 8; }
+// ★ BBOX d'un stick — logique identique à _dcog_rcs_getStickBBox (RCS classic)
+//   Utilisée POUR le HIT et POUR le dessin, source unique de vérité.
+function _ar_sticks_bbox(idx, s, W, H){
+  var L = _ar_sticks_layout(W, H);
+  var stickW = _ar_sticks_stickW();
+  var stickH = _ar_sticks_stickH();
+  var cx = _ar_sticks_stickX(idx, L);
+  var x = cx - stickW/2;
+  var yTop;
+  if (s.state === 'falling'){
+    var prog = Math.min(1, (Date.now() - s.dropStartTs) / _AR_STICK_FALL_MS);
+    yTop = L.barY + L.barH + 2 + prog * (L.floorY - L.barY - L.barH - stickH*0.5);
+  } else {
+    yTop = L.barY + L.barH + 2;
+  }
+  return { x:x, y:yTop, w:stickW, h:stickH };
+}
 function _ar_sticks_refill(){
   _ar_sticks = [];
   for (var i=0;i<_AR_STICK_COUNT;i++){
@@ -36347,40 +36365,42 @@ function _ar_sticks_tick(poses, W, H, now){
     if (!kp) return;
     hands.push({ x: W - kp.x * sx, y: kp.y * sy, side:side });
   });
-  var tolX = W*0.055, tolY = H*0.09;        // tol élargie : stick plus gros, hitbox proportionnelle
-  var stickH = H * 0.20;                    // ★ même valeur que dessin, pour que catch suive le visuel
+  // ★ CATCH DETECTION — strict port de _dcog_rcs_analyzePose (RCS classic)
+  //   Bbox du stick + tolérance tolX/tolY identiques → même feeling HIT que RCS.
+  var tolX = W * 0.035;                   // ★ même valeur que RCS classic (ligne 43686)
+  var tolY = H * 0.045;                   // ★ même valeur que RCS classic (ligne 43687)
   for (var i=0; i<_ar_sticks.length; i++){
     var s = _ar_sticks[i];
     if (s.state !== 'falling') continue;
     var age = now - s.dropStartTs;
     if (age > _AR_STICK_FALL_MS){
-      // Raté → missed
       s.state = 'missed';
       s.catchTs = now;
       _ar_sticks_misses++;
       if (typeof _td_beep === 'function') _td_beep(220, 0.07, 0.10);
       continue;
     }
-    var prog = age / _AR_STICK_FALL_MS;
-    var stickX = _ar_sticks_stickX(i, L);
-    // ★ Point de catch = CENTRE du stick visuel (aligné sur le dessin)
-    //   Top du stick dans le dessin : sy = barY + barH + 2 + prog * (floorY - barY - barH - stickH*0.5)
-    //   Donc centre = sy + stickH/2
-    var stickTopY = L.barY + L.barH + 2 + prog * (L.floorY - L.barY - L.barH - stickH*0.5);
-    var stickCenterY = stickTopY + stickH * 0.5;
-    // Catch si une main est dans la hitbox autour du centre du stick
+    var bb = _ar_sticks_bbox(i, s, W, H);   // bbox source unique (= dessin)
+    // EDGE GRAVITY : sticks d'extrémité (idx 0 à gauche du holder, idx 5 à droite)
+    //   → hitbox étendue jusqu'au bord du HOLDER pour être atteignables bras tendu.
+    //   (Comme RCS classic qui étend jusqu'au bord de l'écran. Ici on étend jusqu'au
+    //    bord du holder pour ne pas déborder sur la zone cibles ou le couloir dribble.)
+    var leftX  = bb.x - tolX;
+    var rightX = bb.x + bb.w + tolX;
+    if (i === 0) leftX  = L.bx;             // bord gauche du holder
+    if (i === _AR_STICK_COUNT - 1) rightX = L.bx + L.bw;
     for (var h=0; h<hands.length; h++){
-      var hx = hands[h].x, hy = hands[h].y;
-      if (Math.abs(hx - stickX) < tolX && Math.abs(hy - stickCenterY) < tolY){
-        // Catch validé — même logique que RCS classic
+      var hd = hands[h];
+      if (hd.x >= leftX && hd.x <= rightX &&
+          hd.y >= bb.y - tolY && hd.y <= bb.y + bb.h + tolY){
+        // Catch validé — identique RCS classic _dcog_rcs_onCatch
         s.state = 'caught';
         s.catchTs = now;
         _ar_sticks_catches++;
         var rt = age;
-        // Barème aligné pattern canonique (base 10 + bonus vitesse /200)
         var pts = 10 + Math.max(0, Math.round((_AR_STICK_FALL_MS - rt)/(_AR_STICK_FALL_MS/10)));
         _opto_score += pts;
-        _ar_fx.push({ x: stickX, y: stickCenterY - 10, txt:'+'+pts, color:'#f5c518', born:now });
+        _ar_fx.push({ x: bb.x + bb.w/2, y: bb.y + bb.h/2, txt:'+'+pts, color:'#f5c518', born:now });
         if (typeof _td_beep === 'function') _td_beep(1760, 0.05, 0.11);
         if (navigator.vibrate) navigator.vibrate(22);
         break;
@@ -36403,42 +36423,41 @@ function _ar_sticks_draw(ctx, W, H){
   if (!_ar_sticks.length) return;
   var L = _ar_sticks_layout(W, H);
   var now = Date.now();
+  // ★ Couleurs = SKIN RCS classic originel (pas d'invention de couleurs) :
+  //   barre jaune + sticks bleu foncé en pending + bleu clair en falling,
+  //   bouchons jaunes, caught = couleur jaune. Fidèle à l'objet physique.
+  var SK = (typeof _dcog_rcs_getSkin === 'function') ? _dcog_rcs_getSkin() : {
+    bar:'#f5c518', hole:'#000000', hang:'#1d7fb5', fall:'#4cc9f0',
+    caught:'#f5c518', cap:'#f5c518', capDim:'#2a2200',
+    fallGlow:'rgba(76,201,240,0.95)', caughtGlow:'rgba(245,197,24,0.9)'
+  };
   ctx.save();
-  // ─ Barre support (holder) ─
+  // ─ Barre support jaune (skin classic) ─
   ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 8;
-  ctx.fillStyle = '#1a1d23';
+  ctx.fillStyle = SK.bar;
   var rr = L.barH * 0.33;
   _opto_roundRect(ctx, L.bx, L.barY, L.bw, L.barH, rr); ctx.fill();
   ctx.shadowBlur = 0;
-  // 3 petits trous (détail d'objet physique)
-  ctx.fillStyle = '#0a0c10';
+  // 3 petits trous noirs (détail d'objet physique)
+  ctx.fillStyle = SK.hole;
   var hR = L.barH * 0.15;
   for (var hi=-1; hi<=1; hi++){
     ctx.beginPath();
     ctx.arc(L.bx + L.bw/2 + hi*L.bw*0.06, L.barY + L.barH/2, hR, 0, Math.PI*2); ctx.fill();
   }
-  // ─ Les 6 sticks (AGRANDIS : H*0.20 vs 0.11 avant — "il faut que ça se voie") ─
-  var stickW = _ar_sticks_stickW(L);
-  var stickH = H * 0.20;
+  // ─ Les 6 sticks — dimensions & positions issues de _ar_sticks_bbox (source unique) ─
+  var stickW = _ar_sticks_stickW();
+  var stickH = _ar_sticks_stickH();
   for (var i=0; i<_ar_sticks.length; i++){
     var s = _ar_sticks[i];
-    var cx = _ar_sticks_stickX(i, L);
-    var sxL = cx - stickW/2;
-    var sy;
-    if (s.state === 'hanging'){
-      sy = L.barY + L.barH + 2;
-    } else if (s.state === 'falling'){
-      var prog = Math.min(1, (now - s.dropStartTs) / _AR_STICK_FALL_MS);
-      sy = L.barY + L.barH + 2 + prog * (L.floorY - L.barY - L.barH - stickH*0.5);
-    } else if (s.state === 'caught'){
-      sy = L.barY + L.barH + 2;      // reste sur le holder, mais en vert
-    } else { // missed
-      continue;                       // disparaît
-    }
+    if (s.state === 'missed') continue;             // disparaît
+    var bb = _ar_sticks_bbox(i, s, W, H);           // ★ MÊME bbox que la détection HIT
+    var sxL = bb.x;
+    var sy = bb.y;
     var bodyColor, capColor, glowColor;
-    if (s.state === 'caught'){ bodyColor='#4ade80'; capColor='#2d7a39'; glowColor='rgba(74,222,128,0.7)'; }
-    else if (s.state === 'falling'){ bodyColor='#f5c518'; capColor='#c97a00'; glowColor='rgba(245,197,24,0.75)'; }
-    else { bodyColor='#5a6377'; capColor='#f5c518'; glowColor='rgba(0,0,0,0.5)'; }
+    if (s.state === 'caught')      { bodyColor=SK.caught; capColor=SK.capDim; glowColor=SK.caughtGlow; }
+    else if (s.state === 'falling'){ bodyColor=SK.fall;   capColor=SK.cap;    glowColor=SK.fallGlow;    }
+    else                           { bodyColor=SK.hang;   capColor=SK.cap;    glowColor='rgba(0,0,0,0.5)'; }
     ctx.save();
     if (s.state === 'falling' || s.state === 'caught'){
       ctx.shadowBlur = 14; ctx.shadowColor = glowColor;
@@ -36468,7 +36487,7 @@ function _ar_sticks_draw(ctx, W, H){
       ctx.font = 'bold '+Math.round(stickW*0.75)+'px "Bebas Neue",sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 2;
-      ctx.fillText(String(i+1), cx, sy + stickH*0.5);
+      ctx.fillText(String(i+1), bb.x + bb.w/2, sy + stickH*0.5);
       ctx.shadowBlur = 0;
     }
     ctx.restore();
