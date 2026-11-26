@@ -36489,37 +36489,51 @@ function _ar_cog_announce(now, W, H){
   _ar_cog_phase = 'ask';
   _ar_cog_total++;
   _ar_cog_pool = [];
-  // Rayon : plafonné pour garantir la non-superposition même sur petit écran
   var r = Math.round(Math.min(W*0.06, H*0.085));
-  // ★ Zones de spawn adaptées au placement du HOLDER (évite toute collision)
-  //   · Mode normal (crossBody=false)   : holder à droite (x ∈ [0.68W, 0.98W])
-  //     → zone cibles gauche : x ∈ [0.08W, 0.42W], y ∈ [0.30H, 0.78H]
-  //     → zone cibles droite : x ∈ [0.44W, 0.62W] (étroite, car holder à droite)
-  //   · Mode cross-body (crossBody=true) : holder à gauche (x ∈ [0.02W, 0.32W])
-  //     → zone cibles gauche : x ∈ [0.34W, 0.52W] (étroite)
-  //     → zone cibles droite : x ∈ [0.54W, 0.92W]
-  //   → zone principale toujours OPPOSÉE au holder pour maximiser l'espace
-  var sideL_x, sideL_wx, sideR_x, sideR_wx;
-  if (_ar_cfg.crossBody){
-    sideL_x = W*0.34; sideL_wx = W*0.18;
-    sideR_x = W*0.54; sideR_wx = W*0.38;
-  } else {
-    sideL_x = W*0.08; sideL_wx = W*0.34;
-    sideR_x = W*0.44; sideR_wx = W*0.18;
-  }
-  // Y plus étalé (0.28H à 0.76H) pour garantir une bonne séparation verticale
+  // ★ ZONES DE SPAWN — règle critique : les cibles ne doivent JAMAIS être dans
+  //   le COULOIR DU BALLON (dribble overhand entre/sur les cônes) sinon la main
+  //   qui dribble déclenche de faux HITs (TDR voit la main près de la cible).
+  //
+  //   · 0 cône  : pas de couloir ballon → cibles des 2 côtés (comme avant), évite juste le holder
+  //   · 1 cône  : ballon passe au-dessus du cône (axe central x≈0.50W)
+  //                → cibles EXCLUSIVEMENT côté opposé au holder, HORS axe ballon
+  //   · 2 cônes : ballon passe entre les 2 cônes (corridor x ∈ [0.30W, 0.70W])
+  //                → cibles EXCLUSIVEMENT côté opposé au holder, HORS corridor
   var yTop = H*0.30, yBot = H*0.76;
-  // 3 slots : 2 d'un côté + 1 de l'autre (choix aléatoire)
-  var slotsL = (Math.random() < 0.5) ? 2 : 1;
-  var slotsR = 3 - slotsL;
   var slots = [];
-  // Côté gauche
-  if (slotsL === 2){ slots.push({x: sideL_x + Math.random()*sideL_wx, y: yTop}); slots.push({x: sideL_x + Math.random()*sideL_wx, y: yBot}); }
-  else             { slots.push({x: sideL_x + Math.random()*sideL_wx, y: (yTop+yBot)/2}); }
-  // Côté droit
-  if (slotsR === 2){ slots.push({x: sideR_x + Math.random()*sideR_wx, y: yTop}); slots.push({x: sideR_x + Math.random()*sideR_wx, y: yBot}); }
-  else             { slots.push({x: sideR_x + Math.random()*sideR_wx, y: (yTop+yBot)/2}); }
-  // ★ Anti-collision : si 2 slots sont trop proches, on sépare verticalement
+  if (_ar_cfg.cones > 0){
+    // Avec cône(s) : 1 seule zone de spawn, OPPOSÉE au holder, hors axe ballon
+    var zoneX, zoneWx;
+    if (_ar_cfg.crossBody){
+      // Holder à gauche [0.02, 0.32W] → cibles toutes à droite hors axe ballon
+      zoneX  = W*0.72; zoneWx = W*0.24;
+    } else {
+      // Holder à droite [0.68, 0.98W] → cibles toutes à gauche hors axe ballon
+      zoneX  = W*0.04; zoneWx = W*0.24;
+    }
+    // 3 slots sur 3 Y différents dans cette zone étroite
+    var ys = [yTop, (yTop+yBot)/2, yBot];
+    for (var k=0; k<3; k++){
+      slots.push({ x: zoneX + Math.random()*zoneWx, y: ys[k] });
+    }
+  } else {
+    // 0 cône : spawn double-côté, juste en évitant le holder
+    var sideL_x, sideL_wx, sideR_x, sideR_wx;
+    if (_ar_cfg.crossBody){
+      sideL_x = W*0.34; sideL_wx = W*0.18;
+      sideR_x = W*0.54; sideR_wx = W*0.38;
+    } else {
+      sideL_x = W*0.08; sideL_wx = W*0.34;
+      sideR_x = W*0.44; sideR_wx = W*0.18;
+    }
+    var slotsL = (Math.random() < 0.5) ? 2 : 1;
+    var slotsR = 3 - slotsL;
+    if (slotsL === 2){ slots.push({x: sideL_x + Math.random()*sideL_wx, y: yTop}); slots.push({x: sideL_x + Math.random()*sideL_wx, y: yBot}); }
+    else             { slots.push({x: sideL_x + Math.random()*sideL_wx, y: (yTop+yBot)/2}); }
+    if (slotsR === 2){ slots.push({x: sideR_x + Math.random()*sideR_wx, y: yTop}); slots.push({x: sideR_x + Math.random()*sideR_wx, y: yBot}); }
+    else             { slots.push({x: sideR_x + Math.random()*sideR_wx, y: (yTop+yBot)/2}); }
+  }
+  // ★ Anti-collision : si 2 slots sont trop proches, séparation verticale
   var minGap = r * 2.6;
   for (var a=0; a<slots.length; a++){
     for (var b=0; b<a; b++){
