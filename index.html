@@ -36490,48 +36490,55 @@ function _ar_cog_announce(now, W, H){
   _ar_cog_total++;
   _ar_cog_pool = [];
   var r = Math.round(Math.min(W*0.06, H*0.085));
-  // ★ ZONES DE SPAWN — règle critique : les cibles ne doivent JAMAIS être dans
-  //   le COULOIR DU BALLON (dribble overhand entre/sur les cônes) sinon la main
-  //   qui dribble déclenche de faux HITs (TDR voit la main près de la cible).
-  //
-  //   · 0 cône  : pas de couloir ballon → cibles des 2 côtés (comme avant), évite juste le holder
-  //   · 1 cône  : ballon passe au-dessus du cône (axe central x≈0.50W)
-  //                → cibles EXCLUSIVEMENT côté opposé au holder, HORS axe ballon
-  //   · 2 cônes : ballon passe entre les 2 cônes (corridor x ∈ [0.30W, 0.70W])
-  //                → cibles EXCLUSIVEMENT côté opposé au holder, HORS corridor
-  var yTop = H*0.30, yBot = H*0.76;
+  // ★ ZONES DE SPAWN — règle simple :
+  //   On construit une liste de "bandes autorisées" en découpant la largeur totale
+  //   en soustrayant uniquement :
+  //     (a) le footprint des cônes (empêche collision visuelle cible↔cône)
+  //     (b) le corridor ballon entre 2 cônes (empêche collision cible↔ballon)
+  //     (c) le holder sticks (empêche collision cible↔holder)
+  //   Résultat : bilatéral quand c'est géométriquement possible, sans artifice.
+  var yTop = H*0.28, yBot = H*0.68;   // au-dessus du haut des cônes (cone_top ≈ 0.73H)
+  // Zone cônes à éviter horizontalement
+  var coneAvoidL = 0, coneAvoidR = 0;
+  if (_ar_cfg.cones === 1){ coneAvoidL = W*0.42; coneAvoidR = W*0.58; }         // cône centré à 0.50W ± cw/2
+  else if (_ar_cfg.cones === 2){ coneAvoidL = W*0.30; coneAvoidR = W*0.70; }   // les 2 cônes + corridor ballon central
+  // Holder sticks
+  var holderL = _ar_cfg.crossBody ? W*0.02 : W*0.68;
+  var holderR = holderL + W*0.30;
+  // Construction des bandes disponibles
+  var bands = [[W*0.02, W*0.98]];
+  var cut = function(bands, cutL, cutR){
+    if (cutR <= cutL) return bands;
+    var res = [];
+    for (var i=0; i<bands.length; i++){
+      var l = bands[i][0], rr = bands[i][1];
+      if (rr <= cutL || l >= cutR){ res.push([l, rr]); continue; }
+      if (l < cutL) res.push([l, cutL]);
+      if (rr > cutR) res.push([cutR, rr]);
+    }
+    return res;
+  };
+  bands = cut(bands, coneAvoidL, coneAvoidR);
+  bands = cut(bands, holderL, holderR);
+  bands = bands.filter(function(b){ return (b[1] - b[0]) > W*0.06; });   // bandes > 6% W
+  if (!bands.length) bands = [[W*0.02, W*0.30]];    // fallback défensif
+  // Tirage pondéré par la largeur de chaque bande
+  var totalW = 0;
+  for (var bi=0; bi<bands.length; bi++) totalW += (bands[bi][1] - bands[bi][0]);
+  var pickBand = function(){
+    var rr = Math.random() * totalW;
+    var cs = 0;
+    for (var j=0; j<bands.length; j++){
+      cs += bands[j][1] - bands[j][0];
+      if (rr <= cs) return bands[j];
+    }
+    return bands[0];
+  };
   var slots = [];
-  if (_ar_cfg.cones > 0){
-    // Avec cône(s) : 1 seule zone de spawn, OPPOSÉE au holder, hors axe ballon
-    var zoneX, zoneWx;
-    if (_ar_cfg.crossBody){
-      // Holder à gauche [0.02, 0.32W] → cibles toutes à droite hors axe ballon
-      zoneX  = W*0.72; zoneWx = W*0.24;
-    } else {
-      // Holder à droite [0.68, 0.98W] → cibles toutes à gauche hors axe ballon
-      zoneX  = W*0.04; zoneWx = W*0.24;
-    }
-    // 3 slots sur 3 Y différents dans cette zone étroite
-    var ys = [yTop, (yTop+yBot)/2, yBot];
-    for (var k=0; k<3; k++){
-      slots.push({ x: zoneX + Math.random()*zoneWx, y: ys[k] });
-    }
-  } else {
-    // 0 cône : spawn double-côté, juste en évitant le holder
-    var sideL_x, sideL_wx, sideR_x, sideR_wx;
-    if (_ar_cfg.crossBody){
-      sideL_x = W*0.34; sideL_wx = W*0.18;
-      sideR_x = W*0.54; sideR_wx = W*0.38;
-    } else {
-      sideL_x = W*0.08; sideL_wx = W*0.34;
-      sideR_x = W*0.44; sideR_wx = W*0.18;
-    }
-    var slotsL = (Math.random() < 0.5) ? 2 : 1;
-    var slotsR = 3 - slotsL;
-    if (slotsL === 2){ slots.push({x: sideL_x + Math.random()*sideL_wx, y: yTop}); slots.push({x: sideL_x + Math.random()*sideL_wx, y: yBot}); }
-    else             { slots.push({x: sideL_x + Math.random()*sideL_wx, y: (yTop+yBot)/2}); }
-    if (slotsR === 2){ slots.push({x: sideR_x + Math.random()*sideR_wx, y: yTop}); slots.push({x: sideR_x + Math.random()*sideR_wx, y: yBot}); }
-    else             { slots.push({x: sideR_x + Math.random()*sideR_wx, y: (yTop+yBot)/2}); }
+  var ys = [yTop, (yTop+yBot)/2, yBot];
+  for (var k=0; k<3; k++){
+    var band = pickBand();
+    slots.push({ x: band[0] + Math.random()*(band[1]-band[0]), y: ys[k] });
   }
   // ★ Anti-collision : si 2 slots sont trop proches, séparation verticale
   var minGap = r * 2.6;
