@@ -2952,6 +2952,30 @@ window._dojoBackHome = function(){
           <option value="c1s_xb">AR-14 · CROSS-BODY · 1 CÔNE + STICKS</option>
           <option value="c2s_xb">AR-15 · CROSS-BODY · 2 CÔNES + STICKS</option>
           <option value="nocone_xb">AR-16 · CROSS-BODY · SANS CÔNE · CIBLES + STICKS</option>
+          <option value="c0_arith">AR-17 · ARITH · SANS CÔNE</option>
+          <option value="c0_arith_xb">AR-18 · ARITH · SANS CÔNE · CROSS-BODY</option>
+          <option value="c0_parity">AR-19 · PAIR/IMPAIR · SANS CÔNE</option>
+          <option value="c0_parity_xb">AR-20 · PAIR/IMPAIR · SANS CÔNE · CROSS-BODY</option>
+          <option value="c0_letter">AR-21 · VOYELLE/CONSONNE · SANS CÔNE</option>
+          <option value="c0_letter_xb">AR-22 · VOYELLE/CONSONNE · SANS CÔNE · CROSS-BODY</option>
+          <option value="c0_color">AR-23 · COULEUR · SANS CÔNE</option>
+          <option value="c0_color_xb">AR-24 · COULEUR · SANS CÔNE · CROSS-BODY</option>
+          <option value="c1_arith">AR-25 · ARITH · 1 CÔNE</option>
+          <option value="c1_arith_xb">AR-26 · ARITH · 1 CÔNE · CROSS-BODY</option>
+          <option value="c1_parity">AR-27 · PAIR/IMPAIR · 1 CÔNE</option>
+          <option value="c1_parity_xb">AR-28 · PAIR/IMPAIR · 1 CÔNE · CROSS-BODY</option>
+          <option value="c1_letter">AR-29 · VOYELLE/CONSONNE · 1 CÔNE</option>
+          <option value="c1_letter_xb">AR-30 · VOYELLE/CONSONNE · 1 CÔNE · CROSS-BODY</option>
+          <option value="c1_color">AR-31 · COULEUR · 1 CÔNE</option>
+          <option value="c1_color_xb">AR-32 · COULEUR · 1 CÔNE · CROSS-BODY</option>
+          <option value="c2_arith">AR-33 · ARITH · 2 CÔNES</option>
+          <option value="c2_arith_xb">AR-34 · ARITH · 2 CÔNES · CROSS-BODY</option>
+          <option value="c2_parity">AR-35 · PAIR/IMPAIR · 2 CÔNES</option>
+          <option value="c2_parity_xb">AR-36 · PAIR/IMPAIR · 2 CÔNES · CROSS-BODY</option>
+          <option value="c2_letter">AR-37 · VOYELLE/CONSONNE · 2 CÔNES</option>
+          <option value="c2_letter_xb">AR-38 · VOYELLE/CONSONNE · 2 CÔNES · CROSS-BODY</option>
+          <option value="c2_color">AR-39 · COULEUR · 2 CÔNES</option>
+          <option value="c2_color_xb">AR-40 · COULEUR · 2 CÔNES · CROSS-BODY</option>
         </select>
         <div id="ar_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px"></div>
       </div>
@@ -35744,11 +35768,11 @@ function _ar_reset(){
   _ar_calib = null; _ar_calibN = 0; _ar_calibAcc = null;
   _ar_zone = null; _ar_reps = 0; _ar_lastRepTs = 0;
   _ar_targets = []; _ar_nextSpawn = 0; _ar_tHit = 0; _ar_tTotal = 0; _ar_fx = [];
-  // ★ Reset des accumulateurs de détection (bounce vertical + time pt AR3/AR4)
   window._ar_bounce = null;
   window._ar_timePtTs = null;
   if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
   if (typeof _ar_sticks_reset === 'function') _ar_sticks_reset();
+  if (typeof _ar_cog_reset === 'function') _ar_cog_reset();
 }
 function _ar_consigne(en){
   if (_ar_cfg.mode === 'color') return en ? 'TOUCH THE CALLED CONE' : 'TOUCHE LE CÔNE ANNONCÉ';
@@ -35901,6 +35925,13 @@ function _opto_analyzeAr(poses){
     }
     B.prevY = hy;
   }
+  // ★ AR17-AR40 : taskType cognitif → délégation à _ar_cog_analyze pour spawn
+  //   multi-cibles + consigne + go/no-go. Les sticks continuent à tourner.
+  if (_ar_cfg.taskType && _ar_cfg.taskType !== 'simple'){
+    if (typeof _ar_cog_analyze === 'function') _ar_cog_analyze(poses, W, H, now);
+    if (_ar_cfg.sticks && typeof _ar_sticks_tick === 'function') _ar_sticks_tick(poses, W, H, now);
+    return;
+  }
   if (!_ar_cfg.targets){
     // ★ AR9/AR10 (sticks sans cibles) : le score vient des catch, pas du temps.
     //   On tick les sticks AVANT le return pour que la détection catch tourne.
@@ -35994,18 +36025,24 @@ function _opto_drawAr(W, H){
     }
   }
   // ── Cibles : disque + anneau de temps restant ──
-  for (var k=0;k<_ar_targets.length;k++){
-    var t = _ar_targets[k];
-    var left = Math.max(0, 1 - (now - t.born)/t.ttl);
-    ctx.fillStyle = t.color; ctx.globalAlpha = 0.92;
-    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
-    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
+  //    (simples quand taskType === 'simple'. Pour AR17-AR40, le module _ar_cog
+  //     dessine ses propres cibles avec valeur rendue au centre.)
+  if (_ar_cfg.taskType && _ar_cfg.taskType !== 'simple'){
+    if (typeof _ar_cog_draw === 'function') _ar_cog_draw(W, H, now);
+  } else {
+    for (var k=0;k<_ar_targets.length;k++){
+      var t = _ar_targets[k];
+      var left = Math.max(0, 1 - (now - t.born)/t.ttl);
+      ctx.fillStyle = t.color; ctx.globalAlpha = 0.92;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); ctx.stroke();
+    }
   }
   ctx.restore(); _ar_drawFx(W, H, now); ctx.save();
   // ── Sticks (AR7-AR11) : dessin DU HOLDER + des 6 sticks ──
@@ -36126,6 +36163,26 @@ window._ar_setDrill = function(v){
   // Defaults côté skin et crossBody
   _ar_cfg.crossBody = isXb;
   _ar_cfg.skin = isXb ? 'yb' : 'classic';
+  _ar_cfg.taskType = 'simple';   // par défaut : cibles simples (disques)
+  // ★ AR17-AR40 : couche cognitive — cibles = chiffres/lettres/couleurs + consigne
+  //   Clé format : c{N}_{task}  où N = 0|1|2 cônes · task = arith/parity/letter/color
+  var cogMatch = core.match(/^c([012])_(arith|parity|letter|color)$/);
+  if (cogMatch){
+    _ar_cfg.mode = 'overhand';
+    _ar_cfg.cones = parseInt(cogMatch[1], 10);
+    _ar_cfg.taskType = cogMatch[2];
+    _ar_cfg.targets = true;
+    _ar_cfg.sticks = true;
+    _ar_cfg.stickTrigger = 'hit';
+    if (typeof _ar_cog_reset === 'function') _ar_cog_reset();
+    if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
+    if (typeof _ar_sticks_reset === 'function') _ar_sticks_reset();
+    _ar_refreshUI();
+    if (typeof _dcog_drill !== 'undefined' && _dcog_drill === 'ar' && typeof _dcog_renderVids === 'function'){
+      _dcog_renderVids();
+    }
+    return;
+  }
   if (core === 'col3' || core === 'col4'){
     _ar_cfg.mode = 'color';
     _ar_cfg.cones = (core === 'col4') ? 4 : 3;
@@ -36189,9 +36246,26 @@ function _ar_applyLang(){
   var en = window._lang === 'en';
   var sel = document.getElementById('ar_drillSelect');
   if (sel){
-    var lab = en
-      ? ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)','AR-5 · COLOR CALL · 3 CONES (colour called)','AR-6 · COLOR CALL · 4 CONES (colour called)','AR-7 · 1 CONE + TARGETS + STICKS','AR-8 · 2 CONES + TARGETS + STICKS','AR-9 · 1 CONE + STICKS','AR-10 · 2 CONES + STICKS','AR-11 · NO CONE · TARGETS + STICKS','AR-12 · CROSS-BODY · 1 CONE + TARGETS + STICKS','AR-13 · CROSS-BODY · 2 CONES + TARGETS + STICKS','AR-14 · CROSS-BODY · 1 CONE + STICKS','AR-15 · CROSS-BODY · 2 CONES + STICKS','AR-16 · CROSS-BODY · NO CONE · TARGETS + STICKS']
-      : ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)','AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)','AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)','AR-7 · 1 CÔNE + CIBLES + STICKS','AR-8 · 2 CÔNES + CIBLES + STICKS','AR-9 · 1 CÔNE + STICKS','AR-10 · 2 CÔNES + STICKS','AR-11 · SANS CÔNE · CIBLES + STICKS','AR-12 · CROSS-BODY · 1 CÔNE + CIBLES + STICKS','AR-13 · CROSS-BODY · 2 CÔNES + CIBLES + STICKS','AR-14 · CROSS-BODY · 1 CÔNE + STICKS','AR-15 · CROSS-BODY · 2 CÔNES + STICKS','AR-16 · CROSS-BODY · SANS CÔNE · CIBLES + STICKS'];
+    var baseEn = ['AR-1 · OVERHAND · 1 CONE + TARGETS','AR-2 · OVERHAND · 2 CONES + TARGETS','AR-3 · OVERHAND · 1 CONE (no target)','AR-4 · OVERHAND · 2 CONES (no target)','AR-5 · COLOR CALL · 3 CONES (colour called)','AR-6 · COLOR CALL · 4 CONES (colour called)','AR-7 · 1 CONE + TARGETS + STICKS','AR-8 · 2 CONES + TARGETS + STICKS','AR-9 · 1 CONE + STICKS','AR-10 · 2 CONES + STICKS','AR-11 · NO CONE · TARGETS + STICKS','AR-12 · CROSS-BODY · 1 CONE + TARGETS + STICKS','AR-13 · CROSS-BODY · 2 CONES + TARGETS + STICKS','AR-14 · CROSS-BODY · 1 CONE + STICKS','AR-15 · CROSS-BODY · 2 CONES + STICKS','AR-16 · CROSS-BODY · NO CONE · TARGETS + STICKS'];
+    var baseFr = ['AR-1 · OVERHAND · 1 CÔNE + CIBLES','AR-2 · OVERHAND · 2 CÔNES + CIBLES','AR-3 · OVERHAND · 1 CÔNE (sans cible)','AR-4 · OVERHAND · 2 CÔNES (sans cible)','AR-5 · COLOR CALL · 3 CÔNES (couleur annoncée)','AR-6 · COLOR CALL · 4 CÔNES (couleur annoncée)','AR-7 · 1 CÔNE + CIBLES + STICKS','AR-8 · 2 CÔNES + CIBLES + STICKS','AR-9 · 1 CÔNE + STICKS','AR-10 · 2 CÔNES + STICKS','AR-11 · SANS CÔNE · CIBLES + STICKS','AR-12 · CROSS-BODY · 1 CÔNE + CIBLES + STICKS','AR-13 · CROSS-BODY · 2 CÔNES + CIBLES + STICKS','AR-14 · CROSS-BODY · 1 CÔNE + STICKS','AR-15 · CROSS-BODY · 2 CÔNES + STICKS','AR-16 · CROSS-BODY · SANS CÔNE · CIBLES + STICKS'];
+    // AR-17 à AR-40 : couche cognitive
+    var cogIdx = 17;
+    var cogTasksEn = {arith:'ARITH', parity:'EVEN/ODD', letter:'VOWEL/CONSONANT', color:'COLOR'};
+    var cogTasksFr = {arith:'ARITH', parity:'PAIR/IMPAIR', letter:'VOYELLE/CONSONNE', color:'COULEUR'};
+    var cogTasks = ['arith','parity','letter','color'];
+    [0,1,2].forEach(function(n){
+      cogTasks.forEach(function(task){
+        var coneEn = (n===0) ? 'NO CONE' : (n+' CONE'+(n>1?'S':''));
+        var coneFr = (n===0) ? 'SANS CÔNE' : (n+' CÔNE'+(n>1?'S':''));
+        baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn);
+        baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr);
+        cogIdx++;
+        baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn+' · CROSS-BODY');
+        baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr+' · CROSS-BODY');
+        cogIdx++;
+      });
+    });
+    var lab = en ? baseEn : baseFr;
     for (var i=0;i<sel.options.length && i<lab.length;i++) sel.options[i].textContent = lab[i];
   }
   var set = function(id, t){ var e = document.getElementById(id); if (e) e.textContent = t; };
@@ -36272,6 +36346,283 @@ function _ar_colorLayout(W, H){
   for (var i=0;i<n;i++) xs.push(W/2 - span/2 + (n>1 ? span*i/(n-1) : 0));
   return { xs:xs, baseY:baseY, ch:ch, cw:cw };
 }
+/* ═══════════════ AR17-AR40 · COUCHE COGNITIVE (arith/parity/letter/color) ═════
+   Réutilise les générateurs et palettes existants dans l'app :
+     · arith  → _dcog_genQuestion / _dcog_genChoices (Dribble Math)
+     · parity → logique inline PAIR/IMPAIR + nombres 0-99 (_DQA_DRILLS C3 pattern)
+     · letter → _DQA_VOWELS + _DQA_LETTERS (Quick Choice C7)
+     · color  → _AR_COLORS palette (AR5/AR6 color call)
+   Multi-cibles simultanées : 3 cibles spawnées aux positions symétriques (gauche/droite
+   aléatoire), UNE SEULE est la bonne réponse. Consigne top rectangle homogène GEO.
+═════════════════════════════════════════════════════════════════════════ */
+var _AR_COG_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var _AR_COG_VOWELS  = 'AEIOUY';
+var _ar_cog_pool    = [];
+var _ar_cog_prompt  = '';
+var _ar_cog_answer  = null;
+var _ar_cog_phase   = 'wait';
+var _ar_cog_askTs   = 0;
+var _ar_cog_nextTs  = 0;
+var _ar_cog_ok      = 0;
+var _ar_cog_wrong   = 0;
+var _ar_cog_total   = 0;
+var _AR_COG_TTL     = 5000;              // fenêtre de réponse par round
+var _AR_COG_GAP_MIN = 1200;
+var _AR_COG_GAP_RAND = 800;
+function _ar_cog_reset(){
+  _ar_cog_pool = []; _ar_cog_prompt = ''; _ar_cog_answer = null;
+  _ar_cog_phase = 'wait'; _ar_cog_askTs = 0; _ar_cog_nextTs = 0;
+  _ar_cog_ok = 0; _ar_cog_wrong = 0; _ar_cog_total = 0;
+}
+// ★ Palette couleur des DISQUES CIBLES (non-color drills) — copiée de _dcog_math
+//   lignes 41100-41102 (Dribble Math) : 6 teintes SENSEI distinctes.
+var _AR_COG_DISC_COLORS = ['#22c55e','#e63946','#f5c518','#4cc9f0','#9f64e6','#f97316'];
+
+// Génère une question selon le taskType + un pool de 3 valeurs dont UNE correcte.
+// ★ Les générateurs sont IMPORTÉS depuis leurs modules d'origine :
+//   · arith  : _dcog_genQuestion() + _dcog_genChoices() (Dribble Math, ligne 41337)
+//   · parity : _DQA_DRILLS['C3'].genQ() (Quick Choice C3, ligne 31482)
+//   · letter : _DQA_DRILLS['C7'].genQ() (Quick Choice C7, ligne 31494)
+//   · color  : _AR_COLORS (AR5/AR6 color call)
+function _ar_cog_newQuestion(){
+  var t = _ar_cfg.taskType;
+  var en = (window._lang === 'en');
+  if (t === 'arith'){
+    var q = (typeof _dcog_genQuestion === 'function') ? _dcog_genQuestion() : { text:'1+1=?', answer:2 };
+    var choices = (typeof _dcog_genChoices === 'function') ? _dcog_genChoices(q.answer).slice() : [q.answer, q.answer-1, q.answer+1];
+    while (choices.length > 3) choices.pop();
+    while (choices.length < 3) choices.push(Math.max(0, q.answer + (choices.length - 1)));
+    for (var i=choices.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=choices[i]; choices[i]=choices[j]; choices[j]=tmp; }
+    return { prompt:q.text, values:choices, answer:q.answer, kind:'num' };
+  }
+  if (t === 'parity'){
+    // ★ Import strict du générateur _DQA_DRILLS['C3'] (Quick Choice pair/impair)
+    var genPar = (typeof _DQA_DRILLS !== 'undefined' && _DQA_DRILLS['C3']) ? _DQA_DRILLS['C3'].genQ : null;
+    var rule = (Math.random() < 0.5) ? 'PAIR' : 'IMPAIR';
+    var answer = null, pool2 = [];
+    var attempts = 0;
+    // On appelle le générateur Quick Choice jusqu'à avoir 1 nombre qui match la règle + 2 qui ne matchent pas
+    while (pool2.length < 3 && attempts++ < 80){
+      var qp = genPar ? genPar() : {stim:String(Math.floor(Math.random()*100)), correct: (Math.random()<0.5?'PAIR':'IMPAIR')};
+      var n = parseInt(qp.stim, 10);
+      if (pool2.indexOf(n) >= 0) continue;
+      var matches = (qp.correct === rule);
+      if (pool2.length === 0 && matches){ answer = n; pool2.push(n); }
+      else if (pool2.length > 0 && !matches){ pool2.push(n); }
+    }
+    for (var m=pool2.length-1;m>0;m--){ var mj=Math.floor(Math.random()*(m+1)); var mt=pool2[m]; pool2[m]=pool2[mj]; pool2[mj]=mt; }
+    var prompt2 = (rule === 'PAIR') ? (en?'EVEN ?':'PAIR ?') : (en?'ODD ?':'IMPAIR ?');
+    return { prompt:prompt2, values:pool2, answer:answer, kind:'num' };
+  }
+  if (t === 'letter'){
+    // ★ Import strict du générateur _DQA_DRILLS['C7'] (Quick Choice voyelle/consonne)
+    var genLet = (typeof _DQA_DRILLS !== 'undefined' && _DQA_DRILLS['C7']) ? _DQA_DRILLS['C7'].genQ : null;
+    var rule2 = (Math.random() < 0.5) ? 'VOYELLE' : 'CONSONNE';
+    var ans2 = null, pool3 = [];
+    var tries = 0;
+    while (pool3.length < 3 && tries++ < 80){
+      var ql = genLet ? genLet() : {stim:_AR_COG_LETTERS.charAt(Math.floor(Math.random()*26)), correct:'VOYELLE'};
+      var L = ql.stim;
+      if (pool3.indexOf(L) >= 0) continue;
+      var matches2 = (ql.correct === rule2);
+      if (pool3.length === 0 && matches2){ ans2 = L; pool3.push(L); }
+      else if (pool3.length > 0 && !matches2){ pool3.push(L); }
+    }
+    for (var p=pool3.length-1;p>0;p--){ var pj=Math.floor(Math.random()*(p+1)); var pt=pool3[p]; pool3[p]=pool3[pj]; pool3[pj]=pt; }
+    var prompt3 = (rule2 === 'VOYELLE') ? (en?'VOWEL ?':'VOYELLE ?') : (en?'CONSONANT ?':'CONSONNE ?');
+    return { prompt:prompt3, values:pool3, answer:ans2, kind:'letter' };
+  }
+  if (t === 'color'){
+    var COLS = (typeof _AR_COLORS !== 'undefined' && _AR_COLORS.length >= 3) ? _AR_COLORS : [
+      {k:'R', fr:'ROUGE', en:'RED', hex:'#e63946'},
+      {k:'B', fr:'BLEU', en:'BLUE', hex:'#4cc9f0'},
+      {k:'J', fr:'JAUNE', en:'YELLOW', hex:'#f5c518'},
+      {k:'V', fr:'VERT', en:'GREEN', hex:'#2dc653'}
+    ];
+    var pool4 = COLS.slice().sort(function(){return Math.random()-0.5;}).slice(0, 3);
+    var tgt = pool4[Math.floor(Math.random()*pool4.length)];
+    return { prompt: (en ? (tgt.en || tgt.fr) : tgt.fr), values:pool4, answer:tgt, kind:'color' };
+  }
+  return null;
+}
+function _ar_cog_announce(now, W, H){
+  var q = _ar_cog_newQuestion();
+  if (!q) return;
+  _ar_cog_prompt = q.prompt;
+  _ar_cog_answer = q.answer;
+  _ar_cog_askTs = now;
+  _ar_cog_phase = 'ask';
+  _ar_cog_total++;
+  _ar_cog_pool = [];
+  // Rayon : plafonné pour garantir la non-superposition même sur petit écran
+  var r = Math.round(Math.min(W*0.06, H*0.085));
+  // ★ Zones de spawn adaptées au placement du HOLDER (évite toute collision)
+  //   · Mode normal (crossBody=false)   : holder à droite (x ∈ [0.68W, 0.98W])
+  //     → zone cibles gauche : x ∈ [0.08W, 0.42W], y ∈ [0.30H, 0.78H]
+  //     → zone cibles droite : x ∈ [0.44W, 0.62W] (étroite, car holder à droite)
+  //   · Mode cross-body (crossBody=true) : holder à gauche (x ∈ [0.02W, 0.32W])
+  //     → zone cibles gauche : x ∈ [0.34W, 0.52W] (étroite)
+  //     → zone cibles droite : x ∈ [0.54W, 0.92W]
+  //   → zone principale toujours OPPOSÉE au holder pour maximiser l'espace
+  var sideL_x, sideL_wx, sideR_x, sideR_wx;
+  if (_ar_cfg.crossBody){
+    sideL_x = W*0.34; sideL_wx = W*0.18;
+    sideR_x = W*0.54; sideR_wx = W*0.38;
+  } else {
+    sideL_x = W*0.08; sideL_wx = W*0.34;
+    sideR_x = W*0.44; sideR_wx = W*0.18;
+  }
+  // Y plus étalé (0.28H à 0.76H) pour garantir une bonne séparation verticale
+  var yTop = H*0.30, yBot = H*0.76;
+  // 3 slots : 2 d'un côté + 1 de l'autre (choix aléatoire)
+  var slotsL = (Math.random() < 0.5) ? 2 : 1;
+  var slotsR = 3 - slotsL;
+  var slots = [];
+  // Côté gauche
+  if (slotsL === 2){ slots.push({x: sideL_x + Math.random()*sideL_wx, y: yTop}); slots.push({x: sideL_x + Math.random()*sideL_wx, y: yBot}); }
+  else             { slots.push({x: sideL_x + Math.random()*sideL_wx, y: (yTop+yBot)/2}); }
+  // Côté droit
+  if (slotsR === 2){ slots.push({x: sideR_x + Math.random()*sideR_wx, y: yTop}); slots.push({x: sideR_x + Math.random()*sideR_wx, y: yBot}); }
+  else             { slots.push({x: sideR_x + Math.random()*sideR_wx, y: (yTop+yBot)/2}); }
+  // ★ Anti-collision : si 2 slots sont trop proches, on sépare verticalement
+  var minGap = r * 2.6;
+  for (var a=0; a<slots.length; a++){
+    for (var b=0; b<a; b++){
+      var dx = slots[a].x - slots[b].x, dy = slots[a].y - slots[b].y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < minGap){
+        slots[a].y = (slots[a].y < (yTop+yBot)/2) ? Math.max(yTop, slots[b].y - minGap) : Math.min(yBot, slots[b].y + minGap);
+      }
+    }
+  }
+  // ★ Couleurs des disques (non-color drills) — rotation parmi 6 teintes SENSEI
+  var discCols = _AR_COG_DISC_COLORS.slice().sort(function(){return Math.random()-0.5;});
+  var vals = q.values.slice();
+  for (var si=0; si<3 && si<slots.length && si<vals.length; si++){
+    var disc = (q.kind === 'color' && vals[si] && vals[si].hex) ? vals[si].hex : discCols[si % discCols.length];
+    _ar_cog_pool.push({
+      x: slots[si].x, y: slots[si].y, r: r,
+      value: vals[si], kind: q.kind, disc: disc,
+      hit: false, born: now, ttl: _AR_COG_TTL
+    });
+  }
+}
+function _ar_cog_endRound(now, extraPause){
+  _ar_cog_phase = 'wait';
+  _ar_cog_nextTs = now + _AR_COG_GAP_MIN + Math.random()*_AR_COG_GAP_RAND + (extraPause||0);
+  _ar_cog_pool = [];
+}
+function _ar_cog_isCorrect(targetValue){
+  if (_ar_cfg.taskType === 'color'){
+    // answer est un objet {k, hex, fr, en} — compare .k
+    return (_ar_cog_answer && targetValue && _ar_cog_answer.k === targetValue.k);
+  }
+  return (targetValue === _ar_cog_answer);
+}
+function _ar_cog_analyze(poses, W, H, now){
+  // Phase wait : attend la fin du gap, puis spawn
+  if (_ar_cog_phase === 'wait'){
+    if (!_ar_cog_nextTs) _ar_cog_nextTs = now + 1000;
+    if (now >= _ar_cog_nextTs) _ar_cog_announce(now, W, H);
+    return;
+  }
+  // Timeout
+  if (now - _ar_cog_askTs > _AR_COG_TTL){
+    _ar_cog_endRound(now, 300);
+    return;
+  }
+  // HIT detection — strict TDR via _opto_doHits
+  _opto_doHits(poses, _ar_cog_pool, 2.0, function(t, side, rt){
+    if (_ar_cog_phase !== 'ask') return;
+    if (_ar_cog_isCorrect(t.value)){
+      var pts = 10 + Math.max(0, Math.round((_AR_COG_TTL - rt)/300));
+      _ar_cog_ok++; _opto_hits++; _ar_tHit++; _opto_score += pts;
+      _ar_fx.push({x:t.x, y:t.y - H*0.07, txt:'+'+pts, color:'#4ade80', born:now});
+      if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.1);
+      if (navigator.vibrate) navigator.vibrate(22);
+      // Trigger stick drop (sticks sont toujours actifs sur AR17-AR40)
+      if (typeof _ar_sticks_onTargetHit === 'function') _ar_sticks_onTargetHit(now);
+      _ar_cog_endRound(now, 0);
+    } else {
+      _ar_cog_wrong++; _opto_miss++; _opto_score = Math.max(0, _opto_score - 5);
+      _ar_fx.push({x:t.x, y:t.y - H*0.07, txt:'-5', color:'#ff8a94', born:now});
+      if (typeof _td_beep === 'function') _td_beep(200, 0.08, 0.12);
+      if (navigator.vibrate) navigator.vibrate([20,40,20]);
+      _ar_cog_endRound(now, 400);
+    }
+  });
+}
+function _ar_cog_draw(W, H, now){
+  var ctx = _opto_ctx, en = (window._lang === 'en');
+  // ── Top rectangle consigne (homogène AR5/AR6 + GEO) ──
+  var rbw = Math.min(W*0.72, 480);
+  var rbh = Math.max(H*0.095, 68);
+  var rbx = (W - rbw) / 2;
+  var rby = H*0.025;
+  var rrr = Math.min(rbh*0.35, 22);
+  var active = (_ar_cog_phase === 'ask' && _ar_cog_prompt);
+  var tagColor = '#64b4ff';
+  ctx.save();
+  ctx.fillStyle = 'rgba(8,11,18,0.38)';
+  _opto_roundRect(ctx, rbx, rby, rbw, rbh, rrr); ctx.fill();
+  ctx.strokeStyle = active ? tagColor : 'rgba(255,255,255,0.35)';
+  ctx.lineWidth = active ? 4 : 3;
+  _opto_roundRect(ctx, rbx, rby, rbw, rbh, rrr); ctx.stroke();
+  if (active){
+    var label = _ar_cog_prompt;
+    var fs = Math.round(rbh*0.56);
+    ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif';
+    while (fs > 18 && ctx.measureText(label).width > rbw*0.80){ fs--; ctx.font = 'bold '+fs+'px "Bebas Neue",sans-serif'; }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = Math.max(3, fs*0.08); ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+    ctx.strokeText(label, rbx + rbw/2, rby + rbh/2);
+    ctx.fillStyle = tagColor; ctx.fillText(label, rbx + rbw/2, rby + rbh/2);
+    // Barre temps restant
+    var left = Math.max(0, 1 - (now - _ar_cog_askTs) / _AR_COG_TTL);
+    var tbh = 4;
+    ctx.fillStyle = tagColor;
+    ctx.fillRect(rbx + 6, rby + rbh - tbh - 4, (rbw - 12) * left, tbh);
+  } else {
+    var wait = en ? 'GET READY' : 'PRÊT…';
+    var fsW = Math.round(rbh*0.42);
+    ctx.font = 'bold '+fsW+'px "Bebas Neue",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(255,255,255,0.80)';
+    ctx.fillText(wait, rbx + rbw/2, rby + rbh/2);
+  }
+  ctx.restore();
+  // ── Les 3 cibles (chiffre/lettre/couleur centré dans un disque coloré) ──
+  ctx.save();
+  for (var i=0; i<_ar_cog_pool.length; i++){
+    var t = _ar_cog_pool[i];
+    if (t.hit) continue;
+    var tLeft = Math.max(0, 1 - (now - t.born)/t.ttl);
+    // Disque coloré — fond : t.disc est posé par _ar_cog_announce (teinte variée
+    // pour arith/parity/letter, hex de la couleur pour color)
+    ctx.fillStyle = t.disc || '#4cc9f0'; ctx.globalAlpha = 0.92;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
+    // Valeur au centre (chiffre ou lettre)
+    if (t.kind === 'num' || t.kind === 'letter'){
+      var txt = String(t.value);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold '+Math.round(t.r*1.0)+'px "Bebas Neue",sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+      ctx.strokeText(txt, t.x, t.y);
+      ctx.fillText(txt, t.x, t.y);
+    }
+    // Arc de temps restant autour
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*tLeft); ctx.stroke();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r + 9, -Math.PI/2, -Math.PI/2 + Math.PI*2*tLeft); ctx.stroke();
+  }
+  ctx.restore();
+}
+
 /* ═══════════════ AR7-AR11 · MINI STICKS (RCS miniaturisé) ═══════════════
    Réutilise la structure stick/state de RCS classic (hanging/falling/caught/missed)
    mais dessiné dans la moitié droite de l'écran, catch zone remontée au niveau
