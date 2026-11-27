@@ -2988,6 +2988,24 @@ window._dojoBackHome = function(){
           <option value="c2_geo2d_xb">AR-50 · GÉOMÉTRIE 2D · 2 CÔNES · CROSS-BODY</option>
           <option value="c2_geo3d">AR-51 · GÉOMÉTRIE 3D · 2 CÔNES</option>
           <option value="c2_geo3d_xb">AR-52 · GÉOMÉTRIE 3D · 2 CÔNES · CROSS-BODY</option>
+          <option value="c0_arith_ns">AR-53 · ARITH · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_arith_ns">AR-54 · ARITH · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_arith_ns">AR-55 · ARITH · 2 CÔNES · SANS STICKS</option>
+          <option value="c0_parity_ns">AR-56 · PAIR/IMPAIR · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_parity_ns">AR-57 · PAIR/IMPAIR · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_parity_ns">AR-58 · PAIR/IMPAIR · 2 CÔNES · SANS STICKS</option>
+          <option value="c0_letter_ns">AR-59 · VOYELLE/CONSONNE · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_letter_ns">AR-60 · VOYELLE/CONSONNE · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_letter_ns">AR-61 · VOYELLE/CONSONNE · 2 CÔNES · SANS STICKS</option>
+          <option value="c0_color_ns">AR-62 · COULEUR · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_color_ns">AR-63 · COULEUR · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_color_ns">AR-64 · COULEUR · 2 CÔNES · SANS STICKS</option>
+          <option value="c0_geo2d_ns">AR-65 · GÉOMÉTRIE 2D · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_geo2d_ns">AR-66 · GÉOMÉTRIE 2D · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_geo2d_ns">AR-67 · GÉOMÉTRIE 2D · 2 CÔNES · SANS STICKS</option>
+          <option value="c0_geo3d_ns">AR-68 · GÉOMÉTRIE 3D · SANS CÔNE · SANS STICKS</option>
+          <option value="c1_geo3d_ns">AR-69 · GÉOMÉTRIE 3D · 1 CÔNE · SANS STICKS</option>
+          <option value="c2_geo3d_ns">AR-70 · GÉOMÉTRIE 3D · 2 CÔNES · SANS STICKS</option>
         </select>
         <div id="ar_drillDesc" style="margin-top:6px;font-family:var(--font-cond);font-size:10px;color:#9aa3b3;line-height:1.5;padding:0 2px"></div>
       </div>
@@ -36129,8 +36147,13 @@ function _ar_desc(){
       ? (n + ' coloured cones · the colour appears in a top rectangle · touch the right cone as fast as you can.')
       : (n + ' cônes de couleur · la couleur apparaît dans un rectangle en haut · touche le bon cône le plus vite possible.');
   }
-  // AR-11 / AR-16 : pas de cône
+  // AR-11 / AR-16 / AR-53+ (cog c0 sans sticks) : pas de cône
   if (n === 0){
+    if (!_ar_cfg.sticks){
+      return en
+        ? ('Dribble freely · hit the right target with your ' + handCibles + '.')
+        : ('Dribble librement · touche la bonne cible avec la ' + handCibles + '.');
+    }
     return en
       ? ('Dribble freely · hit the targets with your ' + handCibles + ' and catch the falling sticks with your ' + handSticks + '.')
       : ('Dribble librement · touche les cibles avec la ' + handCibles + ' et attrape les sticks avec la ' + handSticks + '.');
@@ -36170,21 +36193,26 @@ window._ar_setDrill = function(v){
   //  c1ts/c2ts/c1s/c2s    : AR7-AR10 (sticks côté main dribbleuse, cibles côté libre)
   //  nocone               : AR11
   //  *_xb                 : AR12-AR16 (CROSS-BODY — sides inversés, skin YB)
-  var isXb = /_xb$/.test(v);
-  var core = isXb ? v.replace(/_xb$/, '') : v;
+  // ★ AR53-AR70 : SANS STICKS — suffixe "_ns" prioritaire sur "_xb"
+  //   Clé format : c{N}_{task}_ns   (pas de cross-body sans sticks, car pas de holder à swap)
+  var isNs = /_ns$/.test(v);
+  var vStripNs = isNs ? v.replace(/_ns$/, '') : v;
+  var isXb = /_xb$/.test(vStripNs);
+  var core = isXb ? vStripNs.replace(/_xb$/, '') : vStripNs;
   // Defaults côté skin et crossBody
-  _ar_cfg.crossBody = isXb;
-  _ar_cfg.skin = isXb ? 'yb' : 'classic';
+  _ar_cfg.crossBody = isXb && !isNs;      // xb sans sticks = no-op, forcé à false
+  _ar_cfg.skin = (isXb && !isNs) ? 'yb' : 'classic';
   _ar_cfg.taskType = 'simple';   // par défaut : cibles simples (disques)
-  // ★ AR17-AR40 : couche cognitive — cibles = chiffres/lettres/couleurs + consigne
-  //   Clé format : c{N}_{task}  où N = 0|1|2 cônes · task = arith/parity/letter/color
+  // ★ AR17-AR40 / AR53-AR70 : couche cognitive — cibles = chiffres/lettres/couleurs + consigne
+  //   Clé format : c{N}_{task}[_ns][_xb]  où N = 0|1|2 cônes · task = arith/parity/letter/color/geo2d/geo3d
+  //   _ns = sans sticks (AR53-AR70) · _xb = cross-body (uniquement si sticks présents)
   var cogMatch = core.match(/^c([012])_(arith|parity|letter|color|geo2d|geo3d)$/);
   if (cogMatch){
     _ar_cfg.mode = 'overhand';
     _ar_cfg.cones = parseInt(cogMatch[1], 10);
     _ar_cfg.taskType = cogMatch[2];
     _ar_cfg.targets = true;
-    _ar_cfg.sticks = true;
+    _ar_cfg.sticks = !isNs;                   // AR53-AR70 : sticks désactivés
     _ar_cfg.stickTrigger = 'hit';
     if (typeof _ar_cog_reset === 'function') _ar_cog_reset();
     if (typeof _ar_cc_reset === 'function') _ar_cc_reset();
@@ -36279,6 +36307,17 @@ function _ar_applyLang(){
           baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr+' · CROSS-BODY');
           cogIdx++;
         });
+      });
+    });
+    // PASSE 3 : AR-53 à AR-70 — tâches cog/geo × 3 cônes, SANS STICKS (ordre : arith, parity, letter, color, geo2d, geo3d)
+    var nsTasks = ['arith','parity','letter','color','geo2d','geo3d'];
+    nsTasks.forEach(function(task){
+      [0,1,2].forEach(function(n){
+        var coneEn = (n===0) ? 'NO CONE' : (n+' CONE'+(n>1?'S':''));
+        var coneFr = (n===0) ? 'SANS CÔNE' : (n+' CÔNE'+(n>1?'S':''));
+        baseEn.push('AR-'+(cogIdx)+' · '+cogTasksEn[task]+' · '+coneEn+' · NO STICKS');
+        baseFr.push('AR-'+(cogIdx)+' · '+cogTasksFr[task]+' · '+coneFr+' · SANS STICKS');
+        cogIdx++;
       });
     });
     var lab = en ? baseEn : baseFr;
@@ -36490,21 +36529,29 @@ function _ar_cog_announce(now, W, H){
   _ar_cog_total++;
   _ar_cog_pool = [];
   var r = Math.round(Math.min(W*0.06, H*0.085));
-  // ★ ZONES DE SPAWN — règle simple :
-  //   On construit une liste de "bandes autorisées" en découpant la largeur totale
-  //   en soustrayant uniquement :
-  //     (a) le footprint des cônes (empêche collision visuelle cible↔cône)
-  //     (b) le corridor ballon entre 2 cônes (empêche collision cible↔ballon)
-  //     (c) le holder sticks (empêche collision cible↔holder)
-  //   Résultat : bilatéral quand c'est géométriquement possible, sans artifice.
-  var yTop = H*0.28, yBot = H*0.68;   // au-dessus du haut des cônes (cone_top ≈ 0.73H)
-  // Zone cônes à éviter horizontalement
-  var coneAvoidL = 0, coneAvoidR = 0;
-  if (_ar_cfg.cones === 1){ coneAvoidL = W*0.42; coneAvoidR = W*0.58; }         // cône centré à 0.50W ± cw/2
-  else if (_ar_cfg.cones === 2){ coneAvoidL = W*0.30; coneAvoidR = W*0.70; }   // les 2 cônes + corridor ballon central
-  // Holder sticks
-  var holderL = _ar_cfg.crossBody ? W*0.02 : W*0.68;
-  var holderR = holderL + W*0.30;
+  // ★ ZONES DE SPAWN — règle "éviter UNIQUEMENT les cônes" :
+  //   Les cibles spawnent au-dessus des cônes (y ∈ [0.28H, 0.68H], cone_top ≈ 0.73H).
+  //   Le ballon circule SOUS les cônes pendant le dribble → le corridor entre 2 cônes
+  //   est LIBRE en hauteur pour les cibles. On soustrait donc UNIQUEMENT :
+  //     (a) le footprint X de chaque cône, avec marge = rayon cible (anti-chevauchement visuel)
+  //     (b) le holder sticks (empêche collision cible↔holder)
+  //   Résultat : bilatéral dans toutes les configurations (1 ou 2 cônes, normal ou xb).
+  var yTop = H*0.28, yBot = H*0.68;
+  // Calcul footprint X réel des cônes via _ar_layout (source de vérité des positions/tailles)
+  var coneAvoids = [];
+  if (_ar_cfg.cones > 0){
+    var Lc = _ar_layout(W, H);
+    var pad = r + W*0.015;  // marge = rayon cible + petit padding visuel
+    for (var ci=0; ci<Lc.xs.length; ci++){
+      coneAvoids.push([Lc.xs[ci] - Lc.cw/2 - pad, Lc.xs[ci] + Lc.cw/2 + pad]);
+    }
+  }
+  // Holder sticks (seulement si sticks activés)
+  var holderL = -1, holderR = -1;
+  if (_ar_cfg.sticks){
+    holderL = _ar_cfg.crossBody ? W*0.02 : W*0.68;
+    holderR = holderL + W*0.30;
+  }
   // Construction des bandes disponibles
   var bands = [[W*0.02, W*0.98]];
   var cut = function(bands, cutL, cutR){
@@ -36518,11 +36565,18 @@ function _ar_cog_announce(now, W, H){
     }
     return res;
   };
-  bands = cut(bands, coneAvoidL, coneAvoidR);
-  bands = cut(bands, holderL, holderR);
+  for (var ca=0; ca<coneAvoids.length; ca++) bands = cut(bands, coneAvoids[ca][0], coneAvoids[ca][1]);
+  if (holderL >= 0) bands = cut(bands, holderL, holderR);
   bands = bands.filter(function(b){ return (b[1] - b[0]) > W*0.06; });   // bandes > 6% W
   if (!bands.length) bands = [[W*0.02, W*0.30]];    // fallback défensif
-  // Tirage pondéré par la largeur de chaque bande
+  // ★ DISTRIBUTION BILATÉRALE GARANTIE :
+  //   Si N bandes existent (N ≥ 2), on force 1 cible par bande AVANT de tirer
+  //   les restantes au hasard pondéré. Avec 3 cibles :
+  //     · 2 bandes → 1+1 forcées + 1 au hasard → TOUJOURS bilatéral
+  //     · 3 bandes → 1+1+1 → parfaitement réparti (gauche/centre/droite)
+  //     · 1 bande → 3 dans la seule bande (pas de choix)
+  //   Évite le biais "tout à droite" du tirage pondéré pur quand une bande est
+  //   nettement plus large qu'une autre.
   var totalW = 0;
   for (var bi=0; bi<bands.length; bi++) totalW += (bands[bi][1] - bands[bi][0]);
   var pickBand = function(){
@@ -36534,10 +36588,19 @@ function _ar_cog_announce(now, W, H){
     }
     return bands[0];
   };
-  var slots = [];
+  // Liste des bandes assignées à chaque cible : d'abord round-robin, puis pondéré
+  var shuffledBands = bands.slice().sort(function(){return Math.random()-0.5;});
+  var pickedBands = [];
+  for (var sb=0; sb<3; sb++){
+    if (sb < shuffledBands.length) pickedBands.push(shuffledBands[sb]);
+    else pickedBands.push(pickBand());
+  }
+  // Shuffle Y positions pour que les bandes ne soient pas liées à un Y fixe
   var ys = [yTop, (yTop+yBot)/2, yBot];
+  ys.sort(function(){return Math.random()-0.5;});
+  var slots = [];
   for (var k=0; k<3; k++){
-    var band = pickBand();
+    var band = pickedBands[k];
     slots.push({ x: band[0] + Math.random()*(band[1]-band[0]), y: ys[k] });
   }
   // ★ Anti-collision : si 2 slots sont trop proches, séparation verticale
@@ -36597,8 +36660,8 @@ function _ar_cog_analyze(poses, W, H, now){
       _ar_fx.push({x:t.x, y:t.y - H*0.07, txt:'+'+pts, color:'#4ade80', born:now});
       if (typeof _td_beep === 'function') _td_beep(1320, 0.05, 0.1);
       if (navigator.vibrate) navigator.vibrate(22);
-      // Trigger stick drop (sticks sont toujours actifs sur AR17-AR40)
-      if (typeof _ar_sticks_onTargetHit === 'function') _ar_sticks_onTargetHit(now);
+      // Trigger stick drop (AR17-AR52 avec sticks ; AR53-AR70 n'en ont pas)
+      if (_ar_cfg.sticks && typeof _ar_sticks_onTargetHit === 'function') _ar_sticks_onTargetHit(now);
       _ar_cog_endRound(now, 0);
     } else {
       _ar_cog_wrong++; _opto_miss++; _opto_score = Math.max(0, _opto_score - 5);
